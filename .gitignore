@@ -4,3 +4,4 @@ node_modules/
 *.log
 .claude/
 .vercel/
+scripts/generate-image-dalle.js
