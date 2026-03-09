@@ -1,0 +1,1751 @@
+/* Training page @keyframes animations — extracted from inline <style> */
+
+@keyframes cal-pop {
+    0% { transform: translateY(0) scale(0.4); opacity: 0; }
+    25% { transform: translateY(-6px) scale(1.1); opacity: 1; }
+    50% { transform: translateY(-10px) scale(1); opacity: 1; }
+    100% { transform: translateY(-18px); opacity: 0; }
+}
+@keyframes cal-burst {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    60% { opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+}
+@keyframes bar-flash {
+    0% { width: var(--bar-before, 0%); transform: scaleY(1); filter: brightness(1); }
+    8% { width: 100%; transform: scaleY(5); filter: brightness(3.5); }
+    20% { width: 100%; transform: scaleY(4.5); filter: brightness(3); }
+    40% { width: 100%; transform: scaleY(3); filter: brightness(2.2); }
+    60% { width: 100%; transform: scaleY(2); filter: brightness(1.6); }
+    80% { transform: scaleY(1.3); filter: brightness(1.15); }
+    100% { width: var(--bar-target); transform: scaleY(1); filter: brightness(1); }
+}
+@keyframes bar-glow {
+    0% { box-shadow: inset 0 0 30px rgba(255,255,255,1), 0 0 30px var(--glow-color), 0 0 60px var(--glow-color); }
+    40% { box-shadow: inset 0 0 20px rgba(255,255,255,0.7), 0 0 20px var(--glow-color), 0 0 40px var(--glow-color); }
+    100% { box-shadow: none; }
+}
+@keyframes cell-boom {
+    0% { transform: scale(1); box-shadow: none; }
+    8% { transform: scale(1.35); box-shadow: 0 0 40px var(--boom-color), 0 0 80px var(--boom-color); }
+    20% { transform: scale(1.25); box-shadow: 0 0 30px var(--boom-color), 0 0 60px var(--boom-color); }
+    40% { transform: scale(1.15); box-shadow: 0 0 20px var(--boom-color), 0 0 40px var(--boom-color); }
+    60% { transform: scale(1.08); box-shadow: 0 0 10px var(--boom-color); }
+    100% { transform: scale(1); box-shadow: none; }
+}
+@keyframes cell-white-flash {
+    0% { opacity: 0; }
+    5% { opacity: 0.9; }
+    25% { opacity: 0.5; }
+    60% { opacity: 0.15; }
+    100% { opacity: 0; }
+}
+@keyframes cell-ring {
+    0% { transform: scale(0.5); opacity: 1; border-width: 4px; }
+    100% { transform: scale(2.5); opacity: 0; border-width: 1px; }
+}
+@keyframes xp-float {
+    0% { opacity: 0; transform: translateX(-50%) translateY(0) scale(0.7); }
+    15% { opacity: 1; transform: translateX(-50%) translateY(-18px) scale(1.15); }
+    35% { opacity: 1; transform: translateX(-50%) translateY(-30px) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-54px) scale(0.85); }
+}
+@keyframes pe-slam {
+    0% { transform: translateY(-60vh) scale(1.3); opacity: 0; }
+    5% { opacity: 1; }
+    14% { transform: translateY(6px) scale(0.96); }
+    20% { transform: translateY(-3px) scale(1.02); }
+    26% { transform: translateY(0) scale(1); }
+    70% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(0) scale(0.98); opacity: 0; }
+}
+@keyframes pe-shake {
+    0%, 30%, 100% { transform: translateX(0); }
+    3% { transform: translateX(-4px) rotate(-0.3deg); }
+    6% { transform: translateX(4px) rotate(0.25deg); }
+    9% { transform: translateX(-3px) rotate(-0.2deg); }
+    12% { transform: translateX(2px); }
+    15% { transform: translateX(-1px); }
+    18% { transform: translateX(0); }
+}
+@keyframes pe-crack {
+    0% { transform: scaleX(0); opacity: 0; }
+    10% { transform: scaleX(1); opacity: 0.6; }
+    50% { opacity: 0.3; }
+    100% { transform: scaleX(1); opacity: 0; }
+}
+@keyframes pe-name {
+    0% { opacity: 0; transform: translateY(8px); }
+    20% { opacity: 1; transform: translateY(0); }
+    70% { opacity: 0.9; }
+    100% { opacity: 0; }
+}
+@keyframes pe-impact {
+    0% { transform: scale(0); opacity: 0.5; }
+    15% { transform: scale(1); opacity: 0.15; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+@keyframes xp-bar-pulse {
+    0%, 100% { opacity: 1; filter: brightness(1); }
+    50% { opacity: 0.8; filter: brightness(1.3); }
+}
+@keyframes lvup-burst {
+    0% { transform: scale(0.3); opacity: 0; }
+    20% { transform: scale(1.05); opacity: 1; }
+    80% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0; }
+}
+@keyframes lvup-ring {
+    0% { transform: scale(0.5); opacity: 0.6; }
+    100% { transform: scale(3); opacity: 0; }
+}
+@keyframes lvup-shine {
+    0% { opacity: 0; }
+    15% { opacity: 0.25; }
+    100% { opacity: 0; }
+}
+@keyframes gacha-reel-box {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes slot-machine-enter {
+    0% { transform: scale(0.6) translateY(20px); opacity: 0; }
+    60% { transform: scale(1.04) translateY(-4px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes reel-bounce {
+    0% { transform: translateY(-8px); }
+    30% { transform: translateY(4px); }
+    60% { transform: translateY(-2px); }
+    100% { transform: translateY(0); }
+}
+@keyframes reel-symbol-flash {
+    0% { opacity: 0.3; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.05); }
+    100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ultra-symbol-pulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.08); filter: brightness(1.4); }
+}
+@keyframes reach-border-pulse {
+    0%, 100% { border-color: #EF4444; box-shadow: 0 0 20px #EF444440, inset 0 2px 4px rgba(255,242,168,0.6); }
+    50% { border-color: #FF6B6B; box-shadow: 0 0 50px #EF444470, 0 0 80px #EF444430, inset 0 2px 4px rgba(255,242,168,0.6); }
+}
+@keyframes reach-text-flash {
+    0% { opacity: 0; transform: scale(0.5) translateY(10px); }
+    20% { opacity: 1; transform: scale(1.2) translateY(0); }
+    80% { opacity: 1; transform: scale(1) translateY(0); }
+    100% { opacity: 0.8; transform: scale(1) translateY(0); }
+}
+@keyframes slot-reel-glow {
+    0%, 100% { box-shadow: 0 0 15px var(--glow-color, #D4AF37)30; }
+    50% { box-shadow: 0 0 30px var(--glow-color, #D4AF37)60; }
+}
+@keyframes payline-flash {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+}
+@keyframes gacha-reveal {
+    0% { transform: scale(0.3); opacity: 0; filter: blur(8px); }
+    20% { transform: scale(1.25); opacity: 1; filter: blur(0); }
+    35% { transform: scale(0.95); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; filter: blur(0); }
+}
+@keyframes quiet-toast {
+    0% { opacity: 0; transform: translateY(-8px); }
+    10% { opacity: 1; transform: translateY(0); }
+    75% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-12px); }
+}
+@keyframes gacha-fade-out {
+    0%, 50% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-30px) scale(0.9); }
+}
+@keyframes gacha-sparkle {
+    0% { opacity: 0; transform: scale(0) translateY(0); }
+    20% { opacity: 1; transform: scale(1.5); }
+    50% { opacity: 0.8; transform: scale(1) translateY(-10px); }
+    80% { opacity: 0.3; transform: scale(0.8) translateY(-20px); }
+    100% { opacity: 0; transform: scale(0) translateY(-30px); }
+}
+@keyframes gacha-shake {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    8% { transform: translateX(-10px) translateY(-2px) rotate(-1.5deg); }
+    16% { transform: translateX(10px) translateY(2px) rotate(1.5deg); }
+    24% { transform: translateX(-8px) rotate(-1deg); }
+    32% { transform: translateX(8px) rotate(1deg); }
+    40% { transform: translateX(-5px); }
+    48% { transform: translateX(5px); }
+    56% { transform: translateX(0); }
+}
+@keyframes gacha-explosion {
+    0% { transform: scale(0); opacity: 1; border-width: 6px; }
+    30% { transform: scale(2); opacity: 0.6; }
+    60% { transform: scale(4); opacity: 0.2; border-width: 1px; }
+    100% { transform: scale(6); opacity: 0; }
+}
+@keyframes gacha-explosion-2 {
+    0% { transform: scale(0); opacity: 0.8; }
+    100% { transform: scale(5); opacity: 0; }
+}
+@keyframes gacha-rainbow {
+    0% { filter: hue-rotate(0deg); opacity: 0.15; }
+    50% { opacity: 0.25; }
+    100% { filter: hue-rotate(360deg); opacity: 0.15; }
+}
+@keyframes gacha-legendary-flash {
+    0% { opacity: 0; }
+    3% { opacity: 1; }
+    6% { opacity: 0; }
+    9% { opacity: 0.8; }
+    14% { opacity: 0; }
+    18% { opacity: 0.5; }
+    25% { opacity: 0; }
+}
+@keyframes gacha-rays {
+    0% { transform: translate(-50%,-50%) rotate(0deg); opacity: 0.5; }
+    100% { transform: translate(-50%,-50%) rotate(180deg); opacity: 0.5; }
+}
+@keyframes gacha-pulse-ring {
+    0% { transform: scale(0.8); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 0.2; }
+    100% { transform: scale(0.8); opacity: 0.6; }
+}
+@keyframes card-levelup-celebrate {
+    0% { transform: scale(1); }
+    10% { transform: scale(1.08); }
+    25% { transform: scale(1.05); }
+    100% { transform: scale(1.05); }
+}
+@keyframes celebrate-badge {
+    0% { opacity: 0; transform: scale(0.3) translateY(16px); }
+    18% { opacity: 1; transform: scale(1.2) translateY(0); }
+    35% { transform: scale(1) translateY(0); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes card-holo-shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+@keyframes card-particle-float {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
+    50% { transform: translateY(-8px) scale(1.3); opacity: 1; }
+}
+@keyframes card-legendary-particles {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-20px) scale(0); opacity: 0; }
+}
+@keyframes card-rank-glow {
+    0% { box-shadow: 0 0 8px var(--rank-color); }
+    50% { box-shadow: 0 0 20px var(--rank-color); }
+    100% { box-shadow: 0 0 8px var(--rank-color); }
+}
+@keyframes fever-pulse {
+    0%, 100% { opacity: 0.08; }
+    50% { opacity: 0.18; }
+}
+@keyframes fever-badge-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+@keyframes fever-flash-enter {
+    0% { opacity: 0; }
+    15% { opacity: 0.6; }
+    40% { opacity: 0.2; }
+    60% { opacity: 0.4; }
+    100% { opacity: 0; }
+}
+@keyframes fever-flash-exit {
+    0% { opacity: 0; }
+    10% { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+@keyframes fever-chain-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes fever-entry-slam {
+    0% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+    30% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
+    45% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    60% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+}
+@keyframes fever-entry-shake {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-8px); }
+    20% { transform: translateX(8px); }
+    30% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    50% { transform: translateX(-4px); }
+    60% { transform: translateX(4px); }
+    70% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+    90% { transform: translateX(-1px); }
+}
+@keyframes fever-shockwave {
+    0% { transform: translate(-50%,-50%) scale(0); opacity: 0.8; }
+    100% { transform: translate(-50%,-50%) scale(4); opacity: 0; }
+}
+@keyframes fever-border-glow {
+    0%, 100% { box-shadow: inset 0 0 60px rgba(220,38,38,0.25), inset 0 0 120px rgba(249,115,22,0.12); }
+    50% { box-shadow: inset 0 0 80px rgba(220,38,38,0.35), inset 0 0 150px rgba(249,115,22,0.2); }
+}
+@keyframes fever-particle-rise {
+    0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.8; }
+    25% { transform: translateY(-25vh) translateX(var(--px-drift)) scale(0.9); opacity: 0.7; }
+    50% { transform: translateY(-50vh) translateX(calc(var(--px-drift) * -0.5)) scale(0.7); opacity: 0.5; }
+    75% { transform: translateY(-75vh) translateX(var(--px-drift)) scale(0.4); opacity: 0.3; }
+    100% { transform: translateY(-100vh) translateX(0) scale(0.2); opacity: 0; }
+}
+@keyframes fever-exit-text {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    35% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+}
+@keyframes rankup-banner {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    25% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    40% { transform: translate(-50%, -50%) scale(0.95); opacity: 1; }
+    55% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+    70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    85% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0; }
+}
+@keyframes chain-counter-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-1px); }
+}
+@keyframes review-active-cell {
+    0%, 100% { box-shadow: 0 0 12px rgba(212,175,55,0.6), 0 0 24px rgba(212,175,55,0.3), inset 0 0 8px rgba(212,175,55,0.2); background-color: #FFF8E1; }
+    50% { box-shadow: 0 0 24px rgba(212,175,55,0.9), 0 0 48px rgba(212,175,55,0.4), inset 0 0 12px rgba(212,175,55,0.35); background-color: #FFF3CC; }
+}
+@keyframes review-active-bar {
+    0%, 100% { box-shadow: 0 0 6px var(--bar-glow-color, rgba(212,175,55,0.6)), 0 0 12px var(--bar-glow-color, rgba(212,175,55,0.3)); opacity: 1; }
+    50% { box-shadow: 0 0 12px var(--bar-glow-color, rgba(212,175,55,0.9)), 0 0 24px var(--bar-glow-color, rgba(212,175,55,0.5)); opacity: 0.85; }
+}
+@keyframes gacha-mythic-hearts {
+    0% { transform: translateY(0) scale(0); opacity: 1; }
+    50% { transform: translateY(-40vh) scale(1.5); opacity: 0.8; }
+    100% { transform: translateY(-90vh) scale(0.5); opacity: 0; }
+}
+@keyframes gacha-shiny-prismatic {
+    0% { filter: hue-rotate(0deg) brightness(1); transform: scale(1); }
+    25% { filter: hue-rotate(90deg) brightness(1.3); transform: scale(1.05); }
+    50% { filter: hue-rotate(180deg) brightness(1.5); transform: scale(1.1); }
+    75% { filter: hue-rotate(270deg) brightness(1.3); transform: scale(1.05); }
+    100% { filter: hue-rotate(360deg) brightness(1); transform: scale(1); }
+}
+@keyframes gacha-phantom-whiteout {
+    0% { opacity: 0; filter: invert(0); }
+    20% { opacity: 1; filter: invert(0); }
+    40% { opacity: 1; filter: invert(1); }
+    60% { opacity: 1; filter: invert(0); }
+    80% { opacity: 0.8; filter: invert(0.5); }
+    100% { opacity: 0; filter: invert(0); }
+}
+@keyframes gacha-phantom-pulse {
+    0%, 100% { text-shadow: 0 0 20px #ffffff80, 0 0 40px #ffffff40, 0 0 80px #ffffff20; }
+    50% { text-shadow: 0 0 40px #ffffffCC, 0 0 80px #ffffff80, 0 0 120px #ffffff40; }
+}
+
+/* ── Mini Runner animations ── */
+@keyframes runner-walk {
+    0%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+    50% { transform: translateY(-1px); }
+    80% { transform: translateY(-3px); }
+}
+@keyframes runner-leg-left {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-20deg); }
+    75% { transform: rotate(15deg); }
+}
+@keyframes runner-leg-right {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(15deg); }
+    75% { transform: rotate(-20deg); }
+}
+@keyframes runner-flag-flutter {
+    0%, 100% { transform: scaleX(1) skewY(0deg); }
+    25% { transform: scaleX(0.92) skewY(2deg); }
+    50% { transform: scaleX(1.03) skewY(-1deg); }
+    75% { transform: scaleX(0.95) skewY(1.5deg); }
+}
+@keyframes runner-grass-sway {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(var(--sway, 6deg)); }
+}
+@keyframes runner-sun-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.08); opacity: 1; }
+}
+@keyframes runner-gem-glow {
+    0%, 100% { filter: brightness(1) drop-shadow(0 0 2px var(--gem-color, #fff)); }
+    50% { filter: brightness(1.3) drop-shadow(0 0 5px var(--gem-color, #fff)); }
+}
+@keyframes runner-start-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+/* ── Chakra XP reactions: dance + absorb hybrid (100pt system) ── */
+
+/* +5 芽 SPARK: gentle hop + light glow absorb */
+@keyframes runner-absorb-5 {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    20% { transform: translateY(2px) rotate(0deg) scale(0.93); }
+    45% { transform: translateY(-8px) rotate(-4deg) scale(1.08); filter: brightness(1.3); }
+    65% { transform: translateY(-6px) rotate(4deg) scale(1.05); filter: brightness(1.2); }
+    85% { transform: translateY(-2px) rotate(0deg) scale(1.01); filter: brightness(1.05); }
+    100% { transform: translateY(0) rotate(0deg) scale(1); filter: brightness(1); }
+}
+/* +10 鍛 FORGE: spin + medium absorb glow */
+@keyframes runner-absorb-10 {
+    0% { transform: translateY(0) rotateY(0deg) scale(1); }
+    12% { transform: translateY(3px) rotateY(0deg) scale(0.88); }
+    35% { transform: translateY(-12px) rotateY(180deg) scale(1.12); filter: brightness(1.6); }
+    55% { transform: translateY(-14px) rotateY(360deg) scale(1.15); filter: brightness(1.7); }
+    75% { transform: translateY(-6px) rotateY(540deg) scale(1.05); filter: brightness(1.2); }
+    100% { transform: translateY(0) rotateY(720deg) scale(1); filter: brightness(1); }
+}
+/* +15 得 OWN: big jump + strong absorb pulse */
+@keyframes runner-absorb-15 {
+    0% { transform: translateY(0) scale(1); }
+    10% { transform: translateY(4px) scale(0.84); }
+    30% { transform: translateY(-22px) scale(1.2); filter: brightness(1.8); }
+    45% { transform: translateY(-26px) scale(1.25); filter: brightness(2); }
+    60% { transform: translateY(-20px) scale(1.15); filter: brightness(1.6); }
+    80% { transform: translateY(-6px) scale(1.04); filter: brightness(1.1); }
+    100% { transform: translateY(0) scale(1); filter: brightness(1); }
+}
+/* +20 声/研 VOICE/VISION: backflip + power absorb */
+@keyframes runner-absorb-20 {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    8% { transform: translateY(5px) rotate(0deg) scale(0.8); }
+    28% { transform: translateY(-28px) rotate(-120deg) scale(1.25); filter: brightness(2.2); }
+    45% { transform: translateY(-32px) rotate(-240deg) scale(1.3); filter: brightness(2.5); }
+    62% { transform: translateY(-22px) rotate(-320deg) scale(1.15); filter: brightness(1.8); }
+    80% { transform: translateY(-6px) rotate(-355deg) scale(1.04); filter: brightness(1.15); }
+    100% { transform: translateY(0) rotate(-360deg) scale(1); filter: brightness(1); }
+}
+/* +30 極 CROWN: mega slam + double flip + explosive absorb */
+@keyframes runner-absorb-30 {
+    0% { transform: translateY(0) rotate(0deg) scale(1); }
+    6% { transform: translateY(7px) rotate(0deg) scale(0.75); }
+    22% { transform: translateY(-34px) rotate(-180deg) scale(1.35); filter: brightness(2.8); }
+    38% { transform: translateY(-38px) rotate(-360deg) scale(1.4); filter: brightness(3.2); }
+    52% { transform: translateY(-34px) rotate(-540deg) scale(1.35); filter: brightness(2.8); }
+    68% { transform: translateY(-18px) rotate(-660deg) scale(1.15); filter: brightness(1.8); }
+    84% { transform: translateY(-4px) rotate(-715deg) scale(1.03); filter: brightness(1.1); }
+    100% { transform: translateY(0) rotate(-720deg) scale(1); filter: brightness(1); }
+}
+/* Energy particles converging inward toward character */
+@keyframes runner-energy-in {
+    0% { opacity: 0; }
+    15% { opacity: 1; }
+    100% { transform: translate(var(--ex), var(--ey)) scale(0.2); opacity: 0; }
+}
+/* Aura ring expanding outward after absorb */
+@keyframes runner-aura-ring {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.9; border-width: 3px; }
+    60% { opacity: 0.5; border-width: 2px; }
+    100% { transform: translate(-50%, -50%) scale(3); opacity: 0; border-width: 0.5px; }
+}
+/* Body glow pulse during absorb */
+@keyframes runner-body-glow {
+    0% { box-shadow: 0 0 0px var(--glow-c); }
+    30% { box-shadow: 0 0 12px var(--glow-c), 0 0 24px var(--glow-c); }
+    60% { box-shadow: 0 0 8px var(--glow-c), 0 0 16px var(--glow-c); }
+    100% { box-shadow: 0 0 0px var(--glow-c); }
+}
+/* Floating +N XP text */
+@keyframes runner-xp-float {
+    0% { transform: translateX(-50%) translateY(0) scale(0.6); opacity: 0; }
+    15% { transform: translateX(-50%) translateY(-10px) scale(1.15); opacity: 1; }
+    50% { transform: translateX(-50%) translateY(-22px) scale(1); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-36px) scale(0.85); opacity: 0; }
+}
+@keyframes runner-coin-spin {
+    0% { transform: scaleX(1); }
+    25% { transform: scaleX(0.2); }
+    50% { transform: scaleX(1); }
+    75% { transform: scaleX(0.2); }
+    100% { transform: scaleX(1); }
+}
+@keyframes runner-coin-collect {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { transform: translateY(-12px) scale(1.3); opacity: 1; }
+    100% { transform: translateY(-24px) scale(0.5); opacity: 0; }
+}
+@keyframes runner-cloud-drift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+@keyframes runner-ground-scroll {
+    0% { background-position: 0 0; }
+    100% { background-position: -64px 0; }
+}
+@keyframes runner-star-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.3); opacity: 1; }
+}
+@keyframes runner-dust {
+    0% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+    100% { transform: translate(-8px, -4px) scale(0.3); opacity: 0; }
+}
+
+/* ── God Mode: 本日の神 celebration + post-god state ── */
+
+/* God arrival: massive jump + triple spin + explosive scale */
+@keyframes runner-god-arrive {
+    0% { transform: translateY(0) rotate(0deg) scale(1); filter: brightness(1); }
+    5% { transform: translateY(8px) rotate(0deg) scale(0.7); filter: brightness(1); }
+    20% { transform: translateY(-50px) rotate(-180deg) scale(1.5); filter: brightness(3); }
+    35% { transform: translateY(-60px) rotate(-360deg) scale(1.6); filter: brightness(4); }
+    50% { transform: translateY(-55px) rotate(-540deg) scale(1.5); filter: brightness(3.5); }
+    65% { transform: translateY(-40px) rotate(-660deg) scale(1.3); filter: brightness(2.5); }
+    80% { transform: translateY(-15px) rotate(-710deg) scale(1.1); filter: brightness(1.5); }
+    100% { transform: translateY(0) rotate(-720deg) scale(1); filter: brightness(1); }
+}
+
+/* God float: gentle levitation */
+@keyframes runner-god-float {
+    0%, 100% { transform: translateY(-4px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* God aura: pulsing golden ring */
+@keyframes runner-god-aura {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.4; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.7; }
+}
+
+/* God screen flash */
+@keyframes runner-god-flash {
+    0% { opacity: 0; }
+    15% { opacity: 0.8; }
+    40% { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+
+/* God title slam */
+@keyframes runner-god-title {
+    0% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    40% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+}
+
+/* God firework burst */
+@keyframes runner-god-burst {
+    0% { transform: translate(var(--bx), var(--by)) scale(0); opacity: 1; }
+    50% { transform: translate(calc(var(--bx) * 3), calc(var(--by) * 3)) scale(1.2); opacity: 0.8; }
+    100% { transform: translate(calc(var(--bx) * 5), calc(var(--by) * 5)) scale(0); opacity: 0; }
+}
+
+/* God shooting star */
+@keyframes runner-shooting-star {
+    0% { transform: translateX(0) translateY(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateX(-200px) translateY(40px); opacity: 0; }
+}
+
+/* God orbiting star */
+@keyframes runner-god-orbit {
+    0% { transform: rotate(0deg) translateX(18px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(18px) rotate(-360deg); }
+}
+
+/* Night sky twinkle */
+@keyframes runner-twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ── Premium Runner V2 Animations ── */
+
+@keyframes rv2-parallax-far {
+    0% { background-position: 0 0; }
+    100% { background-position: -600px 0; }
+}
+@keyframes rv2-parallax-mid {
+    0% { background-position: 0 0; }
+    100% { background-position: -400px 0; }
+}
+@keyframes rv2-parallax-near {
+    0% { background-position: 0 0; }
+    100% { background-position: -200px 0; }
+}
+@keyframes rv2-run-body {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    15% { transform: translateY(-5px) rotate(-2deg); }
+    40% { transform: translateY(-1px) rotate(0deg); }
+    65% { transform: translateY(-5px) rotate(2deg); }
+    90% { transform: translateY(-1px) rotate(0deg); }
+}
+@keyframes rv2-arm-left {
+    0%, 100% { transform: rotate(25deg); }
+    50% { transform: rotate(-30deg); }
+}
+@keyframes rv2-arm-right {
+    0%, 100% { transform: rotate(-30deg); }
+    50% { transform: rotate(25deg); }
+}
+@keyframes rv2-leg-left {
+    0%, 100% { transform: rotate(30deg) scaleY(1); }
+    25% { transform: rotate(-5deg) scaleY(0.9); }
+    50% { transform: rotate(-35deg) scaleY(1); }
+    75% { transform: rotate(0deg) scaleY(0.9); }
+}
+@keyframes rv2-leg-right {
+    0%, 100% { transform: rotate(-35deg) scaleY(1); }
+    25% { transform: rotate(0deg) scaleY(0.9); }
+    50% { transform: rotate(30deg) scaleY(1); }
+    75% { transform: rotate(-5deg) scaleY(0.9); }
+}
+@keyframes rv2-shadow-pulse {
+    0%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.2; }
+    15%, 65% { transform: translateX(-50%) scaleX(0.7); opacity: 0.12; }
+    40%, 90% { transform: translateX(-50%) scaleX(1); opacity: 0.2; }
+}
+@keyframes rv2-sunrays {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes rv2-dust-mote {
+    0% { transform: translate(0, 0) scale(1); opacity: 0; }
+    15% { opacity: var(--mote-opacity, 0.4); }
+    85% { opacity: var(--mote-opacity, 0.4); }
+    100% { transform: translate(var(--mote-dx, -30px), var(--mote-dy, -8px)) scale(0.3); opacity: 0; }
+}
+@keyframes rv2-bird {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(-0.3); }
+}
+@keyframes rv2-crystal-pulse {
+    0%, 100% { transform: translateX(-50%) scaleY(1); filter: brightness(1); }
+    50% { transform: translateX(-50%) scaleY(1.08); filter: brightness(1.4); }
+}
+@keyframes rv2-crystal-glow {
+    0%, 100% { box-shadow: 0 0 4px var(--crystal-color), 0 0 8px var(--crystal-color); }
+    50% { box-shadow: 0 0 8px var(--crystal-color), 0 0 16px var(--crystal-color), 0 0 24px var(--crystal-color); }
+}
+@keyframes rv2-flag-wave {
+    0%, 100% { transform: scaleX(1) skewY(0deg); }
+    20% { transform: scaleX(0.88) skewY(3deg); }
+    40% { transform: scaleX(1.05) skewY(-2deg); }
+    60% { transform: scaleX(0.92) skewY(2.5deg); }
+    80% { transform: scaleX(1.02) skewY(-1deg); }
+}
+@keyframes rv2-speed-line {
+    0% { transform: translateX(0) scaleX(1); opacity: 0.6; }
+    100% { transform: translateX(-40px) scaleX(0.3); opacity: 0; }
+}
+@keyframes rv2-float {
+    0%, 100% { transform: translateY(-6px) rotate(0deg); }
+    25% { transform: translateY(-12px) rotate(-3deg); }
+    50% { transform: translateY(-8px) rotate(0deg); }
+    75% { transform: translateY(-14px) rotate(3deg); }
+}
+@keyframes rv2-god-arrive {
+    0% { transform: translateY(0) rotate(0deg) scale(1); filter: brightness(1); }
+    5% { transform: translateY(10px) rotate(0deg) scale(0.6); filter: brightness(1); }
+    18% { transform: translateY(-55px) rotate(-180deg) scale(1.5); filter: brightness(3); }
+    32% { transform: translateY(-65px) rotate(-360deg) scale(1.7); filter: brightness(4.5); }
+    46% { transform: translateY(-58px) rotate(-540deg) scale(1.5); filter: brightness(3.5); }
+    62% { transform: translateY(-35px) rotate(-660deg) scale(1.3); filter: brightness(2.5); }
+    80% { transform: translateY(-12px) rotate(-710deg) scale(1.1); filter: brightness(1.5); }
+    100% { transform: translateY(-6px) rotate(-720deg) scale(1); filter: brightness(1); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   V3 — ULTRA PREMIUM RUNNER ANIMATIONS
+   ═══════════════════════════════════════════════════════ */
+
+/* Sky color band scroll (time-of-day driven by JS var) */
+@keyframes v3-cloud-drift-far {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+@keyframes v3-cloud-drift-near {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Sun/moon arc — positioned by JS, this adds glow pulse */
+@keyframes v3-celestial-glow {
+    0%, 100% { filter: drop-shadow(0 0 8px var(--glow, #FFD93D80)) brightness(1); }
+    50% { filter: drop-shadow(0 0 16px var(--glow, #FFD93DAA)) brightness(1.1); }
+}
+
+/* Light rays from sun */
+@keyframes v3-light-ray {
+    0%, 100% { opacity: var(--ray-max, 0.12); transform: scaleY(1) rotate(var(--ray-angle, 0deg)); }
+    50% { opacity: calc(var(--ray-max, 0.12) * 0.6); transform: scaleY(0.92) rotate(var(--ray-angle, 0deg)); }
+}
+
+/* Parallax mountain layers */
+@keyframes v3-parallax-1 {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-25%); }
+}
+@keyframes v3-parallax-2 {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-33%); }
+}
+@keyframes v3-parallax-3 {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Tree sway */
+@keyframes v3-tree-sway {
+    0%, 100% { transform: rotate(0deg) scaleX(1); }
+    30% { transform: rotate(var(--sway, 2deg)) scaleX(0.98); }
+    70% { transform: rotate(calc(var(--sway, 2deg) * -0.7)) scaleX(1.01); }
+}
+
+/* Character run cycle — proper 4-frame with squash/stretch */
+@keyframes v3-run-body {
+    0%   { transform: translateY(0px) rotate(0deg); }
+    12%  { transform: translateY(-4px) rotate(-3deg); }
+    25%  { transform: translateY(-7px) rotate(-1deg); }
+    37%  { transform: translateY(-3px) rotate(1deg); }
+    50%  { transform: translateY(0px) rotate(0deg); }
+    62%  { transform: translateY(-4px) rotate(3deg); }
+    75%  { transform: translateY(-7px) rotate(1deg); }
+    87%  { transform: translateY(-3px) rotate(-1deg); }
+}
+@keyframes v3-arm-l {
+    0%, 100% { transform: rotate(35deg); }
+    25% { transform: rotate(-10deg); }
+    50% { transform: rotate(-40deg); }
+    75% { transform: rotate(5deg); }
+}
+@keyframes v3-arm-r {
+    0%, 100% { transform: rotate(-40deg); }
+    25% { transform: rotate(5deg); }
+    50% { transform: rotate(35deg); }
+    75% { transform: rotate(-10deg); }
+}
+@keyframes v3-leg-l {
+    0%   { transform: rotate(40deg) scaleY(1); }
+    25%  { transform: rotate(0deg) scaleY(0.88); }
+    50%  { transform: rotate(-45deg) scaleY(1); }
+    75%  { transform: rotate(-5deg) scaleY(0.88); }
+    100% { transform: rotate(40deg) scaleY(1); }
+}
+@keyframes v3-leg-r {
+    0%   { transform: rotate(-45deg) scaleY(1); }
+    25%  { transform: rotate(-5deg) scaleY(0.88); }
+    50%  { transform: rotate(40deg) scaleY(1); }
+    75%  { transform: rotate(0deg) scaleY(0.88); }
+    100% { transform: rotate(-45deg) scaleY(1); }
+}
+
+/* Hair bounce */
+@keyframes v3-hair-bounce {
+    0%, 100% { transform: rotate(-5deg) scaleY(1); }
+    30% { transform: rotate(-12deg) scaleY(0.9); }
+    60% { transform: rotate(2deg) scaleY(1.05); }
+}
+
+/* Cape flutter for god mode */
+@keyframes v3-cape {
+    0%, 100% { transform: scaleX(1) skewY(0deg) rotate(-5deg); }
+    15% { transform: scaleX(0.85) skewY(4deg) rotate(-8deg); }
+    35% { transform: scaleX(1.1) skewY(-3deg) rotate(-3deg); }
+    55% { transform: scaleX(0.9) skewY(3deg) rotate(-7deg); }
+    75% { transform: scaleX(1.05) skewY(-2deg) rotate(-4deg); }
+}
+
+/* God float — more dramatic */
+@keyframes v3-god-float {
+    0%, 100% { transform: translateY(-10px) rotate(0deg); }
+    20% { transform: translateY(-18px) rotate(-4deg); }
+    40% { transform: translateY(-14px) rotate(1deg); }
+    60% { transform: translateY(-20px) rotate(3deg); }
+    80% { transform: translateY(-12px) rotate(-2deg); }
+}
+
+/* God ascension */
+@keyframes v3-god-ascend {
+    0% { transform: translateY(0) scale(1); filter: brightness(1); }
+    8% { transform: translateY(8px) scale(0.7); filter: brightness(0.8); }
+    20% { transform: translateY(-40px) rotate(-180deg) scale(1.4); filter: brightness(3); }
+    35% { transform: translateY(-60px) rotate(-360deg) scale(1.8); filter: brightness(5); }
+    50% { transform: translateY(-50px) rotate(-540deg) scale(1.5); filter: brightness(3.5); }
+    70% { transform: translateY(-25px) rotate(-660deg) scale(1.2); filter: brightness(2); }
+    85% { transform: translateY(-14px) rotate(-700deg) scale(1.05); filter: brightness(1.3); }
+    100% { transform: translateY(-10px) rotate(-720deg) scale(1); filter: brightness(1); }
+}
+
+/* Milestone beacon */
+@keyframes v3-beacon {
+    0%, 100% { opacity: 0.6; box-shadow: 0 0 4px var(--beacon, #fff); }
+    50% { opacity: 1; box-shadow: 0 0 10px var(--beacon, #fff), 0 0 20px var(--beacon, #fff); }
+}
+@keyframes v3-beacon-ray {
+    0% { transform: translateX(-50%) scaleY(0); opacity: 0; }
+    30% { transform: translateX(-50%) scaleY(1); opacity: 0.6; }
+    100% { transform: translateX(-50%) scaleY(1.3); opacity: 0; }
+}
+
+/* Particle systems */
+@keyframes v3-leaf {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+    10% { opacity: var(--leaf-op, 0.7); }
+    90% { opacity: var(--leaf-op, 0.7); }
+    100% { transform: translate(var(--leaf-dx, -60px), var(--leaf-dy, 20px)) rotate(var(--leaf-rot, 360deg)); opacity: 0; }
+}
+@keyframes v3-firefly {
+    0%, 100% { opacity: 0; transform: translate(0, 0); }
+    20% { opacity: var(--ff-op, 0.8); }
+    50% { opacity: var(--ff-op, 0.8); transform: translate(var(--ff-dx, 5px), var(--ff-dy, -8px)); }
+    80% { opacity: var(--ff-op, 0.8); }
+}
+@keyframes v3-sparkle {
+    0%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+    50% { transform: scale(1) rotate(180deg); opacity: 1; }
+}
+
+/* Ground scroll */
+@keyframes v3-ground-scroll {
+    0% { background-position: 0 0; }
+    100% { background-position: -200px 0; }
+}
+
+/* Flag wave — more cloth-like */
+@keyframes v3-flag {
+    0%, 100% { transform: perspective(40px) rotateY(0deg) scaleX(1); }
+    15% { transform: perspective(40px) rotateY(8deg) scaleX(0.9); }
+    30% { transform: perspective(40px) rotateY(-5deg) scaleX(1.04); }
+    50% { transform: perspective(40px) rotateY(6deg) scaleX(0.92); }
+    70% { transform: perspective(40px) rotateY(-3deg) scaleX(1.02); }
+    85% { transform: perspective(40px) rotateY(4deg) scaleX(0.96); }
+}
+
+/* XP pop — bigger and juicier */
+@keyframes v3-xp-pop {
+    0% { opacity: 0; transform: translateX(-50%) translateY(0) scale(0.3); }
+    12% { opacity: 1; transform: translateX(-50%) translateY(-14px) scale(1.3); }
+    25% { transform: translateX(-50%) translateY(-22px) scale(1); }
+    60% { opacity: 1; transform: translateX(-50%) translateY(-34px) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-50px) scale(0.8); }
+}
+
+/* Shadow under character */
+@keyframes v3-shadow {
+    0%, 50%, 100% { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.18; }
+    25%, 75% { transform: translateX(-50%) scaleX(0.7) scaleY(0.7); opacity: 0.1; }
+}
+
+/* Speed lines */
+@keyframes v3-speed {
+    0% { transform: translateX(0) scaleX(1); opacity: 0.5; }
+    100% { transform: translateX(-50px) scaleX(0.2); opacity: 0; }
+}
+
+/* Dust kick */
+@keyframes v3-dust-kick {
+    0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+    100% { transform: translate(var(--dust-dx, -12px), var(--dust-dy, -6px)) scale(0.2); opacity: 0; }
+}
+
+/* Star field twinkle variations */
+@keyframes v3-star-twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.2); }
+}
+@keyframes v3-star-cross {
+    0%, 100% { clip-path: polygon(50% 0%, 55% 40%, 100% 50%, 55% 60%, 50% 100%, 45% 60%, 0% 50%, 45% 40%); transform: rotate(0deg); }
+    50% { clip-path: polygon(50% 5%, 53% 42%, 95% 50%, 53% 58%, 50% 95%, 47% 58%, 5% 50%, 47% 42%); transform: rotate(45deg); }
+}
+
+/* Aurora for god mode */
+@keyframes v3-aurora {
+    0% { transform: translateX(-5%) skewX(-5deg); opacity: 0.15; }
+    33% { transform: translateX(5%) skewX(5deg); opacity: 0.25; }
+    66% { transform: translateX(-3%) skewX(-3deg); opacity: 0.2; }
+    100% { transform: translateX(-5%) skewX(-5deg); opacity: 0.15; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   V4 — DEFINITIVE EDITION ANIMATIONS
+   ═══════════════════════════════════════════════════════ */
+
+/* Cloud drift — seamless doubled layers */
+@keyframes v4-cloud-far {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+@keyframes v4-cloud-near {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Parallax scrolling — 4 depth layers */
+@keyframes v4-para-1 { 0% { transform: translateX(0); } 100% { transform: translateX(-25%); } }
+@keyframes v4-para-2 { 0% { transform: translateX(0); } 100% { transform: translateX(-33%); } }
+@keyframes v4-para-3 { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes v4-para-4 { 0% { transform: translateX(0); } 100% { transform: translateX(-66%); } }
+
+/* Sun glow pulse */
+@keyframes v4-sun-glow {
+    0%, 100% { filter: drop-shadow(0 0 10px var(--sun-glow, #FFD93D80)) brightness(1); }
+    50% { filter: drop-shadow(0 0 22px var(--sun-glow, #FFD93DAA)) brightness(1.08); }
+}
+
+/* Light rays — individual subtle rotations */
+@keyframes v4-ray-pulse {
+    0%, 100% { opacity: var(--ray-op, 0.1); }
+    50% { opacity: calc(var(--ray-op, 0.1) * 0.5); }
+}
+
+/* Tree sway — organic, wind-driven */
+@keyframes v4-tree-sway {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(var(--tw, 2deg)); }
+    75% { transform: rotate(calc(var(--tw, 2deg) * -0.6)); }
+}
+
+/* Character 8-frame run cycle — contact, down, passing, up (x2) */
+@keyframes v4-run {
+    0%   { transform: translateY(0px) rotate(-2deg); }
+    12%  { transform: translateY(-3px) rotate(-4deg); }
+    25%  { transform: translateY(-8px) rotate(-1deg); }
+    37%  { transform: translateY(-4px) rotate(1deg); }
+    50%  { transform: translateY(0px) rotate(2deg); }
+    62%  { transform: translateY(-3px) rotate(4deg); }
+    75%  { transform: translateY(-8px) rotate(1deg); }
+    87%  { transform: translateY(-4px) rotate(-1deg); }
+}
+@keyframes v4-arm-l {
+    0%   { transform: rotate(45deg); }
+    25%  { transform: rotate(-5deg); }
+    50%  { transform: rotate(-50deg); }
+    75%  { transform: rotate(10deg); }
+    100% { transform: rotate(45deg); }
+}
+@keyframes v4-arm-r {
+    0%   { transform: rotate(-50deg); }
+    25%  { transform: rotate(10deg); }
+    50%  { transform: rotate(45deg); }
+    75%  { transform: rotate(-5deg); }
+    100% { transform: rotate(-50deg); }
+}
+@keyframes v4-leg-l {
+    0%   { transform: rotate(50deg) scaleY(1); }
+    20%  { transform: rotate(10deg) scaleY(0.85); }
+    40%  { transform: rotate(-20deg) scaleY(0.9); }
+    60%  { transform: rotate(-55deg) scaleY(1); }
+    80%  { transform: rotate(-10deg) scaleY(0.85); }
+    100% { transform: rotate(50deg) scaleY(1); }
+}
+@keyframes v4-leg-r {
+    0%   { transform: rotate(-55deg) scaleY(1); }
+    20%  { transform: rotate(-10deg) scaleY(0.85); }
+    40%  { transform: rotate(20deg) scaleY(0.9); }
+    60%  { transform: rotate(50deg) scaleY(1); }
+    80%  { transform: rotate(10deg) scaleY(0.85); }
+    100% { transform: rotate(-55deg) scaleY(1); }
+}
+
+/* Scarf physics — cloth sim approximation */
+@keyframes v4-scarf {
+    0%, 100% { transform: rotate(-8deg) scaleX(1) skewY(0deg); }
+    12% { transform: rotate(-15deg) scaleX(0.85) skewY(5deg); }
+    28% { transform: rotate(-5deg) scaleX(1.08) skewY(-3deg); }
+    42% { transform: rotate(-12deg) scaleX(0.9) skewY(4deg); }
+    58% { transform: rotate(-3deg) scaleX(1.05) skewY(-2deg); }
+    72% { transform: rotate(-14deg) scaleX(0.88) skewY(3deg); }
+    85% { transform: rotate(-6deg) scaleX(1.02) skewY(-1deg); }
+}
+
+/* Hair bounce with momentum */
+@keyframes v4-hair {
+    0%, 100% { transform: rotate(-3deg) translateY(0); }
+    20% { transform: rotate(-10deg) translateY(2px); }
+    45% { transform: rotate(4deg) translateY(-3px); }
+    70% { transform: rotate(-8deg) translateY(1px); }
+}
+
+/* God float — majestic hovering */
+@keyframes v4-god-float {
+    0%, 100% { transform: translateY(-14px) rotate(0deg); }
+    15% { transform: translateY(-22px) rotate(-3deg); }
+    35% { transform: translateY(-16px) rotate(1deg); }
+    55% { transform: translateY(-24px) rotate(2deg); }
+    75% { transform: translateY(-18px) rotate(-2deg); }
+}
+
+/* God ascension — dramatic entrance */
+@keyframes v4-god-ascend {
+    0% { transform: translateY(0) scale(1) rotate(0deg); filter: brightness(1); }
+    5% { transform: translateY(10px) scale(0.6) rotate(0deg); filter: brightness(0.7); }
+    15% { transform: translateY(-50px) scale(1.5) rotate(-180deg); filter: brightness(4); }
+    28% { transform: translateY(-70px) scale(2) rotate(-360deg); filter: brightness(6); }
+    42% { transform: translateY(-60px) scale(1.6) rotate(-540deg); filter: brightness(4); }
+    58% { transform: translateY(-40px) scale(1.3) rotate(-660deg); filter: brightness(2.5); }
+    75% { transform: translateY(-20px) scale(1.1) rotate(-700deg); filter: brightness(1.5); }
+    100% { transform: translateY(-14px) scale(1) rotate(-720deg); filter: brightness(1); }
+}
+
+/* Wings flap */
+@keyframes v4-wing-l {
+    0%, 100% { transform: rotate(-10deg) scaleY(1); }
+    30% { transform: rotate(-30deg) scaleY(0.85); }
+    60% { transform: rotate(5deg) scaleY(1.1); }
+}
+@keyframes v4-wing-r {
+    0%, 100% { transform: rotate(10deg) scaleY(1); }
+    30% { transform: rotate(30deg) scaleY(0.85); }
+    60% { transform: rotate(-5deg) scaleY(1.1); }
+}
+
+/* Halo rotation */
+@keyframes v4-halo {
+    0% { transform: translateX(-50%) rotateX(65deg) rotateZ(0deg); }
+    100% { transform: translateX(-50%) rotateX(65deg) rotateZ(360deg); }
+}
+
+/* Divine pillar (god milestone) */
+@keyframes v4-divine-pillar {
+    0%, 100% { opacity: 0.4; height: 100%; }
+    50% { opacity: 0.7; height: 120%; }
+}
+
+/* Beacon orb */
+@keyframes v4-beacon-orb {
+    0%, 100% { box-shadow: 0 0 4px var(--b, #fff), 0 0 8px var(--b, #fff); transform: translateX(-50%) scale(1); }
+    50% { box-shadow: 0 0 10px var(--b, #fff), 0 0 20px var(--b, #fff), 0 0 32px var(--b, #fff); transform: translateX(-50%) scale(1.15); }
+}
+
+/* Particle: leaf drift */
+@keyframes v4-leaf {
+    0% { transform: translate(0,0) rotate(0deg) scale(1); opacity: 0; }
+    8% { opacity: var(--lf-op, 0.6); }
+    50% { transform: translate(calc(var(--lf-dx, -40px) * 0.5), calc(var(--lf-dy, 15px) * 0.4)) rotate(calc(var(--lf-rot, 180deg) * 0.5)) scale(0.9); }
+    92% { opacity: var(--lf-op, 0.6); }
+    100% { transform: translate(var(--lf-dx, -40px), var(--lf-dy, 15px)) rotate(var(--lf-rot, 180deg)) scale(0.4); opacity: 0; }
+}
+
+/* Particle: firefly glow */
+@keyframes v4-firefly {
+    0%, 100% { opacity: 0; transform: translate(0,0) scale(0.5); }
+    15% { opacity: 0.1; }
+    35% { opacity: var(--ff-op, 0.8); transform: translate(calc(var(--ff-dx, 5px)*0.4), calc(var(--ff-dy, -5px)*0.4)) scale(1); }
+    65% { opacity: var(--ff-op, 0.8); transform: translate(calc(var(--ff-dx, 5px)*0.7), calc(var(--ff-dy, -5px)*0.7)) scale(1.1); }
+    85% { opacity: 0.1; }
+}
+
+/* Mist / fog drift */
+@keyframes v4-mist {
+    0% { transform: translateX(0) scaleY(1); opacity: var(--mist-op, 0.15); }
+    50% { transform: translateX(var(--mist-dx, -30px)) scaleY(0.9); opacity: calc(var(--mist-op, 0.15) * 1.3); }
+    100% { transform: translateX(calc(var(--mist-dx, -30px) * 2)) scaleY(1); opacity: var(--mist-op, 0.15); }
+}
+
+/* Heat shimmer */
+@keyframes v4-shimmer {
+    0%, 100% { transform: scaleX(1) translateY(0); opacity: 0.03; }
+    50% { transform: scaleX(1.02) translateY(-1px); opacity: 0.06; }
+}
+
+/* Ground scroll */
+@keyframes v4-ground-scroll {
+    0% { background-position: 0 0; }
+    100% { background-position: -180px 0; }
+}
+
+/* Dust kick — directional */
+@keyframes v4-dust {
+    0% { transform: translate(0,0) scale(1); opacity: 0.4; }
+    100% { transform: translate(var(--d-dx, -10px), var(--d-dy, -5px)) scale(0.15); opacity: 0; }
+}
+
+/* Speed trail */
+@keyframes v4-speed {
+    0% { transform: translateX(0) scaleX(1); opacity: 0.45; }
+    100% { transform: translateX(-55px) scaleX(0.15); opacity: 0; }
+}
+
+/* Flag cloth */
+@keyframes v4-flag {
+    0%, 100% { transform: perspective(50px) rotateY(0deg) scaleX(1); }
+    12% { transform: perspective(50px) rotateY(10deg) scaleX(0.88); }
+    28% { transform: perspective(50px) rotateY(-6deg) scaleX(1.06); }
+    44% { transform: perspective(50px) rotateY(7deg) scaleX(0.92); }
+    60% { transform: perspective(50px) rotateY(-4deg) scaleX(1.03); }
+    76% { transform: perspective(50px) rotateY(5deg) scaleX(0.95); }
+    90% { transform: perspective(50px) rotateY(-2deg) scaleX(1.01); }
+}
+
+/* XP pop — punchy */
+@keyframes v4-xp-pop {
+    0% { opacity: 0; transform: translateX(-50%) translateY(0) scale(0.2) rotate(-5deg); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(-12px) scale(1.4) rotate(3deg); }
+    22% { transform: translateX(-50%) translateY(-20px) scale(0.95) rotate(-1deg); }
+    40% { transform: translateX(-50%) translateY(-28px) scale(1.05) rotate(0deg); }
+    70% { opacity: 1; transform: translateX(-50%) translateY(-40px) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-55px) scale(0.7) rotate(0deg); }
+}
+
+/* Shadow pulse */
+@keyframes v4-shadow {
+    0%, 50%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.18; }
+    25%, 75% { transform: translateX(-50%) scaleX(0.65); opacity: 0.08; }
+}
+
+/* Aurora bands (god) */
+@keyframes v4-aurora-1 {
+    0% { transform: translateX(-8%) skewX(-6deg); opacity: 0.12; }
+    33% { transform: translateX(6%) skewX(6deg); opacity: 0.22; }
+    66% { transform: translateX(-4%) skewX(-3deg); opacity: 0.18; }
+    100% { transform: translateX(-8%) skewX(-6deg); opacity: 0.12; }
+}
+@keyframes v4-aurora-2 {
+    0% { transform: translateX(5%) skewX(4deg); opacity: 0.1; }
+    40% { transform: translateX(-6%) skewX(-5deg); opacity: 0.2; }
+    70% { transform: translateX(3%) skewX(3deg); opacity: 0.15; }
+    100% { transform: translateX(5%) skewX(4deg); opacity: 0.1; }
+}
+
+/* Grass sway — wind wave */
+@keyframes v4-grass {
+    0%, 100% { transform: rotate(0deg) scaleY(1); }
+    30% { transform: rotate(var(--gsw, 3deg)) scaleY(0.95); }
+    70% { transform: rotate(calc(var(--gsw, 3deg) * -0.5)) scaleY(1.02); }
+}
+
+/* Star twinkle with color shift */
+@keyframes v4-star {
+    0%, 100% { opacity: 0.2; transform: scale(0.7); filter: brightness(1); }
+    50% { opacity: 1; transform: scale(1.3); filter: brightness(1.3); }
+}
+
+/* Bird V-formation flap */
+@keyframes v4-bird-flap {
+    0%, 100% { transform: scaleY(1) translateY(0); }
+    25% { transform: scaleY(-0.4) translateY(-1px); }
+    50% { transform: scaleY(0.8) translateY(0); }
+    75% { transform: scaleY(-0.2) translateY(-0.5px); }
+}
+@keyframes v4-bird-drift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-120%); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   V5 — SILHOUETTE JOURNEY
+   Less is more. The character IS the composition.
+   ═══════════════════════════════════════════════════════ */
+
+/* Character run — full proper silhouette sprint cycle.
+   Contact-down-passing-up, both sides. Dramatic lean forward. */
+@keyframes v5-run {
+    0%   { transform: translateY(0px) rotate(-6deg); }
+    12%  { transform: translateY(-2px) rotate(-8deg); }
+    25%  { transform: translateY(-6px) rotate(-4deg); }
+    37%  { transform: translateY(-2px) rotate(-3deg); }
+    50%  { transform: translateY(0px) rotate(-6deg); }
+    62%  { transform: translateY(-2px) rotate(-8deg); }
+    75%  { transform: translateY(-6px) rotate(-4deg); }
+    87%  { transform: translateY(-2px) rotate(-3deg); }
+}
+
+/* Proper arm pump — big range of motion */
+@keyframes v5-arm-back {
+    0%, 100% { transform: rotate(55deg); }
+    50% { transform: rotate(-60deg); }
+}
+@keyframes v5-arm-front {
+    0%, 100% { transform: rotate(-60deg); }
+    50% { transform: rotate(55deg); }
+}
+
+/* Proper running legs — full extension */
+@keyframes v5-leg-back {
+    0%   { transform: rotate(55deg) scaleY(1); }
+    30%  { transform: rotate(0deg) scaleY(0.85); }
+    50%  { transform: rotate(-55deg) scaleY(1.05); }
+    70%  { transform: rotate(-10deg) scaleY(0.85); }
+    100% { transform: rotate(55deg) scaleY(1); }
+}
+@keyframes v5-leg-front {
+    0%   { transform: rotate(-55deg) scaleY(1.05); }
+    30%  { transform: rotate(-10deg) scaleY(0.85); }
+    50%  { transform: rotate(55deg) scaleY(1); }
+    70%  { transform: rotate(0deg) scaleY(0.85); }
+    100% { transform: rotate(-55deg) scaleY(1.05); }
+}
+
+/* Hair streams back */
+@keyframes v5-hair {
+    0%, 100% { transform: rotate(10deg) scaleX(1.1); }
+    30% { transform: rotate(18deg) scaleX(0.95); }
+    60% { transform: rotate(5deg) scaleX(1.15); }
+}
+
+/* Scarf trailing — dramatic flowing fabric */
+@keyframes v5-scarf {
+    0%, 100% { transform: rotate(15deg) scaleX(1); }
+    15% { transform: rotate(22deg) scaleX(0.88); }
+    35% { transform: rotate(8deg) scaleX(1.1); }
+    55% { transform: rotate(20deg) scaleX(0.92); }
+    75% { transform: rotate(10deg) scaleX(1.06); }
+}
+
+/* Idle breathing — character at rest (xp=0) */
+@keyframes v5-idle {
+    0%, 100% { transform: translateY(0) scaleY(1); }
+    50% { transform: translateY(-1px) scaleY(1.02); }
+}
+
+/* God float — serene hovering */
+@keyframes v5-god-float {
+    0%, 100% { transform: translateY(-12px) rotate(0deg); }
+    25% { transform: translateY(-20px) rotate(-2deg); }
+    50% { transform: translateY(-15px) rotate(0deg); }
+    75% { transform: translateY(-22px) rotate(2deg); }
+}
+
+/* God ascension — clean, powerful */
+@keyframes v5-god-ascend {
+    0% { transform: translateY(0) scale(1); filter: brightness(1); }
+    10% { transform: translateY(5px) scale(0.8); filter: brightness(0.6); }
+    30% { transform: translateY(-40px) scale(1.3); filter: brightness(4); }
+    50% { transform: translateY(-50px) scale(1.5); filter: brightness(6); }
+    70% { transform: translateY(-30px) scale(1.2); filter: brightness(2); }
+    100% { transform: translateY(-12px) scale(1); filter: brightness(1); }
+}
+
+/* God ring expand */
+@keyframes v5-god-ring {
+    0% { transform: translate(-50%,-50%) scale(0.3); opacity: 1; }
+    100% { transform: translate(-50%,-50%) scale(3); opacity: 0; }
+}
+
+/* Dust puff — single frame, fade out */
+@keyframes v5-dust {
+    0% { transform: translate(0,0) scale(1); opacity: 0.35; }
+    100% { transform: translate(var(--dx, -8px), var(--dy, -4px)) scale(0.1); opacity: 0; }
+}
+
+/* Milestone dot pulse */
+@keyframes v5-dot-pulse {
+    0%, 100% { box-shadow: 0 0 3px var(--dot, #fff), 0 0 8px var(--dot, #fff); }
+    50% { box-shadow: 0 0 6px var(--dot, #fff), 0 0 16px var(--dot, #fff), 0 0 24px var(--dot, #fff40); }
+}
+
+/* Single cloud — slow, lonely */
+@keyframes v5-cloud {
+    0% { transform: translateX(110%); }
+    100% { transform: translateX(-110%); }
+}
+
+/* Speed streak */
+@keyframes v5-streak {
+    0% { transform: scaleX(1); opacity: 0.3; }
+    100% { transform: scaleX(0); opacity: 0; }
+}
+
+/* Horizon shimmer — subtle life */
+@keyframes v5-horizon {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.25; }
+}
+
+/* Score fade in */
+@keyframes v5-score-in {
+    0% { opacity: 0; transform: translateY(-4px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* XP float — clean, no bounce */
+@keyframes v5-xp {
+    0% { opacity: 0; transform: translateX(-50%) translateY(0) scale(0.5); }
+    15% { opacity: 1; transform: translateX(-50%) translateY(-10px) scale(1.1); }
+    40% { opacity: 1; transform: translateX(-50%) translateY(-22px) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-40px) scale(0.9); }
+}
+
+/* Ground path scroll */
+@keyframes v5-ground {
+    0% { background-position: 0 0; }
+    100% { background-position: -100px 0; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   V6 — V4 EVOLVED: MAXIMUM DENSITY
+   ═══════════════════════════════════════════════════════ */
+
+/* SVG character run cycle — elegant light jog */
+@keyframes v6-run {
+    0%   { transform: translateY(0px) rotate(0deg); }
+    15%  { transform: translateY(-2px) rotate(-0.8deg); }
+    30%  { transform: translateY(-3.5px) rotate(0deg); }
+    45%  { transform: translateY(-1.5px) rotate(0.5deg); }
+    50%  { transform: translateY(0px) rotate(0deg); }
+    65%  { transform: translateY(-2px) rotate(-0.8deg); }
+    80%  { transform: translateY(-3.5px) rotate(0deg); }
+    95%  { transform: translateY(-1.5px) rotate(0.5deg); }
+}
+
+/* Run + periodic jump — endless runner style */
+@keyframes v6-run-jump {
+    /* Jog phase */
+    0%    { transform: translateY(0px); }
+    7%    { transform: translateY(-2px); }
+    14%   { transform: translateY(0px); }
+    21%   { transform: translateY(-2px); }
+    28%   { transform: translateY(0px); }
+    35%   { transform: translateY(-2px); }
+    42%   { transform: translateY(0px); }
+    49%   { transform: translateY(-2px); }
+    55%   { transform: translateY(0px); }
+    /* Crouch (anticipation) */
+    60%   { transform: translateY(2px) scaleY(0.93); }
+    /* Jump arc */
+    67%   { transform: translateY(-16px) scaleY(1.04); }
+    74%   { transform: translateY(-20px) scaleY(1); }
+    81%   { transform: translateY(-16px) scaleY(1); }
+    /* Land + squash */
+    90%   { transform: translateY(0px) scaleY(0.92); }
+    95%   { transform: translateY(-1px) scaleY(1.01); }
+    100%  { transform: translateY(0px); }
+}
+
+/* Obstacle scroll — right to left */
+@keyframes v6-obstacles {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+@keyframes v6-arm-l {
+    0%, 100% { transform: rotate(18deg); }
+    25% { transform: rotate(3deg); }
+    50% { transform: rotate(-18deg); }
+    75% { transform: rotate(-3deg); }
+}
+@keyframes v6-arm-r {
+    0%, 100% { transform: rotate(-18deg); }
+    25% { transform: rotate(-3deg); }
+    50% { transform: rotate(18deg); }
+    75% { transform: rotate(3deg); }
+}
+@keyframes v6-leg-l {
+    0%   { transform: rotate(16deg) scaleY(1); }
+    25%  { transform: rotate(3deg) scaleY(0.95); }
+    50%  { transform: rotate(-18deg) scaleY(1.02); }
+    75%  { transform: rotate(-3deg) scaleY(0.95); }
+    100% { transform: rotate(16deg) scaleY(1); }
+}
+@keyframes v6-leg-r {
+    0%   { transform: rotate(-18deg) scaleY(1.02); }
+    25%  { transform: rotate(-3deg) scaleY(0.95); }
+    50%  { transform: rotate(16deg) scaleY(1); }
+    75%  { transform: rotate(3deg) scaleY(0.95); }
+    100% { transform: rotate(-18deg) scaleY(1.02); }
+}
+
+/* Hair with real momentum */
+@keyframes v6-hair {
+    0%, 100% { transform: rotate(-4deg) translateY(0); }
+    15% { transform: rotate(-14deg) translateY(3px); }
+    40% { transform: rotate(6deg) translateY(-4px); }
+    65% { transform: rotate(-10deg) translateY(2px); }
+}
+
+/* Scarf — long flowing trail */
+@keyframes v6-scarf {
+    0%, 100% { transform: rotate(12deg) scaleX(1) skewY(0deg); }
+    10% { transform: rotate(20deg) scaleX(0.82) skewY(6deg); }
+    25% { transform: rotate(6deg) scaleX(1.12) skewY(-4deg); }
+    40% { transform: rotate(18deg) scaleX(0.88) skewY(5deg); }
+    55% { transform: rotate(4deg) scaleX(1.08) skewY(-3deg); }
+    70% { transform: rotate(16deg) scaleX(0.9) skewY(4deg); }
+    85% { transform: rotate(8deg) scaleX(1.04) skewY(-2deg); }
+}
+
+/* God float — epic */
+@keyframes v6-god-float {
+    0%, 100% { transform: translateY(-16px) rotate(0deg); }
+    15% { transform: translateY(-26px) rotate(-4deg); }
+    35% { transform: translateY(-20px) rotate(2deg); }
+    55% { transform: translateY(-28px) rotate(3deg); }
+    75% { transform: translateY(-18px) rotate(-2deg); }
+}
+
+/* God entrance — devastating */
+@keyframes v6-god-ascend {
+    0% { transform: translateY(0) scale(1) rotate(0deg); filter: brightness(1); }
+    4% { transform: translateY(12px) scale(0.5) rotate(0deg); filter: brightness(0.5); }
+    14% { transform: translateY(-60px) scale(1.6) rotate(-180deg); filter: brightness(5); }
+    26% { transform: translateY(-80px) scale(2.2) rotate(-360deg); filter: brightness(8); }
+    40% { transform: translateY(-65px) scale(1.8) rotate(-540deg); filter: brightness(5); }
+    55% { transform: translateY(-45px) scale(1.4) rotate(-660deg); filter: brightness(3); }
+    72% { transform: translateY(-24px) scale(1.15) rotate(-700deg); filter: brightness(1.8); }
+    88% { transform: translateY(-18px) scale(1.05) rotate(-718deg); filter: brightness(1.2); }
+    100% { transform: translateY(-16px) scale(1) rotate(-720deg); filter: brightness(1); }
+}
+
+/* Wings — full spread */
+@keyframes v6-wing-l {
+    0%, 100% { transform: rotate(-8deg) scaleY(1) scaleX(1); }
+    25% { transform: rotate(-28deg) scaleY(0.8) scaleX(0.9); }
+    50% { transform: rotate(8deg) scaleY(1.15) scaleX(1.1); }
+    75% { transform: rotate(-18deg) scaleY(0.9) scaleX(0.95); }
+}
+@keyframes v6-wing-r {
+    0%, 100% { transform: rotate(8deg) scaleY(1) scaleX(1); }
+    25% { transform: rotate(28deg) scaleY(0.8) scaleX(0.9); }
+    50% { transform: rotate(-8deg) scaleY(1.15) scaleX(1.1); }
+    75% { transform: rotate(18deg) scaleY(0.9) scaleX(0.95); }
+}
+
+/* Halo */
+@keyframes v6-halo {
+    0% { transform: translateX(-50%) rotateX(68deg) rotateZ(0deg); }
+    100% { transform: translateX(-50%) rotateX(68deg) rotateZ(360deg); }
+}
+
+/* Parallax layers */
+@keyframes v6-para-1 { 0% { transform: translateX(0); } 100% { transform: translateX(-25%); } }
+@keyframes v6-para-2 { 0% { transform: translateX(0); } 100% { transform: translateX(-33%); } }
+@keyframes v6-para-3 { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes v6-para-4 { 0% { transform: translateX(0); } 100% { transform: translateX(-66%); } }
+
+/* Cloud drift */
+@keyframes v6-cloud { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* Tree sway */
+@keyframes v6-tree {
+    0%, 100% { transform: rotate(0deg); }
+    30% { transform: rotate(var(--tw, 2deg)); }
+    70% { transform: rotate(calc(var(--tw, 2deg) * -0.6)); }
+}
+
+/* Ground scroll */
+@keyframes v6-ground { 0% { background-position: 0 0; } 100% { background-position: -150px 0; } }
+
+/* Grass wave */
+@keyframes v6-grass {
+    0%, 100% { transform: rotate(0deg) scaleY(1); }
+    30% { transform: rotate(var(--gsw, 3deg)) scaleY(0.94); }
+    70% { transform: rotate(calc(var(--gsw, 3deg) * -0.5)) scaleY(1.03); }
+}
+
+/* Beacon on milestones */
+@keyframes v6-beacon {
+    0%, 100% { box-shadow: 0 0 4px var(--b, #fff), 0 0 10px var(--b, #fff); transform: translateX(-50%) scale(1); }
+    50% { box-shadow: 0 0 12px var(--b, #fff), 0 0 24px var(--b, #fff), 0 0 36px var(--b, #fff40); transform: translateX(-50%) scale(1.2); }
+}
+@keyframes v6-beam {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+}
+
+/* Leaf drift */
+@keyframes v6-leaf {
+    0% { transform: translate(0,0) rotate(0deg) scale(1); opacity: 0; }
+    8% { opacity: var(--lf-op, 0.6); }
+    50% { transform: translate(calc(var(--lf-dx,-40px)*0.5), calc(var(--lf-dy,15px)*0.4)) rotate(calc(var(--lf-rot,180deg)*0.5)) scale(0.85); }
+    92% { opacity: var(--lf-op, 0.6); }
+    100% { transform: translate(var(--lf-dx,-40px), var(--lf-dy,15px)) rotate(var(--lf-rot,180deg)) scale(0.3); opacity: 0; }
+}
+
+/* Firefly */
+@keyframes v6-firefly {
+    0%, 100% { opacity: 0; transform: translate(0,0) scale(0.5); }
+    20% { opacity: var(--ff-op, 0.7); transform: translate(calc(var(--ff-dx,5px)*0.3), calc(var(--ff-dy,-5px)*0.3)) scale(1); }
+    50% { opacity: var(--ff-op, 0.7); transform: translate(calc(var(--ff-dx,5px)*0.6), calc(var(--ff-dy,-5px)*0.6)) scale(1.2); }
+    80% { opacity: var(--ff-op, 0.7); transform: translate(var(--ff-dx,5px), var(--ff-dy,-5px)) scale(0.8); }
+}
+
+/* Mist */
+@keyframes v6-mist {
+    0% { transform: translateX(0) scaleY(1); opacity: var(--mo, 0.1); }
+    50% { transform: translateX(var(--mdx, -20px)) scaleY(0.85); opacity: calc(var(--mo, 0.1) * 1.4); }
+    100% { transform: translateX(calc(var(--mdx, -20px) * 2)) scaleY(1); opacity: var(--mo, 0.1); }
+}
+
+/* Heat shimmer */
+@keyframes v6-shimmer {
+    0%, 100% { transform: scaleX(1) translateY(0); opacity: 0.025; }
+    50% { transform: scaleX(1.03) translateY(-1.5px); opacity: 0.055; }
+}
+
+/* Aurora */
+@keyframes v6-aurora-1 {
+    0% { transform: translateX(-10%) skewX(-8deg); opacity: 0.1; }
+    33% { transform: translateX(8%) skewX(8deg); opacity: 0.2; }
+    66% { transform: translateX(-5%) skewX(-4deg); opacity: 0.16; }
+    100% { transform: translateX(-10%) skewX(-8deg); opacity: 0.1; }
+}
+@keyframes v6-aurora-2 {
+    0% { transform: translateX(6%) skewX(5deg); opacity: 0.08; }
+    40% { transform: translateX(-8%) skewX(-6deg); opacity: 0.18; }
+    70% { transform: translateX(4%) skewX(4deg); opacity: 0.13; }
+    100% { transform: translateX(6%) skewX(5deg); opacity: 0.08; }
+}
+
+/* Sun glow */
+@keyframes v6-sun {
+    0%, 100% { filter: drop-shadow(0 0 12px var(--sg, #FFD93D80)) brightness(1); }
+    50% { filter: drop-shadow(0 0 24px var(--sg, #FFD93DAA)) brightness(1.1); }
+}
+
+/* Star twinkle */
+@keyframes v6-star {
+    0%, 100% { opacity: 0.15; transform: scale(0.6); }
+    50% { opacity: 1; transform: scale(1.4); }
+}
+
+/* Bird V-formation */
+@keyframes v6-bird-flap {
+    0%, 100% { transform: scaleY(1) translateY(0); }
+    30% { transform: scaleY(-0.3) translateY(-1px); }
+    60% { transform: scaleY(0.7) translateY(0.5px); }
+}
+@keyframes v6-bird-drift {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-130%); }
+}
+
+/* Flag */
+@keyframes v6-flag {
+    0%, 100% { transform: perspective(60px) rotateY(0deg) scaleX(1); }
+    12% { transform: perspective(60px) rotateY(12deg) scaleX(0.86); }
+    28% { transform: perspective(60px) rotateY(-7deg) scaleX(1.08); }
+    44% { transform: perspective(60px) rotateY(8deg) scaleX(0.9); }
+    60% { transform: perspective(60px) rotateY(-5deg) scaleX(1.04); }
+    76% { transform: perspective(60px) rotateY(6deg) scaleX(0.94); }
+    90% { transform: perspective(60px) rotateY(-2deg) scaleX(1.01); }
+}
+
+/* Dust */
+@keyframes v6-dust {
+    0% { transform: translate(0,0) scale(1); opacity: 0.4; }
+    100% { transform: translate(var(--ddx,-10px), var(--ddy,-5px)) scale(0.1); opacity: 0; }
+}
+
+/* Speed lines */
+@keyframes v6-speed {
+    0% { transform: translateX(0) scaleX(1); opacity: 0.4; }
+    100% { transform: translateX(-60px) scaleX(0.1); opacity: 0; }
+}
+
+/* XP pop */
+@keyframes v6-xp {
+    0% { opacity: 0; transform: translateX(-50%) translateY(0) scale(0.2) rotate(-6deg); }
+    8% { opacity: 1; transform: translateX(-50%) translateY(-14px) scale(1.5) rotate(4deg); }
+    20% { transform: translateX(-50%) translateY(-24px) scale(0.9) rotate(-2deg); }
+    38% { transform: translateX(-50%) translateY(-32px) scale(1.08) rotate(0deg); }
+    65% { opacity: 1; transform: translateX(-50%) translateY(-44px) scale(1) rotate(0deg); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-60px) scale(0.6) rotate(0deg); }
+}
+
+/* Shadow — synced with run-jump cycle */
+@keyframes v6-shadow {
+    0%, 50%, 100% { transform: translateX(-50%) scaleX(1); opacity: 0.2; }
+    25%, 75% { transform: translateX(-50%) scaleX(0.6); opacity: 0.06; }
+}
+@keyframes v6-shadow-jump {
+    /* Jog phase — gentle pulse */
+    0%    { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.15; }
+    14%   { transform: translateX(-50%) scaleX(0.85) scaleY(0.9); opacity: 0.1; }
+    28%   { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.15; }
+    55%   { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.15; }
+    /* Jump — shadow shrinks and fades */
+    60%   { transform: translateX(-50%) scaleX(1.1) scaleY(1); opacity: 0.18; }
+    74%   { transform: translateX(-50%) scaleX(0.4) scaleY(0.5); opacity: 0.05; }
+    81%   { transform: translateX(-50%) scaleX(0.35) scaleY(0.4); opacity: 0.04; }
+    /* Land — shadow expands with impact */
+    90%   { transform: translateX(-50%) scaleX(1.3) scaleY(1.1); opacity: 0.2; }
+    95%   { transform: translateX(-50%) scaleX(1.05) scaleY(1); opacity: 0.16; }
+    100%  { transform: translateX(-50%) scaleX(1) scaleY(1); opacity: 0.15; }
+}
+
+/* Butterfly */
+@keyframes v6-butterfly {
+    0% { transform: translate(0,0) rotate(0deg); }
+    25% { transform: translate(calc(var(--bx,10px)*0.3), calc(var(--by,-8px)*0.5)) rotate(10deg); }
+    50% { transform: translate(calc(var(--bx,10px)*0.7), calc(var(--by,-8px)*0.8)) rotate(-5deg); }
+    75% { transform: translate(calc(var(--bx,10px)*0.9), calc(var(--by,-8px)*1.1)) rotate(8deg); }
+    100% { transform: translate(var(--bx,10px), var(--by,-8px)) rotate(0deg); }
+}
+@keyframes v6-bf-wings {
+    0%, 100% { transform: scaleX(1); }
+    50% { transform: scaleX(0.15); }
+}
+
+/* ── Enemy & Battle animations ── */
+@keyframes enemy-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+@keyframes enemy-hit-flash {
+    0% { filter: brightness(1); }
+    15% { filter: brightness(3) saturate(0); }
+    30% { filter: brightness(2) saturate(0.3); }
+    50% { filter: brightness(1.5) saturate(0.6); }
+    100% { filter: brightness(1) saturate(1); }
+}
+@keyframes enemy-death {
+    0% { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1); }
+    20% { transform: scale(1.2) rotate(-5deg); opacity: 1; filter: brightness(2); }
+    40% { transform: scale(0.8) rotate(5deg); opacity: 0.8; filter: brightness(3); }
+    60% { transform: scale(0.5) rotate(-10deg); opacity: 0.5; filter: brightness(2); }
+    80% { transform: scale(0.2) rotate(15deg); opacity: 0.2; }
+    100% { transform: scale(0) rotate(20deg); opacity: 0; }
+}
+@keyframes enemy-death-particles {
+    0% { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--ep-x, 10px), var(--ep-y, -20px)) scale(0); opacity: 0; }
+}
+@keyframes enemy-damage-number {
+    0% { transform: translateX(-50%) translateY(0) scale(0.5); opacity: 0; }
+    15% { transform: translateX(-50%) translateY(-8px) scale(1.2); opacity: 1; }
+    40% { transform: translateX(-50%) translateY(-16px) scale(1); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-28px) scale(0.8); opacity: 0; }
+}
+@keyframes hero-slash {
+    0% { transform: rotate(-45deg) scale(0); opacity: 0; }
+    30% { transform: rotate(15deg) scale(1.2); opacity: 1; }
+    60% { transform: rotate(45deg) scale(1); opacity: 0.8; }
+    100% { transform: rotate(60deg) scale(0.5); opacity: 0; }
+}
+@keyframes enemy-spawn {
+    0% { transform: scale(0) translateY(20px); opacity: 0; }
+    50% { transform: scale(1.15) translateY(-3px); opacity: 1; }
+    70% { transform: scale(0.95) translateY(1px); opacity: 1; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes hp-bar-damage {
+    0% { filter: brightness(2); }
+    100% { filter: brightness(1); }
+}
+
+/* ── RPG Hero hair wind animation ── */
+@keyframes hero-hair-wind {
+    0%, 100% { transform: skewX(0deg) scaleX(1); }
+    25% { transform: skewX(-4deg) scaleX(1.05); }
+    50% { transform: skewX(2deg) scaleX(0.97); }
+    75% { transform: skewX(-2deg) scaleX(1.02); }
+}
+@keyframes hero-cape-flutter {
+    0%, 100% { transform: scaleX(1) skewY(0deg) rotate(0deg); }
+    20% { transform: scaleX(0.85) skewY(4deg) rotate(-2deg); }
+    40% { transform: scaleX(1.1) skewY(-2deg) rotate(1deg); }
+    60% { transform: scaleX(0.9) skewY(3deg) rotate(-1deg); }
+    80% { transform: scaleX(1.05) skewY(-1deg) rotate(0deg); }
+}
+@keyframes hero-sword-gleam {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 0.6; }
+}
+
+/* ═══════════════════════════════════════════
+   CHAIN DROP Puzzle Board Animations
+   ═══════════════════════════════════════════ */
+
+@keyframes puzzle-drop {
+    0%   { transform: translateY(-120px) scale(0.6); opacity: 0; }
+    60%  { transform: translateY(8px) scale(1.1); opacity: 1; }
+    80%  { transform: translateY(-3px) scale(0.95); }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes puzzle-match-flash {
+    0%   { filter: brightness(1); transform: scale(1); }
+    30%  { filter: brightness(3); transform: scale(1.15); box-shadow: 0 0 30px currentColor; }
+    60%  { filter: brightness(2); transform: scale(0.5); opacity: 0.7; }
+    100% { filter: brightness(0); transform: scale(0); opacity: 0; }
+}
+
+@keyframes puzzle-crush {
+    0%   { transform: scale(1) rotate(0deg); filter: brightness(1); }
+    30%  { transform: scale(1.2) rotate(10deg); filter: brightness(2); }
+    60%  { transform: scale(0.3) rotate(-20deg); opacity: 0.5; }
+    100% { transform: scale(0) rotate(-45deg); opacity: 0; }
+}
+
+@keyframes puzzle-bomb {
+    0%   { transform: scale(1); filter: brightness(1); }
+    20%  { transform: scale(1.4); filter: brightness(3) saturate(2); box-shadow: 0 0 40px #F97316; }
+    50%  { transform: scale(0.6); filter: brightness(2); }
+    100% { transform: scale(0); opacity: 0; filter: brightness(0); }
+}
+
+@keyframes puzzle-spike {
+    0%   { transform: scaleY(1); filter: brightness(1); }
+    25%  { transform: scaleY(1.5); filter: brightness(3); box-shadow: 0 0 30px #D4AF37; }
+    50%  { transform: scaleY(0.3) scaleX(2); opacity: 0.5; }
+    100% { transform: scaleY(0) scaleX(3); opacity: 0; }
+}
+
+@keyframes puzzle-shimmer {
+    0%   { background-position: -200% -200%; }
+    100% { background-position: 200% 200%; }
+}
+
+@keyframes puzzle-chain-pop {
+    0%   { transform: scale(0); opacity: 0; }
+    60%  { transform: scale(1.3); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes puzzle-chain-mega {
+    0%   { transform: scale(0) rotate(-10deg); opacity: 0; }
+    50%  { transform: scale(1.5) rotate(3deg); opacity: 1; }
+    70%  { transform: scale(0.9) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes puzzle-shake {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-3px, 2px); }
+    20% { transform: translate(4px, -2px); }
+    30% { transform: translate(-4px, -1px); }
+    40% { transform: translate(3px, 3px); }
+    50% { transform: translate(-2px, -3px); }
+    60% { transform: translate(4px, 1px); }
+    70% { transform: translate(-3px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    90% { transform: translate(-1px, 1px); }
+}
+
+@keyframes puzzle-perfect-slam {
+    0%   { transform: scale(5) rotate(-5deg); opacity: 0; }
+    40%  { transform: scale(0.8) rotate(2deg); opacity: 1; }
+    60%  { transform: scale(1.1) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+@keyframes puzzle-perfect-glow {
+    0%   { background: radial-gradient(circle, rgba(212,175,55,0.4) 0%, transparent 70%); }
+    50%  { background: radial-gradient(circle, rgba(212,175,55,0.6) 0%, rgba(245,158,11,0.2) 50%, transparent 80%); }
+    100% { background: transparent; opacity: 0; }
+}
+
+@keyframes puzzle-particle-burst {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--px, 20px), var(--py, -20px)) scale(0); opacity: 0; }
+}
+@keyframes puzzle-modal-in {
+    0%   { transform: scale(0.85); opacity: 0; }
+    60%  { transform: scale(1.03); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}

@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>note Thumbnails</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 0;
+    background: #0c0a09;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    color: #fafaf9;
+  }
+
+  /* ===== NAV BAR ===== */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(12,10,9,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #292524;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .nav-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: #D4AF37;
+    letter-spacing: 2px;
+    margin-right: 12px;
+    white-space: nowrap;
+  }
+  .nav-btn {
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #292524;
+    background: #1c1917;
+    color: #a8a29e;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover {
+    background: #292524;
+    color: #fafaf9;
+    border-color: #44403c;
+  }
+  .nav-btn.active {
+    background: #D4AF37;
+    color: #0c0a09;
+    border-color: #D4AF37;
+  }
+  .nav-btn.style-a-tag { border-left: 3px solid #D4AF37; }
+  .nav-btn.style-b-tag { border-left: 3px solid #a8a29e; }
+  .nav-btn.style-c-tag { border-left: 3px solid #10B981; }
+  .nav-btn.latest {
+    background: #10B981;
+    color: #fff;
+    border-color: #10B981;
+    animation: pulse-new 2s ease-in-out infinite;
+  }
+  @keyframes pulse-new {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+  }
+
+  /* ===== CONTENT ===== */
+  .content {
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+
+  /* ===== THUMB WRAPPER ===== */
+  .thumb-wrap {
+    scroll-margin-top: 80px;
+    position: relative;
+  }
+  .thumb-wrap.highlight .thumb {
+    outline: 3px solid #D4AF37;
+    outline-offset: 4px;
+  }
+  .thumb-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    width: 1280px;
+  }
+  .thumb-label .num {
+    font-size: 14px;
+    font-weight: 900;
+    color: #D4AF37;
+    letter-spacing: 1px;
+  }
+  .thumb-label .desc {
+    font-size: 12px;
+    color: #57534e;
+    flex: 1;
+  }
+  .thumb-label .style-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  .thumb-label .style-tag.sa { background: #D4AF3720; color: #D4AF37; }
+  .thumb-label .style-tag.sb { background: #a8a29e20; color: #a8a29e; }
+  .thumb-label .style-tag.sc { background: #10B98120; color: #10B981; }
+  .solo-btn {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid #292524;
+    background: #1c1917;
+    color: #78716c;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+  }
+  .solo-btn:hover {
+    background: #292524;
+    color: #fafaf9;
+  }
+
+  /* ===== THUMB ===== */
+  .thumb {
+    width: 1280px;
+    height: 670px;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    border-radius: 4px;
+    transition: outline 0.2s;
+  }
+  .thumb-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  /* Style A: Dark */
+  .style-a {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  }
+  .style-a .accent-line {
+    position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+    background: linear-gradient(90deg, #D4AF37, transparent);
+  }
+  .style-a .player-name {
+    font-size: 120px; font-weight: 900; color: #ffffff;
+    letter-spacing: 8px; line-height: 1.2; text-align: center;
+  }
+  .style-a .tagline {
+    font-size: 40px; font-weight: 600; color: #D4AF37;
+    margin-top: 24px; letter-spacing: 2px; text-align: center;
+  }
+  .style-a .series-badge {
+    position: absolute; top: 40px; right: 48px;
+    font-size: 16px; font-weight: 700; color: #D4AF37;
+    letter-spacing: 4px; opacity: 0.6;
+  }
+  .style-a .number {
+    position: absolute; bottom: 32px; left: 48px;
+    font-size: 180px; font-weight: 900;
+    color: rgba(212, 175, 55, 0.08); line-height: 1;
+  }
+
+  /* Style B: White */
+  .style-b {
+    background: #ffffff;
+    border: 1px solid #e7e5e4;
+  }
+  .style-b .left-bar {
+    position: absolute; top: 0; left: 0;
+    width: 6px; height: 100%; background: #D4AF37;
+  }
+  .style-b .player-name {
+    font-size: 100px; font-weight: 900; color: #1c1917;
+    letter-spacing: 4px; text-align: center;
+  }
+  .style-b .tagline {
+    font-size: 36px; font-weight: 500; color: #78716c;
+    margin-top: 20px; text-align: center;
+  }
+  .style-b .number {
+    position: absolute; top: 24px; right: 48px;
+    font-size: 200px; font-weight: 900;
+    color: rgba(212, 175, 55, 0.1); line-height: 1;
+  }
+
+  /* Style C: Stat Hero */
+  .style-c {
+    background: linear-gradient(160deg, #0c0a09 0%, #1c1917 40%, #292524 100%);
+  }
+  .style-c .top-line {
+    position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+    background: linear-gradient(90deg, #D4AF37 0%, #10B981 100%);
+  }
+  .style-c .series-badge {
+    position: absolute; top: 40px; left: 48px;
+    font-size: 14px; font-weight: 700; color: #D4AF37;
+    letter-spacing: 6px; text-transform: uppercase;
+  }
+  .style-c .vibe-badge {
+    position: absolute; top: 38px; right: 48px;
+    font-size: 13px; font-weight: 600; color: #10B981;
+    letter-spacing: 3px;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 4px 16px; border-radius: 4px;
+  }
+  .style-c .hero-stat {
+    font-size: 220px; font-weight: 900;
+    background: linear-gradient(180deg, #ffffff 0%, #a8a29e 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; line-height: 1; letter-spacing: -8px;
+  }
+  .style-c .hero-unit {
+    font-size: 80px; font-weight: 300; color: #D4AF37;
+    margin-left: 8px; letter-spacing: 4px;
+  }
+  .style-c .hero-row {
+    display: flex; align-items: baseline; justify-content: center;
+  }
+  .style-c .tagline {
+    font-size: 38px; font-weight: 600; color: #a8a29e;
+    margin-top: 16px; letter-spacing: 3px; text-align: center;
+  }
+  .style-c .sub-tagline {
+    font-size: 24px; font-weight: 400; color: #57534e;
+    margin-top: 12px; letter-spacing: 2px; text-align: center;
+  }
+  .style-c .number {
+    position: absolute; bottom: 28px; right: 48px;
+    font-size: 160px; font-weight: 900;
+    color: rgba(212, 175, 55, 0.05); line-height: 1;
+  }
+  .style-c .bottom-accent {
+    position: absolute; bottom: 0; left: 0; width: 100%; height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+  }
+
+  /* ===== SOLO VIEW OVERLAY ===== */
+  .solo-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.92);
+    justify-content: center; align-items: center;
+    flex-direction: column; gap: 16px;
+    cursor: pointer;
+  }
+  .solo-overlay.visible { display: flex; }
+  .solo-overlay .solo-hint {
+    font-size: 12px; color: #57534e; letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="nav" id="nav">
+  <span class="nav-title">THUMBNAILS</span>
+</div>
+
+<!-- SOLO VIEW -->
+<div class="solo-overlay" id="soloOverlay" onclick="closeSolo()">
+  <div id="soloContainer"></div>
+  <div class="solo-hint">Click anywhere to close / Right-click to save</div>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="content">
+
+<!-- 012 -->
+<div class="thumb-wrap" id="t-012">
+  <div class="thumb-label">
+    <span class="num">012</span>
+    <span class="desc">310 phrases -- 翻訳できない口癖たち</span>
+    <span class="style-tag sc">STYLE C</span>
+    <button class="solo-btn" onclick="openSolo('t-012')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-c">
+      <div class="top-line"></div>
+      <div class="series-badge">AI x ENGLISH</div>
+      <div class="vibe-badge">バイブコーディング塾 #01</div>
+      <div class="hero-row">
+        <span class="hero-stat">310</span>
+        <span class="hero-unit">個</span>
+      </div>
+      <div class="tagline">翻訳できない口癖たち</div>
+      <div class="sub-tagline">で、結局 / ぶっちゃけ / もともこもない</div>
+      <div class="number">12</div>
+      <div class="bottom-accent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 013 -->
+<div class="thumb-wrap" id="t-013">
+  <div class="thumb-label">
+    <span class="num">013</span>
+    <span class="desc">Story vocab -- サブプロットがある単語帳</span>
+    <span class="style-tag sc">STYLE C</span>
+    <button class="solo-btn" onclick="openSolo('t-013')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-c">
+      <div class="top-line"></div>
+      <div class="series-badge">AI x ENGLISH</div>
+      <div class="vibe-badge">バイブコーディング塾 #02</div>
+      <div class="hero-row">
+        <span class="hero-stat">50</span>
+        <span class="hero-unit">語</span>
+      </div>
+      <div class="tagline">サブプロットがある単語帳</div>
+      <div class="sub-tagline">10人のキャラが喋る。覚えようとしなくていい</div>
+      <div class="number">13</div>
+      <div class="bottom-accent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 014 -->
+<div class="thumb-wrap" id="t-014">
+  <div class="thumb-label">
+    <span class="num">014</span>
+    <span class="desc">Age-based English -- 4歳児が一番聞き取りやすい</span>
+    <span class="style-tag sc">STYLE C</span>
+    <button class="solo-btn" onclick="openSolo('t-014')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-c">
+      <div class="top-line"></div>
+      <div class="series-badge">AI x ENGLISH</div>
+      <div class="vibe-badge">バイブコーディング塾 #03</div>
+      <div class="hero-row">
+        <span class="hero-stat">4</span>
+        <span class="hero-unit">歳</span>
+      </div>
+      <div class="tagline">一番聞き取りやすい英語</div>
+      <div class="sub-tagline">20歳が一番むずかしい。直感に反する</div>
+      <div class="number">14</div>
+      <div class="bottom-accent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 005 Dark -->
+<div class="thumb-wrap" id="t-005a">
+  <div class="thumb-label">
+    <span class="num">005</span>
+    <span class="desc">大谷翔平 -- 英語を必要としていない</span>
+    <span class="style-tag sa">STYLE A</span>
+    <button class="solo-btn" onclick="openSolo('t-005a')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-a">
+      <div class="accent-line"></div>
+      <div class="series-badge">MLB x ENGLISH</div>
+      <div class="player-name">大谷翔平</div>
+      <div class="tagline">英語を必要としていない</div>
+      <div class="number">01</div>
+    </div>
+  </div>
+</div>
+
+<!-- 006 Dark -->
+<div class="thumb-wrap" id="t-006a">
+  <div class="thumb-label">
+    <span class="num">006</span>
+    <span class="desc">長谷川滋利 -- 野球よりアメリカが好きだった</span>
+    <span class="style-tag sa">STYLE A</span>
+    <button class="solo-btn" onclick="openSolo('t-006a')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-a">
+      <div class="accent-line"></div>
+      <div class="series-badge">MLB x ENGLISH</div>
+      <div class="player-name">長谷川滋利</div>
+      <div class="tagline">野球よりアメリカが好きだった</div>
+      <div class="number">02</div>
+    </div>
+  </div>
+</div>
+
+<!-- 007 Dark -->
+<div class="thumb-wrap" id="t-007a">
+  <div class="thumb-label">
+    <span class="num">007</span>
+    <span class="desc">イチロー -- 日本語でも苦労している</span>
+    <span class="style-tag sa">STYLE A</span>
+    <button class="solo-btn" onclick="openSolo('t-007a')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-a">
+      <div class="accent-line"></div>
+      <div class="series-badge">MLB x ENGLISH</div>
+      <div class="player-name">イチロー</div>
+      <div class="tagline">日本語でも苦労している</div>
+      <div class="number">03</div>
+    </div>
+  </div>
+</div>
+
+<!-- 008 Dark (Tennis) -->
+<div class="thumb-wrap" id="t-008a">
+  <div class="thumb-label">
+    <span class="num">008</span>
+    <span class="desc">錦織圭 -- 完璧じゃない。それでいい</span>
+    <span class="style-tag sa">STYLE A</span>
+    <button class="solo-btn" onclick="openSolo('t-008a')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-a" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+      <div class="accent-line" style="background: linear-gradient(90deg, #10B981, transparent);"></div>
+      <div class="series-badge" style="color: #10B981;">TENNIS x ENGLISH</div>
+      <div class="player-name">錦織圭</div>
+      <div class="tagline" style="color: #10B981;">完璧じゃない。それでいい</div>
+      <div class="number" style="color: rgba(16, 185, 129, 0.08);">04</div>
+    </div>
+  </div>
+</div>
+
+<!-- 009 Dark -->
+<div class="thumb-wrap" id="t-009a">
+  <div class="thumb-label">
+    <span class="num">009</span>
+    <span class="desc">鈴木誠也 -- 下ネタは世界共通語</span>
+    <span class="style-tag sa">STYLE A</span>
+    <button class="solo-btn" onclick="openSolo('t-009a')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-a">
+      <div class="accent-line"></div>
+      <div class="series-badge">MLB x ENGLISH</div>
+      <div class="player-name">鈴木誠也</div>
+      <div class="tagline">下ネタは世界共通語</div>
+      <div class="number">05</div>
+    </div>
+  </div>
+</div>
+
+<!-- 005 White -->
+<div class="thumb-wrap" id="t-005b">
+  <div class="thumb-label">
+    <span class="num">005</span>
+    <span class="desc">大谷翔平 (White variant)</span>
+    <span class="style-tag sb">STYLE B</span>
+    <button class="solo-btn" onclick="openSolo('t-005b')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-b">
+      <div class="left-bar"></div>
+      <div class="number">01</div>
+      <div class="player-name">大谷翔平</div>
+      <div class="tagline">英語を必要としていない</div>
+    </div>
+  </div>
+</div>
+
+<!-- 009 White -->
+<div class="thumb-wrap" id="t-009b">
+  <div class="thumb-label">
+    <span class="num">009</span>
+    <span class="desc">鈴木誠也 (White variant)</span>
+    <span class="style-tag sb">STYLE B</span>
+    <button class="solo-btn" onclick="openSolo('t-009b')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-b">
+      <div class="left-bar"></div>
+      <div class="number">05</div>
+      <div class="player-name">鈴木誠也</div>
+      <div class="tagline">下ネタは世界共通語</div>
+    </div>
+  </div>
+</div>
+
+<!-- 018 -->
+<div class="thumb-wrap" id="t-018">
+  <div class="thumb-label">
+    <span class="num">018</span>
+    <span class="desc">パチンコが嫌いだ！ -- 設計が甘い（英語学習の話）</span>
+    <span class="style-tag sc">STYLE C</span>
+    <button class="solo-btn" onclick="openSolo('t-018')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-c">
+      <div class="top-line"></div>
+      <div class="series-badge">AI x ENGLISH</div>
+      <div class="vibe-badge">DESIGN x GAMBLE</div>
+      <div class="hero-row">
+        <span class="hero-stat">0%</span>
+        <span class="hero-unit">還元</span>
+      </div>
+      <div class="tagline">パチンコが嫌いだ！</div>
+      <div class="sub-tagline">嫌いな理由が人と違う。設計が甘い</div>
+      <div class="number">18</div>
+      <div class="bottom-accent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 019 -->
+<div class="thumb-wrap" id="t-019">
+  <div class="thumb-label">
+    <span class="num">019</span>
+    <span class="desc">語彙42,000 -- 2万語の安心感、返品します</span>
+    <span class="style-tag sc">STYLE C</span>
+    <button class="solo-btn" onclick="openSolo('t-019')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-c">
+      <div class="top-line"></div>
+      <div class="series-badge">AI x ENGLISH</div>
+      <div class="vibe-badge">DATA x LINGUISTICS</div>
+      <div class="hero-row">
+        <span class="hero-stat">42K</span>
+        <span class="hero-unit">語</span>
+      </div>
+      <div class="tagline">2万語の安心感、返品します</div>
+      <div class="sub-tagline">数え方にトリックがある。半分は口から出ない</div>
+      <div class="number">19</div>
+      <div class="bottom-accent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 020 -->
+<div class="thumb-wrap" id="t-020">
+  <div class="thumb-label">
+    <span class="num">020</span>
+    <span class="desc">25億通り -- 単語を覚えても喋れない数学的理由</span>
+    <span class="style-tag sc">STYLE C</span>
+    <button class="solo-btn" onclick="openSolo('t-020')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-c">
+      <div class="top-line"></div>
+      <div class="series-badge">AI x ENGLISH</div>
+      <div class="vibe-badge">MATH x COLLOCATIONS</div>
+      <div class="hero-row">
+        <span class="hero-stat">2.5B</span>
+        <span class="hero-unit">通り</span>
+      </div>
+      <div class="tagline">単語5万個、組み合わせ25億</div>
+      <div class="sub-tagline">正解はほんの一部。単語力じゃなくてチャンク力</div>
+      <div class="number">20</div>
+      <div class="bottom-accent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 021 -->
+<div class="thumb-wrap" id="t-021">
+  <div class="thumb-label">
+    <span class="num">021</span>
+    <span class="desc">a vs the -- 諦めていい科学的な根拠</span>
+    <span class="style-tag sc">STYLE C</span>
+    <button class="solo-btn" onclick="openSolo('t-021')">SOLO</button>
+  </div>
+  <div class="thumb">
+    <div class="thumb-inner style-c" style="justify-content: center; gap: 0;">
+      <div class="top-line"></div>
+      <div class="series-badge">AI x ENGLISH</div>
+      <div class="vibe-badge">ARTICLES x LINGUISTICS</div>
+      <!-- a vs the hero -->
+      <div style="display: flex; align-items: baseline; justify-content: center; gap: 40px;">
+        <span style="font-size: 260px; font-weight: 900; color: rgba(255,255,255,0.15); line-height: 1; letter-spacing: -6px; font-style: italic;">a</span>
+        <span style="font-size: 80px; font-weight: 300; color: #D4AF37; letter-spacing: 6px; opacity: 0.5;">vs</span>
+        <span style="font-size: 260px; font-weight: 900; background: linear-gradient(180deg, #ffffff 0%, #a8a29e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1; letter-spacing: -6px; font-style: italic;">the</span>
+      </div>
+      <div class="tagline" style="margin-top: 8px;">諦めていい科学的な根拠がある</div>
+      <div class="sub-tagline">日本人が "は" と "が" を説明できないように</div>
+      <div class="number">21</div>
+      <div class="bottom-accent"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<script>
+// Build nav buttons from all thumb-wraps
+const wraps = document.querySelectorAll('.thumb-wrap');
+const nav = document.getElementById('nav');
+let activeBtn = null;
+
+wraps.forEach(wrap => {
+  const id = wrap.id;
+  const num = wrap.querySelector('.num')?.textContent || '?';
+  const desc = wrap.querySelector('.desc')?.textContent?.split(' -- ')[0] || '';
+  const styleTag = wrap.querySelector('.style-tag');
+  const styleClass = styleTag?.classList.contains('sa') ? 'style-a-tag'
+    : styleTag?.classList.contains('sb') ? 'style-b-tag'
+    : styleTag?.classList.contains('sc') ? 'style-c-tag' : '';
+
+  const btn = document.createElement('button');
+  btn.className = `nav-btn ${styleClass}`;
+  btn.textContent = num;
+  btn.title = desc;
+  btn.onclick = () => {
+    // Remove previous highlight
+    document.querySelectorAll('.thumb-wrap.highlight').forEach(w => w.classList.remove('highlight'));
+    if (activeBtn) activeBtn.classList.remove('active');
+
+    // Activate
+    wrap.classList.add('highlight');
+    btn.classList.add('active');
+    activeBtn = btn;
+    wrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Auto-remove highlight after 3s
+    setTimeout(() => wrap.classList.remove('highlight'), 3000);
+  };
+  nav.appendChild(btn);
+});
+// Mark last button as latest
+const allBtns = nav.querySelectorAll('.nav-btn');
+if (allBtns.length > 0) {
+  const lastBtn = allBtns[allBtns.length - 1];
+  lastBtn.classList.add('latest');
+  lastBtn.textContent += ' NEW';
+}
+
+// Solo view
+function openSolo(id) {
+  event.stopPropagation();
+  const wrap = document.getElementById(id);
+  if (!wrap) return;
+  const thumb = wrap.querySelector('.thumb');
+  if (!thumb) return;
+
+  const container = document.getElementById('soloContainer');
+  container.innerHTML = '';
+  const clone = thumb.cloneNode(true);
+  container.appendChild(clone);
+
+  document.getElementById('soloOverlay').classList.add('visible');
+}
+
+function closeSolo() {
+  document.getElementById('soloOverlay').classList.remove('visible');
+}
+
+// ESC to close solo
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSolo();
+});
+</script>
+
+</body>
+</html>

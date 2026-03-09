@@ -1,0 +1,66 @@
+# Embedded git repositories (removed from project)
+# gsap_macbook_landing/
+# iwasaki-creative-hp/
+
+# SQL files (not needed for runtime)
+*.sql
+
+# Documentation (not needed for runtime)
+docs/
+*.md
+!README.md
+!src/posts/*.md
+
+# Scripts (not needed for runtime)
+scripts/
+
+# Development files
+.env.local.example
+.env.local
+.claude/
+
+# Git
+.git/
+
+# Node modules (Vercel installs these)
+node_modules/
+
+# Build output (Vercel builds fresh)
+.next/
+out/
+dist/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+
+# Root image files (sources, not needed for deployment)
+/work map.png
+/地図に残す仕事！.png
+
+# Large video files (optional features, reduce deployment size)
+public/videos/
+public/hero*.mp4
+public/temp-video.mp4
+public/models/
+
+# Mobile app directories (not needed for web deployment)
+android/
+ios/
+capacitor.config.ts
+
+# Additional documentation
+CONTACT_SETUP.md
+MOBILE_APP_SETUP.md
+MOBILE_README.md
+AI_SETUP.md

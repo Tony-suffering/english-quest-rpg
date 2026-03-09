@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>株式会社イワサキ内装 - 会社案内</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+        }
+
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+            min-height: 297mm;
+        }
+
+        .header {
+            text-align: center;
+            padding-bottom: 40px;
+            border-bottom: 2px solid #e5e5e5;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: #999;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin: 15px 0 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        .service-item {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-table {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .info-table td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .info-table td:first-child {
+            width: 30%;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .info-table td:last-child {
+            font-weight: 500;
+        }
+
+        .achievements {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            padding: 30px;
+            background: #f0f4f8;
+            border-radius: 10px;
+        }
+
+        .achievement-item {
+            text-align: center;
+        }
+
+        .achievement-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2563eb;
+            display: block;
+        }
+
+        .achievement-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .contact-box {
+            background: #e3f2fd;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .contact-info {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+            color: #999;
+            font-size: 12px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>株式会社イワサキ内装</h1>
+            <p class="subtitle">IWASAKI INTERIOR CO., LTD.</p>
+            <p class="tagline">創業74年の信頼と実績 | 内装仕上工事業</p>
+        </div>
+
+        <section>
+            <h2>私たちの約束</h2>
+            <p>
+                確かな技術力と豊富な経験で、お客様の理想の空間づくりをお手伝いいたします。
+                創業以来74年にわたり培ってきた内装工事のノウハウを活かし、
+                クロス張替え、ダイノックシート施工、床材施工など、あらゆる内装工事において、
+                美しい仕上がりと長期的な耐久性を実現します。
+            </p>
+            <p>
+                私たちは単なる施工業者ではなく、お客様の空間づくりのパートナーとして、
+                設計段階から完成まで、そしてアフターメンテナンスまで、
+                トータルでサポートさせていただきます。
+            </p>
+        </section>
+
+        <section>
+            <h2>専門サービス</h2>
+            <div class="grid">
+                <div class="service-item">
+                    <h3>◆ クロス・壁紙工事</h3>
+                    <p>
+                        ビニルクロス、織物クロス、紙クロス、機能性クロスなど多様な材質に対応。
+                        下地処理から仕上げまで、全工程において妥協のない施工を行います。
+                        継ぎ目の見えない美しい仕上がり、長年使用しても剥がれない確実な施工をお約束します。
+                    </p>
+                </div>
+                <div class="service-item">
+                    <h3>◆ ダイノックシート施工</h3>
+                    <p>
+                        3M™ダイノック™フィルムの認定施工技術で、900種類以上のデザインに対応。
+                        木目調、石目調、金属調など、本物と見紛うような仕上がりを実現。
+                        10年以上の耐久性を誇る、確かな品質をお約束します。
+                    </p>
+                </div>
+                <div class="service-item">
+                    <h3>◆ 床材施工</h3>
+                    <p>
+                        OAフロア、タイルカーペット、フロアタイル、長尺シート等、
+                        用途と環境に応じた最適な床材をご提案。
+                        水平精度の確保と長期耐久性を両立した、確実な施工を行います。
+                    </p>
+                </div>
+                <div class="service-item">
+                    <h3>◆ 総合内装工事</h3>
+                    <p>
+                        パーティション工事、天井工事、造作家具工事まで一貫対応。
+                        空間全体のトータルコーディネートで、
+                        機能性と美しさを兼ね備えた理想の空間を実現します。
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>会社概要</h2>
+            <table class="info-table">
+                <tr>
+                    <td>商号</td>
+                    <td>株式会社イワサキ内装</td>
+                </tr>
+                <tr>
+                    <td>創業</td>
+                    <td>1950年（昭和25年）</td>
+                </tr>
+                <tr>
+                    <td>代表取締役</td>
+                    <td>岩崎 和男</td>
+                </tr>
+                <tr>
+                    <td>事業内容</td>
+                    <td>内装仕上工事業</td>
+                </tr>
+                <tr>
+                    <td>所在地</td>
+                    <td>東京都墨田区緑1-24-2-101</td>
+                </tr>
+                <tr>
+                    <td>営業時間</td>
+                    <td>平日 9:00～18:00</td>
+                </tr>
+            </table>
+        </section>
+
+        <section>
+            <h2>信頼の実績</h2>
+            <div class="achievements">
+                <div class="achievement-item">
+                    <span class="achievement-number">74年</span>
+                    <span class="achievement-label">創業実績</span>
+                </div>
+                <div class="achievement-item">
+                    <span class="achievement-number">豊富</span>
+                    <span class="achievement-label">施工実績</span>
+                </div>
+                <div class="achievement-item">
+                    <span class="achievement-number">多数</span>
+                    <span class="achievement-label">取引先企業</span>
+                </div>
+                <div class="achievement-item">
+                    <span class="achievement-number">高評価</span>
+                    <span class="achievement-label">顧客満足度</span>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>保有資格・認証</h2>
+            <ul style="margin-left: 20px; color: #555;">
+                <li>建設業許可（東京都知事許可）</li>
+                <li>一級建築施工管理技士（複数名在籍）</li>
+                <li>二級建築施工管理技士（複数名在籍）</li>
+                <li>内装仕上施工技能士（1級・2級保有者多数）</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>私たちの強み</h2>
+            <p>
+                <strong>1. 熟練の技術力</strong><br>
+                継ぎ目の見えない美しい仕上がり、気泡やシワのない完璧な施工。
+                長年の経験で培った確かな技術で、お客様の期待を超える品質を実現します。
+            </p>
+            <p>
+                <strong>2. 豊富な施工実績</strong><br>
+                大手企業のオフィスから個人住宅まで、幅広い規模・用途の施工に対応。
+                それぞれの空間に最適な提案と施工を行います。
+            </p>
+            <p>
+                <strong>3. 安心のアフターサポート</strong><br>
+                施工後も定期的なメンテナンスと迅速なアフター対応で、
+                長期にわたって美しい空間を保ちます。
+            </p>
+        </section>
+
+        <section>
+            <div class="contact-box">
+                <h2 style="border: none; margin-top: 0;">お問い合わせ</h2>
+                <p>内装工事のご相談・お見積りは無料です。お気軽にお問い合わせください。</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span>📍</span>
+                        <span>東京都墨田区緑1-24-2-101</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>📞</span>
+                        <span>03-0000-0000</span>
+                    </div>
+                    <div class="contact-item">
+                        <span>✉️</span>
+                        <span>info@iwasaki-naisou.co.jp</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer">
+            <p>© 2024 株式会社イワサキ内装 All rights reserved.</p>
+            <p>www.iwasaki-naisou.co.jp</p>
+        </div>
+    </div>
+</body>
+</html>

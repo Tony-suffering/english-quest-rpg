@@ -1,0 +1,540 @@
+@import "tailwindcss";
+
+
+@custom-variant dark (&:is(.dark *));
+
+/* カスタムアニメーション */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn,
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-zen-kaku), var(--font-mplus-rounded), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-space-grotesk), var(--font-sora), var(--font-zen-kaku), ui-sans-serif, system-ui, sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  --primary: #171717;
+  --primary-foreground: #fafafa;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #171717;
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  --accent: #f5f5f5;
+  --accent-foreground: #171717;
+  --destructive: #dc2626;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #a3a3a3;
+  --chart-1: #3b82f6;
+  --chart-2: #10b981;
+  --chart-3: #6366f1;
+  --chart-4: #f59e0b;
+  --chart-5: #ef4444;
+  --sidebar: #fafafa;
+  --sidebar-foreground: #0a0a0a;
+  --sidebar-primary: #171717;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #171717;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #a3a3a3;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --card: #171717;
+  --card-foreground: #fafafa;
+  --popover: #171717;
+  --popover-foreground: #fafafa;
+  --primary: #e5e5e5;
+  --primary-foreground: #171717;
+  --secondary: #262626;
+  --secondary-foreground: #fafafa;
+  --muted: #262626;
+  --muted-foreground: #a3a3a3;
+  --accent: #262626;
+  --accent-foreground: #fafafa;
+  --destructive: #ef4444;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #737373;
+  --chart-1: #8b5cf6;
+  --chart-2: #06d6a0;
+  --chart-3: #ef4444;
+  --chart-4: #d946ef;
+  --chart-5: #f97316;
+  --sidebar: #171717;
+  --sidebar-foreground: #fafafa;
+  --sidebar-primary: #8b5cf6;
+  --sidebar-primary-foreground: #fafafa;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #737373;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* 印刷用スタイル */
+@media print {
+
+  /* 印刷時に非表示にする要素 */
+  .no-print,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* サイドバーとモバイルメニューを完全に非表示 - 強制適用 */
+  nav,
+  aside,
+  header,
+  .lg\:fixed,
+  .lg\:hidden,
+  .lg\:pl-64>div:first-child,
+  .lg\:pl-64>.lg\:hidden,
+  div[class*="lg:hidden"],
+  div[class*="lg:fixed"],
+  div[class*="fixed top-4"],
+  button,
+  svg {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* メインコンテンツのパディングをリセット */
+  .lg\:pl-64 {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  main {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  /* body直下の要素のパディングもリセット */
+  body>div {
+    padding-left: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  /* 印刷用コンテンツのみ表示 */
+  #company-profile-content {
+    display: block !important;
+    margin: 0 !important;
+    padding: 20mm !important;
+  }
+
+  /* セクションがページ途中で切れないようにする */
+  section {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* 見出しの後で改ページしない */
+  h1,
+  h2,
+  h3 {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  /* テーブル行が分割されないようにする */
+  tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* グリッドアイテムが分割されないようにする */
+  .grid>div {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* 印刷時のページ設定 */
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  /* 印刷時の基本スタイル */
+  body {
+    font-size: 10pt;
+    line-height: 1.4;
+    color: black !important;
+    background: white !important;
+  }
+
+  /* 印刷時のテーブルスタイル */
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+  }
+
+  .print-table th,
+  .print-table td {
+    border: 1px solid black !important;
+    padding: 2mm !important;
+    font-size: 9pt;
+  }
+
+  .print-table th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* ページブレーク制御 */
+  .print-page {
+    page-break-after: auto;
+    page-break-inside: avoid;
+  }
+
+  /* リンクの処理 */
+  a {
+    color: black !important;
+    text-decoration: none !important;
+  }
+
+  /* ボタンを非表示 */
+  button {
+    display: none !important;
+  }
+
+  /* 印刷用ヘッダー */
+  .print-header {
+    margin-bottom: 10mm;
+    text-align: center;
+  }
+
+  .print-header h1 {
+    font-size: 14pt;
+    font-weight: bold;
+    margin-bottom: 5mm;
+  }
+
+  /* 印刷用フッター */
+  .print-footer {
+    margin-top: 10mm;
+    font-size: 8pt;
+    text-align: right;
+  }
+
+  /* カラー印刷を避ける */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* 背景色を白に */
+  .bg-gray-50,
+  .bg-gray-100,
+  .bg-blue-50,
+  .bg-green-50 {
+    background-color: white !important;
+  }
+
+  /* 枠線をシンプルに */
+  .border {
+    border-color: black !important;
+  }
+
+  /* 余白の調整 */
+  .container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+/* 印刷プレビュー用スタイル */
+.print-preview {
+  background: white;
+  padding: 20mm;
+  margin: 20px auto;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 210mm;
+  min-height: 297mm;
+}
+
+/* 小口現金出納帳用の横向き印刷 */
+@media print and (orientation: landscape) {
+  @page {
+    size: A4 landscape;
+    margin: 5mm;
+  }
+
+  .print-table-landscape {
+    font-size: 8pt;
+  }
+
+  .print-table-landscape th,
+  .print-table-landscape td {
+    padding: 1mm !important;
+    font-size: 8pt;
+  }
+}
+
+/* Leaflet地図用スタイル */
+/* 現場名ラベル（常時表示） */
+.site-name-label {
+  background: rgba(17, 17, 17, 0.9) !important;
+  border: 2px solid #10B981 !important;
+  border-radius: 6px !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  white-space: nowrap !important;
+  pointer-events: none !important;
+}
+
+.site-name-label::before {
+  display: none !important;
+}
+
+/* ポップアップスタイル */
+.work-map-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+  padding: 16px !important;
+  border: 2px solid #10B981 !important;
+}
+
+.work-map-popup .leaflet-popup-content {
+  margin: 0 !important;
+  max-width: 280px !important;
+  min-width: 260px !important;
+}
+
+.work-map-popup .leaflet-popup-tip {
+  background: white !important;
+  border: 2px solid #10B981 !important;
+  border-top: none !important;
+  border-right: none !important;
+}
+
+/* 閉じるボタン */
+.work-map-popup .leaflet-popup-close-button {
+  top: 8px !important;
+  right: 8px !important;
+  width: 28px !important;
+  height: 28px !important;
+  font-size: 24px !important;
+  font-weight: bold !important;
+  color: #666 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: #f3f4f6 !important;
+  transition: all 0.2s !important;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/*  Refactored Animations from page.tsx                                       */
+/* -------------------------------------------------------------------------- */
+
+/* 右側の画像エリアいっぱいにポップアップして縮小消滅 */
+.popup-image-shrink-large {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: popFadeAndShrink 5s ease-in-out forwards;
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.6),
+    0 0 60px rgba(64, 224, 208, 0.5);
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.popup-image-shrink-large img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+@keyframes popFadeAndShrink {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  5% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  10% {
+    transform: scale(1);
+  }
+
+  /* 4秒静止 (10% ~ 90%) */
+  90% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* 0.5秒で縮小消滅 (90% ~ 100%) */
+  100% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+/* AI×DXセクションを一瞬光らせる */
+.ai-section-glow {
+  box-shadow:
+    0 0 100px rgba(16, 185, 129, 0.9),
+    0 0 150px rgba(16, 185, 129, 0.7),
+    inset 0 0 120px rgba(16, 185, 129, 0.3);
+  animation: sectionFlashGlow 0.6s ease-out forwards;
+}
+
+@keyframes sectionFlashGlow {
+  0% {
+    box-shadow:
+      0 0 0px rgba(16, 185, 129, 0),
+      inset 0 0 0px rgba(16, 185, 129, 0);
+    transform: scale(1);
+  }
+
+  20% {
+    box-shadow:
+      0 0 120px rgba(16, 185, 129, 1),
+      0 0 180px rgba(16, 185, 129, 0.8),
+      inset 0 0 150px rgba(16, 185, 129, 0.4);
+    transform: scale(1.03);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0px rgba(16, 185, 129, 0),
+      inset 0 0 0px rgba(16, 185, 129, 0);
+    transform: scale(1);
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

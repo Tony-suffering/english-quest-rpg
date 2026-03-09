@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Thumbnail Generator</title>
+<style>
+  body {
+    margin: 0;
+    padding: 40px;
+    background: #1a1a1a;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    color: #fff;
+  }
+  .controls {
+    max-width: 1280px;
+    margin: 0 auto 24px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .controls label {
+    font-size: 13px;
+    color: #a8a29e;
+    font-weight: 600;
+  }
+  .controls input, .controls select {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    background: #222;
+    color: #fff;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .controls input:focus, .controls select:focus {
+    outline: none;
+    border-color: #D4AF37;
+  }
+  .controls button {
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: none;
+    background: #D4AF37;
+    color: #1c1917;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .controls button:hover {
+    background: #c9a033;
+  }
+  .preview-label {
+    max-width: 1280px;
+    margin: 0 auto 8px;
+    font-size: 12px;
+    color: #78716c;
+  }
+  canvas {
+    display: block;
+    max-width: 1280px;
+    margin: 0 auto;
+    border: 1px solid #333;
+  }
+  .presets {
+    max-width: 1280px;
+    margin: 0 auto 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .presets button {
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #222;
+    color: #a8a29e;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .presets button:hover, .presets button.active {
+    border-color: #D4AF37;
+    color: #D4AF37;
+  }
+</style>
+</head>
+<body>
+
+<div class="presets" id="presets"></div>
+
+<div class="controls">
+  <div>
+    <label>Name</label><br>
+    <input id="name" value="喋れた。" style="width:160px;font-size:18px;">
+  </div>
+  <div>
+    <label>Tagline</label><br>
+    <input id="tagline" value="ビール1本と構造分析310個の差" style="width:280px;">
+  </div>
+  <div>
+    <label>Number</label><br>
+    <input id="number" value="" style="width:60px;">
+  </div>
+  <div>
+    <label>Series</label><br>
+    <input id="series" value="" style="width:160px;">
+  </div>
+  <div>
+    <label>Style</label><br>
+    <select id="style">
+      <option value="dark">Dark (Gold)</option>
+      <option value="dark-green">Dark (Green)</option>
+      <option value="dark-amber" selected>Dark (Amber)</option>
+      <option value="dark-red">Dark (Red)</option>
+      <option value="white">White Minimal</option>
+      <option value="split">Split (Half/Half)</option>
+      <option value="profile">Profile Banner</option>
+    </select>
+  </div>
+  <div>
+    <label>Scale</label><br>
+    <select id="scale">
+      <option value="1">1x (1280x670)</option>
+      <option value="1.5">1.5x (1920x1006) note推奨</option>
+      <option value="2" selected>2x (2560x1340)</option>
+    </select>
+  </div>
+  <button onclick="downloadPNG()">Download PNG</button>
+</div>
+
+<div class="preview-label">Preview (scaled to fit)</div>
+<canvas id="canvas" width="2560" height="1340" style="width:1280px;height:670px;"></canvas>
+
+<script>
+const PRESETS = [
+  { name: '口癖310個', tagline: '英会話の壁は英語力じゃない', number: '12', series: 'AI x ENGLISH', style: 'dark-amber' },
+  { name: '物語で覚える', tagline: '10人のキャラがいる単語帳', number: '13', series: 'AI x ENGLISH', style: 'dark-green' },
+  { name: '4歳児の英語', tagline: 'リスニング教材はもういらない', number: '14', series: 'AI x ENGLISH', style: 'dark' },
+  { name: 'umの力', tagline: '学校で禁止されたumだけが足りない', number: '15', series: 'AI x ENGLISH', style: 'dark-green' },
+  { name: '2語から', tagline: '最強のスピーキング練習法を作った', number: '16', series: 'AI x ENGLISH', style: 'dark' },
+  { name: '八村塁', tagline: 'ただ止まらないだけ', number: '17', series: 'NBA x ENGLISH', style: 'dark' },
+  { name: 'パチンコ', tagline: '設計が甘い（英語学習の話）', number: '18', series: 'AI x ENGLISH', style: 'dark-red' },
+  { name: '語彙2万語', tagline: '残念だけど桁が違った', number: '19', series: 'AI x ENGLISH', style: 'dark-amber' },
+  { name: '25億通り', tagline: '単語力じゃなくてチャンク力', number: '20', series: 'AI x ENGLISH', style: 'dark' },
+  { name: '大坂なおみ', tagline: '帰国子女じゃ説明できない', number: '24', series: 'TENNIS x ENGLISH', style: 'dark-green' },
+  { name: 'PROFILE', tagline: 'TOEIC 900。読める。聞ける。書ける。喋れない。', number: '', series: '', style: 'profile' },
+];
+
+const presetsEl = document.getElementById('presets');
+PRESETS.forEach((p, i) => {
+  const btn = document.createElement('button');
+  btn.textContent = `#${p.number} ${p.name}`;
+  btn.onclick = () => {
+    document.getElementById('name').value = p.name;
+    document.getElementById('tagline').value = p.tagline;
+    document.getElementById('number').value = p.number;
+    document.getElementById('series').value = p.series;
+    document.getElementById('style').value = p.style;
+    draw();
+    document.querySelectorAll('.presets button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  };
+  if (i === PRESETS.length - 1) btn.classList.add('active');
+  presetsEl.appendChild(btn);
+});
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+const COLORS = {
+  dark: { bg1: '#0f172a', bg2: '#1e293b', accent: '#D4AF37' },
+  'dark-green': { bg1: '#1a1a2e', bg2: '#16213e', accent: '#10B981' },
+  'dark-amber': { bg1: '#1a150a', bg2: '#2d2010', accent: '#F59E0B' },
+  'dark-red': { bg1: '#1a0a0a', bg2: '#2d1515', accent: '#EF4444' },
+  white: { bg1: '#ffffff', bg2: '#ffffff', accent: '#D4AF37' },
+  split: { bg1: '#0f172a', bg2: '#1e293b', accent: '#D4AF37' },
+  profile: { bg1: '#0a0a0a', bg2: '#1a1510', accent: '#D4AF37' },
+};
+
+function draw() {
+  const scale = parseFloat(document.getElementById('scale').value);
+  const W = 1280 * scale;
+  const H = 670 * scale;
+  canvas.width = W;
+  canvas.height = H;
+  canvas.style.width = '1280px';
+  canvas.style.height = '670px';
+
+  const s = (v) => v * scale;
+  const name = document.getElementById('name').value;
+  const tagline = document.getElementById('tagline').value;
+  const number = document.getElementById('number').value;
+  const series = document.getElementById('series').value;
+  const style = document.getElementById('style').value;
+  const c = COLORS[style] || COLORS.dark;
+
+  if (style === 'profile') {
+    // Profile banner -- center-safe layout for note.com center-crop
+    // note.com clips edges on PC/mobile, so all important text is centered
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, '#0a0a0a');
+    grad.addColorStop(0.3, '#1a1510');
+    grad.addColorStop(0.7, '#151008');
+    grad.addColorStop(1, '#0a0a0a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Gold accent lines top + bottom
+    const lineGrad = ctx.createLinearGradient(0, 0, W, 0);
+    lineGrad.addColorStop(0, 'transparent');
+    lineGrad.addColorStop(0.2, '#D4AF37');
+    lineGrad.addColorStop(0.8, '#D4AF37');
+    lineGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = lineGrad;
+    ctx.fillRect(0, 0, W, s(4));
+    ctx.fillRect(0, H - s(4), W, s(4));
+
+    // Decorative 900 watermark (center-right)
+    ctx.font = `900 ${s(320)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#D4AF3706';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('900', W * 0.72, H * 0.5);
+
+    // All text centered
+    const cx = W / 2;
+
+    // TOEIC 900 badge
+    ctx.font = `900 ${s(52)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#D4AF37';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText('TOEIC 900', cx, s(50));
+
+    // Subtitle
+    ctx.font = `700 ${s(30)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#a8a29e';
+    ctx.fillText('読める。聞ける。書ける。喋れない。', cx, s(115));
+
+    // Divider line
+    ctx.fillStyle = '#D4AF3740';
+    ctx.fillRect(cx - s(120), s(160), s(240), s(2));
+
+    // Main body -- centered
+    const bodyLines = [
+      '4技能のうち3つクリアして',
+      '最後の1つで永遠に死んでる男。',
+      '',
+      '原因を調べて、',
+      'だれも考えたことないことだけやったら、',
+      'アプリ1個できてた。',
+    ];
+    ctx.font = `600 ${s(28)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.textAlign = 'center';
+    let bodyY = s(185);
+    for (const line of bodyLines) {
+      if (line === '') { bodyY += s(16); continue; }
+      ctx.fillStyle = '#e7e5e4';
+      ctx.fillText(line, cx, bodyY);
+      bodyY += s(42);
+    }
+
+    // Bottom CTA
+    ctx.font = `800 ${s(30)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#D4AF37';
+    ctx.fillText('最強の英会話アプリを作る。毎日更新中。', cx, H - s(110));
+
+    // URL
+    ctx.font = `500 ${s(18)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#78716c';
+    ctx.fillText('toniolab.com/english/training/guide', cx, H - s(70));
+
+  } else if (style === 'white') {
+    // White style
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    // Left gold bar
+    ctx.fillStyle = c.accent;
+    ctx.fillRect(0, 0, s(6), H);
+
+    // Big number bg
+    ctx.font = `900 ${s(200)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = 'rgba(212, 175, 55, 0.1)';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.fillText(number, W - s(48), s(24));
+
+    // Player name
+    ctx.font = `900 ${s(100)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#1c1917';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(name, W / 2, H / 2 - s(20));
+
+    // Tagline
+    ctx.font = `500 ${s(36)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#78716c';
+    ctx.fillText(tagline, W / 2, H / 2 + s(50));
+
+  } else if (style === 'split') {
+    // Split style: left dark, right lighter
+    const grad = ctx.createLinearGradient(0, 0, W, 0);
+    grad.addColorStop(0, c.bg1);
+    grad.addColorStop(0.5, c.bg2);
+    grad.addColorStop(1, '#0c1222');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Vertical divider
+    ctx.fillStyle = c.accent;
+    ctx.fillRect(W * 0.48, s(80), s(3), H - s(160));
+
+    // Left side: number + series
+    ctx.font = `900 ${s(160)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = `${c.accent}18`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(number, W * 0.24, H / 2);
+
+    ctx.font = `700 ${s(16)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = `${c.accent}99`;
+    ctx.textAlign = 'center';
+    ctx.fillText(series, W * 0.24, H - s(60));
+
+    // Right side: name + tagline
+    ctx.font = `900 ${s(90)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(name, W * 0.74, H / 2 - s(30));
+
+    ctx.font = `600 ${s(34)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = c.accent;
+    ctx.fillText(tagline, W * 0.74, H / 2 + s(40));
+
+  } else {
+    // Dark styles
+    const grad = ctx.createLinearGradient(0, 0, W, H);
+    grad.addColorStop(0, c.bg1);
+    grad.addColorStop(1, c.bg2);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Accent line top
+    const lineGrad = ctx.createLinearGradient(0, 0, W, 0);
+    lineGrad.addColorStop(0, c.accent);
+    lineGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = lineGrad;
+    ctx.fillRect(0, 0, W, s(4));
+
+    // Series badge
+    ctx.font = `700 ${s(16)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = `${c.accent}99`;
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.letterSpacing = `${s(4)}px`;
+    ctx.fillText(series, W - s(48), s(40));
+
+    // Big number watermark
+    ctx.font = `900 ${s(180)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = `${c.accent}14`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(number, s(48), H - s(12));
+
+    // Player name
+    const nameSize = name.length <= 4 ? s(120) : name.length <= 6 ? s(100) : s(80);
+    ctx.font = `900 ${nameSize}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(name, W / 2, H / 2 - s(10));
+
+    // Tagline
+    ctx.font = `600 ${s(40)}px 'Hiragino Kaku Gothic ProN', sans-serif`;
+    ctx.fillStyle = c.accent;
+    ctx.textAlign = 'center';
+    ctx.fillText(tagline, W / 2, H / 2 + s(70));
+
+    // Subtle bottom line
+    const bottomGrad = ctx.createLinearGradient(0, 0, W, 0);
+    bottomGrad.addColorStop(0, 'transparent');
+    bottomGrad.addColorStop(0.5, `${c.accent}33`);
+    bottomGrad.addColorStop(1, 'transparent');
+    ctx.fillStyle = bottomGrad;
+    ctx.fillRect(0, H - s(1), W, s(1));
+  }
+}
+
+function downloadPNG() {
+  draw();
+  const name = document.getElementById('name').value;
+  const number = document.getElementById('number').value;
+  const link = document.createElement('a');
+  link.download = `thumb-${number}-${name}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+// Auto-draw on any input change
+document.querySelectorAll('input, select').forEach(el => {
+  el.addEventListener('input', draw);
+  el.addEventListener('change', draw);
+});
+
+// Initial draw
+draw();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+    "r2": {
+        "endpoint": "https://7efac10f7fba80dc187ea8a1008d0bfc.r2.cloudflarestorage.com",
+        "accessKeyId": "41769f07d9eb2c91eb055bc5d965ba79e",
+        "secretAccessKey": "e21afc8d49f8f927fe19355def62c34ac120e93a7c12b3378191188f9788cff4e",
+        "bucketName": "podcast-audio",
+        "publicUrl": "https://pub-628af24ae7da43ac93bbfb202b34b73e.r2.dev"
+    }
+}

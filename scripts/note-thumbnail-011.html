@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>note thumbnail - 011</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f5f5f5;
+    font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  }
+  .thumbnail {
+    width: 1280px;
+    height: 670px;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 80px;
+  }
+  /* subtle grid pattern */
+  .thumbnail::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(212,175,55,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(212,175,55,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  /* gold accent line */
+  .accent-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #D4AF37, #F5D76E, #D4AF37);
+  }
+  /* Duolingo crossed out */
+  .line1 {
+    font-size: 46px;
+    font-weight: 900;
+    color: #999;
+    letter-spacing: 3px;
+    margin-bottom: 28px;
+    position: relative;
+    z-index: 1;
+  }
+  .strikethrough {
+    text-decoration: line-through;
+    text-decoration-color: #e74c3c;
+    text-decoration-thickness: 4px;
+    color: #777;
+  }
+  /* main title */
+  .main-title {
+    font-size: 62px;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1.3;
+    letter-spacing: -1px;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 24px;
+  }
+  .gold {
+    color: #D4AF37;
+  }
+  /* subtitle */
+  .subtitle {
+    font-size: 24px;
+    color: #aaa;
+    font-weight: 500;
+    position: relative;
+    z-index: 1;
+    letter-spacing: 1px;
+  }
+  .subtitle span {
+    color: #D4AF37;
+    font-weight: 700;
+  }
+  /* bottom stats */
+  .stats {
+    position: absolute;
+    bottom: 40px;
+    left: 80px;
+    right: 80px;
+    display: flex;
+    gap: 40px;
+    z-index: 1;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stat-num {
+    font-size: 32px;
+    font-weight: 900;
+    color: #D4AF37;
+  }
+  .stat-label {
+    font-size: 14px;
+    color: #666;
+    letter-spacing: 2px;
+  }
+  /* corner decoration */
+  .corner {
+    position: absolute;
+    bottom: 40px;
+    right: 80px;
+    z-index: 1;
+    text-align: right;
+  }
+  .corner-text {
+    font-size: 16px;
+    color: #555;
+    letter-spacing: 3px;
+  }
+  .corner-sub {
+    font-size: 13px;
+    color: #444;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="thumbnail">
+  <div class="accent-line"></div>
+
+  <div class="line1">
+    <span class="strikethrough">Duolingo</span> /
+    <span class="strikethrough">英会話スクール</span> /
+    <span class="strikethrough">シャドーイング</span>
+  </div>
+
+  <div class="main-title">
+    では<span class="gold">絶対に学べない</span>英語を<br>
+    教えるアプリを<span class="gold">1人</span>で作った
+  </div>
+
+  <div class="subtitle">
+    <span>15,000</span> イディオム / <span>310</span> 口癖 / <span>4</span> 会話シナリオ
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">50+</div>
+      <div class="stat-label">PAGES</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0</div>
+      <div class="stat-label">SPEAKING ABILITY</div>
+    </div>
+  </div>
+
+  <div class="corner">
+    <div class="corner-text">STILL BUILDING</div>
+    <div class="corner-sub">まだ喋れない。でもまだ作ってる。</div>
+  </div>
+</div>
+</body>
+</html>
