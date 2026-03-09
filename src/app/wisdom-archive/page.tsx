@@ -5,10 +5,12 @@ import { createClient } from '@supabase/supabase-js';
 import Header from '@/components/website/Header';
 import Footer from '@/components/website/Footer';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY || ''
+  );
+}
 
 interface Wisdom {
   id: number;
@@ -26,7 +28,7 @@ export default function WisdomArchivePage() {
 
   useEffect(() => {
     async function fetchWisdoms() {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabase()
         .from('wisdoms')
         .select('*')
         .not('image_url', 'is', null)

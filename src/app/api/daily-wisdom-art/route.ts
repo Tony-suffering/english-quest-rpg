@@ -10,10 +10,12 @@ const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID
 const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN
 
 // wisdomsテーブルはFINANCE Supabaseにある
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY!
+  )
+}
 
 // コルクじじいの口調で今日の悟りを生成
 async function generateWisdom(): Promise<string> {
@@ -191,7 +193,7 @@ async function saveWisdom(content: string, contentEn: string, imageUrl: string):
   console.log('Saving wisdom for date:', today)
 
   try {
-    const { error, data } = await supabase
+    const { error, data } = await getSupabase()
       .from('wisdoms')
       .upsert({
         date: today,

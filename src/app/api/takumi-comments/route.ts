@@ -4,15 +4,17 @@ import { createClient } from '@supabase/supabase-js'
 export const runtime = 'edge'
 
 // Supabaseクライアント（FINANCE用 = iwasaki-naisou）
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY || ''
+  )
+}
 
 // GET: 最新のコメントを取得
 export async function GET() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('takumi_comments')
       .select('*')
       .order('created_at', { ascending: false })
@@ -77,7 +79,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('takumi_comments')
       .insert({
         jijii_tweet: jijiiTweet,

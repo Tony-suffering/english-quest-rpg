@@ -3,10 +3,12 @@ import { createClient } from '@supabase/supabase-js'
 
 export const runtime = 'edge'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY || ''
+  )
+}
 
 // POST /api/ecosystem/jijii  { message: "...", trigger: "NHK" }
 // POST /api/ecosystem/anya   { message: "..." }
@@ -29,7 +31,7 @@ export async function POST(
       return NextResponse.json({ success: false, error: 'message required', body }, { status: 400 })
     }
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('ecosystem_messages')
       .insert({
         id: crypto.randomUUID(),

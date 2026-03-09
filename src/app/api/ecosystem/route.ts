@@ -4,10 +4,12 @@ import { sampleEcosystemThreads } from '@/data/ecosystem'
 
 export const runtime = 'edge'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY!
-)
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY || ''
+  )
+}
 
 // GET: 最新の会話を取得
 export async function GET(request: NextRequest) {
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('ecosystem_messages')
       .select('*')
       .order('created_at', { ascending: false })
@@ -56,7 +58,7 @@ export async function POST(request: NextRequest) {
     if (anya) messages.push({ id: crypto.randomUUID(), thread_id: threadId, character: 'anya', message: anya, trigger: null })
     if (takumi) messages.push({ id: crypto.randomUUID(), thread_id: threadId, character: 'takumi', message: takumi, trigger: null })
 
-    const { error } = await supabase
+    const { error } = await getSupabase()
       .from('ecosystem_messages')
       .insert(messages)
 
