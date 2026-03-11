@@ -889,20 +889,19 @@ export default function MemoriaDetailPage() {
         if (!saveWord.trim() || !saveMeaning.trim()) return;
         setIsSavingPhrase(true);
         try {
-            const res = await fetch('/api/user-phrases', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    phrase: saveWord.trim(),
-                    type: saveType,
-                    meaning: saveMeaning,
-                    example: saveExample,
-                    source: entry ? `Memoria: ${entry.title}` : 'Memoria',
-                }),
+            const saved = JSON.parse(localStorage.getItem('rpg_user_phrases') || '[]');
+            saved.push({
+                id: `up-${Date.now()}`,
+                phrase: saveWord.trim(),
+                type: saveType,
+                meaning: saveMeaning,
+                example: saveExample,
+                source: entry ? `Memoria: ${entry.title}` : 'Memoria',
+                mastery_level: 0,
+                created_at: new Date().toISOString(),
             });
-            if (res.ok || res.status === 409) {
-                setShowSaveModal(false);
-            }
+            localStorage.setItem('rpg_user_phrases', JSON.stringify(saved));
+            setShowSaveModal(false);
         } finally {
             setIsSavingPhrase(false);
         }
@@ -1494,18 +1493,19 @@ export default function MemoriaDetailPage() {
                                                 onClick={async () => {
                                                     // Quick save with pre-filled data
                                                     try {
-                                                        const res = await fetch('/api/user-phrases', {
-                                                            method: 'POST',
-                                                            headers: { 'Content-Type': 'application/json' },
-                                                            body: JSON.stringify({
-                                                                phrase: vocab.word,
-                                                                type: vocab.type,
-                                                                meaning: vocab.meaning,
-                                                                example: vocab.example || '',
-                                                                source: entry ? `Memoria: ${entry.title}` : 'Memoria',
-                                                            }),
+                                                        const saved = JSON.parse(localStorage.getItem('rpg_user_phrases') || '[]');
+                                                        saved.push({
+                                                            id: `up-${Date.now()}`,
+                                                            phrase: vocab.word,
+                                                            type: vocab.type,
+                                                            meaning: vocab.meaning,
+                                                            example: vocab.example || '',
+                                                            source: entry ? `Memoria: ${entry.title}` : 'Memoria',
+                                                            mastery_level: 0,
+                                                            created_at: new Date().toISOString(),
                                                         });
-                                                        if (res.ok) {
+                                                        localStorage.setItem('rpg_user_phrases', JSON.stringify(saved));
+                                                        if (true) {
                                                             // Visual feedback - could add toast
                                                             const el = document.getElementById(`vocab-${i}`);
                                                             if (el) {

@@ -1,11 +1,8 @@
-# イワサキ内装 robots.txt
+# English Quest RPG
 User-agent: *
 Allow: /
 
-# サイトマップ
-Sitemap: https://www.iwasaki-naisou.jp/sitemap.xml
+Sitemap: https://english-quest-rpg.vercel.app/sitemap.xml
 
-# クロール不要なディレクトリ
 Disallow: /api/
 Disallow: /_next/
-Disallow: /admin/

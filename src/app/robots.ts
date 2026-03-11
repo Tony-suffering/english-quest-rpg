@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function robots(): MetadataRoute.Robots {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://iwasaki-naisou.com'
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://english-quest-rpg.vercel.app'
 
     return {
         rules: {

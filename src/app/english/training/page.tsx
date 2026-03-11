@@ -10,6 +10,14 @@ import {
     startFeverBGM, stopFeverBGM, playCardRankSound, playRankUpSound, playFeverChainHit,
 } from '@/lib/training-sounds';
 import PuzzleBoard from '@/components/english/PuzzleBoard';
+import {
+    getAllPhrases, getMastery, getLastLeveled, setMastery as storeMastery,
+    getCardPoints as storeGetCardPoints, getPlayerStats, rollGacha,
+    getMonthlyReviewCounts, getMonthlyDateTouches, incrementDateTouch,
+    getPhraseLinks as storeGetPhraseLinks, addPhraseLink, addUserPhrase,
+    addPhrase as storeAddPhrase, updatePhrase as storeUpdatePhrase,
+    deletePhrase as storeDeletePhrase,
+} from '@/lib/local-store';
 import './training-animations.css';
 
 interface VoiceRecording {
@@ -1591,218 +1599,185 @@ export default function PhrasesPage() {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Fetch player stats on mount
+    // Load player stats on mount
     useEffect(() => {
-        fetch('/api/player-stats')
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    setPlayerTotalXP(d.total_xp || 0);
-                    setPlayerLevel(levelFromXP(d.total_xp || 0));
-                    setPlayerSparks(d.sparks || 0);
-                    playerSparksRef.current = d.sparks || 0;
-                }
-            })
-            .catch(() => { });
+        const stats = getPlayerStats();
+        setPlayerTotalXP(stats.total_xp);
+        setPlayerLevel(levelFromXP(stats.total_xp));
+        setPlayerSparks(stats.sparks);
+        playerSparksRef.current = stats.sparks;
     }, []);
 
-    // Fetch monthly review counts + date touches when month changes
+    // Load monthly review counts + date touches when month changes
     useEffect(() => {
         if (!currentMonth) return;
         const ym = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
-        fetch(`/api/review-count?month=${ym}`)
-            .then(r => r.json())
-            .then(d => { if (d.success) setMonthlyReviewCounts(prev => ({ ...prev, ...(d.counts || {}) })); })
-            .catch(() => { });
-        fetch(`/api/date-touches?month=${ym}`)
-            .then(r => r.json())
-            .then(d => { if (d.success) setDateTouchMap(prev => ({ ...prev, ...(d.touches || {}) })); })
-            .catch(() => { });
+        const counts = getMonthlyReviewCounts(ym);
+        setMonthlyReviewCounts(prev => ({ ...prev, ...counts }));
+        const touches = getMonthlyDateTouches(ym);
+        setDateTouchMap(prev => ({ ...prev, ...touches }));
     }, [currentMonth]);
 
     // Helper: post XP to review-count + update player level + chain transitions
     const postXP = useCallback((todayKey: string, xpGained: number, slamActive = false, phraseId?: string) => {
         const currentChain = feverRef.current;
         const chainTierNum = currentChain.active ? getChainTier(currentChain.streak) : 0;
-        fetch('/api/review-count', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ date: todayKey, xp: xpGained, phrase_id: phraseId, fever: currentChain.active, chain_tier: chainTierNum })
-        })
-            .then(r => r.json())
-            .then(d => {
-                if (d.success) {
-                    // Update count + xp immediately (non-spoiler), defer sparks until after slot
-                    setMonthlyReviewCounts(prev => ({ ...prev, [todayKey]: { count: d.count, xp: d.xp, sparks: prev[todayKey]?.sparks || 0 } }));
-                    if (d.total_xp !== undefined) {
-                        const oldLevel = playerLevel;
-                        const newTotalXP = d.total_xp;
-                        const newLevel = levelFromXP(newTotalXP);
-                        setPlayerTotalXP(newTotalXP);
-                        if (newLevel > oldLevel) {
-                            setPlayerLevel(newLevel);
-                            const info = getTitleForLevel(newLevel);
-                            setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: Date.now() });
-                        } else {
-                            setPlayerLevel(newLevel);
-                        }
-                    }
-                    // Gacha result + card points + FEVER logic
-                    if (d.gacha) {
-                        const tier = d.gacha.tier as string;
-                        const slotOn = getSettings().slotEnabled;
+        const d = rollGacha(xpGained, phraseId, currentChain.active, chainTierNum);
 
-                        // Update sparks ref immediately (even when deferring UI) to prevent stale milestone detection
-                        const prevSparksForMilestone = playerSparksRef.current;
-                        if (d.gacha.total_sparks !== undefined) {
-                            playerSparksRef.current = d.gacha.total_sparks;
-                        }
+        // Update count + xp immediately (non-spoiler), defer sparks until after slot
+        setMonthlyReviewCounts(prev => ({ ...prev, [todayKey]: { count: d.count, xp: d.xp, sparks: prev[todayKey]?.sparks || 0 } }));
+        {
+            const oldLevel = playerLevel;
+            const newTotalXP = d.total_xp;
+            const newLevel = levelFromXP(newTotalXP);
+            setPlayerTotalXP(newTotalXP);
+            if (newLevel > oldLevel) {
+                setPlayerLevel(newLevel);
+                const info = getTitleForLevel(newLevel);
+                setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: Date.now() });
+            } else {
+                setPlayerLevel(newLevel);
+            }
+        }
+        // Gacha result + card points + FEVER logic
+        {
+            const tier = d.gacha.tier as string;
+            const slotOn = getSettings().slotEnabled;
 
-                        // Score updates that would spoil slot result — defer when slot is ON
-                        const scoreUpdates = () => {
-                            setPlayerSparks(d.gacha.total_sparks);
-                            setMonthlyReviewCounts(prev => ({ ...prev, [todayKey]: { ...prev[todayKey], sparks: d.sparks || d.gacha.total_sparks } }));
-                            if (phraseId && d.gacha.card_total_points !== undefined) {
-                                setCardPoints(prev => ({ ...prev, [phraseId]: d.gacha.card_total_points }));
-                            }
-                            // GP milestone detection
-                            if (d.gacha.total_sparks !== undefined) {
-                                const milestones = [5000, 1000, 500, 100, 50];
-                                for (const m of milestones) {
-                                    if (Math.floor(prevSparksForMilestone / m) < Math.floor(d.gacha.total_sparks / m)) {
-                                        setMilestoneEffect({ amount: m, key: Date.now() });
-                                        break;
-                                    }
-                                }
-                            }
-                            if (d.gacha.luck_multiplier !== undefined) {
-                                setLuckMultiplier(d.gacha.luck_multiplier);
-                            }
-                            // Card rank-up detection
-                            if (phraseId && d.gacha.card_total_points !== undefined) {
-                                const prevPoints = cardPoints[phraseId] || 0;
-                                const prevRank = getCardRank(prevPoints);
-                                const newRank = getCardRank(d.gacha.card_total_points);
-                                if (prevRank.rank !== newRank.rank && newRank.rank !== 'NORMAL') {
-                                    setTimeout(() => {
-                                        playRankUpSound(newRank.rank);
-                                        setCardRankUpEffect({
-                                            oldRank: prevRank.label || 'NORMAL',
-                                            newRank: newRank.label,
-                                            newRankColor: newRank.borderColor,
-                                            key: Date.now(),
-                                        });
-                                    }, 500);
-                                }
-                            }
-                        };
+            // Update sparks ref immediately (even when deferring UI) to prevent stale milestone detection
+            const prevSparksForMilestone = playerSparksRef.current;
+            playerSparksRef.current = d.gacha.total_sparks;
 
-                        // 連荘 Chain state transitions — graduated escalation (always immediate)
-                        if (getSettings().feverEnabled) {
-                        const currentFever = feverRef.current;
-                        const isWin = tier !== 'MISS';
-                        const isMiss = tier === 'MISS';
-                        if (isMiss) {
-                            // Chain breaks — reset to 0
-                            if (currentFever.active) {
-                                const exitStreak = currentFever.streak;
-                                stopFeverBGM(feverDroneRef.current);
-                                feverDroneRef.current = null;
-                                setChainState({ count: 0, mode: 'normal', key: Date.now() });
-                                feverRef.current = { active: false, streak: 0 };
-                                setFeverFlash('exit');
-                                setFeverExitEffect({ streak: exitStreak });
-                                playFeverExitSound();
-                            }
-                        } else if (isWin) {
-                            const newCount = currentFever.streak + 1;
-                            const oldMode = getChainMode(currentFever.streak);
-                            const newMode = getChainMode(newCount);
-                            const wasActive = currentFever.active;
-
-                            setChainState({ count: newCount, mode: newMode, key: Date.now() });
-                            feverRef.current = { active: newMode !== 'normal', streak: newCount };
-
-                            // Mode escalation effects
-                            if (newMode !== oldMode && newMode !== 'normal') {
-                                setChainTransition({ from: oldMode, to: newMode, key: Date.now() });
-                                if (!wasActive) {
-                                    // First entry into chain mode (normal → kakuhen at 3)
-                                    setFeverFlash('enter');
-                                    setFeverEntryEffect(true);
-                                    playFeverEntrySound();
-                                    feverDroneRef.current = startFeverBGM();
-                                } else {
-                                    // Escalation (kakuhen → gekiatsu, gekiatsu → god)
-                                    playFeverEntrySound();
-                                }
-                            } else if (wasActive) {
-                                playFeverChainHit(newCount);
-                            }
-                        }
-                        }
-
-                        if (slotOn) {
-                        // Queue score updates to flush after slot reveal clears (no spoilers)
-                        deferredScoreUpdates.current.push(scoreUpdates);
-                        if (pendingGachaRef.current) clearTimeout(pendingGachaRef.current);
-                        const delay = slamActive ? 1200 : 0;
-                        pendingGachaRef.current = setTimeout(() => {
-                            setGachaEffect({
-                                phase: 'reel',
-                                tier,
-                                sparksWon: d.gacha.sparks_won,
-                                phraseId: phraseId || null,
-                                cardPointsEarned: d.gacha.card_points_earned || 0,
-                                cardTotalPoints: d.gacha.card_total_points || 0,
-                                key: Date.now(),
-                            });
-                            pendingGachaRef.current = null;
-                        }, delay);
-                        } else {
-                            // Slot OFF — apply scores immediately + show quiet toast
-                            scoreUpdates();
-                            setQuietToast({
-                                sparks: d.gacha.sparks_won,
-                                cardPts: d.gacha.card_points_earned || 0,
-                                tier,
-                                key: Date.now(),
-                            });
+            // Score updates that would spoil slot result — defer when slot is ON
+            const scoreUpdates = () => {
+                setPlayerSparks(d.gacha.total_sparks);
+                setMonthlyReviewCounts(prev => ({ ...prev, [todayKey]: { ...prev[todayKey], sparks: d.sparks || d.gacha.total_sparks } }));
+                if (phraseId && d.gacha.card_total_points !== undefined) {
+                    setCardPoints(prev => ({ ...prev, [phraseId]: d.gacha.card_total_points }));
+                }
+                // GP milestone detection
+                {
+                    const milestones = [5000, 1000, 500, 100, 50];
+                    for (const m of milestones) {
+                        if (Math.floor(prevSparksForMilestone / m) < Math.floor(d.gacha.total_sparks / m)) {
+                            setMilestoneEffect({ amount: m, key: Date.now() });
+                            break;
                         }
                     }
                 }
-            })
-            .catch(() => { });
+                if (d.gacha.luck_multiplier !== undefined) {
+                    setLuckMultiplier(d.gacha.luck_multiplier);
+                }
+                // Card rank-up detection
+                if (phraseId && d.gacha.card_total_points !== undefined) {
+                    const prevPoints = cardPoints[phraseId] || 0;
+                    const prevRank = getCardRank(prevPoints);
+                    const newRank = getCardRank(d.gacha.card_total_points);
+                    if (prevRank.rank !== newRank.rank && newRank.rank !== 'NORMAL') {
+                        setTimeout(() => {
+                            playRankUpSound(newRank.rank);
+                            setCardRankUpEffect({
+                                oldRank: prevRank.label || 'NORMAL',
+                                newRank: newRank.label,
+                                newRankColor: newRank.borderColor,
+                                key: Date.now(),
+                            });
+                        }, 500);
+                    }
+                }
+            };
+
+            // 連荘 Chain state transitions — graduated escalation (always immediate)
+            if (getSettings().feverEnabled) {
+            const currentFever = feverRef.current;
+            const isWin = tier !== 'MISS';
+            const isMiss = tier === 'MISS';
+            if (isMiss) {
+                // Chain breaks — reset to 0
+                if (currentFever.active) {
+                    const exitStreak = currentFever.streak;
+                    stopFeverBGM(feverDroneRef.current);
+                    feverDroneRef.current = null;
+                    setChainState({ count: 0, mode: 'normal', key: Date.now() });
+                    feverRef.current = { active: false, streak: 0 };
+                    setFeverFlash('exit');
+                    setFeverExitEffect({ streak: exitStreak });
+                    playFeverExitSound();
+                }
+            } else if (isWin) {
+                const newCount = currentFever.streak + 1;
+                const oldMode = getChainMode(currentFever.streak);
+                const newMode = getChainMode(newCount);
+                const wasActive = currentFever.active;
+
+                setChainState({ count: newCount, mode: newMode, key: Date.now() });
+                feverRef.current = { active: newMode !== 'normal', streak: newCount };
+
+                // Mode escalation effects
+                if (newMode !== oldMode && newMode !== 'normal') {
+                    setChainTransition({ from: oldMode, to: newMode, key: Date.now() });
+                    if (!wasActive) {
+                        // First entry into chain mode (normal → kakuhen at 3)
+                        setFeverFlash('enter');
+                        setFeverEntryEffect(true);
+                        playFeverEntrySound();
+                        feverDroneRef.current = startFeverBGM();
+                    } else {
+                        // Escalation (kakuhen → gekiatsu, gekiatsu → god)
+                        playFeverEntrySound();
+                    }
+                } else if (wasActive) {
+                    playFeverChainHit(newCount);
+                }
+            }
+            }
+
+            if (slotOn) {
+            // Queue score updates to flush after slot reveal clears (no spoilers)
+            deferredScoreUpdates.current.push(scoreUpdates);
+            if (pendingGachaRef.current) clearTimeout(pendingGachaRef.current);
+            const delay = slamActive ? 1200 : 0;
+            pendingGachaRef.current = setTimeout(() => {
+                setGachaEffect({
+                    phase: 'reel',
+                    tier,
+                    sparksWon: d.gacha.sparks_won,
+                    phraseId: phraseId || null,
+                    cardPointsEarned: d.gacha.card_points_earned || 0,
+                    cardTotalPoints: d.gacha.card_total_points || 0,
+                    key: Date.now(),
+                });
+                pendingGachaRef.current = null;
+            }, delay);
+            } else {
+                // Slot OFF — apply scores immediately + show quiet toast
+                scoreUpdates();
+                setQuietToast({
+                    sparks: d.gacha.sparks_won,
+                    cardPts: d.gacha.card_points_earned || 0,
+                    tier,
+                    key: Date.now(),
+                });
+            }
+        }
     }, [playerLevel, cardPoints]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [phrasesRes, masteryRes, recordingsRes, linksRes] = await Promise.all([
-                    fetch('/api/phrases'),
-                    fetch('/api/phrases/mastery'),
-                    fetch('/api/voice-recordings'),
-                    fetch('/api/phrases/links'),
-                ]);
-                const phrasesData = await phrasesRes.json();
-                const masteryData = await masteryRes.json();
-                const recordingsData = await recordingsRes.json();
-                const linksData = await linksRes.json();
-                if (phrasesData.success) setPhrases(phrasesData.phrases);
-                if (masteryData.success) {
-                    setPhraseMastery(masteryData.mastery || {});
-                    if (masteryData.lastLeveled) setPhraseLastLeveled(masteryData.lastLeveled);
-                    if (masteryData.cardPoints) setCardPoints(masteryData.cardPoints);
-                }
-                if (recordingsData.success) setVoiceRecordings(recordingsData.recordings || {});
-                if (linksData.success) {
-                    const map: Record<string, PhraseLink[]> = {};
-                    for (const l of (linksData.links || [])) {
-                        if (!map[l.phrase_id]) map[l.phrase_id] = [];
-                        map[l.phrase_id].push(l);
-                    }
-                    setPhraseLinks(map);
-                }
+                const allPhrases = getAllPhrases();
+                setPhrases(allPhrases);
+                const mastery = getMastery();
+                setPhraseMastery(mastery);
+                const lastLeveled = getLastLeveled();
+                setPhraseLastLeveled(lastLeveled);
+                const cp = storeGetCardPoints();
+                setCardPoints(cp);
+                // Voice recordings = empty (no voice in standalone)
+                setVoiceRecordings({});
+                // Links from localStorage
+                const links = storeGetPhraseLinks();
+                setPhraseLinks(links);
             } finally {
                 setLoading(false);
             }
@@ -1960,26 +1935,15 @@ export default function PhrasesPage() {
         setSavingPhrase(true);
         try {
             const fullText = selectedCaptions.map(c => c.text).join(' ');
-            const res = await fetch('/api/phrases', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    english: fullText,
-                    japanese: `(${youglishPhrase?.english.slice(0, 30) || 'YouGlish'})`,
-                    category: 'YouGlish',
-                    date: youglishSaveDate
-                })
+            const newP = storeAddPhrase({
+                english: fullText,
+                japanese: `(${youglishPhrase?.english.slice(0, 30) || 'YouGlish'})`,
+                category: 'YouGlish',
+                date: youglishSaveDate
             });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.success && data.phrase && !data.duplicate) {
-                    setPhrases(prev => [...prev, data.phrase]);
-                }
-                alert('Saved!');
-                setCaptionHistory([]);
-            } else {
-                alert('Failed to save');
-            }
+            setPhrases(prev => [...prev, newP]);
+            alert('Saved!');
+            setCaptionHistory([]);
         } catch (err) {
             console.error(err);
             alert('Error saving');
@@ -3420,11 +3384,7 @@ export default function PhrasesPage() {
             const pDate = phraseDateMap[phraseId];
             if (pDate) {
                 setDateTouchMap(prev => ({ ...prev, [pDate]: (prev[pDate] || 0) + 1 }));
-                fetch('/api/date-touches', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phrase_date: pDate })
-                }).catch(() => { });
+                incrementDateTouch(pDate);
             }
         }
 
@@ -3455,20 +3415,7 @@ export default function PhrasesPage() {
             }
         }
 
-        try {
-            const res = await fetch('/api/phrases/mastery', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phraseId, level: next, today: clientToday })
-            });
-            // Rollback on 409 (server rejected same-day level-up)
-            if (res.status === 409) {
-                setPhraseMastery(prev => ({ ...prev, [phraseId]: current }));
-                return false;
-            }
-        } catch (err) {
-            console.error('Failed to save mastery:', err);
-        }
+        storeMastery(phraseId, next, clientToday);
 
         return true;
     }, [phraseMastery, voiceRecordings, phraseLinks, phraseLastLeveled, clientToday, phraseDateMap]);
@@ -3485,29 +3432,13 @@ export default function PhrasesPage() {
         const pDate = phraseDateMap[phraseId];
         if (pDate) {
             setDateTouchMap(prev => ({ ...prev, [pDate]: (prev[pDate] || 0) + 1 }));
-            fetch('/api/date-touches', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phrase_date: pDate })
-            }).catch(() => { });
+            incrementDateTouch(pDate);
         }
         playLevelSound(6);
 
-        try {
-            const res = await fetch('/api/phrases/mastery', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phraseId, level: 6, today: clientToday })
-            });
-            if (res.status === 409) {
-                setPhraseMastery(prev => ({ ...prev, [phraseId]: 5 }));
-                return;
-            }
-            // CROWN = lv 7 XP
-            postXP(clientToday, CHAKRA_CONFIG[6].lv, false, phraseId);
-        } catch (err) {
-            console.error('Failed to declare CROWN:', err);
-        }
+        storeMastery(phraseId, 6, clientToday);
+        // CROWN = lv 7 XP
+        postXP(clientToday, CHAKRA_CONFIG[6].lv, false, phraseId);
     }, [phraseLastLeveled, clientToday, phraseDateMap]);
 
     // Play phrase audio (must be synchronous to preserve user gesture for Chrome)
@@ -3631,31 +3562,21 @@ export default function PhrasesPage() {
         if (!vocabWord.trim() || !vocabMeaning.trim()) return;
         setVocabSaving(true);
         try {
-            const res = await fetch('/api/user-phrases', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    phrase: vocabWord.trim(),
-                    type: vocabType,
-                    meaning: vocabMeaning.trim(),
-                    example: vocabExample,
-                    source: 'Phrases',
-                    date: vocabDate,
-                }),
+            addUserPhrase({
+                phrase: vocabWord.trim(),
+                type: vocabType,
+                meaning: vocabMeaning.trim(),
+                example: vocabExample,
+                source: 'Phrases',
+                date: vocabDate,
             });
-            const data = await res.json();
-            if (data.success) {
-                setShowVocabModal(false);
-                setVocabWord('');
-                setVocabMeaning('');
-                setVocabExample('');
-                alert('Saved!');
-            } else {
-                alert(data.error || 'Failed to save');
-            }
-        } catch (err) {
-            console.error('Failed to save vocabulary:', err);
-            alert('Error saving vocabulary');
+            setShowVocabModal(false);
+            setVocabWord('');
+            setVocabMeaning('');
+            setVocabExample('');
+            alert('Saved!');
+        } catch (err: any) {
+            alert(err.message || 'Error saving vocabulary');
         } finally {
             setVocabSaving(false);
         }
@@ -3665,35 +3586,26 @@ export default function PhrasesPage() {
         if (!editingPhrase || !editingPhrase.english.trim()) return;
         setEditSaving(true);
         try {
-            const res = await fetch(`/api/phrases/${editingPhrase.id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    english: editingPhrase.english.trim(),
-                    japanese: editingPhrase.japanese.trim(),
-                }),
+            storeUpdatePhrase(editingPhrase.id, {
+                english: editingPhrase.english.trim(),
+                japanese: editingPhrase.japanese.trim(),
             });
-            const data = await res.json();
-            if (data.success) {
-                const updatedEnglish = editingPhrase.english.trim();
-                const updatedJapanese = editingPhrase.japanese.trim();
-                setPhrases(prev => prev.map(p =>
+            const updatedEnglish = editingPhrase.english.trim();
+            const updatedJapanese = editingPhrase.japanese.trim();
+            setPhrases(prev => prev.map(p =>
+                p.id === editingPhrase.id
+                    ? { ...p, english: updatedEnglish, japanese: updatedJapanese }
+                    : p
+            ));
+            // Also update cached review list so review card reflects the edit
+            if (reviewListCacheRef.current.list) {
+                reviewListCacheRef.current.list = reviewListCacheRef.current.list.map(p =>
                     p.id === editingPhrase.id
                         ? { ...p, english: updatedEnglish, japanese: updatedJapanese }
                         : p
-                ));
-                // Also update cached review list so review card reflects the edit
-                if (reviewListCacheRef.current.list) {
-                    reviewListCacheRef.current.list = reviewListCacheRef.current.list.map(p =>
-                        p.id === editingPhrase.id
-                            ? { ...p, english: updatedEnglish, japanese: updatedJapanese }
-                            : p
-                    );
-                }
-                setEditingPhrase(null);
-            } else {
-                alert(data.error || 'Failed to update');
+                );
             }
+            setEditingPhrase(null);
         } catch (error) {
             console.error('Error updating phrase:', error);
             alert('Error updating phrase');
@@ -3704,15 +3616,8 @@ export default function PhrasesPage() {
 
     const handleDeletePhrase = async (id: string) => {
         if (!confirm('Delete this phrase?')) return;
-        try {
-            const res = await fetch(`/api/phrases/${id}`, { method: 'DELETE' });
-            const data = await res.json();
-            if (data.success) {
-                setPhrases(prev => prev.filter(p => p.id !== id));
-            }
-        } catch (error) {
-            console.error('Error deleting phrase:', error);
-        }
+        storeDeletePhrase(id);
+        setPhrases(prev => prev.filter(p => p.id !== id));
     };
 
     const handleAddPhrase = async () => {
@@ -3720,24 +3625,15 @@ export default function PhrasesPage() {
         if (!newPhrase.english.trim() || !newPhrase.japanese.trim()) return;
         setIsSubmitting(true);
         try {
-            const res = await fetch('/api/phrases', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    english: newPhrase.english.trim(),
-                    japanese: newPhrase.japanese.trim(),
-                    category: newPhrase.category,
-                    date: formDate,
-                }),
+            const newP = storeAddPhrase({
+                english: newPhrase.english.trim(),
+                japanese: newPhrase.japanese.trim(),
+                category: newPhrase.category,
+                date: formDate,
             });
-            const data = await res.json();
-            if (data.success) {
-                if (!data.duplicate) {
-                    setPhrases(prev => [...prev, data.phrase]);
-                }
-                setNewPhrase({ english: '', japanese: '', category: randomElement() });
-                setShowAddForm(false);
-            }
+            setPhrases(prev => [...prev, newP]);
+            setNewPhrase({ english: '', japanese: '', category: randomElement() });
+            setShowAddForm(false);
         } finally {
             setIsSubmitting(false);
         }
@@ -3750,28 +3646,21 @@ export default function PhrasesPage() {
         try {
             const prevLinks = phraseLinks[phraseId] || [];
             const wasFirst = prevLinks.length === 0;
-            const res = await fetch('/api/phrases/links', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phrase_id: phraseId, text: quickAddEnglish.trim() }),
-            });
-            const data = await res.json();
-            if (data.success) {
-                setPhraseLinks(prev => ({
-                    ...prev,
-                    [phraseId]: [...(prev[phraseId] || []), data.link],
-                }));
-                setQuickAddEnglish('');
-                setQuickAddedCount(c => c + 1);
-                // XP: first link = VISION level-up
-                if (wasFirst) {
-                    const baseMastery = Number(phraseMastery[phraseId] || 0);
-                    const hasRec = (voiceRecordings[phraseId] || []).length > 0;
-                    const levelBefore = getChakraLevel(baseMastery, hasRec, false);
-                    const levelAfter = getChakraLevel(baseMastery, hasRec, true);
-                    if (levelAfter > levelBefore) {
-                        postXP(new Date().toISOString().split('T')[0], CHAKRA_CONFIG[levelAfter].lv, false, phraseId);
-                    }
+            const link = addPhraseLink(phraseId, quickAddEnglish.trim());
+            setPhraseLinks(prev => ({
+                ...prev,
+                [phraseId]: [...(prev[phraseId] || []), link],
+            }));
+            setQuickAddEnglish('');
+            setQuickAddedCount(c => c + 1);
+            // XP: first link = VISION level-up
+            if (wasFirst) {
+                const baseMastery = Number(phraseMastery[phraseId] || 0);
+                const hasRec = (voiceRecordings[phraseId] || []).length > 0;
+                const levelBefore = getChakraLevel(baseMastery, hasRec, false);
+                const levelAfter = getChakraLevel(baseMastery, hasRec, true);
+                if (levelAfter > levelBefore) {
+                    postXP(new Date().toISOString().split('T')[0], CHAKRA_CONFIG[levelAfter].lv, false, phraseId);
                 }
             }
         } finally {

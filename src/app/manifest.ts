@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'English Learning - Iwasaki',
+    name: 'English Quest RPG',
     short_name: 'English',
     description: 'Daily English phrases learning app with Spotify-style player',
     start_url: '/english',

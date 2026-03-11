@@ -1,162 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- トップページ -->
   <url>
-    <loc>https://www.iwasaki-naisou.jp/</loc>
-    <lastmod>2025-10-09</lastmod>
+    <loc>https://english-quest-rpg.vercel.app/</loc>
+    <lastmod>2026-03-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-
-  <!-- 企業情報 -->
   <url>
-    <loc>https://www.iwasaki-naisou.jp/corporate/about</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/corporate/history</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- サービス -->
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/services/interior</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/services/reform</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/services/barrier-free</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/services/shop-design</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- 技術・テクノロジー -->
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/technology</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/technology/ai</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/technology/craftsmen</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- 施工実績 -->
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/portfolio</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- お知らせ -->
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/news</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <!-- 開発ジャーナル -->
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/journal</loc>
-    <lastmod>2025-01-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/journal/001</loc>
-    <lastmod>2025-11-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/journal/002</loc>
-    <lastmod>2025-01-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/journal/003</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/journal/004</loc>
-    <lastmod>2025-01-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/journal/005</loc>
-    <lastmod>2025-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/journal/006</loc>
-    <lastmod>2025-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- AIタクミ -->
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/chat</loc>
-    <lastmod>2025-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- ランディングページ -->
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/lp/zehitomo</loc>
-    <lastmod>2025-01-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- お問い合わせ -->
-  <url>
-    <loc>https://www.iwasaki-naisou.jp/contact</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://english-quest-rpg.vercel.app/english/training</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
-
-  <!-- プライバシーポリシー -->
   <url>
-    <loc>https://www.iwasaki-naisou.jp/privacy</loc>
-    <lastmod>2025-10-09</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <loc>https://english-quest-rpg.vercel.app/english/quest</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
