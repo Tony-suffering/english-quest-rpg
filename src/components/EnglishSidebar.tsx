@@ -33,6 +33,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         { id: '/english/collection', label: 'Collection' },
         { id: '/english/everyday-words', label: 'Everyday Words' },
         { id: '/english/strategy', label: 'Strategy' },
+        { id: '/journal', label: 'Journal' },
     ];
 
     const isActive = (path: string) => {
@@ -42,6 +43,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         if (path === '/english/world-map') return pathname === '/english/world-map';
         if (path === '/english/collection') return pathname === '/english/collection';
         if (path === '/english/strategy') return pathname === '/english/strategy';
+        if (path === '/journal') return pathname.startsWith('/journal');
         return pathname.startsWith(path);
     };
 
