@@ -19,7 +19,7 @@ const DEFAULTS: AppSettings = {
     feverEnabled: true,
     volume: 100,
     feverBgmVolume: 35,
-    bgmEnabled: false,
+    bgmEnabled: true,
     bgmVolume: 30,
 };
 

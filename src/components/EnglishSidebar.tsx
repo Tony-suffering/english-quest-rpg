@@ -62,6 +62,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     // Main nav: daily use items (3001個人用 全部)
     const allMainItems = [
+        { id: '/english', label: 'ホーム / 遊び方' },
         { id: '/english/dashboard', label: 'ダッシュボード' },
         { id: '/english/quest', label: 'Quest (冒険)' },
         { id: '/english/training', label: 'トレーニング' },

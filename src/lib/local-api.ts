@@ -481,12 +481,99 @@ function handleDynamicRoute(pathname: string, method: string, body: Record<strin
     return null
 }
 
+// ── Auto-seed goroku from static data ──
+async function seedGorokuIfEmpty() {
+    const existing = store('goroku') as unknown[]
+    if (existing.length > 0) return
+    try {
+        const { GOROKU_SEEDS } = await import('@/data/english/goroku-seed')
+        const catPrefix: Record<string, string> = { reaction: 'r', request: 'q', opinion: 'o', suggestion: 's', filler: 'f', shutdown: 'x' }
+        const entries = GOROKU_SEEDS.map((s, i) => {
+            const prefix = catPrefix[s.category] || 'u'
+            const id = `d${String(s.daySlot).padStart(2, '0')}_${prefix}${String(i).padStart(3, '0')}`
+            return {
+                id, day_slot: s.daySlot, japanese: s.japanese,
+                english: JSON.stringify(s.english), literal: s.literal || '',
+                context: s.context, category: s.category, mastery_level: 0,
+                slot: s.slot || '', slot_hints: s.slotHints ? JSON.stringify(s.slotHints) : null,
+                created_at: now()
+            }
+        })
+        save('goroku', entries)
+        console.log(`[local-api] Seeded ${entries.length} goroku entries`)
+    } catch (e) { console.warn('[local-api] Goroku seed failed:', e) }
+}
+
+// ── Auto-seed training phrases from quest data (first 300 = ~1 month) ──
+async function seedPhrasesIfEmpty() {
+    const existing = store('phrases') as unknown[]
+    if (existing.length > 0) return
+    try {
+        const { QUEST_PHRASES } = await import('@/data/quest-phrases')
+        // Start from 30 days ago so there's a month of content
+        const now_ = new Date()
+        const baseDate = new Date(now_.getFullYear(), now_.getMonth(), now_.getDate() - 29)
+        // Seed first 300 phrases (~30 days x 10 phrases/day)
+        const toSeed = QUEST_PHRASES.slice(0, Math.min(300, QUEST_PHRASES.length))
+        const phrases = toSeed.map((qp, i) => {
+            const dayOffset = Math.floor(i / 10)
+            const d = new Date(baseDate)
+            d.setDate(d.getDate() + dayOffset)
+            const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+            return {
+                id: qp.id,
+                english: qp.english,
+                japanese: qp.japanese || '',
+                category: qp.element || '',
+                date: dateStr,
+                created_at: '2025-01-06T12:00:00.000Z',
+            }
+        })
+        save('phrases', phrases)
+        // Also mirror to rpg_custom_phrases so Quest knows they're "caught"
+        localStorage.setItem('rpg_custom_phrases', JSON.stringify(phrases))
+        console.log(`[local-api] Seeded ${phrases.length} training phrases`)
+    } catch (e) { console.warn('[local-api] Phrase seed failed:', e) }
+}
+
+// ── Bridge: keep tl_phrases and rpg_custom_phrases in sync ──
+function bridgeQuestToApi() {
+    // If quest has phrases that API doesn't, merge them
+    try {
+        const apiPhrases = store('phrases') as Record<string, unknown>[]
+        const rpgPhrases = JSON.parse(localStorage.getItem('rpg_custom_phrases') || '[]') as Record<string, unknown>[]
+        const apiIds = new Set(apiPhrases.map(p => p.id))
+        let added = 0
+        for (const rp of rpgPhrases) {
+            if (!apiIds.has(rp.id as string)) {
+                apiPhrases.push({
+                    id: rp.id,
+                    english: rp.english,
+                    japanese: rp.japanese || '',
+                    category: rp.category || '',
+                    date: rp.date || today(),
+                    created_at: (rp as Record<string, unknown>).created_at || now(),
+                })
+                added++
+            }
+        }
+        if (added > 0) {
+            save('phrases', apiPhrases)
+            console.log(`[local-api] Bridged ${added} quest phrases to API store`)
+        }
+    } catch {}
+}
+
 // ── Install interceptor ──
 let installed = false
 
 export function installLocalApi() {
     if (installed || typeof window === 'undefined') return
     installed = true
+    seedPhrasesIfEmpty().then(() => {
+        bridgeQuestToApi()
+    })
+    seedGorokuIfEmpty()
 
     const originalFetch = window.fetch.bind(window)
 

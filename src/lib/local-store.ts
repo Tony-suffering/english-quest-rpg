@@ -135,6 +135,19 @@ export function addQuestPhraseToTraining(qp: { id: string; english: string; japa
     };
     phrases.push(newPhrase);
     setJSON(K.CUSTOM_PHRASES, phrases);
+
+    // Bridge: also add to tl_phrases so Training page (API-based) picks it up
+    try {
+        const apiPhrases = JSON.parse(localStorage.getItem('tl_phrases') || '[]') as TrainingPhrase[];
+        if (!apiPhrases.find(p => p.id === qp.id)) {
+            apiPhrases.push({
+                ...newPhrase,
+                created_at: new Date().toISOString(),
+            } as TrainingPhrase & { created_at: string });
+            localStorage.setItem('tl_phrases', JSON.stringify(apiPhrases));
+        }
+    } catch {}
+
     return newPhrase;
 }
 

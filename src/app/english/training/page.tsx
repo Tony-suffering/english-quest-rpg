@@ -13,8 +13,8 @@ import PuzzleBoard, { type BattleSyncData } from '@/components/english/PuzzleBoa
 import { QUEST_WORDS } from '@/data/english/quest-words';
 import './training-animations.css';
 
-// 3004 = 公開RPG。DBなし、quest-wordsの静的データで動く
-const IS_PUBLIC = typeof window !== 'undefined' && window.location.port === '3004';
+// All API calls are intercepted by local-api.ts -- no port restriction needed
+const IS_PUBLIC = false;
 
 interface VoiceRecording {
     id: number;
