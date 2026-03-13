@@ -9,8 +9,10 @@ import { convenienceStorePanicEntry } from './convenience-store-panic-entry';
 import { ikasamaBlackjackEntry } from './ikasama-blackjack-entry';
 import { philosophyEnglishEntry } from './philosophy-english-entry';
 import { siteExorcismEntry } from './site-exorcism-entry';
+import { wbcJapanEntry } from './wbc-japan-entry';
 
 export const march2026Entries: JournalEntry[] = [
+    wbcJapanEntry,
     siteExorcismEntry,
     philosophyEnglishEntry,
     ikasamaBlackjackEntry,
