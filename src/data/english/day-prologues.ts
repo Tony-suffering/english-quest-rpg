@@ -176,4 +176,18 @@ export const DAY_PROLOGUES: Record<string, DayPrologue> = {
             { name: 'Pearl (85F)', desc: "Ida's neighbor and best friend for 40 years, showed up uninvited, knows where everything is, savage one-liners" },
         ],
     },
+    '2026-03-07': {
+        title: 'Bucket List Trip',
+        titleJa: 'バケットリスト旅行 -- グランドキャニオン（55歳、夫婦）',
+        setting: "Gary retired from the post office six months ago. Linda retired from nursing three months after that. For thirty years they talked about seeing the Grand Canyon. Now they're finally here, driving a rented Hyundai from Las Vegas with a cooler full of Linda's homemade sandwiches and Gary's laminated itinerary. Problem: Gary is terrified of heights and won't admit it. Linda has already posted eleven Instagram stories. They've met Earl and Dot, a retired couple from Connecticut who have been to forty-seven countries and will not stop mentioning it. The tour guide is a twenty-four-year-old geology major named Javi who treats every rock formation like a personal friend.",
+        settingJa: 'ゲイリーは半年前に郵便局を退職。リンダはその3ヶ月後に看護師を辞めた。30年間グランドキャニオンに行くと言い続けてきた。ついにラスベガスからレンタカーのヒュンダイで向かっている。クーラーボックスにはリンダの手作りサンドイッチとゲイリーのラミネート加工した旅程表。問題：ゲイリーは高所恐怖症だが認めない。リンダはもうインスタのストーリーを11件投稿済み。47カ国を旅したコネチカットの退職夫婦アール＆ドットと出会い、その話が止まらない。ツアーガイドは24歳の地質学専攻ハビ、全ての岩石層を親友のように紹介する。',
+        characters: [
+            { name: 'Gary (55M)', desc: 'retired postal worker, laminated itinerary, terrified of heights but will die before admitting it, checks weather app every 10 minutes' },
+            { name: 'Linda (53F)', desc: "Gary's wife, retired ER nurse, unflappable, Instagram-obsessed, packed snacks for a small army, 'we should have done this 20 years ago'" },
+            { name: 'Javi (24M)', desc: 'tour guide, geology major, infectious enthusiasm, names rock layers like they are old friends, terrible puns' },
+            { name: 'Earl (63M)', desc: "fellow tourist, 47 countries, won't stop mentioning it, actually very kind underneath, cargo vest with too many pockets" },
+            { name: 'Dot (61F)', desc: "Earl's wife, cooler than Earl, instant friend to Linda, sneaks wine into the tour bus, sharp wit" },
+            { name: 'Megan (28F)', desc: "Gary & Linda's daughter, FaceTimes every hour, recently engaged, wants them to 'be careful' but also 'take more photos'" },
+        ],
+    },
 };

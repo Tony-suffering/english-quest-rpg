@@ -9,16 +9,12 @@ import {
     playSpinStart, playGachaSound, playFeverEntrySound, playFeverExitSound,
     startFeverBGM, stopFeverBGM, playCardRankSound, playRankUpSound, playFeverChainHit,
 } from '@/lib/training-sounds';
-import PuzzleBoard from '@/components/english/PuzzleBoard';
-import {
-    getAllPhrases, getMastery, getLastLeveled, setMastery as storeMastery,
-    getCardPoints as storeGetCardPoints, getPlayerStats, rollGacha,
-    getMonthlyReviewCounts, getMonthlyDateTouches, incrementDateTouch,
-    getPhraseLinks as storeGetPhraseLinks, addPhraseLink, addUserPhrase,
-    addPhrase as storeAddPhrase, updatePhrase as storeUpdatePhrase,
-    deletePhrase as storeDeletePhrase,
-} from '@/lib/local-store';
+import PuzzleBoard, { type BattleSyncData } from '@/components/english/PuzzleBoard';
+import { QUEST_WORDS } from '@/data/english/quest-words';
 import './training-animations.css';
+
+// 3004 = 公開RPG。DBなし、quest-wordsの静的データで動く
+const IS_PUBLIC = typeof window !== 'undefined' && window.location.port === '3004';
 
 interface VoiceRecording {
     id: number;
@@ -398,18 +394,667 @@ function getTrainingV6Sky(ratio: number, isGod: boolean) {
     };
 }
 
-export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
+export function MiniRunner({ todayXP, goalXP, onGoalChange, battleData, onBattleStart, onBattleEnd, lastReviewedWord, dropCard }: {
     todayXP: number;
     goalXP: number;
     onGoalChange: (xp: number) => void;
+    battleData?: { cards: { english: string; element: string; rank: string; bstTotal: number; modifiedBst: number; elementAdvantage: 'super' | 'weak' | 'neutral' }[]; synergies: { name: string; multiplier: number; color: string; icon: string }[]; bossHp: number; bossName: string; bossElement: string; finalDamage: number; bossDefeated: boolean; grade: string } | null;
+    onBattleStart?: () => void;
+    onBattleEnd?: () => void;
+    lastReviewedWord?: { text: string; key: number } | null;
+    dropCard?: { phraseId: string; english: string; japanese: string; element: string; rank: string; points: number; bstTotal: number; key: number } | null;
 }) {
     const prevXpRef = useRef(todayXP);
     const prevGodRef = useRef(todayXP >= goalXP);
+
+    // === PER-CARD SLOT ATTACK (fires on every review) ===
+    const [cardSlotPhase, setCardSlotPhase] = useState<'idle' | 'spin' | 'stop1' | 'stop2' | 'reach' | 'stop3' | 'result' | 'attack' | 'impact'>('idle');
+    const [cardSlotReels, setCardSlotReels] = useState<[string, string, string]>(['blank', 'blank', 'blank']);
+    const [cardSlotTier, setCardSlotTier] = useState('');
+    const [cardSlotCard, setCardSlotCard] = useState<{ english: string; element: string; bstTotal: number; rank: string } | null>(null);
+    const [cardSlotDmg, setCardSlotDmg] = useState<number | null>(null);
+    const cardSlotTimerRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+    const prevDropRef = useRef<number>(dropCard?.key ?? 0);
+
+    const ELEM_COLOR_MAP: Record<string, string> = { flame: '#EF4444', aqua: '#3B82F6', wind: '#10B981', earth: '#D97706', thunder: '#8B5CF6' };
+    const ELEM_JA_MAP: Record<string, string> = { flame: '火', aqua: '水', wind: '風', earth: '地', thunder: '雷' };
+
+    // Hoisted before the per-card slot useEffect that depends on it
+    const [battleActive, setBattleActive] = useState(false);
+    const [kakuhenBoost, setKakuhenBoost] = useState(0); // remaining boosted spins after boss defeat
+
+    useEffect(() => {
+        if (!dropCard || dropCard.key === prevDropRef.current || battleActive) return;
+        prevDropRef.current = dropCard.key;
+        cardSlotTimerRef.current.forEach(t => clearTimeout(t));
+        cardSlotTimerRef.current = [];
+        const T: ReturnType<typeof setTimeout>[] = [];
+        const push = (fn: () => void, ms: number) => { T.push(setTimeout(fn, ms)); };
+
+        // Calculate slot tier based on card stats — generous odds, MISS is rare
+        const bstBonus = dropCard.bstTotal >= 500 ? 15 : dropCard.bstTotal >= 400 ? 8 : dropCard.bstTotal >= 300 ? 3 : 0;
+        const rankMap: Record<string, number> = { LEGENDARY: 20, HOLOGRAPHIC: 12, GOLD: 6, SILVER: 3, BRONZE: 1, NORMAL: 0 };
+        const rankBonus = rankMap[dropCard.rank] || 0;
+        const kBoost = kakuhenBoost > 0 ? 20 : 0; // 確変中は大幅ブースト
+        const bonus = bstBonus + rankBonus + kBoost;
+        if (kakuhenBoost > 0) setKakuhenBoost(prev => prev - 1);
+        const roll = Math.random() * 100;
+        // Boosted odds: MISS only ~15%, 確変中はMISS ~5%
+        const tier = roll < 1 + bonus * 0.05 ? 'MYTHIC'
+            : roll < 4 + bonus * 0.1 ? 'LEGENDARY'
+            : roll < 12 + bonus * 0.15 ? 'MEGA'
+            : roll < 28 + bonus * 0.25 ? 'SUPER'
+            : roll < 50 + bonus * 0.3 ? 'GREAT'
+            : roll < 85 + bonus * 0.2 ? 'BONUS' : 'MISS';
+        const combo = (TIER_TO_COMBO[tier] || generateMissCombo()) as [string, string, string];
+        const isReach = tier !== 'MISS' && combo[0] === combo[1];
+        const tierPower = { MYTHIC: 6, LEGENDARY: 5, MEGA: 4, SUPER: 3, GREAT: 2, BONUS: 1, MISS: 0 }[tier] || 0;
+
+        setCardSlotCard({ english: dropCard.english, element: dropCard.element, bstTotal: dropCard.bstTotal, rank: dropCard.rank });
+        setCardSlotDmg(null);
+        const dmgMultiplier = { MYTHIC: 4.0, LEGENDARY: 3.0, MEGA: 2.2, SUPER: 1.6, GREAT: 1.3, BONUS: 1.0, MISS: 0.5 }[tier] || 1;
+
+        // === COMPLETELY DIFFERENT SEQUENCE PER TIER ===
+
+        if (tier === 'MISS') {
+            // MISS: No reels. Tiny "x" flash at bottom, gone in 0.5s
+            push(() => { setCardSlotPhase('result'); setCardSlotTier('MISS'); }, 0);
+            push(() => { setCardSlotDmg(Math.round(dropCard.bstTotal * 0.5)); setCardSlotPhase('impact'); }, 200);
+            push(() => { setCardSlotPhase('idle'); setCardSlotCard(null); setCardSlotDmg(null); setCardSlotTier(''); }, 600);
+
+        } else if (tier === 'BONUS') {
+            // BONUS: Small reels, quick spin, small flash
+            push(() => { setCardSlotPhase('spin'); setCardSlotTier(''); setCardSlotReels(['blank', 'blank', 'blank']); }, 0);
+            push(() => { setCardSlotReels(combo); setCardSlotPhase('stop3'); }, 400);
+            push(() => { setCardSlotPhase('result'); setCardSlotTier(tier); }, 550);
+            push(() => { setCardSlotPhase('attack'); }, 800);
+            push(() => { setCardSlotPhase('impact'); setCardSlotDmg(Math.round(dropCard.bstTotal * dmgMultiplier)); }, 1000);
+            push(() => { setCardSlotPhase('idle'); setCardSlotCard(null); setCardSlotDmg(null); setCardSlotTier(''); }, 2000);
+
+        } else if (tier === 'GREAT') {
+            // GREAT: Normal reels, element tint, decent effect
+            push(() => { setCardSlotPhase('spin'); setCardSlotTier(''); setCardSlotReels(['blank', 'blank', 'blank']); }, 0);
+            push(() => { setCardSlotReels([combo[0], 'blank', 'blank']); setCardSlotPhase('stop1'); }, 450);
+            push(() => { setCardSlotReels([combo[0], combo[1], 'blank']); setCardSlotPhase(isReach ? 'reach' : 'stop2'); }, 800);
+            const r3g = isReach ? 1400 : 1050;
+            push(() => { setCardSlotReels(combo); setCardSlotPhase('stop3'); }, r3g);
+            push(() => { setCardSlotPhase('result'); setCardSlotTier(tier); }, r3g + 200);
+            push(() => { setCardSlotPhase('attack'); }, r3g + 500);
+            push(() => { setCardSlotPhase('impact'); setCardSlotDmg(Math.round(dropCard.bstTotal * dmgMultiplier)); }, r3g + 750);
+            push(() => { setCardSlotPhase('idle'); setCardSlotCard(null); setCardSlotDmg(null); setCardSlotTier(''); }, r3g + 2000);
+
+        } else if (tier === 'SUPER') {
+            // SUPER: Bigger reels, screen border glow, dramatic pause
+            push(() => { setCardSlotPhase('spin'); setCardSlotTier(''); setCardSlotReels(['blank', 'blank', 'blank']); }, 0);
+            push(() => { setCardSlotReels([combo[0], 'blank', 'blank']); setCardSlotPhase('stop1'); }, 500);
+            push(() => { setCardSlotReels([combo[0], combo[1], 'blank']); setCardSlotPhase(isReach ? 'reach' : 'stop2'); }, 900);
+            const r3s = isReach ? 1800 : 1200;
+            push(() => { setCardSlotReels(combo); setCardSlotPhase('stop3'); }, r3s);
+            push(() => { setCardSlotPhase('result'); setCardSlotTier(tier); }, r3s + 250);
+            push(() => { setCardSlotPhase('attack'); }, r3s + 600);
+            push(() => { setCardSlotPhase('impact'); setCardSlotDmg(Math.round(dropCard.bstTotal * dmgMultiplier)); }, r3s + 900);
+            push(() => { setCardSlotPhase('idle'); setCardSlotCard(null); setCardSlotDmg(null); setCardSlotTier(''); }, r3s + 2500);
+
+        } else if (tier === 'MEGA') {
+            // MEGA: Full screen takeover, long REACH, screen crack, explosion
+            push(() => { setCardSlotPhase('spin'); setCardSlotTier(''); setCardSlotReels(['blank', 'blank', 'blank']); }, 0);
+            push(() => { setCardSlotReels([combo[0], 'blank', 'blank']); setCardSlotPhase('stop1'); }, 600);
+            push(() => { setCardSlotReels([combo[0], combo[1], 'blank']); setCardSlotPhase('reach'); }, 1000);
+            // Long dramatic REACH pause
+            push(() => { setCardSlotReels(combo); setCardSlotPhase('stop3'); }, 2400);
+            push(() => { setCardSlotPhase('result'); setCardSlotTier(tier); }, 2600);
+            push(() => { setCardSlotPhase('attack'); }, 3000);
+            push(() => { setCardSlotPhase('impact'); setCardSlotDmg(Math.round(dropCard.bstTotal * dmgMultiplier)); }, 3300);
+            push(() => { setCardSlotPhase('idle'); setCardSlotCard(null); setCardSlotDmg(null); setCardSlotTier(''); }, 5500);
+
+        } else if (tier === 'LEGENDARY') {
+            // LEGENDARY: Screen goes GOLD, everything transforms, massive payoff
+            push(() => { setCardSlotPhase('spin'); setCardSlotTier(''); setCardSlotReels(['blank', 'blank', 'blank']); }, 0);
+            push(() => { setCardSlotReels([combo[0], 'blank', 'blank']); setCardSlotPhase('stop1'); }, 600);
+            push(() => { setCardSlotReels([combo[0], combo[1], 'blank']); setCardSlotPhase('reach'); }, 1100);
+            // Extra long dramatic REACH
+            push(() => { setCardSlotReels(combo); setCardSlotPhase('stop3'); }, 3000);
+            push(() => { setCardSlotPhase('result'); setCardSlotTier(tier); }, 3300);
+            push(() => { setCardSlotPhase('attack'); }, 3800);
+            push(() => { setCardSlotPhase('impact'); setCardSlotDmg(Math.round(dropCard.bstTotal * dmgMultiplier)); }, 4200);
+            push(() => { setCardSlotPhase('idle'); setCardSlotCard(null); setCardSlotDmg(null); setCardSlotTier(''); }, 6500);
+
+        } else {
+            // MYTHIC: Complete scene transformation, god-mode
+            push(() => { setCardSlotPhase('spin'); setCardSlotTier(''); setCardSlotReels(['blank', 'blank', 'blank']); }, 0);
+            push(() => { setCardSlotReels([combo[0], 'blank', 'blank']); setCardSlotPhase('stop1'); }, 700);
+            push(() => { setCardSlotReels([combo[0], combo[1], 'blank']); setCardSlotPhase('reach'); }, 1200);
+            // Maximum suspense REACH
+            push(() => { setCardSlotReels(combo); setCardSlotPhase('stop3'); }, 3500);
+            push(() => { setCardSlotPhase('result'); setCardSlotTier(tier); }, 3800);
+            push(() => { setCardSlotPhase('attack'); }, 4500);
+            push(() => { setCardSlotPhase('impact'); setCardSlotDmg(Math.round(dropCard.bstTotal * dmgMultiplier)); }, 5000);
+            push(() => { setCardSlotPhase('idle'); setCardSlotCard(null); setCardSlotDmg(null); setCardSlotTier(''); }, 7500);
+        }
+
+        cardSlotTimerRef.current = T;
+        return () => { T.forEach(t => clearTimeout(t)); };
+    }, [dropCard, battleActive]);
     const [reaction, setReaction] = useState<(RunnerReaction & { points: number; key: number }) | null>(null);
     const [godCelebration, setGodCelebration] = useState(false);
     const [showGoalSetting, setShowGoalSetting] = useState(false);
     const [goalInput, setGoalInput] = useState(String(goalXP));
     useEffect(() => { setGoalInput(String(goalXP)); }, [goalXP]);
+
+    // === BATTLE SYNC STATE (DQ-style ULTIMATE) ===
+    // battleActive is hoisted above (before per-card slot useEffect)
+    const [battleGpRain, setBattleGpRain] = useState(false);
+    const [battleGpRainCoins, setBattleGpRainCoins] = useState<{ x: number; delay: number; size: number; key: number }[]>([]);
+    const [battleKakuhenFlash, setBattleKakuhenFlash] = useState(false);
+    const [battleBossExplode, setBattleBossExplode] = useState(false);
+    const [battleCardIdx, setBattleCardIdx] = useState(-1);
+    const [battleBossHpLeft, setBattleBossHpLeft] = useState(0);
+    const [battlePhase, setBattlePhase] = useState<'idle' | 'wipe' | 'intro' | 'cards' | 'synergy' | 'result' | 'victory'>('idle');
+    const [battleMsg, setBattleMsg] = useState('');
+    const [battleMsg2, setBattleMsg2] = useState('');
+    const [battleSlash, setBattleSlash] = useState(false);
+    const [battleShake, setBattleShake] = useState(false);
+    const [battleSpellEffect, setBattleSpellEffect] = useState<string | null>(null);
+    const [battleGrade, setBattleGrade] = useState<string | null>(null);
+    const [battleDefeated, setBattleDefeated] = useState(false);
+    const [battleBossHit, setBattleBossHit] = useState(false);
+    const [battleCritical, setBattleCritical] = useState(false);
+    const [battleDmgNum, setBattleDmgNum] = useState<{ val: number; key: number } | null>(null);
+    const [battleCombo, setBattleCombo] = useState(0);
+    const [battleTotalDmg, setBattleTotalDmg] = useState(0);
+    const [battleHeroAtk, setBattleHeroAtk] = useState(false);
+    const [battleSynergyName, setBattleSynergyName] = useState<string | null>(null);
+    const [battleVictoryStats, setBattleVictoryStats] = useState<{ totalDmg: number; cards: number; synergies: number; gp: number } | null>(null);
+    const [battleWipeIn, setBattleWipeIn] = useState(false);
+    const [battleWipeOut, setBattleWipeOut] = useState(false);
+    const [battleBossIntro, setBattleBossIntro] = useState(false);
+    const [battlePhraseAtk, setBattlePhraseAtk] = useState<string | null>(null);
+    const [battleBossCounter, setBattleBossCounter] = useState(false);
+    const [battleBossTaunt, setBattleBossTaunt] = useState<string | null>(null);
+    const [battleWordBuild, setBattleWordBuild] = useState<string[]>([]);
+    const [battleWordIdx, setBattleWordIdx] = useState(-1);
+    const [battleFinisher, setBattleFinisher] = useState(false);
+    const [battleRankFx, setBattleRankFx] = useState<string | null>(null);
+    const [battlePhraseFlash, setBattlePhraseFlash] = useState<string[]>([]);
+    const [battlePhraseFlashIdx, setBattlePhraseFlashIdx] = useState(-1);
+    const [battleRush, setBattleRush] = useState(false);
+    const [battleRushCombo, setBattleRushCombo] = useState<string | null>(null);
+    const [battleZoom, setBattleZoom] = useState(false);
+    const [battleCrack, setBattleCrack] = useState(false);
+    const [battleWhiteout, setBattleWhiteout] = useState(false);
+    const [battleInvert, setBattleInvert] = useState(false);
+    // Slot integration — spins before each card attack, determines演出 tier
+    const [battleSlotReels, setBattleSlotReels] = useState<[string, string, string]>(['blank', 'blank', 'blank']);
+    const [battleSlotPhase, setBattleSlotPhase] = useState<'idle' | 'spin' | 'stop1' | 'stop2' | 'stop3' | 'reach' | 'result'>('idle');
+    const [battleSlotTier, setBattleSlotTier] = useState<string>('MISS');
+    const battleTimerRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+    // Initialize with current battleData so remount doesn't replay the battle
+    const prevBattleRef = useRef<typeof battleData>(battleData ?? null);
+
+    const ELEM_JA: Record<string, string> = { flame: '火', aqua: '水', wind: '風', earth: '地', thunder: '雷' };
+    const ELEM_COLOR: Record<string, string> = { flame: '#EF4444', aqua: '#3B82F6', wind: '#10B981', earth: '#D97706', thunder: '#8B5CF6' };
+
+    // === WEB AUDIO SFX ===
+    const audioCtxRef = useRef<AudioContext | null>(null);
+    const getAudio = () => {
+        if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
+        return audioCtxRef.current;
+    };
+    const sfxTone = (freq: number, dur: number, type: OscillatorType = 'square', vol = 0.12) => {
+        try {
+            const ctx = getAudio();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type; osc.frequency.value = freq;
+            gain.gain.setValueAtTime(vol, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + dur);
+        } catch {}
+    };
+    const sfxNoise = (dur: number, vol = 0.08) => {
+        try {
+            const ctx = getAudio();
+            const buf = ctx.createBuffer(1, ctx.sampleRate * dur, ctx.sampleRate);
+            const d = buf.getChannelData(0);
+            for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+            const src = ctx.createBufferSource();
+            const gain = ctx.createGain();
+            src.buffer = buf;
+            gain.gain.setValueAtTime(vol, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+            src.connect(gain); gain.connect(ctx.destination);
+            src.start();
+        } catch {}
+    };
+    const sfxBattleStart = () => { sfxTone(220, 0.15, 'square'); setTimeout(() => sfxTone(330, 0.15, 'square'), 100); setTimeout(() => sfxTone(440, 0.3, 'square'), 200); };
+    const sfxBossAppear = () => { sfxTone(120, 0.3, 'sawtooth', 0.15); setTimeout(() => sfxTone(80, 0.5, 'sawtooth', 0.12), 200); };
+    const sfxSlash = () => { sfxNoise(0.12, 0.15); sfxTone(800, 0.08, 'square', 0.1); };
+    const sfxCritical = () => { sfxNoise(0.2, 0.2); sfxTone(1200, 0.1, 'square', 0.15); setTimeout(() => sfxTone(1600, 0.15, 'square', 0.12), 80); };
+    const sfxSpell: Record<string, () => void> = {
+        flame: () => { sfxNoise(0.3, 0.12); sfxTone(300, 0.3, 'sawtooth', 0.08); },
+        aqua: () => { sfxTone(600, 0.2, 'sine', 0.1); setTimeout(() => sfxTone(800, 0.2, 'sine', 0.08), 100); },
+        thunder: () => { sfxNoise(0.15, 0.2); sfxTone(100, 0.4, 'square', 0.1); },
+        wind: () => { sfxNoise(0.25, 0.06); sfxTone(500, 0.2, 'triangle', 0.08); },
+        earth: () => { sfxTone(80, 0.3, 'square', 0.12); sfxNoise(0.2, 0.1); },
+    };
+    const sfxDamageHit = () => { sfxTone(200, 0.1, 'square', 0.1); sfxNoise(0.08, 0.1); };
+    const sfxSynergy = () => { sfxTone(440, 0.1, 'square', 0.08); setTimeout(() => sfxTone(660, 0.15, 'square', 0.1), 80); };
+    const sfxVictory = () => {
+        [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => sfxTone(f, 0.25, 'square', 0.1), i * 120));
+    };
+    const sfxDefeat = () => { sfxTone(300, 0.2, 'sawtooth', 0.1); setTimeout(() => sfxTone(200, 0.3, 'sawtooth', 0.1), 150); setTimeout(() => sfxTone(120, 0.5, 'sawtooth', 0.08), 350); };
+    const sfxGrade = (g: string) => {
+        if (g === 'S') { [880, 1108, 1320, 1760].forEach((f, i) => setTimeout(() => sfxTone(f, 0.2, 'square', 0.12), i * 80)); }
+        else if (g === 'A') { sfxTone(660, 0.2, 'square', 0.1); setTimeout(() => sfxTone(880, 0.25, 'square', 0.1), 100); }
+        else { sfxTone(440, 0.2, 'triangle', 0.08); }
+    };
+
+    // Slot tier for each card — better cards = better odds
+    const getSlotTierForCard = (card: { bstTotal: number; rank: string; elementAdvantage: string }): string => {
+        const bstBonus = card.bstTotal >= 500 ? 15 : card.bstTotal >= 400 ? 8 : card.bstTotal >= 300 ? 3 : 0;
+        const rankMap: Record<string, number> = { LEGENDARY: 20, HOLOGRAPHIC: 12, GOLD: 6, SILVER: 3, BRONZE: 1, NORMAL: 0 };
+        const rankBonus = rankMap[card.rank] || 0;
+        const advBonus = card.elementAdvantage === 'super' ? 10 : 0;
+        const bonus = bstBonus + rankBonus + advBonus;
+        const roll = Math.random() * 100;
+        if (roll < 0.5 + bonus * 0.02) return 'MYTHIC';
+        if (roll < 2 + bonus * 0.05) return 'LEGENDARY';
+        if (roll < 6 + bonus * 0.1) return 'MEGA';
+        if (roll < 15 + bonus * 0.2) return 'SUPER';
+        if (roll < 30 + bonus * 0.3) return 'GREAT';
+        if (roll < 55 + bonus * 0.3) return 'BONUS';
+        return 'MISS';
+    };
+    const sfxSlotSpin = () => { sfxTone(200, 0.06, 'square', 0.06); };
+    const sfxSlotStop = () => { sfxTone(440, 0.04, 'sine', 0.08); };
+    const sfxSlotReach = () => { sfxTone(880, 0.15, 'square', 0.12); setTimeout(() => sfxTone(880, 0.15, 'square', 0.1), 120); };
+    const sfxSlotHit = (tier: string) => {
+        if (tier === 'MYTHIC' || tier === 'LEGENDARY') { [880, 1100, 1320, 1760].forEach((f, i) => setTimeout(() => sfxTone(f, 0.2, 'square', 0.14), i * 60)); }
+        else if (tier === 'MEGA') { sfxTone(660, 0.15, 'square', 0.12); setTimeout(() => sfxTone(990, 0.2, 'square', 0.12), 80); }
+        else if (tier === 'SUPER') { sfxTone(550, 0.12, 'square', 0.1); setTimeout(() => sfxTone(770, 0.15, 'square', 0.1), 80); }
+        else if (tier === 'GREAT') { sfxTone(440, 0.1, 'sine', 0.1); }
+    };
+
+    useEffect(() => {
+        if (!battleData || battleData === prevBattleRef.current) return;
+        prevBattleRef.current = battleData;
+        battleTimerRef.current.forEach(t => clearTimeout(t));
+        battleTimerRef.current = [];
+
+        const T: ReturnType<typeof setTimeout>[] = [];
+        const push = (fn: () => void, ms: number) => { T.push(setTimeout(fn, ms)); };
+
+        // Boss taunts pool
+        const BOSS_TAUNTS = ['その程度か?', 'ぬるいぞ!', 'まだまだだな!', '効いてないぞ!', 'くだらん...', 'つまらん攻撃だ!'];
+        const BOSS_HURT = ['ぐっ...!', 'なかなかやるな...', 'く...!', 'やるではないか!', 'き、貴様...!'];
+        const BOSS_DESPERATE = ['ば、バカな...!', 'こ、こんなはずは...!', 'ありえん...!'];
+        const RANK_TIER = (r: string) => { const v: Record<string,number> = { S:4, A:3, B:2, C:1, D:0 }; return v[r] ?? 1; };
+
+        // Reset all
+        setBattleActive(true);
+        onBattleStart?.();
+        setBattleBossHpLeft(battleData.bossHp);
+        setBattlePhase('wipe');
+        setBattleCardIdx(-1);
+        setBattleMsg(''); setBattleMsg2('');
+        setBattleSlash(false); setBattleShake(false);
+        setBattleSpellEffect(null); setBattleGrade(null);
+        setBattleDefeated(false); setBattleBossHit(false);
+        setBattleCritical(false); setBattleDmgNum(null);
+        setBattleCombo(0); setBattleTotalDmg(0);
+        setBattleHeroAtk(false); setBattleSynergyName(null);
+        setBattleVictoryStats(null);
+        setBattleWipeIn(true); setBattleWipeOut(false);
+        setBattleBossIntro(false);
+        setBattlePhraseAtk(null);
+        setBattleBossCounter(false); setBattleBossTaunt(null);
+        setBattleWordBuild([]); setBattleWordIdx(-1);
+        setBattleFinisher(false); setBattleRankFx(null);
+        setBattlePhraseFlash([]); setBattlePhraseFlashIdx(-1);
+        setBattleRush(false); setBattleRushCombo(null);
+        setBattleZoom(false); setBattleCrack(false); setBattleWhiteout(false); setBattleInvert(false);
+        setBattleSlotPhase('idle'); setBattleSlotReels(['blank', 'blank', 'blank']); setBattleSlotTier('MISS');
+
+        // Phase 1: Screen wipe (faster)
+        push(() => { setBattleWipeIn(false); setBattlePhase('intro'); sfxBattleStart(); }, 400);
+
+        // Phase 2: Boss entrance (compressed)
+        push(() => { setBattleBossIntro(true); sfxBossAppear(); setBattleMsg(`${battleData!.bossName} があらわれた!`); setBattleMsg2(`[${ELEM_JA[battleData!.bossElement]}属性] HP: ${battleData!.bossHp.toLocaleString()}`); }, 500);
+        push(() => { setBattleBossIntro(false); setBattlePhase('cards'); }, 1400);
+
+        // Phase 3: Card attacks — 3-ACT STRUCTURE
+        let cumulativeDmg = 0;
+        let cursor = 1600;
+        const N_CARDS = battleData.cards.length;
+        const FULL_LIMIT = Math.min(2, N_CARDS - 1); // first 2 get full treatment
+        const synMult = battleData.synergies.reduce((m, s) => m * s.multiplier, 1);
+
+        const doFullCard = (card: typeof battleData.cards[0], i: number) => {
+            const isCrit = card.bstTotal >= 500;
+            const isSuper = card.elementAdvantage === 'super';
+            const isWeak = card.elementAdvantage === 'weak';
+            const slotTier = getSlotTierForCard(card);
+            const slotCombo = (TIER_TO_COMBO[slotTier] || generateMissCombo()) as [string, string, string];
+            const isReach = slotTier !== 'MISS' && slotCombo[0] === slotCombo[1];
+            const tierPower = { MYTHIC: 6, LEGENDARY: 5, MEGA: 4, SUPER: 3, GREAT: 2, BONUS: 1, MISS: 0 }[slotTier] || 0;
+
+            // Phase 1: Slot spin
+            push(() => {
+                setBattleCardIdx(i); setBattleCombo(i + 1);
+                setBattleBossTaunt(null); setBattleBossCounter(false); setBattleRush(false);
+                setBattleSlotPhase('spin'); setBattleSlotTier('');
+                setBattleMsg(`[${i + 1}/${N_CARDS}] ${card.english}`);
+                setBattleMsg2(`${ELEM_JA[card.element]}属性 / BST ${card.bstTotal}`);
+                sfxSlotSpin();
+            }, cursor);
+
+            // Reel 1 stops
+            push(() => {
+                setBattleSlotReels([slotCombo[0], 'blank', 'blank']);
+                setBattleSlotPhase('stop1'); sfxSlotStop();
+            }, cursor + 500);
+
+            // Reel 2 stops
+            push(() => {
+                setBattleSlotReels([slotCombo[0], slotCombo[1], 'blank']);
+                setBattleSlotPhase('stop2'); sfxSlotStop();
+                if (isReach) { setBattleSlotPhase('reach'); sfxSlotReach(); }
+            }, cursor + 800);
+
+            // Reel 3 stops (slower if reach = more anticipation)
+            const reel3At = isReach ? cursor + 1400 : cursor + 1050;
+            push(() => {
+                setBattleSlotReels(slotCombo);
+                setBattleSlotPhase('stop3'); sfxSlotStop();
+            }, reel3At);
+
+            // Slot result flash
+            const resultAt = reel3At + 200;
+            push(() => {
+                setBattleSlotPhase('result'); setBattleSlotTier(slotTier);
+                if (tierPower >= 2) sfxSlotHit(slotTier);
+                setBattleMsg2(tierPower >= 4 ? `-- ${TIER_JA[slotTier] || slotTier} --` : tierPower >= 2 ? TIER_JA[slotTier] || '' : '');
+            }, resultAt);
+
+            // Phase 2: Attack — scaled by slot tier
+            const atkAt = resultAt + 300;
+            push(() => {
+                setBattleSlotPhase('idle');
+                setBattlePhraseAtk(card.english); setBattleHeroAtk(true);
+                setBattleRankFx(tierPower >= 3 ? card.rank : null);
+                sfxTone(660, 0.06, 'square', 0.1);
+            }, atkAt);
+
+            push(() => {
+                setBattlePhraseAtk(null); setBattleHeroAtk(false);
+                setBattleSlash(true); setBattleBossHit(true);
+                // Tier-scaled effects
+                if (tierPower >= 4) { setBattleShake(true); setBattleZoom(true); setTimeout(() => setBattleZoom(false), 200); }
+                if (tierPower >= 5 || isCrit) { setBattleCritical(true); sfxCritical(); setBattleCrack(true); }
+                else { sfxSlash(); }
+                if (tierPower >= 3) { setBattleShake(true); }
+                if (tierPower >= 2 || isSuper) { setBattleSpellEffect(card.element); sfxSpell[card.element]?.(); }
+                if (tierPower >= 6) { setBattleWhiteout(true); setTimeout(() => setBattleWhiteout(false), 300); setBattleInvert(true); setTimeout(() => setBattleInvert(false), 150); }
+                if (i === N_CARDS - 1 && N_CARDS > 1) { setBattleWhiteout(true); setTimeout(() => setBattleWhiteout(false), 300); }
+            }, atkAt + 200);
+
+            // Damage — slot tier multiplies visual impact
+            const dmgAt = atkAt + 450;
+            push(() => {
+                setBattleSlash(false); setBattleShake(false); setBattleBossHit(false);
+                setBattleCritical(false); setBattleSpellEffect(null); setBattleRankFx(null);
+                cumulativeDmg += card.modifiedBst;
+                setBattleTotalDmg(cumulativeDmg);
+                setBattleBossHpLeft(Math.max(0, battleData!.bossHp - Math.round(cumulativeDmg * synMult)));
+                setBattleDmgNum({ val: card.modifiedBst, key: Date.now() + i });
+                sfxDamageHit();
+                const dmgMsg = tierPower >= 4
+                    ? `「${card.english}」 ${TIER_JA[slotTier]}!! ${card.modifiedBst.toLocaleString()} ダメージ!!`
+                    : isCrit ? `「${card.english}」 会心!! ${card.modifiedBst.toLocaleString()} ダメージ!!`
+                    : isSuper ? `「${card.english}」 弱点! ${card.modifiedBst.toLocaleString()} ダメージ!`
+                    : isWeak ? `「${card.english}」... ${card.modifiedBst.toLocaleString()} 効きが悪い...`
+                    : `「${card.english}」 ${card.modifiedBst.toLocaleString()} ダメージ`;
+                setBattleMsg(dmgMsg);
+                setBattleMsg2(isCrit ? '-- CRITICAL --' : isSuper ? '弱点を突いた!' : tierPower >= 2 ? `${TIER_JA[slotTier] || ''} x${(1 + tierPower * 0.1).toFixed(1)}` : '');
+            }, dmgAt);
+
+            push(() => setBattleDmgNum(null), dmgAt + 350);
+            cursor = dmgAt + 450;
+        };
+
+        // === ACT 1: First cards — full word-by-word ===
+        for (let i = 0; i < Math.min(FULL_LIMIT, N_CARDS); i++) {
+            doFullCard(battleData.cards[i], i);
+
+            // Boss taunt after first card (short)
+            if (i === 0 && N_CARDS > 2) {
+                push(() => {
+                    setBattleBossCounter(true); setBattleShake(true);
+                    sfxTone(150, 0.1, 'sawtooth', 0.08);
+                    setBattleBossTaunt(BOSS_TAUNTS[0]);
+                    setBattleMsg(`${battleData!.bossName}「${BOSS_TAUNTS[0]}」`); setBattleMsg2('');
+                }, cursor);
+                push(() => { setBattleBossCounter(false); setBattleShake(false); setBattleBossTaunt(null); }, cursor + 300);
+                cursor += 400;
+            }
+        }
+
+        // === ACT 2: Middle cards — RUSH MODE (rapid-fire) ===
+        const rushCards = battleData.cards.slice(FULL_LIMIT, N_CARDS - 1);
+        if (rushCards.length > 0) {
+            // Rush intro
+            push(() => {
+                setBattleRush(true);
+                setBattleMsg('--- RUSH ---');
+                setBattleMsg2(`${rushCards.length} HIT COMBO!`);
+                sfxTone(440, 0.08, 'square', 0.1);
+                setTimeout(() => sfxTone(660, 0.08, 'square', 0.1), 60);
+            }, cursor);
+            cursor += 250;
+
+            const RUSH_DELAY = 400; // fast but with mini-slot flash
+            rushCards.forEach((card, ri) => {
+                const i = FULL_LIMIT + ri;
+                const rushTier = getSlotTierForCard(card);
+                const rushCombo = (TIER_TO_COMBO[rushTier] || generateMissCombo()) as [string, string, string];
+                const rushPower = { MYTHIC: 6, LEGENDARY: 5, MEGA: 4, SUPER: 3, GREAT: 2, BONUS: 1, MISS: 0 }[rushTier] || 0;
+
+                // Quick slot flash (no individual reel stops)
+                push(() => {
+                    setBattleCardIdx(i); setBattleCombo(i + 1);
+                    setBattleSlotReels(rushCombo); setBattleSlotPhase('result'); setBattleSlotTier(rushTier);
+                    setBattlePhraseAtk(card.english);
+                    setBattleSlash(true); setBattleBossHit(true);
+                    if (rushPower >= 3) { setBattleShake(true); setBattleZoom(true); setTimeout(() => setBattleZoom(false), 100); }
+                    if (rushPower >= 4) { setBattleCritical(true); setBattleCrack(true); sfxCritical(); }
+                    else { sfxSlash(); }
+                    if (rushPower >= 2) { setBattleSpellEffect(card.element); }
+                    sfxTone(400 + ri * 40, 0.04, 'square', 0.06);
+                    if (rushPower >= 2) sfxSlotHit(rushTier);
+
+                    cumulativeDmg += card.modifiedBst;
+                    setBattleTotalDmg(cumulativeDmg);
+                    setBattleBossHpLeft(Math.max(0, battleData!.bossHp - Math.round(cumulativeDmg * synMult)));
+                    setBattleDmgNum({ val: card.modifiedBst, key: Date.now() + i });
+                    setBattleMsg(`「${card.english}」 ${card.modifiedBst.toLocaleString()}!`);
+                    setBattleMsg2(rushPower >= 2 ? `${TIER_JA[rushTier] || ''} -- ${i + 1} HIT!` : `${i + 1} HIT!`);
+                }, cursor + ri * RUSH_DELAY);
+
+                push(() => {
+                    setBattlePhraseAtk(null); setBattleSlash(false); setBattleShake(false);
+                    setBattleBossHit(false); setBattleCritical(false); setBattleSpellEffect(null);
+                    setBattleDmgNum(null); setBattleSlotPhase('idle');
+                }, cursor + ri * RUSH_DELAY + 250);
+            });
+
+            cursor += rushCards.length * RUSH_DELAY + 200;
+
+            // Rush end — boss reaction (short)
+            const hpPct = Math.max(0, battleData!.bossHp - Math.round(cumulativeDmg * synMult)) / battleData!.bossHp;
+            push(() => {
+                setBattleRush(false);
+                setBattleBossCounter(true); setBattleShake(true);
+                sfxTone(120, 0.15, 'sawtooth', 0.1);
+                const taunt = hpPct < 0.3 ? BOSS_DESPERATE[0] : BOSS_HURT[1];
+                setBattleBossTaunt(taunt);
+                setBattleMsg(`${battleData!.bossName}「${taunt}」`);
+                setBattleMsg2(hpPct < 0.3 ? 'ボスが追い詰められている!' : '');
+            }, cursor);
+            push(() => { setBattleBossCounter(false); setBattleShake(false); setBattleBossTaunt(null); }, cursor + 300);
+            cursor += 400;
+        }
+
+        // === ACT 3: Last card — FINAL STRIKE ===
+        if (N_CARDS > 1) {
+            push(() => {
+                setBattleFinisher(true);
+                setBattleMsg('--- とどめの一撃 ---'); setBattleMsg2('');
+                sfxTone(220, 0.3, 'sawtooth', 0.1);
+            }, cursor);
+            cursor += 600;
+            push(() => setBattleFinisher(false), cursor);
+            cursor += 100;
+        }
+        doFullCard(battleData.cards[N_CARDS - 1], N_CARDS - 1);
+
+        cursor += 300;
+
+        // Phase 4: Synergies (compressed)
+        if (battleData.synergies.length > 0) {
+            push(() => { setBattleMsg('--- シナジー発動 ---'); setBattleMsg2(''); }, cursor);
+            battleData.synergies.forEach((syn, si) => {
+                push(() => {
+                    setBattlePhase('synergy');
+                    setBattleSynergyName(`${syn.icon} ${syn.name}`);
+                    sfxSynergy();
+                    setBattleMsg(`${syn.icon} ${syn.name} 発動!`);
+                    setBattleMsg2(`ダメージ x${syn.multiplier.toFixed(1)}倍!`);
+                    setBattleShake(true); setBattleSpellEffect('thunder');
+                    setTimeout(() => { setBattleShake(false); setBattleSpellEffect(null); setBattleSynergyName(null); }, 350);
+                }, cursor + 250 + si * 550);
+            });
+            cursor += 250 + battleData.synergies.length * 550;
+        }
+
+        cursor += 200;
+
+        // Final damage + Result + Grade (merged for speed)
+        push(() => {
+            const finalHp = Math.max(0, battleData!.bossHp - battleData!.finalDamage);
+            setBattleBossHpLeft(finalHp);
+            setBattleTotalDmg(battleData!.finalDamage);
+            setBattlePhase('result');
+            setBattleGrade(battleData!.grade);
+            sfxGrade(battleData!.grade);
+            if (battleData!.bossDefeated) {
+                // Boss EXPLOSION effect
+                setBattleBossExplode(true);
+                setBattleShake(true);
+                setBattleInvert(true); setTimeout(() => setBattleInvert(false), 200);
+                setBattleWhiteout(true); setTimeout(() => setBattleWhiteout(false), 400);
+                setBattleZoom(true); setTimeout(() => setBattleZoom(false), 400);
+                setTimeout(() => { setBattleShake(false); setBattleBossExplode(false); }, 600);
+                setBattleMsg(`${battleData!.bossName} を撃破!!`);
+                setBattleMsg2('');
+            } else {
+                setBattleMsg(`${battleData!.bossName} は倒せなかった...`);
+                setBattleMsg2(`総ダメージ: ${battleData!.finalDamage.toLocaleString()} / 残HP ${Math.max(0, battleData!.bossHp - battleData!.finalDamage).toLocaleString()}`);
+                sfxDefeat();
+            }
+        }, cursor);
+
+        cursor += 800;
+
+        // === GP RAIN + 確変突入 (boss defeated only) ===
+        if (battleData.bossDefeated) {
+            // GP coin rain — 20 coins falling with staggered delays
+            push(() => {
+                const coins = Array.from({ length: 20 }, (_, i) => ({
+                    x: Math.random() * 90 + 5, // 5-95% horizontal
+                    delay: Math.random() * 0.6,
+                    size: 8 + Math.random() * 8,
+                    key: Date.now() + i,
+                }));
+                setBattleGpRain(true);
+                setBattleGpRainCoins(coins);
+                sfxTone(880, 0.06, 'square', 0.05);
+                setTimeout(() => sfxTone(1100, 0.06, 'square', 0.05), 80);
+                setTimeout(() => sfxTone(1320, 0.06, 'square', 0.05), 160);
+                setBattleMsg('GP BONUS!!');
+                const gpEarned = Math.round(battleData!.finalDamage / 10) * 2;
+                setBattleMsg2(`+${gpEarned.toLocaleString()} GP`);
+            }, cursor);
+            cursor += 1200;
+
+            // 確変突入 flash
+            push(() => {
+                setBattleGpRain(false); setBattleGpRainCoins([]);
+                setBattleKakuhenFlash(true);
+                setBattleInvert(true); setTimeout(() => setBattleInvert(false), 150);
+                sfxTone(440, 0.15, 'square', 0.08);
+                setTimeout(() => sfxTone(660, 0.12, 'square', 0.08), 100);
+                setTimeout(() => sfxTone(880, 0.1, 'square', 0.08), 200);
+                setKakuhenBoost(10); // 次の10回のスロットが確変
+                setBattleMsg('確変突入!!');
+                setBattleMsg2('次の10回スロット確率UP!');
+            }, cursor);
+            cursor += 1500;
+
+            push(() => { setBattleKakuhenFlash(false); }, cursor);
+        }
+
+        cursor += 400;
+
+        // Victory: rapid phrase flashback
+        const allPhrases = battleData.cards.map(c => c.english);
+        const FLASH_DELAY = Math.min(200, 800 / allPhrases.length);
+        push(() => {
+            setBattlePhase('victory');
+            setBattlePhraseFlash(allPhrases); setBattlePhraseFlashIdx(0);
+        }, cursor);
+        allPhrases.forEach((_, fi) => {
+            push(() => { setBattlePhraseFlashIdx(fi); sfxTone(440 + fi * 60, 0.03, 'square', 0.05); }, cursor + fi * FLASH_DELAY);
+        });
+        cursor += allPhrases.length * FLASH_DELAY + 300;
+
+        push(() => {
+            setBattlePhraseFlash([]); setBattlePhraseFlashIdx(-1);
+            setBattleVictoryStats({
+                totalDmg: battleData!.finalDamage,
+                cards: battleData!.cards.length,
+                synergies: battleData!.synergies.length,
+                gp: Math.round(battleData!.finalDamage / 10) * (battleData!.bossDefeated ? 2 : 1),
+            });
+            setBattleMsg(battleData!.bossDefeated ? 'VICTORY!' : 'BATTLE END');
+            setBattleMsg2('');
+            if (battleData!.bossDefeated) sfxVictory();
+        }, cursor);
+
+        cursor += 1200;
+
+        // Screen wipe out + cleanup
+        push(() => { setBattleWipeOut(true); }, cursor);
+        push(() => {
+            setBattleActive(false); setBattlePhase('idle');
+            setBattleCardIdx(-1); setBattleGrade(null);
+            setBattleDefeated(false); setBattleMsg(''); setBattleMsg2('');
+            setBattleDmgNum(null); setBattleCombo(0); setBattleTotalDmg(0);
+            setBattleVictoryStats(null); setBattleWipeIn(false); setBattleWipeOut(false);
+            setBattlePhraseAtk(null); setBattleBossCounter(false); setBattleBossTaunt(null);
+            setBattleWordBuild([]); setBattleWordIdx(-1);
+            setBattleFinisher(false); setBattleRankFx(null);
+            setBattlePhraseFlash([]); setBattlePhraseFlashIdx(-1);
+            setBattleRush(false); setBattleRushCombo(null);
+            setBattleZoom(false); setBattleCrack(false); setBattleWhiteout(false); setBattleInvert(false);
+            setBattleSlotPhase('idle'); setBattleSlotReels(['blank', 'blank', 'blank']); setBattleSlotTier('MISS');
+            setBattleGpRain(false); setBattleGpRainCoins([]); setBattleKakuhenFlash(false); setBattleBossExplode(false);
+            onBattleEnd?.();
+        }, cursor + 600);
+
+        battleTimerRef.current = T;
+        return () => { T.forEach(t => clearTimeout(t)); };
+    }, [battleData]);
 
     const milestones = getRunnerMilestones(goalXP);
     const maxXP = Math.round(goalXP * 1.07);
@@ -429,6 +1074,7 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
     const cc = dailyTitle.color;
 
     useEffect(() => {
+        if (battleActive) return; // Skip normal XP reactions during battle
         const diff = todayXP - prevXpRef.current;
         if (diff > 0) {
             const r = getRunnerReaction();
@@ -440,7 +1086,7 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
             return () => clearTimeout(t);
         }
         prevXpRef.current = todayXP; prevGodRef.current = todayXP >= goalXP;
-    }, [todayXP, goalXP]);
+    }, [todayXP, goalXP, battleActive]);
 
     const sunAngle = Math.min(wr, 1) * 150 + 15;
     const sunX = 50 - Math.cos(sunAngle * Math.PI / 180) * 44;
@@ -463,7 +1109,8 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
     const enemyMaxHP = enemyMilestone ? enemyMilestone.xp - prevMilestoneXP : 1;
     const enemyCurrentHP = enemyMilestone ? Math.max(0, enemyMilestone.xp - todayXP) : 0;
     const enemyHPRatio = enemyMaxHP > 0 ? enemyCurrentHP / enemyMaxHP : 0;
-    const enemyLeft = enemyMilestone ? Math.min((enemyMilestone.xp / maxXP) * 100, 90) : 85;
+    // Use evenly-spaced position matching milestone flags (8% to 88%)
+    const enemyEvenX = hasEnemy ? 8 + (nextMilestoneIdx / (milestones.length - 1)) * 80 : 85;
     // Enemy type based on milestone tier
     const enemyTier: 'slime' | 'wolf' | 'dragon' | 'demon' = (() => {
         if (nextMilestoneIdx <= 1) return 'slime';
@@ -481,8 +1128,8 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
     })();
     const isAttacking = !!reaction;
     const enemyJustHit = isAttacking;
-    // Position enemy slightly LEFT of the milestone gate (not on top of it)
-    const enemyLeftAdjusted = enemyMilestone ? Math.min((enemyMilestone.xp / maxXP) * 100 - 4, 86) : 82;
+    // Position enemy slightly LEFT of the milestone flag
+    const enemyLeftAdjusted = hasEnemy ? enemyEvenX - 4 : 82;
 
     return (
         <div style={{ height: '160px', position: 'relative', overflow: 'hidden', background: sky.bg, transition: 'background 3s ease', borderBottom: '1px solid #e5e5e5', flexShrink: 0 }}>
@@ -618,24 +1265,6 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
                 return <div key={`ff-${i}`} style={{ position: 'absolute', top: `${fy}px`, left: `${fx}%`, width: `${2 + (i % 2)}px`, height: `${2 + (i % 2)}px`, borderRadius: '50%', background: ['#FDE68A', '#A78BFA', '#10B981', '#F472B6', '#60A5FA', '#FBBF24'][i % 6], boxShadow: `0 0 5px ${['#FDE68A', '#A78BFA', '#10B981', '#F472B6', '#60A5FA', '#FBBF24'][i % 6]}50`, '--ff-dx': `${(i % 2 === 0 ? 10 : -10)}px`, '--ff-dy': `${-6 - (i % 4) * 3}px`, '--ff-op': '0.6', animation: `v6-firefly ${2.2 + (i % 5) * 0.4}s ease-in-out ${i * 0.3}s infinite`, zIndex: 8 } as React.CSSProperties} />;
             })}
 
-            {/* === BUTTERFLIES === */}
-            {!isGod && wr >= 0.2 && wr < 0.7 && [
-                { x: 20, y: 55, bx: 15, by: -20, c: '#F472B6' },
-                { x: 60, y: 45, bx: -12, by: -15, c: '#A78BFA' },
-                { x: 80, y: 60, bx: 10, by: -18, c: '#FBBF24' },
-            ].map((bf, i) => (
-                <div key={`bf-${i}`} style={{
-                    position: 'absolute', top: `${bf.y}px`, left: `${bf.x}%`,
-                    '--bx': `${bf.bx}px`, '--by': `${bf.by}px`,
-                    animation: `v6-butterfly ${4 + i}s ease-in-out ${i * 1.5}s infinite`,
-                    zIndex: 8,
-                } as React.CSSProperties}>
-                    <div style={{ display: 'flex', gap: '0px', animation: `v6-bf-wings 0.3s ease-in-out infinite` }}>
-                        <div style={{ width: '3px', height: '4px', borderRadius: '50% 50% 50% 0', background: bf.c, opacity: 0.7 }} />
-                        <div style={{ width: '3px', height: '4px', borderRadius: '50% 50% 0 50%', background: bf.c, opacity: 0.7 }} />
-                    </div>
-                </div>
-            ))}
 
             {/* === GROUND === */}
             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${GH}px`, background: `linear-gradient(180deg, ${sky.gTop} 0%, ${sky.gMid} 40%, ${sky.gBot} 100%)`, borderTop: `2px solid ${sky.gTop}`, transition: 'all 3s ease', zIndex: 9 }}>
@@ -666,6 +1295,8 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
                     <div style={{ width: '1px', height: '4px', background: sky.grass, opacity: 0.45 }} />
                 </div>
             ))}
+
+            {/* Word stream removed — heavy animation */}
 
             {/* === OBSTACLES (endless runner) === */}
             {isRunning && !isGod && (
@@ -709,21 +1340,74 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
                 </div>
             </div>
 
-            {/* === MILESTONE GATES === */}
+            {/* === MILESTONE FLAGS — evenly spaced, staggered heights === */}
             {milestones.map((m, i) => {
-                const mx = (m.xp / maxXP) * 100;
+                // Evenly space flags across 8%–88% of the runner width (not bunched at start)
+                const evenX = 8 + (i / (milestones.length - 1)) * 80;
                 const cleared = todayXP >= m.xp;
                 const isNext = !cleared && (i === 0 || todayXP >= milestones[i - 1].xp);
+                // Alternate tall/short to avoid overlap
+                const isOdd = i % 2 === 1;
+                const poleH = cleared ? (isOdd ? 40 : 28) : (isOdd ? 30 : 20);
+                // Cute milestone icons
+                const msIcons = ['⚡', '✦', '☆', '♦', '★', '♥', '◆', '♛'];
                 return (
-                    <div key={`ms-${i}`} style={{ position: 'absolute', bottom: `${GH}px`, left: `${Math.min(mx, 90)}%`, zIndex: 12 }}>
-                        <div style={{ position: 'relative', width: '10px', height: cleared ? '26px' : '16px', transition: 'height 0.6s ease' }}>
-                            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '2.5px', height: '100%', background: cleared ? `linear-gradient(180deg, ${m.color}70, ${m.color})` : 'linear-gradient(180deg, #D6D3D150, #A8A29E)', borderRadius: '1px 1px 0 0' }} />
-                            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '2.5px', height: '100%', background: cleared ? `linear-gradient(180deg, ${m.color}70, ${m.color})` : 'linear-gradient(180deg, #D6D3D150, #A8A29E)', borderRadius: '1px 1px 0 0' }} />
-                            <div style={{ position: 'absolute', top: 0, left: '-2px', right: '-2px', height: '3.5px', background: cleared ? m.color : '#A8A29E70', borderRadius: '2px', boxShadow: cleared ? `0 0 6px ${m.color}40` : 'none' }} />
-                            <div style={{ position: 'absolute', top: '-5px', left: '50%', width: cleared ? '7px' : '4px', height: cleared ? '7px' : '4px', borderRadius: '50%', background: cleared ? `radial-gradient(circle at 35% 35%, ${m.color}EE, ${m.color})` : '#A8A29E50', '--b': m.color, animation: cleared ? 'v6-beacon 2.8s ease-in-out infinite' : 'none', transform: 'translateX(-50%)', transition: 'all 0.6s ease' } as React.CSSProperties} />
-                            {cleared && <div style={{ position: 'absolute', top: '-24px', left: '50%', transform: 'translateX(-50%)', width: '1px', height: '18px', background: `linear-gradient(180deg, transparent, ${m.color}50, transparent)`, animation: 'v6-beam 3.5s ease-in-out infinite' }} />}
+                    <div key={`ms-${i}`} style={{ position: 'absolute', bottom: `${GH}px`, left: `${evenX}%`, zIndex: 12, transform: 'translateX(-50%)' }}>
+                        {/* Flag pole with gradient */}
+                        <div style={{
+                            width: cleared ? '3px' : '2px', height: `${poleH}px`,
+                            background: cleared ? `linear-gradient(180deg, ${m.color}, ${m.color}60)` : '#C4B5A0',
+                            borderRadius: '1.5px', transition: 'all 0.6s ease',
+                            margin: '0 auto',
+                        }} />
+                        {/* Flag pennant — bigger, more colorful */}
+                        <div style={{
+                            position: 'absolute', top: 0, left: '3px',
+                            width: cleared ? '24px' : '16px', height: cleared ? '16px' : '10px',
+                            background: cleared ? `linear-gradient(135deg, ${m.color}, ${m.color}CC)` : '#D6D3D1',
+                            clipPath: 'polygon(0 0, 100% 15%, 75% 50%, 100% 85%, 0 100%)',
+                            opacity: cleared ? 1 : 0.4,
+                            animation: cleared ? 'v6-flag 2.5s ease-in-out infinite' : undefined,
+                            transformOrigin: 'left center',
+                            transition: 'all 0.4s ease',
+                        }}>
+                            <div style={{ fontSize: cleared ? '8px' : '6px', fontWeight: '900', color: '#fff', paddingTop: cleared ? '2px' : '1px', paddingLeft: '3px', textShadow: '0 1px 2px rgba(0,0,0,0.4)', lineHeight: 1 }}>
+                                {msIcons[i] || '✦'}
+                            </div>
                         </div>
-                        {(cleared || isNext) && <div style={{ position: 'absolute', top: '-32px', left: '50%', transform: 'translateX(-50%)', fontSize: '6px', fontWeight: '800', whiteSpace: 'nowrap', color: cleared ? m.color : '#A8A29E', textShadow: cleared ? `0 0 12px ${m.color}50, 0 1px 3px rgba(0,0,0,0.5)` : '0 1px 2px rgba(0,0,0,0.3)', letterSpacing: '0.4px' }}>{m.title}</div>}
+                        {/* Small tier number */}
+                        <div style={{
+                            position: 'absolute', top: `${-10 - (isOdd ? 4 : 0)}px`, left: '50%', transform: 'translateX(-50%)',
+                            fontSize: '7px', fontWeight: '900', whiteSpace: 'nowrap',
+                            color: cleared ? '#fff' : isNext ? m.color : '#A8A29E80',
+                            background: cleared ? m.color : 'transparent',
+                            width: '14px', height: '14px', borderRadius: '50%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            boxShadow: cleared ? `0 0 8px ${m.color}60` : 'none',
+                            border: isNext ? `1.5px solid ${m.color}` : 'none',
+                            animation: isNext ? 'enemy-bob 2s ease-in-out infinite' : undefined,
+                            transition: 'all 0.4s ease',
+                        }}>
+                            {i + 1}
+                        </div>
+                        {/* Cleared glow ring */}
+                        {cleared && (
+                            <div style={{
+                                position: 'absolute', top: '-4px', left: '50%', transform: 'translateX(-50%)',
+                                width: '10px', height: '10px', borderRadius: '50%',
+                                background: `radial-gradient(circle, ${m.color}80, transparent 70%)`,
+                                animation: 'v6-beacon 2s ease-in-out infinite',
+                            }} />
+                        )}
+                        {/* Next target pulse */}
+                        {isNext && (
+                            <div style={{
+                                position: 'absolute', top: '-6px', left: '50%', transform: 'translateX(-50%)',
+                                width: '14px', height: '14px', borderRadius: '50%',
+                                border: `1.5px solid ${m.color}`,
+                                animation: 'milestone-pulse 1.5s ease-in-out infinite',
+                            }} />
+                        )}
                     </div>
                 );
             })}
@@ -739,17 +1423,27 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
                 </div>
             </div>
 
-            {/* ═══════ ENEMY — clean minimal design ═══════ */}
-            {hasEnemy && enemyMilestone && (
+            {/* ═══════ ENEMY — animated with name & provocation ═══════ */}
+            {hasEnemy && enemyMilestone && !battleActive && (
                 <div style={{
                     position: 'absolute', bottom: `${GH}px`,
                     left: `${enemyLeftAdjusted}%`, transform: 'translateX(-50%)',
                     zIndex: 18,
                     animation: enemyJustHit ? `enemy-hit-flash 400ms ease-out` : `enemy-bob 2s ease-in-out infinite`,
                 }}>
-                    {/* HP Bar — compact */}
-                    <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', width: '28px', zIndex: 19 }}>
-                        <div style={{ width: '100%', height: '3px', background: '#1c191740', borderRadius: '2px', overflow: 'hidden' }}>
+                    {/* Enemy level badge */}
+                    <div style={{
+                        position: 'absolute', top: '-30px', left: '50%', transform: 'translateX(-50%)',
+                        fontSize: '7px', fontWeight: '900', color: '#fff',
+                        whiteSpace: 'nowrap', zIndex: 19,
+                        background: enemyColor.body, padding: '2px 5px', borderRadius: '8px',
+                        boxShadow: `0 1px 4px ${enemyColor.dark}40`,
+                    }}>
+                        Lv.{nextMilestoneIdx + 1}
+                    </div>
+                    {/* HP Bar */}
+                    <div style={{ position: 'absolute', top: '-16px', left: '50%', transform: 'translateX(-50%)', width: '32px', zIndex: 19 }}>
+                        <div style={{ width: '100%', height: '4px', background: '#1c191740', borderRadius: '2px', overflow: 'hidden', border: `0.5px solid ${enemyColor.dark}30` }}>
                             <div style={{
                                 width: `${enemyHPRatio * 100}%`, height: '100%',
                                 background: enemyHPRatio > 0.5 ? '#10B981' : enemyHPRatio > 0.2 ? '#F59E0B' : '#EF4444',
@@ -759,6 +1453,15 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
                             }} />
                         </div>
                     </div>
+                    {/* Provocation aura — enemy pulses menacingly */}
+                    <div style={{
+                        position: 'absolute', top: '50%', left: '50%',
+                        width: '36px', height: '36px', borderRadius: '50%',
+                        border: `1.5px solid ${enemyColor.body}30`,
+                        transform: 'translate(-50%, -50%)',
+                        animation: 'enemy-aura-pulse 2s ease-in-out infinite',
+                        pointerEvents: 'none',
+                    }} />
 
                     {/* Damage popup */}
                     {reaction && (
@@ -773,55 +1476,129 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
                         }}>-{reaction.points}</div>
                     )}
 
-                    {/* Enemy body — unified 24x24 SVG */}
-                    <svg width="24" height="24" viewBox="0 0 24 24" style={{ display: 'block', filter: `drop-shadow(0 1px 3px ${enemyColor.dark}40)` }}>
+                    {/* Enemy body — cute chibi creatures */}
+                    <svg width="32" height="32" viewBox="0 0 24 24" style={{
+                        display: 'block',
+                        filter: `drop-shadow(0 2px 4px ${enemyColor.dark}30)`,
+                        animation: enemyJustHit ? undefined : 'enemy-idle-sway 2.5s ease-in-out infinite',
+                    }}>
                         {enemyTier === 'slime' && <>
-                            {/* Simple droplet shape */}
-                            <ellipse cx="12" cy="22" rx="7" ry="1.5" fill="rgba(0,0,0,0.08)" />
-                            <path d="M12 4 Q5 12 5 16 Q5 22 12 22 Q19 22 19 16 Q19 12 12 4Z" fill={enemyColor.body} stroke={enemyColor.dark} strokeWidth="0.6" />
-                            <ellipse cx="10" cy="14" rx="1.5" ry="1.8" fill="#fff" />
-                            <circle cx="10.5" cy="14.5" r="0.8" fill={enemyColor.dark} />
-                            <ellipse cx="15" cy="14" rx="1.5" ry="1.8" fill="#fff" />
-                            <circle cx="15.5" cy="14.5" r="0.8" fill={enemyColor.dark} />
-                            <path d="M10 18 Q12 19.5 14 18" fill="none" stroke={enemyColor.dark} strokeWidth="0.6" strokeLinecap="round" />
+                            {/* Cute round slime with sparkly eyes and blush */}
+                            <ellipse cx="12" cy="22" rx="8" ry="1.5" fill="rgba(0,0,0,0.06)" />
+                            <ellipse cx="12" cy="15" rx="9" ry="8" fill={enemyColor.body} />
+                            <ellipse cx="12" cy="16" rx="7" ry="5" fill={`${enemyColor.body}80`} />
+                            {/* Big sparkly eyes */}
+                            <ellipse cx="9" cy="13" rx="2.5" ry="2.8" fill="#fff" />
+                            <circle cx="9.5" cy="13" r="1.5" fill={enemyColor.eye} />
+                            <circle cx="10" cy="12.3" r="0.6" fill="#fff" />
+                            <ellipse cx="15" cy="13" rx="2.5" ry="2.8" fill="#fff" />
+                            <circle cx="15.5" cy="13" r="1.5" fill={enemyColor.eye} />
+                            <circle cx="16" cy="12.3" r="0.6" fill="#fff" />
+                            {/* Blush cheeks */}
+                            <ellipse cx="6.5" cy="15.5" rx="1.5" ry="1" fill="#FDA4AF" opacity="0.5" />
+                            <ellipse cx="17.5" cy="15.5" rx="1.5" ry="1" fill="#FDA4AF" opacity="0.5" />
+                            {/* Happy mouth */}
+                            <path d="M10 17 Q12 19 14 17" fill="none" stroke={enemyColor.eye} strokeWidth="0.7" strokeLinecap="round" />
+                            {/* Tiny crown */}
+                            <path d="M8,8 L9,5 L10.5,7.5 L12,4 L13.5,7.5 L15,5 L16,8Z" fill="#FBBF24" stroke="#F59E0B" strokeWidth="0.3" />
                         </>}
                         {enemyTier === 'wolf' && <>
-                            {/* Compact wolf head */}
-                            <ellipse cx="12" cy="22" rx="7" ry="1.5" fill="rgba(0,0,0,0.08)" />
-                            <polygon points="4,10 6,2 9,8" fill={enemyColor.body} />
-                            <polygon points="20,10 18,2 15,8" fill={enemyColor.body} />
-                            <ellipse cx="12" cy="14" rx="8" ry="7" fill={enemyColor.body} stroke={enemyColor.dark} strokeWidth="0.6" />
-                            <circle cx="9" cy="12" r="2" fill="#fff" />
-                            <circle cx="9.5" cy="12.5" r="1" fill={enemyColor.dark} />
-                            <circle cx="15" cy="12" r="2" fill="#fff" />
-                            <circle cx="15.5" cy="12.5" r="1" fill={enemyColor.dark} />
-                            <ellipse cx="12" cy="17" rx="1.2" ry="0.8" fill="#1a1a2e" />
-                            <path d="M9 19 Q12 17 15 19" fill="none" stroke="#1a1a2e" strokeWidth="0.5" />
+                            {/* Cute puppy with floppy ears */}
+                            <ellipse cx="12" cy="22.5" rx="6" ry="1" fill="rgba(0,0,0,0.06)" />
+                            {/* Floppy ears */}
+                            <ellipse cx="5" cy="10" rx="3" ry="5" fill={enemyColor.body} transform="rotate(-20 5 10)" />
+                            <ellipse cx="5.5" cy="10" rx="2" ry="3.5" fill={`${enemyColor.body}80`} transform="rotate(-20 5.5 10)" />
+                            <ellipse cx="19" cy="10" rx="3" ry="5" fill={enemyColor.body} transform="rotate(20 19 10)" />
+                            <ellipse cx="18.5" cy="10" rx="2" ry="3.5" fill={`${enemyColor.body}80`} transform="rotate(20 18.5 10)" />
+                            {/* Round head */}
+                            <circle cx="12" cy="12" r="8" fill={enemyColor.body} />
+                            {/* Big eyes */}
+                            <ellipse cx="9" cy="11" rx="2.5" ry="2.8" fill="#fff" />
+                            <circle cx="9.5" cy="11.5" r="1.4" fill={enemyColor.eye} />
+                            <circle cx="10" cy="10.8" r="0.5" fill="#fff" />
+                            <ellipse cx="15" cy="11" rx="2.5" ry="2.8" fill="#fff" />
+                            <circle cx="15.5" cy="11.5" r="1.4" fill={enemyColor.eye} />
+                            <circle cx="16" cy="10.8" r="0.5" fill="#fff" />
+                            {/* Nose and mouth */}
+                            <ellipse cx="12" cy="14.5" rx="1.2" ry="0.9" fill="#1a1a2e" />
+                            <path d="M12 15.4 L10.5 17" fill="none" stroke="#1a1a2e" strokeWidth="0.5" strokeLinecap="round" />
+                            <path d="M12 15.4 L13.5 17" fill="none" stroke="#1a1a2e" strokeWidth="0.5" strokeLinecap="round" />
+                            {/* Blush */}
+                            <ellipse cx="6.5" cy="14" rx="1.5" ry="1" fill="#FDA4AF" opacity="0.4" />
+                            <ellipse cx="17.5" cy="14" rx="1.5" ry="1" fill="#FDA4AF" opacity="0.4" />
+                            {/* Round body */}
+                            <ellipse cx="12" cy="20" rx="5" ry="3" fill={enemyColor.body} />
+                            {/* Tiny paws */}
+                            <circle cx="8.5" cy="22" r="1.5" fill={enemyColor.body} />
+                            <circle cx="15.5" cy="22" r="1.5" fill={enemyColor.body} />
                         </>}
                         {enemyTier === 'dragon' && <>
-                            {/* Mini dragon — round body + horns */}
-                            <ellipse cx="12" cy="22" rx="7" ry="1.5" fill="rgba(0,0,0,0.1)" />
-                            <path d="M5,8 L3,2 L8,7Z" fill="#FDE68A" />
-                            <path d="M19,8 L21,2 L16,7Z" fill="#FDE68A" />
-                            <circle cx="12" cy="13" r="8" fill={enemyColor.body} stroke={enemyColor.dark} strokeWidth="0.6" />
-                            <ellipse cx="9" cy="12" rx="2.2" ry="2" fill="#FBBF24" />
-                            <circle cx="9.5" cy="12.5" r="1" fill="#1a1a2e" />
-                            <ellipse cx="16" cy="12" rx="2.2" ry="2" fill="#FBBF24" />
-                            <circle cx="16.5" cy="12.5" r="1" fill="#1a1a2e" />
-                            <path d="M10 17 Q12 19 14 17" fill="none" stroke="#7F1D1D" strokeWidth="0.7" strokeLinecap="round" />
+                            {/* Baby dragon — round, chubby, tiny wings */}
+                            <ellipse cx="12" cy="22.5" rx="6" ry="1" fill="rgba(0,0,0,0.06)" />
+                            {/* Tiny wings */}
+                            <path d="M4,11 Q1,6 5,8 Q3,5 7,9" fill="#FDE68A" stroke="#F59E0B" strokeWidth="0.3" />
+                            <path d="M20,11 Q23,6 19,8 Q21,5 17,9" fill="#FDE68A" stroke="#F59E0B" strokeWidth="0.3" />
+                            {/* Small horns */}
+                            <circle cx="8" cy="5" r="1.5" fill="#FBBF24" />
+                            <circle cx="16" cy="5" r="1.5" fill="#FBBF24" />
+                            {/* Round head */}
+                            <circle cx="12" cy="11" r="7.5" fill={enemyColor.body} />
+                            {/* Big sparkly eyes */}
+                            <ellipse cx="9" cy="10" rx="2.5" ry="3" fill="#fff" />
+                            <circle cx="9.5" cy="10.5" r="1.5" fill={enemyColor.eye} />
+                            <circle cx="10" cy="9.8" r="0.6" fill="#fff" />
+                            <ellipse cx="15" cy="10" rx="2.5" ry="3" fill="#fff" />
+                            <circle cx="15.5" cy="10.5" r="1.5" fill={enemyColor.eye} />
+                            <circle cx="16" cy="9.8" r="0.6" fill="#fff" />
+                            {/* Blush */}
+                            <ellipse cx="6" cy="13" rx="1.5" ry="1" fill="#FDA4AF" opacity="0.5" />
+                            <ellipse cx="18" cy="13" rx="1.5" ry="1" fill="#FDA4AF" opacity="0.5" />
+                            {/* Toothy grin */}
+                            <path d="M9 14 Q12 17 15 14" fill="#fff" stroke={enemyColor.eye} strokeWidth="0.5" />
+                            <path d="M10.5 14.5 L10.5 15.5" stroke={enemyColor.eye} strokeWidth="0.3" />
+                            <path d="M13.5 14.5 L13.5 15.5" stroke={enemyColor.eye} strokeWidth="0.3" />
+                            {/* Chubby body */}
+                            <ellipse cx="12" cy="19.5" rx="5.5" ry="3.5" fill={enemyColor.body} />
+                            {/* Belly patch */}
+                            <ellipse cx="12" cy="19.5" rx="3.5" ry="2.5" fill={`${enemyColor.body}60`} />
+                            {/* Tiny tail */}
+                            <path d="M17.5 19 Q20 17 21 19 Q20 20 19 19" fill={enemyColor.body} stroke={enemyColor.dark} strokeWidth="0.3" />
                         </>}
                         {enemyTier === 'demon' && <>
-                            {/* Dark orb with horns */}
-                            <ellipse cx="12" cy="22" rx="7" ry="1.5" fill="rgba(0,0,0,0.1)" />
-                            <path d="M5,9 L2,1 L8,7Z" fill="#DC2626" />
-                            <path d="M19,9 L22,1 L16,7Z" fill="#DC2626" />
-                            <circle cx="12" cy="13" r="8.5" fill={enemyColor.body} stroke={enemyColor.dark} strokeWidth="0.8" />
-                            <circle cx="12" cy="13" r="6" fill={enemyColor.dark} opacity="0.3" />
-                            <ellipse cx="9" cy="12" rx="2" ry="1.5" fill="#EF4444" />
-                            <circle cx="9.5" cy="12" r="0.7" fill="#fff" />
-                            <ellipse cx="16" cy="12" rx="2" ry="1.5" fill="#EF4444" />
-                            <circle cx="16.5" cy="12" r="0.7" fill="#fff" />
-                            <path d="M9 16 Q12 18 15 16" fill="none" stroke="#1a1a2e" strokeWidth="0.8" strokeLinecap="round" />
+                            {/* Cute demon cat — round with horns and tail */}
+                            <ellipse cx="12" cy="22.5" rx="6" ry="1" fill="rgba(0,0,0,0.06)" />
+                            {/* Cat ears */}
+                            <polygon points="5,7 7,1 10,6" fill={enemyColor.body} />
+                            <polygon points="6,7 7.5,3 9,6" fill="#FDA4AF" opacity="0.5" />
+                            <polygon points="19,7 17,1 14,6" fill={enemyColor.body} />
+                            <polygon points="18,7 16.5,3 15,6" fill="#FDA4AF" opacity="0.5" />
+                            {/* Tiny demon horns on ears */}
+                            <circle cx="7" cy="2" r="1" fill="#DC2626" />
+                            <circle cx="17" cy="2" r="1" fill="#DC2626" />
+                            {/* Round head */}
+                            <circle cx="12" cy="11" r="7.5" fill={enemyColor.body} />
+                            {/* Big mischievous eyes */}
+                            <ellipse cx="9" cy="10" rx="2.5" ry="2.5" fill="#fff" />
+                            <circle cx="9.8" cy="10.5" r="1.5" fill={enemyColor.eye} />
+                            <circle cx="10.2" cy="9.8" r="0.5" fill="#fff" />
+                            <ellipse cx="15" cy="10" rx="2.5" ry="2.5" fill="#fff" />
+                            <circle cx="15.8" cy="10.5" r="1.5" fill={enemyColor.eye} />
+                            <circle cx="16.2" cy="9.8" r="0.5" fill="#fff" />
+                            {/* Cheeky grin */}
+                            <path d="M9 14 Q12 16.5 15 14" fill="none" stroke={enemyColor.eye} strokeWidth="0.7" strokeLinecap="round" />
+                            {/* Blush */}
+                            <ellipse cx="6" cy="13" rx="1.5" ry="1" fill="#FDA4AF" opacity="0.5" />
+                            <ellipse cx="18" cy="13" rx="1.5" ry="1" fill="#FDA4AF" opacity="0.5" />
+                            {/* Chubby body */}
+                            <ellipse cx="12" cy="19.5" rx="5" ry="3.5" fill={enemyColor.body} />
+                            {/* Belly */}
+                            <ellipse cx="12" cy="19.5" rx="3" ry="2" fill={`${enemyColor.body}50`} />
+                            {/* Devil tail */}
+                            <path d="M17 19 Q21 15 22 17 Q21 19 20 17.5" fill="none" stroke={enemyColor.body} strokeWidth="1.5" strokeLinecap="round" />
+                            <path d="M22 17 L23 15.5 L21.5 16.5Z" fill="#DC2626" />
+                            {/* Tiny paws */}
+                            <circle cx="8.5" cy="22" r="1.5" fill={enemyColor.body} />
+                            <circle cx="15.5" cy="22" r="1.5" fill={enemyColor.body} />
                         </>}
                     </svg>
                 </div>
@@ -872,117 +1649,517 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
                 {/* Dust — minimal */}
                 {isRunning && !isGod && !reaction && wr >= 0.15 && [0, 1].map(i => <div key={`dk-${i}`} style={{ position: 'absolute', bottom: `${i * 3}px`, left: `${-4 - i * 4}px`, width: '2.5px', height: '2.5px', borderRadius: '50%', background: '#A8A29E', opacity: 0.18, '--ddx': `${-6 - i * 3}px`, '--ddy': `${-2 - i * 2}px`, animation: `v6-dust ${0.35 + i * 0.08}s ease-out infinite`, animationDelay: `${i * 0.08}s` } as React.CSSProperties} />)}
 
-                {/* SVG Hero */}
-                <svg width="36" height="52" viewBox="0 0 36 52" style={{ display: 'block', overflow: 'visible' }}>
-                    <defs>
-                        <linearGradient id="heroHairGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={cc} />
-                            <stop offset="100%" stopColor={`${cc}DD`} />
-                        </linearGradient>
-                        <linearGradient id="heroArmorGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={`${cc}EE`} />
-                            <stop offset="50%" stopColor={`${cc}CC`} />
-                            <stop offset="100%" stopColor={`${cc}AA`} />
-                        </linearGradient>
-                        <linearGradient id="heroBlade" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={isGod ? '#FDE68A' : '#E8E8E8'} />
-                            <stop offset="50%" stopColor={isGod ? '#D4AF37' : '#C0C0C0'} />
-                            <stop offset="100%" stopColor={isGod ? '#A08020' : '#888'} />
-                        </linearGradient>
-                        <linearGradient id="heroCapeGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={isGod ? '#D4AF37CC' : `${cc}EE`} />
-                            <stop offset="100%" stopColor={isGod ? '#D4AF3730' : `${cc}30`} />
-                        </linearGradient>
-                    </defs>
+                {/* SVG Cute Chibi Character */}
+                <svg width="40" height="48" viewBox="0 0 40 48" style={{ display: 'block', overflow: 'visible' }}>
+                    {/* Tail (behind body) */}
+                    <path d={isRunning ? "M8,34 Q-2,28 2,22 Q4,20 6,22" : "M8,34 Q0,30 4,24 Q5,22 7,24"} fill="none" stroke={isGod ? '#D4AF37' : '#F5C77E'} strokeWidth="3" strokeLinecap="round" style={{ transformOrigin: '8px 34px', animation: isRunning ? `chibi-tail-wag 0.4s ease-in-out infinite` : 'chibi-tail-idle 2s ease-in-out infinite' }} />
 
-                    {/* Cape */}
-                    {(isRunning || isGod) && (
-                        <path d={`M10,22 Q${isGod ? 0 : 6},24 ${isGod ? -4 : 2},${isGod ? 38 : 32} Q${isGod ? 0 : 4},${isGod ? 40 : 34} 8,${isGod ? 36 : 30} Q12,28 14,24Z`} fill="url(#heroCapeGrad)" style={{ transformOrigin: '14px 22px', animation: `hero-cape-flutter ${isGod ? 2 : ws * 1.2}s ease-in-out infinite` }} />
-                    )}
+                    {/* Body — round, soft */}
+                    <ellipse cx="20" cy="36" rx="10" ry="8" fill={isGod ? '#FDE68A' : '#FFE4B5'} stroke={isGod ? '#D4AF37' : '#E8C890'} strokeWidth="0.8" />
+                    {/* Belly patch */}
+                    <ellipse cx="20" cy="38" rx="6" ry="5" fill={isGod ? '#FFF8DC' : '#FFF5E6'} />
 
-                    {/* Hair (behind head) */}
-                    <path d="M8,10 Q6,4 10,2 L14,0 Q18,-2 22,0 L26,2 Q30,4 28,10 L30,8 Q32,12 28,14 L8,14 Q4,12 6,8Z" fill="url(#heroHairGrad)" />
-                    {/* Hair spikes */}
-                    <path d="M8,6 L5,0 L12,5Z" fill={cc} />
-                    <path d="M14,3 L13,-3 L19,2Z" fill={cc} />
-                    <path d="M22,3 L24,-2 L26,4Z" fill={cc} />
-                    <path d="M28,8 L32,3 L29,10Z" fill={`${cc}DD`} />
+                    {/* Legs — tiny stubs */}
+                    <g style={{ transformOrigin: '14px 42px', animation: isRunning && !reaction ? `chibi-leg-l ${ws}s ease-in-out infinite` : 'none' }}>
+                        <ellipse cx="14" cy="44" rx="4" ry="3" fill={isGod ? '#D4AF37' : '#F5C77E'} />
+                    </g>
+                    <g style={{ transformOrigin: '26px 42px', animation: isRunning && !reaction ? `chibi-leg-r ${ws}s ease-in-out infinite` : 'none' }}>
+                        <ellipse cx="26" cy="44" rx="4" ry="3" fill={isGod ? '#D4AF37' : '#F5C77E'} />
+                    </g>
 
-                    {/* Head */}
-                    <ellipse cx="18" cy="14" rx="9" ry="9" fill="#FCEBD0" stroke="#E8C8A0" strokeWidth="0.8" />
+                    {/* Head — BIG round */}
+                    <circle cx="20" cy="18" r="15" fill={isGod ? '#FDE68A' : '#FFE4B5'} stroke={isGod ? '#D4AF37' : '#E8C890'} strokeWidth="0.8" />
+                    {/* Inner ear color */}
+                    <ellipse cx="9" cy="5" rx="3" ry="2.5" fill="#FFB5B5" opacity="0.5" transform="rotate(-15 9 5)" />
+                    <ellipse cx="31" cy="5" rx="3" ry="2.5" fill="#FFB5B5" opacity="0.5" transform="rotate(15 31 5)" />
+                    {/* Ears — pointy cat ears */}
+                    <path d="M5,12 L3,0 L14,8Z" fill={isGod ? '#FDE68A' : '#FFE4B5'} stroke={isGod ? '#D4AF37' : '#E8C890'} strokeWidth="0.8" strokeLinejoin="round" />
+                    <path d="M35,12 L37,0 L26,8Z" fill={isGod ? '#FDE68A' : '#FFE4B5'} stroke={isGod ? '#D4AF37' : '#E8C890'} strokeWidth="0.8" strokeLinejoin="round" />
 
-                    {/* Hair fringe over forehead */}
-                    <path d="M9,10 Q10,7 14,8 Q16,6 18,8 Q20,6 22,8 Q26,7 27,10 Q24,11 18,10 Q12,11 9,10Z" fill={cc} />
-
-                    {/* Eyes */}
+                    {/* Face */}
+                    {/* Eyes — big sparkly */}
                     {reaction && reaction.points >= 6 ? (<>
-                        <path d="M12,15 Q14,13 16,15" fill="none" stroke="#1a1a2e" strokeWidth="1.5" strokeLinecap="round" />
-                        <path d="M20,15 Q22,13 24,15" fill="none" stroke="#1a1a2e" strokeWidth="1.5" strokeLinecap="round" />
+                        {/* Happy squint eyes */}
+                        <path d="M10,17 Q14,13 18,17" fill="none" stroke="#3B2F1A" strokeWidth="2" strokeLinecap="round" />
+                        <path d="M22,17 Q26,13 30,17" fill="none" stroke="#3B2F1A" strokeWidth="2" strokeLinecap="round" />
                     </>) : (<>
-                        <ellipse cx="13.5" cy="15" rx="2.8" ry="2.8" fill="#fff" stroke="#D4C4B0" strokeWidth="0.3" />
-                        <circle cx="14.5" cy="15.5" r="1.5" fill={isGod ? '#D4AF37' : cc} />
-                        <circle cx="13" cy="14" r="0.8" fill="#fff" opacity="0.9" />
-                        <ellipse cx="22.5" cy="15" rx="2.8" ry="2.8" fill="#fff" stroke="#D4C4B0" strokeWidth="0.3" />
-                        <circle cx="23.5" cy="15.5" r="1.5" fill={isGod ? '#D4AF37' : cc} />
-                        <circle cx="22" cy="14" r="0.8" fill="#fff" opacity="0.9" />
+                        {/* Normal big cute eyes */}
+                        <ellipse cx="13" cy="18" rx="4" ry="4.5" fill="#fff" stroke="#C4A882" strokeWidth="0.4" />
+                        <ellipse cx="14" cy="19" rx="2.5" ry="3" fill={isGod ? '#D4AF37' : '#5B3E1A'} />
+                        <circle cx="12" cy="16.5" r="1.5" fill="#fff" opacity="0.9" />
+                        <circle cx="15" cy="18" r="0.7" fill="#fff" opacity="0.6" />
+                        <ellipse cx="27" cy="18" rx="4" ry="4.5" fill="#fff" stroke="#C4A882" strokeWidth="0.4" />
+                        <ellipse cx="28" cy="19" rx="2.5" ry="3" fill={isGod ? '#D4AF37' : '#5B3E1A'} />
+                        <circle cx="26" cy="16.5" r="1.5" fill="#fff" opacity="0.9" />
+                        <circle cx="29" cy="18" r="0.7" fill="#fff" opacity="0.6" />
                     </>)}
-                    {/* Brows */}
-                    <line x1="11" y1="11.5" x2="16" y2="12" stroke={`${cc}90`} strokeWidth="1" strokeLinecap="round" />
-                    <line x1="25" y1="11.5" x2="20" y2="12" stroke={`${cc}90`} strokeWidth="1" strokeLinecap="round" />
-                    {/* Blush */}
-                    {(isGod || (reaction && reaction.points >= 3)) && <>
-                        <ellipse cx="11" cy="18" rx="2" ry="1" fill="#FF9999" opacity="0.3" />
-                        <ellipse cx="25" cy="18" rx="2" ry="1" fill="#FF9999" opacity="0.3" />
-                    </>}
+
+                    {/* Blush — always visible, cute */}
+                    <ellipse cx="9" cy="22" rx="3" ry="1.5" fill="#FFB5B5" opacity={reaction ? 0.6 : 0.35} />
+                    <ellipse cx="31" cy="22" rx="3" ry="1.5" fill="#FFB5B5" opacity={reaction ? 0.6 : 0.35} />
+
+                    {/* Nose — tiny pink triangle */}
+                    <ellipse cx="20" cy="22" rx="1.2" ry="0.8" fill="#FFB0A0" />
+
                     {/* Mouth */}
                     {(isGod || (reaction && reaction.points >= 3))
-                        ? <path d="M15,20 Q18,23 21,20" fill="none" stroke="#C07060" strokeWidth="1.2" strokeLinecap="round" />
-                        : wr > 0.04 ? <line x1="16" y1="20" x2="20" y2="20" stroke="#C07060" strokeWidth="0.8" strokeLinecap="round" opacity="0.5" /> : null}
+                        ? <path d="M16,25 Q20,29 24,25" fill="none" stroke="#C07060" strokeWidth="1.2" strokeLinecap="round" />
+                        : <>
+                            <path d="M17,25 Q20,27 23,25" fill="none" stroke="#C08070" strokeWidth="0.8" strokeLinecap="round" />
+                        </>
+                    }
 
-                    {/* Body (armor) */}
-                    <rect x="9" y="23" width="18" height="14" rx="3" fill="url(#heroArmorGrad)" stroke={cc} strokeWidth="0.8" />
-                    {/* Chest plate shine */}
-                    <rect x="13" y="25" width="10" height="5" rx="2" fill="rgba(255,255,255,0.15)" />
-                    {/* Belt */}
-                    <rect x="10" y="33" width="16" height="2.5" rx="1" fill={isGod ? '#8B6914' : '#5C4A32'} />
-                    <rect x="16.5" y="32.5" width="3" height="3.5" rx="1" fill={isGod ? '#D4AF37' : '#A08050'} />
+                    {/* Whiskers */}
+                    <line x1="1" y1="20" x2="8" y2="21" stroke="#D4C4A0" strokeWidth="0.5" opacity="0.4" />
+                    <line x1="1" y1="23" x2="8" y2="23" stroke="#D4C4A0" strokeWidth="0.5" opacity="0.4" />
+                    <line x1="32" y1="21" x2="39" y2="20" stroke="#D4C4A0" strokeWidth="0.5" opacity="0.4" />
+                    <line x1="32" y1="23" x2="39" y2="23" stroke="#D4C4A0" strokeWidth="0.5" opacity="0.4" />
 
-                    {/* Left arm + shield */}
-                    <g style={{ transformOrigin: '9px 24px', animation: isRunning && !reaction ? `v6-arm-l ${ws}s ease-in-out infinite` : 'none' }}>
-                        <rect x="2" y="24" width="7" height="12" rx="3" fill={cc} stroke={`${cc}`} strokeWidth="0.3" />
-                        <rect x="3" y="34" width="5" height="4" rx="2" fill={isGod ? '#8B6914' : '#5C4A32'} />
-                        <rect x="-1" y="28" width="6" height="9" rx="1.5" fill={`${cc}EE`} stroke={cc} strokeWidth="0.8" />
-                        <circle cx="2" cy="32.5" r="1.2" fill={isGod ? '#FDE68A' : '#fff'} opacity="0.5" />
-                    </g>
-
-                    {/* Right arm + sword */}
-                    <g style={{ transformOrigin: '27px 24px', animation: isRunning && !reaction ? `v6-arm-r ${ws}s ease-in-out infinite` : 'none' }}>
-                        <rect x="27" y="24" width="7" height="12" rx="3" fill={cc} stroke={`${cc}`} strokeWidth="0.3" />
-                        <rect x="28" y="34" width="5" height="4" rx="2" fill={isGod ? '#8B6914' : '#5C4A32'} />
-                        {/* Sword */}
-                        <g transform="translate(33, 20) rotate(15)">
-                            <rect x="-1" y="-14" width="2.5" height="14" rx="0.5" fill="url(#heroBlade)" />
-                            <rect x="-1.5" y="-15" width="3.5" height="1.5" rx="0.5" fill="rgba(255,255,255,0.3)" />
-                            <polygon points="0,0 -1,-14 1,-14" fill="none" stroke="rgba(255,255,255,0.25)" strokeWidth="0.5" />
-                            <rect x="-3" y="0" width="6" height="2" rx="0.5" fill={isGod ? '#D4AF37' : '#8B6914'} />
-                            <rect x="-0.5" y="2" width="2" height="3" rx="0.5" fill="#5C4A32" />
-                        </g>
-                    </g>
-
-                    {/* Legs */}
-                    <g style={{ transformOrigin: '14px 37px', animation: isRunning && !reaction ? `v6-leg-l ${ws}s ease-in-out infinite` : 'none' }}>
-                        <rect x="10" y="37" width="7" height="10" rx="2" fill={`${cc}DD`} stroke={cc} strokeWidth="0.3" />
-                        <rect x="9" y="45" width="9" height="4" rx="2" fill={isGod ? '#8B6914' : '#5C4A32'} />
-                    </g>
-                    <g style={{ transformOrigin: '22px 37px', animation: isRunning && !reaction ? `v6-leg-r ${ws}s ease-in-out infinite` : 'none' }}>
-                        <rect x="19" y="37" width="7" height="10" rx="2" fill={`${cc}DD`} stroke={cc} strokeWidth="0.3" />
-                        <rect x="18" y="45" width="9" height="4" rx="2" fill={isGod ? '#8B6914' : '#5C4A32'} />
-                    </g>
+                    {/* Scarf / accessory */}
+                    <path d="M10,28 Q20,32 30,28 Q32,30 28,31 Q20,34 12,31 Q8,30 10,28Z" fill={isGod ? '#D4AF37' : cc} opacity="0.85" />
                 </svg>
             </div>
 
+            {/* === AMBIENT CREATURES — butterflies, bird, bunny === */}
+            {!battleActive && <>
+                {/* Butterflies */}
+                {[
+                    { x: 15, y: 25, c1: '#F472B6', c2: '#FBCFE8', d: 6, s: 4 },
+                    { x: 55, y: 35, c1: '#A78BFA', c2: '#DDD6FE', d: 8, s: 5 },
+                    { x: 80, y: 20, c1: '#FBBF24', c2: '#FDE68A', d: 7, s: 6 },
+                ].map((b, i) => (
+                    <div key={`bf-${i}`} style={{
+                        position: 'absolute', top: `${b.y}%`, left: `${b.x}%`,
+                        zIndex: 16, pointerEvents: 'none',
+                        animation: `butterfly-float ${b.d}s ease-in-out ${i * 1.5}s infinite alternate`,
+                    }}>
+                        {/* Left wing */}
+                        <div style={{
+                            position: 'absolute', left: '-4px', top: '0',
+                            width: `${b.s}px`, height: `${b.s + 1}px`, borderRadius: '50% 50% 30% 50%',
+                            background: b.c1, boxShadow: `0 0 4px ${b.c1}60`,
+                            transformOrigin: 'right center',
+                            animation: `butterfly-wing 0.3s ease-in-out ${i * 0.1}s infinite`,
+                        }} />
+                        {/* Right wing */}
+                        <div style={{
+                            position: 'absolute', left: '2px', top: '0',
+                            width: `${b.s}px`, height: `${b.s + 1}px`, borderRadius: '50% 50% 50% 30%',
+                            background: b.c2, boxShadow: `0 0 4px ${b.c2}60`,
+                            transformOrigin: 'left center',
+                            animation: `butterfly-wing 0.3s ease-in-out ${i * 0.1 + 0.15}s infinite`,
+                        }} />
+                        {/* Body */}
+                        <div style={{ position: 'absolute', left: '1px', top: '1px', width: '1.5px', height: `${b.s - 1}px`, background: '#6B5B3A', borderRadius: '1px' }} />
+                    </div>
+                ))}
+
+                {/* Bird flying across */}
+                <svg width="16" height="10" viewBox="0 0 16 10" style={{
+                    position: 'absolute', top: '12%', right: '-20px',
+                    zIndex: 16, pointerEvents: 'none',
+                    animation: 'bird-fly 18s linear infinite',
+                }}>
+                    <path d="M0,5 Q4,0 8,5 Q12,0 16,5" fill="none" stroke="#57534E" strokeWidth="1.2" strokeLinecap="round" style={{ animation: 'bird-wing 0.5s ease-in-out infinite' }} />
+                </svg>
+                <svg width="12" height="8" viewBox="0 0 16 10" style={{
+                    position: 'absolute', top: '18%', right: '-60px',
+                    zIndex: 16, pointerEvents: 'none', opacity: 0.6,
+                    animation: 'bird-fly 22s linear 3s infinite',
+                }}>
+                    <path d="M0,5 Q4,0 8,5 Q12,0 16,5" fill="none" stroke="#78716C" strokeWidth="1.2" strokeLinecap="round" style={{ animation: 'bird-wing 0.4s ease-in-out infinite' }} />
+                </svg>
+
+                {/* Little bunny on the ground */}
+                <div style={{
+                    position: 'absolute', bottom: `${GH}px`, left: '72%',
+                    zIndex: 12, pointerEvents: 'none',
+                    animation: 'bunny-hop 2s ease-in-out infinite',
+                }}>
+                    <svg width="12" height="16" viewBox="0 0 12 16">
+                        {/* Ears */}
+                        <ellipse cx="4" cy="3" rx="1.5" ry="4" fill="#E8D8C8" stroke="#D4C4B0" strokeWidth="0.3" />
+                        <ellipse cx="4" cy="3" rx="0.8" ry="2.5" fill="#FFD0D0" opacity="0.5" />
+                        <ellipse cx="8" cy="3" rx="1.5" ry="4" fill="#E8D8C8" stroke="#D4C4B0" strokeWidth="0.3" />
+                        <ellipse cx="8" cy="3" rx="0.8" ry="2.5" fill="#FFD0D0" opacity="0.5" />
+                        {/* Head */}
+                        <circle cx="6" cy="8" r="4" fill="#F5F0E8" stroke="#D4C4B0" strokeWidth="0.3" />
+                        {/* Eyes */}
+                        <circle cx="4.5" cy="7.5" r="0.8" fill="#3B2F1A" />
+                        <circle cx="4.2" cy="7.2" r="0.3" fill="#fff" />
+                        <circle cx="7.5" cy="7.5" r="0.8" fill="#3B2F1A" />
+                        <circle cx="7.2" cy="7.2" r="0.3" fill="#fff" />
+                        {/* Nose */}
+                        <ellipse cx="6" cy="9" rx="0.6" ry="0.4" fill="#FFB0A0" />
+                        {/* Body */}
+                        <ellipse cx="6" cy="13" rx="3.5" ry="3" fill="#F5F0E8" stroke="#D4C4B0" strokeWidth="0.3" />
+                        {/* Tail */}
+                        <circle cx="9" cy="13" r="1.5" fill="#fff" />
+                    </svg>
+                </div>
+            </>}
+
+            {/* === PER-CARD SLOT OVERLAY — TIER-DIFFERENTIATED === */}
+            {cardSlotPhase !== 'idle' && cardSlotCard && (() => {
+                const ec = ELEM_COLOR_MAP[cardSlotCard.element] || '#78716C';
+                const tierColor: Record<string, string> = { MYTHIC: '#EC4899', LEGENDARY: '#D4AF37', MEGA: '#EF4444', SUPER: '#3B82F6', GREAT: '#FBBF24', BONUS: '#7C3AED', MISS: '#78716C' };
+                const tc = tierColor[cardSlotTier] || '#78716C';
+                const tierPow = { MYTHIC: 6, LEGENDARY: 5, MEGA: 4, SUPER: 3, GREAT: 2, BONUS: 1, MISS: 0 }[cardSlotTier] || 0;
+                const isSpinning = cardSlotPhase === 'spin';
+                const isReaching = cardSlotPhase === 'reach';
+                const isResult = cardSlotPhase === 'result';
+                const isAttack = cardSlotPhase === 'attack';
+                const isImpact = cardSlotPhase === 'impact';
+                // Reel size scales with tier
+                const reelSize = tierPow >= 5 ? 72 : tierPow >= 4 ? 64 : tierPow >= 3 ? 56 : tierPow >= 2 ? 48 : 40;
+                const reelFont = tierPow >= 5 ? 44 : tierPow >= 4 ? 38 : tierPow >= 3 ? 32 : tierPow >= 2 ? 26 : 22;
+                // === MISS: minimal — tiny x at bottom, no overlay, no reels ===
+                if (cardSlotTier === 'MISS' && (isResult || isImpact)) {
+                    return (<div style={{
+                        position: 'absolute', bottom: '8px', left: '50%', transform: 'translateX(-50%)',
+                        zIndex: 30, pointerEvents: 'none',
+                        fontSize: '12px', fontWeight: '700', color: '#78716C80',
+                        animation: 'dq-text-appear 150ms ease-out',
+                    }}>
+                        {isImpact && cardSlotDmg ? cardSlotDmg.toLocaleString() : 'x'}
+                    </div>);
+                }
+
+                // === BONUS+: overlay background darkness scales with tier ===
+                const overlayOpacity = tierPow >= 5 ? 0.75 : tierPow >= 4 ? 0.65 : tierPow >= 3 ? 0.5 : tierPow >= 2 ? 0.4 : 0.25;
+                // LEGENDARY+ = gold tint, MEGA = element tint, others = neutral dark
+                const overlayBg = tierPow >= 5
+                    ? `radial-gradient(circle at 50% 50%, ${tc}40 0%, rgba(0,0,0,${overlayOpacity}) 70%)`
+                    : tierPow >= 4
+                    ? `radial-gradient(circle at 50% 50%, ${ec}30 0%, rgba(0,0,0,${overlayOpacity}) 70%)`
+                    : `rgba(0,0,0,${overlayOpacity})`;
+
+                return (<>
+                    {/* Overlay — tier-scaled darkness + color */}
+                    <div style={{
+                        position: 'absolute', inset: 0, zIndex: 30, pointerEvents: 'none',
+                        background: (isAttack || isImpact) && tierPow >= 4
+                            ? `radial-gradient(circle at 50% 50%, ${tc}60 0%, rgba(0,0,0,0.8) 60%)`
+                            : isReaching ? `rgba(0,0,0,${overlayOpacity + 0.15})`
+                            : overlayBg,
+                        transition: 'background 0.2s ease',
+                    }} />
+
+                    {/* REACH — border pulse. MEGA+: thick red + screen flash. Others: subtle */}
+                    {isReaching && (
+                        <div style={{
+                            position: 'absolute', inset: 0, zIndex: 31, pointerEvents: 'none',
+                            border: `${tierPow >= 4 ? '4px' : '2px'} solid ${tierPow >= 4 ? '#EF4444' : '#D4AF37'}`,
+                            boxShadow: tierPow >= 4
+                                ? 'inset 0 0 40px rgba(239,68,68,0.5), 0 0 30px rgba(239,68,68,0.4)'
+                                : 'inset 0 0 15px rgba(212,175,55,0.2)',
+                            animation: `dq-aura-pulse ${tierPow >= 4 ? '0.25' : '0.5'}s ease-in-out infinite`,
+                        }} />
+                    )}
+
+                    {/* 確変 badge */}
+                    {kakuhenBoost > 0 && (
+                        <div style={{
+                            position: 'absolute', top: '3px', right: '8px', zIndex: 33, pointerEvents: 'none',
+                            fontSize: '9px', fontWeight: '900', color: '#DC2626',
+                            background: 'rgba(220,38,38,0.15)', border: '1px solid #DC262660',
+                            borderRadius: '4px', padding: '1px 6px',
+                            textShadow: '0 0 6px rgba(220,38,38,0.6)',
+                            animation: 'dq-aura-pulse 0.5s ease-in-out infinite',
+                        }}>確変 x{kakuhenBoost}</div>
+                    )}
+
+                    {/* Card name — shown for GREAT+ only (BONUS too fast to need it) */}
+                    {tierPow >= 2 && (
+                        <div style={{
+                            position: 'absolute', top: '5px', left: '50%', transform: 'translateX(-50%)',
+                            zIndex: 32, pointerEvents: 'none', textAlign: 'center',
+                        }}>
+                            <div style={{
+                                fontSize: tierPow >= 4 ? '15px' : '12px', fontWeight: '900', color: '#fff',
+                                textShadow: `0 0 12px ${ec}, 0 2px 4px rgba(0,0,0,0.9)`,
+                                letterSpacing: tierPow >= 4 ? '3px' : '1px',
+                            }}>
+                                {cardSlotCard.english}
+                            </div>
+                            {tierPow >= 3 && (
+                                <div style={{ fontSize: '9px', color: ec, fontWeight: '700', letterSpacing: '2px' }}>
+                                    {ELEM_JA_MAP[cardSlotCard.element] || '?'}属性 BST {cardSlotCard.bstTotal}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* SLOT REELS — size scales dramatically with tier */}
+                    {(isSpinning || cardSlotPhase === 'stop1' || cardSlotPhase === 'stop2' || isReaching || cardSlotPhase === 'stop3' || isResult) && (
+                        <div style={{
+                            position: 'absolute', top: '50%', left: '50%',
+                            transform: `translate(-50%, -50%)${isReaching ? ` scale(${tierPow >= 4 ? 1.15 : 1.05})` : ''}`,
+                            zIndex: 33, display: 'flex', gap: tierPow >= 4 ? '12px' : '8px', pointerEvents: 'none',
+                            transition: 'transform 0.3s ease',
+                        }}>
+                            {cardSlotReels.map((symbolId, ri) => {
+                                const sym = SLOT_SYMBOL_MAP[symbolId as SlotSymbolId] || SLOT_SYMBOL_MAP.blank;
+                                const stopped = cardSlotPhase === 'stop1' ? ri === 0
+                                    : cardSlotPhase === 'stop2' ? ri <= 1
+                                    : isReaching ? ri <= 1
+                                    : cardSlotPhase === 'stop3' || isResult ? true : false;
+                                const reelGlow = isResult && cardSlotTier !== 'MISS';
+                                const reachPulse = isReaching && ri === 2;
+                                // LEGENDARY+: gold border. MEGA: red border on reach. Others: default
+                                const borderColor = reelGlow ? tc
+                                    : reachPulse && tierPow >= 4 ? '#EF4444'
+                                    : reachPulse ? '#D4AF37'
+                                    : '#D4AF3740';
+                                return (
+                                    <div key={`csr-${ri}`} style={{
+                                        width: `${reelSize}px`, height: `${reelSize * 1.15}px`,
+                                        background: reelGlow
+                                            ? tierPow >= 5 ? `linear-gradient(180deg, ${tc}70, ${tc}30)` : `linear-gradient(180deg, ${tc}40, ${tc}15)`
+                                            : 'rgba(0,0,20,0.95)',
+                                        border: `${tierPow >= 4 ? '3px' : '2px'} solid ${borderColor}`,
+                                        borderRadius: tierPow >= 4 ? '12px' : '8px',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        boxShadow: reelGlow
+                                            ? `0 0 ${tierPow * 6}px ${tc}90, 0 0 ${tierPow * 12}px ${tc}40, inset 0 0 ${tierPow * 4}px ${tc}50`
+                                            : reachPulse ? `0 0 ${tierPow * 5}px ${borderColor}80` : '0 0 6px rgba(0,0,0,0.5)',
+                                        transition: 'all 0.15s ease',
+                                        animation: reachPulse ? `dq-aura-pulse ${tierPow >= 4 ? '0.2' : '0.3'}s ease-in-out infinite` : undefined,
+                                    }}>
+                                        {!stopped ? (
+                                            <div style={{
+                                                fontSize: `${reelFont * 0.85}px`, fontWeight: '900', color: '#D4AF3780',
+                                                animation: 'slot-symbol-flash 0.06s steps(1) infinite',
+                                            }}>?</div>
+                                        ) : (
+                                            <div style={{
+                                                fontSize: `${(sym.scale || 0.75) * reelFont}px`,
+                                                fontWeight: '900', color: sym.color,
+                                                textShadow: `0 0 ${tierPow * 4}px ${sym.glow}, 0 0 ${tierPow * 8}px ${sym.glow}`,
+                                                animation: 'dq-combo-bounce 250ms ease-out',
+                                            }}>
+                                                {sym.label}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                            {/* REACH text — size/style varies by tier */}
+                            {isReaching && (
+                                <div style={{
+                                    position: 'absolute', top: `${-reelSize * 0.5}px`, left: '50%', transform: 'translateX(-50%)',
+                                    fontSize: tierPow >= 4 ? '26px' : tierPow >= 3 ? '18px' : '14px',
+                                    fontWeight: '900',
+                                    color: tierPow >= 4 ? '#EF4444' : '#D4AF37',
+                                    textShadow: tierPow >= 4
+                                        ? '0 0 24px rgba(239,68,68,1), 0 0 48px rgba(239,68,68,0.7)'
+                                        : '0 0 12px rgba(212,175,55,0.8)',
+                                    letterSpacing: tierPow >= 4 ? '10px' : '4px',
+                                    animation: `dq-aura-pulse ${tierPow >= 4 ? '0.2' : '0.4'}s ease-in-out infinite`,
+                                }}>{tierPow >= 4 ? 'REACH!!' : 'REACH'}</div>
+                            )}
+                            {/* Tier result label */}
+                            {isResult && cardSlotTier && cardSlotTier !== 'MISS' && (
+                                <div style={{
+                                    position: 'absolute', top: `${-reelSize * 0.55}px`, left: '50%', transform: 'translateX(-50%)',
+                                    fontSize: tierPow >= 5 ? '30px' : tierPow >= 4 ? '24px' : tierPow >= 3 ? '18px' : '14px',
+                                    fontWeight: '900', color: tc,
+                                    textShadow: `0 0 ${tierPow * 5}px ${tc}, 0 0 ${tierPow * 10}px ${tc}80`,
+                                    letterSpacing: tierPow >= 4 ? '6px' : '3px', whiteSpace: 'nowrap',
+                                    animation: 'dq-text-appear 200ms ease-out',
+                                }}>
+                                    {TIER_JA[cardSlotTier] || cardSlotTier}
+                                    {tierPow >= 5 ? ' !!!' : tierPow >= 4 ? ' !!' : tierPow >= 3 ? ' !' : ''}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* ATTACK + IMPACT — completely different per tier */}
+                    {(isAttack || isImpact) && (
+                        <div style={{
+                            position: 'absolute', inset: 0, zIndex: 34, pointerEvents: 'none',
+                            overflow: 'hidden',
+                            animation: isImpact && tierPow >= 3 ? `dq-screen-shake ${tierPow >= 5 ? '500' : '300'}ms ease-out` : undefined,
+                        }}>
+                            {/* BONUS: small element flash */}
+                            {isAttack && tierPow <= 1 && (
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: `radial-gradient(circle at 50% 60%, ${ec}30 0%, transparent 50%)`,
+                                    animation: 'dq-spell-burst 300ms ease-out forwards',
+                                }} />
+                            )}
+                            {/* GREAT: element tint across runner */}
+                            {isAttack && tierPow === 2 && (
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: `linear-gradient(180deg, transparent 20%, ${ec}25 50%, transparent 80%)`,
+                                    animation: 'dq-spell-burst 400ms ease-out forwards',
+                                }} />
+                            )}
+                            {/* SUPER: full element burst + X slash */}
+                            {isAttack && tierPow === 3 && (<>
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: `radial-gradient(circle at 50% 50%, ${ec}50 0%, ${ec}20 40%, transparent 70%)`,
+                                    animation: 'dq-spell-burst 500ms ease-out forwards',
+                                }} />
+                                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 200 120" preserveAspectRatio="none">
+                                    <line x1="20" y1="0" x2="180" y2="120" stroke={ec} strokeWidth="2.5" opacity="0.8">
+                                        <animate attributeName="opacity" from="1" to="0" dur="0.4s" fill="freeze" />
+                                    </line>
+                                    <line x1="180" y1="0" x2="20" y2="120" stroke={ec} strokeWidth="2.5" opacity="0.8">
+                                        <animate attributeName="opacity" from="1" to="0" dur="0.4s" begin="0.05s" fill="freeze" />
+                                    </line>
+                                </svg>
+                            </>)}
+                            {/* MEGA: full screen element explosion + 4-way slash + screen crack */}
+                            {isAttack && tierPow === 4 && (<>
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: `radial-gradient(circle at 50% 50%, ${ec}80 0%, ${ec}40 30%, transparent 70%)`,
+                                    animation: 'dq-spell-burst 600ms ease-out forwards',
+                                }} />
+                                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 200 120" preserveAspectRatio="none">
+                                    {[[20,0,180,120],[180,0,20,120],[100,0,100,120],[0,60,200,60]].map(([x1,y1,x2,y2], i) => (
+                                        <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke={i < 2 ? ec : '#fff'} strokeWidth={i < 2 ? '3' : '2'} opacity="0.8">
+                                            <animate attributeName="opacity" from="1" to="0" dur="0.5s" begin={`${i*0.04}s`} fill="freeze" />
+                                        </line>
+                                    ))}
+                                </svg>
+                            </>)}
+                            {/* LEGENDARY: GOLD EXPLOSION — entire screen goes gold */}
+                            {isAttack && tierPow === 5 && (<>
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: 'radial-gradient(circle at 50% 50%, #D4AF37CC 0%, #D4AF3760 40%, #8B691430 70%, transparent 90%)',
+                                    animation: 'dq-spell-burst 700ms ease-out forwards',
+                                }} />
+                                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 200 120" preserveAspectRatio="none">
+                                    {Array.from({length: 8}, (_, i) => {
+                                        const a = (i / 8) * Math.PI * 2;
+                                        return <line key={i} x1="100" y1="60" x2={100 + Math.cos(a) * 120} y2={60 + Math.sin(a) * 80}
+                                            stroke="#D4AF37" strokeWidth="2" opacity="0.6">
+                                            <animate attributeName="opacity" from="0.8" to="0" dur="0.6s" begin={`${i*0.03}s`} fill="freeze" />
+                                        </line>;
+                                    })}
+                                </svg>
+                            </>)}
+                            {/* MYTHIC: WHITE VOID → PINK GOD ENERGY */}
+                            {isAttack && tierPow >= 6 && (<>
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: 'radial-gradient(circle at 50% 50%, #EC4899EE 0%, #EC489980 30%, #EC489940 60%, transparent 90%)',
+                                    animation: 'dq-spell-burst 800ms ease-out forwards',
+                                }} />
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: '#fff', animation: 'dq-whiteout 200ms ease-out forwards',
+                                }} />
+                                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} viewBox="0 0 200 120" preserveAspectRatio="none">
+                                    {Array.from({length: 12}, (_, i) => {
+                                        const a = (i / 12) * Math.PI * 2;
+                                        return <line key={i} x1="100" y1="60" x2={100 + Math.cos(a) * 140} y2={60 + Math.sin(a) * 100}
+                                            stroke="#EC4899" strokeWidth="2.5" opacity="0.7">
+                                            <animate attributeName="opacity" from="1" to="0" dur="0.8s" begin={`${i*0.02}s`} fill="freeze" />
+                                        </line>;
+                                    })}
+                                </svg>
+                            </>)}
+
+                            {/* Damage number — size is RADICALLY different per tier */}
+                            {isImpact && cardSlotDmg !== null && (
+                                <div style={{
+                                    position: 'absolute', top: tierPow >= 5 ? '28%' : '35%', left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: tierPow >= 6 ? '52px' : tierPow >= 5 ? '44px' : tierPow >= 4 ? '36px' : tierPow >= 3 ? '26px' : tierPow >= 2 ? '20px' : '14px',
+                                    fontWeight: '900',
+                                    color: tierPow >= 5 ? '#fff' : tierPow >= 4 ? tc : tierPow >= 2 ? tc : '#A8A29E',
+                                    textShadow: tierPow >= 5
+                                        ? `0 0 24px ${tc}, 0 0 48px ${tc}, 0 0 72px ${tc}80, 0 4px 16px rgba(0,0,0,0.9)`
+                                        : tierPow >= 4
+                                        ? `0 0 16px ${tc}, 0 0 32px ${tc}80, 0 3px 10px rgba(0,0,0,0.9)`
+                                        : tierPow >= 2
+                                        ? `0 0 8px ${tc}80, 0 2px 6px rgba(0,0,0,0.8)`
+                                        : '0 1px 3px rgba(0,0,0,0.5)',
+                                    animation: 'dq-text-appear 300ms ease-out',
+                                    fontFamily: tierPow >= 4 ? 'serif' : undefined,
+                                    letterSpacing: tierPow >= 4 ? '4px' : '1px',
+                                    WebkitTextStroke: tierPow >= 5 ? `1px ${tc}` : undefined,
+                                }}>
+                                    {cardSlotDmg.toLocaleString()}
+                                </div>
+                            )}
+                            {/* Tier kanji under damage — only SUPER+ */}
+                            {isImpact && tierPow >= 3 && (
+                                <div style={{
+                                    position: 'absolute', top: tierPow >= 5 ? '55%' : '55%', left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    fontSize: tierPow >= 5 ? '18px' : tierPow >= 4 ? '14px' : '11px',
+                                    fontWeight: '900', color: tc, letterSpacing: '4px', whiteSpace: 'nowrap',
+                                    textShadow: `0 0 12px ${tc}90`,
+                                }}>
+                                    {TIER_JA[cardSlotTier] || ''}{tierPow >= 5 ? ' !!!' : tierPow >= 4 ? ' !!' : ' !'}
+                                </div>
+                            )}
+                            {/* Screen crack — MEGA+ */}
+                            {isImpact && tierPow >= 4 && (
+                                <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 36 }} viewBox="0 0 200 120" preserveAspectRatio="none">
+                                    <path d="M100,0 L97,20 L85,38 L78,55 L83,72 L72,90 L60,120" stroke="#fff" strokeWidth="2.5" fill="none" opacity="0.8">
+                                        <animate attributeName="opacity" from="1" to="0.2" dur="1.5s" fill="freeze" />
+                                    </path>
+                                    <path d="M100,0 L103,18 L115,35 L125,55 L118,75 L130,95 L140,120" stroke="#fff" strokeWidth="2" fill="none" opacity="0.6">
+                                        <animate attributeName="opacity" from="0.8" to="0.1" dur="1.5s" fill="freeze" />
+                                    </path>
+                                    {tierPow >= 5 && <>
+                                        <path d="M0,60 L30,55 L55,48 L78,55 L100,60" stroke="#fff" strokeWidth="2" fill="none" opacity="0.5" />
+                                        <path d="M200,60 L170,65 L145,72 L122,55 L100,60" stroke="#fff" strokeWidth="2" fill="none" opacity="0.5" />
+                                        <path d="M0,30 L40,25 L70,35 L100,28" stroke="#fff" strokeWidth="1.5" fill="none" opacity="0.3" />
+                                        <path d="M200,90 L160,95 L130,85 L100,92" stroke="#fff" strokeWidth="1.5" fill="none" opacity="0.3" />
+                                    </>}
+                                </svg>
+                            )}
+                            {/* LEGENDARY: gold flash */}
+                            {isImpact && tierPow === 5 && (
+                                <div style={{
+                                    position: 'absolute', inset: 0, background: '#D4AF37',
+                                    animation: 'dq-whiteout 500ms ease-out forwards',
+                                }} />
+                            )}
+                            {/* MYTHIC: pink → white → fade */}
+                            {isImpact && tierPow >= 6 && (<>
+                                <div style={{
+                                    position: 'absolute', inset: 0, background: '#EC4899',
+                                    animation: 'dq-whiteout 300ms ease-out forwards',
+                                }} />
+                                <div style={{
+                                    position: 'absolute', inset: 0, background: '#fff',
+                                    animation: 'dq-whiteout 600ms ease-out forwards',
+                                    animationDelay: '150ms',
+                                }} />
+                            </>)}
+                        </div>
+                    )}
+                </>);
+            })()}
+
             {/* === PROGRESS === */}
             <div style={{ position: 'absolute', bottom: 0, left: 0, width: `${progress * 100}%`, height: '3px', background: isGod ? 'linear-gradient(90deg, #4A3A08, #8B6914, #D4AF37, #FDE68A, #D4AF37)' : `linear-gradient(90deg, ${cc}22, ${cc}55, ${cc}99, ${cc})`, transition: 'width 0.8s ease', zIndex: 14, boxShadow: progress > 0.3 ? `0 0 10px ${cc}28` : 'none' }} />
+
+            {/* === 確変 PERSISTENT BADGE === */}
+            {kakuhenBoost > 0 && cardSlotPhase === 'idle' && !battleActive && (
+                <div style={{
+                    position: 'absolute', top: '6px', left: '10px', zIndex: 24,
+                    fontSize: '10px', fontWeight: '900', color: '#DC2626',
+                    background: 'rgba(220,38,38,0.1)', border: '1px solid #DC262650',
+                    borderRadius: '6px', padding: '2px 8px',
+                    boxShadow: '0 0 12px rgba(220,38,38,0.2)',
+                    animation: 'dq-aura-pulse 1s ease-in-out infinite',
+                }}>
+                    確変中 残{kakuhenBoost}回
+                </div>
+            )}
 
             {/* === SCORE === */}
             <div style={{ position: 'absolute', top: '6px', right: '10px', display: 'flex', alignItems: 'center', gap: '6px', zIndex: 24 }}>
@@ -1069,12 +2246,883 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange }: {
                     </div>
                 </div>
             )}
+
+            {/* ═══════ ULTIMATE DQ BATTLE SCREEN ═══════ */}
+            {/* Screen wipe IN */}
+            {battleWipeIn && (
+                <div style={{ position: 'absolute', inset: 0, zIndex: 60, pointerEvents: 'none', overflow: 'hidden' }}>
+                    {Array.from({ length: 8 }, (_, i) => (
+                        <div key={`wipe-in-${i}`} style={{
+                            position: 'absolute', left: 0, width: '100%',
+                            top: `${i * 12.5}%`, height: '12.5%',
+                            background: '#000',
+                            transformOrigin: i % 2 === 0 ? 'left' : 'right',
+                            animation: `dq-wipe-in 400ms ease-in-out ${i * 50}ms forwards`,
+                        }} />
+                    ))}
+                </div>
+            )}
+            {/* Screen wipe OUT */}
+            {battleWipeOut && (
+                <div style={{ position: 'absolute', inset: 0, zIndex: 60, pointerEvents: 'none', overflow: 'hidden' }}>
+                    {Array.from({ length: 8 }, (_, i) => (
+                        <div key={`wipe-out-${i}`} style={{
+                            position: 'absolute', left: 0, width: '100%',
+                            top: `${i * 12.5}%`, height: '12.5%',
+                            background: '#000',
+                            transformOrigin: i % 2 === 0 ? 'right' : 'left',
+                            animation: `dq-wipe-out 400ms ease-in-out ${i * 50}ms forwards`,
+                        }} />
+                    ))}
+                </div>
+            )}
+
+            {battleActive && battleData && (() => {
+                const ec = ELEM_COLOR[battleData.bossElement] || '#78716C';
+                const hpRatio = battleBossHpLeft / battleData.bossHp;
+                return (
+                <div style={{
+                    position: 'absolute', inset: 0, zIndex: 50,
+                    background: `linear-gradient(180deg, #0a0a1a 0%, ${ec}${battleCombo > 5 ? '30' : '15'} 20%, #0c1628 50%, ${hpRatio < 0.3 ? '#2a0a0a' : '#1a2a1a'} 80%, #2a3a2a 100%)`,
+                    animation: battleShake ? 'dq-screen-shake 200ms ease-out' : undefined,
+                    overflow: 'hidden',
+                    boxShadow: battleCombo > 3
+                        ? `inset 0 0 ${8 + battleCombo * 3}px ${ec}${Math.min(80, 20 + battleCombo * 8).toString(16)}`
+                        : undefined,
+                    transition: 'background 0.5s ease, box-shadow 0.3s ease, transform 0.1s ease-out, filter 0.1s ease',
+                    transform: battleZoom ? 'scale(1.06)' : 'scale(1)',
+                    filter: battleInvert ? 'invert(1)' : undefined,
+                }}>
+                    {/* Screen edge glow — intensifies with combo */}
+                    {battleCombo > 2 && (
+                        <div style={{
+                            position: 'absolute', inset: 0, zIndex: 49, pointerEvents: 'none',
+                            border: `2px solid ${ec}${Math.min(60, battleCombo * 8).toString(16).padStart(2, '0')}`,
+                            borderRadius: '2px',
+                            boxShadow: `inset 0 0 ${battleCombo * 4}px ${ec}30`,
+                            transition: 'all 0.3s ease',
+                        }} />
+                    )}
+
+                    {/* Whiteout flash — finisher impact */}
+                    {battleWhiteout && (
+                        <div style={{
+                            position: 'absolute', inset: 0, zIndex: 99, pointerEvents: 'none',
+                            background: '#fff',
+                            animation: 'dq-whiteout 300ms ease-out forwards',
+                        }} />
+                    )}
+
+                    {/* Screen cracks — accumulate on crits */}
+                    {battleCrack && (
+                        <svg style={{ position: 'absolute', inset: 0, zIndex: 98, pointerEvents: 'none', width: '100%', height: '100%' }}
+                            viewBox="0 0 200 200" preserveAspectRatio="none">
+                            <path d="M100,0 L95,40 L80,55 L60,80 L65,120 L50,160 L55,200" stroke="#fff" strokeWidth="1.5" fill="none" opacity="0.6" />
+                            <path d="M100,0 L105,35 L120,60 L140,75 L130,110 L145,145 L150,200" stroke="#fff" strokeWidth="1" fill="none" opacity="0.4" />
+                            <path d="M0,100 L35,95 L55,80 L80,85 L95,40" stroke="#fff" strokeWidth="1" fill="none" opacity="0.5" />
+                            <path d="M200,100 L170,105 L145,90 L120,60" stroke="#fff" strokeWidth="0.8" fill="none" opacity="0.3" />
+                            <path d="M80,55 L50,50 L20,65" stroke="#fff" strokeWidth="0.8" fill="none" opacity="0.35" />
+                            <path d="M140,75 L160,55 L185,40" stroke="#fff" strokeWidth="0.8" fill="none" opacity="0.3" />
+                        </svg>
+                    )}
+
+                    {/* Atmospheric particles */}
+                    {Array.from({ length: 30 }, (_, i) => (
+                        <div key={`atm-${i}`} style={{
+                            position: 'absolute',
+                            top: `${(i * 13 + 5) % 90}%`, left: `${(i * 19 + 3) % 95}%`,
+                            width: `${1 + i % 3}px`, height: `${1 + i % 3}px`,
+                            background: i % 4 === 0 ? ec : '#fff',
+                            borderRadius: '50%',
+                            opacity: 0.08 + (i % 6) * 0.04,
+                            animation: `v6-star ${1.5 + (i % 5) * 0.7}s ease-in-out ${i * 0.15}s infinite`,
+                        }} />
+                    ))}
+
+                    {/* ═══ BATTLE POWER GAUGE — arc meter (NOT slot reels) ═══ */}
+                    {battleSlotPhase !== 'idle' && (() => {
+                        const tierColor: Record<string, string> = { MYTHIC: '#EC4899', LEGENDARY: '#D4AF37', MEGA: '#EF4444', SUPER: '#3B82F6', GREAT: '#FBBF24', BONUS: '#7C3AED', MISS: '#78716C' };
+                        const isResult = battleSlotPhase === 'result';
+                        const isReaching = battleSlotPhase === 'reach';
+                        const tierC = tierColor[battleSlotTier] || '#78716C';
+                        const tierPow = { MYTHIC: 6, LEGENDARY: 5, MEGA: 4, SUPER: 3, GREAT: 2, BONUS: 1, MISS: 0 }[battleSlotTier] || 0;
+                        // Power gauge fills based on tier — arc from 0 to 180 degrees
+                        const gaugeAngle = isResult ? tierPow * 30 : 0; // 0-180
+                        const spinning = battleSlotPhase === 'spin' || battleSlotPhase === 'stop1' || battleSlotPhase === 'stop2';
+                        // Arc path for SVG
+                        const r = 28; const cx = 35; const cy = 35;
+                        const startAngle = -180; const endAngle = startAngle + (spinning ? 0 : gaugeAngle);
+                        const rad = (a: number) => (a * Math.PI) / 180;
+                        const x1 = cx + r * Math.cos(rad(startAngle)); const y1 = cy + r * Math.sin(rad(startAngle));
+                        const x2 = cx + r * Math.cos(rad(endAngle)); const y2 = cy + r * Math.sin(rad(endAngle));
+                        const largeArc = gaugeAngle > 180 ? 1 : 0;
+                        return (
+                            <div style={{
+                                position: 'absolute', top: '30%', left: '50%', transform: 'translateX(-50%)',
+                                zIndex: 57, pointerEvents: 'none', width: '70px', height: '50px',
+                            }}>
+                                {/* Spinning indicator */}
+                                {spinning && (
+                                    <div style={{
+                                        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                                        width: '56px', height: '56px', borderRadius: '50%',
+                                        border: '3px solid transparent', borderTopColor: '#D4AF37', borderRightColor: '#D4AF3760',
+                                        animation: 'dq-spin-fast 0.4s linear infinite',
+                                    }} />
+                                )}
+                                {/* Arc gauge on result */}
+                                {isResult && gaugeAngle > 0 && (
+                                    <svg width="70" height="50" viewBox="0 0 70 50" style={{ position: 'absolute', top: 0, left: 0 }}>
+                                        {/* Background arc */}
+                                        <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`}
+                                            fill="none" stroke="#78716C30" strokeWidth="5" strokeLinecap="round" />
+                                        {/* Filled arc */}
+                                        <path d={`M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`}
+                                            fill="none" stroke={tierC} strokeWidth="5" strokeLinecap="round"
+                                            style={{ filter: `drop-shadow(0 0 8px ${tierC})` }}>
+                                            <animate attributeName="stroke-dasharray" from="0 200" to="200 200" dur="0.3s" fill="freeze" />
+                                        </path>
+                                    </svg>
+                                )}
+                                {/* Center text — tier kanji */}
+                                {isResult && battleSlotTier !== 'MISS' && (
+                                    <div style={{
+                                        position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)',
+                                        fontSize: tierPow >= 4 ? '20px' : '15px',
+                                        fontWeight: '900', color: tierC,
+                                        textShadow: `0 0 12px ${tierC}, 0 0 24px ${tierC}80`,
+                                        animation: 'dq-text-appear 200ms ease-out',
+                                    }}>
+                                        {TIER_JA[battleSlotTier] || ''}
+                                    </div>
+                                )}
+                                {/* REACH — pulsing ring */}
+                                {isReaching && (
+                                    <>
+                                        <div style={{
+                                            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                                            width: '60px', height: '60px', borderRadius: '50%',
+                                            border: '3px solid #EF4444',
+                                            boxShadow: '0 0 16px rgba(239,68,68,0.7), inset 0 0 12px rgba(239,68,68,0.3)',
+                                            animation: 'dq-aura-pulse 0.3s ease-in-out infinite',
+                                        }} />
+                                        <div style={{
+                                            position: 'absolute', top: '-8px', left: '50%', transform: 'translateX(-50%)',
+                                            fontSize: '11px', fontWeight: '900', color: '#EF4444',
+                                            textShadow: '0 0 8px rgba(239,68,68,0.8)',
+                                            letterSpacing: '3px',
+                                            animation: 'dq-aura-pulse 0.3s ease-in-out infinite',
+                                        }}>CHARGE</div>
+                                    </>
+                                )}
+                            </div>
+                        );
+                    })()}
+
+                    {/* Ground plane with grid lines */}
+                    <div style={{
+                        position: 'absolute', bottom: 0, left: 0, right: 0, height: '25%',
+                        background: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.4))',
+                        overflow: 'hidden',
+                    }}>
+                        {Array.from({ length: 5 }, (_, i) => (
+                            <div key={`grid-${i}`} style={{
+                                position: 'absolute', bottom: `${i * 20}%`, left: 0, right: 0,
+                                height: '1px', background: `${ec}20`,
+                            }} />
+                        ))}
+                    </div>
+
+                    {/* Boss sprite — massive, centered */}
+                    <div style={{
+                        position: 'absolute', top: '12%', left: '50%',
+                        animation: battleBossHit ? 'dq-boss-hit 300ms ease-out'
+                            : battleDefeated ? 'dq-boss-death 1.5s ease-out forwards'
+                            : battleBossIntro ? 'dq-boss-entrance 800ms ease-out forwards'
+                            : 'dq-boss-breathe 3s ease-in-out infinite',
+                    }}>
+                        {/* Aura glow behind boss */}
+                        <div style={{
+                            position: 'absolute', top: '50%', left: '50%',
+                            width: '120px', height: '120px',
+                            transform: 'translate(-50%, -50%)',
+                            background: `radial-gradient(circle, ${ec}40 0%, ${ec}10 40%, transparent 70%)`,
+                            animation: 'dq-aura-pulse 2s ease-in-out infinite',
+                            pointerEvents: 'none',
+                        }} />
+
+                        {/* Orbiting element particles */}
+                        {Array.from({ length: 6 }, (_, i) => (
+                            <div key={`orb-${i}`} style={{
+                                position: 'absolute', top: '50%', left: '50%',
+                                width: '4px', height: '4px', borderRadius: '50%',
+                                background: ec, opacity: 0.6,
+                                '--orb-r': `${38 + i * 4}px`,
+                                animation: `dq-orb-orbit ${3 + i * 0.5}s linear ${i * 0.5}s infinite`,
+                                pointerEvents: 'none',
+                            } as React.CSSProperties} />
+                        ))}
+
+                        <svg width="86" height="86" viewBox="0 0 28 28" style={{
+                            display: 'block',
+                            filter: `drop-shadow(0 4px 20px ${hpRatio < 0.3 ? '#EF444460' : ec + '60'}) ${battleBossHit ? 'brightness(2.5) saturate(0.3)' : ''}`,
+                            transition: 'filter 0.3s ease',
+                        }}>
+                            {/* Shadow */}
+                            <ellipse cx="14" cy="27" rx="10" ry="1.5" fill="rgba(0,0,0,0.3)" />
+                            {/* Tiny bat wings — flutter when angry */}
+                            <path d={hpRatio < 0.5 ? 'M3,10 Q-2,4 1,2 Q3,4 4,6 Q2,5 1,7Z' : 'M4,11 Q0,6 2,4 Q4,5 5,8Z'} fill={ec} opacity="0.6" />
+                            <path d={hpRatio < 0.5 ? 'M25,10 Q30,4 27,2 Q25,4 24,6 Q26,5 27,7Z' : 'M24,11 Q28,6 26,4 Q24,5 23,8Z'} fill={ec} opacity="0.6" />
+                            {/* Round cat ears */}
+                            <ellipse cx="7" cy="5" rx="3.5" ry="4" fill={ec} />
+                            <ellipse cx="7" cy="5" rx="2" ry="2.5" fill="#FDA4AF" opacity="0.4" />
+                            <ellipse cx="21" cy="5" rx="3.5" ry="4" fill={ec} />
+                            <ellipse cx="21" cy="5" rx="2" ry="2.5" fill="#FDA4AF" opacity="0.4" />
+                            {/* Tiny crown between ears */}
+                            <path d="M10,3 L11,0 L12.5,2.5 L14,0 L15.5,2.5 L17,0 L18,3Z" fill="#FBBF24" stroke="#F59E0B" strokeWidth="0.2" />
+                            {/* Big round head */}
+                            <circle cx="14" cy="13" r="9" fill={ec} />
+                            {/* Lighter face area */}
+                            <ellipse cx="14" cy="14.5" rx="6.5" ry="5.5" fill={`${ec}40`} />
+                            {/* Big sparkly eyes — change expression with HP */}
+                            <ellipse cx="10" cy="12" rx="3" ry={hpRatio < 0.3 ? 2.5 : 3.2} fill="#fff" />
+                            <circle cx={hpRatio < 0.3 ? 10.5 : 10.3} cy={hpRatio < 0.3 ? 12.5 : 12.2} r={hpRatio < 0.3 ? 2 : 1.8} fill={hpRatio < 0.3 ? '#EF4444' : '#1a1a2e'} />
+                            <circle cx="10.8" cy="11.2" r={hpRatio < 0.3 ? 0.3 : 0.7} fill="#fff" />
+                            <circle cx="10" cy="11.8" r={hpRatio < 0.3 ? 0 : 0.35} fill="#fff" />
+                            <ellipse cx="18" cy="12" rx="3" ry={hpRatio < 0.3 ? 2.5 : 3.2} fill="#fff" />
+                            <circle cx={hpRatio < 0.3 ? 18.5 : 18.3} cy={hpRatio < 0.3 ? 12.5 : 12.2} r={hpRatio < 0.3 ? 2 : 1.8} fill={hpRatio < 0.3 ? '#EF4444' : '#1a1a2e'} />
+                            <circle cx="18.8" cy="11.2" r={hpRatio < 0.3 ? 0.3 : 0.7} fill="#fff" />
+                            <circle cx="18" cy="11.8" r={hpRatio < 0.3 ? 0 : 0.35} fill="#fff" />
+                            {/* Blush cheeks — fade when angry */}
+                            <ellipse cx="6.5" cy="14.5" rx="2" ry="1.2" fill="#FDA4AF" opacity={hpRatio < 0.3 ? 0.2 : 0.5} />
+                            <ellipse cx="21.5" cy="14.5" rx="2" ry="1.2" fill="#FDA4AF" opacity={hpRatio < 0.3 ? 0.2 : 0.5} />
+                            {/* Nose */}
+                            <ellipse cx="14" cy="15" rx="1" ry="0.7" fill={hpRatio < 0.3 ? '#DC2626' : '#1a1a2e'} />
+                            {/* Mouth — changes with HP */}
+                            {hpRatio >= 0.3 ? (
+                                <path d="M11 17 Q14 19.5 17 17" fill="none" stroke="#1a1a2e" strokeWidth="0.7" strokeLinecap="round" />
+                            ) : (
+                                <>
+                                    <path d="M10.5 17 Q14 15 17.5 17" fill="none" stroke="#1a1a2e" strokeWidth="0.8" strokeLinecap="round" />
+                                    <path d="M11.5 17.5 L11.5 18.5" stroke="#1a1a2e" strokeWidth="0.4" />
+                                    <path d="M16.5 17.5 L16.5 18.5" stroke="#1a1a2e" strokeWidth="0.4" />
+                                </>
+                            )}
+                            {/* Whiskers */}
+                            <line x1="4" y1="14" x2="8" y2="15" stroke={ec} strokeWidth="0.4" opacity="0.5" />
+                            <line x1="4" y1="16" x2="8" y2="15.5" stroke={ec} strokeWidth="0.4" opacity="0.5" />
+                            <line x1="24" y1="14" x2="20" y2="15" stroke={ec} strokeWidth="0.4" opacity="0.5" />
+                            <line x1="24" y1="16" x2="20" y2="15.5" stroke={ec} strokeWidth="0.4" opacity="0.5" />
+                            {/* Chubby body */}
+                            <ellipse cx="14" cy="23" rx="7" ry="4.5" fill={ec} />
+                            <ellipse cx="14" cy="23.5" rx="4.5" ry="3" fill={`${ec}50`} />
+                            {/* Chest gem */}
+                            <circle cx="14" cy="22" r="1.5" fill={hpRatio < 0.3 ? '#EF4444' : '#FBBF24'}>
+                                {hpRatio < 0.3 && <animate attributeName="opacity" values="1;0.4;1" dur="0.6s" repeatCount="indefinite" />}
+                            </circle>
+                            {/* Tiny paws */}
+                            <ellipse cx="9" cy="26.5" rx="2.5" ry="1.5" fill={ec} />
+                            <ellipse cx="19" cy="26.5" rx="2.5" ry="1.5" fill={ec} />
+                            {/* Devil tail */}
+                            <path d="M21 22 Q25 18 26 20 Q25 22 24 20" fill="none" stroke={ec} strokeWidth="1.2" strokeLinecap="round" />
+                            <path d="M26 20 L27.5 18 L25.5 19Z" fill="#DC2626" />
+                        </svg>
+
+                        {/* Damage number popup */}
+                        {battleDmgNum && (
+                            <div key={`bdmg-${battleDmgNum.key}`} style={{
+                                position: 'absolute', top: '-8px', left: '50%',
+                                fontSize: battleDmgNum.val >= 400 ? '26px' : battleDmgNum.val >= 200 ? '20px' : '16px',
+                                fontWeight: '900', color: battleCritical ? '#FDE68A' : '#fff',
+                                whiteSpace: 'nowrap', fontFamily: 'serif',
+                                animation: 'dq-damage-pop 800ms ease-out forwards',
+                                textShadow: battleCritical
+                                    ? '0 0 20px #D4AF37, 0 0 40px #FDE68A, 0 2px 6px rgba(0,0,0,0.9)'
+                                    : '0 0 10px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.8)',
+                                zIndex: 55, pointerEvents: 'none',
+                            }}>{battleDmgNum.val}</div>
+                        )}
+                    </div>
+
+                    {/* Multi-slash effects */}
+                    {battleSlash && (
+                        <>
+                            {Array.from({ length: 3 }, (_, i) => (
+                                <div key={`mslash-${i}`} style={{
+                                    position: 'absolute', top: '8%', left: '20%', width: '60%', height: '60%',
+                                    zIndex: 52, pointerEvents: 'none',
+                                    '--slash-angle': `${-60 + i * 30}deg`,
+                                    animation: `dq-multi-slash 250ms ease-out ${i * 80}ms forwards`,
+                                } as React.CSSProperties}>
+                                    <div style={{
+                                        width: '100%', height: '3px',
+                                        background: `linear-gradient(90deg, transparent, ${battleCritical ? '#FDE68A' : '#fff'}, transparent)`,
+                                        position: 'absolute', top: '50%',
+                                    }} />
+                                </div>
+                            ))}
+                            {/* Impact sparks */}
+                            {Array.from({ length: battleCritical ? 16 : 8 }, (_, i) => {
+                                const sa = (i / (battleCritical ? 16 : 8)) * 360;
+                                return <div key={`spark-${i}`} style={{
+                                    position: 'absolute', top: '30%', left: '50%',
+                                    width: '3px', height: '3px', borderRadius: '50%',
+                                    background: battleCritical ? '#FDE68A' : '#fff',
+                                    '--sx': `${Math.cos(sa * Math.PI / 180) * 25}px`,
+                                    '--sy': `${Math.sin(sa * Math.PI / 180) * 25}px`,
+                                    animation: `dq-spark 400ms ease-out ${i * 20}ms forwards`,
+                                    zIndex: 52, pointerEvents: 'none',
+                                } as React.CSSProperties} />;
+                            })}
+                            {/* Screen flash */}
+                            <div style={{
+                                position: 'absolute', inset: 0, zIndex: 51, pointerEvents: 'none',
+                                background: battleCritical ? '#FDE68A' : '#fff',
+                                animation: 'dq-hit-flash 200ms ease-out forwards',
+                            }} />
+                        </>
+                    )}
+
+                    {/* Hero charge animation */}
+                    {battleHeroAtk && (
+                        <div style={{
+                            position: 'absolute', bottom: '28%', left: '20%',
+                            zIndex: 52, pointerEvents: 'none',
+                            animation: 'dq-hero-charge 400ms ease-out forwards',
+                        }}>
+                            <svg width="28" height="32" viewBox="0 0 28 32">
+                                {/* Mini chibi hero — matches the runner character */}
+                                <ellipse cx="14" cy="10" rx="8" ry="7" fill="#FFE4B5" />
+                                <ellipse cx="11" cy="9" rx="2" ry="2.2" fill="#fff" />
+                                <circle cx="11.5" cy="9.5" r="1" fill="#1a1a2e" />
+                                <circle cx="12" cy="8.8" r="0.4" fill="#fff" />
+                                <ellipse cx="17" cy="9" rx="2" ry="2.2" fill="#fff" />
+                                <circle cx="17.5" cy="9.5" r="1" fill="#1a1a2e" />
+                                <circle cx="18" cy="8.8" r="0.4" fill="#fff" />
+                                <path d="M13 12.5 Q14 13.5 15 12.5" fill="none" stroke="#1a1a2e" strokeWidth="0.5" strokeLinecap="round" />
+                                <polygon points="8,5 9,1 12,4" fill="#F5C77E" />
+                                <polygon points="20,5 19,1 16,4" fill="#F5C77E" />
+                                <ellipse cx="14" cy="22" rx="7" ry="6" fill="#FFE4B5" />
+                                <ellipse cx="14" cy="23" rx="4.5" ry="4" fill="#FFF5E6" />
+                                <path d="M8,20 Q4,16 6,14" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" />
+                            </svg>
+                        </div>
+                    )}
+
+                    {/* Word-by-word buildup — words appear one at a time */}
+                    {battleWordBuild.length > 0 && (
+                        <div style={{
+                            position: 'absolute', bottom: '32%', left: '5%', right: '5%',
+                            zIndex: 55, pointerEvents: 'none', textAlign: 'center',
+                        }}>
+                            {battleWordBuild.map((word, wi) => (
+                                <span key={`wb-${wi}`} style={{
+                                    display: 'inline-block',
+                                    fontSize: wi === battleWordBuild.length - 1 && wi === battleWordIdx ? '18px' : '14px',
+                                    fontWeight: '900',
+                                    color: wi <= battleWordIdx ? '#FDE68A' : '#FDE68A20',
+                                    fontFamily: 'serif',
+                                    letterSpacing: '0.5px',
+                                    margin: '0 3px',
+                                    textShadow: wi <= battleWordIdx
+                                        ? '0 0 10px #D4AF37, 0 0 20px #FDE68A60, 0 2px 4px rgba(0,0,0,0.9)'
+                                        : 'none',
+                                    transform: wi === battleWordIdx ? 'scale(1.2)' : 'scale(1)',
+                                    transition: 'all 0.15s ease-out',
+                                }}>
+                                    {word}
+                                </span>
+                            ))}
+                            {/* Energy buildup bar under words */}
+                            <div style={{
+                                marginTop: '6px', height: '3px', background: '#1a1a2e',
+                                borderRadius: '2px', overflow: 'hidden',
+                            }}>
+                                <div style={{
+                                    width: `${((battleWordIdx + 1) / battleWordBuild.length) * 100}%`,
+                                    height: '100%',
+                                    background: 'linear-gradient(90deg, #D4AF37, #FDE68A)',
+                                    transition: 'width 0.15s ease-out',
+                                    boxShadow: '0 0 8px #D4AF37',
+                                }} />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Phrase attack — full phrase launches at boss */}
+                    {battlePhraseAtk && (
+                        <div key={`patk-${battlePhraseAtk}`} style={{
+                            position: 'absolute', bottom: '30%', left: '5%', right: '5%',
+                            zIndex: 55, pointerEvents: 'none',
+                            textAlign: 'center',
+                            animation: 'dq-phrase-attack 400ms ease-in forwards',
+                        }}>
+                            <span style={{
+                                fontSize: '18px', fontWeight: '900', color: '#FDE68A',
+                                fontFamily: 'serif', letterSpacing: '1px',
+                                textShadow: '0 0 16px #D4AF37, 0 0 32px #FDE68A80, 0 2px 8px rgba(0,0,0,0.9)',
+                                display: 'inline-block', padding: '3px 10px',
+                                background: 'rgba(0,0,0,0.4)', borderRadius: '4px',
+                                border: '1px solid #D4AF3740',
+                            }}>
+                                {battlePhraseAtk}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Rank-based screen glow */}
+                    {battleRankFx && (() => {
+                        const rt: Record<string,string> = { S: '#D4AF37', A: '#A855F7', B: '#3B82F6' };
+                        const c = rt[battleRankFx];
+                        return c ? <div style={{
+                            position: 'absolute', inset: 0, zIndex: 51, pointerEvents: 'none',
+                            background: `radial-gradient(circle at 50% 50%, ${c}30 0%, transparent 70%)`,
+                            animation: 'dq-aura-pulse 0.5s ease-out',
+                        }} /> : null;
+                    })()}
+
+                    {/* RUSH mode — speed lines + pulsing indicator */}
+                    {battleRush && (
+                        <>
+                            {/* Speed lines */}
+                            {Array.from({ length: 12 }, (_, i) => (
+                                <div key={`rush-${i}`} style={{
+                                    position: 'absolute',
+                                    top: `${5 + (i * 7.5)}%`,
+                                    left: 0, right: 0, height: '1px',
+                                    background: `linear-gradient(90deg, transparent 10%, #FDE68A${20 + i * 5 > 99 ? '' : '0'}${20 + i * 5} 50%, transparent 90%)`,
+                                    animation: `dq-wind-slash ${0.2 + (i % 3) * 0.1}s ease-out ${i * 30}ms infinite`,
+                                    pointerEvents: 'none', zIndex: 51,
+                                }} />
+                            ))}
+                            {/* RUSH badge */}
+                            <div style={{
+                                position: 'absolute', top: '42%', left: '50%',
+                                transform: 'translateX(-50%)', zIndex: 56, pointerEvents: 'none',
+                                fontSize: '24px', fontWeight: '900', color: '#FDE68A',
+                                fontFamily: 'serif', letterSpacing: '8px',
+                                textShadow: '0 0 20px #D4AF37, 0 0 40px #FDE68A60',
+                                opacity: 0.3,
+                                animation: 'dq-aura-pulse 0.4s ease-in-out infinite',
+                            }}>
+                                RUSH
+                            </div>
+                        </>
+                    )}
+
+                    {/* Finisher dramatic overlay */}
+                    {battleFinisher && (
+                        <div style={{
+                            position: 'absolute', inset: 0, zIndex: 56, pointerEvents: 'none',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: 'rgba(0,0,0,0.5)',
+                            animation: 'dq-text-appear 400ms ease-out',
+                        }}>
+                            <div style={{
+                                fontSize: '20px', fontWeight: '900', color: '#FDE68A',
+                                fontFamily: 'serif', letterSpacing: '4px',
+                                textShadow: '0 0 20px #D4AF37, 0 0 40px #FDE68A60',
+                                animation: 'dq-aura-pulse 1s ease-in-out infinite',
+                            }}>
+                                FINAL STRIKE
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Boss counter flash */}
+                    {battleBossCounter && (
+                        <div style={{
+                            position: 'absolute', inset: 0, zIndex: 51, pointerEvents: 'none',
+                            background: 'radial-gradient(circle at 50% 30%, rgba(239,68,68,0.35), transparent 60%)',
+                            animation: 'dq-hit-flash 300ms ease-out forwards',
+                        }} />
+                    )}
+
+                    {/* Boss taunt bubble */}
+                    {battleBossTaunt && (
+                        <div style={{
+                            position: 'absolute', top: '10%', right: '6%', zIndex: 56,
+                            background: 'rgba(0,0,0,0.9)', border: '1px solid #EF4444',
+                            borderRadius: '8px 8px 8px 0',
+                            padding: '4px 10px',
+                            animation: 'dq-text-appear 150ms ease-out',
+                            maxWidth: '45%',
+                        }}>
+                            <span style={{
+                                fontSize: '10px', fontWeight: '700', color: '#EF4444',
+                                fontFamily: 'serif',
+                            }}>
+                                {battleBossTaunt}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Phrase flashback on victory */}
+                    {battlePhraseFlash.length > 0 && battlePhraseFlashIdx >= 0 && (
+                        <div style={{
+                            position: 'absolute', top: '35%', left: '50%',
+                            transform: 'translateX(-50%)', zIndex: 56, pointerEvents: 'none',
+                            textAlign: 'center',
+                        }}>
+                            <div key={`pf-${battlePhraseFlashIdx}`} style={{
+                                fontSize: '15px', fontWeight: '900', color: '#FDE68A',
+                                fontFamily: 'serif', whiteSpace: 'nowrap',
+                                textShadow: '0 0 12px #D4AF37, 0 2px 6px rgba(0,0,0,0.9)',
+                                animation: 'dq-phrase-flash 300ms ease-out',
+                            }}>
+                                {battlePhraseFlash[battlePhraseFlashIdx]}
+                            </div>
+                            <div style={{
+                                fontSize: '8px', fontWeight: '700', color: '#D4AF3780',
+                                marginTop: '4px', letterSpacing: '2px',
+                            }}>
+                                {battlePhraseFlashIdx + 1} / {battlePhraseFlash.length}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Element spell effect — enhanced */}
+                    {battleSpellEffect && (
+                        <div style={{
+                            position: 'absolute', top: '3%', left: '25%', width: '50%', height: '65%',
+                            zIndex: 53, pointerEvents: 'none',
+                            animation: 'dq-spell-burst 500ms ease-out forwards',
+                        }}>
+                            {battleSpellEffect === 'flame' && Array.from({ length: 12 }, (_, i) => (
+                                <div key={`fire-${i}`} style={{
+                                    position: 'absolute', bottom: `${5 + i * 7}%`, left: `${10 + (i % 4) * 22}%`,
+                                    width: `${8 + i % 3 * 5}px`, height: `${14 + i * 2}px`,
+                                    background: `linear-gradient(180deg, #FDE68A, #F59E0B, #EF4444${i > 6 ? '80' : ''})`,
+                                    borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
+                                    animation: `dq-fire-col 400ms ease-out ${i * 30}ms forwards`,
+                                }} />
+                            ))}
+                            {battleSpellEffect === 'aqua' && Array.from({ length: 10 }, (_, i) => (
+                                <div key={`ice-${i}`} style={{
+                                    position: 'absolute', top: `${10 + (i % 5) * 16}%`, left: `${5 + (i * 9) % 80}%`,
+                                    width: '14px', height: '14px',
+                                    background: 'radial-gradient(circle, #93C5FD, #3B82F6, #1E40AF)',
+                                    clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)',
+                                    animation: `dq-ice-shard 400ms ease-out ${i * 45}ms forwards`,
+                                }} />
+                            ))}
+                            {battleSpellEffect === 'thunder' && Array.from({ length: 5 }, (_, i) => (
+                                <div key={`bolt-${i}`} style={{
+                                    position: 'absolute', top: 0, left: `${12 + i * 17}%`,
+                                    width: '4px', height: '100%',
+                                    background: `linear-gradient(180deg, #FDE68A, #8B5CF6, transparent)`,
+                                    animation: `dq-lightning 300ms ease-out ${i * 40}ms forwards`,
+                                    clipPath: `polygon(0 0, 100% 0, 60% 30%, 100% 30%, 40% 60%, 80% 60%, 50% 100%, 0 100%, 40% 60%, 0 60%, 60% 30%, 20% 30%)`,
+                                }} />
+                            ))}
+                            {battleSpellEffect === 'wind' && Array.from({ length: 8 }, (_, i) => (
+                                <div key={`wind-${i}`} style={{
+                                    position: 'absolute', top: `${10 + i * 10}%`, left: '5%',
+                                    width: '90%', height: '2px',
+                                    background: `linear-gradient(90deg, transparent, #10B981, #34D399, #6EE7B7, transparent)`,
+                                    borderRadius: '2px',
+                                    animation: `dq-wind-slash 300ms ease-out ${i * 40}ms forwards`,
+                                }} />
+                            ))}
+                            {battleSpellEffect === 'earth' && Array.from({ length: 10 }, (_, i) => (
+                                <div key={`rock-${i}`} style={{
+                                    position: 'absolute', bottom: `${3 + i * 8}%`, left: `${8 + (i * 11) % 70}%`,
+                                    width: `${6 + i % 4 * 4}px`, height: `${6 + i % 4 * 4}px`,
+                                    background: `linear-gradient(135deg, #FCD34D, #D97706, #92400E)`,
+                                    borderRadius: '2px', transform: `rotate(${i * 25}deg)`,
+                                    animation: `dq-rock-burst 400ms ease-out ${i * 35}ms forwards`,
+                                }} />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Boss HP bar — DQ style top-right */}
+                    <div style={{
+                        position: 'absolute', top: '6px', right: '6px', zIndex: 54,
+                        background: 'rgba(0,0,20,0.9)', border: '2px solid #D4AF37', borderRadius: '4px',
+                        padding: '5px 10px', minWidth: '110px',
+                        boxShadow: 'inset 0 0 8px rgba(212,175,55,0.15)',
+                    }}>
+                        <div style={{ fontSize: '8px', fontWeight: '900', color: '#D4AF37', letterSpacing: '1px', marginBottom: '3px' }}>
+                            {battleData.bossName} [{ELEM_JA[battleData.bossElement] || '?'}]
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span style={{ fontSize: '7px', fontWeight: '700', color: '#F59E0B' }}>HP</span>
+                            <div style={{ flex: 1, height: '7px', background: '#1a1a2e', borderRadius: '3px', overflow: 'hidden', border: '1px solid #444' }}>
+                                <div style={{
+                                    width: `${hpRatio * 100}%`,
+                                    height: '100%', borderRadius: '2px',
+                                    background: hpRatio > 0.5
+                                        ? 'linear-gradient(180deg, #10B981, #059669)'
+                                        : hpRatio > 0.2
+                                        ? 'linear-gradient(180deg, #F59E0B, #D97706)'
+                                        : 'linear-gradient(180deg, #EF4444, #DC2626)',
+                                    transition: 'width 0.4s ease',
+                                    boxShadow: hpRatio <= 0.2 ? '0 0 6px rgba(239,68,68,0.5)' : undefined,
+                                }} />
+                            </div>
+                            <span style={{ fontSize: '7px', fontWeight: '700', color: '#fff', minWidth: '32px', textAlign: 'right' }}>
+                                {battleBossHpLeft.toLocaleString()}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Combo + Total Damage counter — top-left */}
+                    {battleCombo > 0 && (
+                        <div style={{
+                            position: 'absolute', top: '6px', left: '6px', zIndex: 54,
+                            background: battleCombo > 5 ? 'rgba(212,175,55,0.15)' : 'rgba(0,0,20,0.8)',
+                            border: `${battleCombo > 5 ? 2 : 1}px solid ${battleCombo > 5 ? '#D4AF37' : '#D4AF3780'}`,
+                            borderRadius: '4px', padding: '4px 8px',
+                            boxShadow: battleCombo > 5 ? `0 0 12px #D4AF3740` : undefined,
+                            transition: 'all 0.3s ease',
+                        }}>
+                            <div key={`cb-${battleCombo}`} style={{
+                                fontSize: battleCombo > 5 ? '14px' : '10px', fontWeight: '900',
+                                color: battleCombo > 7 ? '#fff' : '#FDE68A',
+                                animation: 'dq-combo-bounce 200ms ease-out',
+                                textShadow: battleCombo > 5 ? '0 0 8px #D4AF37' : undefined,
+                            }}>
+                                {battleCombo} HIT{battleCombo > 1 ? 'S' : ''}
+                            </div>
+                            <div style={{
+                                fontSize: battleCombo > 5 ? '9px' : '7px', fontWeight: '700',
+                                color: battleCombo > 7 ? '#FDE68A' : '#D4AF37', marginTop: '1px',
+                            }}>
+                                DMG {battleTotalDmg.toLocaleString()}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Synergy name flash — center */}
+                    {battleSynergyName && (
+                        <div style={{
+                            position: 'absolute', top: '45%', left: '50%', zIndex: 56,
+                            animation: 'dq-synergy-stamp 600ms ease-out forwards',
+                            fontSize: '14px', fontWeight: '900', color: '#FDE68A',
+                            textShadow: '0 0 20px #D4AF37, 0 0 40px #FDE68A80, 0 2px 8px rgba(0,0,0,0.9)',
+                            whiteSpace: 'nowrap', fontFamily: 'serif', pointerEvents: 'none',
+                        }}>
+                            {battleSynergyName}
+                        </div>
+                    )}
+
+                    {/* Grade reveal — huge, center */}
+                    {battleGrade && (
+                        <div style={{
+                            position: 'absolute', top: '20%', left: '50%',
+                            transform: 'translateX(-50%)',
+                            zIndex: 56, pointerEvents: 'none',
+                            textAlign: 'center',
+                        }}>
+                            <div style={{
+                                fontSize: '56px', fontWeight: '900', fontFamily: 'serif',
+                                color: battleGrade === 'S' ? '#D4AF37' : battleGrade === 'A' ? '#A855F7' : battleGrade === 'B' ? '#3B82F6' : '#78716C',
+                                textShadow: `0 0 40px ${battleGrade === 'S' ? '#D4AF37' : '#A855F7'}80, 0 0 80px ${battleGrade === 'S' ? '#D4AF37' : '#A855F7'}40, 0 4px 12px rgba(0,0,0,0.8)`,
+                                animation: 'battle-grade-appear 800ms ease-out forwards',
+                                lineHeight: 1,
+                            }}>
+                                {battleGrade}
+                            </div>
+                            <div style={{
+                                fontSize: '9px', fontWeight: '700', color: '#D4AF37', letterSpacing: '3px',
+                                marginTop: '4px', opacity: 0.8,
+                            }}>
+                                RANK
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Boss defeated — explosion particles (32) */}
+                    {battleDefeated && Array.from({ length: 32 }).map((_, i) => {
+                        const a = (i / 32) * 360;
+                        const d = 35 + (i % 4) * 12;
+                        return <div key={`dexp-${i}`} style={{
+                            position: 'absolute', top: '30%', left: '50%',
+                            width: `${3 + i % 4 * 2}px`, height: `${3 + i % 4 * 2}px`,
+                            borderRadius: i % 3 === 0 ? '50%' : '1px',
+                            background: ['#FDE68A', '#EF4444', '#F59E0B', '#D4AF37', '#A855F7', '#fff', ec, '#FF6B6B'][i % 8],
+                            '--bx': `${Math.cos(a * Math.PI / 180) * d}px`,
+                            '--by': `${Math.sin(a * Math.PI / 180) * d}px`,
+                            animation: `runner-god-burst 1.4s ease-out ${i * 20}ms forwards`,
+                            zIndex: 57, pointerEvents: 'none',
+                        } as React.CSSProperties} />;
+                    })}
+
+                    {/* Boss explosion effect */}
+                    {battleBossExplode && (
+                        <div style={{
+                            position: 'absolute', top: '15%', left: '50%', transform: 'translateX(-50%)',
+                            zIndex: 59, pointerEvents: 'none', width: '80px', height: '80px',
+                        }}>
+                            {/* Explosion rings */}
+                            {[0, 1, 2].map(i => (
+                                <div key={`exp-${i}`} style={{
+                                    position: 'absolute', top: '50%', left: '50%',
+                                    width: `${40 + i * 25}px`, height: `${40 + i * 25}px`,
+                                    borderRadius: '50%',
+                                    border: `2px solid ${i === 0 ? '#fff' : i === 1 ? '#FDE68A' : '#EF4444'}`,
+                                    transform: 'translate(-50%, -50%)',
+                                    animation: `boss-explode ${0.6 + i * 0.15}s ease-out forwards`,
+                                    animationDelay: `${i * 0.1}s`,
+                                }} />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* GP RAIN — coins falling from top */}
+                    {battleGpRain && battleGpRainCoins.length > 0 && (
+                        <div style={{ position: 'absolute', inset: 0, zIndex: 59, pointerEvents: 'none', overflow: 'hidden' }}>
+                            {battleGpRainCoins.map(coin => (
+                                <div key={coin.key} style={{
+                                    position: 'absolute', top: '-10px',
+                                    left: `${coin.x}%`,
+                                    width: `${coin.size}px`, height: `${coin.size}px`,
+                                    borderRadius: '50%',
+                                    background: 'radial-gradient(circle at 30% 30%, #FDE68A, #D4AF37, #8B6914)',
+                                    border: '1px solid #D4AF3780',
+                                    boxShadow: '0 0 6px #D4AF3760, inset 0 -2px 4px rgba(0,0,0,0.3)',
+                                    animation: `gp-rain-fall 1.2s ease-in forwards`,
+                                    animationDelay: `${coin.delay}s`,
+                                }}>
+                                    <div style={{
+                                        position: 'absolute', top: '50%', left: '50%',
+                                        transform: 'translate(-50%, -50%)',
+                                        fontSize: `${coin.size * 0.5}px`, fontWeight: '900',
+                                        color: '#8B6914', lineHeight: 1,
+                                    }}>G</div>
+                                </div>
+                            ))}
+                            {/* Big GP text */}
+                            <div style={{
+                                position: 'absolute', top: '35%', left: '50%', transform: 'translateX(-50%)',
+                                fontSize: '28px', fontWeight: '900', color: '#D4AF37',
+                                textShadow: '0 0 20px #D4AF37, 0 0 40px #D4AF3780, 0 2px 8px rgba(0,0,0,0.9)',
+                                letterSpacing: '4px', whiteSpace: 'nowrap',
+                                animation: 'dq-text-appear 300ms ease-out',
+                            }}>GP BONUS</div>
+                        </div>
+                    )}
+
+                    {/* 確変突入 flash */}
+                    {battleKakuhenFlash && (
+                        <div style={{ position: 'absolute', inset: 0, zIndex: 60, pointerEvents: 'none' }}>
+                            {/* Red/gold gradient flash */}
+                            <div style={{
+                                position: 'absolute', inset: 0,
+                                background: 'linear-gradient(180deg, #DC262640, #D4AF3730, #DC262640)',
+                                animation: 'dq-aura-pulse 0.3s ease-in-out infinite',
+                            }} />
+                            {/* Red border pulse */}
+                            <div style={{
+                                position: 'absolute', inset: 0,
+                                border: '4px solid #DC2626',
+                                boxShadow: 'inset 0 0 40px rgba(220,38,38,0.3), 0 0 30px rgba(220,38,38,0.4)',
+                                animation: 'dq-aura-pulse 0.25s ease-in-out infinite',
+                            }} />
+                            {/* Big text */}
+                            <div style={{
+                                position: 'absolute', top: '30%', left: '50%',
+                                fontSize: '24px', fontWeight: '900', color: '#DC2626',
+                                textShadow: '0 0 20px rgba(220,38,38,0.9), 0 0 40px rgba(220,38,38,0.5), 0 2px 8px rgba(0,0,0,0.9)',
+                                letterSpacing: '6px', whiteSpace: 'nowrap',
+                                animation: 'kakuhen-flash 0.5s ease-out forwards',
+                            }}>確変突入</div>
+                            <div style={{
+                                position: 'absolute', top: '50%', left: '50%', transform: 'translateX(-50%)',
+                                fontSize: '10px', fontWeight: '700', color: '#FDE68A',
+                                textShadow: '0 0 8px #D4AF37',
+                                letterSpacing: '2px', whiteSpace: 'nowrap',
+                            }}>SLOT ODDS BOOSTED</div>
+                        </div>
+                    )}
+
+                    {/* Victory stats panel */}
+                    {battleVictoryStats && (
+                        <div style={{
+                            position: 'absolute', top: '40%', left: '50%', transform: 'translateX(-50%)',
+                            zIndex: 57, pointerEvents: 'none',
+                            animation: 'dq-victory-panel 500ms ease-out forwards',
+                            background: 'rgba(0,0,20,0.92)', border: '2px solid #D4AF37', borderRadius: '6px',
+                            padding: '8px 14px', minWidth: '130px',
+                            boxShadow: 'inset 0 0 12px rgba(212,175,55,0.1)',
+                        }}>
+                            {[
+                                ['TOTAL DMG', battleVictoryStats.totalDmg.toLocaleString()],
+                                ['CARDS', String(battleVictoryStats.cards)],
+                                ['SYNERGIES', String(battleVictoryStats.synergies)],
+                            ].map(([label, val], i) => (
+                                <div key={label} style={{
+                                    display: 'flex', justifyContent: 'space-between', gap: '12px',
+                                    fontSize: '8px', fontWeight: '700', padding: '2px 0',
+                                    borderBottom: i < 2 ? '1px solid #D4AF3730' : undefined,
+                                }}>
+                                    <span style={{ color: '#D4AF37', letterSpacing: '0.5px' }}>{label}</span>
+                                    <span style={{ color: '#fff' }}>{val}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* DQ-style message window — bottom */}
+                    <div style={{
+                        position: 'absolute', bottom: '5px', left: '5px', right: '5px',
+                        zIndex: 58,
+                        background: 'rgba(0,0,20,0.94)',
+                        border: '2px solid #D4AF37',
+                        borderRadius: '6px',
+                        padding: '8px 12px',
+                        minHeight: '36px',
+                        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                        boxShadow: 'inset 0 0 12px rgba(212,175,55,0.1), 0 0 20px rgba(0,0,0,0.5)',
+                    }}>
+                        {/* Inner border decoration */}
+                        <div style={{
+                            position: 'absolute', inset: '3px', border: '1px solid #D4AF3720',
+                            borderRadius: '4px', pointerEvents: 'none',
+                        }} />
+                        <div style={{
+                            fontSize: '11px', fontWeight: '700', color: '#fff',
+                            fontFamily: 'serif', letterSpacing: '0.5px', lineHeight: 1.4,
+                            textShadow: '0 1px 2px rgba(0,0,0,0.5)',
+                            animation: battleMsg ? 'dq-text-appear 300ms ease-out' : undefined,
+                        }}>
+                            {battleMsg}
+                        </div>
+                        {battleMsg2 && (
+                            <div style={{
+                                fontSize: '10px', fontWeight: '600', color: '#D4AF37',
+                                fontFamily: 'serif', letterSpacing: '0.3px', marginTop: '2px',
+                                animation: 'dq-text-appear 300ms ease-out 150ms both',
+                            }}>
+                                {battleMsg2}
+                            </div>
+                        )}
+                        {/* Blinking cursor */}
+                        <div style={{
+                            position: 'absolute', bottom: '8px', right: '10px',
+                            width: 0, height: 0,
+                            borderLeft: '4px solid transparent', borderRight: '4px solid transparent',
+                            borderTop: '5px solid #D4AF37',
+                            animation: 'dq-cursor-blink 800ms step-end infinite',
+                        }} />
+                    </div>
+                </div>
+                );
+            })()}
         </div>
     );
 }
 
 
 export default function PhrasesPage() {
+    // Data mode: phrases (default) or words
+    const [dataMode, setDataMode] = useState<'phrases' | 'words'>(() => {
+        if (typeof window !== 'undefined') {
+            return (localStorage.getItem('training-data-mode') as 'phrases' | 'words') || 'phrases';
+        }
+        return 'phrases';
+    });
     const [phrases, setPhrases] = useState<Phrase[]>([]);
     const [loading, setLoading] = useState(true);
     const [phraseMastery, setPhraseMastery] = useState<Record<string, number>>({});
@@ -1097,10 +3145,14 @@ export default function PhrasesPage() {
         localStorage.setItem('runner-goal-xp', String(xp));
     };
     const [viewMode, setViewMode] = useState<'calendar' | 'list' | 'review'>('calendar');
+    const [copiedId, setCopiedId] = useState('');
 
     // Puzzle board — tab inside calendar view, card drop triggered after each review COMPLETE
     const [calendarTab, setCalendarTab] = useState<'calendar' | 'puzzle'>('calendar');
     const [puzzleDropCard, setPuzzleDropCard] = useState<{ element: string; rank: string; bstTotal: number; key: number } | null>(null);
+    const [battleSyncData, setBattleSyncData] = useState<BattleSyncData | null>(null);
+    const [miniRunnerBattleActive, setMiniRunnerBattleActive] = useState(false);
+    const [lastReviewedWord, setLastReviewedWord] = useState<{ text: string; key: number } | null>(null);
     const [showRunner, setShowRunner] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('training-show-runner');
@@ -1110,6 +3162,10 @@ export default function PhrasesPage() {
     });
     const [searchQuery, setSearchQuery] = useState('');
     const [playingPhraseId, setPlayingPhraseId] = useState<string | null>(null);
+    const [recordAutoPlayId, setRecordAutoPlayId] = useState<string | null>(null);
+    const [recordingStateForCard, setRecordingStateForCard] = useState<'idle' | 'recording' | 'uploading'>('idle');
+    const inlineMediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const inlinePlaybackAudioRef = useRef<HTMLAudioElement | null>(null);
     const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
     const [reviewFilter, setReviewFilter] = useState<0 | 1 | 2 | 3 | 4 | 5 | 6 | 'all' | 'random' | 'recorded' | 'linked'>('random');
     const [reviewIndex, setReviewIndex] = useState(0);
@@ -1142,7 +3198,6 @@ export default function PhrasesPage() {
 
     // Gacha bonus system state
     const [playerSparks, setPlayerSparks] = useState(0);
-    const playerSparksRef = useRef(0);
     const [gachaEffect, setGachaEffect] = useState<{
         phase: 'reel' | 'reveal';
         tier: string;
@@ -1186,12 +3241,9 @@ export default function PhrasesPage() {
     // Keep backward-compat aliases for FEVER visuals
     const feverMode = { active: chainState.mode !== 'normal', streak: chainState.count, key: chainState.key };
     const [feverFlash, setFeverFlash] = useState<'enter' | 'exit' | null>(null);
-    const [feverEntryEffect, setFeverEntryEffect] = useState(false);
     const [feverExitEffect, setFeverExitEffect] = useState<{ streak: number } | null>(null);
     const feverDroneRef = useRef<HTMLAudioElement | null>(null);
     const feverRef = useRef({ active: false, streak: 0 });
-    // GP milestone celebration
-    const [milestoneEffect, setMilestoneEffect] = useState<{ amount: number; key: number } | null>(null);
     // Luck multiplier display
     const [luckMultiplier, setLuckMultiplier] = useState(1.0);
     const [cardRankUpEffect, setCardRankUpEffect] = useState<{ oldRank: string; newRank: string; newRankColor: string; key: number } | null>(null);
@@ -1208,13 +3260,6 @@ export default function PhrasesPage() {
         const timer = setTimeout(() => setFeverFlash(null), feverFlash === 'enter' ? 800 : 1200);
         return () => clearTimeout(timer);
     }, [feverFlash]);
-
-    // Auto-clear fever entry slam
-    useEffect(() => {
-        if (!feverEntryEffect) return;
-        const timer = setTimeout(() => setFeverEntryEffect(false), 1000);
-        return () => clearTimeout(timer);
-    }, [feverEntryEffect]);
 
     // Auto-clear fever exit text
     useEffect(() => {
@@ -1251,11 +3296,6 @@ export default function PhrasesPage() {
         feverRef.current = { active: chainState.mode !== 'normal', streak: chainState.count };
     }, [chainState.mode, chainState.count]);
 
-    // Keep sparksRef in sync (prevents stale closure in milestone detection during kakuhen bursts)
-    useEffect(() => {
-        playerSparksRef.current = playerSparks;
-    }, [playerSparks]);
-
     // Stop FEVER BGM when chain ends + duck/restore main BGM
     useEffect(() => {
         if (chainState.mode !== 'normal') {
@@ -1281,13 +3321,6 @@ export default function PhrasesPage() {
         return () => clearTimeout(timer);
     }, [chainTransition]);
 
-    // Auto-clear milestone effect
-    useEffect(() => {
-        if (!milestoneEffect) return;
-        const dur = milestoneEffect.amount >= 5000 ? 8000 : milestoneEffect.amount >= 1000 ? 5000 : milestoneEffect.amount >= 500 ? 3000 : milestoneEffect.amount >= 100 ? 2000 : 1500;
-        const timer = setTimeout(() => setMilestoneEffect(null), dur);
-        return () => clearTimeout(timer);
-    }, [milestoneEffect]);
 
     // ── Main BGM (always-on loop, independent of FEVER) ──
     const mainBgmRef = useRef<HTMLAudioElement | null>(null);
@@ -1540,6 +3573,10 @@ export default function PhrasesPage() {
     const [quickAddSubmitting, setQuickAddSubmitting] = useState(false);
     const [quickAddedCount, setQuickAddedCount] = useState(0);
 
+    // Flavor text registration
+    const [savedFlavorTexts, setSavedFlavorTexts] = useState<Set<string>>(new Set());
+    const [savingFlavorText, setSavingFlavorText] = useState(false);
+
     // Daily review counts per month (date -> { count, xp })
     const [monthlyReviewCounts, setMonthlyReviewCounts] = useState<Record<string, { count: number; xp: number; sparks?: number }>>({});
 
@@ -1599,189 +3636,261 @@ export default function PhrasesPage() {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Load player stats on mount
+    // Fetch player stats on mount (3001 only)
     useEffect(() => {
-        const stats = getPlayerStats();
-        setPlayerTotalXP(stats.total_xp);
-        setPlayerLevel(levelFromXP(stats.total_xp));
-        setPlayerSparks(stats.sparks);
-        playerSparksRef.current = stats.sparks;
+        if (IS_PUBLIC) return;
+        fetch('/api/player-stats')
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    setPlayerTotalXP(d.total_xp || 0);
+                    setPlayerLevel(levelFromXP(d.total_xp || 0));
+                    setPlayerSparks(d.sparks || 0);
+                }
+            })
+            .catch(() => { });
     }, []);
 
-    // Load monthly review counts + date touches when month changes
+    // Fetch monthly review counts + date touches when month changes (3001 only)
     useEffect(() => {
+        if (IS_PUBLIC) return;
         if (!currentMonth) return;
         const ym = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
-        const counts = getMonthlyReviewCounts(ym);
-        setMonthlyReviewCounts(prev => ({ ...prev, ...counts }));
-        const touches = getMonthlyDateTouches(ym);
-        setDateTouchMap(prev => ({ ...prev, ...touches }));
+        fetch(`/api/review-count?month=${ym}`)
+            .then(r => r.json())
+            .then(d => { if (d.success) setMonthlyReviewCounts(prev => ({ ...prev, ...(d.counts || {}) })); })
+            .catch(() => { });
+        fetch(`/api/date-touches?month=${ym}`)
+            .then(r => r.json())
+            .then(d => { if (d.success) setDateTouchMap(prev => ({ ...prev, ...(d.touches || {}) })); })
+            .catch(() => { });
     }, [currentMonth]);
 
     // Helper: post XP to review-count + update player level + chain transitions
     const postXP = useCallback((todayKey: string, xpGained: number, slamActive = false, phraseId?: string) => {
+        if (IS_PUBLIC) return; // 3004: DB不要
         const currentChain = feverRef.current;
         const chainTierNum = currentChain.active ? getChainTier(currentChain.streak) : 0;
-        const d = rollGacha(xpGained, phraseId, currentChain.active, chainTierNum);
+        fetch('/api/review-count', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: todayKey, xp: xpGained, phrase_id: phraseId, fever: currentChain.active, chain_tier: chainTierNum })
+        })
+            .then(r => r.json())
+            .then(d => {
+                if (d.success) {
+                    // Update count + xp immediately (non-spoiler), defer sparks until after slot
+                    setMonthlyReviewCounts(prev => ({ ...prev, [todayKey]: { count: d.count, xp: d.xp, sparks: prev[todayKey]?.sparks || 0 } }));
+                    if (d.total_xp !== undefined) {
+                        const oldLevel = playerLevel;
+                        const newTotalXP = d.total_xp;
+                        const newLevel = levelFromXP(newTotalXP);
+                        setPlayerTotalXP(newTotalXP);
+                        if (newLevel > oldLevel) {
+                            setPlayerLevel(newLevel);
+                            const info = getTitleForLevel(newLevel);
+                            setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: Date.now() });
+                        } else {
+                            setPlayerLevel(newLevel);
+                        }
+                    }
+                    // Gacha result + card points + FEVER logic
+                    if (d.gacha) {
+                        const tier = d.gacha.tier as string;
+                        const slotOn = getSettings().slotEnabled;
 
-        // Update count + xp immediately (non-spoiler), defer sparks until after slot
-        setMonthlyReviewCounts(prev => ({ ...prev, [todayKey]: { count: d.count, xp: d.xp, sparks: prev[todayKey]?.sparks || 0 } }));
-        {
-            const oldLevel = playerLevel;
-            const newTotalXP = d.total_xp;
-            const newLevel = levelFromXP(newTotalXP);
-            setPlayerTotalXP(newTotalXP);
-            if (newLevel > oldLevel) {
-                setPlayerLevel(newLevel);
-                const info = getTitleForLevel(newLevel);
-                setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: Date.now() });
-            } else {
-                setPlayerLevel(newLevel);
-            }
-        }
-        // Gacha result + card points + FEVER logic
-        {
-            const tier = d.gacha.tier as string;
-            const slotOn = getSettings().slotEnabled;
+                        // Score updates that would spoil slot result — defer when slot is ON
+                        const scoreUpdates = () => {
+                            setPlayerSparks(d.gacha.total_sparks);
+                            setMonthlyReviewCounts(prev => ({ ...prev, [todayKey]: { ...prev[todayKey], sparks: d.sparks || d.gacha.total_sparks } }));
+                            if (phraseId && d.gacha.card_total_points !== undefined) {
+                                setCardPoints(prev => ({ ...prev, [phraseId]: d.gacha.card_total_points }));
+                                // In word mode, sync card points to user_words table
+                                if (dataMode === 'words' && d.gacha.card_points_earned > 0) {
+                                    fetch(`/api/user-words/${phraseId}`, {
+                                        method: 'PATCH',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ card_points: d.gacha.card_points_earned })
+                                    }).catch(() => {});
+                                }
+                            }
+                            if (d.gacha.luck_multiplier !== undefined) {
+                                setLuckMultiplier(d.gacha.luck_multiplier);
+                            }
+                            // Card rank-up detection
+                            if (phraseId && d.gacha.card_total_points !== undefined) {
+                                const prevPoints = cardPoints[phraseId] || 0;
+                                const prevRank = getCardRank(prevPoints);
+                                const newRank = getCardRank(d.gacha.card_total_points);
+                                if (prevRank.rank !== newRank.rank && newRank.rank !== 'NORMAL') {
+                                    setTimeout(() => {
+                                        playRankUpSound(newRank.rank);
+                                        setCardRankUpEffect({
+                                            oldRank: prevRank.label || 'NORMAL',
+                                            newRank: newRank.label,
+                                            newRankColor: newRank.borderColor,
+                                            key: Date.now(),
+                                        });
+                                    }, 500);
+                                }
+                            }
+                        };
 
-            // Update sparks ref immediately (even when deferring UI) to prevent stale milestone detection
-            const prevSparksForMilestone = playerSparksRef.current;
-            playerSparksRef.current = d.gacha.total_sparks;
+                        // 連荘 Chain state transitions — graduated escalation (always immediate)
+                        if (getSettings().feverEnabled) {
+                        const currentFever = feverRef.current;
+                        const isWin = tier !== 'MISS';
+                        const isMiss = tier === 'MISS';
+                        if (isMiss) {
+                            // Chain breaks — reset to 0
+                            if (currentFever.active) {
+                                const exitStreak = currentFever.streak;
+                                stopFeverBGM(feverDroneRef.current);
+                                feverDroneRef.current = null;
+                                setChainState({ count: 0, mode: 'normal', key: Date.now() });
+                                feverRef.current = { active: false, streak: 0 };
+                                setFeverFlash('exit');
+                                setFeverExitEffect({ streak: exitStreak });
+                                playFeverExitSound();
+                            }
+                        } else if (isWin) {
+                            const newCount = currentFever.streak + 1;
+                            const oldMode = getChainMode(currentFever.streak);
+                            const newMode = getChainMode(newCount);
+                            const wasActive = currentFever.active;
 
-            // Score updates that would spoil slot result — defer when slot is ON
-            const scoreUpdates = () => {
-                setPlayerSparks(d.gacha.total_sparks);
-                setMonthlyReviewCounts(prev => ({ ...prev, [todayKey]: { ...prev[todayKey], sparks: d.sparks || d.gacha.total_sparks } }));
-                if (phraseId && d.gacha.card_total_points !== undefined) {
-                    setCardPoints(prev => ({ ...prev, [phraseId]: d.gacha.card_total_points }));
-                }
-                // GP milestone detection
-                {
-                    const milestones = [5000, 1000, 500, 100, 50];
-                    for (const m of milestones) {
-                        if (Math.floor(prevSparksForMilestone / m) < Math.floor(d.gacha.total_sparks / m)) {
-                            setMilestoneEffect({ amount: m, key: Date.now() });
-                            break;
+                            setChainState({ count: newCount, mode: newMode, key: Date.now() });
+                            feverRef.current = { active: newMode !== 'normal', streak: newCount };
+
+                            // Mode escalation effects
+                            if (newMode !== oldMode && newMode !== 'normal') {
+                                setChainTransition({ from: oldMode, to: newMode, key: Date.now() });
+                                if (!wasActive) {
+                                    // First entry into chain mode (normal → kakuhen at 3)
+                                    setFeverFlash('enter');
+                                    playFeverEntrySound();
+                                    feverDroneRef.current = startFeverBGM();
+                                } else {
+                                    // Escalation (kakuhen → gekiatsu, gekiatsu → god)
+                                    playFeverEntrySound();
+                                }
+                            } else if (wasActive) {
+                                playFeverChainHit(newCount);
+                            }
+                        }
+                        }
+
+                        if (slotOn) {
+                        // Queue score updates to flush after slot reveal clears (no spoilers)
+                        deferredScoreUpdates.current.push(scoreUpdates);
+                        if (pendingGachaRef.current) clearTimeout(pendingGachaRef.current);
+                        const delay = slamActive ? 1200 : 0;
+                        pendingGachaRef.current = setTimeout(() => {
+                            setGachaEffect({
+                                phase: 'reel',
+                                tier,
+                                sparksWon: d.gacha.sparks_won,
+                                phraseId: phraseId || null,
+                                cardPointsEarned: d.gacha.card_points_earned || 0,
+                                cardTotalPoints: d.gacha.card_total_points || 0,
+                                key: Date.now(),
+                            });
+                            pendingGachaRef.current = null;
+                        }, delay);
+                        } else {
+                            // Slot OFF — apply scores immediately + show quiet toast
+                            scoreUpdates();
+                            setQuietToast({
+                                sparks: d.gacha.sparks_won,
+                                cardPts: d.gacha.card_points_earned || 0,
+                                tier,
+                                key: Date.now(),
+                            });
                         }
                     }
                 }
-                if (d.gacha.luck_multiplier !== undefined) {
-                    setLuckMultiplier(d.gacha.luck_multiplier);
-                }
-                // Card rank-up detection
-                if (phraseId && d.gacha.card_total_points !== undefined) {
-                    const prevPoints = cardPoints[phraseId] || 0;
-                    const prevRank = getCardRank(prevPoints);
-                    const newRank = getCardRank(d.gacha.card_total_points);
-                    if (prevRank.rank !== newRank.rank && newRank.rank !== 'NORMAL') {
-                        setTimeout(() => {
-                            playRankUpSound(newRank.rank);
-                            setCardRankUpEffect({
-                                oldRank: prevRank.label || 'NORMAL',
-                                newRank: newRank.label,
-                                newRankColor: newRank.borderColor,
-                                key: Date.now(),
-                            });
-                        }, 500);
-                    }
-                }
-            };
-
-            // 連荘 Chain state transitions — graduated escalation (always immediate)
-            if (getSettings().feverEnabled) {
-            const currentFever = feverRef.current;
-            const isWin = tier !== 'MISS';
-            const isMiss = tier === 'MISS';
-            if (isMiss) {
-                // Chain breaks — reset to 0
-                if (currentFever.active) {
-                    const exitStreak = currentFever.streak;
-                    stopFeverBGM(feverDroneRef.current);
-                    feverDroneRef.current = null;
-                    setChainState({ count: 0, mode: 'normal', key: Date.now() });
-                    feverRef.current = { active: false, streak: 0 };
-                    setFeverFlash('exit');
-                    setFeverExitEffect({ streak: exitStreak });
-                    playFeverExitSound();
-                }
-            } else if (isWin) {
-                const newCount = currentFever.streak + 1;
-                const oldMode = getChainMode(currentFever.streak);
-                const newMode = getChainMode(newCount);
-                const wasActive = currentFever.active;
-
-                setChainState({ count: newCount, mode: newMode, key: Date.now() });
-                feverRef.current = { active: newMode !== 'normal', streak: newCount };
-
-                // Mode escalation effects
-                if (newMode !== oldMode && newMode !== 'normal') {
-                    setChainTransition({ from: oldMode, to: newMode, key: Date.now() });
-                    if (!wasActive) {
-                        // First entry into chain mode (normal → kakuhen at 3)
-                        setFeverFlash('enter');
-                        setFeverEntryEffect(true);
-                        playFeverEntrySound();
-                        feverDroneRef.current = startFeverBGM();
-                    } else {
-                        // Escalation (kakuhen → gekiatsu, gekiatsu → god)
-                        playFeverEntrySound();
-                    }
-                } else if (wasActive) {
-                    playFeverChainHit(newCount);
-                }
-            }
-            }
-
-            if (slotOn) {
-            // Queue score updates to flush after slot reveal clears (no spoilers)
-            deferredScoreUpdates.current.push(scoreUpdates);
-            if (pendingGachaRef.current) clearTimeout(pendingGachaRef.current);
-            const delay = slamActive ? 1200 : 0;
-            pendingGachaRef.current = setTimeout(() => {
-                setGachaEffect({
-                    phase: 'reel',
-                    tier,
-                    sparksWon: d.gacha.sparks_won,
-                    phraseId: phraseId || null,
-                    cardPointsEarned: d.gacha.card_points_earned || 0,
-                    cardTotalPoints: d.gacha.card_total_points || 0,
-                    key: Date.now(),
-                });
-                pendingGachaRef.current = null;
-            }, delay);
-            } else {
-                // Slot OFF — apply scores immediately + show quiet toast
-                scoreUpdates();
-                setQuietToast({
-                    sparks: d.gacha.sparks_won,
-                    cardPts: d.gacha.card_points_earned || 0,
-                    tier,
-                    key: Date.now(),
-                });
-            }
-        }
+            })
+            .catch(() => { });
     }, [playerLevel, cardPoints]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const allPhrases = getAllPhrases();
-                setPhrases(allPhrases);
-                const mastery = getMastery();
-                setPhraseMastery(mastery);
-                const lastLeveled = getLastLeveled();
-                setPhraseLastLeveled(lastLeveled);
-                const cp = storeGetCardPoints();
-                setCardPoints(cp);
-                // Voice recordings = empty (no voice in standalone)
-                setVoiceRecordings({});
-                // Links from localStorage
-                const links = storeGetPhraseLinks();
-                setPhraseLinks(links);
+                if (IS_PUBLIC) {
+                    // 公開RPG (3004): quest-words.tsの静的データ。DB不要
+                    const mapped: Phrase[] = QUEST_WORDS.map((w, i) => ({
+                        id: `quest_${i}`,
+                        english: w.en,
+                        japanese: w.ja + ` (${w.pron})`,
+                        category: w.cat,
+                        date: '2025-01-01T00:00:00.000Z',
+                    }));
+                    setPhrases(mapped);
+                    try {
+                        const saved = localStorage.getItem('quest-mastery');
+                        if (saved) setPhraseMastery(JSON.parse(saved));
+                    } catch { /* */ }
+                    setVoiceRecordings({});
+                    setPhraseLinks({});
+                } else if (dataMode === 'words') {
+                    // Word mode: load from user-words API
+                    const [wordsRes, masteryRes] = await Promise.all([
+                        fetch('/api/user-words'),
+                        fetch('/api/user-words?mastery=true'),
+                    ]);
+                    const wordsData = await wordsRes.json();
+                    const masteryData = await masteryRes.json();
+                    if (wordsData.success) {
+                        // Map words to Phrase interface for UI compatibility
+                        const mapped: Phrase[] = (wordsData.words || []).map((w: { id: string; english: string; japanese: string; pronunciation?: string; category?: string; created_at: string }) => ({
+                            id: w.id,
+                            english: w.english,
+                            japanese: w.japanese + (w.pronunciation ? ` (${w.pronunciation})` : ''),
+                            category: w.category || 'word',
+                            date: w.created_at,
+                        }));
+                        setPhrases(mapped);
+                    }
+                    if (masteryData.success) {
+                        setPhraseMastery(masteryData.mastery || {});
+                        if (masteryData.lastLeveled) setPhraseLastLeveled(masteryData.lastLeveled);
+                        if (masteryData.cardPoints) setCardPoints(masteryData.cardPoints);
+                    }
+                    setVoiceRecordings({});
+                    setPhraseLinks({});
+                } else {
+                    // Phrase mode: original loading
+                    const [phrasesRes, masteryRes, recordingsRes, linksRes] = await Promise.all([
+                        fetch('/api/phrases'),
+                        fetch('/api/phrases/mastery'),
+                        fetch('/api/voice-recordings'),
+                        fetch('/api/phrases/links'),
+                    ]);
+                    const phrasesData = await phrasesRes.json();
+                    const masteryData = await masteryRes.json();
+                    const recordingsData = await recordingsRes.json();
+                    const linksData = await linksRes.json();
+                    if (phrasesData.success) setPhrases(phrasesData.phrases);
+                    if (masteryData.success) {
+                        setPhraseMastery(masteryData.mastery || {});
+                        if (masteryData.lastLeveled) setPhraseLastLeveled(masteryData.lastLeveled);
+                        if (masteryData.cardPoints) setCardPoints(masteryData.cardPoints);
+                    }
+                    if (recordingsData.success) setVoiceRecordings(recordingsData.recordings || {});
+                    if (linksData.success) {
+                        const map: Record<string, PhraseLink[]> = {};
+                        for (const l of (linksData.links || [])) {
+                            if (!map[l.phrase_id]) map[l.phrase_id] = [];
+                            map[l.phrase_id].push(l);
+                        }
+                        setPhraseLinks(map);
+                    }
+                }
             } finally {
                 setLoading(false);
             }
         };
+        setLoading(true);
         fetchData();
 
         // Load voices for speech synthesis
@@ -1794,7 +3903,7 @@ export default function PhrasesPage() {
         window.speechSynthesis.onvoiceschanged = loadVoices;
 
         return () => window.speechSynthesis.cancel();
-    }, []);
+    }, [dataMode]);
 
     // Load YouGlish script
     useEffect(() => {
@@ -1935,15 +4044,26 @@ export default function PhrasesPage() {
         setSavingPhrase(true);
         try {
             const fullText = selectedCaptions.map(c => c.text).join(' ');
-            const newP = storeAddPhrase({
-                english: fullText,
-                japanese: `(${youglishPhrase?.english.slice(0, 30) || 'YouGlish'})`,
-                category: 'YouGlish',
-                date: youglishSaveDate
+            const res = await fetch('/api/phrases', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    english: fullText,
+                    japanese: `(${youglishPhrase?.english.slice(0, 30) || 'YouGlish'})`,
+                    category: 'YouGlish',
+                    date: youglishSaveDate
+                })
             });
-            setPhrases(prev => [...prev, newP]);
-            alert('Saved!');
-            setCaptionHistory([]);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.phrase && !data.duplicate) {
+                    setPhrases(prev => [...prev, data.phrase]);
+                }
+                alert('Saved!');
+                setCaptionHistory([]);
+            } else {
+                alert('Failed to save');
+            }
         } catch (err) {
             console.error(err);
             alert('Error saving');
@@ -2127,12 +4247,12 @@ export default function PhrasesPage() {
 
     // Stable review list — only updates on filter/shuffle/phrase changes, NOT on recording/mastery
     // This prevents "jump to next" when recording promotes a phrase to a higher chakra level
-    const reviewListCacheRef = useRef<{ filter: string; shuffleKey: number; phrasesLen: number; list: Phrase[] }>(
-        { filter: '', shuffleKey: -1, phrasesLen: 0, list: [] }
+    const reviewListCacheRef = useRef<{ filter: string; shuffleKey: number; listRef: Phrase[]; list: Phrase[] }>(
+        { filter: '', shuffleKey: -1, listRef: [], list: [] }
     );
     const cacheKey = reviewListCacheRef.current;
-    if (cacheKey.filter !== String(reviewFilter) || cacheKey.shuffleKey !== shuffleKey || cacheKey.phrasesLen !== phrases.length) {
-        reviewListCacheRef.current = { filter: String(reviewFilter), shuffleKey, phrasesLen: phrases.length, list: computedReviewList };
+    if (cacheKey.filter !== String(reviewFilter) || cacheKey.shuffleKey !== shuffleKey || cacheKey.listRef !== computedReviewList) {
+        reviewListCacheRef.current = { filter: String(reviewFilter), shuffleKey, listRef: computedReviewList, list: computedReviewList };
     }
     // Hide phrases touched today — once you press mastery, it won't reappear until tomorrow
     const reviewListRaw = reviewListCacheRef.current.list;
@@ -2153,6 +4273,15 @@ export default function PhrasesPage() {
             setReviewIndex(reviewList.length - 1);
         }
     }, [reviewList.length, reviewIndex]);
+
+    // Reset inline recording state when card changes
+    useEffect(() => {
+        setRecordingStateForCard('idle');
+        if (inlineMediaRecorderRef.current?.state === 'recording') {
+            inlineMediaRecorderRef.current.stop();
+        }
+        inlineMediaRecorderRef.current = null;
+    }, [reviewIndex, historyOffset]);
 
     // Exit review mode on Escape
     useEffect(() => {
@@ -2230,6 +4359,36 @@ export default function PhrasesPage() {
         const timer = setTimeout(() => setCalendarPulse(null), 4500);
         return () => clearTimeout(timer);
     }, [calendarPulse]);
+
+    const saveFlavorText = async (flavorEn: string, flavorJa: string) => {
+        if (savingFlavorText || savedFlavorTexts.has(flavorEn)) return;
+        setSavingFlavorText(true);
+        try {
+            const res = await fetch('/api/phrases', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    english: flavorEn,
+                    japanese: flavorJa,
+                    category: 'Flavor',
+                    date: clientToday,
+                }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setSavedFlavorTexts(prev => new Set(prev).add(flavorEn));
+                if (data.phrase && !data.duplicate) {
+                    setPhrases(prev => [...prev, data.phrase]);
+                }
+            } else {
+                alert(data.error || 'Failed to save');
+            }
+        } catch (err) {
+            console.error('Failed to save flavor text:', err);
+        } finally {
+            setSavingFlavorText(false);
+        }
+    };
 
     // Review content: large version for PC fullscreen, compact for mobile inline
     const isFullReview = viewMode === 'review' && !isMobile;
@@ -2567,7 +4726,62 @@ export default function PhrasesPage() {
                                 lineHeight: 1.5,
                                 textAlign: 'center',
                             }}>
-                                {displayedCard?.english}
+                                {(() => {
+                                    const pid = displayedCard?.id || '';
+                                    const bm = Number(phraseMastery[pid] || 0);
+                                    const hr = (voiceRecordings[pid] || []).length > 0;
+                                    const hl = (phraseLinks[pid] || []).length > 0;
+                                    const chakra = getChakraLevel(bm, hr, hl);
+                                    const text = displayedCard?.english || '';
+                                    if (chakra === 4) {
+                                        // Lv.5 CHAMPION: copy to clipboard for research
+                                        return (
+                                            <span
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(text);
+                                                    setCopiedId(displayedCard?.id || '');
+                                                    setTimeout(() => setCopiedId(''), 1500);
+                                                }}
+                                                style={{
+                                                    color: '#1a1a1a',
+                                                    borderBottom: '1px dashed #3730A3',
+                                                    cursor: 'copy',
+                                                }}
+                                                title="Click to copy (research mode)"
+                                            >
+                                                {text}
+                                                {copiedId === displayedCard?.id && (
+                                                    <span style={{
+                                                        fontSize: '12px',
+                                                        color: '#3730A3',
+                                                        marginLeft: '8px',
+                                                        fontWeight: '400',
+                                                    }}>Copied!</span>
+                                                )}
+                                            </span>
+                                        );
+                                    }
+                                    // All other levels: Google search
+                                    const q = dataMode === 'words'
+                                        ? `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(text)}`
+                                        : `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+                                    return (
+                                        <a
+                                            href={q}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                color: '#1a1a1a',
+                                                textDecoration: 'none',
+                                                borderBottom: `1px dashed ${dataMode === 'words' ? '#D4AF37' : '#10B981'}`,
+                                                cursor: 'pointer',
+                                            }}
+                                            title={dataMode === 'words' ? 'Google Images で検索' : 'Google で検索'}
+                                        >
+                                            {text}
+                                        </a>
+                                    );
+                                })()}
                             </div>
 
                             {/* Japanese */}
@@ -2579,6 +4793,66 @@ export default function PhrasesPage() {
                             }}>
                                 {displayedCard?.japanese}
                             </div>
+
+                            {/* Flavor Text — register to user phrases */}
+                            {displayedCard && (() => {
+                                const flavor = getFlavorText(displayedCard.id);
+                                const isSaved = savedFlavorTexts.has(flavor.en);
+                                return (
+                                    <div style={{
+                                        padding: isFullReview ? '12px 16px' : '8px 10px',
+                                        backgroundColor: isSaved ? '#F0FDF4' : '#FAFAF9',
+                                        borderRadius: '10px',
+                                        border: `1px solid ${isSaved ? '#BBF7D0' : '#E7E5E4'}`,
+                                        marginBottom: isFullReview ? '16px' : '8px',
+                                        transition: 'all 0.2s',
+                                    }}>
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'flex-start',
+                                            justifyContent: 'space-between',
+                                            gap: '8px',
+                                        }}>
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{
+                                                    fontSize: isFullReview ? '13px' : '11px',
+                                                    fontStyle: 'italic',
+                                                    color: '#78716C',
+                                                    lineHeight: 1.5,
+                                                }}>
+                                                    &ldquo;{flavor.en}&rdquo;
+                                                </div>
+                                                <div style={{
+                                                    fontSize: isFullReview ? '11px' : '9px',
+                                                    color: '#A8A29E',
+                                                    marginTop: '2px',
+                                                }}>
+                                                    {flavor.ja}
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => saveFlavorText(flavor.en, flavor.ja)}
+                                                disabled={isSaved || savingFlavorText}
+                                                style={{
+                                                    padding: isFullReview ? '6px 12px' : '4px 8px',
+                                                    borderRadius: '6px',
+                                                    border: isSaved ? '1px solid #86EFAC' : '1px solid #D4AF37',
+                                                    backgroundColor: isSaved ? '#DCFCE7' : 'transparent',
+                                                    color: isSaved ? '#16A34A' : '#D4AF37',
+                                                    fontSize: isFullReview ? '10px' : '8px',
+                                                    fontWeight: '700',
+                                                    cursor: isSaved ? 'default' : savingFlavorText ? 'wait' : 'pointer',
+                                                    flexShrink: 0,
+                                                    transition: 'all 0.15s',
+                                                    letterSpacing: '0.5px',
+                                                }}
+                                            >
+                                                {isSaved ? 'Saved' : savingFlavorText ? '...' : 'Add'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
                             {/* Linked notes on this card */}
                             {displayedCard && (phraseLinks[displayedCard.id] || []).length > 0 && (
@@ -2674,21 +4948,129 @@ export default function PhrasesPage() {
                                                 </svg>
                                                 CROWN
                                             </button>
+                                        ) : isMaxed && !hasRec ? (
+                                            /* Lv.4 needs recording: Big REC + small NEXT */
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+                                                {(() => {
+                                                    const recState = recordingStateForCard;
+                                                    return (
+                                                        <button
+                                                            onClick={() => {
+                                                                if (recState === 'uploading') return;
+                                                                if (recState === 'recording') {
+                                                                    if (inlineMediaRecorderRef.current) { inlineMediaRecorderRef.current.stop(); setRecordingStateForCard('uploading'); }
+                                                                } else {
+                                                                    (async () => {
+                                                                        try {
+                                                                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                                                                            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+                                                                            const mr = new MediaRecorder(stream, { mimeType });
+                                                                            const chunks: Blob[] = [];
+                                                                            mr.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+                                                                            mr.onstop = async () => {
+                                                                                stream.getTracks().forEach(t => t.stop());
+                                                                                const blob = new Blob(chunks, { type: mimeType });
+                                                                                const pid = displayedCard.id;
+                                                                                const fd = new FormData();
+                                                                                fd.append('audio', blob, 'recording.webm');
+                                                                                fd.append('phraseId', pid);
+                                                                                try {
+                                                                                    const res = await fetch('/api/voice-recordings', { method: 'POST', body: fd });
+                                                                                    const data = await res.json();
+                                                                                    if (data.success && data.recording) {
+                                                                                        const prevRecs = voiceRecordings[pid] || [];
+                                                                                        const wasFirst = prevRecs.length === 0;
+                                                                                        setVoiceRecordings(prev => ({ ...prev, [pid]: [data.recording, ...(prev[pid] || [])] }));
+                                                                                        const bm = Number(phraseMastery[pid] || 0);
+                                                                                        const hl = (phraseLinks[pid] || []).length > 0;
+                                                                                        const lvB = getChakraLevel(bm, !wasFirst, hl);
+                                                                                        const lvA = getChakraLevel(bm, true, hl);
+                                                                                        const xp = lvA > lvB ? CHAKRA_CONFIG[lvA].lv : 0;
+                                                                                        if (xp > 0) {
+                                                                                            postXP(new Date().toISOString().split('T')[0], xp, false, pid);
+                                                                                            // Full level-up effects (same as normal level-up)
+                                                                                            const nc = CHAKRA_CONFIG[lvA];
+                                                                                            const k = Date.now();
+                                                                                            playLevelSound(lvA);
+                                                                                            setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
+                                                                                            setCalendarPulse({ dateKey: displayedCard.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: lvA, key: k });
+                                                                                            setCardCelebration({ phrase: displayedCard, key: k });
+                                                                                            // Register card to 布陣バトル
+                                                                                            const pts = cardPoints[pid] || 0;
+                                                                                            const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                                                                                            setPuzzleDropCard({ phraseId: pid, english: displayedCard.english, japanese: displayedCard.japanese, element: displayedCard.category, rank, points: pts, bstTotal: calcBstTotal(pid), key: k });
+                                                                                        }
+                                                                                        if (data.recording.url) {
+                                                                                            setRecordAutoPlayId(pid);
+                                                                                            const a = new Audio(data.recording.url);
+                                                                                            a.onended = () => setRecordAutoPlayId(null);
+                                                                                            a.play().catch(() => setRecordAutoPlayId(null));
+                                                                                        }
+                                                                                    }
+                                                                                } catch (err) { console.error('Upload failed:', err); }
+                                                                                setRecordingStateForCard('idle');
+                                                                            };
+                                                                            inlineMediaRecorderRef.current = mr; mr.start(); setRecordingStateForCard('recording');
+                                                                        } catch (err) { console.error('Mic denied:', err); alert('マイクへのアクセスが許可されていません'); }
+                                                                    })();
+                                                                }
+                                                            }}
+                                                            style={{
+                                                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                                                flex: 1, padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px',
+                                                                border: recState === 'recording' ? '2px solid #dc2626' : 'none',
+                                                                background: recState === 'recording' ? '#fef2f2' : recState === 'uploading' ? '#E7E5E4' : 'linear-gradient(135deg, #fbbf24, #d97706)',
+                                                                color: recState === 'recording' ? '#dc2626' : recState === 'uploading' ? '#A8A29E' : '#fff',
+                                                                fontSize: isFullReview ? '15px' : '13px', fontWeight: '800',
+                                                                cursor: recState === 'uploading' ? 'not-allowed' : 'pointer', letterSpacing: '2px',
+                                                                boxShadow: recState === 'recording' ? '0 0 0 4px rgba(220,38,38,0.15)' : recState === 'uploading' ? 'none' : '0 4px 16px #d9770640',
+                                                                transition: 'transform 0.12s, box-shadow 0.12s',
+                                                            }}
+                                                            className={recState === 'recording' ? 'recording-pulse' : undefined}
+                                                            onMouseDown={e => { if (recState !== 'uploading') e.currentTarget.style.transform = 'scale(0.97)'; }}
+                                                            onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                        >
+                                                            {recState === 'recording' ? (<><svg width="16" height="16" viewBox="0 0 24 24" fill="#dc2626"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>STOP</>)
+                                                            : recState === 'uploading' ? (<><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>...</>)
+                                                            : (<><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>REC</>)}
+                                                        </button>
+                                                    );
+                                                })()}
+                                                <button onClick={() => { if (cardCelebration) { setReviewHistory(prev => [...prev, cardCelebration.phrase]); setHistoryOffset(0); setCardCelebration(null); return; } if (historyOffset > 0) setHistoryOffset(h => h - 1); else if (reviewList.length > 0) setReviewIndex(i => (i + 1) % reviewList.length); }}
+                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: isFullReview ? '52px' : '44px', padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none', background: 'linear-gradient(135deg, #D4AF37, #B8941E)', color: '#fff', cursor: 'pointer', boxShadow: '0 2px 8px #D4AF3730', transition: 'transform 0.12s', flexShrink: 0 }}
+                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.95)'; }} onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }} title="次のカード"
+                                                ><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg></button>
+                                            </div>
+                                        ) : isMaxed && hasRec && !hasLink ? (
+                                            /* Lv.5 has recording, needs link: Big 研究 + small NEXT */
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+                                                <button
+                                                    onClick={() => setShowQuickAdd(!showQuickAdd)}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                                        flex: 1, padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none',
+                                                        background: showQuickAdd ? 'linear-gradient(135deg, #92400E, #78350F)' : 'linear-gradient(135deg, #D4AF37, #B8941E)',
+                                                        color: '#fff', fontSize: isFullReview ? '15px' : '13px', fontWeight: '800',
+                                                        cursor: 'pointer', letterSpacing: '2px',
+                                                        boxShadow: '0 4px 16px #D4AF3740', transition: 'transform 0.12s, box-shadow 0.12s',
+                                                    }}
+                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+                                                    onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                >
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                                    {showQuickAdd ? 'CLOSE' : '研究'}
+                                                </button>
+                                                <button onClick={() => { if (cardCelebration) { setReviewHistory(prev => [...prev, cardCelebration.phrase]); setHistoryOffset(0); setCardCelebration(null); return; } if (historyOffset > 0) setHistoryOffset(h => h - 1); else if (reviewList.length > 0) setReviewIndex(i => (i + 1) % reviewList.length); }}
+                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: isFullReview ? '52px' : '44px', padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none', background: 'linear-gradient(135deg, #D4AF37, #B8941E)', color: '#fff', cursor: 'pointer', boxShadow: '0 2px 8px #D4AF3730', transition: 'transform 0.12s', flexShrink: 0 }}
+                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.95)'; }} onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }} title="次のカード"
+                                                ><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg></button>
+                                            </div>
                                         ) : isMaxed ? (
-                                            <div style={{
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
-                                                width: '100%',
-                                                padding: isFullReview ? '12px 0' : '10px 0',
-                                                borderRadius: '14px',
-                                                backgroundColor: '#F5F5F4',
-                                                color: '#A8A29E',
-                                                fontSize: isFullReview ? '13px' : '11px',
-                                                fontWeight: '700',
-                                                letterSpacing: '2px',
-                                            }}>
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                    <polyline points="20 6 9 17 4 12" />
-                                                </svg>
+                                            /* Lv.7 MASTER — fully complete */
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%', padding: isFullReview ? '12px 0' : '10px 0', borderRadius: '14px', backgroundColor: '#F5F5F4', color: '#A8A29E', fontSize: isFullReview ? '13px' : '11px', fontWeight: '700', letterSpacing: '2px' }}>
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                                                 COMPLETE
                                             </div>
                                         ) : (
@@ -3054,34 +5436,97 @@ export default function PhrasesPage() {
                                 >
                                     {showQuickAdd ? 'Close' : '研究'}
                                 </button>
-                                {displayedCard && (
-                                    <VoiceRecorder
-                                        phraseId={displayedCard.id}
-                                        recordings={voiceRecordings[displayedCard.id] || []}
-                                        onRecordingComplete={(recording) => {
-                                            const pid = displayedCard.id;
-                                            const prevRecs = voiceRecordings[pid] || [];
-                                            const wasFirst = prevRecs.length === 0;
-                                            setVoiceRecordings(prev => ({
-                                                ...prev,
-                                                [pid]: [recording, ...(prev[pid] || [])],
-                                            }));
-                                            const baseMastery = Number(phraseMastery[pid] || 0);
-                                            const hasLink = (phraseLinks[pid] || []).length > 0;
-                                            const levelBefore = getChakraLevel(baseMastery, !wasFirst, hasLink);
-                                            const levelAfter = getChakraLevel(baseMastery, true, hasLink);
-                                            const xpGained = levelAfter > levelBefore ? CHAKRA_CONFIG[levelAfter].lv : 0;
-                                            const todayKey = new Date().toISOString().split('T')[0];
-                                            if (xpGained > 0) postXP(todayKey, xpGained, false, pid);
-                                        }}
-                                        onRecordingDelete={(id) => {
-                                            setVoiceRecordings(prev => ({
-                                                ...prev,
-                                                [displayedCard.id]: (prev[displayedCard.id] || []).filter(r => r.id !== id),
-                                            }));
-                                        }}
-                                    />
-                                )}
+                                {/* TTS auto-voice button */}
+                                {displayedCard && (() => {
+                                    const isTTSPlaying = playingPhraseId === displayedCard.id;
+                                    return (
+                                        <button
+                                            onClick={() => {
+                                                if (isTTSPlaying) { window.speechSynthesis.cancel(); setPlayingPhraseId(null); }
+                                                else { playPhrase(displayedCard); }
+                                            }}
+                                            style={{
+                                                padding: isFullReview ? '6px 14px' : '5px 10px', borderRadius: '5px',
+                                                border: isTTSPlaying ? '2px solid #3B82F6' : '1px solid #ddd',
+                                                backgroundColor: isTTSPlaying ? '#DBEAFE' : 'transparent',
+                                                color: isTTSPlaying ? '#2563EB' : '#888',
+                                                fontSize: isFullReview ? '11px' : '10px', fontWeight: '600', cursor: 'pointer',
+                                                display: 'flex', alignItems: 'center', gap: '4px', transition: 'all 0.15s',
+                                            }}
+                                        >
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor"/>
+                                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                                            </svg>
+                                            {isTTSPlaying ? '停止' : '自動'}
+                                        </button>
+                                    );
+                                })()}
+                                {/* Play recorded voice + delete button */}
+                                {displayedCard && (voiceRecordings[displayedCard.id] || []).length > 0 && (() => {
+                                    const latestRec = (voiceRecordings[displayedCard.id] || [])[0];
+                                    const isAutoPlaying = recordAutoPlayId === displayedCard.id;
+                                    return (
+                                        <>
+                                            <button
+                                                onClick={() => {
+                                                    if (isAutoPlaying) {
+                                                        if (inlinePlaybackAudioRef.current) { inlinePlaybackAudioRef.current.pause(); inlinePlaybackAudioRef.current = null; }
+                                                        setRecordAutoPlayId(null);
+                                                    } else {
+                                                        if (inlinePlaybackAudioRef.current) inlinePlaybackAudioRef.current.pause();
+                                                        const audio = new Audio(latestRec.url);
+                                                        inlinePlaybackAudioRef.current = audio;
+                                                        setRecordAutoPlayId(displayedCard.id);
+                                                        audio.onended = () => { setRecordAutoPlayId(null); inlinePlaybackAudioRef.current = null; };
+                                                        audio.play().catch(() => setRecordAutoPlayId(null));
+                                                    }
+                                                }}
+                                                style={{
+                                                    padding: isFullReview ? '6px 14px' : '5px 10px', borderRadius: '5px',
+                                                    border: isAutoPlaying ? '2px solid #10B981' : '1px solid #ddd',
+                                                    backgroundColor: isAutoPlaying ? '#D1FAE5' : 'transparent',
+                                                    color: isAutoPlaying ? '#059669' : '#888',
+                                                    fontSize: isFullReview ? '11px' : '10px', fontWeight: '600', cursor: 'pointer',
+                                                    display: 'flex', alignItems: 'center', gap: '4px', transition: 'all 0.15s',
+                                                }}
+                                            >
+                                                {isAutoPlaying ? (
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>
+                                                ) : (
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+                                                )}
+                                                {isAutoPlaying ? '停止' : '録音'}
+                                            </button>
+                                            <button
+                                                onClick={async () => {
+                                                    if (!confirm('この録音を削除しますか？')) return;
+                                                    try {
+                                                        const res = await fetch(`/api/voice-recordings?id=${latestRec.id}&url=${encodeURIComponent(latestRec.url)}`, { method: 'DELETE' });
+                                                        const data = await res.json();
+                                                        if (data.success) {
+                                                            setVoiceRecordings(prev => ({
+                                                                ...prev,
+                                                                [displayedCard.id]: (prev[displayedCard.id] || []).filter(r => r.id !== latestRec.id),
+                                                            }));
+                                                        }
+                                                    } catch (err) { console.error('Delete failed:', err); }
+                                                }}
+                                                title="録音を削除"
+                                                style={{
+                                                    width: '24px', height: '24px', borderRadius: '50%', border: 'none',
+                                                    background: 'transparent', color: '#ccc', cursor: 'pointer',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
+                                                }}
+                                                onMouseEnter={(e) => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = '#ef4444'; }}
+                                                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#ccc'; }}
+                                            >
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                            </button>
+                                        </>
+                                    );
+                                })()}
                             </div>
                         )}
                         {showQuickAdd && displayedCard && (
@@ -3384,7 +5829,11 @@ export default function PhrasesPage() {
             const pDate = phraseDateMap[phraseId];
             if (pDate) {
                 setDateTouchMap(prev => ({ ...prev, [pDate]: (prev[pDate] || 0) + 1 }));
-                incrementDateTouch(pDate);
+                fetch('/api/date-touches', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phrase_date: pDate })
+                }).catch(() => { });
             }
         }
 
@@ -3396,6 +5845,12 @@ export default function PhrasesPage() {
             const nextLevel = getChakraLevel(next, hasRec, hasLink);
             const xpGained = CHAKRA_CONFIG[nextLevel].lv;
             postXP(todayKey, xpGained, slamActive, phraseId);
+
+            // Send reviewed word to runner word stream
+            const reviewedPhrase = phrases.find(p => p.id === phraseId);
+            if (reviewedPhrase) {
+                setLastReviewedWord({ text: reviewedPhrase.english, key: Date.now() });
+            }
 
             // Trigger puzzle board card drop
             const phrase = phrases.find(p => p.id === phraseId);
@@ -3415,10 +5870,35 @@ export default function PhrasesPage() {
             }
         }
 
-        storeMastery(phraseId, next, clientToday);
+        try {
+            if (IS_PUBLIC) {
+                // 3004: localStorageに保存
+                const updated = { ...phraseMastery, [phraseId]: next };
+                localStorage.setItem('quest-mastery', JSON.stringify(updated));
+            } else if (dataMode === 'words') {
+                await fetch(`/api/user-words/${phraseId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mastery_level: next })
+                });
+            } else {
+                const res = await fetch('/api/phrases/mastery', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phraseId, level: next, today: clientToday })
+                });
+                // Rollback on 409 (server rejected same-day level-up)
+                if (res.status === 409) {
+                    setPhraseMastery(prev => ({ ...prev, [phraseId]: current }));
+                    return false;
+                }
+            }
+        } catch (err) {
+            console.error('Failed to save mastery:', err);
+        }
 
         return true;
-    }, [phraseMastery, voiceRecordings, phraseLinks, phraseLastLeveled, clientToday, phraseDateMap]);
+    }, [phraseMastery, voiceRecordings, phraseLinks, phraseLastLeveled, clientToday, phraseDateMap, dataMode]);
 
     // Declare CROWN: VISION(5) -> CROWN(6) in DB
     const declareCrown = useCallback(async (phraseId: string) => {
@@ -3432,13 +5912,35 @@ export default function PhrasesPage() {
         const pDate = phraseDateMap[phraseId];
         if (pDate) {
             setDateTouchMap(prev => ({ ...prev, [pDate]: (prev[pDate] || 0) + 1 }));
-            incrementDateTouch(pDate);
+            fetch('/api/date-touches', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phrase_date: pDate })
+            }).catch(() => { });
         }
         playLevelSound(6);
 
-        storeMastery(phraseId, 6, clientToday);
-        // CROWN = lv 7 XP
-        postXP(clientToday, CHAKRA_CONFIG[6].lv, false, phraseId);
+        try {
+            const res = dataMode === 'words'
+                ? await fetch(`/api/user-words/${phraseId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mastery_level: 6 })
+                })
+                : await fetch('/api/phrases/mastery', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phraseId, level: 6, today: clientToday })
+                });
+            if (res.status === 409) {
+                setPhraseMastery(prev => ({ ...prev, [phraseId]: 5 }));
+                return;
+            }
+            // CROWN = lv 7 XP
+            postXP(clientToday, CHAKRA_CONFIG[6].lv, false, phraseId);
+        } catch (err) {
+            console.error('Failed to declare CROWN:', err);
+        }
     }, [phraseLastLeveled, clientToday, phraseDateMap]);
 
     // Play phrase audio (must be synchronous to preserve user gesture for Chrome)
@@ -3562,21 +6064,31 @@ export default function PhrasesPage() {
         if (!vocabWord.trim() || !vocabMeaning.trim()) return;
         setVocabSaving(true);
         try {
-            addUserPhrase({
-                phrase: vocabWord.trim(),
-                type: vocabType,
-                meaning: vocabMeaning.trim(),
-                example: vocabExample,
-                source: 'Phrases',
-                date: vocabDate,
+            const res = await fetch('/api/user-phrases', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phrase: vocabWord.trim(),
+                    type: vocabType,
+                    meaning: vocabMeaning.trim(),
+                    example: vocabExample,
+                    source: 'Phrases',
+                    date: vocabDate,
+                }),
             });
-            setShowVocabModal(false);
-            setVocabWord('');
-            setVocabMeaning('');
-            setVocabExample('');
-            alert('Saved!');
-        } catch (err: any) {
-            alert(err.message || 'Error saving vocabulary');
+            const data = await res.json();
+            if (data.success) {
+                setShowVocabModal(false);
+                setVocabWord('');
+                setVocabMeaning('');
+                setVocabExample('');
+                alert('Saved!');
+            } else {
+                alert(data.error || 'Failed to save');
+            }
+        } catch (err) {
+            console.error('Failed to save vocabulary:', err);
+            alert('Error saving vocabulary');
         } finally {
             setVocabSaving(false);
         }
@@ -3586,26 +6098,38 @@ export default function PhrasesPage() {
         if (!editingPhrase || !editingPhrase.english.trim()) return;
         setEditSaving(true);
         try {
-            storeUpdatePhrase(editingPhrase.id, {
-                english: editingPhrase.english.trim(),
-                japanese: editingPhrase.japanese.trim(),
+            const endpoint = dataMode === 'words'
+                ? `/api/user-words/${editingPhrase.id}`
+                : `/api/phrases/${editingPhrase.id}`;
+            const res = await fetch(endpoint, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    english: editingPhrase.english.trim(),
+                    japanese: editingPhrase.japanese.trim(),
+                }),
             });
-            const updatedEnglish = editingPhrase.english.trim();
-            const updatedJapanese = editingPhrase.japanese.trim();
-            setPhrases(prev => prev.map(p =>
-                p.id === editingPhrase.id
-                    ? { ...p, english: updatedEnglish, japanese: updatedJapanese }
-                    : p
-            ));
-            // Also update cached review list so review card reflects the edit
-            if (reviewListCacheRef.current.list) {
-                reviewListCacheRef.current.list = reviewListCacheRef.current.list.map(p =>
+            const data = await res.json();
+            if (data.success) {
+                const updatedEnglish = editingPhrase.english.trim();
+                const updatedJapanese = editingPhrase.japanese.trim();
+                setPhrases(prev => prev.map(p =>
                     p.id === editingPhrase.id
                         ? { ...p, english: updatedEnglish, japanese: updatedJapanese }
                         : p
-                );
+                ));
+                // Also update cached review list so review card reflects the edit
+                if (reviewListCacheRef.current.list) {
+                    reviewListCacheRef.current.list = reviewListCacheRef.current.list.map(p =>
+                        p.id === editingPhrase.id
+                            ? { ...p, english: updatedEnglish, japanese: updatedJapanese }
+                            : p
+                    );
+                }
+                setEditingPhrase(null);
+            } else {
+                alert(data.error || 'Failed to update');
             }
-            setEditingPhrase(null);
         } catch (error) {
             console.error('Error updating phrase:', error);
             alert('Error updating phrase');
@@ -3615,9 +6139,17 @@ export default function PhrasesPage() {
     };
 
     const handleDeletePhrase = async (id: string) => {
-        if (!confirm('Delete this phrase?')) return;
-        storeDeletePhrase(id);
-        setPhrases(prev => prev.filter(p => p.id !== id));
+        if (!confirm(dataMode === 'words' ? 'Delete this word?' : 'Delete this phrase?')) return;
+        try {
+            const endpoint = dataMode === 'words' ? `/api/user-words/${id}` : `/api/phrases/${id}`;
+            const res = await fetch(endpoint, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) {
+                setPhrases(prev => prev.filter(p => p.id !== id));
+            }
+        } catch (error) {
+            console.error('Error deleting:', error);
+        }
     };
 
     const handleAddPhrase = async () => {
@@ -3625,15 +6157,49 @@ export default function PhrasesPage() {
         if (!newPhrase.english.trim() || !newPhrase.japanese.trim()) return;
         setIsSubmitting(true);
         try {
-            const newP = storeAddPhrase({
-                english: newPhrase.english.trim(),
-                japanese: newPhrase.japanese.trim(),
-                category: newPhrase.category,
-                date: formDate,
-            });
-            setPhrases(prev => [...prev, newP]);
-            setNewPhrase({ english: '', japanese: '', category: randomElement() });
-            setShowAddForm(false);
+            if (dataMode === 'words') {
+                const res = await fetch('/api/user-words', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        english: newPhrase.english.trim(),
+                        japanese: newPhrase.japanese.trim(),
+                        category: newPhrase.category,
+                    }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const w = data.word;
+                    setPhrases(prev => [...prev, {
+                        id: w.id,
+                        english: w.english,
+                        japanese: w.japanese + (w.pronunciation ? ` (${w.pronunciation})` : ''),
+                        category: w.category || 'word',
+                        date: w.created_at,
+                    }]);
+                    setNewPhrase({ english: '', japanese: '', category: randomElement() });
+                    setShowAddForm(false);
+                }
+            } else {
+                const res = await fetch('/api/phrases', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        english: newPhrase.english.trim(),
+                        japanese: newPhrase.japanese.trim(),
+                        category: newPhrase.category,
+                        date: formDate,
+                    }),
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (!data.duplicate) {
+                        setPhrases(prev => [...prev, data.phrase]);
+                    }
+                    setNewPhrase({ english: '', japanese: '', category: randomElement() });
+                    setShowAddForm(false);
+                }
+            }
         } finally {
             setIsSubmitting(false);
         }
@@ -3646,21 +6212,41 @@ export default function PhrasesPage() {
         try {
             const prevLinks = phraseLinks[phraseId] || [];
             const wasFirst = prevLinks.length === 0;
-            const link = addPhraseLink(phraseId, quickAddEnglish.trim());
-            setPhraseLinks(prev => ({
-                ...prev,
-                [phraseId]: [...(prev[phraseId] || []), link],
-            }));
-            setQuickAddEnglish('');
-            setQuickAddedCount(c => c + 1);
-            // XP: first link = VISION level-up
-            if (wasFirst) {
-                const baseMastery = Number(phraseMastery[phraseId] || 0);
-                const hasRec = (voiceRecordings[phraseId] || []).length > 0;
-                const levelBefore = getChakraLevel(baseMastery, hasRec, false);
-                const levelAfter = getChakraLevel(baseMastery, hasRec, true);
-                if (levelAfter > levelBefore) {
-                    postXP(new Date().toISOString().split('T')[0], CHAKRA_CONFIG[levelAfter].lv, false, phraseId);
+            const res = await fetch('/api/phrases/links', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phrase_id: phraseId, text: quickAddEnglish.trim() }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setPhraseLinks(prev => ({
+                    ...prev,
+                    [phraseId]: [...(prev[phraseId] || []), data.link],
+                }));
+                setQuickAddEnglish('');
+                setQuickAddedCount(c => c + 1);
+                // XP: first link = VISION level-up
+                if (wasFirst) {
+                    const baseMastery = Number(phraseMastery[phraseId] || 0);
+                    const hasRec = (voiceRecordings[phraseId] || []).length > 0;
+                    const levelBefore = getChakraLevel(baseMastery, hasRec, false);
+                    const levelAfter = getChakraLevel(baseMastery, hasRec, true);
+                    if (levelAfter > levelBefore) {
+                        postXP(new Date().toISOString().split('T')[0], CHAKRA_CONFIG[levelAfter].lv, false, phraseId);
+                        // Full level-up effects
+                        const nc = CHAKRA_CONFIG[levelAfter];
+                        const k = Date.now();
+                        playLevelSound(levelAfter);
+                        setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
+                        if (displayedCard) {
+                            setCalendarPulse({ dateKey: displayedCard.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: levelAfter, key: k });
+                            setCardCelebration({ phrase: displayedCard, key: k });
+                            // Register card to 布陣バトル
+                            const pts = cardPoints[phraseId] || 0;
+                            const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                            setPuzzleDropCard({ phraseId, english: displayedCard.english, japanese: displayedCard.japanese, element: displayedCard.category, rank, points: pts, bstTotal: calcBstTotal(phraseId), key: k });
+                        }
+                    }
                 }
             }
         } finally {
@@ -3679,7 +6265,7 @@ export default function PhrasesPage() {
     return (
         <div style={{
             backgroundColor: '#f5f5f5',
-            height: '100%',
+            height: '100vh',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden'
@@ -3832,38 +6418,6 @@ export default function PhrasesPage() {
                 </div>
             )}
 
-            {/* GP Milestone celebration */}
-            {milestoneEffect && (
-                <div key={milestoneEffect.key} style={{
-                    position: 'fixed', inset: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
-                    zIndex: 10002, pointerEvents: 'none',
-                    animation: milestoneEffect.amount >= 500 ? 'gacha-legendary-flash 0.5s ease-out' : undefined,
-                }}>
-                    <div style={{
-                        color: '#D4AF37',
-                        fontWeight: '900',
-                        fontSize: milestoneEffect.amount >= 1000 ? (isMobile ? '48px' : '72px') : milestoneEffect.amount >= 100 ? (isMobile ? '36px' : '56px') : (isMobile ? '28px' : '40px'),
-                        textShadow: '0 0 30px #D4AF3780, 0 0 60px #D4AF3740',
-                        animation: 'gacha-reveal 1s cubic-bezier(0.34,1.56,0.64,1)',
-                        letterSpacing: '4px',
-                    }}>
-                        {milestoneEffect.amount.toLocaleString()} GP
-                    </div>
-                    {(
-                        <div style={{
-                            color: '#F59E0B',
-                            fontWeight: '700',
-                            fontSize: milestoneEffect.amount >= 500 ? (isMobile ? '16px' : '22px') : (isMobile ? '12px' : '16px'),
-                            marginTop: '12px',
-                            letterSpacing: '2px',
-                            animation: 'gacha-reveal 1.2s cubic-bezier(0.34,1.56,0.64,1)',
-                        }}>
-                            GP MILESTONE
-                        </div>
-                    )}
-                </div>
-            )}
 
             {/* FEVER flash (enter = red, exit = blue) */}
             {feverFlash && (
@@ -3879,42 +6433,6 @@ export default function PhrasesPage() {
                 }} />
             )}
 
-            {/* FEVER entry slam — "FEVER" text slams in + shockwave + screen shake */}
-            {feverEntryEffect && (
-                <div style={{
-                    position: 'fixed', inset: 0,
-                    pointerEvents: 'none', zIndex: 10001,
-                    animation: 'fever-entry-shake 0.5s ease-out',
-                }}>
-                    {/* Shockwave ring */}
-                    <div style={{
-                        position: 'absolute',
-                        top: '50%', left: '50%',
-                        width: isMobile ? '80px' : '120px',
-                        height: isMobile ? '80px' : '120px',
-                        borderRadius: '50%',
-                        border: '3px solid rgba(249,115,22,0.6)',
-                        background: 'radial-gradient(circle, rgba(220,38,38,0.15), transparent 70%)',
-                        animation: 'fever-shockwave 0.8s ease-out forwards',
-                    }} />
-                    {/* FEVER slam text */}
-                    <div style={{
-                        position: 'absolute',
-                        top: '50%', left: '50%',
-                        fontSize: isMobile ? '48px' : '72px',
-                        fontWeight: '900',
-                        letterSpacing: '8px',
-                        background: 'linear-gradient(180deg, #FF4444 0%, #FF8800 50%, #FF4444 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        textShadow: '0 0 30px rgba(255,68,68,0.6), 0 0 60px rgba(255,136,0,0.3), 0 4px 12px rgba(0,0,0,0.5)',
-                        animation: 'fever-entry-slam 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
-                        whiteSpace: 'nowrap',
-                    }}>
-                        確変
-                    </div>
-                </div>
-            )}
 
             {/* FEVER exit — "確変終了" + chain count */}
             {feverExitEffect && (
@@ -4762,8 +7280,67 @@ export default function PhrasesPage() {
                 )}
 
                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    {/* Data Mode Toggle */}
+                    <div style={{ display: 'flex', marginRight: '4px' }}>
+                        <button
+                            onClick={() => {
+                                setDataMode('phrases');
+                                localStorage.setItem('training-data-mode', 'phrases');
+                                setViewMode('calendar');
+                            }}
+                            style={{
+                                padding: '4px 10px',
+                                borderRadius: '4px 0 0 4px',
+                                border: dataMode === 'phrases' ? '1.5px solid #D4AF37' : '1px solid #E7E5E4',
+                                backgroundColor: dataMode === 'phrases' ? '#FFFBEB' : '#fff',
+                                color: dataMode === 'phrases' ? '#92400E' : '#A8A29E',
+                                fontSize: '10px',
+                                fontWeight: dataMode === 'phrases' ? '700' : '500',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s',
+                            }}
+                        >
+                            Phrases
+                        </button>
+                        <button
+                            onClick={() => {
+                                setDataMode('words');
+                                localStorage.setItem('training-data-mode', 'words');
+                                setViewMode('calendar');
+                            }}
+                            style={{
+                                padding: '4px 10px',
+                                borderRadius: '0 4px 4px 0',
+                                border: dataMode === 'words' ? '1.5px solid #8B5CF6' : '1px solid #E7E5E4',
+                                backgroundColor: dataMode === 'words' ? '#F5F3FF' : '#fff',
+                                color: dataMode === 'words' ? '#6D28D9' : '#A8A29E',
+                                fontSize: '10px',
+                                fontWeight: dataMode === 'words' ? '700' : '500',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s',
+                            }}
+                        >
+                            Words
+                        </button>
+                    </div>
                     {viewMode === 'calendar' && (
                         <>
+                            <button
+                                onClick={() => {
+                                    const target = selectedDate || (() => {
+                                        const d = new Date();
+                                        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                                    })();
+                                    window.location.href = `/english/training/${target}?settings`;
+                                }}
+                                style={{
+                                    background: 'none', border: '1.5px solid #3B82F6',
+                                    borderRadius: '6px', padding: '4px 10px', cursor: 'pointer',
+                                    fontSize: '11px', fontWeight: '600', color: '#3B82F6',
+                                }}
+                            >
+                                Listen
+                            </button>
                             {!isMobile && (
                                 <button
                                     onClick={() => { setViewMode('review'); if (!shuffledToday) handleShuffle(); }}
@@ -4820,6 +7397,11 @@ export default function PhrasesPage() {
                             todayXP={todayXP}
                             goalXP={goalXP}
                             onGoalChange={handleGoalChange}
+                            battleData={battleSyncData}
+                            onBattleStart={() => setMiniRunnerBattleActive(true)}
+                            onBattleEnd={() => setMiniRunnerBattleActive(false)}
+                            lastReviewedWord={lastReviewedWord}
+                            dropCard={puzzleDropCard as any}
                         />
                     )}
                     <button
@@ -5047,25 +7629,20 @@ export default function PhrasesPage() {
                 /* Calendar View */
                 <div style={{
                     flex: 1,
-                    position: 'relative',
                     overflow: isMobile ? 'auto' : 'hidden',
                     minHeight: 0,
-                    display: isMobile ? 'flex' : 'block',
-                    flexDirection: 'column'
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
                 }}>
                     {/* Calendar Section */}
                     <div style={{
-                        position: isMobile ? 'sticky' : 'absolute',
-                        top: 0,
-                        left: isMobile ? 'auto' : 0,
-                        right: isMobile ? 'auto' : (sidebarExpanded ? '540px' : '320px'),
-                        bottom: isMobile ? 'auto' : 0,
+                        flex: isMobile ? 'none' : (calendarTab === 'puzzle' ? '0 0 auto' : '1 1 0%'),
+                        minWidth: 0,
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: isMobile ? 'visible' : 'hidden',
                         backgroundColor: '#fff',
                         zIndex: isMobile ? 10 : 'auto',
-                        transition: 'right 0.25s ease'
                     }}>
                         {/* Calendar / Puzzle Tab Switcher */}
                         <div style={{
@@ -5753,18 +8330,21 @@ export default function PhrasesPage() {
                                 alignItems: 'flex-start',
                                 padding: isMobile ? '4px 2px' : '8px',
                                 backgroundColor: '#FAFAF9',
-                                overflow: 'hidden',
+                                overflowY: 'auto',
                             }}>
                                 <PuzzleBoard
                                     dropCard={puzzleDropCard as any}
                                     chainMode={chainState.mode}
                                     isMobile={isMobile}
                                     cardPoints={cardPoints}
+                                    mastery={phraseMastery}
                                     onChainResult={(result) => {
                                         if (result.gpEarned > 0) {
                                             setPlayerSparks(prev => prev + result.gpEarned);
                                         }
                                     }}
+                                    onBattleSync={(data) => setBattleSyncData(data)}
+                                    externalBattleActive={miniRunnerBattleActive}
                                     onCardClick={(phraseId) => {
                                         // Select the phrase in sidebar (same as calendar date click)
                                         const phrase = phrases.find(p => p.id === phraseId);
@@ -5786,6 +8366,9 @@ export default function PhrasesPage() {
                                     todayXP={todayXP}
                                     goalXP={goalXP}
                                     onGoalChange={handleGoalChange}
+                                    battleData={battleSyncData}
+                                    lastReviewedWord={lastReviewedWord}
+                                    dropCard={puzzleDropCard as any}
                                 />
                             )}
                             <button
@@ -5821,11 +8404,9 @@ export default function PhrasesPage() {
 
                     {/* Right Panel - Stats OR Selected Date Phrases */}
                     <div style={{
-                        position: isMobile ? 'relative' : 'absolute',
-                        top: isMobile ? 'auto' : 0,
-                        right: isMobile ? 'auto' : 0,
-                        bottom: isMobile ? 'auto' : 0,
-                        width: isMobile ? '100%' : (sidebarExpanded ? '540px' : '320px'),
+                        flex: isMobile ? 'none' : (sidebarExpanded ? '1 1 0%' : '0.8 1 0%'),
+                        minWidth: isMobile ? undefined : '320px',
+                        width: isMobile ? '100%' : undefined,
                         flexShrink: 0,
                         backgroundColor: '#fafafa',
                         borderLeft: isMobile ? 'none' : '1px solid #e5e5e5',
@@ -5835,7 +8416,6 @@ export default function PhrasesPage() {
                         flexDirection: 'column',
                         gap: '12px',
                         overflowY: isMobile ? 'visible' : 'auto',
-                        transition: 'width 0.25s ease'
                     }}>
                         {/* Show phrases when date is selected, otherwise show stats */}
                         {selectedDate && selectedPhrasesAll.length > 0 ? (
@@ -6093,27 +8673,55 @@ export default function PhrasesPage() {
                                                     </div>
                                                     {(() => {
                                                         const flavor = getFlavorText(phrase.id);
+                                                        const flavorSaved = savedFlavorTexts.has(flavor.en);
                                                         return (
                                                             <div style={{
                                                                 marginTop: '8px',
                                                                 paddingTop: '6px',
                                                                 borderTop: '1px solid rgba(0,0,0,0.05)',
+                                                                display: 'flex',
+                                                                alignItems: 'flex-start',
+                                                                justifyContent: 'space-between',
+                                                                gap: '6px',
                                                             }}>
-                                                                <div style={{
-                                                                    fontSize: '9px',
-                                                                    fontStyle: 'italic',
-                                                                    color: '#A8A29E',
-                                                                    lineHeight: 1.4,
-                                                                }}>
-                                                                    &ldquo;{flavor.en}&rdquo;
+                                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                                    <div style={{
+                                                                        fontSize: '9px',
+                                                                        fontStyle: 'italic',
+                                                                        color: '#A8A29E',
+                                                                        lineHeight: 1.4,
+                                                                    }}>
+                                                                        &ldquo;{flavor.en}&rdquo;
+                                                                    </div>
+                                                                    <div style={{
+                                                                        fontSize: '7.5px',
+                                                                        color: '#C4B5A4',
+                                                                        marginTop: '1px',
+                                                                    }}>
+                                                                        {flavor.ja}
+                                                                    </div>
                                                                 </div>
-                                                                <div style={{
-                                                                    fontSize: '7.5px',
-                                                                    color: '#C4B5A4',
-                                                                    marginTop: '1px',
-                                                                }}>
-                                                                    {flavor.ja}
-                                                                </div>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        saveFlavorText(flavor.en, flavor.ja);
+                                                                    }}
+                                                                    disabled={flavorSaved || savingFlavorText}
+                                                                    style={{
+                                                                        padding: '2px 6px',
+                                                                        borderRadius: '4px',
+                                                                        border: flavorSaved ? '1px solid #86EFAC' : '1px solid #D4AF3780',
+                                                                        backgroundColor: flavorSaved ? '#DCFCE7' : 'transparent',
+                                                                        color: flavorSaved ? '#16A34A' : '#D4AF37',
+                                                                        fontSize: '7px',
+                                                                        fontWeight: '700',
+                                                                        cursor: flavorSaved ? 'default' : 'pointer',
+                                                                        flexShrink: 0,
+                                                                        marginTop: '2px',
+                                                                    }}
+                                                                >
+                                                                    {flavorSaved ? 'Saved' : '+'}
+                                                                </button>
                                                             </div>
                                                         );
                                                     })()}
@@ -6189,7 +8797,18 @@ export default function PhrasesPage() {
                                                                 const levelBefore = getChakraLevel(bm, !wasFirst, hl);
                                                                 const levelAfter = getChakraLevel(bm, true, hl);
                                                                 const xpGained = levelAfter > levelBefore ? CHAKRA_CONFIG[levelAfter].lv : 0;
-                                                                if (xpGained > 0) postXP(new Date().toISOString().split('T')[0], xpGained, false, pid);
+                                                                if (xpGained > 0) {
+                                                                    postXP(new Date().toISOString().split('T')[0], xpGained, false, pid);
+                                                                    const nc = CHAKRA_CONFIG[levelAfter];
+                                                                    const k = Date.now();
+                                                                    playLevelSound(levelAfter);
+                                                                    setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
+                                                                    setCalendarPulse({ dateKey: phrase.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: levelAfter, key: k });
+                                                                    // Register card to 布陣バトル
+                                                                    const pts = cardPoints[pid] || 0;
+                                                                    const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                                                                    setPuzzleDropCard({ phraseId: pid, english: phrase.english, japanese: phrase.japanese, element: phrase.category, rank, points: pts, bstTotal: calcBstTotal(pid), key: k });
+                                                                }
                                                             }}
                                                             onRecordingDelete={(id) => {
                                                                 setVoiceRecordings(prev => ({

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import EnglishSidebar from '@/components/EnglishSidebar';
+import { installLocalApi } from '@/lib/local-api';
 
 export default function MemoriaLayout({ children }: { children: React.ReactNode }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -9,6 +10,10 @@ export default function MemoriaLayout({ children }: { children: React.ReactNode 
     const [error, setError] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        installLocalApi();
+    }, []);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);

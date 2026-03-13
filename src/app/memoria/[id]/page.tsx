@@ -14,6 +14,7 @@ import { skeletonTalkEntries } from '@/data/english/skeleton-talk';
 import { movieNightEntries } from '@/data/english/movie-night';
 import { gameNightEntries } from '@/data/english/game-night-chaos';
 import { antiquesHouseEntries } from '@/data/english/antiques-house';
+import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
 import { SavedPhrasesStorage } from '@/lib/saved-phrases';
 
 type ThemeMode = 'dark' | 'light';
@@ -101,6 +102,12 @@ const CHARACTER_COLORS: Record<string, string> = {
     'Benji': '#EF4444',
     'Mrs Chen': '#78716C',
     'Old Man Gus': '#92400E',
+    // Bucket List Trip
+    'Gary': '#78716C',
+    'Linda': '#EC4899',
+    'Javi': '#F59E0B',
+    'Earl': '#2563EB',
+    'Dot': '#10B981',
     // Antiques House Call
     'Uncle Ray': '#B45309',
     'Nadia': '#7C3AED',
@@ -387,7 +394,21 @@ export default function MemoriaDetailPage() {
                 tags: e.tags,
             }));
 
-            const all = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...tangentMemoriaEntries].sort(
+            const bucketListMemoriaEntries: MemoriaEntry[] = bucketListTripEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const all = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries, ...tangentMemoriaEntries].sort(
                 (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
             );
             setAllEntries(all);
@@ -521,6 +542,23 @@ export default function MemoriaDetailPage() {
                         createdAt: antiquesEntry.createdAt,
                         updatedAt: antiquesEntry.updatedAt,
                         tags: antiquesEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('bucketlist-')) {
+                const bucketListEntry = bucketListTripEntries.find(e => e.id === id);
+                if (bucketListEntry) {
+                    loadedEntry = {
+                        id,
+                        date: bucketListEntry.date,
+                        title: bucketListEntry.title,
+                        content: bucketListEntry.content,
+                        conversation: bucketListEntry.conversation,
+                        tone: bucketListEntry.tone,
+                        series: bucketListEntry.series,
+                        seriesTitle: bucketListEntry.seriesTitle,
+                        createdAt: bucketListEntry.createdAt,
+                        updatedAt: bucketListEntry.updatedAt,
+                        tags: bucketListEntry.tags,
                     };
                 }
             } else if (id.startsWith('tangent-')) {
@@ -889,19 +927,20 @@ export default function MemoriaDetailPage() {
         if (!saveWord.trim() || !saveMeaning.trim()) return;
         setIsSavingPhrase(true);
         try {
-            const saved = JSON.parse(localStorage.getItem('rpg_user_phrases') || '[]');
-            saved.push({
-                id: `up-${Date.now()}`,
-                phrase: saveWord.trim(),
-                type: saveType,
-                meaning: saveMeaning,
-                example: saveExample,
-                source: entry ? `Memoria: ${entry.title}` : 'Memoria',
-                mastery_level: 0,
-                created_at: new Date().toISOString(),
+            const res = await fetch('/api/user-phrases', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phrase: saveWord.trim(),
+                    type: saveType,
+                    meaning: saveMeaning,
+                    example: saveExample,
+                    source: entry ? `Memoria: ${entry.title}` : 'Memoria',
+                }),
             });
-            localStorage.setItem('rpg_user_phrases', JSON.stringify(saved));
-            setShowSaveModal(false);
+            if (res.ok || res.status === 409) {
+                setShowSaveModal(false);
+            }
         } finally {
             setIsSavingPhrase(false);
         }
@@ -1493,19 +1532,18 @@ export default function MemoriaDetailPage() {
                                                 onClick={async () => {
                                                     // Quick save with pre-filled data
                                                     try {
-                                                        const saved = JSON.parse(localStorage.getItem('rpg_user_phrases') || '[]');
-                                                        saved.push({
-                                                            id: `up-${Date.now()}`,
-                                                            phrase: vocab.word,
-                                                            type: vocab.type,
-                                                            meaning: vocab.meaning,
-                                                            example: vocab.example || '',
-                                                            source: entry ? `Memoria: ${entry.title}` : 'Memoria',
-                                                            mastery_level: 0,
-                                                            created_at: new Date().toISOString(),
+                                                        const res = await fetch('/api/user-phrases', {
+                                                            method: 'POST',
+                                                            headers: { 'Content-Type': 'application/json' },
+                                                            body: JSON.stringify({
+                                                                phrase: vocab.word,
+                                                                type: vocab.type,
+                                                                meaning: vocab.meaning,
+                                                                example: vocab.example || '',
+                                                                source: entry ? `Memoria: ${entry.title}` : 'Memoria',
+                                                            }),
                                                         });
-                                                        localStorage.setItem('rpg_user_phrases', JSON.stringify(saved));
-                                                        if (true) {
+                                                        if (res.ok) {
                                                             // Visual feedback - could add toast
                                                             const el = document.getElementById(`vocab-${i}`);
                                                             if (el) {

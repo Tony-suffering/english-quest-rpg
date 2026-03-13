@@ -30,6 +30,29 @@ const STATUS_META: Record<Status, { label: string; color: string; bg: string; bo
     planned: { label: '予定', color: '#78716C', bg: '#F5F5F4', border: '#E7E5E4' },
 };
 
+// ── コンセプト：なぜこのアプリが存在するか ──────────────────────
+const CONCEPT = {
+    title: 'Why This Exists',
+    sections: [
+        {
+            heading: '寡占市場の構造',
+            body: 'Udemyの英語教材は寡占市場。TOEIC満点・TOEFL満点の教師が一度コースを作れば、それがランキングを独占し続ける。Amazonの1位と同じ構造。1位だから売れる、売れるから1位に居座る。2ページ目以降は存在しないのと同じで、どんなに良い教材を作っても表示すらされない。ヒカキンが日本一面白いわけじゃないのと同じ。先に入って、人々の脳裏に刻まれた者が勝つ。教材の質とは別の力学で市場が動いている。ただ、これはヒカキンが悪いという話ではない。彼は最初に始めて、続けて、ポジションを築いた。それ自体がすごい。プラットフォームの構造がそうなっているだけで、先行者を責めても意味がない。',
+        },
+        {
+            heading: '教師 vs 当事者',
+            body: 'このアプリを作っているのは英語の教師じゃない。TOEIC 900取って、4技能のうち3つクリアして、最後の1つ（スピーキング）で永遠に死んでる当事者。満点の教師が上から教えるのとは根本的に角度が違う。もがいてる最中の人間が、自分のために作って、自分で毎日使っている。',
+        },
+        {
+            heading: '何が勝負か',
+            body: '人間力と、注いだ情熱と、クオリティ。それだけ。大谷翔平はスキルと独占の両方を持っている。ヒカキンは先行者として圧倒的なポジションを築いている。俺がどっちになるかはわからない。ただ、作り続けている。喜びはほぼない。苦しみが常にある。どっちも見ている。',
+        },
+        {
+            heading: 'エネルギーの正体',
+            body: '子供の頃から苦しみに敏感だった。焦り、落ち着き、痛み。全部見えている。エゴの動きも、それを観ている意識も。willで止めようとしても、そのwill自体がエゴだから止まらない。アジャシャンティもブッダも正解すぎて、もう無駄な抵抗はしていない。理解しても苦しみは消えない。ただ一緒にいる。そのエネルギーが、このアプリを作らせている。',
+        },
+    ],
+};
+
 const PHASES: Phase[] = [
     {
         id: 'A',
@@ -197,6 +220,40 @@ export default function StrategyPage() {
                     <div style={{ fontSize: '28px', fontWeight: '900', color: '#FAFAF9', marginTop: '8px' }}>
                         {progressPct}%
                     </div>
+                </div>
+
+                {/* Concept */}
+                <div style={{
+                    marginBottom: '32px', borderRadius: '14px', overflow: 'hidden',
+                    border: '1px solid #E7E5E4', backgroundColor: '#fff',
+                }}>
+                    <div style={{
+                        padding: '20px 24px', borderBottom: '1px solid #F5F5F4',
+                        background: 'linear-gradient(135deg, #FAFAF9, #F5F5F4)',
+                    }}>
+                        <h2 style={{ fontSize: '18px', fontWeight: '900', color: '#1C1917', margin: 0 }}>
+                            {CONCEPT.title}
+                        </h2>
+                    </div>
+                    {CONCEPT.sections.map((s, i) => (
+                        <div key={i} style={{
+                            padding: '16px 24px',
+                            borderTop: i > 0 ? '1px solid #F5F5F4' : 'none',
+                        }}>
+                            <h3 style={{
+                                fontSize: '13px', fontWeight: '700', color: '#D4AF37',
+                                marginBottom: '6px', letterSpacing: '0.5px',
+                            }}>
+                                {s.heading}
+                            </h3>
+                            <p style={{
+                                fontSize: '13px', color: '#57534E', lineHeight: 1.8,
+                                margin: 0,
+                            }}>
+                                {s.body}
+                            </p>
+                        </div>
+                    ))}
                 </div>
 
                 {/* Phases */}

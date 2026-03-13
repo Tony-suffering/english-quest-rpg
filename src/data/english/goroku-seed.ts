@@ -3868,4 +3868,30 @@ export const GOROKU_SEEDS: GorokuSeed[] = [
         "for the first time in a while, I'm genuinely looking forward to what comes next",
         "I'm excited for what's next. and that's new for me. usually I'm anxious about the future. dreading it. building worst-case scenarios like a hobby. but right now? right now I'm actually looking forward to it. whatever 'it' is. I don't know what's coming. but for the first time, that's exciting instead of terrifying. and that shift -- from fear to curiosity -- that might be the biggest growth of all."
     ], context: "look forward toは「楽しみにする」。直訳は「前を見る」。forward=前方。英語は未来を「前」に置く。look back(振り返る)=過去、look forward(前を見る)=未来。日本語も「先を見る」と言うから同じ構造。でも面白いのは一部の言語(アイマラ語など)では未来が「後ろ」にある。見えないから。英語と日本語は「未来=前」で一致してる。珍しい共通点。", category: 'reaction', month: '2026-03' },
+
+    // ── Extra: 2026-03-10 session picks ──
+    { daySlot: 1, japanese: 'さぼるなよ', english: [
+        "don't slack off",
+        "don't you dare phone it in",
+        "you better not half-ass this, I'm watchin'",
+        "don't slack off. I mean it. I know you. you'll do the first two properly and then coast on the rest. I've seen it. I've been it. the energy drops around item three and by item five you're copy-pastin' vibes. not today. today you finish strong or I'm callin' you out. publicly. with receipts."
+    ], context: "phone it inは「手を抜く」の超ネイティブ表現。昔、役者が体調不良でスタジオに来ず電話で台詞を読んだことが由来。つまり「現場に来ないで電話で済ませる」=「やる気ない」。日本語の「さぼる」はフランス語のsabotage(破壊工作)が語源。つまり日本語では「破壊」、英語では「電話で済ます」。怠け方のイメージが全然違う。英語の方がリアルで面白い。", category: 'request', month: '2026-03' },
+    { daySlot: 1, japanese: '色々かわってるでしょ？', english: [
+        "stuff's changed right?",
+        "things are different now, y'know?",
+        "a lot has changed since you last looked, can you tell?",
+        "stuff's changed. like, a lot. you probably didn't even notice half of it. that's the thing about gradual improvement -- nobody sees it until you point at it and go 'hey look.' and even then they're like 'oh was it always like that?' no. no it was not. I built that. yesterday. at 2am. you're welcome."
+    ], context: "stuff's changedのstuffは「もの・こと」の超カジュアル版。thingsより更に砕けてる。stuff=数えられない塊、things=数えられる個別のもの。でも会話では完全に互換。面白いのは語尾のright?。日本語の「でしょ？」は確認+同意要求。英語のright?も全く同じ機能。y'know?も同じ。この「文末で相手に投げる」パターンは日英共通。珍しく直訳が機能する例。", category: 'filler', month: '2026-03' },
+    { daySlot: 2, japanese: 'しっかり調べて楽しく書いて', english: [
+        "do your homework",
+        "do your homework and make it slap",
+        "research it properly and make the writing actually fun to read",
+        "do your homework. like actually do it. don't skim three articles and call it research. dig. find the weird facts. the stuff that makes people go 'wait really?' and then make it fun. 'cause nobody reads boring stuff. nobody. you could cure cancer in your article and if it's boring nobody's readin' past paragraph two. facts plus fun. that's the recipe. that's the only recipe."
+    ], context: "make it slapは「めちゃくちゃ良くする」のスラング。元は音楽用語でビートが「叩く(slap)」ように効くこと。This song slaps(この曲やばい)。食べ物にも使う。This ramen slaps(このラーメンやばい)。日本語の「楽しく」は形容詞。英語のslapは動詞で「殴る」。つまり英語では「良い」を「殴る」で表現する。暴力的な褒め方。でも最高の褒め言葉。", category: 'request', month: '2026-03' },
+    { daySlot: 2, japanese: 'つかれた', english: [
+        "I'm cooked",
+        "I'm absolutely cooked, stick a fork in me",
+        "I'm done for the day, my brain checked out an hour ago",
+        "I'm cooked. not tired. cooked. there's a difference. tired is 'I could use a nap.' cooked is 'my soul left my body three tasks ago and I've been operatin' on pure spite since then.' the screen is blurry. my thoughts are blurry. my will to live is blurry. tomorrow me can deal with whatever's left. tonight me is goin' horizontal."
+    ], context: "I'm cookedは「完全に消耗した」のGen Zスラング。料理が焼き上がった=もう終わり。stick a fork in me(フォーク刺して)=肉が焼けたか確認する動作。「つかれた」は日本語では状態の報告。英語のcookedは「加熱されて変質した」という比喩。自分を料理に例えてる。他にも I'm fried(揚がった)、I'm toast(トーストになった)、I'm burnt out(燃え尽きた)。英語は疲労を「熱で調理された」イメージで語る。全部キッチン用語。", category: 'reaction', month: '2026-03' },
 ];

@@ -13,6 +13,7 @@ import { skeletonTalkEntries } from '@/data/english/skeleton-talk';
 import { movieNightEntries } from '@/data/english/movie-night';
 import { gameNightEntries } from '@/data/english/game-night-chaos';
 import { antiquesHouseEntries } from '@/data/english/antiques-house';
+import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
 
 export default function MemoriaPage() {
     const [entries, setEntries] = useState<MemoriaEntry[]>([]);
@@ -191,7 +192,21 @@ export default function MemoriaPage() {
                 tags: e.tags,
             }));
 
-            const allEntries = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries];
+            const bucketListMemoriaEntries: MemoriaEntry[] = bucketListTripEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const allEntries = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries];
             setEntries(allEntries);
             setTangentEntries(tangentMemoriaEntries);
             localStorage.setItem('memoria_total', String(allEntries.length + tangentMemoriaEntries.length));
