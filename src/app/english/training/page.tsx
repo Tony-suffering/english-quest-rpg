@@ -3135,6 +3135,17 @@ export default function PhrasesPage() {
         setCurrentMonth(now);
     }, []);
     const [isMobile, setIsMobile] = useState(false);
+    const [showOnboarding, setShowOnboarding] = useState(false);
+    const [onboardingStep, setOnboardingStep] = useState(0);
+    useEffect(() => {
+        if (typeof window !== 'undefined' && !localStorage.getItem('training-onboarding-done')) {
+            setShowOnboarding(true);
+        }
+    }, []);
+    const dismissOnboarding = () => {
+        setShowOnboarding(false);
+        localStorage.setItem('training-onboarding-done', 'true');
+    };
     const [goalXP, setGoalXP] = useState(DEFAULT_GOAL_XP);
     useEffect(() => {
         const saved = localStorage.getItem('runner-goal-xp');
@@ -6286,6 +6297,136 @@ export default function PhrasesPage() {
             flexDirection: 'column',
             overflow: 'hidden'
         }}>
+            {/* ── Onboarding Tutorial Overlay ── */}
+            {showOnboarding && (() => {
+                const steps = [
+                    {
+                        title: 'トレーニングへようこそ',
+                        body: 'ここはこのアプリの核です。\n\n5min英会話やQuestで出会ったフレーズを、ここで繰り返しレビューして「自分の言葉」にしていきます。\n\n覚えるんじゃなくて、体に染み込ませる。それがトレーニングです。',
+                        color: '#D4AF37',
+                    },
+                    {
+                        title: 'カードを育てる',
+                        body: '登録したフレーズは「カード」になります。\n\nカードにはチャクラレベル（Lv.1〜7）があり、タップするとレベルが上がります。\n\nLv.1 種 → Lv.2 芽 → Lv.3 鍛 → Lv.4 得\n\nLv.4「得」まで来たら、もう考えなくても英語が出てくる状態。それが目標です。',
+                        color: '#10B981',
+                    },
+                    {
+                        title: 'スロットマシン',
+                        body: 'レビューに正解するとスロットが回ります。\n\nMISS → BONUS → GREAT → SUPER → MEGA → LEGENDARY\n\n連続正解するとチェーンが繋がって、ボーナス倍率がどんどん上がります。ゲーム感覚で続けられる仕組みです。',
+                        color: '#F59E0B',
+                    },
+                    {
+                        title: 'カレンダーで毎日確認',
+                        body: 'フレーズは日付ごとに割り振られています。\n\n今日の日付をタップすると、今日レビューすべきカードが表示されます。\n\n各日の色付きバーは、その日のフレーズの習熟度を表しています。バーが上に伸びるほど、よく覚えているということです。',
+                        color: '#3B82F6',
+                    },
+                    {
+                        title: 'まずは1枚から',
+                        body: 'フレーズがまだない場合は、まず「5min英会話」でレッスンを1つやってみてください。完了画面で「+登録」を押すとここに追加されます。\n\n焦らなくて大丈夫。\n1日10分。それだけで変わります。',
+                        color: '#8B5CF6',
+                    },
+                ];
+                const step = steps[onboardingStep];
+                return (
+                    <div style={{
+                        position: 'fixed', inset: 0, zIndex: 10000,
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        padding: 20,
+                    }} onClick={(e) => { if (e.target === e.currentTarget) dismissOnboarding(); }}>
+                        <div style={{
+                            backgroundColor: '#fff', borderRadius: 20, padding: '32px 28px',
+                            maxWidth: 420, width: '100%',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                            position: 'relative',
+                        }}>
+                            {/* Step indicator */}
+                            <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginBottom: 24 }}>
+                                {steps.map((_, i) => (
+                                    <div key={i} style={{
+                                        width: i === onboardingStep ? 24 : 8, height: 8, borderRadius: 4,
+                                        backgroundColor: i <= onboardingStep ? step.color : '#E7E5E4',
+                                        transition: 'all 0.3s ease',
+                                    }} />
+                                ))}
+                            </div>
+
+                            {/* Step number */}
+                            <div style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                width: 40, height: 40, borderRadius: '50%',
+                                backgroundColor: step.color, color: '#fff',
+                                fontSize: 16, fontWeight: 700, margin: '0 auto 16px',
+                            }}>
+                                {onboardingStep + 1}
+                            </div>
+
+                            {/* Title */}
+                            <h2 style={{
+                                fontSize: 20, fontWeight: 700, color: '#292524',
+                                textAlign: 'center', margin: '0 0 16px',
+                            }}>
+                                {step.title}
+                            </h2>
+
+                            {/* Body */}
+                            <p style={{
+                                fontSize: 13, color: '#57534E', lineHeight: 2,
+                                textAlign: 'center', margin: '0 0 28px',
+                                whiteSpace: 'pre-line',
+                            }}>
+                                {step.body}
+                            </p>
+
+                            {/* Buttons */}
+                            <div style={{ display: 'flex', gap: 10 }}>
+                                {onboardingStep > 0 && (
+                                    <button
+                                        onClick={() => setOnboardingStep(onboardingStep - 1)}
+                                        style={{
+                                            flex: 1, padding: '12px 0', borderRadius: 12,
+                                            border: '1px solid #E7E5E4', backgroundColor: 'transparent',
+                                            color: '#78716C', fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                                        }}
+                                    >
+                                        戻る
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        if (onboardingStep < steps.length - 1) {
+                                            setOnboardingStep(onboardingStep + 1);
+                                        } else {
+                                            dismissOnboarding();
+                                        }
+                                    }}
+                                    style={{
+                                        flex: 1, padding: '12px 0', borderRadius: 12,
+                                        border: 'none', backgroundColor: step.color,
+                                        color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+                                        boxShadow: `0 4px 16px ${step.color}40`,
+                                    }}
+                                >
+                                    {onboardingStep < steps.length - 1 ? '次へ' : '始める'}
+                                </button>
+                            </div>
+
+                            {/* Skip */}
+                            <button
+                                onClick={dismissOnboarding}
+                                style={{
+                                    display: 'block', margin: '12px auto 0',
+                                    background: 'none', border: 'none',
+                                    color: '#A8A29E', fontSize: 11, cursor: 'pointer',
+                                }}
+                            >
+                                スキップ
+                            </button>
+                        </div>
+                    </div>
+                );
+            })()}
+
             {/* Keyframes loaded from training-animations.css */}
 
 
