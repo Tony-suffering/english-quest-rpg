@@ -3825,6 +3825,22 @@ export default function PhrasesPage() {
                         category: w.cat,
                         date: '2025-01-01T00:00:00.000Z',
                     }));
+                    // 5minから登録されたフレーズも読み込む
+                    try {
+                        const fiveMinRaw = localStorage.getItem('5min-training-phrases');
+                        if (fiveMinRaw) {
+                            const fiveMinPhrases: { english: string; japanese: string; category: string; date: string }[] = JSON.parse(fiveMinRaw);
+                            fiveMinPhrases.forEach((p, i) => {
+                                mapped.push({
+                                    id: `5min_${i}`,
+                                    english: p.english,
+                                    japanese: p.japanese,
+                                    category: p.category || '5min',
+                                    date: p.date || '2025-01-01T00:00:00.000Z',
+                                });
+                            });
+                        }
+                    } catch { /* ignore */ }
                     setPhrases(mapped);
                     try {
                         const saved = localStorage.getItem('quest-mastery');

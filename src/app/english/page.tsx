@@ -323,6 +323,14 @@ export default function EnglishHomePage() {
                 <Section title="メインコンテンツ" sub="MAIN FEATURES -- 毎日使うもの">
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 12 }}>
                         <NavCard
+                            href="/english/5min"
+                            title="5min 英会話"
+                            desc="1日5分で始める英会話入門。5つのフレーズと1つの会話シーンを毎日こなす。全30日で150フレーズが身につく。初心者はここから。"
+                            tag="BEGINNER"
+                            tagColor={T.green}
+                            number="00"
+                        />
+                        <NavCard
                             href="/english/quest"
                             title="Quest（冒険）"
                             desc="新しいフレーズに出会う場所。10カテゴリ x 25フレーズ。「捕まえる」を押すとトレーニングデッキに追加。"

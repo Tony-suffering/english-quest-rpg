@@ -46,6 +46,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     // Main nav: 商品として見せるもの
     const allMainItems = [
         { id: '/english', label: 'ホーム / 遊び方' },
+        { id: '/english/5min', label: '5min 英会話' },
         { id: '/english/dashboard', label: 'ダッシュボード' },
         { id: '/english/quest', label: 'Quest (冒険)' },
         { id: '/english/training', label: 'トレーニング' },
