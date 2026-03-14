@@ -14,7 +14,7 @@ import { QUEST_WORDS } from '@/data/english/quest-words';
 import './training-animations.css';
 
 // All API calls are intercepted by local-api.ts -- no port restriction needed
-const IS_PUBLIC = false;
+const IS_PUBLIC = true;
 
 interface VoiceRecording {
     id: number;
