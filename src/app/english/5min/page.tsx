@@ -956,21 +956,48 @@ export default function FiveMinPage() {
         )}
       </div>
 
+      {/* Next Step Connector */}
+      <div style={{
+        ...cardStyle, marginBottom: 16, textAlign: 'center',
+        backgroundColor: '#FFFBEB', border: `1px solid ${GOLD}30`,
+      }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: GOLD, letterSpacing: '0.15em', marginBottom: 6 }}>
+          NEXT STEP
+        </div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: STONE_800, marginBottom: 4 }}>
+          気に入ったフレーズ、育ててみない？
+        </div>
+        <div style={{ fontSize: 11, color: STONE_500, marginBottom: 12, lineHeight: 1.6 }}>
+          上で登録したフレーズは「トレーニング」でスロットを回しながら復習できる。<br />
+          タップするたびにカードが進化する。
+        </div>
+        <a href="/english/training" style={{
+          display: 'inline-block', padding: '12px 32px',
+          borderRadius: 10, backgroundColor: GOLD, color: '#fff',
+          fontSize: 14, fontWeight: 700, textDecoration: 'none',
+          letterSpacing: '0.08em', boxShadow: `0 2px 8px ${GOLD}40`,
+        }}>
+          トレーニングへ進む
+        </a>
+      </div>
+
       {/* Navigation */}
       <div style={{ display: 'flex', gap: 10, maxWidth: 320, width: '100%' }}>
         <button onClick={goHome} style={{
           ...goldButton, flex: 1, padding: '12px 0', fontSize: 13,
+          backgroundColor: 'transparent', border: `1px solid ${STONE_200}`,
+          color: STONE_600, boxShadow: 'none',
         }}>
           ホームへ
         </button>
-        <a href="/english/training" style={{
+        <a href="/english/quest" style={{
           ...goldButton, textDecoration: 'none', textAlign: 'center',
           flex: 1, padding: '12px 0', fontSize: 13,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           backgroundColor: 'transparent', border: `1px solid ${STONE_200}`,
           color: STONE_600, boxShadow: 'none',
         }}>
-          トレーニングへ
+          もっと集める (Quest)
         </a>
       </div>
     </div>

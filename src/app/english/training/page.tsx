@@ -3679,7 +3679,131 @@ export default function PhrasesPage() {
 
     // Helper: post XP to review-count + update player level + chain transitions
     const postXP = useCallback((todayKey: string, xpGained: number, slamActive = false, phraseId?: string) => {
-        if (IS_PUBLIC) return; // 3004: DB不要
+        if (IS_PUBLIC) {
+            // 3004: ローカルガチャシミュレーション（DB不要、演出は維持）
+            const currentChain = feverRef.current;
+            const roll = Math.random() * 100;
+            const tier = roll < 1 ? 'MYTHIC'
+                : roll < 4 ? 'LEGENDARY'
+                : roll < 12 ? 'MEGA'
+                : roll < 28 ? 'SUPER'
+                : roll < 50 ? 'GREAT'
+                : roll < 85 ? 'BONUS' : 'MISS';
+
+            // Simulate sparks + card points
+            const sparksMap: Record<string, number> = { MYTHIC: 50, LEGENDARY: 30, MEGA: 15, SUPER: 8, GREAT: 4, BONUS: 2, MISS: 0 };
+            const cpMap: Record<string, number> = { MYTHIC: 25, LEGENDARY: 15, MEGA: 8, SUPER: 4, GREAT: 2, BONUS: 1, MISS: 0 };
+            const sparksWon = sparksMap[tier] || 0;
+            const cardPointsEarned = cpMap[tier] || 0;
+
+            // Update local XP + sparks
+            setPlayerTotalXP(prev => {
+                const next = prev + xpGained;
+                const newLevel = levelFromXP(next);
+                if (newLevel > playerLevel) {
+                    setPlayerLevel(newLevel);
+                    const info = getTitleForLevel(newLevel);
+                    setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: Date.now() });
+                } else {
+                    setPlayerLevel(newLevel);
+                }
+                return next;
+            });
+            setPlayerSparks(prev => prev + sparksWon);
+            if (phraseId) {
+                setCardPoints(prev => {
+                    const newTotal = (prev[phraseId] || 0) + cardPointsEarned;
+                    // Card rank-up detection
+                    const prevRank = getCardRank(prev[phraseId] || 0);
+                    const newRank = getCardRank(newTotal);
+                    if (prevRank.rank !== newRank.rank && newRank.rank !== 'NORMAL') {
+                        setTimeout(() => {
+                            playRankUpSound(newRank.rank);
+                            setCardRankUpEffect({
+                                oldRank: prevRank.label || 'NORMAL',
+                                newRank: newRank.label,
+                                newRankColor: newRank.borderColor,
+                                key: Date.now(),
+                            });
+                        }, 500);
+                    }
+                    return { ...prev, [phraseId]: newTotal };
+                });
+            }
+            setMonthlyReviewCounts(prev => ({
+                ...prev,
+                [todayKey]: {
+                    count: (prev[todayKey]?.count || 0) + 1,
+                    xp: (prev[todayKey]?.xp || 0) + xpGained,
+                    sparks: (prev[todayKey]?.sparks || 0) + sparksWon,
+                }
+            }));
+
+            // 連荘 Chain state transitions
+            if (getSettings().feverEnabled) {
+                const isWin = tier !== 'MISS';
+                const isMiss = tier === 'MISS';
+                if (isMiss) {
+                    if (currentChain.active) {
+                        const exitStreak = currentChain.streak;
+                        stopFeverBGM(feverDroneRef.current);
+                        feverDroneRef.current = null;
+                        setChainState({ count: 0, mode: 'normal', key: Date.now() });
+                        feverRef.current = { active: false, streak: 0 };
+                        setFeverFlash('exit');
+                        setFeverExitEffect({ streak: exitStreak });
+                        playFeverExitSound();
+                    }
+                } else if (isWin) {
+                    const newCount = currentChain.streak + 1;
+                    const oldMode = getChainMode(currentChain.streak);
+                    const newMode = getChainMode(newCount);
+                    const wasActive = currentChain.active;
+                    setChainState({ count: newCount, mode: newMode, key: Date.now() });
+                    feverRef.current = { active: newMode !== 'normal', streak: newCount };
+                    if (newMode !== oldMode && newMode !== 'normal') {
+                        setChainTransition({ from: oldMode, to: newMode, key: Date.now() });
+                        if (!wasActive) {
+                            setFeverFlash('enter');
+                            playFeverEntrySound();
+                            feverDroneRef.current = startFeverBGM();
+                        } else {
+                            playFeverEntrySound();
+                        }
+                    } else if (wasActive) {
+                        playFeverChainHit(newCount);
+                    }
+                }
+            }
+
+            // Trigger gacha overlay
+            const slotOn = getSettings().slotEnabled;
+            if (slotOn) {
+                deferredScoreUpdates.current.push(() => {}); // no deferred DB updates needed
+                if (pendingGachaRef.current) clearTimeout(pendingGachaRef.current);
+                const delay = slamActive ? 1200 : 0;
+                pendingGachaRef.current = setTimeout(() => {
+                    setGachaEffect({
+                        phase: 'reel',
+                        tier,
+                        sparksWon,
+                        phraseId: phraseId || null,
+                        cardPointsEarned,
+                        cardTotalPoints: phraseId ? (cardPoints[phraseId] || 0) + cardPointsEarned : 0,
+                        key: Date.now(),
+                    });
+                    pendingGachaRef.current = null;
+                }, delay);
+            } else {
+                setQuietToast({
+                    sparks: sparksWon,
+                    cardPts: cardPointsEarned,
+                    tier,
+                    key: Date.now(),
+                });
+            }
+            return;
+        }
         const currentChain = feverRef.current;
         const chainTierNum = currentChain.active ? getChainTier(currentChain.streak) : 0;
         fetch('/api/review-count', {
@@ -9042,8 +9166,11 @@ export default function PhrasesPage() {
                                 <>{renderReviewContent()}</>
                             ) : (
                                 <>
-                                    {/* Analytics Dashboard */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                    {/* Review Cards first */}
+                                    {renderReviewContent()}
+
+                                    {/* Analytics Dashboard — below review cards */}
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
 
 
                                         {/* Daily Activity Sparkline */}
@@ -9159,8 +9286,6 @@ export default function PhrasesPage() {
                                         </div>
 
                                     </div>
-                                    {/* Review Cards */}
-                                    {renderReviewContent()}
                                 </>
                             )
                         )}
