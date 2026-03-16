@@ -3146,6 +3146,8 @@ export default function PhrasesPage() {
     useEffect(() => {
         if (typeof window !== 'undefined' && !localStorage.getItem('training-onboarding-done')) {
             setShowOnboarding(true);
+            // Mark immediately so reload won't re-trigger
+            localStorage.setItem('training-onboarding-done', 'true');
         }
     }, []);
     const dismissOnboarding = () => {
