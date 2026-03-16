@@ -2,6 +2,11 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
+import { DAILY_LESSONS } from '@/data/english/five-min-data';
+import { QUEST_WORDS } from '@/data/english/quest-words';
+
+// All API calls are intercepted by local data when true -- no server needed
+const IS_PUBLIC = true;
 
 // ===== Types =====
 interface Phrase { id: string; english: string; japanese: string; category: string; date: string; }
@@ -133,26 +138,94 @@ export default function AnalyticsPage() {
     useEffect(() => {
         (async () => {
             try {
-                const [a, b, c, d, e] = await Promise.all([
-                    fetch('/api/phrases'), fetch('/api/phrases/mastery'),
-                    fetch('/api/voice-recordings'), fetch('/api/phrases/links'),
-                    fetch('/api/player-stats'),
-                ]);
-                const [ad, bd, cd, dd, ed] = await Promise.all([a.json(), b.json(), c.json(), d.json(), e.json()]);
-                if (ad.success) setPhrases(ad.phrases);
-                if (bd.success) setMast(bd.mastery || {});
-                if (cd.success) setRecs(cd.recordings || {});
-                if (dd.success) {
-                    const m: Record<string, PhraseLink[]> = {};
-                    for (const l of (dd.links || [])) { if (!m[l.phrase_id]) m[l.phrase_id] = []; m[l.phrase_id].push(l); }
-                    setLnks(m);
+                if (IS_PUBLIC) {
+                    // Public mode (3004): load from static data + localStorage, no API needed
+                    const now = new Date();
+                    const y = now.getFullYear();
+                    const m = now.getMonth();
+                    const daysInMonth = new Date(y, m + 1, 0).getDate();
+                    const makeDateStr = (day: number) =>
+                        `${y}-${String(m + 1).padStart(2, '0')}-${String(Math.min(day, daysInMonth)).padStart(2, '0')}T00:00:00.000Z`;
+
+                    // Build phrases from DAILY_LESSONS + QUEST_WORDS
+                    const allPhrases: Phrase[] = [];
+                    let idx = 0;
+                    for (const lesson of DAILY_LESSONS) {
+                        for (const p of lesson.phrases) {
+                            const day = Math.floor(idx / 10) + 1;
+                            allPhrases.push({
+                                id: `phrase_${idx}`,
+                                english: p.english,
+                                japanese: p.japanese,
+                                category: lesson.label || 'phrase',
+                                date: makeDateStr(day),
+                            });
+                            idx++;
+                        }
+                    }
+                    for (let i = 0; i < QUEST_WORDS.length; i++) {
+                        const w = QUEST_WORDS[i];
+                        const day = Math.floor((idx + i) / 10) + 1;
+                        allPhrases.push({
+                            id: `quest_${i}`,
+                            english: w.en,
+                            japanese: w.ja + ` (${w.pron})`,
+                            category: w.cat,
+                            date: makeDateStr(day),
+                        });
+                    }
+                    setPhrases(allPhrases);
+
+                    // Mastery from localStorage
+                    try {
+                        const saved = localStorage.getItem('quest-mastery');
+                        if (saved) setMast(JSON.parse(saved));
+                    } catch { /* ignore */ }
+
+                    // Player stats calculated from local mastery
+                    try {
+                        const saved = localStorage.getItem('quest-mastery');
+                        const mastery: Record<string, number> = saved ? JSON.parse(saved) : {};
+                        let totalXp = 0;
+                        let totalTouches = 0;
+                        for (const val of Object.values(mastery)) {
+                            totalXp += (val as number) * 10;
+                            totalTouches++;
+                        }
+                        setPs({ total_xp: totalXp, sparks: 0, legendary_count: 0, pity_counter: 0, total_touches: totalTouches });
+                    } catch { /* ignore */ }
+
+                    // No voice recordings or phrase links in public mode
+                    setRecs({});
+                    setLnks({});
+                } else {
+                    const [a, b, c, d, e] = await Promise.all([
+                        fetch('/api/phrases'), fetch('/api/phrases/mastery'),
+                        fetch('/api/voice-recordings'), fetch('/api/phrases/links'),
+                        fetch('/api/player-stats'),
+                    ]);
+                    const [ad, bd, cd, dd, ed] = await Promise.all([a.json(), b.json(), c.json(), d.json(), e.json()]);
+                    if (ad.success) setPhrases(ad.phrases);
+                    if (bd.success) setMast(bd.mastery || {});
+                    if (cd.success) setRecs(cd.recordings || {});
+                    if (dd.success) {
+                        const m: Record<string, PhraseLink[]> = {};
+                        for (const l of (dd.links || [])) { if (!m[l.phrase_id]) m[l.phrase_id] = []; m[l.phrase_id].push(l); }
+                        setLnks(m);
+                    }
+                    if (ed.success) setPs({ total_xp: ed.total_xp ?? 0, sparks: ed.sparks ?? 0, legendary_count: ed.legendary_count ?? 0, pity_counter: ed.pity_counter ?? 0, total_touches: ed.total_touches ?? 0 });
                 }
-                if (ed.success) setPs({ total_xp: ed.total_xp ?? 0, sparks: ed.sparks ?? 0, legendary_count: ed.legendary_count ?? 0, pity_counter: ed.pity_counter ?? 0, total_touches: ed.total_touches ?? 0 });
             } finally { setLoading(false); }
         })();
     }, []);
 
     useEffect(() => {
+        if (IS_PUBLIC) {
+            // Public mode: no review count or date touch APIs
+            setRc({});
+            setDt({});
+            return;
+        }
         const ym = `${cm.getFullYear()}-${String(cm.getMonth() + 1).padStart(2, '0')}`;
         fetch(`/api/review-count?month=${ym}`).then(r => r.json()).then(d => { if (d.success) setRc(d.counts || {}); }).catch(() => {});
         fetch(`/api/date-touches?month=${ym}`).then(r => r.json()).then(d => { if (d.success) setDt(d.touches || {}); }).catch(() => {});

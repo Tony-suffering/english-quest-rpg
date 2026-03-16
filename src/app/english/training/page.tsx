@@ -11,6 +11,7 @@ import {
 } from '@/lib/training-sounds';
 import PuzzleBoard, { type BattleSyncData } from '@/components/english/PuzzleBoard';
 import { QUEST_WORDS } from '@/data/english/quest-words';
+import { DAILY_LESSONS } from '@/data/english/five-min-data';
 import './training-animations.css';
 
 // All API calls are intercepted by local-api.ts -- no port restriction needed
@@ -3119,6 +3120,7 @@ export default function PhrasesPage() {
     // Data mode: phrases (default) or words
     const [dataMode, setDataMode] = useState<'phrases' | 'words'>(() => {
         if (typeof window !== 'undefined') {
+            if (IS_PUBLIC) return (localStorage.getItem('training-data-mode') as 'phrases' | 'words') || 'phrases';
             return (localStorage.getItem('training-data-mode') as 'phrases' | 'words') || 'phrases';
         }
         return 'phrases';
@@ -3952,31 +3954,61 @@ export default function PhrasesPage() {
         const fetchData = async () => {
             try {
                 if (IS_PUBLIC) {
-                    // 公開RPG (3004): quest-words.tsの静的データ。DB不要
-                    const mapped: Phrase[] = QUEST_WORDS.map((w, i) => ({
-                        id: `quest_${i}`,
-                        english: w.en,
-                        japanese: w.ja + ` (${w.pron})`,
-                        category: w.cat,
-                        date: '2025-01-01T00:00:00.000Z',
-                    }));
-                    // 5minから登録されたフレーズも読み込む
-                    try {
-                        const fiveMinRaw = localStorage.getItem('5min-training-phrases');
-                        if (fiveMinRaw) {
-                            const fiveMinPhrases: { english: string; japanese: string; category: string; date: string }[] = JSON.parse(fiveMinRaw);
-                            fiveMinPhrases.forEach((p, i) => {
-                                mapped.push({
-                                    id: `5min_${i}`,
+                    // 公開RPG (3004): ローカルデータ。DB不要
+                    // 毎日10個ずつ、月全体に分散
+                    const now = new Date();
+                    const y = now.getFullYear();
+                    const m = now.getMonth();
+                    const daysInMonth = new Date(y, m + 1, 0).getDate();
+                    const makeDateStr = (day: number) =>
+                        `${y}-${String(m + 1).padStart(2, '0')}-${String(Math.min(day, daysInMonth)).padStart(2, '0')}T00:00:00.000Z`;
+
+                    if (dataMode === 'phrases') {
+                        // フレーズモード: 5minの150フレーズを10個/日で分散
+                        const allPhrases: Phrase[] = [];
+                        let idx = 0;
+                        for (const lesson of DAILY_LESSONS) {
+                            for (const p of lesson.phrases) {
+                                const day = Math.floor(idx / 10) + 1;
+                                allPhrases.push({
+                                    id: `phrase_${idx}`,
                                     english: p.english,
                                     japanese: p.japanese,
-                                    category: p.category || '5min',
-                                    date: p.date || '2025-01-01T00:00:00.000Z',
+                                    category: lesson.label || 'phrase',
+                                    date: makeDateStr(day),
                                 });
-                            });
+                                idx++;
+                            }
                         }
-                    } catch { /* ignore */ }
-                    setPhrases(mapped);
+                        // 5minから追加登録されたフレーズも読み込む
+                        try {
+                            const fiveMinRaw = localStorage.getItem('5min-training-phrases');
+                            if (fiveMinRaw) {
+                                const fiveMinPhrases: { english: string; japanese: string; category: string; date: string }[] = JSON.parse(fiveMinRaw);
+                                fiveMinPhrases.forEach((p, i) => {
+                                    const day = Math.floor((idx + i) / 10) + 1;
+                                    allPhrases.push({
+                                        id: `5min_${i}`,
+                                        english: p.english,
+                                        japanese: p.japanese,
+                                        category: p.category || '5min',
+                                        date: p.date || makeDateStr(day),
+                                    });
+                                });
+                            }
+                        } catch { /* ignore */ }
+                        setPhrases(allPhrases);
+                    } else {
+                        // 単語モード: QUEST_WORDSの125個を10個/日で分散
+                        const mapped: Phrase[] = QUEST_WORDS.map((w, i) => ({
+                            id: `quest_${i}`,
+                            english: w.en,
+                            japanese: w.ja + ` (${w.pron})`,
+                            category: w.cat,
+                            date: makeDateStr(Math.floor(i / 10) + 1),
+                        }));
+                        setPhrases(mapped);
+                    }
                     try {
                         const saved = localStorage.getItem('quest-mastery');
                         if (saved) setPhraseMastery(JSON.parse(saved));

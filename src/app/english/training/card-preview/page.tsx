@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Link from 'next/link';
+import { DAILY_LESSONS } from '@/data/english/five-min-data';
+import { getAllPhrases, getCardPoints, getMastery } from '@/lib/local-store';
+
+const IS_PUBLIC = true;
 
 // ===== Types =====
 interface Phrase {
@@ -169,8 +173,29 @@ function useCardTilt(rank: CardRank, enabled: boolean) {
     return { ref, style, mousePos, isHovering, onMouseMove, onMouseLeave };
 }
 
-// ===== Card Nicknames (DB via API) =====
+// ===== Card Nicknames =====
+function saveNicknameLocal(phraseId: string, name: string) {
+    try {
+        const raw = localStorage.getItem('rpg_card_names');
+        const names = raw ? JSON.parse(raw) : {};
+        if (name.trim()) names[phraseId] = name.trim();
+        else delete names[phraseId];
+        localStorage.setItem('rpg_card_names', JSON.stringify(names));
+    } catch { /* ignore */ }
+}
+
+function loadNicknames(): Record<string, string> {
+    try {
+        const raw = localStorage.getItem('rpg_card_names');
+        return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+}
+
 async function saveNicknameAPI(phraseId: string, name: string) {
+    if (IS_PUBLIC) {
+        saveNicknameLocal(phraseId, name);
+        return;
+    }
     await fetch('/api/phrases/mastery/card-name', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -1279,18 +1304,66 @@ export default function CardCollectionPage() {
         const handleResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener('resize', handleResize);
 
-        Promise.all([
-            fetch('/api/phrases').then(r => r.json()),
-            fetch('/api/phrases/mastery').then(r => r.json()),
-        ]).then(([phrasesRes, masteryRes]) => {
-            if (phrasesRes.success) setPhrases(phrasesRes.phrases || []);
-            if (masteryRes.success) {
-                setCardPoints(masteryRes.cardPoints || {});
-                setNicknames(masteryRes.cardNames || {});
-                setMastery(masteryRes.mastery || {});
+        if (IS_PUBLIC) {
+            // Public mode: load from localStorage + static data
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = now.getMonth();
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
+            const makeDateStr = (day: number) =>
+                `${y}-${String(m + 1).padStart(2, '0')}-${String(Math.min(day, daysInMonth)).padStart(2, '0')}`;
+
+            // Build phrases from DAILY_LESSONS (150 phrases, 10 per day)
+            const allPhrases: Phrase[] = [];
+            let idx = 0;
+            for (const lesson of DAILY_LESSONS) {
+                for (const p of lesson.phrases) {
+                    const day = Math.floor(idx / 10) + 1;
+                    allPhrases.push({
+                        id: `phrase_${idx}`,
+                        english: p.english,
+                        japanese: p.japanese,
+                        category: lesson.label || 'phrase',
+                        date: makeDateStr(day),
+                    });
+                    idx++;
+                }
             }
+
+            // Also merge any custom phrases from local-store
+            const custom = getAllPhrases();
+            for (const cp of custom) {
+                if (!allPhrases.find(p => p.id === cp.id)) {
+                    allPhrases.push({
+                        id: cp.id,
+                        english: cp.english,
+                        japanese: cp.japanese,
+                        category: cp.category,
+                        date: cp.date,
+                    });
+                }
+            }
+
+            setPhrases(allPhrases);
+            setCardPoints(getCardPoints());
+            setMastery(getMastery());
+            setNicknames(loadNicknames());
             setLoading(false);
-        }).catch(() => setLoading(false));
+        } else {
+            // Dev mode: fetch from API
+            Promise.all([
+                fetch('/api/phrases').then(r => r.json()),
+                fetch('/api/phrases/mastery').then(r => r.json()),
+            ]).then(([phrasesRes, masteryRes]) => {
+                if (phrasesRes.success) setPhrases(phrasesRes.phrases || []);
+                if (masteryRes.success) {
+                    setCardPoints(masteryRes.cardPoints || {});
+                    setNicknames(masteryRes.cardNames || {});
+                    setMastery(masteryRes.mastery || {});
+                }
+                setLoading(false);
+            }).catch(() => setLoading(false));
+        }
 
         return () => window.removeEventListener('resize', handleResize);
     }, []);

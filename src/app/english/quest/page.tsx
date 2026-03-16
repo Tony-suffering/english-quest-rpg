@@ -59,6 +59,7 @@ export default function QuestPage() {
   const currentCard = stageCards[state.index] || null;
   const isCaught = currentCard ? (state.caught[currentCard.id] || isInTraining(currentCard.id)) : false;
   const caughtInStage = stageCards.filter(c => state.caught[c.id] || isInTraining(c.id)).length;
+  const totalCaught = Object.keys(state.caught).length;
 
   const update = (partial: Partial<QuestState>) => {
     setState(prev => {
@@ -205,6 +206,37 @@ export default function QuestPage() {
             </div>
           </div>
         )}
+
+        {/* Next step guidance banner */}
+        <div style={{
+          marginBottom: 16, padding: '14px 18px', borderRadius: 14,
+          background: '#fff', border: '1px solid rgba(212,175,55,0.18)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 12,
+        }}>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: 13, fontWeight: 600, color: '#44403C', lineHeight: 1.6,
+            }}>
+              フレーズを捕まえたら「トレーニング」で育てよう
+            </div>
+            <div style={{
+              fontSize: 11, color: '#A8A29E', marginTop: 2,
+            }}>
+              GET したフレーズは繰り返し練習で定着する
+            </div>
+          </div>
+          <a href="/english/training"
+            style={{
+              padding: '7px 16px', borderRadius: 10, flexShrink: 0,
+              background: 'rgba(212,175,55,0.08)', border: '1px solid rgba(212,175,55,0.2)',
+              color: '#D4AF37', fontSize: 12, fontWeight: 700,
+              textDecoration: 'none', letterSpacing: '0.04em',
+              transition: 'background 0.15s ease',
+            }}>
+            Training
+          </a>
+        </div>
 
         {/* The phrase card */}
         <div style={{
@@ -398,6 +430,45 @@ export default function QuestPage() {
           Next
         </button>
       </div>
+
+      {/* Floating training prompt (appears after catching phrases) */}
+      {totalCaught > 0 && (
+        <div style={{
+          position: 'fixed', bottom: 72, left: 0, right: 0,
+          display: 'flex', justifyContent: 'center',
+          zIndex: 40, pointerEvents: 'none',
+          padding: '0 16px',
+        }}>
+          <div style={{
+            pointerEvents: 'auto',
+            display: 'flex', alignItems: 'center', gap: 14,
+            padding: '10px 12px 10px 18px', borderRadius: 14,
+            background: 'rgba(255,255,255,0.96)',
+            border: '1px solid rgba(212,175,55,0.2)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+            backdropFilter: 'blur(8px)',
+            maxWidth: 400,
+          }}>
+            <div style={{
+              fontSize: 13, color: '#57534E', fontWeight: 500,
+              whiteSpace: 'nowrap',
+            }}>
+              <span style={{ fontWeight: 800, color: '#D4AF37' }}>{totalCaught}</span>
+              <span style={{ marginLeft: 2 }}>フレーズ GET 済み</span>
+            </div>
+            <a href="/english/training"
+              style={{
+                padding: '8px 18px', borderRadius: 10, flexShrink: 0,
+                background: '#D4AF37', border: 'none',
+                color: '#fff', fontSize: 13, fontWeight: 700,
+                textDecoration: 'none', letterSpacing: '0.04em',
+                boxShadow: '0 2px 8px rgba(212,175,55,0.25)',
+              }}>
+              トレーニングへ
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Catch effect overlay */}
       {showCatchEffect && (
