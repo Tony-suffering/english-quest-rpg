@@ -808,7 +808,7 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, battleData, onBattle
                 cumulativeDmg += card.modifiedBst;
                 setBattleTotalDmg(cumulativeDmg);
                 setBattleBossHpLeft(Math.max(0, battleData!.bossHp - Math.round(cumulativeDmg * synMult)));
-                setBattleDmgNum({ val: card.modifiedBst, key: Date.now() + i });
+                setBattleDmgNum({ val: card.modifiedBst, key: effectKey() + i });
                 sfxDamageHit();
                 const dmgMsg = tierPower >= 4
                     ? `「${card.english}」 ${TIER_JA[slotTier]}!! ${card.modifiedBst.toLocaleString()} ダメージ!!`
@@ -877,7 +877,7 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, battleData, onBattle
                     cumulativeDmg += card.modifiedBst;
                     setBattleTotalDmg(cumulativeDmg);
                     setBattleBossHpLeft(Math.max(0, battleData!.bossHp - Math.round(cumulativeDmg * synMult)));
-                    setBattleDmgNum({ val: card.modifiedBst, key: Date.now() + i });
+                    setBattleDmgNum({ val: card.modifiedBst, key: effectKey() + i });
                     setBattleMsg(`「${card.english}」 ${card.modifiedBst.toLocaleString()}!`);
                     setBattleMsg2(rushPower >= 2 ? `${TIER_JA[rushTier] || ''} -- ${i + 1} HIT!` : `${i + 1} HIT!`);
                 }, cursor + ri * RUSH_DELAY);
@@ -975,7 +975,7 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, battleData, onBattle
                     x: Math.random() * 90 + 5, // 5-95% horizontal
                     delay: Math.random() * 0.6,
                     size: 8 + Math.random() * 8,
-                    key: Date.now() + i,
+                    key: effectKey() + i,
                 }));
                 setBattleGpRain(true);
                 setBattleGpRainCoins(coins);
@@ -1079,7 +1079,7 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, battleData, onBattle
         const diff = todayXP - prevXpRef.current;
         if (diff > 0) {
             const r = getRunnerReaction();
-            setReaction({ ...r, points: diff, key: Date.now() });
+            setReaction({ ...r, points: diff, key: effectKey() });
             const t = setTimeout(() => setReaction(null), r.dur + 200);
             const nowGod = todayXP >= goalXP;
             if (nowGod && !prevGodRef.current) { setGodCelebration(true); setTimeout(() => setGodCelebration(false), 3500); }
@@ -3116,6 +3116,10 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, battleData, onBattle
 }
 
 
+// Monotonic counter for unique React keys (avoids Date.now() collisions)
+let _effectKeyCounter = 0;
+function effectKey() { return ++_effectKeyCounter; }
+
 export default function PhrasesPage() {
     // Data mode: phrases (default) or words
     const [dataMode, setDataMode] = useState<'phrases' | 'words'>(() => {
@@ -3166,6 +3170,67 @@ export default function PhrasesPage() {
     const [battleSyncData, setBattleSyncData] = useState<BattleSyncData | null>(null);
     const [miniRunnerBattleActive, setMiniRunnerBattleActive] = useState(false);
     const [lastReviewedWord, setLastReviewedWord] = useState<{ text: string; key: number } | null>(null);
+
+    // === PROGRESSIVE UNLOCK SYSTEM ===
+    const [daysActive, setDaysActive] = useState<string[]>([]);
+    const [unlockNotif, setUnlockNotif] = useState<string | null>(null);
+    // First-run demo: guarantee chain progression to GOD mode on very first session
+    const [isFirstRun, setIsFirstRun] = useState(false);
+    const isFirstRunRef = useRef(false);
+    // First-run complete overlay: shows after god+MYTHIC+LEGENDARY rank-up sequence
+    const [firstRunComplete, setFirstRunComplete] = useState(false);
+    const firstRunGodDismissed = useRef(false);
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem('quest-days-active');
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                setDaysActive(parsed);
+            }
+            // First run = no existing data AND haven't completed first-run
+            const hasData = raw ? JSON.parse(raw).length > 0 : false;
+            const hasMastery = !!localStorage.getItem('quest-mastery');
+            const hasDone = !!localStorage.getItem('quest-first-run-done');
+            if (!hasDone && !hasData && !hasMastery) {
+                setIsFirstRun(true);
+                isFirstRunRef.current = true;
+                // Mark immediately so reload won't re-trigger first-run
+                localStorage.setItem('quest-first-run-done', '1');
+            }
+        } catch { /* */ }
+    }, []);
+    const trackActiveDay = useCallback(() => {
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        setDaysActive(prev => {
+            if (prev.includes(today)) return prev;
+            const next = [...prev, today];
+            localStorage.setItem('quest-days-active', JSON.stringify(next));
+            // Check for new unlocks
+            const oldLen = prev.length;
+            const newLen = next.length;
+            if (oldLen < 3 && newLen >= 3) setUnlockNotif('スロット解禁!');
+            else if (oldLen < 6 && newLen >= 6) setUnlockNotif('確変モード解禁!');
+            else if (oldLen < 10 && newLen >= 10) setUnlockNotif('バトル解禁!');
+            return next;
+        });
+    }, []);
+    useEffect(() => {
+        if (!unlockNotif) return;
+        const timer = setTimeout(() => setUnlockNotif(null), 3000);
+        return () => clearTimeout(timer);
+    }, [unlockNotif]);
+    const beginnerMode = getSettings().beginnerMode;
+    const unlockLevel = beginnerMode ? daysActive.length : Infinity;
+    // First-run overrides all progressive locks
+    const SLOT_UNLOCKED = isFirstRun || unlockLevel >= 3;
+    const CHAIN_UNLOCKED = isFirstRun || unlockLevel >= 6;
+    const BATTLE_UNLOCKED = isFirstRun || unlockLevel >= 10;
+    // Refs for stable access inside useCallback closures (postXP, etc.)
+    const slotUnlockedRef = useRef(SLOT_UNLOCKED);
+    const chainUnlockedRef = useRef(CHAIN_UNLOCKED);
+    useEffect(() => { slotUnlockedRef.current = SLOT_UNLOCKED; }, [SLOT_UNLOCKED]);
+    useEffect(() => { chainUnlockedRef.current = CHAIN_UNLOCKED; }, [CHAIN_UNLOCKED]);
     const [showRunner, setShowRunner] = useState(() => {
         if (typeof window !== 'undefined') {
             const saved = localStorage.getItem('training-show-runner');
@@ -3174,6 +3239,7 @@ export default function PhrasesPage() {
         return true;
     });
     const [searchQuery, setSearchQuery] = useState('');
+    const [highlightPhraseId, setHighlightPhraseId] = useState<string | null>(null);
     const [playingPhraseId, setPlayingPhraseId] = useState<string | null>(null);
     const [recordAutoPlayId, setRecordAutoPlayId] = useState<string | null>(null);
     const [recordingStateForCard, setRecordingStateForCard] = useState<'idle' | 'recording' | 'uploading'>('idle');
@@ -3251,6 +3317,13 @@ export default function PhrasesPage() {
     // 連荘 Chain system state
     const [chainState, setChainState] = useState<{ count: number; mode: ChainMode; key: number }>({ count: 0, mode: 'normal', key: 0 });
     const [chainTransition, setChainTransition] = useState<{ from: ChainMode; to: ChainMode; key: number } | null>(null);
+    const chainTransitionRef = useRef<{ from: ChainMode; to: ChainMode; key: number } | null>(null);
+    // Guarded setter: prevent double-fire while a transition is already showing
+    const fireChainTransition = useCallback((t: { from: ChainMode; to: ChainMode; key: number } | null) => {
+        if (t && chainTransitionRef.current) return; // already showing, skip
+        chainTransitionRef.current = t;
+        setChainTransition(t);
+    }, []);
     // Keep backward-compat aliases for FEVER visuals
     const feverMode = { active: chainState.mode !== 'normal', streak: chainState.count, key: chainState.key };
     const [feverFlash, setFeverFlash] = useState<'enter' | 'exit' | null>(null);
@@ -3327,10 +3400,20 @@ export default function PhrasesPage() {
         }
     }, [chainState.mode]);
 
-    // Auto-clear chain transition effect
+    // First-run complete: after god dismissed → wait for gacha + rank-up to finish → show congrats
+    useEffect(() => {
+        if (!firstRunGodDismissed.current) return;
+        if (gachaEffect || cardRankUpEffect || chainTransition) return; // still animating
+        // All effects cleared — show the congratulations overlay
+        firstRunGodDismissed.current = false;
+        setFirstRunComplete(true);
+    }, [gachaEffect, cardRankUpEffect, chainTransition]);
+
+    // Auto-clear chain transition effect (skip during first-run: user must tap to dismiss)
     useEffect(() => {
         if (!chainTransition) return;
-        const timer = setTimeout(() => setChainTransition(null), 1500);
+        if (isFirstRunRef.current) return;
+        const timer = setTimeout(() => fireChainTransition(null), 1500);
         return () => clearTimeout(timer);
     }, [chainTransition]);
 
@@ -3685,18 +3768,26 @@ export default function PhrasesPage() {
             // 3004: ローカルガチャシミュレーション（DB不要、演出は維持）
             const currentChain = feverRef.current;
             const roll = Math.random() * 100;
-            const tier = roll < 1 ? 'MYTHIC'
+            // First-run: guarantee no MISS so chain always progresses to GOD
+            // At god transition (streak 10): force MYTHIC + 250 card points → instant LEGENDARY rank
+            const firstRun = isFirstRunRef.current;
+            const firstRunGodHit = firstRun && currentChain.streak === 9; // about to become 10
+            const tier = firstRunGodHit
+                ? 'MYTHIC'
+                : firstRun
+                ? (roll < 2 ? 'MYTHIC' : roll < 8 ? 'LEGENDARY' : roll < 20 ? 'MEGA' : roll < 40 ? 'SUPER' : roll < 65 ? 'GREAT' : 'BONUS')
+                : (roll < 1 ? 'MYTHIC'
                 : roll < 4 ? 'LEGENDARY'
                 : roll < 12 ? 'MEGA'
                 : roll < 28 ? 'SUPER'
                 : roll < 50 ? 'GREAT'
-                : roll < 85 ? 'BONUS' : 'MISS';
+                : roll < 85 ? 'BONUS' : 'MISS');
 
             // Simulate sparks + card points
             const sparksMap: Record<string, number> = { MYTHIC: 50, LEGENDARY: 30, MEGA: 15, SUPER: 8, GREAT: 4, BONUS: 2, MISS: 0 };
             const cpMap: Record<string, number> = { MYTHIC: 25, LEGENDARY: 15, MEGA: 8, SUPER: 4, GREAT: 2, BONUS: 1, MISS: 0 };
             const sparksWon = sparksMap[tier] || 0;
-            const cardPointsEarned = cpMap[tier] || 0;
+            const cardPointsEarned = firstRunGodHit ? 250 : (cpMap[tier] || 0);
 
             // Update local XP + sparks
             setPlayerTotalXP(prev => {
@@ -3705,7 +3796,7 @@ export default function PhrasesPage() {
                 if (newLevel > playerLevel) {
                     setPlayerLevel(newLevel);
                     const info = getTitleForLevel(newLevel);
-                    setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: Date.now() });
+                    setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: effectKey() });
                 } else {
                     setPlayerLevel(newLevel);
                 }
@@ -3715,6 +3806,9 @@ export default function PhrasesPage() {
             if (phraseId) {
                 setCardPoints(prev => {
                     const newTotal = (prev[phraseId] || 0) + cardPointsEarned;
+                    // Persist to localStorage for IS_PUBLIC mode
+                    const updated = { ...prev, [phraseId]: newTotal };
+                    try { localStorage.setItem('rpg_card_points', JSON.stringify(updated)); } catch {}
                     // Card rank-up detection
                     const prevRank = getCardRank(prev[phraseId] || 0);
                     const newRank = getCardRank(newTotal);
@@ -3725,7 +3819,7 @@ export default function PhrasesPage() {
                                 oldRank: prevRank.label || 'NORMAL',
                                 newRank: newRank.label,
                                 newRankColor: newRank.borderColor,
-                                key: Date.now(),
+                                key: effectKey(),
                             });
                         }, 500);
                     }
@@ -3742,7 +3836,10 @@ export default function PhrasesPage() {
             }));
 
             // 連荘 Chain state transitions
-            if (getSettings().feverEnabled) {
+            // Normal mode: 1/16 random chance to trigger 確変突入 (matching iwasaki-naisou)
+            // First-run: guaranteed progression (old streak-based behavior)
+            const slotOn = getSettings().slotEnabled;
+            if (chainUnlockedRef.current && getSettings().feverEnabled) {
                 const isWin = tier !== 'MISS';
                 const isMiss = tier === 'MISS';
                 if (isMiss) {
@@ -3750,37 +3847,68 @@ export default function PhrasesPage() {
                         const exitStreak = currentChain.streak;
                         stopFeverBGM(feverDroneRef.current);
                         feverDroneRef.current = null;
-                        setChainState({ count: 0, mode: 'normal', key: Date.now() });
+                        setChainState({ count: 0, mode: 'normal', key: effectKey() });
                         feverRef.current = { active: false, streak: 0 };
                         setFeverFlash('exit');
                         setFeverExitEffect({ streak: exitStreak });
                         playFeverExitSound();
                     }
                 } else if (isWin) {
-                    const newCount = currentChain.streak + 1;
-                    const oldMode = getChainMode(currentChain.streak);
-                    const newMode = getChainMode(newCount);
-                    const wasActive = currentChain.active;
-                    setChainState({ count: newCount, mode: newMode, key: Date.now() });
-                    feverRef.current = { active: newMode !== 'normal', streak: newCount };
-                    if (newMode !== oldMode && newMode !== 'normal') {
-                        setChainTransition({ from: oldMode, to: newMode, key: Date.now() });
-                        if (!wasActive) {
+                    const firstRun = isFirstRunRef.current;
+                    if (firstRun) {
+                        // First-run: guaranteed chain progression (streak-based)
+                        const newCount = currentChain.streak + 1;
+                        const oldMode = getChainMode(currentChain.streak);
+                        const newMode = getChainMode(newCount);
+                        const wasActive = currentChain.active;
+                        setChainState({ count: newCount, mode: newMode, key: effectKey() });
+                        feverRef.current = { active: newMode !== 'normal', streak: newCount };
+                        if (newMode !== oldMode && newMode !== 'normal') {
+                            fireChainTransition({ from: oldMode, to: newMode, key: effectKey() });
+                            if (!wasActive) {
+                                setFeverFlash('enter');
+                                playFeverEntrySound();
+                                feverDroneRef.current = startFeverBGM();
+                            } else {
+                                playFeverEntrySound();
+                            }
+                        } else if (wasActive) {
+                            playFeverChainHit(newCount);
+                        }
+                    } else if (currentChain.active) {
+                        // Already in chain: increment streak normally
+                        const newCount = currentChain.streak + 1;
+                        const oldMode = getChainMode(currentChain.streak);
+                        const newMode = getChainMode(newCount);
+                        setChainState({ count: newCount, mode: newMode, key: effectKey() });
+                        feverRef.current = { active: newMode !== 'normal', streak: newCount };
+                        if (newMode !== oldMode && newMode !== 'normal') {
+                            fireChainTransition({ from: oldMode, to: newMode, key: effectKey() });
+                            playFeverEntrySound();
+                        } else {
+                            playFeverChainHit(newCount);
+                        }
+                    } else {
+                        // Normal mode: 1/16 確変 roll
+                        const kakuhenRoll = Math.random() < (1 / 16);
+                        if (kakuhenRoll) {
+                            // 確変突入! Jump to streak 3 (kakuhen entry point)
+                            const newCount = 3;
+                            const newMode: ChainMode = 'kakuhen';
+                            setChainState({ count: newCount, mode: newMode, key: effectKey() });
+                            feverRef.current = { active: true, streak: newCount };
+                            fireChainTransition({ from: 'normal', to: 'kakuhen', key: effectKey() });
                             setFeverFlash('enter');
                             playFeverEntrySound();
                             feverDroneRef.current = startFeverBGM();
-                        } else {
-                            playFeverEntrySound();
                         }
-                    } else if (wasActive) {
-                        playFeverChainHit(newCount);
+                        // else: no chain entry, stay normal
                     }
                 }
             }
 
             // Trigger gacha overlay
-            const slotOn = getSettings().slotEnabled;
-            if (slotOn) {
+            if (slotUnlockedRef.current && slotOn) {
                 deferredScoreUpdates.current.push(() => {}); // no deferred DB updates needed
                 if (pendingGachaRef.current) clearTimeout(pendingGachaRef.current);
                 const delay = slamActive ? 1200 : 0;
@@ -3792,7 +3920,7 @@ export default function PhrasesPage() {
                         phraseId: phraseId || null,
                         cardPointsEarned,
                         cardTotalPoints: phraseId ? (cardPoints[phraseId] || 0) + cardPointsEarned : 0,
-                        key: Date.now(),
+                        key: effectKey(),
                     });
                     pendingGachaRef.current = null;
                 }, delay);
@@ -3801,7 +3929,7 @@ export default function PhrasesPage() {
                     sparks: sparksWon,
                     cardPts: cardPointsEarned,
                     tier,
-                    key: Date.now(),
+                    key: effectKey(),
                 });
             }
             return;
@@ -3826,7 +3954,7 @@ export default function PhrasesPage() {
                         if (newLevel > oldLevel) {
                             setPlayerLevel(newLevel);
                             const info = getTitleForLevel(newLevel);
-                            setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: Date.now() });
+                            setLevelUpEffect({ level: newLevel, title: info.title, color: info.color, key: effectKey() });
                         } else {
                             setPlayerLevel(newLevel);
                         }
@@ -3866,58 +3994,61 @@ export default function PhrasesPage() {
                                             oldRank: prevRank.label || 'NORMAL',
                                             newRank: newRank.label,
                                             newRankColor: newRank.borderColor,
-                                            key: Date.now(),
+                                            key: effectKey(),
                                         });
                                     }, 500);
                                 }
                             }
                         };
 
-                        // 連荘 Chain state transitions — graduated escalation (always immediate)
-                        if (getSettings().feverEnabled) {
+                        // 連荘 Chain state transitions — 1/16 random kakuhen entry
+                        if (chainUnlockedRef.current && getSettings().feverEnabled) {
                         const currentFever = feverRef.current;
                         const isWin = tier !== 'MISS';
                         const isMiss = tier === 'MISS';
                         if (isMiss) {
-                            // Chain breaks — reset to 0
                             if (currentFever.active) {
                                 const exitStreak = currentFever.streak;
                                 stopFeverBGM(feverDroneRef.current);
                                 feverDroneRef.current = null;
-                                setChainState({ count: 0, mode: 'normal', key: Date.now() });
+                                setChainState({ count: 0, mode: 'normal', key: effectKey() });
                                 feverRef.current = { active: false, streak: 0 };
                                 setFeverFlash('exit');
                                 setFeverExitEffect({ streak: exitStreak });
                                 playFeverExitSound();
                             }
                         } else if (isWin) {
-                            const newCount = currentFever.streak + 1;
-                            const oldMode = getChainMode(currentFever.streak);
-                            const newMode = getChainMode(newCount);
-                            const wasActive = currentFever.active;
-
-                            setChainState({ count: newCount, mode: newMode, key: Date.now() });
-                            feverRef.current = { active: newMode !== 'normal', streak: newCount };
-
-                            // Mode escalation effects
-                            if (newMode !== oldMode && newMode !== 'normal') {
-                                setChainTransition({ from: oldMode, to: newMode, key: Date.now() });
-                                if (!wasActive) {
-                                    // First entry into chain mode (normal → kakuhen at 3)
+                            if (currentFever.active) {
+                                // Already in chain: increment streak normally
+                                const newCount = currentFever.streak + 1;
+                                const oldMode = getChainMode(currentFever.streak);
+                                const newMode = getChainMode(newCount);
+                                setChainState({ count: newCount, mode: newMode, key: effectKey() });
+                                feverRef.current = { active: newMode !== 'normal', streak: newCount };
+                                if (newMode !== oldMode && newMode !== 'normal') {
+                                    fireChainTransition({ from: oldMode, to: newMode, key: effectKey() });
+                                    playFeverEntrySound();
+                                } else {
+                                    playFeverChainHit(newCount);
+                                }
+                            } else {
+                                // Normal mode: 1/16 確変 roll
+                                const kakuhenRoll = Math.random() < (1 / 16);
+                                if (kakuhenRoll) {
+                                    const newCount = 3;
+                                    const newMode: ChainMode = 'kakuhen';
+                                    setChainState({ count: newCount, mode: newMode, key: effectKey() });
+                                    feverRef.current = { active: true, streak: newCount };
+                                    fireChainTransition({ from: 'normal', to: 'kakuhen', key: effectKey() });
                                     setFeverFlash('enter');
                                     playFeverEntrySound();
                                     feverDroneRef.current = startFeverBGM();
-                                } else {
-                                    // Escalation (kakuhen → gekiatsu, gekiatsu → god)
-                                    playFeverEntrySound();
                                 }
-                            } else if (wasActive) {
-                                playFeverChainHit(newCount);
                             }
                         }
                         }
 
-                        if (slotOn) {
+                        if (slotUnlockedRef.current && slotOn) {
                         // Queue score updates to flush after slot reveal clears (no spoilers)
                         deferredScoreUpdates.current.push(scoreUpdates);
                         if (pendingGachaRef.current) clearTimeout(pendingGachaRef.current);
@@ -3930,7 +4061,7 @@ export default function PhrasesPage() {
                                 phraseId: phraseId || null,
                                 cardPointsEarned: d.gacha.card_points_earned || 0,
                                 cardTotalPoints: d.gacha.card_total_points || 0,
-                                key: Date.now(),
+                                key: effectKey(),
                             });
                             pendingGachaRef.current = null;
                         }, delay);
@@ -3941,7 +4072,7 @@ export default function PhrasesPage() {
                                 sparks: d.gacha.sparks_won,
                                 cardPts: d.gacha.card_points_earned || 0,
                                 tier,
-                                key: Date.now(),
+                                key: effectKey(),
                             });
                         }
                     }
@@ -4012,6 +4143,10 @@ export default function PhrasesPage() {
                     try {
                         const saved = localStorage.getItem('quest-mastery');
                         if (saved) setPhraseMastery(JSON.parse(saved));
+                    } catch { /* */ }
+                    try {
+                        const savedCP = localStorage.getItem('rpg_card_points');
+                        if (savedCP) setCardPoints(JSON.parse(savedCP));
                     } catch { /* */ }
                     setVoiceRecordings({});
                     setPhraseLinks({});
@@ -4273,6 +4408,41 @@ export default function PhrasesPage() {
         return map;
     }, [phrases]);
 
+    // Deep link support: ?date=YYYY-MM-DD and/or ?phrase=PHRASE_ID
+    useEffect(() => {
+        if (!phrases.length || !currentMonth) return;
+        const params = new URLSearchParams(window.location.search);
+        const dateParam = params.get('date');
+        const phraseParam = params.get('phrase');
+        if (!dateParam && !phraseParam) return;
+
+        let targetDate: string | null = null;
+
+        if (phraseParam && phraseDateMap[phraseParam]) {
+            targetDate = phraseDateMap[phraseParam];
+            setHighlightPhraseId(phraseParam);
+            setTimeout(() => setHighlightPhraseId(null), 3000);
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const el = document.querySelector(`[data-phrase-id="${phraseParam}"]`);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+        } else if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+            targetDate = dateParam;
+        }
+
+        if (targetDate) {
+            const [y, m] = targetDate.split('-').map(Number);
+            if (currentMonth.getFullYear() !== y || currentMonth.getMonth() + 1 !== m) {
+                setCurrentMonth(new Date(y, m - 1, 1));
+            }
+            setSelectedDate(targetDate);
+        }
+
+        window.history.replaceState({}, '', window.location.pathname);
+    }, [phrases, currentMonth, phraseDateMap]);
+
     // Filtered items for search
     const filteredPhrases = useMemo(() => {
         if (!searchQuery.trim()) return phrases;
@@ -4498,7 +4668,7 @@ export default function PhrasesPage() {
         if (currentMilestoneIndex > prevDailyLevelRef.current && prevDailyLevelRef.current > -2) {
             if (currentMilestoneIndex >= 0) {
                 const m = scaledMilestones[currentMilestoneIndex];
-                setDailyLevelUpEffect({ level: currentMilestoneIndex + 1, title: m.title, color: m.color, key: Date.now() });
+                setDailyLevelUpEffect({ level: currentMilestoneIndex + 1, title: m.title, color: m.color, key: effectKey() });
             }
         }
         prevDailyLevelRef.current = currentMilestoneIndex;
@@ -5103,7 +5273,7 @@ export default function PhrasesPage() {
                                                 onClick={() => {
                                                     if (cardCelebration) return;
                                                     if (displayedCard) {
-                                                        setCardCelebration({ phrase: displayedCard, key: Date.now() });
+                                                        setCardCelebration({ phrase: displayedCard, key: effectKey() });
                                                     }
                                                     declareCrown(displayedCard.id);
                                                 }}
@@ -5173,7 +5343,7 @@ export default function PhrasesPage() {
                                                                                             postXP(new Date().toISOString().split('T')[0], xp, false, pid);
                                                                                             // Full level-up effects (same as normal level-up)
                                                                                             const nc = CHAKRA_CONFIG[lvA];
-                                                                                            const k = Date.now();
+                                                                                            const k = effectKey();
                                                                                             playLevelSound(lvA);
                                                                                             setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
                                                                                             setCalendarPulse({ dateKey: displayedCard.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: lvA, key: k });
@@ -5257,7 +5427,42 @@ export default function PhrasesPage() {
                                                 COMPLETE
                                             </div>
                                         ) : (
-                                            <div style={{ display: 'flex', gap: '8px', width: '100%', alignItems: 'stretch' }}>
+                                            <div style={{ display: 'flex', gap: '8px', width: '100%', alignItems: 'stretch', position: 'relative' }}>
+                                                {/* First-time hint: big flashy arrow + label */}
+                                                {todayXP === 0 && !isLockedToday && !cardCelebration && (<>
+                                                    {/* Spotlight overlay dimming everything else */}
+                                                    <div style={{
+                                                        position: 'fixed', inset: 0,
+                                                        background: 'radial-gradient(ellipse 400px 200px at 50% 85%, transparent 30%, rgba(0,0,0,0.45) 100%)',
+                                                        zIndex: 99, pointerEvents: 'none',
+                                                    }} />
+                                                    {/* Floating hint banner */}
+                                                    <div style={{
+                                                        position: 'absolute',
+                                                        top: '-58px', left: '50%', transform: 'translateX(-50%)',
+                                                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+                                                        animation: 'onboard-hint 1.2s ease-in-out infinite',
+                                                        pointerEvents: 'none',
+                                                        zIndex: 100,
+                                                    }}>
+                                                        <div style={{
+                                                            background: 'linear-gradient(135deg, #D4AF37, #F59E0B)',
+                                                            color: '#fff',
+                                                            padding: '6px 20px',
+                                                            borderRadius: '20px',
+                                                            fontSize: '15px', fontWeight: '900',
+                                                            letterSpacing: '2px',
+                                                            whiteSpace: 'nowrap',
+                                                            boxShadow: '0 4px 20px rgba(212,175,55,0.5), 0 0 40px rgba(212,175,55,0.25)',
+                                                            textShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                                                        }}>
+                                                            TAP HERE!
+                                                        </div>
+                                                        <svg width="24" height="16" viewBox="0 0 24 16" fill="none" style={{ filter: 'drop-shadow(0 2px 4px rgba(212,175,55,0.5))' }}>
+                                                            <path d="M12 16L2 4h20L12 16z" fill="#D4AF37"/>
+                                                        </svg>
+                                                    </div>
+                                                </>)}
                                                 <button
                                                     onClick={() => {
                                                         if (isLockedToday || cardCelebration) return;
@@ -5271,7 +5476,7 @@ export default function PhrasesPage() {
                                                         if (isLevelUp) {
                                                             const nl = getChakraLevel(next, hasRec, hasLink);
                                                             const nc = CHAKRA_CONFIG[nl];
-                                                            const k = Date.now();
+                                                            const k = effectKey();
                                                             playLevelSound(nl);
                                                             setPointEffect({
                                                                 points: nc.lv,
@@ -5292,10 +5497,11 @@ export default function PhrasesPage() {
                                                         }
 
                                                         if (isLevelUp) {
-                                                            setCardCelebration({ phrase: currentPhrase, key: Date.now() });
+                                                            setCardCelebration({ phrase: currentPhrase, key: effectKey() });
                                                         }
                                                         cycleMastery(currentPhrase.id, isLevelUp);
                                                     }}
+                                                    className={todayXP === 0 && !isLockedToday ? 'onboard-btn-pulse' : undefined}
                                                     style={{
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
                                                         flex: 1,
@@ -6028,11 +6234,12 @@ export default function PhrasesPage() {
             const nextLevel = getChakraLevel(next, hasRec, hasLink);
             const xpGained = CHAKRA_CONFIG[nextLevel].lv;
             postXP(todayKey, xpGained, slamActive, phraseId);
+            trackActiveDay();
 
             // Send reviewed word to runner word stream
             const reviewedPhrase = phrases.find(p => p.id === phraseId);
             if (reviewedPhrase) {
-                setLastReviewedWord({ text: reviewedPhrase.english, key: Date.now() });
+                setLastReviewedWord({ text: reviewedPhrase.english, key: effectKey() });
             }
 
             // Trigger puzzle board card drop
@@ -6048,7 +6255,7 @@ export default function PhrasesPage() {
                     rank,
                     points: pts,
                     bstTotal: calcBstTotal(phraseId),
-                    key: Date.now(),
+                    key: effectKey(),
                 });
             }
         }
@@ -6418,7 +6625,7 @@ export default function PhrasesPage() {
                         postXP(new Date().toISOString().split('T')[0], CHAKRA_CONFIG[levelAfter].lv, false, phraseId);
                         // Full level-up effects
                         const nc = CHAKRA_CONFIG[levelAfter];
-                        const k = Date.now();
+                        const k = effectKey();
                         playLevelSound(levelAfter);
                         setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
                         if (displayedCard) {
@@ -6708,14 +6915,32 @@ export default function PhrasesPage() {
             )}
 
             {/* Chain mode transition banner (確変突入! 激熱突入! 神降臨!) */}
-            {chainTransition && (
+            {chainTransition && (() => {
+                const isGodTransition = chainTransition.to === 'god';
+                const showExplain = isFirstRun;
+                const explainText = chainTransition.to === 'kakuhen'
+                    ? '3連鎖達成! スロット確率UP + GP1.5倍!'
+                    : chainTransition.to === 'gekiatsu'
+                    ? '5連鎖! さらに確率UP! GP2倍!'
+                    : '10連鎖で神降臨! GP3倍! 最強モード!';
+                return (
                 <div key={chainTransition.key} style={{
                     position: 'fixed', inset: 0,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    zIndex: 10001, pointerEvents: 'none',
-                }}>
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px',
+                    zIndex: 10001, pointerEvents: showExplain ? 'auto' : 'none',
+                    background: showExplain ? 'rgba(0,0,0,0.5)' : 'transparent',
+                    cursor: showExplain ? 'pointer' : 'default',
+                }}
+                    onClick={showExplain ? () => {
+                        fireChainTransition(null);
+                        if (isGodTransition) {
+                            // Don't end first-run yet — wait for MYTHIC gacha + LEGENDARY rank-up
+                            firstRunGodDismissed.current = true;
+                        }
+                    } : undefined}
+                >
                     <div
-                        onAnimationEnd={() => setChainTransition(null)}
+                        onAnimationEnd={() => { if (!showExplain) fireChainTransition(null); }}
                         style={{
                         background: CHAIN_MODE_CONFIG[chainTransition.to].gradient,
                         color: '#fff',
@@ -6726,13 +6951,118 @@ export default function PhrasesPage() {
                         letterSpacing: '8px',
                         textShadow: '0 0 20px rgba(255,255,255,0.8)',
                         boxShadow: `0 0 60px ${CHAIN_MODE_CONFIG[chainTransition.to].color}AA`,
-                        animation: 'fever-entry-slam 1s cubic-bezier(0.34,1.56,0.64,1) forwards',
+                        animation: showExplain ? 'fever-entry-slam-hold 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards' : 'fever-entry-slam 1s cubic-bezier(0.34,1.56,0.64,1) forwards',
                     }}>
                         {chainTransition.to === 'kakuhen' ? '確変突入!' : chainTransition.to === 'gekiatsu' ? '激熱突入!' : '神 降 臨 !'}
                     </div>
+                    {showExplain && (
+                        <div style={{
+                            animation: 'fever-entry-slam-hold 0.8s cubic-bezier(0.34,1.56,0.64,1) 0.3s both',
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
+                        }}>
+                            <div style={{
+                                color: '#fff',
+                                fontSize: isMobile ? '15px' : '18px',
+                                fontWeight: '700',
+                                textAlign: 'center',
+                                lineHeight: 1.8,
+                                textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                                maxWidth: '400px',
+                            }}>
+                                {explainText}
+                            </div>
+                            <div style={{
+                                color: 'rgba(255,255,255,0.6)',
+                                fontSize: '13px',
+                                fontWeight: '600',
+                                animation: 'onboard-hint 1.5s ease-in-out infinite',
+                            }}>
+                                tap to continue
+                            </div>
+                        </div>
+                    )}
+                </div>
+                );
+            })()}
+
+
+            {/* First-run complete: congratulations + guide to card collection */}
+            {firstRunComplete && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 10002,
+                    background: 'rgba(0,0,0,0.88)',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    padding: '24px', cursor: 'pointer',
+                    animation: 'fever-entry-slam-hold 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards',
+                }}
+                    onClick={() => {
+                        localStorage.setItem('quest-first-run-done', '1');
+                        setIsFirstRun(false);
+                        isFirstRunRef.current = false;
+                        setFirstRunComplete(false);
+                    }}
+                >
+                    <div style={{
+                        maxWidth: 420, width: '100%', textAlign: 'center',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px',
+                    }}>
+                        {/* LEGENDARY card icon */}
+                        <div style={{
+                            width: 80, height: 100, borderRadius: 12,
+                            background: 'linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)',
+                            border: '3px solid #D4AF37',
+                            boxShadow: '0 0 40px rgba(212,175,55,0.6), 0 0 80px rgba(212,175,55,0.3)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 28, fontWeight: 900, color: '#fff',
+                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                            animation: 'onboard-pulse 2s ease-in-out infinite',
+                        }}>
+                            L
+                        </div>
+
+                        <div style={{
+                            fontSize: 22, fontWeight: 800, color: '#D4AF37',
+                            letterSpacing: '0.1em',
+                            textShadow: '0 0 20px rgba(212,175,55,0.5)',
+                        }}>
+                            LEGENDARYカード誕生
+                        </div>
+
+                        <div style={{
+                            fontSize: 15, color: '#ccc', lineHeight: 2.2, fontWeight: 400,
+                        }}>
+                            今のカードがLEGENDARYランクになりました。<br />
+                            カレンダーからいつでも確認できます。<br /><br />
+                            <span style={{ color: '#fff', fontWeight: 600 }}>
+                                ここからが本番です。
+                            </span><br />
+                            スロットの確率は本物になります。<br />
+                            MISSもあります。連荘が途切れることもあります。<br /><br />
+                            <span style={{ color: '#D4AF37', fontWeight: 600 }}>
+                                全カードをLEGENDARYにするのが最終目標。
+                            </span><br />
+                            毎日コツコツ、カードを育てていきましょう。
+                        </div>
+
+                        <div style={{
+                            marginTop: 8,
+                            padding: '14px 48px', borderRadius: 14,
+                            background: 'linear-gradient(135deg, #D4AF37, #B8960C)',
+                            color: '#000', fontSize: 16, fontWeight: 800,
+                            letterSpacing: '0.1em',
+                            boxShadow: '0 4px 24px rgba(212,175,55,0.5)',
+                        }}>
+                            本番スタート
+                        </div>
+
+                        <div style={{
+                            color: 'rgba(255,255,255,0.4)', fontSize: 12,
+                        }}>
+                            tap to start
+                        </div>
+                    </div>
                 </div>
             )}
-
 
             {/* FEVER flash (enter = red, exit = blue) */}
             {feverFlash && (
@@ -7538,6 +7868,33 @@ export default function PhrasesPage() {
                             <span style={{ opacity: 0.6, marginLeft: '4px', fontSize: '9px' }}>{quietToast.tier}</span>
                         </span>
                     )}
+                </div>
+            )}
+
+            {/* Unlock notification */}
+            {unlockNotif && (
+                <div key={unlockNotif} style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 10001,
+                    pointerEvents: 'none',
+                    padding: '24px 48px',
+                    borderRadius: '16px',
+                    backgroundColor: 'rgba(28,25,23,0.92)',
+                    backdropFilter: 'blur(12px)',
+                    boxShadow: '0 0 40px rgba(212,175,55,0.4), 0 8px 32px rgba(0,0,0,0.3)',
+                    border: '2px solid rgba(212,175,55,0.6)',
+                    animation: 'unlock-notif 3s ease-out forwards',
+                    textAlign: 'center',
+                }}>
+                    <div style={{ fontSize: '28px', fontWeight: '800', color: '#D4AF37', letterSpacing: '0.05em' }}>
+                        {unlockNotif}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#a8a29e', marginTop: '8px', fontWeight: 500 }}>
+                        {daysActive.length} days active
+                    </div>
                 </div>
             )}
 
@@ -8658,7 +9015,7 @@ export default function PhrasesPage() {
                                             setPlayerSparks(prev => prev + result.gpEarned);
                                         }
                                     }}
-                                    onBattleSync={(data) => setBattleSyncData(data)}
+                                    onBattleSync={(data) => { if (BATTLE_UNLOCKED) setBattleSyncData(data); }}
                                     externalBattleActive={miniRunnerBattleActive}
                                     onCardClick={(phraseId) => {
                                         // Select the phrase in sidebar (same as calendar date click)
@@ -8898,6 +9255,8 @@ export default function PhrasesPage() {
                                         return (
                                             <div
                                                 key={phrase.id}
+                                                data-phrase-id={phrase.id}
+                                                className={highlightPhraseId === phrase.id ? 'deep-link-highlight' : undefined}
                                                 style={{
                                                     borderRadius: '12px',
                                                     ...cFrame,
@@ -9061,7 +9420,7 @@ export default function PhrasesPage() {
                                                                         gradFrom: nc.gradFrom,
                                                                         color: nc.color,
                                                                         level: nl,
-                                                                        key: Date.now(),
+                                                                        key: effectKey(),
                                                                     });
                                                                 }
                                                                 cycleMastery(phrase.id);
@@ -9115,7 +9474,7 @@ export default function PhrasesPage() {
                                                                 if (xpGained > 0) {
                                                                     postXP(new Date().toISOString().split('T')[0], xpGained, false, pid);
                                                                     const nc = CHAKRA_CONFIG[levelAfter];
-                                                                    const k = Date.now();
+                                                                    const k = effectKey();
                                                                     playLevelSound(levelAfter);
                                                                     setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
                                                                     setCalendarPulse({ dateKey: phrase.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: levelAfter, key: k });
