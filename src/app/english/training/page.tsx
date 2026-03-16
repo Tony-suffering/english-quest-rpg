@@ -6714,7 +6714,9 @@ export default function PhrasesPage() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     zIndex: 10001, pointerEvents: 'none',
                 }}>
-                    <div style={{
+                    <div
+                        onAnimationEnd={() => setChainTransition(null)}
+                        style={{
                         background: CHAIN_MODE_CONFIG[chainTransition.to].gradient,
                         color: '#fff',
                         padding: isMobile ? '16px 40px' : '24px 64px',
@@ -6724,7 +6726,7 @@ export default function PhrasesPage() {
                         letterSpacing: '8px',
                         textShadow: '0 0 20px rgba(255,255,255,0.8)',
                         boxShadow: `0 0 60px ${CHAIN_MODE_CONFIG[chainTransition.to].color}AA`,
-                        animation: 'fever-entry-slam 1s cubic-bezier(0.34,1.56,0.64,1)',
+                        animation: 'fever-entry-slam 1s cubic-bezier(0.34,1.56,0.64,1) forwards',
                     }}>
                         {chainTransition.to === 'kakuhen' ? '確変突入!' : chainTransition.to === 'gekiatsu' ? '激熱突入!' : '神 降 臨 !'}
                     </div>
