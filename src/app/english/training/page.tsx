@@ -3751,32 +3751,21 @@ export default function PhrasesPage() {
         }
     }, [chainState.mode]);
 
-    // First-run complete: after god dismissed → wait for gacha + rank-up to finish → show congrats
-    // Race condition fix: rank-up has a 500ms setTimeout, so we must wait at least 1s after god dismiss
-    // before checking if all effects are cleared. Otherwise congrats fires before rank-up appears.
+    // First-run complete: after god dismissed → short delay → show congrats
+    // Everything is already force-cleared in the god dismiss handler above.
     useEffect(() => {
         if (!firstRunGodDismissed.current) return;
-        if (gachaEffect || cardRankUpEffect || chainTransition) return; // still animating
-        const elapsed = Date.now() - firstRunGodDismissedAt.current;
-        if (elapsed < 1200) {
-            // Not enough time for rank-up setTimeout(500) + gacha animation to fire — recheck soon
-            const timer = setTimeout(() => {
-                // Re-trigger this effect by forcing a state update
-                setFirstRunComplete(prev => prev); // no-op but triggers re-render
-            }, 1200 - elapsed + 100);
-            return () => clearTimeout(timer);
-        }
-        // All effects cleared AND enough time passed — safe to show congrats
-        firstRunGodDismissed.current = false;
-        firstRunGodDismissedAt.current = 0;
-        // Reset god mode / chain state before showing congrats
-        stopFeverBGM(feverDroneRef.current);
-        feverDroneRef.current = null;
-        setChainState({ count: 0, mode: 'normal', key: effectKey() });
-        feverRef.current = { active: false, streak: 0 };
-        setFeverFlash(null);
-        window.speechSynthesis.cancel();
-        setFirstRunComplete(true);
+        // Wait 800ms for any remaining rank-up setTimeout(500) to fire and be visible briefly
+        const timer = setTimeout(() => {
+            // Force-clear any late-firing effects
+            setGachaEffect(null);
+            setCardRankUpEffect(null);
+            setSlotReels(null);
+            firstRunGodDismissed.current = false;
+            firstRunGodDismissedAt.current = 0;
+            setFirstRunComplete(true);
+        }, 800);
+        return () => clearTimeout(timer);
     }, [gachaEffect, cardRankUpEffect, chainTransition]);
 
     // Auto-clear chain transition effect (skip during first-run: user must tap to dismiss)
@@ -6603,6 +6592,8 @@ export default function PhrasesPage() {
     // Cycle mastery level: 0 -> 1 -> 2 -> 3 (OWN stops), CROWN(6) -> 0 with confirm
     // Date gate: each level-up requires a different calendar day
     const cycleMastery = useCallback(async (phraseId: string, slamActive = false): Promise<boolean> => {
+        // Block interaction after god mode dismissed (waiting for congrats overlay)
+        if (firstRunGodDismissed.current || firstRunComplete) return false;
         const current = Number(phraseMastery[phraseId] || 0);
         if (current === 3) return false;  // OWN = terminal, no cycle back
         const next = current === 6 ? 0 : (current + 1);
@@ -7426,9 +7417,26 @@ export default function PhrasesPage() {
                     onClick={showExplain ? () => {
                         fireChainTransition(null);
                         if (isGodTransition) {
-                            // Don't end first-run yet — wait for MYTHIC gacha + LEGENDARY rank-up
+                            // IMMEDIATELY freeze everything: stop BGM, cancel all pending effects
                             firstRunGodDismissed.current = true;
                             firstRunGodDismissedAt.current = Date.now();
+                            // Kill BGM right now (don't fade)
+                            if (feverDroneRef.current) {
+                                try { feverDroneRef.current.pause(); feverDroneRef.current.currentTime = 0; } catch {}
+                                feverDroneRef.current = null;
+                            }
+                            // Cancel any pending gacha/slot
+                            if (pendingGachaRef.current) { clearTimeout(pendingGachaRef.current); pendingGachaRef.current = null; }
+                            slotSpinTimers.current.forEach(clearTimeout);
+                            slotSpinTimers.current = [];
+                            // Force clear all visual effects
+                            setGachaEffect(null);
+                            setSlotReels(null);
+                            setChainState({ count: 0, mode: 'normal', key: effectKey() });
+                            feverRef.current = { active: false, streak: 0 };
+                            setFeverFlash(null);
+                            setFeverExitEffect(null);
+                            window.speechSynthesis.cancel();
                         }
                     } : undefined}
                 >
