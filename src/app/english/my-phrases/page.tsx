@@ -179,7 +179,7 @@ export default function MyPhrasesPage() {
                 <span style={{ fontWeight: '600', fontSize: '16px' }}>
                     My Phrases
                 </span>
-                <Link href="/english/analyze" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '13px' }}>
+                <Link href="/english/expressions" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '13px' }}>
                     + Add
                 </Link>
             </div>
@@ -197,7 +197,7 @@ export default function MyPhrasesPage() {
                         No phrases saved yet
                     </div>
                     <Link
-                        href="/english/analyze"
+                        href="/english/expressions"
                         style={{
                             display: 'inline-block',
                             padding: '12px 24px',

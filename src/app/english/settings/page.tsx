@@ -187,6 +187,43 @@ export default function SettingsPage() {
                 />
             </Section>
 
+            {/* ── Progressive Unlock Section ── */}
+            <Section title="段階解放">
+                <ToggleRow
+                    label="ビギナーモード"
+                    description="ON: 日数に応じて機能が段階的に解放。OFF: 全機能を即時解放"
+                    checked={settings.beginnerMode}
+                    onChange={(v) => update('beginnerMode', v)}
+                />
+                {settings.beginnerMode && (() => {
+                    let days = 0;
+                    try {
+                        const raw = localStorage.getItem('quest-days-active');
+                        if (raw) days = JSON.parse(raw).length;
+                    } catch { /* */ }
+                    return (
+                        <div style={{
+                            padding: '12px 16px', borderRadius: 10,
+                            backgroundColor: '#FAFAF9', border: '1px solid #E7E5E4',
+                            fontSize: 13, color: '#57534e', lineHeight: 1.8,
+                        }}>
+                            <div style={{ fontWeight: 600, marginBottom: 4, color: '#1c1917' }}>
+                                アクティブ日数: {days}
+                            </div>
+                            <div style={{ color: days >= 3 ? '#10B981' : '#a8a29e' }}>
+                                {days >= 3 ? '[UNLOCKED]' : '[LOCKED]'} Day 3: スロット演出
+                            </div>
+                            <div style={{ color: days >= 6 ? '#10B981' : '#a8a29e' }}>
+                                {days >= 6 ? '[UNLOCKED]' : '[LOCKED]'} Day 6: 確変 / FEVER モード
+                            </div>
+                            <div style={{ color: days >= 10 ? '#10B981' : '#a8a29e' }}>
+                                {days >= 10 ? '[UNLOCKED]' : '[LOCKED]'} Day 10: バトル
+                            </div>
+                        </div>
+                    );
+                })()}
+            </Section>
+
             {/* ── Tutorial Section ── */}
             <Section title="チュートリアル">
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0' }}>

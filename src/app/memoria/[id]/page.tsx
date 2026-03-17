@@ -1066,6 +1066,45 @@ export default function MemoriaDetailPage() {
                     <h1 style={{ fontSize: '24px', fontWeight: '700', lineHeight: '1.3', margin: 0 }}>{entry.title}</h1>
                 </div>
 
+                {/* Training CTA: guide note.com readers to training */}
+                <div style={{
+                    marginBottom: '20px',
+                    padding: '16px 20px',
+                    background: `linear-gradient(135deg, ${t.accent}15, ${t.accent}08)`,
+                    borderRadius: '14px',
+                    border: `1px solid ${t.accent}30`,
+                }}>
+                    <div style={{ fontSize: '13px', fontWeight: '700', color: t.accent, marginBottom: '8px', letterSpacing: '0.05em' }}>
+                        TRAINING MODE
+                    </div>
+                    <div style={{ fontSize: '13px', color: t.textSecondary, lineHeight: 1.9, marginBottom: '12px' }}>
+                        この会話に出てくるフレーズを毎日練習できます。<br />
+                        気になるフレーズをタップで保存 → トレーニングに追加。<br />
+                        カードを育ててLEGENDARYランクを目指そう。
+                    </div>
+                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        <a href="/english/training" style={{
+                            display: 'inline-block',
+                            padding: '8px 20px', borderRadius: '10px',
+                            background: t.accent, color: '#000',
+                            fontSize: '12px', fontWeight: '800',
+                            letterSpacing: '0.08em',
+                            textDecoration: 'none',
+                            boxShadow: `0 2px 12px ${t.accent}40`,
+                        }}>
+                            TRAINING
+                        </a>
+                        <span style={{
+                            display: 'inline-flex', alignItems: 'center',
+                            padding: '8px 14px', borderRadius: '10px',
+                            border: `1px solid ${t.borderLight}`,
+                            fontSize: '11px', color: t.textMuted,
+                        }}>
+                            会話をタップ → フレーズ保存
+                        </span>
+                    </div>
+                </div>
+
                 {/* Article Navigation */}
                 {allEntries.length > 1 && (
                     <div style={{

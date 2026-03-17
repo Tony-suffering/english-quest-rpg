@@ -1,5 +1,33 @@
 /* Training page @keyframes animations — extracted from inline <style> */
 
+/* Deep link highlight — gold pulse for linked phrase cards */
+@keyframes deep-link-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.6); }
+    50% { box-shadow: 0 0 16px 6px rgba(212, 175, 55, 0.35); }
+    100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+}
+.deep-link-highlight {
+    animation: deep-link-pulse 0.8s ease-in-out 3;
+}
+
+/* Onboarding hints for new users — FLASHY */
+@keyframes onboard-hint {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-12px); }
+}
+@keyframes onboard-pulse {
+    0% { box-shadow: 0 0 8px rgba(212,175,55,0.4), 0 0 0 0 rgba(212,175,55,0.6); transform: scale(1); }
+    25% { box-shadow: 0 0 20px rgba(212,175,55,0.6), 0 0 0 8px rgba(212,175,55,0.3); transform: scale(1.04); }
+    50% { box-shadow: 0 0 40px rgba(212,175,55,0.8), 0 0 0 14px rgba(212,175,55,0.15), 0 0 80px rgba(212,175,55,0.3); transform: scale(1.06); }
+    75% { box-shadow: 0 0 20px rgba(212,175,55,0.6), 0 0 0 8px rgba(212,175,55,0.3); transform: scale(1.04); }
+    100% { box-shadow: 0 0 8px rgba(212,175,55,0.4), 0 0 0 0 rgba(212,175,55,0.6); transform: scale(1); }
+}
+.onboard-btn-pulse {
+    animation: onboard-pulse 1.2s ease-in-out infinite !important;
+    position: relative;
+    z-index: 100;
+}
+
 /* Slot reel spinning symbol flash */
 @keyframes slot-symbol-flash {
     0% { content: '7'; opacity: 0.6; }
@@ -206,6 +234,13 @@
     75% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-12px); }
 }
+@keyframes unlock-notif {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+    12% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+    20% { transform: translate(-50%, -50%) scale(1); }
+    75% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+}
 @keyframes gacha-fade-out {
     0%, 50% { opacity: 1; }
     100% { opacity: 0; transform: translateY(-30px) scale(0.9); }
@@ -322,6 +357,13 @@
     60% { transform: scale(1); opacity: 1; }
     80% { transform: scale(1); opacity: 1; }
     100% { transform: scale(0.8); opacity: 0; }
+}
+@keyframes fever-entry-slam-hold {
+    0% { transform: scale(3); opacity: 0; }
+    30% { transform: scale(0.9); opacity: 1; }
+    45% { transform: scale(1.1); opacity: 1; }
+    60% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
 }
 @keyframes fever-entry-shake {
     0%, 100% { transform: translateX(0); }
@@ -2078,4 +2120,41 @@
     0%, 100% { transform: translateX(0); }
     30%      { transform: translateX(-8px); }
     70%      { transform: translateX(4px); }
+}
+
+/* ── Rank-Up Full-Screen Celebration (card-preview quality) ── */
+@keyframes levelup-overlay-in {
+    0% { opacity: 0; backdrop-filter: blur(0px); }
+    100% { opacity: 1; backdrop-filter: blur(12px); }
+}
+@keyframes levelup-card-slam {
+    0% { opacity: 0; transform: scale(0.3) rotate(-8deg); }
+    40% { opacity: 1; transform: scale(1.15) rotate(2deg); }
+    60% { transform: scale(0.95) rotate(-1deg); }
+    80% { transform: scale(1.03) rotate(0deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes levelup-title-slide {
+    0% { opacity: 0; transform: translateY(30px) scale(0.8); }
+    50% { opacity: 1; transform: translateY(-5px) scale(1.05); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes levelup-ring-expand {
+    0% { transform: scale(0); opacity: 0.8; }
+    70% { transform: scale(1.8); opacity: 0.3; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes levelup-sparkle {
+    0% { transform: translate(0, 0) scale(0); opacity: 1; }
+    100% { transform: translate(var(--sx), var(--sy)) scale(1); opacity: 0; }
+}
+@keyframes levelup-glow-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+/* Progressive tip slide-up animation */
+@keyframes tip-slide-up {
+    0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    100% { opacity: 1; transform: translateX(-50%) translateY(0); }
 }

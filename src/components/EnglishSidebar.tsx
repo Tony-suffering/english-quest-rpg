@@ -48,7 +48,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     // ── Essential tools (always visible) ──
     const essentialItems = [
         { id: '/english/training/guide', label: 'ガイド' },
-        { id: '/english/dashboard', label: 'ダッシュボード' },
+        { id: '/english/dashboard-v2', label: 'ダッシュボード' },
         { id: '/english/training/card-preview', label: 'カードコレクション' },
         { id: '/english/settings', label: '設定' },
     ];
@@ -65,14 +65,13 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         { id: '/english/everyday-words', label: '日常英単語' },
         { id: '/english/tonio-words', label: 'TONIO WORDS' },
         { id: '/english/eikaiwa-lab', label: '英会話Lab' },
-        { id: '/english/self-master', label: 'セルフマスター' },
         { id: '/english/speaking-guide', label: 'スピーキングガイド' },
     ];
 
     const isActive = (path: string) => {
         if (!pathname) return false;
         if (path === '/english') return pathname === '/english';
-        if (path === '/english/dashboard') return pathname === '/english/dashboard';
+        if (path === '/english/dashboard-v2') return pathname === '/english/dashboard-v2';
         if (path === '/english/training') return pathname === '/english/training';
         if (path === '/english/training/guide') return pathname === '/english/training/guide';
         if (path === '/english/training/card-preview') return pathname.startsWith('/english/training/card');

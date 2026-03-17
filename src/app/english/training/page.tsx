@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import { getSettings } from '@/lib/settings';
 import {
@@ -12,6 +13,8 @@ import {
 import PuzzleBoard, { type BattleSyncData } from '@/components/english/PuzzleBoard';
 import { QUEST_WORDS } from '@/data/english/quest-words';
 import { DAILY_LESSONS } from '@/data/english/five-min-data';
+import { ALL_WORDS as TOEIC_WORDS, ALL_PHRASES as TOEIC_PHRASES, CATEGORIES as TOEIC_CATEGORIES } from '@/data/tonio-words';
+import { LEVELS as TOEIC_LEVELS } from '@/data/tonio-words/types';
 import './training-animations.css';
 
 // All API calls are intercepted by local-api.ts -- no port restriction needed
@@ -3121,16 +3124,25 @@ let _effectKeyCounter = 0;
 function effectKey() { return ++_effectKeyCounter; }
 
 export default function PhrasesPage() {
+    const router = useRouter();
     // Data mode: phrases (default) or words
-    const [dataMode, setDataMode] = useState<'phrases' | 'words'>(() => {
+    const [dataMode, setDataMode] = useState<'phrases' | 'words' | 'toeic'>(() => {
         if (typeof window !== 'undefined') {
-            if (IS_PUBLIC) return (localStorage.getItem('training-data-mode') as 'phrases' | 'words') || 'phrases';
-            return (localStorage.getItem('training-data-mode') as 'phrases' | 'words') || 'phrases';
+            if (IS_PUBLIC) return (localStorage.getItem('training-data-mode') as 'phrases' | 'words' | 'toeic') || 'phrases';
+            return (localStorage.getItem('training-data-mode') as 'phrases' | 'words' | 'toeic') || 'phrases';
         }
         return 'phrases';
     });
     const [phrases, setPhrases] = useState<Phrase[]>([]);
     const [loading, setLoading] = useState(true);
+    const [toeicTargetLevel, setToeicTargetLevel] = useState<1 | 2 | 3 | null>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('toeic-target-level');
+            if (saved) return parseInt(saved) as 1 | 2 | 3;
+        }
+        return null;
+    });
+    const [showToeicLevelPicker, setShowToeicLevelPicker] = useState(false);
     const [phraseMastery, setPhraseMastery] = useState<Record<string, number>>({});
     const [currentMonth, setCurrentMonth] = useState<Date | null>(null);
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -3181,7 +3193,9 @@ export default function PhrasesPage() {
     const isFirstRunRef = useRef(false);
     // First-run complete overlay: shows after god+MYTHIC+LEGENDARY rank-up sequence
     const [firstRunComplete, setFirstRunComplete] = useState(false);
+    const [firstRunPhase, setFirstRunPhase] = useState<'legendary' | 'realmode' | 'guide'>('legendary');
     const firstRunGodDismissed = useRef(false);
+    const firstRunGodDismissedAt = useRef(0);
     useEffect(() => {
         try {
             const raw = localStorage.getItem('quest-days-active');
@@ -3334,13 +3348,128 @@ export default function PhrasesPage() {
     const feverRef = useRef({ active: false, streak: 0 });
     // Luck multiplier display
     const [luckMultiplier, setLuckMultiplier] = useState(1.0);
-    const [cardRankUpEffect, setCardRankUpEffect] = useState<{ oldRank: string; newRank: string; newRankColor: string; key: number } | null>(null);
+    const [cardRankUpEffect, setCardRankUpEffect] = useState<{ oldRank: string; newRank: string; newRankKey: CardRank; newRankColor: string; snapshotPoints: number; snapshotPhrase: { english: string; japanese: string; category: string } | null; key: number } | null>(null);
 
     // Card level-up celebration: hold the card on screen before advancing
     const [cardCelebration, setCardCelebration] = useState<{
         phrase: Phrase;
         key: number;
     } | null>(null);
+
+    // ── Progressive Tip System ──
+    // Contextual guidance that appears at key milestones after first-run
+    type TipId = 'first-gacha' | 'first-chain' | 'first-rankup' | 'calendar-hint' | 'slot-explain' | 'data-switch' | 'streak-encourage' | 'chakra-explain';
+    const [activeTip, setActiveTip] = useState<TipId | null>(null);
+    const shownTipsRef = useRef<Set<string>>(new Set());
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem('rpg-tips-shown');
+            if (saved) shownTipsRef.current = new Set(JSON.parse(saved));
+        } catch { /* */ }
+    }, []);
+    const showTip = useCallback((tipId: TipId) => {
+        if (isFirstRun || firstRunComplete) return; // skip during first-run flow
+        if (shownTipsRef.current.has(tipId)) return; // already shown
+        shownTipsRef.current.add(tipId);
+        try { localStorage.setItem('rpg-tips-shown', JSON.stringify([...shownTipsRef.current])); } catch { /* */ }
+        setActiveTip(tipId);
+    }, [isFirstRun, firstRunComplete]);
+    const dismissTip = useCallback(() => setActiveTip(null), []);
+    // Auto-dismiss tips after 8 seconds
+    useEffect(() => {
+        if (!activeTip) return;
+        const timer = setTimeout(() => setActiveTip(null), 8000);
+        return () => clearTimeout(timer);
+    }, [activeTip]);
+
+    const TIP_CONTENT: Record<string, { title: string; body: string; color: string }> = {
+        'first-gacha': {
+            title: 'ガチャ結果!',
+            body: '正解するたびにカードポイント(CP)がもらえる。CPが貯まるとカードのランクが上がるぞ!',
+            color: '#D4AF37',
+        },
+        'first-chain': {
+            title: '確変モード突入!',
+            body: '連続正解でチェーンが発動! 確変(x1.5)→激熱(x2)→神(x3)とポイント倍率がアップ。パチンコのアレだ!',
+            color: '#EF4444',
+        },
+        'first-rankup': {
+            title: 'ランクアップ!',
+            body: 'カードのランクが上がった! NORMAL→BRONZE→SILVER→GOLD→HOLOGRAPHIC→LEGENDARY。全部LEGENDARYにできるか?',
+            color: '#8B5CF6',
+        },
+        'calendar-hint': {
+            title: 'カレンダーの見方',
+            body: '日付をタップするとその日のカードが表示される。毎日やると色が変わっていくぞ。連続記録を伸ばそう!',
+            color: '#3B82F6',
+        },
+        'slot-explain': {
+            title: 'スロットマシン',
+            body: '正解するとスロットが自動で回る。揃えばボーナスCP! リーチ演出もあるから見逃すな!',
+            color: '#F59E0B',
+        },
+        'data-switch': {
+            title: 'データ切替',
+            body: 'Phrases(フレーズ)、Words(単語)、TOEIC(試験対策)を切り替えられる。TOEICはレベル別に分かれてるぞ!',
+            color: '#10B981',
+        },
+        'streak-encourage': {
+            title: '連続正解!',
+            body: 'いい調子! 連続正解を続けると確変モードに入りやすくなる。集中して一気にいけ!',
+            color: '#F97316',
+        },
+        'chakra-explain': {
+            title: 'チャクラレベルアップ!',
+            body: 'カードのチャクラが進化した! EGG→HATCH→ROOKIE→FIGHTER→CHAMPION→ELITE→MASTERの7段階。育てていこう!',
+            color: '#6366F1',
+        },
+    };
+
+    // ── Tip triggers ──
+    // First gacha result (non-first-run)
+    useEffect(() => {
+        if (gachaEffect?.phase === 'reveal' && !isFirstRun) {
+            showTip('first-gacha');
+        }
+    }, [gachaEffect?.phase, isFirstRun, showTip]);
+    // First chain mode entry
+    useEffect(() => {
+        if (chainTransition && chainTransition.to === 'kakuhen' && !isFirstRun) {
+            showTip('first-chain');
+        }
+    }, [chainTransition, isFirstRun, showTip]);
+    // First card rank-up (non-first-run)
+    useEffect(() => {
+        if (cardRankUpEffect && !isFirstRun) {
+            showTip('first-rankup');
+        }
+    }, [cardRankUpEffect, isFirstRun, showTip]);
+    // Chakra level-up
+    useEffect(() => {
+        if (pointEffect && !isFirstRun) {
+            showTip('chakra-explain');
+        }
+    }, [pointEffect, isFirstRun, showTip]);
+    // Slot unlock (day 3)
+    useEffect(() => {
+        if (SLOT_UNLOCKED && !isFirstRun && daysActive.length >= 3) {
+            showTip('slot-explain');
+        }
+    }, [SLOT_UNLOCKED, isFirstRun, daysActive.length, showTip]);
+    // Streak encouragement (5 correct in a row, non-chain)
+    useEffect(() => {
+        if (chainState.count === 5 && chainState.mode === 'kakuhen' && !isFirstRun) {
+            showTip('streak-encourage');
+        }
+    }, [chainState.count, chainState.mode, isFirstRun, showTip]);
+    // Data mode switch tip
+    const prevDataModeRef = useRef(dataMode);
+    useEffect(() => {
+        if (dataMode !== prevDataModeRef.current) {
+            prevDataModeRef.current = dataMode;
+            showTip('data-switch');
+        }
+    }, [dataMode, showTip]);
 
     // Auto-clear fever flash
     useEffect(() => {
@@ -3356,9 +3485,10 @@ export default function PhrasesPage() {
         return () => clearTimeout(timer);
     }, [feverExitEffect]);
 
-    // Auto-clear rank-up banner
+    // Auto-clear rank-up banner (skip auto-clear during first-run: user must tap to dismiss)
     useEffect(() => {
         if (!cardRankUpEffect) return;
+        if (isFirstRunRef.current) return; // first-run: tap to dismiss
         const timer = setTimeout(() => setCardRankUpEffect(null), 3000);
         return () => clearTimeout(timer);
     }, [cardRankUpEffect]);
@@ -3403,11 +3533,30 @@ export default function PhrasesPage() {
     }, [chainState.mode]);
 
     // First-run complete: after god dismissed → wait for gacha + rank-up to finish → show congrats
+    // Race condition fix: rank-up has a 500ms setTimeout, so we must wait at least 1s after god dismiss
+    // before checking if all effects are cleared. Otherwise congrats fires before rank-up appears.
     useEffect(() => {
         if (!firstRunGodDismissed.current) return;
         if (gachaEffect || cardRankUpEffect || chainTransition) return; // still animating
-        // All effects cleared — show the congratulations overlay
+        const elapsed = Date.now() - firstRunGodDismissedAt.current;
+        if (elapsed < 1200) {
+            // Not enough time for rank-up setTimeout(500) + gacha animation to fire — recheck soon
+            const timer = setTimeout(() => {
+                // Re-trigger this effect by forcing a state update
+                setFirstRunComplete(prev => prev); // no-op but triggers re-render
+            }, 1200 - elapsed + 100);
+            return () => clearTimeout(timer);
+        }
+        // All effects cleared AND enough time passed — safe to show congrats
         firstRunGodDismissed.current = false;
+        firstRunGodDismissedAt.current = 0;
+        // Reset god mode / chain state before showing congrats
+        stopFeverBGM(feverDroneRef.current);
+        feverDroneRef.current = null;
+        setChainState({ count: 0, mode: 'normal', key: effectKey() });
+        feverRef.current = { active: false, streak: 0 };
+        setFeverFlash(null);
+        window.speechSynthesis.cancel();
         setFirstRunComplete(true);
     }, [gachaEffect, cardRankUpEffect, chainTransition]);
 
@@ -3815,12 +3964,18 @@ export default function PhrasesPage() {
                     const prevRank = getCardRank(prev[phraseId] || 0);
                     const newRank = getCardRank(newTotal);
                     if (prevRank.rank !== newRank.rank && newRank.rank !== 'NORMAL') {
+                        // Snapshot the current card BEFORE the timeout fires (card may advance)
+                        const snapCard = displayedCardRef.current;
                         setTimeout(() => {
+                            window.speechSynthesis.cancel();
                             playRankUpSound(newRank.rank);
                             setCardRankUpEffect({
                                 oldRank: prevRank.label || 'NORMAL',
                                 newRank: newRank.label,
+                                newRankKey: newRank.rank,
                                 newRankColor: newRank.borderColor,
+                                snapshotPoints: newTotal,
+                                snapshotPhrase: snapCard ? { english: snapCard.english, japanese: snapCard.japanese, category: snapCard.category } : null,
                                 key: effectKey(),
                             });
                         }, 500);
@@ -3990,12 +4145,17 @@ export default function PhrasesPage() {
                                 const prevRank = getCardRank(prevPoints);
                                 const newRank = getCardRank(d.gacha.card_total_points);
                                 if (prevRank.rank !== newRank.rank && newRank.rank !== 'NORMAL') {
+                                    const snapCard = displayedCardRef.current;
                                     setTimeout(() => {
+                                        window.speechSynthesis.cancel();
                                         playRankUpSound(newRank.rank);
                                         setCardRankUpEffect({
                                             oldRank: prevRank.label || 'NORMAL',
                                             newRank: newRank.label,
+                                            newRankKey: newRank.rank,
                                             newRankColor: newRank.borderColor,
+                                            snapshotPoints: d.gacha.card_total_points,
+                                            snapshotPhrase: snapCard ? { english: snapCard.english, japanese: snapCard.japanese, category: snapCard.category } : null,
                                             key: effectKey(),
                                         });
                                     }, 500);
@@ -4131,6 +4291,27 @@ export default function PhrasesPage() {
                             }
                         } catch { /* ignore */ }
                         setPhrases(allPhrases);
+                    } else if (dataMode === 'toeic') {
+                        // TOEICモード: tonio-words 498語をレベル別に10個/日で分散
+                        // レベルごとに連続配置 (L1: day1-15, L2: day16-33, L3: day34-51)
+                        const toeicLevel = (() => {
+                            try {
+                                const saved = localStorage.getItem('toeic-target-level');
+                                if (saved) return parseInt(saved) as 1 | 2 | 3;
+                            } catch { /* */ }
+                            return null;
+                        })();
+                        const wordsToUse = toeicLevel
+                            ? TOEIC_WORDS.filter(w => w.level === toeicLevel)
+                            : TOEIC_WORDS;
+                        const mapped: Phrase[] = wordsToUse.map((w, i) => ({
+                            id: `toeic_${w.level}_${w.lesson}_${i}`,
+                            english: w.en,
+                            japanese: w.ja + ` (${w.pron})`,
+                            category: TOEIC_CATEGORIES[w.cat]?.label || w.cat,
+                            date: makeDateStr(Math.floor(i / 10) + 1),
+                        }));
+                        setPhrases(mapped);
                     } else {
                         // 単語モード: QUEST_WORDSの125個を10個/日で分散
                         const mapped: Phrase[] = QUEST_WORDS.map((w, i) => ({
@@ -4621,6 +4802,8 @@ export default function PhrasesPage() {
         : historyOffset > 0 && reviewHistory.length >= historyOffset
             ? reviewHistory[reviewHistory.length - historyOffset]
             : (reviewList[reviewIndex] || null);
+    const displayedCardRef = useRef(displayedCard);
+    useEffect(() => { displayedCardRef.current = displayedCard; }, [displayedCard]);
 
     // Clamp reviewIndex when list shrinks (e.g. after deletion)
     useEffect(() => {
@@ -6355,11 +6538,11 @@ export default function PhrasesPage() {
 
     // Auto-play TTS when displayed card changes
     useEffect(() => {
-        if (!displayedCard || cardCelebration) return;
+        if (!displayedCard || cardCelebration || cardRankUpEffect || firstRunComplete) return;
         if (displayedCard.id === prevAutoPlayIdRef.current) return;
         prevAutoPlayIdRef.current = displayedCard.id;
         playPhrase(displayedCard);
-    }, [displayedCard, cardCelebration, playPhrase]);
+    }, [displayedCard, cardCelebration, cardRankUpEffect, firstRunComplete, playPhrase]);
 
     const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
     const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
@@ -6662,6 +6845,93 @@ export default function PhrasesPage() {
             flexDirection: 'column',
             overflow: 'hidden'
         }}>
+            {/* ── TOEIC Level Picker Overlay ── */}
+            {showToeicLevelPicker && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 10000,
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: 20,
+                }} onClick={(e) => { if (e.target === e.currentTarget) setShowToeicLevelPicker(false); }}>
+                    <div style={{
+                        backgroundColor: '#fff', borderRadius: 20, padding: '32px 24px',
+                        maxWidth: 400, width: '100%',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                    }}>
+                        <div style={{
+                            fontSize: 20, fontWeight: 800, color: '#1C1917',
+                            textAlign: 'center', marginBottom: 8,
+                        }}>
+                            TOEIC何点を目指す？
+                        </div>
+                        <div style={{
+                            fontSize: 12, color: '#78716C', textAlign: 'center', marginBottom: 24,
+                        }}>
+                            レベルに合った単語が出題されます
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {TOEIC_LEVELS.map(lv => (
+                                <button
+                                    key={lv.level}
+                                    onClick={() => {
+                                        setToeicTargetLevel(lv.level as 1 | 2 | 3);
+                                        localStorage.setItem('toeic-target-level', String(lv.level));
+                                        setShowToeicLevelPicker(false);
+                                        setDataMode('toeic');
+                                        localStorage.setItem('training-data-mode', 'toeic');
+                                        setViewMode('calendar');
+                                    }}
+                                    style={{
+                                        padding: '16px 20px', borderRadius: 14,
+                                        border: `2px solid ${lv.color}`,
+                                        backgroundColor: lv.bg,
+                                        cursor: 'pointer', textAlign: 'left',
+                                        transition: 'all 0.15s',
+                                        display: 'flex', alignItems: 'center', gap: 16,
+                                    }}
+                                >
+                                    <div style={{
+                                        width: 48, height: 48, borderRadius: 12, flexShrink: 0,
+                                        background: `linear-gradient(135deg, ${lv.color}, ${lv.color}CC)`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 18, fontWeight: 900, color: '#fff',
+                                        boxShadow: `0 4px 12px ${lv.color}40`,
+                                    }}>
+                                        L{lv.level}
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: 16, fontWeight: 700, color: '#1C1917' }}>
+                                            {lv.target}
+                                        </div>
+                                        <div style={{ fontSize: 12, color: '#78716C', marginTop: 2 }}>
+                                            {lv.name} -- {lv.words}語
+                                        </div>
+                                    </div>
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => {
+                                    setToeicTargetLevel(null);
+                                    localStorage.removeItem('toeic-target-level');
+                                    setShowToeicLevelPicker(false);
+                                    setDataMode('toeic');
+                                    localStorage.setItem('training-data-mode', 'toeic');
+                                    setViewMode('calendar');
+                                }}
+                                style={{
+                                    padding: '12px 20px', borderRadius: 14,
+                                    border: '1px solid #E7E5E4', backgroundColor: '#fff',
+                                    cursor: 'pointer', textAlign: 'center',
+                                    fontSize: 13, color: '#78716C', fontWeight: 600,
+                                }}
+                            >
+                                全レベルまとめて（498語）
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* ── Onboarding Tutorial Overlay ── */}
             {showOnboarding && (() => {
                 const steps = [
@@ -6938,6 +7208,7 @@ export default function PhrasesPage() {
                         if (isGodTransition) {
                             // Don't end first-run yet — wait for MYTHIC gacha + LEGENDARY rank-up
                             firstRunGodDismissed.current = true;
+                            firstRunGodDismissedAt.current = Date.now();
                         }
                     } : undefined}
                 >
@@ -6988,79 +7259,215 @@ export default function PhrasesPage() {
             })()}
 
 
-            {/* First-run complete: congratulations + guide to card collection */}
+            {/* First-run complete: multi-phase congratulations + transition to real mode */}
             {firstRunComplete && (
                 <div style={{
                     position: 'fixed', inset: 0, zIndex: 10002,
-                    background: 'rgba(0,0,0,0.88)',
+                    background: firstRunPhase === 'realmode'
+                        ? 'rgba(0,0,0,0.95)'
+                        : 'rgba(0,0,0,0.88)',
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                     padding: '24px', cursor: 'pointer',
                     animation: 'fever-entry-slam-hold 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards',
+                    transition: 'background 0.5s ease',
                 }}
                     onClick={() => {
-                        localStorage.setItem('quest-first-run-done', '1');
-                        setIsFirstRun(false);
-                        isFirstRunRef.current = false;
-                        setFirstRunComplete(false);
+                        if (firstRunPhase === 'legendary') {
+                            setFirstRunPhase('realmode');
+                        } else if (firstRunPhase === 'realmode') {
+                            setFirstRunPhase('guide');
+                        } else {
+                            // Final phase: dismiss and navigate to card collection
+                            localStorage.setItem('quest-first-run-done', '1');
+                            setIsFirstRun(false);
+                            isFirstRunRef.current = false;
+                            setFirstRunComplete(false);
+                            setFirstRunPhase('legendary');
+                            // Navigate to card collection so user sees their LEGENDARY card
+                            router.push('/english/training/card-preview');
+                        }
                     }}
                 >
                     <div style={{
                         maxWidth: 420, width: '100%', textAlign: 'center',
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px',
                     }}>
-                        {/* LEGENDARY card icon */}
-                        <div style={{
-                            width: 80, height: 100, borderRadius: 12,
-                            background: 'linear-gradient(135deg, #D4AF37, #F6E27A, #D4AF37)',
-                            border: '3px solid #D4AF37',
-                            boxShadow: '0 0 40px rgba(212,175,55,0.6), 0 0 80px rgba(212,175,55,0.3)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 28, fontWeight: 900, color: '#fff',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.3)',
-                            animation: 'onboard-pulse 2s ease-in-out infinite',
-                        }}>
-                            L
-                        </div>
+                        {/* Phase 1: LEGENDARY card celebration */}
+                        {firstRunPhase === 'legendary' && (<>
+                            <div style={{
+                                width: 100, height: 130, borderRadius: 14,
+                                background: 'linear-gradient(135deg, #1C1917, #292524, #1C1917)',
+                                border: '3px solid #D4AF37',
+                                boxShadow: '0 0 40px rgba(212,175,55,0.6), 0 0 80px rgba(212,175,55,0.3), inset 0 0 30px rgba(212,175,55,0.1)',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
+                                animation: 'onboard-pulse 2s ease-in-out infinite',
+                                position: 'relative', overflow: 'hidden',
+                            }}>
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    background: 'linear-gradient(135deg, transparent 30%, rgba(212,175,55,0.15) 50%, transparent 70%)',
+                                    animation: 'card-holo-shimmer 3s ease-in-out infinite',
+                                }} />
+                                <div style={{ fontSize: 11, fontWeight: 700, color: '#D4AF37', letterSpacing: '0.15em', zIndex: 1 }}>
+                                    LEGENDARY
+                                </div>
+                                <div style={{ fontSize: 24, fontWeight: 900, color: '#F6E27A', textShadow: '0 0 12px rgba(212,175,55,0.8)', zIndex: 1 }}>
+                                    L
+                                </div>
+                                <div style={{ fontSize: 8, fontWeight: 600, color: '#A8A29E', letterSpacing: '0.1em', zIndex: 1 }}>
+                                    BST 600
+                                </div>
+                            </div>
+
+                            <div style={{
+                                fontSize: 24, fontWeight: 900, color: '#D4AF37',
+                                letterSpacing: '0.15em',
+                                textShadow: '0 0 30px rgba(212,175,55,0.6)',
+                            }}>
+                                LEGENDARY
+                            </div>
+
+                            <div style={{
+                                fontSize: 15, color: '#A8A29E', lineHeight: 2, fontWeight: 400,
+                            }}>
+                                最高ランクのカードが誕生しました。
+                            </div>
+
+                            <div style={{
+                                marginTop: 12, padding: '14px 48px', borderRadius: 14,
+                                background: 'linear-gradient(135deg, #D4AF37, #B8960C)',
+                                color: '#000', fontSize: 16, fontWeight: 800,
+                                letterSpacing: '0.1em',
+                                boxShadow: '0 4px 24px rgba(212,175,55,0.5)',
+                            }}>
+                                次へ
+                            </div>
+                        </>)}
+
+                        {/* Phase 2: Reality check — normal mode explanation */}
+                        {firstRunPhase === 'realmode' && (<>
+                            <div style={{
+                                display: 'flex', gap: 16, alignItems: 'center', justifyContent: 'center',
+                                marginBottom: 8,
+                            }}>
+                                {/* Demo mode icon */}
+                                <div style={{
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                                    opacity: 0.4,
+                                }}>
+                                    <div style={{
+                                        width: 48, height: 48, borderRadius: 12,
+                                        background: 'linear-gradient(135deg, #D4AF37, #F6E27A)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 20, fontWeight: 900, color: '#fff',
+                                    }}>D</div>
+                                    <div style={{ fontSize: 10, color: '#78716C' }}>DEMO</div>
+                                </div>
+                                {/* Arrow */}
+                                <div style={{
+                                    fontSize: 24, color: '#D4AF37', fontWeight: 900,
+                                    animation: 'onboard-hint 1.5s ease-in-out infinite',
+                                }}>
+                                    &rarr;
+                                </div>
+                                {/* Real mode icon */}
+                                <div style={{
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
+                                }}>
+                                    <div style={{
+                                        width: 48, height: 48, borderRadius: 12,
+                                        background: 'linear-gradient(135deg, #DC2626, #F97316)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 20, fontWeight: 900, color: '#fff',
+                                        boxShadow: '0 0 20px rgba(220,38,38,0.4)',
+                                    }}>R</div>
+                                    <div style={{ fontSize: 10, color: '#fff', fontWeight: 700 }}>REAL</div>
+                                </div>
+                            </div>
+
+                            <div style={{
+                                fontSize: 20, fontWeight: 800, color: '#fff',
+                                letterSpacing: '0.1em',
+                            }}>
+                                ここからが本番
+                            </div>
+
+                            <div style={{
+                                fontSize: 14, color: '#A8A29E', lineHeight: 2.2, fontWeight: 400,
+                                maxWidth: 340,
+                            }}>
+                                <span style={{ color: '#EF4444', fontWeight: 700 }}>MISS</span>が出ます。連荘が途切れます。<br />
+                                確変は<span style={{ color: '#D4AF37', fontWeight: 600 }}>1/16</span>のランダム抽選。<br />
+                                さっきみたいに簡単にはいきません。<br /><br />
+                                <span style={{ color: '#fff', fontWeight: 600 }}>
+                                    だから面白い。
+                                </span>
+                            </div>
+
+                            <div style={{
+                                marginTop: 12, padding: '14px 48px', borderRadius: 14,
+                                background: 'linear-gradient(135deg, #DC2626, #B91C1C)',
+                                color: '#fff', fontSize: 16, fontWeight: 800,
+                                letterSpacing: '0.1em',
+                                boxShadow: '0 4px 24px rgba(220,38,38,0.4)',
+                            }}>
+                                次へ
+                            </div>
+                        </>)}
+
+                        {/* Phase 3: What to do next */}
+                        {firstRunPhase === 'guide' && (<>
+                            <div style={{
+                                fontSize: 20, fontWeight: 800, color: '#10B981',
+                                letterSpacing: '0.1em',
+                            }}>
+                                次にやること
+                            </div>
+
+                            <div style={{
+                                display: 'flex', flexDirection: 'column', gap: 16,
+                                width: '100%', maxWidth: 340,
+                            }}>
+                                {[
+                                    { num: '1', text: 'カレンダーから今日のカードをレビュー', sub: 'タップでチャクラレベルUP', color: '#3B82F6' },
+                                    { num: '2', text: 'スロットで当たりを狙う', sub: '正解するたびスロットが回る', color: '#F59E0B' },
+                                    { num: '3', text: '全カードLEGENDARYを目指す', sub: 'これが最終目標', color: '#D4AF37' },
+                                ].map(item => (
+                                    <div key={item.num} style={{
+                                        display: 'flex', gap: 14, alignItems: 'flex-start',
+                                    }}>
+                                        <div style={{
+                                            width: 32, height: 32, borderRadius: 10, flexShrink: 0,
+                                            background: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: 14, fontWeight: 800, color: '#fff',
+                                        }}>{item.num}</div>
+                                        <div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', lineHeight: 1.5 }}>
+                                                {item.text}
+                                            </div>
+                                            <div style={{ fontSize: 12, color: '#78716C', lineHeight: 1.5, marginTop: 2 }}>
+                                                {item.sub}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div style={{
+                                marginTop: 16, padding: '14px 48px', borderRadius: 14,
+                                background: 'linear-gradient(135deg, #10B981, #059669)',
+                                color: '#fff', fontSize: 16, fontWeight: 800,
+                                letterSpacing: '0.1em',
+                                boxShadow: '0 4px 24px rgba(16,185,129,0.4)',
+                            }}>
+                                始める
+                            </div>
+                        </>)}
 
                         <div style={{
-                            fontSize: 22, fontWeight: 800, color: '#D4AF37',
-                            letterSpacing: '0.1em',
-                            textShadow: '0 0 20px rgba(212,175,55,0.5)',
+                            color: 'rgba(255,255,255,0.3)', fontSize: 11, marginTop: 4,
                         }}>
-                            LEGENDARYカード誕生
-                        </div>
-
-                        <div style={{
-                            fontSize: 15, color: '#ccc', lineHeight: 2.2, fontWeight: 400,
-                        }}>
-                            今のカードがLEGENDARYランクになりました。<br />
-                            カレンダーからいつでも確認できます。<br /><br />
-                            <span style={{ color: '#fff', fontWeight: 600 }}>
-                                ここからが本番です。
-                            </span><br />
-                            スロットの確率は本物になります。<br />
-                            MISSもあります。連荘が途切れることもあります。<br /><br />
-                            <span style={{ color: '#D4AF37', fontWeight: 600 }}>
-                                全カードをLEGENDARYにするのが最終目標。
-                            </span><br />
-                            毎日コツコツ、カードを育てていきましょう。
-                        </div>
-
-                        <div style={{
-                            marginTop: 8,
-                            padding: '14px 48px', borderRadius: 14,
-                            background: 'linear-gradient(135deg, #D4AF37, #B8960C)',
-                            color: '#000', fontSize: 16, fontWeight: 800,
-                            letterSpacing: '0.1em',
-                            boxShadow: '0 4px 24px rgba(212,175,55,0.5)',
-                        }}>
-                            本番スタート
-                        </div>
-
-                        <div style={{
-                            color: 'rgba(255,255,255,0.4)', fontSize: 12,
-                        }}>
-                            tap to start
+                            {firstRunPhase === 'legendary' ? '1 / 3' : firstRunPhase === 'realmode' ? '2 / 3' : '3 / 3'}
                         </div>
                     </div>
                 </div>
@@ -7121,44 +7528,162 @@ export default function PhrasesPage() {
             )}
 
             {/* Card Rank-Up Banner */}
-            {cardRankUpEffect && (
-                <div key={cardRankUpEffect.key} style={{
-                    position: 'fixed', inset: 0,
-                    pointerEvents: 'none', zIndex: 10002,
-                }}>
-                    <div style={{
-                        position: 'absolute',
-                        top: '50%', left: '50%',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px',
-                        animation: 'rankup-banner 3s ease-out forwards',
-                    }}>
+            {/* Rank Up Full-Screen Celebration — card-preview quality */}
+            {cardRankUpEffect && (() => {
+                const rankColor = cardRankUpEffect.newRankColor;
+                const displayRank = cardRankUpEffect.newRankKey;
+                const cFrame = getCardFrame(displayRank);
+                const cShadow = getCardShadow(displayRank);
+                const cAccent = getFrameAccent(displayRank);
+                const isLight = displayRank === 'LEGENDARY';
+                const RANK_JA: Record<string, string> = {
+                    LEGENDARY: '伝説', HOLOGRAPHIC: '虹色', HOLO: '虹色', GOLD: '金', SILVER: '銀', BRONZE: '銅', NORMAL: '普通',
+                };
+                const rankJa = RANK_JA[cardRankUpEffect.newRank] || cardRankUpEffect.newRank;
+                const cPts = cardRankUpEffect.snapshotPoints;
+                const sparkles = Array.from({ length: 30 }, (_, i) => ({
+                    id: i,
+                    sx: `${(Math.random() - 0.5) * 300}px`,
+                    sy: `${(Math.random() - 0.5) * 300}px`,
+                    delay: Math.random() * 1.2,
+                    size: 3 + Math.random() * 6,
+                    color: i % 4 === 0 ? rankColor : i % 4 === 1 ? '#FDE68A' : i % 4 === 2 ? '#fff' : '#10B981',
+                }));
+                // Get displayed card info for the card visual
+                const cardPhrase = cardRankUpEffect.snapshotPhrase || (displayedCard ? { english: displayedCard.english, japanese: displayedCard.japanese, category: displayedCard.category } : null);
+                return (
+                    <div
+                        key={cardRankUpEffect.key}
+                        onClick={() => setCardRankUpEffect(null)}
+                        style={{
+                            position: 'fixed', inset: 0, zIndex: 10003,
+                            display: 'flex', flexDirection: 'column',
+                            alignItems: 'center', justifyContent: 'center',
+                            background: 'rgba(0,0,0,0.75)',
+                            cursor: 'pointer',
+                            animation: 'levelup-overlay-in 0.5s ease-out forwards',
+                            backdropFilter: 'blur(16px)',
+                        }}
+                    >
+                        {/* Expanding rings */}
+                        {[0, 0.2, 0.4, 0.6].map((delay, i) => (
+                            <div key={i} style={{
+                                position: 'absolute',
+                                width: '240px', height: '240px', borderRadius: '50%',
+                                border: `2px solid ${rankColor}`,
+                                animation: `levelup-ring-expand 2s ease-out ${delay}s infinite`,
+                            }} />
+                        ))}
+                        {/* Sparkles */}
+                        {sparkles.map(s => (
+                            <div key={s.id} style={{
+                                position: 'absolute',
+                                width: `${s.size}px`, height: `${s.size}px`,
+                                borderRadius: '50%', backgroundColor: s.color,
+                                '--sx': s.sx, '--sy': s.sy,
+                                animation: `levelup-sparkle 1.5s ease-out ${s.delay}s infinite`,
+                                boxShadow: `0 0 8px ${s.color}`,
+                            } as React.CSSProperties} />
+                        ))}
+                        {/* Glow */}
                         <div style={{
-                            fontSize: isMobile ? '32px' : '48px',
-                            fontWeight: '900',
-                            letterSpacing: '4px',
-                            color: cardRankUpEffect.newRankColor,
-                            textShadow: `0 0 30px ${cardRankUpEffect.newRankColor}80, 0 0 60px ${cardRankUpEffect.newRankColor}40, 0 4px 12px rgba(0,0,0,0.4)`,
-                            whiteSpace: 'nowrap',
-                        }}>
-                            ランクアップ!
-                        </div>
+                            position: 'absolute', width: '400px', height: '400px', borderRadius: '50%',
+                            background: `radial-gradient(circle, ${rankColor}50 0%, transparent 60%)`,
+                            animation: 'levelup-glow-pulse 1.5s ease-in-out infinite',
+                        }} />
+                        {/* Rank title */}
                         <div style={{
-                            fontSize: isMobile ? '16px' : '22px',
-                            fontWeight: '800',
-                            letterSpacing: '3px',
-                            color: '#E7E5E4',
-                            display: 'flex', alignItems: 'center', gap: '12px',
-                            textShadow: '0 2px 8px rgba(0,0,0,0.5)',
+                            animation: 'levelup-title-slide 0.6s ease-out forwards',
+                            textAlign: 'center', marginBottom: '20px', zIndex: 2,
                         }}>
-                            <span style={{ opacity: 0.6 }}>{cardRankUpEffect.oldRank}</span>
-                            <span style={{ color: '#F97316', fontSize: isMobile ? '20px' : '28px' }}>→</span>
-                            <span style={{ color: cardRankUpEffect.newRankColor, textShadow: `0 0 15px ${cardRankUpEffect.newRankColor}60` }}>
-                                {cardRankUpEffect.newRank}
-                            </span>
+                            <div style={{ fontSize: isMobile ? '12px' : '16px', fontWeight: '800', letterSpacing: '6px', color: '#fff', opacity: 0.6, marginBottom: '6px' }}>RANK UP</div>
+                            <div style={{
+                                fontSize: isMobile ? '56px' : '72px', fontWeight: '900', letterSpacing: '6px',
+                                color: rankColor,
+                                textShadow: `0 0 40px ${rankColor}80, 0 0 80px ${rankColor}40, 0 4px 20px rgba(0,0,0,0.5)`,
+                                lineHeight: 1.1,
+                            }}>{rankJa}</div>
+                            <div style={{
+                                fontSize: '22px', fontWeight: '800', letterSpacing: '4px',
+                                color: rankColor, marginTop: '8px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
+                            }}>
+                                <span style={{ opacity: 0.4, color: '#fff', fontSize: '16px' }}>{cardRankUpEffect.oldRank}</span>
+                                <span style={{ color: '#F97316' }}>&#8594;</span>
+                                <span>{cardRankUpEffect.newRank}</span>
+                            </div>
                         </div>
+                        {/* Card slam */}
+                        {cardPhrase && (
+                            <div style={{
+                                animation: 'levelup-card-slam 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                                zIndex: 2, width: '90%', maxWidth: isMobile ? '320px' : '460px',
+                            }}>
+                                <div style={{
+                                    ...cFrame, borderRadius: '12px', overflow: 'hidden',
+                                    boxShadow: `${cShadow}, 0 0 60px ${rankColor}40, 0 0 120px ${rankColor}20`,
+                                    padding: '6px',
+                                    display: 'flex', flexDirection: 'column',
+                                }}>
+                                    {/* Top bar */}
+                                    <div style={{
+                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                        padding: '5px 10px',
+                                        backgroundColor: isLight ? 'rgba(255,255,255,0.06)' : `${cAccent}12`,
+                                        borderRadius: '8px 8px 0 0',
+                                        borderBottom: `1px solid ${isLight ? 'rgba(255,255,255,0.1)' : cAccent + '30'}`,
+                                    }}>
+                                        <span style={{ fontSize: '9px', fontWeight: '800', color: rankColor, letterSpacing: '1.5px',
+                                            textShadow: `0 0 8px ${rankColor}60`,
+                                        }}>{cardRankUpEffect.newRank}</span>
+                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
+                                            <span style={{ fontSize: '14px', fontWeight: '900', color: rankColor }}>{cPts}</span>
+                                            <span style={{ fontSize: '8px', fontWeight: '700', color: isLight ? 'rgba(255,255,255,0.4)' : '#A8A29E' }}>SP</span>
+                                        </div>
+                                    </div>
+                                    {/* Card content */}
+                                    <div style={{
+                                        flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center',
+                                        background: getCardWindowBg(displayRank),
+                                        borderRadius: '8px', margin: '6px 0', padding: '24px 16px',
+                                        border: `1px solid ${isLight ? 'rgba(255,255,255,0.08)' : cAccent + '25'}`,
+                                        position: 'relative', overflow: 'hidden', textAlign: 'center',
+                                    }}>
+                                        {(displayRank === 'HOLOGRAPHIC' || displayRank === 'LEGENDARY') && <div style={{ position: 'absolute', inset: 0, opacity: 0.06, background: 'repeating-conic-gradient(from 0deg, rgba(168,85,247,0.1) 0deg, rgba(59,130,246,0.1) 60deg, rgba(232,121,249,0.1) 120deg, rgba(16,185,129,0.1) 180deg, rgba(245,158,11,0.1) 240deg, rgba(168,85,247,0.1) 360deg)', pointerEvents: 'none' }} />}
+                                        <div style={{
+                                            fontSize: isMobile ? '24px' : '30px', fontWeight: '800', color: isLight ? '#FAFAF9' : '#1C1917',
+                                            lineHeight: 1.3, marginBottom: '8px', position: 'relative',
+                                            textShadow: isLight ? '0 1px 4px rgba(0,0,0,0.5)' : 'none',
+                                        }}>{cardPhrase.english}</div>
+                                        <div style={{
+                                            fontSize: isMobile ? '14px' : '18px', color: isLight ? 'rgba(255,255,255,0.5)' : '#78716C',
+                                            position: 'relative',
+                                        }}>{cardPhrase.japanese}</div>
+                                    </div>
+                                    {/* Bottom bar */}
+                                    <div style={{
+                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                        padding: '5px 10px',
+                                        backgroundColor: isLight ? 'rgba(255,255,255,0.04)' : `${cAccent}08`,
+                                        borderRadius: '0 0 8px 8px',
+                                        borderTop: `1px solid ${isLight ? 'rgba(255,255,255,0.08)' : cAccent + '20'}`,
+                                    }}>
+                                        <span style={{ fontSize: '9px', fontWeight: '700', color: isLight ? 'rgba(255,255,255,0.5)' : '#A8A29E' }}>
+                                            {cardPhrase.category}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        {/* Tap instruction */}
+                        <div style={{
+                            marginTop: '28px', fontSize: '12px', color: '#ffffff60',
+                            letterSpacing: '3px', fontWeight: '600', zIndex: 2,
+                            animation: 'levelup-glow-pulse 2s ease-in-out infinite',
+                        }}>TAP TO CONTINUE</div>
                     </div>
-                </div>
-            )}
+                );
+            })()}
 
             {/* Point Effect Overlay */}
             {pointEffect && (
@@ -7984,7 +8509,7 @@ export default function PhrasesPage() {
                             }}
                             style={{
                                 padding: '4px 10px',
-                                borderRadius: '0 4px 4px 0',
+                                borderRadius: '0',
                                 border: dataMode === 'words' ? '1.5px solid #8B5CF6' : '1px solid #E7E5E4',
                                 backgroundColor: dataMode === 'words' ? '#F5F3FF' : '#fff',
                                 color: dataMode === 'words' ? '#6D28D9' : '#A8A29E',
@@ -7995,6 +8520,30 @@ export default function PhrasesPage() {
                             }}
                         >
                             Words
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (!toeicTargetLevel) {
+                                    setShowToeicLevelPicker(true);
+                                    return;
+                                }
+                                setDataMode('toeic');
+                                localStorage.setItem('training-data-mode', 'toeic');
+                                setViewMode('calendar');
+                            }}
+                            style={{
+                                padding: '4px 10px',
+                                borderRadius: '0 4px 4px 0',
+                                border: dataMode === 'toeic' ? '1.5px solid #F59E0B' : '1px solid #E7E5E4',
+                                backgroundColor: dataMode === 'toeic' ? '#FFFBEB' : '#fff',
+                                color: dataMode === 'toeic' ? '#B45309' : '#A8A29E',
+                                fontSize: '10px',
+                                fontWeight: dataMode === 'toeic' ? '700' : '500',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s',
+                            }}
+                        >
+                            TOEIC
                         </button>
                     </div>
                     {viewMode === 'calendar' && (
@@ -10369,6 +10918,53 @@ export default function PhrasesPage() {
                                 {vocabSaving ? 'Saving...' : 'Save'}
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Progressive Tip Coach Mark ── */}
+            {activeTip && TIP_CONTENT[activeTip] && (
+                <div
+                    onClick={dismissTip}
+                    style={{
+                        position: 'fixed',
+                        bottom: 24, left: '50%', transform: 'translateX(-50%)',
+                        zIndex: 9500,
+                        maxWidth: 380, width: 'calc(100% - 32px)',
+                        backgroundColor: '#1a1a1a',
+                        borderRadius: 16,
+                        padding: '16px 20px',
+                        boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 0 2px ${TIP_CONTENT[activeTip].color}40`,
+                        cursor: 'pointer',
+                        animation: 'tip-slide-up 0.3s ease-out',
+                    }}
+                >
+                    <div style={{
+                        display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8,
+                    }}>
+                        <div style={{
+                            width: 8, height: 8, borderRadius: '50%',
+                            backgroundColor: TIP_CONTENT[activeTip].color,
+                            boxShadow: `0 0 8px ${TIP_CONTENT[activeTip].color}`,
+                            flexShrink: 0,
+                        }} />
+                        <div style={{
+                            fontSize: 14, fontWeight: 800, color: TIP_CONTENT[activeTip].color,
+                            letterSpacing: '0.02em',
+                        }}>
+                            {TIP_CONTENT[activeTip].title}
+                        </div>
+                    </div>
+                    <div style={{
+                        fontSize: 13, color: '#ccc', lineHeight: 1.6,
+                        fontWeight: 400,
+                    }}>
+                        {TIP_CONTENT[activeTip].body}
+                    </div>
+                    <div style={{
+                        fontSize: 10, color: '#666', textAlign: 'right', marginTop: 8,
+                    }}>
+                        tap to dismiss
                     </div>
                 </div>
             )}

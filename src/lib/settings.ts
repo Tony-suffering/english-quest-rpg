@@ -9,6 +9,7 @@ export interface AppSettings {
     feverBgmVolume: number;    // FEVER BGM volume 0-100
     bgmEnabled: boolean;       // Background music ON/OFF
     bgmVolume: number;         // BGM volume 0-100
+    beginnerMode: boolean;     // Progressive unlock gating ON/OFF
 }
 
 const STORAGE_KEY = 'eigodamashii-settings';
@@ -21,14 +22,24 @@ const DEFAULTS: AppSettings = {
     feverBgmVolume: 35,
     bgmEnabled: true,
     bgmVolume: 30,
+    beginnerMode: true,
 };
 
 export function getSettings(): AppSettings {
     if (typeof window === 'undefined') return { ...DEFAULTS };
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return { ...DEFAULTS };
+        if (!raw) {
+            // Existing users (have quest-mastery) are not beginners
+            const isExisting = !!localStorage.getItem('quest-mastery');
+            return { ...DEFAULTS, beginnerMode: isExisting ? false : true };
+        }
         const parsed = JSON.parse(raw);
+        // If beginnerMode was never explicitly set, infer from existing data
+        if (parsed.beginnerMode === undefined) {
+            const isExisting = !!localStorage.getItem('quest-mastery');
+            parsed.beginnerMode = isExisting ? false : true;
+        }
         return { ...DEFAULTS, ...parsed };
     } catch {
         return { ...DEFAULTS };
