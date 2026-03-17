@@ -3356,77 +3356,264 @@ export default function PhrasesPage() {
         key: number;
     } | null>(null);
 
-    // ── Progressive Tip System ──
-    // Contextual guidance that appears at key milestones after first-run
-    type TipId = 'first-gacha' | 'first-chain' | 'first-rankup' | 'calendar-hint' | 'slot-explain' | 'data-switch' | 'streak-encourage' | 'chakra-explain';
+    // ── Progressive Tip System (v2: queued, multi-layered) ──
+    type TipId =
+        // Core mechanics (show once)
+        | 'welcome-back' | 'first-review' | 'mastery-tap' | 'first-gacha' | 'first-chain'
+        | 'first-rankup' | 'slot-explain' | 'data-switch' | 'chakra-explain' | 'calendar-hint'
+        // Interaction guidance (show once per feature)
+        | 'review-swipe' | 'tts-hint' | 'recording-hint' | 'link-hint' | 'filter-hint'
+        | 'list-view-hint' | 'add-phrase-hint' | 'listen-mode-hint'
+        // Encouragement (show once per milestone)
+        | 'streak-3' | 'streak-10' | 'cards-10' | 'cards-50' | 'day-complete'
+        | 'consecutive-days-3' | 'consecutive-days-7'
+        // Next-step nudges
+        | 'after-first-review' | 'try-toeic' | 'try-review-mode' | 'check-collection';
+
     const [activeTip, setActiveTip] = useState<TipId | null>(null);
+    const tipQueueRef = useRef<TipId[]>([]);
     const shownTipsRef = useRef<Set<string>>(new Set());
+    const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
     useEffect(() => {
         try {
             const saved = localStorage.getItem('rpg-tips-shown');
             if (saved) shownTipsRef.current = new Set(JSON.parse(saved));
         } catch { /* */ }
     }, []);
-    const showTip = useCallback((tipId: TipId) => {
-        if (isFirstRun || firstRunComplete) return; // skip during first-run flow
-        if (shownTipsRef.current.has(tipId)) return; // already shown
+
+    const showTip = useCallback((tipId: TipId, delay?: number) => {
+        if (isFirstRun || firstRunComplete) return;
+        if (shownTipsRef.current.has(tipId)) return;
         shownTipsRef.current.add(tipId);
         try { localStorage.setItem('rpg-tips-shown', JSON.stringify([...shownTipsRef.current])); } catch { /* */ }
-        setActiveTip(tipId);
-    }, [isFirstRun, firstRunComplete]);
-    const dismissTip = useCallback(() => setActiveTip(null), []);
-    // Auto-dismiss tips after 8 seconds
+        const doShow = () => {
+            if (activeTip) {
+                // Queue it if another tip is showing
+                tipQueueRef.current.push(tipId);
+            } else {
+                setActiveTip(tipId);
+            }
+        };
+        if (delay) {
+            setTimeout(doShow, delay);
+        } else {
+            doShow();
+        }
+    }, [isFirstRun, firstRunComplete, activeTip]);
+
+    const dismissTip = useCallback(() => {
+        setActiveTip(null);
+        if (tipTimerRef.current) { clearTimeout(tipTimerRef.current); tipTimerRef.current = null; }
+        // Show next queued tip after brief pause
+        setTimeout(() => {
+            if (tipQueueRef.current.length > 0) {
+                const next = tipQueueRef.current.shift()!;
+                setActiveTip(next);
+            }
+        }, 500);
+    }, []);
+
+    // Auto-dismiss tips (longer for important ones, shorter for encouragement)
     useEffect(() => {
         if (!activeTip) return;
-        const timer = setTimeout(() => setActiveTip(null), 8000);
-        return () => clearTimeout(timer);
+        const isLong = ['mastery-tap', 'first-review', 'review-swipe', 'slot-explain', 'calendar-hint'].includes(activeTip);
+        const duration = isLong ? 12000 : 7000;
+        tipTimerRef.current = setTimeout(() => {
+            setActiveTip(null);
+            // Dequeue next
+            setTimeout(() => {
+                if (tipQueueRef.current.length > 0) {
+                    const next = tipQueueRef.current.shift()!;
+                    setActiveTip(next);
+                }
+            }, 500);
+        }, duration);
+        return () => { if (tipTimerRef.current) clearTimeout(tipTimerRef.current); };
     }, [activeTip]);
 
-    const TIP_CONTENT: Record<string, { title: string; body: string; color: string }> = {
+    const TIP_CONTENT: Record<string, { title: string; body: string; color: string; action?: string }> = {
+        // ── Core Mechanics ──
+        'welcome-back': {
+            title: 'おかえり!',
+            body: 'まずはカレンダーから今日の日付をタップして、今日のカードを確認しよう。',
+            color: '#D4AF37', action: '日付をタップ →',
+        },
+        'first-review': {
+            title: 'カードレビューの基本',
+            body: '英語を見て意味がわかったら「知ってる」、わからなければ「まだ」をタップ。\n正解するとスロットが回ってポイントがもらえるぞ!',
+            color: '#10B981', action: 'カードをタップ →',
+        },
+        'mastery-tap': {
+            title: 'レベルの上げ方',
+            body: 'カード左上のレベルボタンをタップすると習熟度が上がる。\nEGG(0) → HATCH(1) → ROOKIE(2) → FIGHTER(3) → CHAMPION(4)\n4回タップで「体に染み込んだ」状態!',
+            color: '#10B981',
+        },
         'first-gacha': {
             title: 'ガチャ結果!',
-            body: '正解するたびにカードポイント(CP)がもらえる。CPが貯まるとカードのランクが上がるぞ!',
+            body: '正解するたびにカードポイント(CP)がもらえる。CPが貯まるとカードのランクが上がるぞ!\nMISS→BONUS→GREAT→SUPER→MEGA→LEGENDARY',
             color: '#D4AF37',
         },
         'first-chain': {
             title: '確変モード突入!',
-            body: '連続正解でチェーンが発動! 確変(x1.5)→激熱(x2)→神(x3)とポイント倍率がアップ。パチンコのアレだ!',
+            body: '連続正解でチェーンが発動! 確変(x1.5)→激熱(x2)→神(x3)とポイント倍率がアップ。パチンコのアレだ!\n画面の色が変わったら確変中!',
             color: '#EF4444',
         },
         'first-rankup': {
             title: 'ランクアップ!',
-            body: 'カードのランクが上がった! NORMAL→BRONZE→SILVER→GOLD→HOLOGRAPHIC→LEGENDARY。全部LEGENDARYにできるか?',
+            body: 'カードのランクが上がった!\nNORMAL → BRONZE → SILVER → GOLD → HOLOGRAPHIC → LEGENDARY\nレアカードを集めよう!',
             color: '#8B5CF6',
         },
-        'calendar-hint': {
-            title: 'カレンダーの見方',
-            body: '日付をタップするとその日のカードが表示される。毎日やると色が変わっていくぞ。連続記録を伸ばそう!',
-            color: '#3B82F6',
-        },
         'slot-explain': {
-            title: 'スロットマシン',
-            body: '正解するとスロットが自動で回る。揃えばボーナスCP! リーチ演出もあるから見逃すな!',
+            title: 'スロット解禁!',
+            body: '3日連続で来てくれたご褒美! 正解するとスロットが自動で回る。揃えばボーナスCP!\nリーチ演出もあるから見逃すな!',
             color: '#F59E0B',
         },
         'data-switch': {
             title: 'データ切替',
-            body: 'Phrases(フレーズ)、Words(単語)、TOEIC(試験対策)を切り替えられる。TOEICはレベル別に分かれてるぞ!',
+            body: 'Phrases(英会話フレーズ)、Words(単語)、TOEIC(試験対策)の3つのモードがある。\n目的に合わせて切り替えよう!',
             color: '#10B981',
         },
-        'streak-encourage': {
-            title: '連続正解!',
-            body: 'いい調子! 連続正解を続けると確変モードに入りやすくなる。集中して一気にいけ!',
+        'chakra-explain': {
+            title: 'チャクラ進化!',
+            body: 'カードが進化した! 習熟度を上げると:\nEGG→HATCH→ROOKIE→FIGHTER→CHAMPION→ELITE→MASTER\n録音・リンク追加でさらにレベルアップ!',
+            color: '#6366F1',
+        },
+        'calendar-hint': {
+            title: 'カレンダーの見方',
+            body: '各日付のバーは習熟度を表してる。バーが伸びるほど覚えてるということ。\n色付きの日 = データがある日。灰色 = まだ。',
+            color: '#3B82F6',
+        },
+        // ── Interaction Guidance ──
+        'review-swipe': {
+            title: '操作ヒント',
+            body: 'キーボードの←→でカード切替、スペースで正解/不正解。\nマウスなら画面下のボタンでもOK。',
+            color: '#78716C',
+        },
+        'tts-hint': {
+            title: '音声で聞こう',
+            body: 'カード横のスピーカーボタンで英語の発音が聞ける。\n何度も聞いて耳に馴染ませよう!',
+            color: '#3B82F6', action: 'スピーカーをタップ →',
+        },
+        'recording-hint': {
+            title: '自分の声を録音しよう',
+            body: 'マイクボタンで自分の発音を録音できる。\n録音するとチャクラレベルがアップ! ネイティブと比べてみよう。',
+            color: '#EF4444', action: 'マイクをタップ →',
+        },
+        'link-hint': {
+            title: '研究メモを残そう',
+            body: '「研究」ボタンで関連フレーズやメモを追加できる。\nリンクを追加するとチャクラがさらにレベルアップ!',
+            color: '#8B5CF6',
+        },
+        'filter-hint': {
+            title: 'フィルターを使おう',
+            body: '復習モードではレベル別にカードを絞り込める。\n「random」で全部シャッフル、レベル0だけ集中復習もできる。',
+            color: '#F59E0B',
+        },
+        'list-view-hint': {
+            title: 'リストビュー',
+            body: '右上の「List」ボタンで全カードをリスト表示。\n検索もできるから、特定のフレーズを探すときに便利!',
+            color: '#78716C',
+        },
+        'add-phrase-hint': {
+            title: 'フレーズ追加',
+            body: '右上の「+」ボタンで新しいフレーズを追加できる。\n日常で見つけた使える英語をどんどん登録しよう!',
+            color: '#1C1917',
+        },
+        'listen-mode-hint': {
+            title: 'リスニングモード',
+            body: '「Listen」ボタンでその日のカードを連続再生。\n通勤中、家事中にBGM感覚でリスニング練習!',
+            color: '#3B82F6',
+        },
+        // ── Encouragement ──
+        'streak-3': {
+            title: '3連続正解!',
+            body: 'いい調子! この感覚を覚えておこう。\n続けると確変モードが近づいてくるぞ!',
             color: '#F97316',
         },
-        'chakra-explain': {
-            title: 'チャクラレベルアップ!',
-            body: 'カードのチャクラが進化した! EGG→HATCH→ROOKIE→FIGHTER→CHAMPION→ELITE→MASTERの7段階。育てていこう!',
-            color: '#6366F1',
+        'streak-10': {
+            title: '10連続正解!',
+            body: 'すごい集中力! もう確変マスターだな。\nこの調子で神モードを目指せ!',
+            color: '#EF4444',
+        },
+        'cards-10': {
+            title: '10枚クリア!',
+            body: '今日はもう10枚レビューした。立派!\n毎日10枚が理想的なペースだぞ。',
+            color: '#10B981',
+        },
+        'cards-50': {
+            title: '50枚突破!',
+            body: 'マジで? 50枚もレビューしたの?\nその根性、英語力に変わってるから安心しろ。',
+            color: '#D4AF37',
+        },
+        'day-complete': {
+            title: '今日のノルマ達成!',
+            body: '今日のカードを全部レビューした!\nカードコレクションで成果を確認してみよう。',
+            color: '#10B981', action: 'カードコレクション →',
+        },
+        'consecutive-days-3': {
+            title: '3日連続!',
+            body: '3日連続でトレーニング! この習慣が一番大事。\n3日坊主じゃなかった。自分を褒めろ!',
+            color: '#D4AF37',
+        },
+        'consecutive-days-7': {
+            title: '7日連続!',
+            body: '1週間毎日来てる。もう習慣になってるな。\nこの調子なら英語力は確実に伸びてる!',
+            color: '#EF4444',
+        },
+        // ── Next-Step Nudges ──
+        'after-first-review': {
+            title: '最初のレビュー完了!',
+            body: '1枚目のレビューお疲れ様! カレンダーに戻って他の日付も見てみよう。\n毎日少しずつ、これが最強の英語学習法。',
+            color: '#10B981', action: 'カレンダーに戻る →',
+        },
+        'try-toeic': {
+            title: 'TOEICモードもあるよ',
+            body: '右上の「TOEIC」タブで試験対策用の単語が練習できる。\n400点→500点→600点→730点のレベル別!',
+            color: '#F59E0B', action: 'TOEICタブ →',
+        },
+        'try-review-mode': {
+            title: '復習モードを試そう',
+            body: '「復習」ボタンでカードをシャッフルしてランダムにレビューできる。\nスロットもここで回るぞ!',
+            color: '#D4AF37', action: '復習ボタン →',
+        },
+        'check-collection': {
+            title: 'カードコレクション',
+            body: '集めたカードはカードコレクションで一覧できる。\nランク別、レベル別に確認してみよう!',
+            color: '#8B5CF6', action: 'サイドバー → カードコレクション',
         },
     };
 
     // ── Tip triggers ──
-    // First gacha result (non-first-run)
+    // Welcome back (first visit after first-run, show calendar tip)
+    const welcomeTipFired = useRef(false);
+    useEffect(() => {
+        if (welcomeTipFired.current || isFirstRun || loading) return;
+        welcomeTipFired.current = true;
+        // Delay so page renders first
+        const timer = setTimeout(() => {
+            showTip('welcome-back');
+        }, 1500);
+        return () => clearTimeout(timer);
+    }, [isFirstRun, loading, showTip]);
+
+    // First time entering review mode
+    const prevViewModeRef = useRef(viewMode);
+    useEffect(() => {
+        if (viewMode === 'review' && prevViewModeRef.current !== 'review') {
+            showTip('first-review', 800);
+            // Queue interaction hints
+            setTimeout(() => showTip('review-swipe'), 15000);
+            setTimeout(() => showTip('tts-hint'), 25000);
+            setTimeout(() => showTip('recording-hint'), 40000);
+        }
+        if (viewMode === 'list' && prevViewModeRef.current !== 'list') {
+            showTip('list-view-hint');
+        }
+        prevViewModeRef.current = viewMode;
+    }, [viewMode, showTip]);
+
+    // First gacha result
     useEffect(() => {
         if (gachaEffect?.phase === 'reveal' && !isFirstRun) {
             showTip('first-gacha');
@@ -3438,7 +3625,7 @@ export default function PhrasesPage() {
             showTip('first-chain');
         }
     }, [chainTransition, isFirstRun, showTip]);
-    // First card rank-up (non-first-run)
+    // First card rank-up
     useEffect(() => {
         if (cardRankUpEffect && !isFirstRun) {
             showTip('first-rankup');
@@ -3456,13 +3643,13 @@ export default function PhrasesPage() {
             showTip('slot-explain');
         }
     }, [SLOT_UNLOCKED, isFirstRun, daysActive.length, showTip]);
-    // Streak encouragement (5 correct in a row, non-chain)
+    // Streak milestones
     useEffect(() => {
-        if (chainState.count === 5 && chainState.mode === 'kakuhen' && !isFirstRun) {
-            showTip('streak-encourage');
-        }
-    }, [chainState.count, chainState.mode, isFirstRun, showTip]);
-    // Data mode switch tip
+        if (isFirstRun) return;
+        if (chainState.count === 3) showTip('streak-3');
+        if (chainState.count === 10) showTip('streak-10');
+    }, [chainState.count, isFirstRun, showTip]);
+    // Data mode switch
     const prevDataModeRef = useRef(dataMode);
     useEffect(() => {
         if (dataMode !== prevDataModeRef.current) {
@@ -3470,6 +3657,38 @@ export default function PhrasesPage() {
             showTip('data-switch');
         }
     }, [dataMode, showTip]);
+    // Consecutive days milestones
+    useEffect(() => {
+        if (isFirstRun) return;
+        const len = daysActive.length;
+        if (len === 3) showTip('consecutive-days-3', 2000);
+        if (len === 7) showTip('consecutive-days-7', 2000);
+    }, [daysActive.length, isFirstRun, showTip]);
+    // After some time on calendar, nudge to try review mode
+    useEffect(() => {
+        if (viewMode !== 'calendar' || isFirstRun || loading) return;
+        const timer = setTimeout(() => {
+            showTip('try-review-mode');
+        }, 60000); // after 1 min on calendar
+        return () => clearTimeout(timer);
+    }, [viewMode, isFirstRun, loading, showTip]);
+    // After 5 days, suggest TOEIC
+    useEffect(() => {
+        if (daysActive.length >= 5 && !isFirstRun) {
+            showTip('try-toeic', 3000);
+        }
+    }, [daysActive.length, isFirstRun, showTip]);
+    // Review count tracking for card milestones
+    const reviewCountSession = useRef(0);
+    const trackReviewCount = useCallback(() => {
+        reviewCountSession.current++;
+        if (reviewCountSession.current === 10) showTip('cards-10');
+        if (reviewCountSession.current === 50) showTip('cards-50');
+        if (reviewCountSession.current === 1) {
+            // First review of session: queue after-first-review nudge
+            setTimeout(() => showTip('after-first-review'), 5000);
+        }
+    }, [showTip]);
 
     // Auto-clear fever flash
     useEffect(() => {
@@ -6472,8 +6691,9 @@ export default function PhrasesPage() {
             console.error('Failed to save mastery:', err);
         }
 
+        trackReviewCount();
         return true;
-    }, [phraseMastery, voiceRecordings, phraseLinks, phraseLastLeveled, clientToday, phraseDateMap, dataMode]);
+    }, [phraseMastery, voiceRecordings, phraseLinks, phraseLastLeveled, clientToday, phraseDateMap, dataMode, trackReviewCount]);
 
     // Declare CROWN: VISION(5) -> CROWN(6) in DB
     const declareCrown = useCallback(async (phraseId: string) => {
@@ -8598,17 +8818,47 @@ export default function PhrasesPage() {
                     >
                         +
                     </button>
-                    <Link
-                        href="/english/training/guide"
+                    <button
+                        onClick={() => {
+                            // Context-sensitive help based on current view
+                            const helpTips: Record<string, string> = {
+                                calendar: viewMode === 'calendar'
+                                    ? '【カレンダー】日付タップでその日のカード表示。バーは習熟度。\n右上: Phrases/Words/TOEIC切替、Listen=連続再生、復習=シャッフルレビュー、List=一覧、+=追加'
+                                    : '',
+                                review: viewMode === 'review'
+                                    ? '【復習モード】\n- カード左上: レベルボタン(タップで習熟度UP)\n- スピーカー: 発音再生\n- マイク: 録音(チャクラUP)\n- 研究: メモ追加(チャクラUP)\n- ←→キーでカード切替\n- 正解でスロット回転→CP獲得→ランクUP'
+                                    : '',
+                                list: viewMode === 'list'
+                                    ? '【リスト】全カード一覧。検索バーでフレーズ検索。\nステータス列で習熟度確認。カテゴリでフィルタ可能。'
+                                    : '',
+                            };
+                            const msg = helpTips[viewMode] || helpTips.calendar;
+                            // Show as a temporary inline tip
+                            setActiveTip(null); // clear any existing
+                            tipQueueRef.current = []; // clear queue
+                            // Use a special approach: temporarily show help
+                            const helpKey = `help-${viewMode}` as TipId;
+                            if (!TIP_CONTENT[helpKey]) {
+                                // Add dynamic help content
+                                (TIP_CONTENT as Record<string, { title: string; body: string; color: string }>)[helpKey] = {
+                                    title: 'ヘルプ',
+                                    body: msg,
+                                    color: '#78716C',
+                                };
+                            }
+                            shownTipsRef.current.delete(helpKey); // always allow re-show
+                            setActiveTip(helpKey);
+                        }}
                         style={{
-                            background: 'none', border: 'none',
+                            background: 'none', border: '1px solid #E7E5E4',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             cursor: 'pointer', fontSize: '11px', color: '#A8A29E',
-                            textDecoration: 'none', padding: '4px',
+                            borderRadius: '50%', width: 24, height: 24,
+                            fontWeight: 700, padding: 0,
                         }}
                     >
                         ?
-                    </Link>
+                    </button>
                 </div>
             </div>
 
@@ -10923,51 +11173,66 @@ export default function PhrasesPage() {
             )}
 
             {/* ── Progressive Tip Coach Mark ── */}
-            {activeTip && TIP_CONTENT[activeTip] && (
-                <div
-                    onClick={dismissTip}
-                    style={{
-                        position: 'fixed',
-                        bottom: 24, left: '50%', transform: 'translateX(-50%)',
-                        zIndex: 9500,
-                        maxWidth: 380, width: 'calc(100% - 32px)',
-                        backgroundColor: '#1a1a1a',
-                        borderRadius: 16,
-                        padding: '16px 20px',
-                        boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 0 2px ${TIP_CONTENT[activeTip].color}40`,
-                        cursor: 'pointer',
-                        animation: 'tip-slide-up 0.3s ease-out',
-                    }}
-                >
-                    <div style={{
-                        display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8,
-                    }}>
+            {activeTip && TIP_CONTENT[activeTip] && (() => {
+                const tip = TIP_CONTENT[activeTip];
+                return (
+                    <div
+                        onClick={dismissTip}
+                        style={{
+                            position: 'fixed',
+                            bottom: 24, left: '50%', transform: 'translateX(-50%)',
+                            zIndex: 9500,
+                            maxWidth: 380, width: 'calc(100% - 32px)',
+                            backgroundColor: '#1a1a1a',
+                            borderRadius: 16,
+                            padding: '16px 20px',
+                            boxShadow: `0 8px 32px rgba(0,0,0,0.4), 0 0 0 2px ${tip.color}40`,
+                            cursor: 'pointer',
+                            animation: 'tip-slide-up 0.3s ease-out',
+                        }}
+                    >
                         <div style={{
-                            width: 8, height: 8, borderRadius: '50%',
-                            backgroundColor: TIP_CONTENT[activeTip].color,
-                            boxShadow: `0 0 8px ${TIP_CONTENT[activeTip].color}`,
-                            flexShrink: 0,
-                        }} />
-                        <div style={{
-                            fontSize: 14, fontWeight: 800, color: TIP_CONTENT[activeTip].color,
-                            letterSpacing: '0.02em',
+                            display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8,
                         }}>
-                            {TIP_CONTENT[activeTip].title}
+                            <div style={{
+                                width: 8, height: 8, borderRadius: '50%',
+                                backgroundColor: tip.color,
+                                boxShadow: `0 0 8px ${tip.color}`,
+                                animation: 'tip-dot-pulse 2s ease-in-out infinite',
+                                flexShrink: 0,
+                            }} />
+                            <div style={{
+                                fontSize: 14, fontWeight: 800, color: tip.color,
+                                letterSpacing: '0.02em',
+                            }}>
+                                {tip.title}
+                            </div>
+                        </div>
+                        <div style={{
+                            fontSize: 13, color: '#ccc', lineHeight: 1.7,
+                            fontWeight: 400, whiteSpace: 'pre-line',
+                        }}>
+                            {tip.body}
+                        </div>
+                        {tip.action && (
+                            <div style={{
+                                marginTop: 10, padding: '6px 12px',
+                                backgroundColor: `${tip.color}20`,
+                                borderRadius: 8, display: 'inline-block',
+                                fontSize: 12, fontWeight: 700, color: tip.color,
+                                letterSpacing: '0.02em',
+                            }}>
+                                {tip.action}
+                            </div>
+                        )}
+                        <div style={{
+                            fontSize: 10, color: '#555', textAlign: 'right', marginTop: 6,
+                        }}>
+                            tap to close
                         </div>
                     </div>
-                    <div style={{
-                        fontSize: 13, color: '#ccc', lineHeight: 1.6,
-                        fontWeight: 400,
-                    }}>
-                        {TIP_CONTENT[activeTip].body}
-                    </div>
-                    <div style={{
-                        fontSize: 10, color: '#666', textAlign: 'right', marginTop: 8,
-                    }}>
-                        tap to dismiss
-                    </div>
-                </div>
-            )}
+                );
+            })()}
         </div>
     );
 }

@@ -2153,8 +2153,12 @@
     50% { opacity: 0.8; transform: scale(1.1); }
 }
 
-/* Progressive tip slide-up animation */
+/* Progressive tip animations */
 @keyframes tip-slide-up {
     0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
     100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes tip-dot-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.4); }
 }
