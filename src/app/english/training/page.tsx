@@ -4123,6 +4123,8 @@ export default function PhrasesPage() {
 
     // Helper: post XP to review-count + update player level + chain transitions
     const postXP = useCallback((todayKey: string, xpGained: number, slamActive = false, phraseId?: string) => {
+        // Block if god mode dismissed (waiting for congrats overlay)
+        if (firstRunGodDismissed.current) return;
         if (IS_PUBLIC) {
             // 3004: ローカルガチャシミュレーション（DB不要、演出は維持）
             const currentChain = feverRef.current;
@@ -4222,6 +4224,8 @@ export default function PhrasesPage() {
                     const firstRun = isFirstRunRef.current;
                     if (firstRun) {
                         // First-run: guaranteed chain progression (streak-based)
+                        // Cap at 10 (god mode entry) — don't increment further
+                        if (currentChain.streak >= 10) return; // already in god, wait for user to dismiss
                         const newCount = currentChain.streak + 1;
                         const oldMode = getChainMode(currentChain.streak);
                         const newMode = getChainMode(newCount);
@@ -4233,6 +4237,8 @@ export default function PhrasesPage() {
                             if (!wasActive) {
                                 setFeverFlash('enter');
                                 playFeverEntrySound();
+                                // Stop any existing BGM before starting new one
+                                if (feverDroneRef.current) { stopFeverBGM(feverDroneRef.current); }
                                 feverDroneRef.current = startFeverBGM();
                             } else {
                                 playFeverEntrySound();
@@ -4265,6 +4271,7 @@ export default function PhrasesPage() {
                             fireChainTransition({ from: 'normal', to: 'kakuhen', key: effectKey() });
                             setFeverFlash('enter');
                             playFeverEntrySound();
+                            if (feverDroneRef.current) { stopFeverBGM(feverDroneRef.current); }
                             feverDroneRef.current = startFeverBGM();
                         }
                         // else: no chain entry, stay normal
@@ -4412,6 +4419,7 @@ export default function PhrasesPage() {
                                     fireChainTransition({ from: 'normal', to: 'kakuhen', key: effectKey() });
                                     setFeverFlash('enter');
                                     playFeverEntrySound();
+                                    if (feverDroneRef.current) { stopFeverBGM(feverDroneRef.current); }
                                     feverDroneRef.current = startFeverBGM();
                                 }
                             }
