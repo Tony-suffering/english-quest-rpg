@@ -242,6 +242,7 @@ export default function IzakayaToeicPage() {
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
             {[
+              { href: '/english/izakaya-toeic/program', icon: '30', iconColor: '#fff', iconBg: T.gold, title: '30日間プログラム', sub: '30日で完走 -- カレンダーで進捗管理' },
               { href: '/english/training', icon: 'S', iconColor: T.green, iconBg: T.greenBg, title: 'TOEIC単語トレーニング', sub: 'エピソードの語彙をスロットマシンで復習' },
               { href: '/english/izakaya-toeic/guide', icon: 'G', iconColor: T.blue, iconBg: T.blue + '08', title: 'Part別攻略ガイド', sub: 'Part 1-4のテクニックと頻出パターン' },
               { href: '/english/izakaya-toeic/paraphrase', icon: 'P', iconColor: T.gold, iconBg: T.goldBg, title: 'パラフレーズ辞典', sub: '167パターン -- 600→800点の最重要スキル' },

@@ -499,6 +499,7 @@ const episode: IzakayaEpisode = {
     { word: 'body of work', meaning: '作品群、業績', example: 'He spent three decades building a body of work.', partOfSpeech: 'noun phrase' },
   ],
   previousEpisodeId: 'ep-019',
+  nextEpisodeId: 'ep-021',
 };
 
 export default episode;
