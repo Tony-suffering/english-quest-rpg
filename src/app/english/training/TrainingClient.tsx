@@ -15,8 +15,8 @@ import ReviewSlotPanel from '@/components/english/ReviewSlotPanel';
 import { TOEIC_30DAY, getToeicStartDate, getToeicCurrentDay } from '@/data/izakaya-toeic/toeic-30day-content';
 import './training-animations.css';
 
-// 3004 = 公開RPG。DBなし、TOEIC 30日コンテンツで動く
-const IS_PUBLIC = typeof window !== 'undefined' && window.location.port === '3004';
+// 公開RPG: localhost:3004 or toniolab.com。DBなし、TOEIC 30日コンテンツで動く
+const IS_PUBLIC = typeof window !== 'undefined' && (window.location.port === '3004' || window.location.hostname.includes('toniolab'));
 
 interface VoiceRecording {
     id: number;

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { IZAKAYA_CHARACTERS } from '@/data/izakaya-toeic/characters';
 import { ToeicPart } from '@/data/izakaya-toeic/types';
@@ -70,7 +69,8 @@ function ScoreBar({ current, target, color }: { current: number; target: number;
 }
 
 export default function CharactersPage() {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  // All characters always expanded (no accordion)
+  const expandedId = '__all__';
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, color: T.text }}>
@@ -129,22 +129,20 @@ export default function CharactersPage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {IZAKAYA_CHARACTERS.map((char, i) => {
             const hook = CHARACTER_HOOKS[char.id];
-            const isExpanded = expandedId === char.id;
+            const isExpanded = true;
             const isMaster = char.id === 'master';
 
             return (
               <div
                 key={char.id}
-                onClick={() => setExpandedId(isExpanded ? null : char.id)}
                 style={{
                   position: 'relative',
                   padding: 0,
                   background: T.surface,
                   borderRadius: 16,
                   border: `1px solid ${isExpanded ? char.color + '50' : T.border}`,
-                  cursor: 'pointer',
                   transition: 'all 0.25s ease',
-                  boxShadow: isExpanded ? `0 8px 32px ${char.color}15` : T.shadow,
+                  boxShadow: `0 8px 32px ${char.color}15`,
                   overflow: 'hidden',
                   animation: `izk-slideup 0.4s ease ${i * 0.07}s both`,
                 }}
