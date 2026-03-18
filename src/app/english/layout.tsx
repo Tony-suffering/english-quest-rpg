@@ -248,12 +248,11 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                     <MockCard en="How's it going?" ja="調子どう？" showAnswer={true} />
                 </div>
                 <div style={{ fontSize: 13, color: '#aaa', lineHeight: 2, textAlign: 'center', ...fadeIn(0.5) }}>
-                    トレーニング画面を開くと、<br />
-                    英語と日本語がセットで表示される。<br /><br />
-                    <span style={{ color: '#fff', fontWeight: 600 }}>声に出して読んでみて。</span><br />
-                    意味を確認して、頭に入れる。<br /><br />
-                    覚えた？ まだ怪しい？<br />
-                    自分で判断して次のステップへ。
+                    600個のフレーズが<br />
+                    <span style={{ color: '#fff', fontWeight: 600 }}>ランダムシャッフル</span>で出てくる。<br /><br />
+                    英語と日本語がセットで表示される。<br />
+                    声に出して読んでみて。<br /><br />
+                    覚えたら<span style={{ color: '#EF4444', fontWeight: 700 }}>赤いボタン</span>をタップ！
                 </div>
             </Screen>
             <Nav />
@@ -406,8 +405,8 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                 </div>
 
                 <div style={{ fontSize: 14, color: '#fff', textAlign: 'center', lineHeight: 1.8, marginBottom: 24, ...fadeIn(0.6) }}>
-                    フレーズは<span style={{ color: gold, fontWeight: 700 }}>300個</span>入ってる。<br />
-                    まずは1枚、レベルアップしてみよう。
+                    フレーズは<span style={{ color: gold, fontWeight: 700 }}>600個</span>入ってる。<br />
+                    まずは<span style={{ color: '#EF4444', fontWeight: 700 }}>赤いボタン</span>を押してみよう。
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', ...fadeIn(0.7) }}>
