@@ -256,6 +256,7 @@ export default function ProgramPage() {
             const isSelected = selectedDay?.day === plan.day;
             const weekTheme = WEEK_THEMES.find(w => w.week === plan.weekNumber);
             const weekColor = weekTheme?.color || T.gold;
+            const isLocked = plan.day !== 1 && !completed.includes(plan.day - 1) && !done;
 
             return (
               <button
@@ -265,9 +266,9 @@ export default function ProgramPage() {
                   position: 'relative',
                   minHeight: 80,
                   padding: '8px 4px 6px',
-                  background: isSelected ? `${weekColor}0C` : T.surface,
+                  background: isSelected ? `${weekColor}0C` : isLocked ? T.bgSecondary : T.surface,
                   border: `1px solid ${isSelected ? weekColor : T.border}`,
-                  borderLeft: `3px solid ${weekColor}`,
+                  borderLeft: `3px solid ${isLocked ? T.border : weekColor}`,
                   borderRadius: 8,
                   cursor: 'pointer',
                   textAlign: 'center',
@@ -283,13 +284,14 @@ export default function ProgramPage() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   overflow: 'hidden',
+                  opacity: isLocked ? 0.55 : 1,
                 }}
               >
                 {/* Day number */}
                 <div style={{
                   fontSize: 16,
                   fontWeight: 800,
-                  color: done ? weekColor : isRec ? T.gold : T.text,
+                  color: done ? weekColor : isRec ? T.gold : isLocked ? T.textMuted : T.text,
                   lineHeight: 1,
                 }}>
                   {plan.day}
@@ -298,7 +300,7 @@ export default function ProgramPage() {
                 {/* Title (hidden on very small screens via clamp) */}
                 <div style={{
                   fontSize: 'clamp(8px, 1.8vw, 10px)',
-                  color: T.textSub,
+                  color: isLocked ? T.textMuted : T.textSub,
                   fontWeight: 600,
                   lineHeight: 1.2,
                   marginTop: 4,
@@ -310,15 +312,32 @@ export default function ProgramPage() {
                   {plan.dayTitle}
                 </div>
 
-                {/* Completion dot */}
-                <div style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  background: done ? T.gold : '#D6D3D1',
-                  marginTop: 4,
-                  boxShadow: done ? `0 0 6px ${T.gold}60` : 'none',
-                }} />
+                {/* Status indicator */}
+                {done ? (
+                  <div style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    color: weekColor,
+                    marginTop: 4,
+                    letterSpacing: 0.5,
+                  }}>DONE</div>
+                ) : isLocked ? (
+                  <div style={{
+                    fontSize: 8,
+                    fontWeight: 800,
+                    color: T.textMuted,
+                    marginTop: 4,
+                    letterSpacing: 0.5,
+                  }}>LOCK</div>
+                ) : (
+                  <div style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: '#D6D3D1',
+                    marginTop: 4,
+                  }} />
+                )}
 
                 {/* Recommended glow indicator */}
                 {isRec && (

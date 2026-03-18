@@ -8,6 +8,8 @@ import { CHARACTER_MAP } from '@/data/izakaya-toeic/characters';
 import { StoryLine, ToeicQuestion } from '@/data/izakaya-toeic/types';
 import { recordEpisodeResult, getEpisodeResult, addVocabToDeck, getVocabDeck, updateVocabMastery, VocabDeckItem } from '@/data/izakaya-toeic/progress';
 import { T, parseConversation, isConversation } from '@/data/izakaya-toeic/theme';
+import { THIRTY_DAY_PLAN, getCompletedDays, markDayComplete } from '@/data/izakaya-toeic/thirty-day-plan';
+import EpisodeTutorial from '../EpisodeTutorial';
 
 type Phase = 'story' | 'quiz' | 'results';
 
@@ -562,6 +564,22 @@ export default function EpisodeDetailPage() {
   const episode = getEpisode(episodeId);
   const nextEp = episodeId ? getNextEpisode(episodeId) : undefined;
 
+  // 30-day program lock check
+  const dayPlan = useMemo(() => THIRTY_DAY_PLAN.find(d => d.episodeId === episodeId), [episodeId]);
+  const [completedDays, setCompletedDays] = useState<number[]>([]);
+  useEffect(() => { setCompletedDays(getCompletedDays()); }, []);
+  const isUnlocked = !dayPlan || dayPlan.day === 1 || completedDays.includes(dayPlan.day - 1);
+
+  // Next day info for results CTA
+  const nextDayPlan = useMemo(() => {
+    if (!dayPlan) return undefined;
+    return THIRTY_DAY_PLAN.find(d => d.day === dayPlan.day + 1);
+  }, [dayPlan]);
+  const nextDayEpisode = useMemo(() => {
+    if (!nextDayPlan) return undefined;
+    return getEpisode(nextDayPlan.episodeId);
+  }, [nextDayPlan]);
+
   const [phase, setPhase] = useState<Phase>('story');
   const [visibleLines, setVisibleLines] = useState(5);
   const [quizIndex, setQuizIndex] = useState(0);
@@ -571,6 +589,13 @@ export default function EpisodeDetailPage() {
   const [showEnglish, setShowEnglish] = useState(true);
   const [expandedQ, setExpandedQ] = useState<number | null>(null);
   const storyEndRef = useRef<HTMLDivElement>(null);
+
+  // Vocab save modal state
+  const [showVocabModal, setShowVocabModal] = useState(false);
+  const [vocabWord, setVocabWord] = useState('');
+  const [vocabMeaning, setVocabMeaning] = useState('');
+  const [vocabType, setVocabType] = useState('word');
+  const [vocabExample, setVocabExample] = useState('');
 
   // Story player state
   const [storyCurrentLine, setStoryCurrentLine] = useState(-1);
@@ -583,54 +608,225 @@ export default function EpisodeDetailPage() {
   const storyLineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const storyListRef = useRef<HTMLDivElement>(null);
 
+  // Voice selector state (Memoria-style)
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [maleVoice, setMaleVoice] = useState<string>('');
+  const [femaleVoice, setFemaleVoice] = useState<string>('');
+  const [savedPhrases, setSavedPhrases] = useState<Set<string>>(new Set());
+
+  // Initialize savedPhrases from vocab deck on mount
+  useEffect(() => {
+    const deck = getVocabDeck();
+    const existing = new Set(deck.map(d => d.word));
+    if (existing.size > 0) setSavedPhrases(existing);
+  }, []);
+
+  // Line mode (sequential / shuffle / repeat-one)
+  type LineMode = 'sequential' | 'shuffle' | 'repeat-one';
+  const [lineMode, setLineMode] = useState<LineMode>('sequential');
+  const lineModeRef = useRef<LineMode>('sequential');
+  useEffect(() => { lineModeRef.current = lineMode; }, [lineMode]);
+
+  // Progress bar state
+  const [storyProgress, setStoryProgress] = useState(0);
+  const storyProgressRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startStoryProgress = () => {
+    setStoryProgress(0);
+    let elapsed = 0;
+    if (storyProgressRef.current) clearInterval(storyProgressRef.current);
+    storyProgressRef.current = setInterval(() => {
+      elapsed += 50;
+      setStoryProgress(Math.min((elapsed / 3000) * 100, 100));
+    }, 50);
+  };
+  const stopStoryProgress = () => {
+    if (storyProgressRef.current) {
+      clearInterval(storyProgressRef.current);
+      storyProgressRef.current = null;
+    }
+  };
+
+  // Voice loading (Memoria-style)
+  const loadVoices = useCallback(() => {
+    const allVoices = window.speechSynthesis.getVoices();
+    const enVoices = allVoices.filter(v => v.lang.startsWith('en'));
+    setVoices(enVoices);
+    if (enVoices.length > 0) {
+      setMaleVoice(prev => {
+        if (prev) return prev;
+        const def = enVoices.find(v => /male|david|daniel|google us/i.test(v.name) && !/female/i.test(v.name)) || enVoices[0];
+        return def.name;
+      });
+      setFemaleVoice(prev => {
+        if (prev) return prev;
+        const def = enVoices.find(v => /female|zira|samantha/i.test(v.name)) || enVoices[1] || enVoices[0];
+        return def.name;
+      });
+    }
+  }, []);
+
+  const getVoiceByName = useCallback((name: string) => {
+    const allVoices = window.speechSynthesis.getVoices();
+    const selected = allVoices.find(v => v.name === name);
+    if (selected) return selected;
+    const enVoices = allVoices.filter(v => v.lang.startsWith('en'));
+    if (enVoices.length > 0) {
+      return enVoices.find(v => v.name.includes('Google US English')) || enVoices[0];
+    }
+    return allVoices.find(v => v.lang.includes('en')) || null;
+  }, []);
+
+  // Load voices on mount
+  useEffect(() => {
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => { window.speechSynthesis.onvoiceschanged = null; };
+  }, [loadVoices]);
+
+  const cycleLineMode = () => {
+    const modes: LineMode[] = ['sequential', 'shuffle', 'repeat-one'];
+    const currentIdx = modes.indexOf(lineMode);
+    const nextMode = modes[(currentIdx + 1) % modes.length];
+    setLineMode(nextMode);
+    lineModeRef.current = nextMode;
+  };
+
+  const getNextStoryIndex = useCallback((currentIdx: number) => {
+    if (!episode) return -1;
+    const total = episode.story.length;
+    const mode = lineModeRef.current;
+    if (mode === 'repeat-one') return currentIdx;
+    if (mode === 'shuffle') {
+      let next = Math.floor(Math.random() * total);
+      if (total > 1) while (next === currentIdx) next = Math.floor(Math.random() * total);
+      return next;
+    }
+    return currentIdx + 1 < total ? currentIdx + 1 : -1;
+  }, [episode]);
+
+  const toggleSavePhrase = (text: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSavedPhrases(prev => {
+      const next = new Set(prev);
+      if (next.has(text)) next.delete(text); else next.add(text);
+      return next;
+    });
+  };
+
+  const openStoryVocabModal = (text: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setVocabExample(text);
+    setVocabWord('');
+    setVocabMeaning('');
+    setVocabType('word');
+    setShowVocabModal(true);
+  };
+
+  const speakStoryLine = useCallback((line: StoryLine, rate: number) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const txt = line.english || line.japanese;
+    const utterance = new SpeechSynthesisUtterance(txt);
+    const isFemale = line.speaker !== 'narration' && /female|lisa|mina|yuki/i.test(line.speaker);
+    const voiceName = isFemale ? femaleVoice : maleVoice;
+    const voice = getVoiceByName(voiceName);
+    if (voice) utterance.voice = voice;
+    utterance.lang = 'en-US';
+    utterance.rate = rate;
+    window.speechSynthesis.speak(utterance);
+  }, [maleVoice, femaleVoice, getVoiceByName]);
+
   const playStoryLine = useCallback((idx: number) => {
     if (!episode || idx < 0 || idx >= episode.story.length) {
       setStoryPlaying(false);
       storyPlayingRef.current = false;
+      stopStoryProgress();
       return;
     }
     setStoryCurrentLine(idx);
     const line = episode.story[idx];
-    const txt = line.english || line.japanese;
-    const gender = line.speaker !== 'narration' && CHARACTER_MAP[line.speaker]
-      ? (/female|lisa|mina|yuki/i.test(line.speaker) ? 'female' : 'male')
-      : 'male';
-    speakText(txt, gender as 'male' | 'female', storySpeed);
-    storyLineRefs.current[idx]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    speakStoryLine(line, storySpeed);
+    startStoryProgress();
 
     const check = setInterval(() => {
       if (!window.speechSynthesis.speaking) {
         clearInterval(check);
-        if (storyPlayingRef.current && idx + 1 < episode.story.length) {
-          setTimeout(() => playStoryLine(idx + 1), 500);
-        } else if (idx + 1 >= episode.story.length) {
-          setStoryPlaying(false);
-          storyPlayingRef.current = false;
+        stopStoryProgress();
+        setStoryProgress(100);
+        if (storyPlayingRef.current) {
+          const nextIdx = getNextStoryIndex(idx);
+          if (nextIdx >= 0) {
+            setTimeout(() => playStoryLine(nextIdx), 400);
+          } else {
+            setStoryPlaying(false);
+            storyPlayingRef.current = false;
+          }
         }
       }
     }, 100);
-  }, [episode, storySpeed]);
+  }, [episode, storySpeed, speakStoryLine, getNextStoryIndex]);
+
+  const playStoryPrevious = useCallback(() => {
+    if (!episode) return;
+    window.speechSynthesis.cancel();
+    stopStoryProgress();
+    const prev = storyCurrentLine <= 0 ? episode.story.length - 1 : storyCurrentLine - 1;
+    setStoryCurrentLine(prev);
+    speakStoryLine(episode.story[prev], storySpeed);
+    startStoryProgress();
+    // no auto-scroll -- user controls their own scroll position
+  }, [episode, storyCurrentLine, storySpeed, speakStoryLine]);
+
+  const playStoryNext = useCallback(() => {
+    if (!episode) return;
+    window.speechSynthesis.cancel();
+    stopStoryProgress();
+    const next = storyCurrentLine + 1 >= episode.story.length ? 0 : storyCurrentLine + 1;
+    setStoryCurrentLine(next);
+    speakStoryLine(episode.story[next], storySpeed);
+    startStoryProgress();
+    // no auto-scroll
+  }, [episode, storyCurrentLine, storySpeed, speakStoryLine]);
+
+  const toggleStoryPlay = useCallback(() => {
+    if (storyPlaying) {
+      window.speechSynthesis.cancel();
+      setStoryPlaying(false);
+      storyPlayingRef.current = false;
+      stopStoryProgress();
+    } else {
+      setStoryPlaying(true);
+      storyPlayingRef.current = true;
+      const startIdx = storyCurrentLine < 0 ? 0 : storyCurrentLine;
+      playStoryLine(startIdx);
+    }
+  }, [storyPlaying, storyCurrentLine, playStoryLine]);
 
   // Cleanup TTS on unmount or phase change
   useEffect(() => {
-    return () => { window.speechSynthesis?.cancel(); storyPlayingRef.current = false; };
+    return () => { window.speechSynthesis?.cancel(); storyPlayingRef.current = false; stopStoryProgress(); };
   }, [phase]);
 
   const previousBest = useMemo(() => episodeId ? getEpisodeResult(episodeId) : undefined, [episodeId]);
 
   useEffect(() => {
-    if (phase === 'story') storyEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    // no auto-scroll
   }, [visibleLines, phase]);
 
-  // Auto-save all vocab to deck on results
+  // Auto-save all vocab to deck on results + mark day complete
   useEffect(() => {
     if (phase === 'results' && episode) {
       episode.vocabHighlights.forEach(v => {
         addVocabToDeck(v.word, v.meaning, episode.id, episode.title, v.example, v.partOfSpeech);
       });
       setSavedVocab(new Set(episode.vocabHighlights.map(v => v.word)));
+      if (dayPlan) {
+        markDayComplete(dayPlan.day);
+        setCompletedDays(getCompletedDays());
+      }
     }
-  }, [phase, episode]);
+  }, [phase, episode, dayPlan]);
 
   const handleShowMore = useCallback(() => {
     if (!episode) return;
@@ -679,6 +875,82 @@ export default function EpisodeDetailPage() {
     );
   }
 
+  // Lock screen for locked episodes
+  if (!isUnlocked && dayPlan) {
+    const prevDayPlan = THIRTY_DAY_PLAN.find(d => d.day === dayPlan.day - 1);
+    const prevEpisodeId = prevDayPlan?.episodeId;
+    return (
+      <div style={{ minHeight: '100vh', background: T.bg, color: T.text }}>
+        {/* Header */}
+        <div style={{
+          position: 'sticky', top: 0, zIndex: 20, padding: '10px 16px',
+          background: 'rgba(250,250,249,0.92)', backdropFilter: 'blur(10px)',
+          borderBottom: `1px solid ${T.border}`,
+        }}>
+          <div style={{ maxWidth: 640, margin: '0 auto' }}>
+            <Link href="/english/izakaya-toeic" style={{ fontSize: 11, color: T.textMuted, textDecoration: 'none' }}>
+              {'<'} 居酒屋TOEIC
+            </Link>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: 640, margin: '0 auto', padding: '80px 16px', textAlign: 'center' }}>
+          {/* Lock Icon */}
+          <div style={{
+            width: 80, height: 80, borderRadius: '50%',
+            background: T.goldBg, border: `2px solid ${T.goldBorder}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 24px',
+          }}>
+            <span style={{ fontSize: 28, fontWeight: 900, color: T.gold, letterSpacing: 2 }}>LOCK</span>
+          </div>
+
+          <h1 style={{
+            fontSize: 24, fontWeight: 900, color: T.text,
+            margin: '0 0 8px', letterSpacing: -0.5,
+          }}>
+            LOCKED
+          </h1>
+
+          <p style={{
+            fontSize: 14, color: T.textSub, margin: '0 0 8px', lineHeight: 1.6,
+          }}>
+            EP.{episode.number} -- {episode.title}
+          </p>
+
+          <p style={{
+            fontSize: 15, color: T.textSub, margin: '0 0 32px', lineHeight: 1.8,
+          }}>
+            Day {dayPlan.day - 1} をクリアすると解放されます
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, maxWidth: 320, margin: '0 auto' }}>
+            {prevEpisodeId && (
+              <Link href={`/english/izakaya-toeic/episodes/${prevEpisodeId}`} style={{
+                display: 'block', padding: '14px 24px',
+                background: T.gold, color: '#fff', borderRadius: 10,
+                fontWeight: 800, fontSize: 15, textDecoration: 'none',
+                boxShadow: `0 4px 20px ${T.gold}40`,
+                textAlign: 'center',
+              }}>
+                Day {dayPlan.day - 1} に挑戦する
+              </Link>
+            )}
+            <Link href="/english/izakaya-toeic/program" style={{
+              display: 'block', padding: '12px 24px',
+              background: T.surface, color: T.textSub,
+              border: `1px solid ${T.border}`, borderRadius: 10,
+              fontWeight: 700, fontSize: 14, textDecoration: 'none',
+              textAlign: 'center',
+            }}>
+              プログラムに戻る
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const correctCount = results.filter(Boolean).length;
   const totalQ = episode.questions.length;
   const accuracy = totalQ > 0 ? correctCount / totalQ : 0;
@@ -719,15 +991,25 @@ export default function EpisodeDetailPage() {
         {phase === 'story' && (() => {
           const storyLines = episode.story;
           const totalLines = storyLines.length;
-
-          // Player state is managed via component-level state:
-          // - storyCurrentLine: active line index (-1 = none)
-          // - storyPlaying: auto-play in progress
-          // - storySpeed: TTS speed (0.5-1.5)
-          // These are declared above in the main component body.
+          const activeLine = storyCurrentLine >= 0 ? storyLines[storyCurrentLine] : null;
+          const activeChar = activeLine && activeLine.speaker !== 'narration' ? CHARACTER_MAP[activeLine.speaker] : null;
+          const activeColor = activeChar?.color || T.textMuted;
 
           return (
           <div>
+            {/* Guide banner */}
+            <div style={{
+              padding: '12px 14px', background: T.goldBg, borderRadius: 10,
+              border: `1px solid ${T.goldBorder}`, marginBottom: 14, lineHeight: 1.7,
+            }}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: T.gold, letterSpacing: 1, marginBottom: 4 }}>HOW TO USE</div>
+              <div style={{ fontSize: 12, color: T.textSub }}>
+                1. ストーリーを聴いて内容を理解する<br/>
+                2. 覚えたい表現は「トレーニングに追加」で保存<br/>
+                3. 聴き終わったら下の「TOEIC問題に挑戦」へ
+              </div>
+            </div>
+
             {/* Tags row */}
             <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
               <span style={{ padding: '3px 8px', background: T.goldBg, color: T.gold, fontSize: 10, fontWeight: 700, borderRadius: 3 }}>
@@ -743,169 +1025,311 @@ export default function EpisodeDetailPage() {
               )}
             </div>
 
-            {/* Compact controls bar */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px',
-              background: T.surface, borderRadius: 10, border: `1px solid ${T.border}`,
-              marginBottom: 12, boxShadow: T.shadow,
-            }}>
-              {/* Play / Pause */}
-              <button
-                onClick={() => {
-                  if (storyPlaying) {
-                    window.speechSynthesis?.cancel();
-                    setStoryPlaying(false);
-                    storyPlayingRef.current = false;
-                  } else {
-                    setStoryPlaying(true);
-                    storyPlayingRef.current = true;
-                    const startIdx = storyCurrentLine < 0 ? 0 : storyCurrentLine;
-                    playStoryLine(startIdx);
-                  }
-                }}
-                style={{
-                  width: 36, height: 36, borderRadius: '50%',
-                  background: storyPlaying ? T.red + '12' : T.goldBg,
-                  border: `1.5px solid ${storyPlaying ? T.red + '40' : T.goldBorder}`,
-                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 900,
-                  color: storyPlaying ? T.red : T.gold, flexShrink: 0,
-                }}
-              >
-                {storyPlaying ? 'II' : '|>'}
-              </button>
-              {/* Progress bar */}
-              <div style={{ flex: 1, height: 3, background: T.bgSecondary, borderRadius: 2, overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%',
-                  width: totalLines > 0 ? `${((storyCurrentLine + 1) / totalLines) * 100}%` : '0%',
-                  background: `linear-gradient(90deg, ${T.gold}, ${T.goldLight})`,
-                  transition: 'width 0.3s', borderRadius: 2,
-                }} />
-              </div>
-              {/* Speed */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                <span style={{ fontSize: 9, fontWeight: 700, color: T.textMuted }}>{storySpeed.toFixed(1)}x</span>
-                <input
-                  type="range" min="0.5" max="1.5" step="0.1"
-                  value={storySpeed}
-                  onChange={(e) => {
-                    const v = parseFloat(e.target.value);
-                    setStorySpeed(v);
-                    try { localStorage.setItem('izakaya_tts_speed', String(v)); } catch {}
-                  }}
-                  style={{ width: 50, accentColor: T.gold, height: 3, cursor: 'pointer' }}
-                />
-              </div>
-              {/* EN toggle */}
-              <button onClick={() => setShowEnglish(p => !p)} style={{
-                padding: '3px 8px', background: showEnglish ? T.goldBg : 'transparent',
-                border: `1px solid ${showEnglish ? T.goldBorder : T.border}`,
-                borderRadius: 4, fontSize: 9, fontWeight: 700,
-                color: showEnglish ? T.gold : T.textMuted, cursor: 'pointer', flexShrink: 0,
-              }}>
-                {showEnglish ? 'EN' : 'EN'}
-              </button>
-              {/* Counter */}
-              <span style={{ fontSize: 9, color: T.textMuted, fontWeight: 600, flexShrink: 0 }}>
-                {storyCurrentLine >= 0 ? storyCurrentLine + 1 : 0}/{totalLines}
-              </span>
-            </div>
+            <h2 style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase' as const, letterSpacing: 1, marginBottom: 16 }}>
+              Story Conversation
+            </h2>
 
-            {/* Story lines list */}
-            <div style={{
-              background: T.surface, borderRadius: 12, border: `1px solid ${T.border}`,
-              overflow: 'hidden', boxShadow: T.shadowMd, marginBottom: 16,
-            }}>
-              <div ref={storyListRef} style={{ padding: '6px 0' }}>
-                {storyLines.map((line, i) => {
-                  const isActive = i === storyCurrentLine;
-                  const char = line.speaker !== 'narration' ? CHARACTER_MAP[line.speaker] : null;
-                  const color = char?.color || T.textMuted;
-                  const isNarration = line.speaker === 'narration';
-
-                  return (
-                    <div
-                      key={i}
-                      ref={el => { storyLineRefs.current[i] = el; }}
-                      onClick={() => {
-                        window.speechSynthesis?.cancel();
-                        setStoryPlaying(false);
-                        storyPlayingRef.current = false;
-                        setStoryCurrentLine(i);
-                        const txt = line.english || line.japanese;
-                        const gender = !isNarration && CHARACTER_MAP[line.speaker]
-                          ? (/female|lisa|mina|yuki/i.test(line.speaker) ? 'female' : 'male')
-                          : 'male';
-                        speakText(txt, gender as 'male' | 'female', storySpeed);
-                      }}
-                      style={{
-                        display: 'flex', gap: 12, alignItems: 'flex-start',
-                        padding: isActive ? '14px 16px' : '10px 16px',
-                        background: isActive ? `${color}08` : 'transparent',
-                        borderLeft: isActive ? `3px solid ${color}` : '3px solid transparent',
-                        cursor: 'pointer', transition: 'all 0.15s',
-                      }}
-                    >
-                      {/* Speaker badge */}
-                      {isNarration ? (
+            {/* Current Line Display */}
+            <div style={{ backgroundColor: T.bgSecondary, borderRadius: 12, padding: 20, marginBottom: 24 }}>
+              {activeLine ? (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: activeColor, textTransform: 'uppercase' as const, letterSpacing: 1 }}>
+                      {activeLine.speaker !== 'narration' ? (
                         <div style={{
-                          width: 28, height: 28, borderRadius: '50%', background: T.bgSecondary,
+                          width: 20, height: 20, borderRadius: '50%', backgroundColor: activeColor,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 9, fontWeight: 800, color: T.textMuted, flexShrink: 0, marginTop: 3,
-                        }}>N</div>
+                          fontSize: 10, fontWeight: 700, color: '#fff',
+                        }}>
+                          {activeChar?.initial || '?'}
+                        </div>
                       ) : (
                         <div style={{
-                          width: 28, height: 28, borderRadius: '50%', background: color + '12', border: `1.5px solid ${color}`,
+                          width: 20, height: 20, borderRadius: '50%', backgroundColor: T.textMuted,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontWeight: 900, fontSize: 11, color, flexShrink: 0, marginTop: 3,
-                        }}>
-                          {char?.initial || '?'}
-                        </div>
+                          fontSize: 9, fontWeight: 700, color: '#fff',
+                        }}>N</div>
                       )}
-                      {/* Content */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        {/* Speaker name for non-narration */}
-                        {!isNarration && (
-                          <div style={{ fontSize: 12, fontWeight: 700, color, marginBottom: 3 }}>
-                            {char?.name.split('\uFF08')[0]}
-                            {line.mood && line.mood !== 'normal' && (
-                              <span style={{ color: T.textMuted, fontWeight: 400, marginLeft: 6, fontSize: 11 }}>({line.mood})</span>
-                            )}
-                          </div>
-                        )}
-                        {/* Action */}
-                        {line.action && (
-                          <div style={{ fontSize: 12, color: T.textMuted, fontStyle: 'italic', marginBottom: 4 }}>{line.action}</div>
-                        )}
-                        {/* Japanese */}
-                        <div style={{
-                          fontSize: isActive ? 17 : 15,
-                          color: isNarration ? T.textSub : T.text,
-                          fontStyle: isNarration ? 'italic' : 'normal',
-                          lineHeight: 1.8, fontWeight: isActive ? 600 : 400,
-                        }}>
-                          {line.japanese}
-                        </div>
-                        {/* English */}
-                        {showEnglish && line.english && (
-                          <div style={{
-                            fontSize: isActive ? 14 : 13,
-                            color: isActive ? T.gold : T.textMuted,
-                            lineHeight: 1.6, marginTop: 3, fontStyle: 'italic',
-                          }}>
-                            {line.english}
-                          </div>
-                        )}
-                      </div>
+                      {activeLine.speaker === 'narration' ? 'Narration' : activeChar?.name.split('\uFF08')[0]}
                     </div>
-                  );
-                })}
+                    {activeLine.english && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (savedPhrases.has(activeLine.english!)) {
+                            setSavedPhrases(prev => { const n = new Set(prev); n.delete(activeLine.english!); return n; });
+                          } else {
+                            addVocabToDeck(activeLine.english!, activeLine.japanese, episode.id, episode.title, '', 'expression');
+                            setSavedPhrases(prev => new Set(prev).add(activeLine.english!));
+                            playSound('correct');
+                          }
+                        }}
+                        style={{
+                          background: savedPhrases.has(activeLine.english!) ? T.green + '12' : T.goldBg,
+                          border: `1px solid ${savedPhrases.has(activeLine.english!) ? T.green + '40' : T.goldBorder}`,
+                          cursor: 'pointer', padding: '5px 12px', borderRadius: 6,
+                          fontSize: 11, fontWeight: 700,
+                          color: savedPhrases.has(activeLine.english!) ? T.green : T.gold,
+                        }}
+                      >
+                        {savedPhrases.has(activeLine.english!) ? 'ADDED' : 'トレーニングに追加'}
+                      </button>
+                    )}
+                  </div>
+                  {activeLine.action && (
+                    <div style={{ fontSize: 12, color: T.textMuted, fontStyle: 'italic', marginBottom: 6 }}>{activeLine.action}</div>
+                  )}
+                  <div style={{ fontSize: 15, color: T.text, lineHeight: 1.6, minHeight: 48 }}>
+                    {activeLine.japanese}
+                  </div>
+                  {activeLine.english && (
+                    <div style={{
+                      fontSize: 14, color: T.textMuted, lineHeight: 1.6,
+                      marginTop: 12, paddingTop: 12,
+                      borderTop: `1px solid ${T.border}`,
+                    }}>
+                      {activeLine.english}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '16px 0', color: T.textMuted, fontSize: 14, minHeight: 48 }}>
+                  Select a line to play
+                </div>
+              )}
+            </div>
+
+            {/* Progress Bar */}
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ height: 4, backgroundColor: T.border, borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: `${storyProgress}%`, backgroundColor: T.gold, transition: 'width 0.05s linear' }} />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8, fontSize: 11, color: T.textMuted }}>
+                <span>{storyCurrentLine >= 0 ? storyCurrentLine + 1 : 0} / {totalLines}</span>
+                <span>{storySpeed.toFixed(2)}x</span>
               </div>
             </div>
 
-            {/* ── Start Quiz button (always visible at bottom) ── */}
-            <div style={{ textAlign: 'center' }}>
+            {/* Playback Controls */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 32, marginBottom: 32 }}>
+              {/* Shuffle Button */}
+              <button
+                onClick={cycleLineMode}
+                style={{ background: 'none', border: 'none', color: lineMode === 'shuffle' ? T.gold : T.textMuted, cursor: 'pointer', padding: 8 }}
+                title={lineMode === 'sequential' ? 'Sequential' : lineMode === 'shuffle' ? 'Shuffle' : 'Repeat One'}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" />
+                </svg>
+              </button>
+
+              <button onClick={playStoryPrevious} style={{ background: 'none', border: 'none', color: T.text, cursor: 'pointer', padding: 8 }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                </svg>
+              </button>
+
+              <button
+                onClick={toggleStoryPlay}
+                style={{ width: 64, height: 64, borderRadius: '50%', backgroundColor: T.gold, border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                {storyPlaying ? (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="#000">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                  </svg>
+                ) : (
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="#000" style={{ marginLeft: 3 }}>
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                )}
+              </button>
+
+              <button onClick={playStoryNext} style={{ background: 'none', border: 'none', color: T.text, cursor: 'pointer', padding: 8 }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                </svg>
+              </button>
+
+              {/* Repeat Button */}
+              <button
+                onClick={cycleLineMode}
+                style={{ background: 'none', border: 'none', color: lineMode === 'repeat-one' ? T.gold : T.textMuted, cursor: 'pointer', padding: 8, position: 'relative' as const }}
+                title={lineMode === 'repeat-one' ? 'Repeat One' : 'Repeat Off'}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" />
+                </svg>
+                {lineMode === 'repeat-one' && <span style={{ position: 'absolute' as const, fontSize: 9, fontWeight: 'bold', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: T.gold }}>1</span>}
+              </button>
+            </div>
+
+            {/* Speed Control */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginBottom: 16 }}>
+              <span style={{ fontSize: 12, color: T.textMuted, minWidth: 32 }}>0.5x</span>
+              <input
+                type="range" min="0.5" max="1.5" step="0.05"
+                value={storySpeed}
+                onChange={(e) => {
+                  const v = parseFloat(e.target.value);
+                  setStorySpeed(v);
+                  try { localStorage.setItem('izakaya_tts_speed', String(v)); } catch {}
+                }}
+                style={{ width: 150, accentColor: T.gold }}
+              />
+              <span style={{ fontSize: 12, color: T.textMuted, minWidth: 32 }}>1.5x</span>
+              <span style={{ fontSize: 14, color: T.gold, fontWeight: 600, minWidth: 45, textAlign: 'center' }}>{storySpeed.toFixed(2)}x</span>
+            </div>
+
+            {/* Voice Selectors */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, marginBottom: 32, flexWrap: 'wrap' as const }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, color: '#FF69B4' }}>Female:</span>
+                <select
+                  value={femaleVoice}
+                  onChange={(e) => setFemaleVoice(e.target.value)}
+                  style={{
+                    backgroundColor: T.bgSecondary, color: T.text,
+                    border: `1px solid ${T.border}`, borderRadius: 8,
+                    padding: '6px 10px', fontSize: 11, cursor: 'pointer', minWidth: 140,
+                  }}
+                >
+                  {voices.map((v) => (
+                    <option key={v.name} value={v.name}>{v.name.replace('Microsoft ', '').replace(' Online (Natural)', '')}</option>
+                  ))}
+                </select>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 12, color: '#4A9EFF' }}>Male:</span>
+                <select
+                  value={maleVoice}
+                  onChange={(e) => setMaleVoice(e.target.value)}
+                  style={{
+                    backgroundColor: T.bgSecondary, color: T.text,
+                    border: `1px solid ${T.border}`, borderRadius: 8,
+                    padding: '6px 10px', fontSize: 11, cursor: 'pointer', minWidth: 140,
+                  }}
+                >
+                  {voices.map((v) => (
+                    <option key={v.name} value={v.name}>{v.name.replace('Microsoft ', '').replace(' Online (Natural)', '')}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* EN Toggle */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+              <button onClick={() => setShowEnglish(p => !p)} style={{
+                padding: '6px 14px', background: showEnglish ? T.goldBg : 'transparent',
+                border: `1px solid ${showEnglish ? T.goldBorder : T.border}`,
+                borderRadius: 6, fontSize: 11, fontWeight: 700,
+                color: showEnglish ? T.gold : T.textMuted, cursor: 'pointer',
+              }}>
+                {showEnglish ? 'EN ON' : 'EN OFF'}
+              </button>
+            </div>
+
+            {/* Conversation Lines List */}
+            <h3 style={{ fontSize: 11, fontWeight: 600, color: T.textMuted, textTransform: 'uppercase' as const, letterSpacing: 1, marginBottom: 16 }}>
+              Lines ({totalLines})
+            </h3>
+            <div ref={storyListRef} style={{ display: 'flex', flexDirection: 'column' as const, gap: 2 }}>
+              {storyLines.map((line, i) => {
+                const isActive = i === storyCurrentLine;
+                const char = line.speaker !== 'narration' ? CHARACTER_MAP[line.speaker] : null;
+                const color = char?.color || T.textMuted;
+                const isNarration = line.speaker === 'narration';
+
+                const handleLineClick = () => {
+                  window.speechSynthesis.cancel();
+                  stopStoryProgress();
+                  setStoryPlaying(false);
+                  storyPlayingRef.current = false;
+                  setStoryCurrentLine(i);
+                  speakStoryLine(line, storySpeed);
+                  startStoryProgress();
+                };
+
+                return (
+                  <div
+                    key={i}
+                    ref={el => { storyLineRefs.current[i] = el; }}
+                    onClick={handleLineClick}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 16,
+                      padding: '12px 16px',
+                      backgroundColor: isActive ? T.bgSecondary : 'transparent',
+                      borderRadius: 8, cursor: 'pointer',
+                    }}
+                  >
+                    <div style={{ width: 24, textAlign: 'center', fontSize: 13, color: isActive ? T.gold : T.textMuted }}>
+                      {isActive && storyPlaying ? '\u266B' : i + 1}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color, marginBottom: 4, textTransform: 'uppercase' as const }}>
+                        {isNarration ? (
+                          <div style={{
+                            width: 16, height: 16, borderRadius: '50%', backgroundColor: T.textMuted,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 8, fontWeight: 700, color: '#fff', flexShrink: 0,
+                          }}>N</div>
+                        ) : (
+                          <div style={{
+                            width: 16, height: 16, borderRadius: '50%', backgroundColor: color,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 8, fontWeight: 700, color: '#fff', flexShrink: 0,
+                          }}>
+                            {char?.initial || '?'}
+                          </div>
+                        )}
+                        {isNarration ? 'Narration' : char?.name.split('\uFF08')[0]}
+                      </div>
+                      <div style={{
+                        fontSize: 14, color: isActive ? T.gold : T.text, lineHeight: 1.5,
+                        fontStyle: isNarration ? 'italic' : 'normal',
+                      }}>
+                        {line.japanese}
+                      </div>
+                      {showEnglish && line.english && (
+                        <div style={{
+                          fontSize: 13, color: T.textMuted, lineHeight: 1.5,
+                          marginTop: 4, paddingLeft: 8,
+                          borderLeft: `2px solid ${T.border}`,
+                        }}>
+                          {line.english}
+                        </div>
+                      )}
+                    </div>
+                    {line.english && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (savedPhrases.has(line.english!)) {
+                            setSavedPhrases(prev => { const n = new Set(prev); n.delete(line.english!); return n; });
+                          } else {
+                            addVocabToDeck(line.english!, line.japanese, episode.id, episode.title, '', 'expression');
+                            setSavedPhrases(prev => new Set(prev).add(line.english!));
+                            playSound('correct');
+                          }
+                        }}
+                        style={{
+                          background: savedPhrases.has(line.english!) ? T.green + '12' : 'none',
+                          border: `1px solid ${savedPhrases.has(line.english!) ? T.green + '40' : T.border}`,
+                          cursor: 'pointer', padding: '4px 8px', borderRadius: 5,
+                          fontSize: 10, fontWeight: 700, flexShrink: 0,
+                          color: savedPhrases.has(line.english!) ? T.green : T.textMuted,
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {savedPhrases.has(line.english!) ? 'ADDED' : '+Training'}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Start Quiz button */}
+            <div style={{ textAlign: 'center', marginTop: 32 }}>
               <button onClick={handleStartQuiz} style={{
                 padding: '14px 36px', background: T.gold, border: 'none', borderRadius: 10,
                 color: '#fff', fontWeight: 800, fontSize: 15, cursor: 'pointer',
@@ -1164,11 +1588,112 @@ export default function EpisodeDetailPage() {
         )}
       </div>
 
+      {/* ── Vocab Save Modal ── */}
+      {showVocabModal && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 1000, padding: 20,
+          }}
+          onClick={() => setShowVocabModal(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: T.surface, borderRadius: 16, padding: 24,
+              width: '100%', maxWidth: 420, border: `1px solid ${T.border}`,
+              boxShadow: T.shadowMd,
+            }}
+          >
+            <div style={{ fontSize: 11, color: T.gold, fontWeight: 700, letterSpacing: 1, marginBottom: 14 }}>
+              SAVE TO TRAINING DECK
+            </div>
+            <div style={{
+              fontSize: 13, color: T.textSub, marginBottom: 16, padding: 12,
+              background: T.bgSecondary, borderRadius: 8, lineHeight: 1.6,
+              borderLeft: `3px solid ${T.gold}`,
+            }}>
+              {vocabExample}
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, color: T.textMuted, marginBottom: 4 }}>Word / Phrase *</label>
+              <input
+                type="text" value={vocabWord} onChange={(e) => setVocabWord(e.target.value)}
+                placeholder="e.g. get the hang of" autoFocus
+                style={{
+                  width: '100%', padding: 10, borderRadius: 8,
+                  border: `1px solid ${T.border}`, background: T.bg, color: T.text,
+                  fontSize: 14, boxSizing: 'border-box',
+                }}
+              />
+            </div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 11, color: T.textMuted, marginBottom: 4 }}>Type</label>
+              <select
+                value={vocabType} onChange={(e) => setVocabType(e.target.value)}
+                style={{
+                  width: '100%', padding: 8, borderRadius: 8,
+                  border: `1px solid ${T.border}`, background: T.bg, color: T.text, fontSize: 13,
+                }}
+              >
+                <option value="word">word</option>
+                <option value="phrasal verb">phrasal verb</option>
+                <option value="idiom">idiom</option>
+                <option value="slang">slang</option>
+                <option value="collocation">collocation</option>
+                <option value="expression">expression</option>
+              </select>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: 'block', fontSize: 11, color: T.textMuted, marginBottom: 4 }}>Meaning *</label>
+              <input
+                type="text" value={vocabMeaning} onChange={(e) => setVocabMeaning(e.target.value)}
+                placeholder="意味を入力..."
+                style={{
+                  width: '100%', padding: 10, borderRadius: 8,
+                  border: `1px solid ${T.border}`, background: T.bg, color: T.text,
+                  fontSize: 14, boxSizing: 'border-box',
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                onClick={() => setShowVocabModal(false)}
+                style={{
+                  flex: 1, padding: 10, borderRadius: 8,
+                  border: `1px solid ${T.border}`, background: 'transparent',
+                  color: T.textMuted, fontSize: 13, cursor: 'pointer',
+                }}
+              >Cancel</button>
+              <button
+                onClick={() => {
+                  if (!vocabWord.trim() || !vocabMeaning.trim()) return;
+                  addVocabToDeck(vocabWord.trim(), vocabMeaning.trim(), episode.id, episode.title, vocabExample, vocabType);
+                  setSavedVocab(prev => new Set(prev).add(vocabWord.trim()));
+                  setShowVocabModal(false);
+                  playSound('correct');
+                }}
+                disabled={!vocabWord.trim() || !vocabMeaning.trim()}
+                style={{
+                  flex: 1, padding: 10, borderRadius: 8, border: 'none',
+                  background: (vocabWord.trim() && vocabMeaning.trim()) ? T.gold : T.bgSecondary,
+                  color: (vocabWord.trim() && vocabMeaning.trim()) ? '#fff' : T.textMuted,
+                  fontWeight: 700, fontSize: 13,
+                  cursor: (vocabWord.trim() && vocabMeaning.trim()) ? 'pointer' : 'default',
+                }}
+              >Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @keyframes izk-fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes izk-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
         @keyframes izk-shake { 0% { transform: translateX(-1px); } 50% { transform: translateX(1px); } 100% { transform: translateX(-1px); } }
       `}</style>
+      <EpisodeTutorial />
     </div>
   );
 }

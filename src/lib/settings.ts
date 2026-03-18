@@ -10,6 +10,8 @@ export interface AppSettings {
     bgmEnabled: boolean;       // Background music ON/OFF
     bgmVolume: number;         // BGM volume 0-100
     beginnerMode: boolean;     // Progressive unlock gating ON/OFF
+    tapToLevel: boolean;       // Tap card body = level up + next card
+    typingMatch: boolean;      // Exact-match typing for phrases mode too (words always on)
 }
 
 const STORAGE_KEY = 'eigodamashii-settings';
@@ -23,6 +25,8 @@ const DEFAULTS: AppSettings = {
     bgmEnabled: true,
     bgmVolume: 30,
     beginnerMode: true,
+    tapToLevel: false,
+    typingMatch: false,
 };
 
 export function getSettings(): AppSettings {

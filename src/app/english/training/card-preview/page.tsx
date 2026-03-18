@@ -2,10 +2,23 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { DAILY_LESSONS } from '@/data/english/five-min-data';
-import { getAllPhrases, getCardPoints, getMastery } from '@/lib/local-store';
+import { TOEIC_30DAY, getToeicStartDate } from '@/data/izakaya-toeic/toeic-30day-content';
 
 const IS_PUBLIC = true;
+
+// Read from same localStorage keys as TrainingClient
+function getCardPoints(): Record<string, number> {
+    try {
+        const raw = localStorage.getItem('izakaya_card_points');
+        return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+}
+function getMastery(): Record<string, number> {
+    try {
+        const raw = localStorage.getItem('quest-mastery');
+        return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+}
 
 // ===== Types =====
 interface Phrase {
@@ -1305,44 +1318,49 @@ export default function CardCollectionPage() {
         window.addEventListener('resize', handleResize);
 
         if (IS_PUBLIC) {
-            // Public mode: load from localStorage + static data
-            const now = new Date();
-            const y = now.getFullYear();
-            const m = now.getMonth();
-            const daysInMonth = new Date(y, m + 1, 0).getDate();
-            const makeDateStr = (day: number) =>
-                `${y}-${String(m + 1).padStart(2, '0')}-${String(Math.min(day, daysInMonth)).padStart(2, '0')}`;
+            // Public mode: load TOEIC 30-day content + episode vocab deck
+            const startDate = getToeicStartDate();
+            const makeDayDate = (dayNum: number) => {
+                const d = new Date(startDate);
+                d.setDate(d.getDate() + (dayNum - 1));
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            };
 
-            // Build phrases from DAILY_LESSONS (150 phrases, 10 per day)
             const allPhrases: Phrase[] = [];
             let idx = 0;
-            for (const lesson of DAILY_LESSONS) {
-                for (const p of lesson.phrases) {
-                    const day = Math.floor(idx / 10) + 1;
+            for (const day of TOEIC_30DAY) {
+                const dateStr = makeDayDate(day.day);
+                for (const item of day.items) {
                     allPhrases.push({
-                        id: `phrase_${idx}`,
-                        english: p.english,
-                        japanese: p.japanese,
-                        category: lesson.label || 'phrase',
-                        date: makeDateStr(day),
+                        id: `toeic30_${idx}`,
+                        english: item.english,
+                        japanese: item.japanese,
+                        category: `Day ${day.day}: ${day.themeJa}`,
+                        date: dateStr,
                     });
                     idx++;
                 }
             }
 
-            // Also merge any custom phrases from local-store
-            const custom = getAllPhrases();
-            for (const cp of custom) {
-                if (!allPhrases.find(p => p.id === cp.id)) {
-                    allPhrases.push({
-                        id: cp.id,
-                        english: cp.english,
-                        japanese: cp.japanese,
-                        category: cp.category,
-                        date: cp.date,
-                    });
+            // Also merge episode vocab deck
+            try {
+                const deckRaw = localStorage.getItem('izakaya_toeic_vocab_deck');
+                if (deckRaw) {
+                    const deck = JSON.parse(deckRaw) as { word: string; meaning: string; addedAt?: string }[];
+                    for (const item of deck) {
+                        const vocabId = `toeic_${item.word.replace(/\s+/g, '_').toLowerCase()}`;
+                        if (!allPhrases.find(p => p.id === vocabId)) {
+                            allPhrases.push({
+                                id: vocabId,
+                                english: item.word,
+                                japanese: item.meaning,
+                                category: 'Episode Vocab',
+                                date: item.addedAt ? item.addedAt.slice(0, 10) : makeDayDate(1),
+                            });
+                        }
+                    }
                 }
-            }
+            } catch { /* */ }
 
             setPhrases(allPhrases);
             setCardPoints(getCardPoints());

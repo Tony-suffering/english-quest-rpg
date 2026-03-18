@@ -33,6 +33,7 @@ export interface VocabDeckItem {
   lastReviewedAt: string | null;
   reviewCount: number;
   correctStreak: number;
+  addedAt?: string;           // ISO date when added to deck
 }
 
 const DEFAULT_PROGRESS: ToeicProgress = {
@@ -176,6 +177,7 @@ export function addVocabToDeck(
     lastReviewedAt: null,
     reviewCount: 0,
     correctStreak: 0,
+    addedAt: new Date().toISOString(),
   };
   deck.push(item);
   saveVocabDeck(deck);

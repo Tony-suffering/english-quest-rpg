@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import EnglishSidebar from '@/components/EnglishSidebar';
 import { installLocalApi } from '@/lib/local-api';
+import { getSettings } from '@/lib/settings';
 
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
@@ -440,6 +441,40 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
     const [isLoading, setIsLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+    const bgmRef = useRef<HTMLAudioElement | null>(null);
+    const bgmStartedRef = useRef(false);
+
+    // Start BGM on first user interaction (autoplay policy requires gesture)
+    const startBGM = useCallback(() => {
+        if (bgmStartedRef.current) return;
+        const st = getSettings();
+        if (!st.bgmEnabled || !st.soundEnabled) return;
+        bgmStartedRef.current = true;
+
+        const audio = new Audio('/audio/bgm-main.mp3');
+        audio.loop = true;
+        audio.volume = (st.bgmVolume / 100) * (st.volume / 100);
+        audio.play().catch(() => { bgmStartedRef.current = false; });
+        bgmRef.current = audio;
+
+        // Listen for settings changes
+        const checkSettings = () => {
+            const s = getSettings();
+            if (!s.bgmEnabled || !s.soundEnabled) {
+                audio.pause();
+            } else {
+                audio.volume = (s.bgmVolume / 100) * (s.volume / 100);
+                if (audio.paused) audio.play().catch(() => {});
+            }
+        };
+        // Poll settings every 2 seconds (lightweight)
+        const interval = setInterval(checkSettings, 2000);
+        // Cleanup when page unloads
+        window.addEventListener('beforeunload', () => {
+            clearInterval(interval);
+            audio.pause();
+        });
+    }, []);
 
     useEffect(() => {
         installLocalApi();
@@ -448,7 +483,13 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
             setShowWelcome(true);
         }
         setIsLoading(false);
-    }, []);
+
+        // Start BGM on first click/tap/keydown anywhere
+        const handler = () => { startBGM(); window.removeEventListener('click', handler); window.removeEventListener('keydown', handler); };
+        window.addEventListener('click', handler);
+        window.addEventListener('keydown', handler);
+        return () => { window.removeEventListener('click', handler); window.removeEventListener('keydown', handler); };
+    }, [startBGM]);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);

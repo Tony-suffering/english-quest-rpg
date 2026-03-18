@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { IZAKAYA_CHARACTERS } from '@/data/izakaya-toeic/characters';
 
 const T = {
     bg: '#FFFBEB',
@@ -146,6 +147,106 @@ export default function EnglishHomePage() {
             </div>
 
             <div style={{ maxWidth: 640, margin: '0 auto', padding: '24px 16px 60px' }}>
+
+                {/* Primary CTA */}
+                <div style={{
+                    textAlign: 'center', padding: '24px 16px', marginBottom: 24,
+                    background: `linear-gradient(135deg, ${T.gold}08, ${T.gold}15)`,
+                    border: `1px solid ${T.gold}30`,
+                    borderRadius: 16,
+                }}>
+                    <div style={{ fontSize: 18, fontWeight: 800, color: T.text, marginBottom: 6 }}>
+                        今すぐ始めよう
+                    </div>
+                    <div style={{ fontSize: 13, color: T.textSub, marginBottom: 16, lineHeight: 1.7 }}>
+                        30日間のストーリーで、聞く・話す・書くが同時に伸びる。
+                    </div>
+                    <Link href="/english/izakaya-toeic/program" style={{
+                        display: 'inline-block', padding: '14px 40px',
+                        background: T.gold, color: '#fff', borderRadius: 10,
+                        fontWeight: 800, fontSize: 16, textDecoration: 'none',
+                        boxShadow: `0 4px 20px ${T.gold}40`,
+                    }}>
+                        {progress.completed > 0
+                            ? `Day ${progress.completed + 1} から続ける`
+                            : '始める'
+                        }
+                    </Link>
+                </div>
+
+                {/* CAST */}
+                <div style={{ marginBottom: 24 }}>
+                    <div style={{
+                        fontSize: 10, fontWeight: 700, color: T.gold, letterSpacing: 2, marginBottom: 12,
+                    }}>
+                        CAST
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                        {IZAKAYA_CHARACTERS.map(char => (
+                            <div key={char.id} style={{
+                                display: 'flex', gap: 10, alignItems: 'center',
+                                padding: '12px', background: T.surface, borderRadius: 10,
+                                border: `1px solid #E7E5E4`, boxShadow: T.shadow,
+                            }}>
+                                <div style={{
+                                    width: 36, height: 36, borderRadius: '50%',
+                                    background: char.color + '15', border: `2px solid ${char.color}`,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontWeight: 900, fontSize: 13, color: char.color, flexShrink: 0,
+                                }}>{char.initial}</div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: T.text }}>
+                                        {char.name.split('\uFF08')[0]}
+                                    </div>
+                                    <div style={{ fontSize: 10, color: char.color, fontWeight: 700 }}>
+                                        TOEIC {char.currentScore}
+                                    </div>
+                                    <div style={{
+                                        fontSize: 10, color: T.textMuted, lineHeight: 1.4,
+                                        overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis',
+                                    }}>
+                                        {char.job}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div style={{ textAlign: 'center', marginTop: 10 }}>
+                        <Link href="/english/izakaya-toeic/characters" style={{
+                            fontSize: 13, fontWeight: 700, color: T.gold, textDecoration: 'none',
+                        }}>
+                            キャラクター詳細 {'>'}
+                        </Link>
+                    </div>
+                </div>
+
+                {/* TRAINING */}
+                <div style={{
+                    padding: '20px', marginBottom: 24,
+                    background: T.surface, borderRadius: 14,
+                    border: `1px solid #E7E5E4`, boxShadow: T.shadowMd,
+                }}>
+                    <div style={{
+                        fontSize: 10, fontWeight: 700, color: T.green, letterSpacing: 2, marginBottom: 8,
+                    }}>
+                        TRAINING
+                    </div>
+                    <div style={{ fontSize: 16, fontWeight: 800, color: T.text, marginBottom: 4 }}>
+                        単語トレーニング
+                    </div>
+                    <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.7, marginBottom: 16 }}>
+                        ストーリーで学んだ単語をスロットで復習。
+                        ゲーム感覚で語彙力を定着させる。
+                    </div>
+                    <Link href="/english/training" style={{
+                        display: 'inline-block', padding: '12px 28px',
+                        background: T.gold, color: '#fff', borderRadius: 8,
+                        fontWeight: 800, fontSize: 14, textDecoration: 'none',
+                        boxShadow: `0 4px 16px ${T.gold}30`,
+                    }}>
+                        トレーニングを始める
+                    </Link>
+                </div>
 
                 {/* Concept: 3 Skills */}
                 <div style={{ marginBottom: 24 }}>

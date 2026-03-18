@@ -53,7 +53,6 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         { id: '/english/goroku', label: '俺語録' },
         { id: '/english/dashboard-v2', label: 'ダッシュボード' },
         { id: '/english/tonio-words', label: 'TONIO WORDS' },
-        { id: '/english/settings', label: '設定' },
     ];
 
     const isActive = (path: string) => {
@@ -196,6 +195,10 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     {/* Progress */}
                     <SectionLabel text="PROGRESS" />
                     {progressItems.map(item => renderItem(item))}
+
+                    {/* Settings */}
+                    <SectionLabel text="SETTINGS" />
+                    {renderItem({ id: '/english/settings', label: '設定' })}
 
                     {/* More toggle */}
                     <div style={{ height: 1, backgroundColor: '#e5e5e5', margin: '12px 20px 8px' }} />

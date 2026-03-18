@@ -1,14 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { type Element, ELEMENT_COLORS, ELEMENT_LABELS, ELEMENT_ADVANTAGE, calcBstTotal, getBstTier } from '@/data/english/elements';
+import { type Element, ELEMENT_COLORS, ELEMENT_LABELS, ELEMENT_ADVANTAGE, calcBstTotal, calcBstStats, getBstTier, BST_STAT_NAMES_JA } from '@/data/english/elements';
+import { getFlavorText } from '@/data/english/flavor-text';
 import { ElementBadge } from '@/components/english/ElementIcon';
 
 // ═══════════════════════════════════════════════════════════
-// 布陣バトル — 3x3 / 4x4 カード布陣 + 日替わりボス戦
+// 布陣バトル — 3x3 / 4x4 カード布陣 + グリッド評価
 // ═══════════════════════════════════════════════════════════
 
-type GridSize = 3 | 4;
+type GridSize = 2 | 3 | 4;
 
 // ── Sound Engine (Web Audio API, no external files) ──
 let _audioCtx: AudioContext | null = null;
@@ -55,14 +56,38 @@ const RANK_VAL: Record<string, number> = { NORMAL: 0, BRONZE: 1, SILVER: 2, GOLD
 
 // ── Card-Preview Visual Helpers (identical to card-preview/page.tsx) ──
 
-const RANK_META: Record<CardRank, { borderColor: string; label: string }> = {
-    LEGENDARY: { borderColor: '#D4AF37', label: 'LEGENDARY' },
-    HOLOGRAPHIC: { borderColor: '#A855F7', label: 'HOLO' },
-    GOLD: { borderColor: '#F6C85F', label: 'GOLD' },
-    SILVER: { borderColor: '#94A3B8', label: 'SILVER' },
-    BRONZE: { borderColor: '#CD7F32', label: 'BRONZE' },
-    NORMAL: { borderColor: '#D6D3D1', label: 'NORMAL' },
+const RANK_META: Record<CardRank, { borderColor: string; label: string; threshold: number }> = {
+    LEGENDARY: { borderColor: '#D4AF37', label: 'LEGENDARY', threshold: 250 },
+    HOLOGRAPHIC: { borderColor: '#A855F7', label: 'HOLO', threshold: 100 },
+    GOLD: { borderColor: '#F6C85F', label: 'GOLD', threshold: 50 },
+    SILVER: { borderColor: '#94A3B8', label: 'SILVER', threshold: 20 },
+    BRONZE: { borderColor: '#CD7F32', label: 'BRONZE', threshold: 5 },
+    NORMAL: { borderColor: '#D6D3D1', label: 'NORMAL', threshold: 0 },
 };
+
+const RANK_ORDER_ASC: CardRank[] = ['NORMAL', 'BRONZE', 'SILVER', 'GOLD', 'HOLOGRAPHIC', 'LEGENDARY'];
+const RANK_JA: Record<CardRank, string> = {
+    LEGENDARY: '伝説', HOLOGRAPHIC: '虹色', GOLD: '金', SILVER: '銀', BRONZE: '銅', NORMAL: '普通',
+};
+
+const CHAKRA: { name: string; ja: string; color: string }[] = [
+    { name: 'SEED', ja: '種', color: '#B91C1C' },
+    { name: 'SPARK', ja: '芽', color: '#C2410C' },
+    { name: 'FORGE', ja: '鍛', color: '#A16207' },
+    { name: 'OWN', ja: '得', color: '#166534' },
+    { name: 'VOICE', ja: '声', color: '#1E40AF' },
+    { name: 'VISION', ja: '研', color: '#3730A3' },
+    { name: 'CROWN', ja: '極', color: '#6B21A8' },
+];
+
+function getNextRankForCard(rank: CardRank): { rank: CardRank; borderColor: string; label: string; threshold: number } | null {
+    const idx = RANK_ORDER_ASC.indexOf(rank);
+    if (idx < RANK_ORDER_ASC.length - 1) {
+        const next = RANK_ORDER_ASC[idx + 1];
+        return { rank: next, ...RANK_META[next] };
+    }
+    return null;
+}
 
 function getFrameFull(rank: CardRank): React.CSSProperties {
     const br = '8px';
@@ -166,94 +191,19 @@ interface PuzzleStats {
     totalGP: number;
     sRanks: number;
     month: string;
-    bossWins: number;
-    bossLosses: number;
-    winStreak: number;
-    bestStreak: number;
 }
 
-// ── Boss System (日替わりボス) ──
-
-type BossDebuffType = 'seal_element' | 'rank_floor' | 'weaken_all' | 'hp_wall' | 'seal_elem_synergy';
-
-interface BossTemplate {
-    name: string;
-    element: Element;
-    hpBase: number;
-    debuffType: BossDebuffType;
-    sealTarget?: Element;
-    debuffLabel: string;
-    debuffDesc: string;
-}
-
-interface DailyBoss extends BossTemplate {
-    hp: number;
-}
-
-const BOSS_POOL: BossTemplate[] = [
-    { name: '朱雀', element: 'flame', hpBase: 3000, debuffType: 'seal_element', sealTarget: 'aqua', debuffLabel: '水封印', debuffDesc: '水カードBST半減' },
-    { name: '玄武', element: 'aqua', hpBase: 3500, debuffType: 'seal_element', sealTarget: 'flame', debuffLabel: '火封印', debuffDesc: '火カードBST半減' },
-    { name: '白虎', element: 'wind', hpBase: 3200, debuffType: 'seal_element', sealTarget: 'earth', debuffLabel: '地封印', debuffDesc: '地カードBST半減' },
-    { name: '青龍', element: 'thunder', hpBase: 3400, debuffType: 'seal_element', sealTarget: 'wind', debuffLabel: '風封印', debuffDesc: '風カードBST半減' },
-    { name: '麒麟', element: 'earth', hpBase: 3800, debuffType: 'seal_element', sealTarget: 'thunder', debuffLabel: '雷封印', debuffDesc: '雷カードBST半減' },
-    { name: '鬼', element: 'flame', hpBase: 2800, debuffType: 'rank_floor', debuffLabel: 'ランク制限', debuffDesc: 'BRONZE以下BST半減' },
-    { name: '天狗', element: 'wind', hpBase: 2500, debuffType: 'weaken_all', debuffLabel: '弱体化', debuffDesc: '全BST -20%' },
-    { name: '河童', element: 'aqua', hpBase: 3000, debuffType: 'seal_elem_synergy', debuffLabel: '属性封印', debuffDesc: '属性シナジー無効' },
-    { name: '龍王', element: 'thunder', hpBase: 5500, debuffType: 'hp_wall', debuffLabel: 'HP壁', debuffDesc: 'HPが極めて高い' },
-    { name: '大蛇', element: 'earth', hpBase: 4200, debuffType: 'seal_elem_synergy', debuffLabel: '混沌', debuffDesc: '属性シナジー無効' },
-];
-
-function getDailyBoss(gridSize: GridSize): DailyBoss {
-    const d = new Date();
-    const seed = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
-    const idx = seed % BOSS_POOL.length;
-    const template = BOSS_POOL[idx];
-    const hpScale = gridSize === 4 ? 1.8 : 1.0;
-    return { ...template, hp: Math.round(template.hpBase * hpScale) };
-}
-
-const ELEM_SYNERGY_NAMES = ['RAINBOW', 'DUAL CORE', 'TRIANGLE', 'KILL CHAIN'];
-
-function evaluateWithBoss(cards: PuzzleCard[], boss: DailyBoss): BattleResult & { bossHp: number; bossDefeated: boolean } {
-    // Apply boss debuffs + element advantage to BST
-    const modifiedCards = cards.map(c => {
-        let bst = c.bstTotal;
-
-        // Element advantage: your card's element beats boss → +25%
-        if (ELEMENT_ADVANTAGE[c.element] === boss.element) bst = Math.round(bst * 1.25);
-        // Boss's element beats your card → -25%
-        else if (ELEMENT_ADVANTAGE[boss.element] === c.element) bst = Math.round(bst * 0.75);
-
-        // Debuff effects
-        if (boss.debuffType === 'seal_element' && c.element === boss.sealTarget) bst = Math.round(bst * 0.5);
-        if (boss.debuffType === 'rank_floor' && RANK_VAL[c.rank] <= 1) bst = Math.round(bst * 0.5);
-        if (boss.debuffType === 'weaken_all') bst = Math.round(bst * 0.8);
-
-        return { ...c, bstTotal: bst };
-    });
-
-    const result = evaluateParty(modifiedCards);
-
-    // Post-process: remove element synergies if boss seals them
-    if (boss.debuffType === 'seal_elem_synergy') {
-        result.synergies = result.synergies.filter(s =>
-            !ELEM_SYNERGY_NAMES.includes(s.name) && !s.name.includes('の力')
-        );
-    }
-
-    // Recalculate with filtered synergies
-    const totalMultiplier = result.synergies.reduce((m, s) => m * s.multiplier, 1);
-    const finalDamage = Math.round(result.basePower * totalMultiplier);
-    const bossDefeated = finalDamage >= boss.hp;
-    const gpEarned = Math.round(finalDamage / 10) * (bossDefeated ? 2 : 1);
-
-    const grade: BattleResult['grade'] =
-        finalDamage >= result.basePower * 3 ? 'S' :
-        finalDamage >= result.basePower * 2 ? 'A' :
-        finalDamage >= result.basePower * 1.5 ? 'B' :
-        finalDamage >= result.basePower * 1.2 ? 'C' : 'D';
-
-    return { ...result, totalMultiplier, finalDamage, gpEarned, grade, bossHp: boss.hp, bossDefeated };
+// ── Grid Milestone (PuzzleBoard → parent) ──
+export interface GridMilestoneData {
+    cards: { english: string; element: Element; rank: string; bstTotal: number }[];
+    synergies: { name: string; multiplier: number; color: string; icon: string }[];
+    totalPower: number;
+    totalMultiplier: number;
+    finalDamage: number;
+    gpBonus: number;
+    grade: 'S' | 'A' | 'B' | 'C' | 'D';
+    avgBST: number;
+    cardCount: number;
 }
 
 export interface PuzzleBoardProps {
@@ -264,8 +214,13 @@ export interface PuzzleBoardProps {
     chainMode: 'normal' | 'kakuhen' | 'gekiatsu' | 'god';
     onChainResult?: (stats: { cleared: number; chainCount: number; gpEarned: number }) => void;
     onCardClick?: (phraseId: string) => void;
+    onGridMilestone?: (data: GridMilestoneData) => void;
+    onGridUpdate?: (info: { filled: number; total: number }) => void;
+    externalBattleActive?: boolean;
     isMobile: boolean;
     cardPoints: Record<string, number>;
+    mastery?: Record<string, number>;
+    hideSidePanel?: boolean;
 }
 
 // ── Persistence ──
@@ -273,9 +228,9 @@ export interface PuzzleBoardProps {
 function curMonth(): string { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
 function loadGrid(n: GridSize): Grid { try { const r = localStorage.getItem(`puzzle-board-${n}`); if (r) { const d = JSON.parse(r); if (d.month === curMonth() && d.grid) return d.grid; } } catch {} return mk(n); }
 function saveGrid(g: Grid, n: GridSize) { try { localStorage.setItem(`puzzle-board-${n}`, JSON.stringify({ grid: g, month: curMonth() })); } catch {} }
-function loadStats(n: GridSize): PuzzleStats { const m = curMonth(); const def: PuzzleStats = { totalBattles: 0, bestDamage: 0, totalGP: 0, sRanks: 0, month: m, bossWins: 0, bossLosses: 0, winStreak: 0, bestStreak: 0 }; try { const r = localStorage.getItem(`puzzle-stats-${n}`); if (r) { const d = JSON.parse(r); if (d.month === m && typeof d.bestDamage === 'number') return { ...def, ...d }; } } catch {} return def; }
+function loadStats(n: GridSize): PuzzleStats { const m = curMonth(); const def: PuzzleStats = { totalBattles: 0, bestDamage: 0, totalGP: 0, sRanks: 0, month: m }; try { const r = localStorage.getItem(`puzzle-stats-${n}`); if (r) { const d = JSON.parse(r); if (d.month === m && typeof d.bestDamage === 'number') return { ...def, ...d }; } } catch {} return def; }
 function saveStats(s: PuzzleStats, n: GridSize) { try { localStorage.setItem(`puzzle-stats-${n}`, JSON.stringify(s)); } catch {} }
-function loadGridSize(): GridSize { try { const v = localStorage.getItem('puzzle-grid-size'); if (v === '3' || v === '4') return Number(v) as GridSize; } catch {} return 3; }
+function loadGridSize(): GridSize { try { const v = localStorage.getItem('puzzle-grid-size'); if (v === '2' || v === '3' || v === '4') return Number(v) as GridSize; } catch {} return 3; }
 
 // ── Grid Helpers ──
 
@@ -284,14 +239,35 @@ function cl(g: Grid): Grid { return g.map(r => r.map(c => c ? { ...c } : null));
 function cnt(g: Grid): number { let n = 0; for (const r of g) for (const c of r) if (c) n++; return n; }
 function allCards(g: Grid): PuzzleCard[] { const a: PuzzleCard[] = []; for (const r of g) for (const c of r) if (c) a.push(c); return a; }
 
-function placeAuto(g: Grid, card: PuzzleCard, N: number): { grid: Grid; row: number; col: number } {
+function placeAuto(g: Grid, card: PuzzleCard, N: number): { grid: Grid; row: number; col: number; synHit: boolean } {
     const grid = cl(g);
-    // Fill left-to-right, top-to-bottom into first empty slot
+    // Smart placement: prioritize cells adjacent to same-element cards (synergy optimization)
+    let bestR = -1, bestC = -1, bestScore = -1;
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
-        if (!grid[r][c]) { grid[r][c] = card; return { grid, row: r, col: c }; }
+        if (grid[r][c]) continue;
+        let score = 0;
+        // Check 4 neighbors for same element (synergy bonus)
+        const neighbors: [number, number][] = [[r-1,c],[r+1,c],[r,c-1],[r,c+1]];
+        for (const [nr, nc] of neighbors) {
+            if (nr >= 0 && nr < N && nc >= 0 && nc < N && grid[nr][nc]) {
+                if (grid[nr][nc]!.element === card.element) score += 10; // same element = synergy
+                else score += 1; // adjacent to any card = mild preference (cluster)
+            }
+        }
+        // Diagonal neighbors — weaker synergy hint
+        const diags: [number, number][] = [[r-1,c-1],[r-1,c+1],[r+1,c-1],[r+1,c+1]];
+        for (const [nr, nc] of diags) {
+            if (nr >= 0 && nr < N && nc >= 0 && nc < N && grid[nr][nc]?.element === card.element) score += 3;
+        }
+        // Center preference when grid is empty (looks better)
+        const centerDist = Math.abs(r - (N-1)/2) + Math.abs(c - (N-1)/2);
+        score += (N - centerDist) * 0.5;
+        if (score > bestScore) { bestScore = score; bestR = r; bestC = c; }
     }
+    const synHit = bestScore >= 10; // did we find a synergy match?
+    if (bestR >= 0) { grid[bestR][bestC] = card; return { grid, row: bestR, col: bestC, synHit }; }
     // Full — shouldn't happen (battle triggers when full)
-    grid[0][0] = card; return { grid, row: 0, col: 0 };
+    grid[0][0] = card; return { grid, row: 0, col: 0, synHit: false };
 }
 
 // ── Synergy Evaluation (the heart of the game) ──
@@ -403,160 +379,369 @@ function evaluateParty(cards: PuzzleCard[]): BattleResult {
 // Full-Size Card Modal (card-preview quality)
 // ═══════════════════════════════════════════════════════════
 
-function CardModal({ card, onClose, isMobile }: { card: PuzzleCard; onClose: () => void; isMobile: boolean }) {
+function CardModal({ card, onClose, isMobile, chakra }: { card: PuzzleCard; onClose: () => void; isMobile: boolean; chakra: number }) {
     const rank = card.rank;
     const isLeg = rank === 'LEGENDARY';
     const isHolo = rank === 'HOLOGRAPHIC' || isLeg;
-    const isTextLight = isLeg;
-    const accent = getAccent(rank);
-    const frame = getFrameFull(rank);
-    const shadow = getShadowFull(rank);
-    const bstTier = getBstTier(card.bstTotal);
-    const w = isMobile ? 240 : 280;
-    const h = isMobile ? 340 : 400;
+    const accent = RANK_META[rank].borderColor;
+    const nextRank = getNextRankForCard(rank);
+    const progressPct = nextRank
+        ? Math.min(100, ((card.points - RANK_META[rank].threshold) / (nextRank.threshold - RANK_META[rank].threshold)) * 100)
+        : 100;
+    const [mounted, setMounted] = useState(false);
+
+    const bstStats = calcBstStats(card.phraseId);
+    const bstTotal = bstStats.reduce((a, b) => a + b, 0);
+    const bstTier = getBstTier(bstTotal);
+    const ci = CHAKRA[chakra] || CHAKRA[0];
+    const statColors = ['#EF4444', '#F97316', '#EAB308', '#10B981', '#3B82F6', '#A855F7'];
+
+    const maxStat = Math.max(...bstStats);
+    const minStat = Math.min(...bstStats);
+    const maxIdx = bstStats.indexOf(maxStat);
+    const minIdx = bstStats.lastIndexOf(minStat);
+
+    const el = card.element;
+    const elLabel = ELEMENT_LABELS[el] || el;
+    const advEl = ELEMENT_ADVANTAGE[el];
+    const advLabel = advEl ? ELEMENT_LABELS[advEl] : '';
+
+    useEffect(() => { requestAnimationFrame(() => setMounted(true)); }, []);
+
+    useEffect(() => {
+        const handleKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
+    }, [onClose]);
+
+    const panelW = isMobile ? 310 : 360;
+    const STAT_MAX = 120;
+    const STAT_MIN_VISUAL = 0.08;
+    const cx = 90, cy = 90, radarR = 60;
+    const getPoint = (i: number, val: number) => {
+        const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
+        const pct = Math.max(val / STAT_MAX, STAT_MIN_VISUAL);
+        return { x: cx + radarR * pct * Math.cos(angle), y: cy + radarR * pct * Math.sin(angle) };
+    };
+    const statPoints = bstStats.map((v, i) => getPoint(i, v));
+    const polygon = statPoints.map(p => `${p.x},${p.y}`).join(' ');
 
     return (
         <div
             onClick={onClose}
             style={{
                 position: 'fixed', inset: 0, zIndex: 1000,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                backdropFilter: 'blur(4px)',
-                animation: 'puzzle-modal-in 0.2s ease-out',
+                backgroundColor: mounted ? 'rgba(0,0,0,0.75)' : 'rgba(0,0,0,0)',
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                padding: '16px',
+                transition: 'background-color 0.3s ease',
             }}
         >
-            <div
-                onClick={e => e.stopPropagation()}
-                style={{
-                    width: w, height: h,
-                    position: 'relative', overflow: 'hidden',
-                    display: 'flex', flexDirection: 'column',
-                    ...frame,
-                    boxShadow: shadow,
-                    padding: '8px',
-                    ...(isLeg ? { animation: 'card-legendary-aura 4s ease-in-out infinite' } : {}),
-                    ...(rank === 'GOLD' ? { animation: 'card-gold-pulse 5s ease-in-out infinite' } : {}),
-                }}
-            >
-                {/* Holo shimmer overlay */}
-                {isHolo && (
-                    <div style={{
-                        position: 'absolute', inset: 0,
-                        background: isLeg
-                            ? 'linear-gradient(135deg, rgba(212,175,55,0.15) 0%, rgba(168,85,247,0.2) 25%, rgba(212,175,55,0.15) 50%, rgba(168,85,247,0.2) 75%, rgba(212,175,55,0.15) 100%)'
-                            : 'linear-gradient(135deg, rgba(232,121,249,0.15) 0%, rgba(99,102,241,0.15) 20%, rgba(59,130,246,0.15) 40%, rgba(16,185,129,0.15) 60%, rgba(245,158,11,0.15) 80%)',
-                        backgroundSize: '200% 200%',
-                        animation: 'card-holo-shimmer 3s linear infinite',
-                        borderRadius: '4px', pointerEvents: 'none', zIndex: 4,
-                        opacity: 0.15, mixBlendMode: 'overlay',
-                    }} />
-                )}
+            <div onClick={e => e.stopPropagation()} style={{
+                width: panelW, maxHeight: '92vh', overflowY: 'auto',
+                background: 'rgba(28,25,23,0.97)',
+                borderRadius: '20px',
+                border: `1.5px solid ${accent}50`,
+                boxShadow: `0 12px 60px rgba(0,0,0,0.6), 0 0 30px ${accent}15, inset 0 1px 0 rgba(255,255,255,0.05)`,
+                padding: '0', position: 'relative' as const,
+                transform: mounted ? 'scale(1) translateY(0)' : 'scale(0.9) translateY(20px)',
+                opacity: mounted ? 1 : 0,
+                transition: 'transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease',
+            }}>
+                {/* Close button */}
+                <button onClick={onClose} style={{
+                    position: 'absolute', top: '0', right: '0', marginTop: '8px', marginRight: '8px',
+                    width: '28px', height: '28px', borderRadius: '50%',
+                    border: 'none', cursor: 'pointer',
+                    background: 'rgba(0,0,0,0.4)', color: 'rgba(255,255,255,0.6)',
+                    fontSize: '14px', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    zIndex: 10, backdropFilter: 'blur(4px)',
+                }}>x</button>
 
-                {/* Legendary particles */}
-                {isLeg && Array.from({ length: 10 }).map((_, i) => (
-                    <div key={i} style={{
-                        position: 'absolute',
-                        width: `${3 + (i % 3)}px`, height: `${3 + (i % 3)}px`, borderRadius: '50%',
-                        background: i % 2 === 0 ? '#D4AF37' : '#A855F7',
-                        left: `${10 + (i * 8) % 80}%`, top: `${5 + (i * 12) % 85}%`,
-                        animation: `card-particle-float ${2 + (i % 3)}s ease-in-out infinite`,
-                        animationDelay: `${i * 0.3}s`, opacity: 0.7, zIndex: 6, pointerEvents: 'none',
-                    }} />
-                ))}
-
-                {/* Top Name Bar */}
+                {/* Header */}
                 <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '6px 10px',
-                    backgroundColor: isTextLight ? 'rgba(255,255,255,0.06)' : `${accent}12`,
-                    borderRadius: '8px 8px 0 0',
-                    borderBottom: `1px solid ${isTextLight ? 'rgba(255,255,255,0.1)' : accent + '30'}`,
-                    position: 'relative', zIndex: 7,
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <ElementBadge element={card.element} size={12} />
-                        <span style={{
-                            fontSize: '9px', fontWeight: '800',
-                            color: RANK_META[rank].borderColor,
-                            letterSpacing: '1.5px',
-                            textShadow: isHolo ? `0 0 8px ${RANK_META[rank].borderColor}60` : 'none',
-                        }}>
-                            {rank !== 'NORMAL' ? RANK_META[rank].label : ''}
-                        </span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
-                        <span style={{
-                            fontSize: '14px', fontWeight: '900',
-                            color: rank !== 'NORMAL' ? RANK_META[rank].borderColor : '#A8A29E',
-                            fontVariantNumeric: 'tabular-nums',
-                        }}>
-                            {card.points}
-                        </span>
-                        <span style={{ fontSize: '8px', fontWeight: '700', color: isTextLight ? 'rgba(255,255,255,0.4)' : '#A8A29E' }}>
-                            SP
-                        </span>
-                    </div>
-                </div>
-
-                {/* Illustration Window */}
-                <div style={{
-                    flex: 1, display: 'flex', flexDirection: 'column',
-                    justifyContent: 'center', alignItems: 'center',
+                    padding: '28px 24px 20px',
                     background: getWindowBg(rank),
-                    borderRadius: '8px',
-                    border: `1px solid ${isTextLight ? 'rgba(255,255,255,0.08)' : accent + '25'}`,
-                    margin: '6px 0', padding: '20px 16px',
-                    textAlign: 'center', position: 'relative', zIndex: 7, overflow: 'hidden',
+                    borderRadius: '20px 20px 0 0',
+                    borderBottom: `1px solid ${accent}30`,
+                    position: 'relative', overflow: 'hidden',
                 }}>
-                    {/* Background textures */}
-                    {rank === 'BRONZE' && <div style={{ position: 'absolute', inset: 0, opacity: 0.04, background: 'repeating-linear-gradient(45deg, #CD7F32, #CD7F32 1px, transparent 1px, transparent 12px)', pointerEvents: 'none' }} />}
-                    {rank === 'SILVER' && <div style={{ position: 'absolute', inset: 0, opacity: 0.05, background: 'repeating-linear-gradient(-45deg, #94A3B8, #94A3B8 1px, transparent 1px, transparent 14px)', pointerEvents: 'none' }} />}
-                    {rank === 'GOLD' && <div style={{ position: 'absolute', inset: 0, opacity: 0.03, background: 'radial-gradient(circle at 30% 40%, #D4AF37 0.5px, transparent 0.5px)', backgroundSize: '16px 16px', pointerEvents: 'none' }} />}
-                    {isHolo && <div style={{ position: 'absolute', inset: 0, opacity: 0.06, background: 'repeating-conic-gradient(from 0deg, rgba(168,85,247,0.1) 0deg, rgba(59,130,246,0.1) 60deg, rgba(232,121,249,0.1) 120deg, rgba(16,185,129,0.1) 180deg, rgba(245,158,11,0.1) 240deg, rgba(168,85,247,0.1) 360deg)', pointerEvents: 'none' }} />}
+                    {(isLeg || isHolo) && <div style={{
+                        position: 'absolute', top: '-30%', right: '-20%',
+                        width: '60%', height: '120%', borderRadius: '50%',
+                        background: `radial-gradient(circle, ${accent}12, transparent 70%)`,
+                        pointerEvents: 'none',
+                    }} />}
 
+                    {/* Rank + Element row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', position: 'relative' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <ElementBadge element={el} size={16} />
+                            <span style={{ fontSize: '11px', fontWeight: '800', color: accent, letterSpacing: '1.5px' }}>
+                                {RANK_META[rank].label}
+                            </span>
+                            {advEl && (
+                                <span style={{ fontSize: '9px', fontWeight: '600', color: isLeg ? 'rgba(255,255,255,0.4)' : '#A8A29E', marginLeft: '2px' }}>
+                                    {elLabel} &gt; {advLabel}
+                                </span>
+                            )}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                            <span style={{
+                                fontSize: '22px', fontWeight: '900',
+                                color: rank !== 'NORMAL' ? accent : '#A8A29E',
+                                fontFamily: 'monospace',
+                            }}>
+                                {card.points}
+                            </span>
+                            <span style={{ fontSize: '10px', fontWeight: '700', color: '#A8A29E' }}>SP</span>
+                        </div>
+                    </div>
+
+                    {/* English */}
                     <div style={{
-                        fontSize: '20px', fontWeight: '800',
-                        color: isTextLight ? '#FAFAF9' : '#1C1917',
-                        lineHeight: 1.3, marginBottom: '8px', letterSpacing: '-0.3px',
-                        position: 'relative',
-                        textShadow: isTextLight ? '0 1px 4px rgba(0,0,0,0.5)' : 'none',
+                        fontSize: '22px', fontWeight: '800',
+                        color: isLeg ? '#FAFAF9' : '#1C1917',
+                        lineHeight: 1.35, marginBottom: '10px',
+                        textShadow: isLeg ? '0 1px 6px rgba(0,0,0,0.5)' : 'none',
+                        wordBreak: 'break-word', letterSpacing: '-0.3px',
                     }}>
                         {card.english}
                     </div>
+
+                    {/* Japanese */}
                     <div style={{
-                        fontSize: '13px',
-                        color: isTextLight ? 'rgba(255,255,255,0.5)' : '#78716C',
-                        lineHeight: 1.4, position: 'relative',
+                        fontSize: '14px',
+                        color: isLeg ? 'rgba(255,255,255,0.55)' : '#78716C',
+                        lineHeight: 1.6, wordBreak: 'break-word',
                     }}>
                         {card.japanese}
                     </div>
+
+                    {/* Flavor Text */}
+                    {(() => {
+                        const flavor = getFlavorText(card.phraseId);
+                        return (
+                            <div style={{
+                                marginTop: '16px', paddingTop: '14px',
+                                borderTop: `1px solid ${isLeg ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                            }}>
+                                <div style={{
+                                    fontSize: '12px', fontStyle: 'italic',
+                                    color: isLeg ? 'rgba(255,255,255,0.45)' : '#8C7E6F',
+                                    lineHeight: 1.5, letterSpacing: '0.2px',
+                                }}>
+                                    &ldquo;{flavor.en}&rdquo;
+                                </div>
+                                <div style={{
+                                    fontSize: '10px',
+                                    color: isLeg ? 'rgba(255,255,255,0.25)' : '#B5A99A',
+                                    lineHeight: 1.4, marginTop: '4px',
+                                }}>
+                                    {flavor.ja}
+                                </div>
+                            </div>
+                        );
+                    })()}
                 </div>
 
-                {/* Bottom Bar */}
-                <div style={{
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '5px 10px',
-                    backgroundColor: isTextLight ? 'rgba(255,255,255,0.04)' : `${accent}08`,
-                    borderRadius: '0 0 8px 8px',
-                    borderTop: `1px solid ${isTextLight ? 'rgba(255,255,255,0.08)' : accent + '20'}`,
-                    position: 'relative', zIndex: 7,
-                }}>
-                    <span style={{
-                        fontSize: '8px', fontWeight: '700',
-                        color: isTextLight ? 'rgba(255,255,255,0.35)' : '#A8A29E',
-                        letterSpacing: '1px',
+                {/* Stats Area */}
+                <div style={{ padding: '16px 20px 12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+                    {/* SP Progress */}
+                    <div style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: '12px', padding: '14px 16px',
+                        border: '1px solid rgba(255,255,255,0.04)',
                     }}>
-                        {RANK_META[rank].label}
-                    </span>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ fontSize: '8px', fontWeight: '800', color: bstTier.color, letterSpacing: '0.5px' }}>
-                            {bstTier.tier} {card.bstTotal}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.45)', letterSpacing: '1.2px' }}>RANK PROGRESS</span>
+                            <span style={{ fontSize: '10px', fontWeight: '600', color: 'rgba(255,255,255,0.4)' }}>
+                                {nextRank ? `${RANK_JA[nextRank.rank]} (${nextRank.threshold} SP)` : 'MAX'}
+                            </span>
+                        </div>
+                        <div style={{
+                            height: '8px', borderRadius: '4px',
+                            backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden',
+                        }}>
+                            <div style={{
+                                height: '100%',
+                                width: mounted ? `${progressPct}%` : '0%',
+                                borderRadius: '4px',
+                                background: nextRank
+                                    ? `linear-gradient(90deg, ${accent}, ${nextRank.borderColor})`
+                                    : `linear-gradient(90deg, #D4AF37, #A855F7)`,
+                                transition: 'width 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s',
+                                boxShadow: `0 0 8px ${accent}40`,
+                            }} />
+                        </div>
+                        {nextRank && (
+                            <div style={{
+                                fontSize: '10px', color: accent + '80', marginTop: '5px', textAlign: 'right',
+                                fontWeight: '600',
+                            }}>
+                                {nextRank.threshold - card.points} SP
+                            </div>
+                        )}
+                    </div>
+
+                    {/* BST Radar + Stats */}
+                    <div style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: '12px', padding: '14px 16px',
+                        border: '1px solid rgba(255,255,255,0.04)',
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.45)', letterSpacing: '1.2px' }}>BST</span>
+                                <span style={{
+                                    fontSize: '9px', fontWeight: '700', letterSpacing: '0.5px',
+                                    color: bstTier.color, backgroundColor: bstTier.color + '18',
+                                    padding: '1px 6px', borderRadius: '4px',
+                                }}>
+                                    {bstTier.ja}
+                                </span>
+                            </div>
+                            <span style={{ fontSize: '16px', fontWeight: '900', color: bstTier.color, fontFamily: 'monospace' }}>
+                                {bstTotal}
+                            </span>
+                        </div>
+                        <svg viewBox="0 0 180 185" style={{ width: '100%', maxWidth: '220px', display: 'block', margin: '0 auto' }}>
+                            {[0.25, 0.5, 0.75, 1.0].map(level => {
+                                const pts = Array.from({ length: 6 }, (_, i) => {
+                                    const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
+                                    return `${cx + radarR * level * Math.cos(angle)},${cy + radarR * level * Math.sin(angle)}`;
+                                }).join(' ');
+                                return <polygon key={level} points={pts} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="0.5" />;
+                            })}
+                            {Array.from({ length: 6 }, (_, i) => {
+                                const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
+                                return <line key={i} x1={cx} y1={cy} x2={cx + radarR * Math.cos(angle)} y2={cy + radarR * Math.sin(angle)} stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />;
+                            })}
+                            <polygon points={polygon}
+                                fill={`${bstTier.color}20`}
+                                stroke={bstTier.color} strokeWidth="1.5"
+                                style={{ opacity: mounted ? 1 : 0, transition: 'opacity 0.6s ease 0.3s' }}
+                            />
+                            {statPoints.map((p, i) => (
+                                <circle key={i} cx={p.x} cy={p.y}
+                                    r={i === maxIdx ? '4' : i === minIdx ? '2.5' : '3'}
+                                    fill={statColors[i]}
+                                    stroke={i === maxIdx ? '#fff' : 'rgba(0,0,0,0.3)'}
+                                    strokeWidth={i === maxIdx ? '1' : '0.5'}
+                                    style={{ opacity: mounted ? 1 : 0, transition: `opacity 0.4s ease ${0.3 + i * 0.05}s` }}
+                                />
+                            ))}
+                            {BST_STAT_NAMES_JA.map((name, i) => {
+                                const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
+                                const lx = cx + (radarR + 18) * Math.cos(angle);
+                                const ly = cy + (radarR + 18) * Math.sin(angle);
+                                return (
+                                    <g key={i}>
+                                        <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
+                                            style={{ fontSize: '8px', fontWeight: i === maxIdx ? '900' : '700', fill: i === maxIdx ? statColors[i] : 'rgba(255,255,255,0.5)' }}>
+                                            {name}
+                                        </text>
+                                        <text x={lx} y={ly + 11} textAnchor="middle" dominantBaseline="middle"
+                                            style={{ fontSize: '8px', fontWeight: '700', fill: statColors[i], fontFamily: 'monospace' }}>
+                                            {bstStats[i]}
+                                        </text>
+                                    </g>
+                                );
+                            })}
+                        </svg>
+                        {/* Stat bars */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '6px' }}>
+                            {BST_STAT_NAMES_JA.map((name, i) => {
+                                const pct = (bstStats[i] / STAT_MAX) * 100;
+                                const isMax = i === maxIdx;
+                                const isMin = i === minIdx;
+                                return (
+                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{
+                                            fontSize: '10px', fontWeight: isMax ? '900' : '700',
+                                            color: statColors[i], width: '24px',
+                                            textShadow: isMax ? `0 0 6px ${statColors[i]}40` : 'none',
+                                        }}>{name}</span>
+                                        <div style={{
+                                            flex: 1, height: '6px',
+                                            background: 'rgba(255,255,255,0.06)',
+                                            borderRadius: '3px', overflow: 'hidden',
+                                        }}>
+                                            <div style={{
+                                                height: '100%',
+                                                width: mounted ? `${pct}%` : '0%',
+                                                background: isMax
+                                                    ? `linear-gradient(90deg, ${statColors[i]}, ${statColors[i]}cc)`
+                                                    : statColors[i] + (isMin ? '80' : 'bb'),
+                                                borderRadius: '3px',
+                                                transition: `width 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.2 + i * 0.06}s`,
+                                                boxShadow: isMax ? `0 0 4px ${statColors[i]}30` : 'none',
+                                            }} />
+                                        </div>
+                                        <span style={{
+                                            fontSize: '11px', fontWeight: isMax ? '900' : '700',
+                                            color: statColors[i], fontFamily: 'monospace', width: '24px', textAlign: 'right',
+                                        }}>{bstStats[i]}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Chakra */}
+                    <div style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        borderRadius: '12px', padding: '12px 16px',
+                        border: '1px solid rgba(255,255,255,0.04)',
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                            <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.45)', letterSpacing: '1.2px' }}>CHAKRA</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '11px', fontWeight: '800', color: ci.color }}>{ci.ja}</span>
+                                <span style={{ fontSize: '13px', fontWeight: '900', color: ci.color, fontFamily: 'monospace' }}>Lv.{chakra}</span>
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
+                            {CHAKRA.map((c, i) => {
+                                const active = i <= chakra;
+                                const current = i === chakra;
+                                return (
+                                    <div key={c.name} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                                        <div style={{
+                                            width: '100%', height: current ? '6px' : '4px', borderRadius: '3px',
+                                            backgroundColor: active ? c.color : 'rgba(255,255,255,0.06)',
+                                            boxShadow: current ? `0 0 8px ${c.color}50` : 'none',
+                                            transition: 'all 0.3s ease',
+                                        }} />
+                                        <span style={{
+                                            fontSize: current ? '10px' : '9px',
+                                            fontWeight: current ? '900' : '600',
+                                            color: current ? c.color : active ? c.color + '70' : 'rgba(255,255,255,0.18)',
+                                        }}>
+                                            {c.ja}
+                                        </span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        padding: '4px 4px 6px',
+                        borderTop: '1px solid rgba(255,255,255,0.04)',
+                    }}>
+                        <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace', letterSpacing: '0.3px' }}>
+                            {card.phraseId}
                         </span>
-                        <span style={{ fontSize: '7px', fontWeight: '600', color: isTextLight ? 'rgba(255,255,255,0.3)' : '#A8A29E', fontFamily: 'monospace' }}>
-                            {card.phraseId.slice(0, 6)}
+                        <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)', letterSpacing: '0.5px' }}>
+                            {bstTier.tier}-TIER / {bstTier.ja}
                         </span>
-                    </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -567,7 +752,7 @@ function CardModal({ card, onClose, isMobile }: { card: PuzzleCard; onClose: () 
 // Main Component
 // ═══════════════════════════════════════════════════════════
 
-export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobile }: PuzzleBoardProps) {
+export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGridMilestone, onGridUpdate, externalBattleActive, isMobile, mastery: masteryProp, hideSidePanel }: PuzzleBoardProps) {
     const [gridSize, setGridSize] = useState<GridSize>(() => loadGridSize());
     const N = gridSize;
     const total = N * N;
@@ -575,18 +760,20 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
     const [grid, setGrid] = useState<Grid>(() => loadGrid(gridSize));
     const [stats, setStats] = useState<PuzzleStats>(() => loadStats(gridSize));
     const [dropHL, setDropHL] = useState<{ row: number; col: number; key: number } | null>(null);
+    const [gridFlash, setGridFlash] = useState<{ color: string; key: number } | null>(null);
+    const [synergyFlash, setSynergyFlash] = useState<{ row: number; col: number; element: string; key: number } | null>(null);
     const [modalCard, setModalCard] = useState<PuzzleCard | null>(null);
     const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
     const [battlePhase, setBattlePhase] = useState<'idle' | 'charging' | 'synergies' | 'damage' | 'grade' | 'done'>('idle');
     const [shownSynergies, setShownSynergies] = useState<number>(0);
     const [isBattling, setIsBattling] = useState(false);
-    const [boss, setBoss] = useState<DailyBoss>(() => getDailyBoss(gridSize));
-    const [bossDefeated, setBossDefeated] = useState<boolean | null>(null);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
 
     const prevKeyRef = useRef(0);
     const sizeRef = useRef(gridSize);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const onGridMilestoneRef = useRef(onGridMilestone);
+    onGridMilestoneRef.current = onGridMilestone;
 
     // Reset board (manual)
     const resetBoard = useCallback(() => {
@@ -596,7 +783,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
         saveGrid(mk(sz), sz);
         setBattleResult(null);
         setBattlePhase('idle');
-        setBossDefeated(null);
+        if (onGridUpdate) onGridUpdate({ filled: 0, total: sz * sz });
         setShowResetConfirm(false);
     }, [isBattling]);
 
@@ -604,7 +791,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
     const resetStats = useCallback(() => {
         if (isBattling) return;
         const sz = sizeRef.current;
-        const fresh: PuzzleStats = { totalBattles: 0, bestDamage: 0, totalGP: 0, sRanks: 0, month: curMonth(), bossWins: 0, bossLosses: 0, winStreak: 0, bestStreak: 0 };
+        const fresh: PuzzleStats = { totalBattles: 0, bestDamage: 0, totalGP: 0, sRanks: 0, month: curMonth() };
         setStats(fresh);
         saveStats(fresh, sz);
         setShowResetConfirm(false);
@@ -620,20 +807,30 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
         setStats(loadStats(n));
         setBattleResult(null);
         setBattlePhase('idle');
-        setBoss(getDailyBoss(n));
-        setBossDefeated(null);
     }, [isBattling]);
 
-    // Run battle sequence when grid is full
-    const runBattle = useCallback((g: Grid) => {
+    // Run milestone evaluation when grid is full
+    const runMilestone = useCallback((g: Grid) => {
         const cards = allCards(g);
-        const currentBoss = getDailyBoss(sizeRef.current);
-        setBoss(currentBoss);
-        const bossResult = evaluateWithBoss(cards, currentBoss);
-        const result: BattleResult = bossResult;
+        const result = evaluateParty(cards);
         setBattleResult(result);
-        setBossDefeated(bossResult.bossDefeated);
         setIsBattling(true);
+
+        // Emit grid milestone data
+        if (onGridMilestoneRef.current) {
+            const avgBST = cards.length > 0 ? Math.round(cards.reduce((s, c) => s + c.bstTotal, 0) / cards.length) : 0;
+            onGridMilestoneRef.current({
+                cards: cards.map(c => ({ english: c.english, element: c.element, rank: c.rank, bstTotal: c.bstTotal })),
+                synergies: result.synergies.map(s => ({ name: s.name, multiplier: s.multiplier, color: s.color, icon: s.icon })),
+                totalPower: result.basePower,
+                totalMultiplier: result.totalMultiplier,
+                finalDamage: result.finalDamage,
+                gpBonus: result.gpEarned,
+                grade: result.grade,
+                avgBST,
+                cardCount: cards.length,
+            });
+        }
 
         // Phase 1: Charging (board glows)
         sfxDrop();
@@ -652,7 +849,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                     setBattlePhase('damage');
                     setTimeout(() => {
                         setBattlePhase('grade');
-                        setTimeout(() => finishBattle(result, g), 2000);
+                        setTimeout(() => finishMilestone(result, g), 2000);
                     }, 1500);
                 }, 500);
                 return;
@@ -675,7 +872,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                             if (result.grade === 'S') sfxPerfect();
                             else sfxSpike();
                             setBattlePhase('grade');
-                            setTimeout(() => finishBattle(result, g), 2500);
+                            setTimeout(() => finishMilestone(result, g), 2500);
                         }, 1500);
                     }, 400);
                 }
@@ -684,11 +881,8 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
         }, 1200);
     }, []);
 
-    const finishBattle = useCallback((result: BattleResult, g: Grid) => {
+    const finishMilestone = useCallback((result: BattleResult, g: Grid) => {
         const sz = sizeRef.current;
-        const won = bossDefeated === true;
-        const newStreak = won ? (stats.winStreak || 0) + 1 : 0;
-        const currentBoss = getDailyBoss(sz);
         // Update stats
         const ns: PuzzleStats = {
             totalBattles: stats.totalBattles + 1,
@@ -696,15 +890,11 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
             totalGP: stats.totalGP + result.gpEarned,
             sRanks: stats.sRanks + (result.grade === 'S' ? 1 : 0),
             month: curMonth(),
-            bossWins: (stats.bossWins || 0) + (won ? 1 : 0),
-            bossLosses: (stats.bossLosses || 0) + (won ? 0 : 1),
-            winStreak: newStreak,
-            bestStreak: Math.max(stats.bestStreak || 0, newStreak),
         };
         setStats(ns); saveStats(ns, sz);
         if (onChainResult) onChainResult({ cleared: allCards(g).length, chainCount: result.synergies.length, gpEarned: result.gpEarned });
 
-        // Save cards for story generation (∞ learning loop)
+        // Save cards for story generation
         try {
             const storyCards = allCards(g).map(c => ({
                 english: c.english,
@@ -717,24 +907,22 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
             localStorage.setItem('fujin-pending-cards', JSON.stringify({
                 cards: storyCards,
                 gridSize: sz,
-                bossDefeated: won,
-                bossName: currentBoss.name,
             }));
         } catch {}
 
         setBattlePhase('done');
 
-        // Reset grid after showing results
+        // Auto-reset grid after milestone completes (2s delay for results to show)
         setTimeout(() => {
+            const sz = sizeRef.current;
             setGrid(mk(sz));
             saveGrid(mk(sz), sz);
             setBattleResult(null);
             setBattlePhase('idle');
             setIsBattling(false);
-            setShownSynergies(0);
-            setBossDefeated(null);
-        }, 2500);
-    }, [stats, onChainResult, bossDefeated]);
+            if (onGridUpdate) onGridUpdate({ filled: 0, total: sz * sz });
+        }, 2000);
+    }, [stats, onChainResult]);
 
     // When a new dropCard arrives, auto-place it
     useEffect(() => {
@@ -752,17 +940,22 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
             bstTotal: dropCard.bstTotal,
         };
 
-        sfxDrop();
-        const { grid: ng, row, col } = placeAuto(grid, card, N);
+        const { grid: ng, row, col, synHit } = placeAuto(grid, card, N);
+        if (synHit) { sfxMatch(1); } else { sfxDrop(); }
         setGrid(ng);
         setDropHL({ row, col, key: Date.now() });
+        setGridFlash({ color: ELEMENT_COLORS[card.element as Element] || '#78716C', key: Date.now() });
+        if (synHit) setSynergyFlash({ row, col, element: card.element, key: Date.now() });
         saveGrid(ng, gridSize);
+        if (onGridUpdate) onGridUpdate({ filled: cnt(ng), total });
 
-        setTimeout(() => setDropHL(null), 500);
+        setTimeout(() => setDropHL(null), 600);
+        setTimeout(() => setGridFlash(null), 400);
+        if (synHit) setTimeout(() => setSynergyFlash(null), 800);
 
         // Check if grid is now full → trigger battle
         if (cnt(ng) >= total) {
-            setTimeout(() => runBattle(ng), 800);
+            setTimeout(() => runMilestone(ng), 800);
         }
     }, [dropCard?.key]);
 
@@ -795,7 +988,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
             background: '#F0EFED', borderRadius: '6px', padding: '2px',
             border: '1px solid #E7E5E4',
         }}>
-            {([3, 4] as GridSize[]).map(n => (
+            {([2, 3, 4] as GridSize[]).map(n => (
                 <button
                     key={n}
                     onClick={() => switchSize(n)}
@@ -817,168 +1010,99 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
     );
 
     // Side panel (PC only)
-    const bossColor = ELEMENT_COLORS[boss.element] || '#78716C';
+    const avgBST = cardCount > 0 ? Math.round(totalBST / cardCount) : 0;
+
     const sidePanel = (
         <div style={{
-            flex: 1, display: 'flex', flexDirection: 'column', gap: '10px',
+            width: '240px', flex: 'none',
+            display: 'flex', flexDirection: 'column', gap: '8px',
             minWidth: 0,
+            maxHeight: boardMaxH,
+            overflowY: 'auto',
         }}>
-            {/* Daily Boss */}
+            {/* === PARTY POWER GAUGE === */}
             <div style={{
-                background: `linear-gradient(135deg, ${bossColor}08, ${bossColor}15)`,
-                borderRadius: '10px', border: `1px solid ${bossColor}30`,
-                padding: '14px', boxShadow: `0 1px 6px ${bossColor}10`,
+                background: '#fff', borderRadius: '10px', border: '1px solid #E7E5E4',
+                padding: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <div style={{ fontSize: '10px', fontWeight: '800', color: bossColor, letterSpacing: '1px' }}>
-                        TODAY&apos;S BOSS
-                    </div>
-                    {(stats.winStreak || 0) > 0 && (
-                        <span style={{ fontSize: '9px', fontWeight: '800', color: '#D4AF37', letterSpacing: '0.5px' }}>
-                            {stats.winStreak} STREAK
-                        </span>
-                    )}
+                    <span style={{ fontSize: '9px', fontWeight: '800', color: '#A8A29E', letterSpacing: '1px' }}>PARTY POWER</span>
+                    <span style={{ fontSize: '11px', fontWeight: '900', color: '#1C1917' }}>{cardCount}/{total}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                    <div style={{
-                        width: '36px', height: '36px', borderRadius: '8px',
-                        background: `linear-gradient(135deg, ${bossColor}25, ${bossColor}40)`,
-                        border: `1.5px solid ${bossColor}50`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '18px', fontWeight: '900', color: bossColor,
-                    }}>
-                        {ELEMENT_LABELS[boss.element]}
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '16px', fontWeight: '900', color: '#1C1917' }}>{boss.name}</div>
-                        <div style={{ fontSize: '10px', fontWeight: '600', color: '#78716C' }}>
-                            HP {boss.hp.toLocaleString()}
-                        </div>
-                    </div>
-                </div>
-                {/* HP bar */}
+                {/* Fill gauge */}
                 <div style={{
-                    height: '8px', borderRadius: '4px', overflow: 'hidden',
-                    background: '#E7E5E4',
+                    height: '6px', borderRadius: '3px', overflow: 'hidden',
+                    background: '#F0EFED', marginBottom: '10px',
                 }}>
                     <div style={{
-                        height: '100%', width: '100%', borderRadius: '4px',
-                        background: `linear-gradient(90deg, ${bossColor}, ${bossColor}cc)`,
+                        height: '100%', width: `${Math.round(cardCount / total * 100)}%`,
+                        background: cardCount === total ? 'linear-gradient(90deg, #D4AF37, #F59E0B)' : 'linear-gradient(90deg, #3B82F6, #60A5FA)',
+                        borderRadius: '3px', transition: 'width 0.3s ease',
                     }} />
                 </div>
-                {/* Debuff */}
-                <div style={{
-                    marginTop: '8px', display: 'flex', alignItems: 'center', gap: '6px',
-                    background: 'rgba(0,0,0,0.03)', borderRadius: '6px', padding: '6px 8px',
-                }}>
-                    <span style={{
-                        fontSize: '9px', fontWeight: '800', color: '#EF4444',
-                        background: '#FEE2E2', padding: '1px 5px', borderRadius: '3px',
-                    }}>DEBUFF</span>
-                    <span style={{ fontSize: '10px', fontWeight: '700', color: '#78716C' }}>
-                        {boss.debuffLabel}: {boss.debuffDesc}
-                    </span>
+                {/* Stats row */}
+                <div style={{ display: 'flex', gap: '6px' }}>
+                    {[
+                        { label: 'SP', value: String(totalSP), color: '#D4AF37', bg: '#FFF7ED' },
+                        { label: 'AVG BST', value: cardCount > 0 ? String(avgBST) : '--', color: avgBST >= 500 ? '#EF4444' : avgBST >= 400 ? '#F59E0B' : '#10B981', bg: '#F0FDF4' },
+                        { label: 'DMG', value: previewResult ? previewResult.finalDamage.toLocaleString() : '--', color: '#EF4444', bg: '#FEF2F2' },
+                    ].map(s => (
+                        <div key={s.label} style={{
+                            flex: 1, background: s.bg, borderRadius: '8px', padding: '6px 8px',
+                            border: '1px solid #F0EFED', textAlign: 'center' as const,
+                        }}>
+                            <div style={{ fontSize: '8px', fontWeight: '700', color: '#A8A29E', letterSpacing: '0.3px' }}>{s.label}</div>
+                            <div style={{ fontSize: '15px', fontWeight: '900', color: s.color, marginTop: '1px' }}>{s.value}</div>
+                        </div>
+                    ))}
                 </div>
-                {/* Win rate */}
-                {stats.totalBattles > 0 && (
-                    <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: '700' }}>
-                        <span style={{ color: '#78716C' }}>
-                            {stats.bossWins || 0}W / {stats.bossLosses || 0}L
-                        </span>
-                        <span style={{ color: '#D4AF37' }}>
-                            Best Streak: {stats.bestStreak || 0}
-                        </span>
+                {/* Grade preview */}
+                {previewResult && (
+                    <div style={{
+                        marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px',
+                        background: `${GRADE_COLORS[previewResult.grade]}10`, borderRadius: '6px', padding: '4px',
+                        border: `1px solid ${GRADE_COLORS[previewResult.grade]}20`,
+                    }}>
+                        <span style={{ fontSize: '9px', fontWeight: '700', color: '#A8A29E' }}>Est. Grade</span>
+                        <span style={{
+                            fontSize: '16px', fontWeight: '900', color: GRADE_COLORS[previewResult.grade],
+                            textShadow: previewResult.grade === 'S' ? '0 0 6px rgba(212,175,55,0.4)' : undefined,
+                        }}>{previewResult.grade}</span>
+                        <span style={{ fontSize: '9px', fontWeight: '700', color: '#A8A29E' }}>x{previewResult.totalMultiplier.toFixed(1)}</span>
                     </div>
                 )}
             </div>
 
-            {/* Board Stats */}
+            {/* === ELEMENT STRATEGY === */}
             <div style={{
                 background: '#fff', borderRadius: '10px', border: '1px solid #E7E5E4',
-                padding: '14px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                padding: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
             }}>
-                <div style={{ fontSize: '10px', fontWeight: '800', color: '#A8A29E', letterSpacing: '1px', marginBottom: '10px' }}>
-                    PARTY STATUS
+                <div style={{ fontSize: '9px', fontWeight: '800', color: '#A8A29E', letterSpacing: '1px', marginBottom: '8px' }}>
+                    ELEMENT STRATEGY
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    {[
-                        { label: 'CARDS', value: `${cardCount}/${total}`, color: '#1C1917' },
-                        { label: 'TOTAL SP', value: String(totalSP), color: '#D4AF37' },
-                        { label: 'AVG BST', value: cardCount > 0 ? String(Math.round(totalBST / cardCount)) : '--', color: '#10B981' },
-                        { label: 'FILL %', value: `${Math.round(cardCount / total * 100)}%`, color: '#78716C' },
-                    ].map(s => (
-                        <div key={s.label} style={{
-                            background: '#FAFAF9', borderRadius: '8px', padding: '8px 10px',
-                            border: '1px solid #F0EFED',
-                        }}>
-                            <div style={{ fontSize: '9px', fontWeight: '700', color: '#A8A29E', letterSpacing: '0.5px' }}>{s.label}</div>
-                            <div style={{ fontSize: '18px', fontWeight: '900', color: s.color, marginTop: '2px' }}>{s.value}</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Synergy Preview (live as cards fill) */}
-            {previewResult && previewResult.synergies.length > 0 && (
-                <div style={{
-                    background: 'linear-gradient(135deg, #FFF7ED, #FFF)', borderRadius: '10px',
-                    border: '1px solid #FED7AA', padding: '14px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                }}>
-                    <div style={{ fontSize: '10px', fontWeight: '800', color: '#D4AF37', letterSpacing: '1px', marginBottom: '8px' }}>
-                        SYNERGY PREVIEW
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        {previewResult.synergies.map((s, i) => (
-                            <div key={i} style={{
-                                display: 'flex', alignItems: 'center', gap: '8px',
-                                background: `${s.color}10`, borderRadius: '6px', padding: '6px 8px',
-                                border: `1px solid ${s.color}25`,
-                            }}>
-                                <span style={{
-                                    fontSize: '12px', fontWeight: '900', color: s.color,
-                                    width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    background: `${s.color}15`, borderRadius: '4px',
-                                }}>{s.icon}</span>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <div style={{ fontSize: '10px', fontWeight: '800', color: s.color }}>{s.name}</div>
-                                    <div style={{ fontSize: '9px', color: '#78716C' }}>{s.description}</div>
-                                </div>
-                                <span style={{ fontSize: '11px', fontWeight: '900', color: s.color }}>x{s.multiplier.toFixed(1)}</span>
-                            </div>
-                        ))}
-                    </div>
-                    <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: '800' }}>
-                        <span style={{ color: '#78716C' }}>Est. DMG</span>
-                        <span style={{ color: GRADE_COLORS[previewResult.grade] }}>{previewResult.finalDamage.toLocaleString()}</span>
-                    </div>
-                </div>
-            )}
-
-            {/* Element Breakdown */}
-            <div style={{
-                background: '#fff', borderRadius: '10px', border: '1px solid #E7E5E4',
-                padding: '14px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-            }}>
-                <div style={{ fontSize: '10px', fontWeight: '800', color: '#A8A29E', letterSpacing: '1px', marginBottom: '10px' }}>
-                    ELEMENTS
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {(['flame', 'aqua', 'wind', 'earth', 'thunder'] as Element[]).map(el => {
                         const count = elemCounts[el] || 0;
                         const pct = cardCount > 0 ? count / cardCount * 100 : 0;
                         return (
-                            <div key={el} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div key={el} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                 <ElementBadge element={el} size={14} />
-                                <div style={{ flex: 1, height: '6px', background: '#F0EFED', borderRadius: '3px', overflow: 'hidden' }}>
+                                <div style={{
+                                    flex: 1, height: '8px', borderRadius: '4px', overflow: 'hidden',
+                                    background: '#F0EFED',
+                                    border: '1px solid transparent',
+                                }}>
                                     <div style={{
                                         width: `${pct}%`, height: '100%',
                                         background: ELEMENT_COLORS[el],
-                                        borderRadius: '3px',
-                                        transition: 'width 0.3s ease',
+                                        borderRadius: '4px', transition: 'width 0.3s ease',
                                     }} />
                                 </div>
-                                <span style={{ fontSize: '11px', fontWeight: '800', color: '#78716C', minWidth: '16px', textAlign: 'right' }}>
+                                <span style={{
+                                    fontSize: '11px', fontWeight: '800', minWidth: '16px', textAlign: 'right' as const,
+                                    color: '#78716C',
+                                }}>
                                     {count}
                                 </span>
                             </div>
@@ -987,46 +1111,85 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                 </div>
             </div>
 
-            {/* Records */}
+            {/* === SYNERGY PREVIEW (live) === */}
+            {previewResult && previewResult.synergies.length > 0 && (
+                <div style={{
+                    background: 'linear-gradient(135deg, #FFF7ED, #FFF)', borderRadius: '10px',
+                    border: '1px solid #FED7AA', padding: '12px',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                }}>
+                    <div style={{ fontSize: '9px', fontWeight: '800', color: '#D4AF37', letterSpacing: '1px', marginBottom: '8px' }}>
+                        ACTIVE SYNERGIES
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                        {previewResult.synergies.map((s, i) => (
+                            <div key={i} style={{
+                                display: 'flex', alignItems: 'center', gap: '8px',
+                                background: `${s.color}15`, borderRadius: '6px', padding: '5px 8px',
+                                border: `1px solid ${s.color}30`,
+                            }}>
+                                <span style={{
+                                    fontSize: '13px', fontWeight: '900', color: s.color,
+                                    width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    background: `${s.color}20`, borderRadius: '5px',
+                                    boxShadow: `0 1px 3px ${s.color}20`,
+                                }}>{s.icon}</span>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontSize: '10px', fontWeight: '800', color: s.color }}>{s.name}</div>
+                                    <div style={{ fontSize: '8px', color: '#A8A29E' }}>{s.description}</div>
+                                </div>
+                                <span style={{
+                                    fontSize: '12px', fontWeight: '900', color: s.color,
+                                }}>x{s.multiplier.toFixed(1)}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* === GRID RECORDS === */}
             <div style={{
                 background: '#fff', borderRadius: '10px', border: '1px solid #E7E5E4',
-                padding: '14px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                padding: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
             }}>
-                <div style={{ fontSize: '10px', fontWeight: '800', color: '#A8A29E', letterSpacing: '1px', marginBottom: '10px' }}>
-                    BATTLE RECORDS
+                <div style={{ fontSize: '9px', fontWeight: '800', color: '#A8A29E', letterSpacing: '1px', marginBottom: '8px' }}>
+                    GRID RECORDS
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px' }}>
                     {[
-                        { label: 'Battles', value: String(stats.totalBattles), color: '#78716C' },
-                        { label: 'Best DMG', value: stats.bestDamage.toLocaleString(), color: '#EF4444' },
-                        { label: 'Total GP', value: stats.totalGP.toLocaleString(), color: '#D4AF37' },
-                        { label: 'S Ranks', value: String(stats.sRanks), color: '#A855F7' },
+                        { label: 'GRIDS', value: String(stats.totalBattles), color: '#1C1917' },
+                        { label: 'S RANK', value: String(stats.sRanks), color: '#A855F7' },
+                        { label: 'BEST DMG', value: stats.bestDamage.toLocaleString(), color: '#EF4444' },
+                        { label: 'TOTAL GP', value: stats.totalGP.toLocaleString(), color: '#D4AF37' },
                     ].map(r => (
-                        <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '11px', fontWeight: '600', color: '#A8A29E' }}>{r.label}</span>
-                            <span style={{ fontSize: '14px', fontWeight: '900', color: r.color }}>{r.value}</span>
+                        <div key={r.label} style={{
+                            background: '#FAFAF9', borderRadius: '8px', padding: '6px 8px',
+                            border: '1px solid #F0EFED',
+                        }}>
+                            <div style={{ fontSize: '8px', fontWeight: '700', color: '#A8A29E', letterSpacing: '0.3px' }}>{r.label}</div>
+                            <div style={{ fontSize: '14px', fontWeight: '900', color: r.color, marginTop: '1px' }}>{r.value}</div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            {/* Rank Distribution */}
+            {/* === RANKS ON BOARD === */}
             {cardCount > 0 && (
                 <div style={{
                     background: '#fff', borderRadius: '10px', border: '1px solid #E7E5E4',
-                    padding: '14px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                    padding: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                 }}>
-                    <div style={{ fontSize: '10px', fontWeight: '800', color: '#A8A29E', letterSpacing: '1px', marginBottom: '10px' }}>
+                    <div style={{ fontSize: '9px', fontWeight: '800', color: '#A8A29E', letterSpacing: '1px', marginBottom: '8px' }}>
                         RANKS ON BOARD
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                         {(['LEGENDARY', 'HOLOGRAPHIC', 'GOLD', 'SILVER', 'BRONZE', 'NORMAL'] as CardRank[])
                             .filter(r => (rankCounts[r] || 0) > 0)
                             .map(r => (
                                 <div key={r} style={{
                                     display: 'flex', alignItems: 'center', gap: '4px',
-                                    background: '#FAFAF9', borderRadius: '6px', padding: '4px 8px',
-                                    border: `1px solid ${RANK_META[r].borderColor}30`,
+                                    background: `${RANK_META[r].borderColor}08`, borderRadius: '6px', padding: '4px 8px',
+                                    border: `1px solid ${RANK_META[r].borderColor}25`,
                                 }}>
                                     <span style={{ fontSize: '10px', fontWeight: '800', color: RANK_META[r].borderColor }}>
                                         {RANK_META[r].label}
@@ -1051,7 +1214,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ fontSize: '13px', fontWeight: '900', color: '#1C1917', letterSpacing: '1px' }}>
-                        布陣バトル
+                        GOD GRID
                     </span>
                     <span style={{ fontSize: '12px', fontWeight: '700', color: '#A8A29E' }}>
                         {cardCount}/{total}
@@ -1117,6 +1280,46 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                         position: 'relative',
                         flexShrink: 0,
                     }}>
+                        {/* Grid flash on card drop — entire grid pulses with element color */}
+                        {gridFlash && (
+                            <div key={gridFlash.key} style={{
+                                position: 'absolute', inset: 0, zIndex: 25, pointerEvents: 'none',
+                                borderRadius: '12px',
+                                background: `radial-gradient(circle at 50% 50%, ${gridFlash.color}30 0%, transparent 70%)`,
+                                animation: 'puzzle-drop-flash 0.4s ease-out forwards',
+                            }} />
+                        )}
+
+                        {/* Synergy connection flash — element-colored ripple from placed card */}
+                        {synergyFlash && (
+                            <div key={synergyFlash.key} style={{
+                                position: 'absolute', inset: 0, zIndex: 26, pointerEvents: 'none',
+                                borderRadius: '12px',
+                                overflow: 'hidden',
+                            }}>
+                                <div style={{
+                                    position: 'absolute',
+                                    left: `${((synergyFlash.col + 0.5) / N) * 100}%`,
+                                    top: `${((synergyFlash.row + 0.5) / N) * 100}%`,
+                                    width: '200%', height: '200%',
+                                    transform: 'translate(-50%, -50%)',
+                                    background: `radial-gradient(circle, ${ELEMENT_COLORS[synergyFlash.element as Element] || '#D4AF37'}50 0%, ${ELEMENT_COLORS[synergyFlash.element as Element] || '#D4AF37'}20 30%, transparent 60%)`,
+                                    animation: 'puzzle-synergy-ripple 0.8s ease-out forwards',
+                                }} />
+                                <div style={{
+                                    position: 'absolute', inset: 0,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    animation: 'puzzle-synergy-text 0.8s ease-out forwards',
+                                }}>
+                                    <span style={{
+                                        fontSize: '14px', fontWeight: 900, letterSpacing: '3px',
+                                        color: ELEMENT_COLORS[synergyFlash.element as Element] || '#D4AF37',
+                                        textShadow: `0 0 12px ${ELEMENT_COLORS[synergyFlash.element as Element] || '#D4AF37'}80`,
+                                    }}>SYNERGY</span>
+                                </div>
+                            </div>
+                        )}
+
                         {/* Battle charging overlay */}
                         {battlePhase === 'charging' && (
                             <div style={{
@@ -1135,14 +1338,25 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                             aspectRatio: `${N / (N * 1.4)}`,
                             maxWidth: isMobile ? '100%' : undefined,
                             gap: `${gap}px`,
-                            backgroundColor: battlePhase === 'charging' ? '#FEF3C7' : '#F0EFED',
+                            // Grid bg evolves: empty=neutral → filling=warm → almost full=golden → battling=gold
+                            backgroundColor: battlePhase === 'charging' ? '#FEF3C7'
+                                : cardCount >= total - 1 ? '#FEF9C3'
+                                : cardCount >= total * 0.7 ? '#FFFBEB'
+                                : cardCount >= total * 0.4 ? '#FEFCE8'
+                                : '#F0EFED',
                             borderRadius: '12px',
                             padding: isMobile ? '5px' : '8px',
-                            border: isBattling ? '2px solid #D4AF37' : '1px solid #E7E5E4',
+                            // Border intensifies as grid fills
+                            border: isBattling ? '2px solid #D4AF37'
+                                : cardCount >= total - 1 ? '2px solid #D4AF3760'
+                                : cardCount >= total * 0.7 ? '1.5px solid #F59E0B30'
+                                : '1px solid #E7E5E4',
                             boxShadow: isBattling
                                 ? '0 0 20px rgba(212,175,55,0.3)'
+                                : cardCount >= total - 1 ? '0 0 16px rgba(212,175,55,0.2), inset 0 0 12px rgba(212,175,55,0.05)'
+                                : cardCount >= total * 0.7 ? '0 0 8px rgba(245,158,11,0.1)'
                                 : '0 1px 4px rgba(0,0,0,0.04), inset 0 1px 2px rgba(0,0,0,0.02)',
-                            transition: 'border-color 0.3s, background-color 0.3s, box-shadow 0.3s',
+                            transition: 'all 0.5s ease',
                         }}>
                     {Array.from({ length: total }).map((_, idx) => {
                         const row = Math.floor(idx / N);
@@ -1150,16 +1364,39 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                         const card = grid[row]?.[col];
                         const key = `${row},${col}`;
                         const isDrop = dropHL?.row === row && dropHL?.col === col;
+                        const isSynDrop = isDrop && synergyFlash?.row === row && synergyFlash?.col === col;
 
                         if (!card) {
+                            const remaining = total - cardCount;
+                            const isAlmostFull = remaining <= 3;
+                            const isLastSlot = remaining === 1;
+                            // Check if adjacent cells have same element for hint
+                            const neighbors: Element[] = [];
+                            if (row > 0 && grid[row-1]?.[col]) neighbors.push(grid[row-1][col]!.element);
+                            if (row < N-1 && grid[row+1]?.[col]) neighbors.push(grid[row+1][col]!.element);
+                            if (col > 0 && grid[row]?.[col-1]) neighbors.push(grid[row][col-1]!.element);
+                            if (col < N-1 && grid[row]?.[col+1]) neighbors.push(grid[row][col+1]!.element);
+                            const hintEl = neighbors.length > 0 ? neighbors[0] : null;
+                            const hintColor = hintEl ? ELEMENT_COLORS[hintEl] : null;
                             return (
                                 <div key={key} style={{
                                     borderRadius: '8px',
-                                    backgroundColor: '#E7E5E4',
-                                    border: '2px dashed #D6D3D1',
-                                    opacity: 0.5,
-                                    transition: 'all 0.15s',
-                                }} />
+                                    backgroundColor: isLastSlot ? '#FEF9C3' : isAlmostFull ? '#FFF7ED' : '#E7E5E4',
+                                    border: isLastSlot
+                                        ? '2px solid #D4AF3780'
+                                        : hintColor
+                                        ? `2px dashed ${hintColor}40`
+                                        : '2px dashed #D6D3D1',
+                                    opacity: isAlmostFull ? 0.8 : 0.5,
+                                    transition: 'all 0.3s ease',
+                                    animation: isLastSlot ? 'puzzle-perfect-glow 1s ease-in-out infinite' : undefined,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: isLastSlot ? '0 0 12px rgba(212,175,55,0.3)' : 'none',
+                                }}>
+                                    {isLastSlot && (
+                                        <span style={{ fontSize: '10px', fontWeight: '900', color: '#D4AF37', letterSpacing: '1px' }}>!</span>
+                                    )}
+                                </div>
                             );
                         }
 
@@ -1168,6 +1405,15 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                         const isTextLight = isLeg;
                         const accent = getAccent(card.rank);
                         const bstTier = getBstTier(card.bstTotal);
+                        const elColor = ELEMENT_COLORS[card.element] || '#78716C';
+
+                        // Check adjacent same-element for connection glow
+                        const sameTop = row > 0 && grid[row-1]?.[col]?.element === card.element;
+                        const sameBottom = row < N-1 && grid[row+1]?.[col]?.element === card.element;
+                        const sameLeft = col > 0 && grid[row]?.[col-1]?.element === card.element;
+                        const sameRight = col < N-1 && grid[row]?.[col+1]?.element === card.element;
+                        const hasConnection = sameTop || sameBottom || sameLeft || sameRight;
+                        const connectionCount = [sameTop, sameBottom, sameLeft, sameRight].filter(Boolean).length;
 
                         return (
                             <div
@@ -1180,7 +1426,9 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                                     ...getFrameMini(card.rank),
                                     boxShadow: getShadow(card.rank),
                                     transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-                                    animation: isDrop
+                                    animation: isSynDrop
+                                        ? 'puzzle-synergy-land 0.6s cubic-bezier(0.34,1.56,0.64,1)'
+                                        : isDrop
                                         ? 'puzzle-drop 0.4s cubic-bezier(0.34,1.56,0.64,1)'
                                         : isLeg ? 'card-legendary-aura 4s ease-in-out infinite'
                                         : card.rank === 'GOLD' ? 'card-gold-pulse 5s ease-in-out infinite'
@@ -1189,6 +1437,51 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                                 onMouseEnter={e => { if (!isBattling) e.currentTarget.style.transform = 'scale(1.03)'; }}
                                 onMouseLeave={e => { e.currentTarget.style.transform = ''; }}
                             >
+                                {/* Element background tint — grid becomes colorful mosaic */}
+                                <div style={{
+                                    position: 'absolute', inset: 0, borderRadius: '3px', pointerEvents: 'none', zIndex: 1,
+                                    background: isLeg
+                                        ? 'none'
+                                        : `linear-gradient(135deg, ${elColor}08 0%, ${elColor}15 50%, ${elColor}08 100%)`,
+                                }} />
+
+                                {/* Element connection glow — same-element neighbors light up edges */}
+                                {hasConnection && !isLeg && (
+                                    <div style={{
+                                        position: 'absolute', inset: '-1px', borderRadius: '3px', pointerEvents: 'none', zIndex: 3,
+                                        boxShadow: connectionCount >= 3
+                                            ? `inset 0 0 16px ${elColor}50, 0 0 12px ${elColor}40`
+                                            : connectionCount >= 2
+                                            ? `inset 0 0 10px ${elColor}35, 0 0 6px ${elColor}20`
+                                            : `inset 0 0 5px ${elColor}18`,
+                                        borderTop: sameTop ? `2px solid ${elColor}${connectionCount >= 3 ? '70' : '50'}` : undefined,
+                                        borderBottom: sameBottom ? `2px solid ${elColor}${connectionCount >= 3 ? '70' : '50'}` : undefined,
+                                        borderLeft: sameLeft ? `2px solid ${elColor}${connectionCount >= 3 ? '70' : '50'}` : undefined,
+                                        borderRight: sameRight ? `2px solid ${elColor}${connectionCount >= 3 ? '70' : '50'}` : undefined,
+                                        animation: connectionCount >= 3
+                                            ? 'puzzle-connection-strong 1.5s ease-in-out infinite'
+                                            : connectionCount >= 2
+                                            ? 'puzzle-connection-pulse 2s ease-in-out infinite' : undefined,
+                                    }} />
+                                )}
+                                {/* Connection sparkle dots for 3+ connections */}
+                                {connectionCount >= 3 && !isLeg && (
+                                    <>
+                                        <div style={{
+                                            position: 'absolute', top: '2px', right: '2px', width: '3px', height: '3px',
+                                            borderRadius: '50%', background: elColor, zIndex: 4, pointerEvents: 'none',
+                                            boxShadow: `0 0 4px ${elColor}`,
+                                            animation: 'v6-star 1.2s ease-in-out infinite',
+                                        }} />
+                                        <div style={{
+                                            position: 'absolute', bottom: '2px', left: '2px', width: '2px', height: '2px',
+                                            borderRadius: '50%', background: elColor, zIndex: 4, pointerEvents: 'none',
+                                            boxShadow: `0 0 3px ${elColor}`,
+                                            animation: 'v6-star 1.5s ease-in-out 0.4s infinite',
+                                        }} />
+                                    </>
+                                )}
+
                                 {/* Holo shimmer */}
                                 {isHolo && (
                                     <div style={{
@@ -1295,8 +1588,8 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                     })}
                 </div>
 
-                {/* Battle Overlay — synergy reveal + damage + grade */}
-                {isBattling && battleResult && battlePhase !== 'charging' && (
+                {/* Battle Overlay — synergy reveal + damage + grade (hidden while MiniRunner animates) */}
+                {isBattling && battleResult && battlePhase !== 'charging' && !externalBattleActive && (
                     <div style={{
                         position: 'absolute', inset: 0,
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -1349,7 +1642,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                             </div>
                         )}
 
-                        {/* Grade stamp + Boss result */}
+                        {/* Grade stamp + Milestone result */}
                         {(battlePhase === 'grade' || battlePhase === 'done') && (
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                                 <div style={{
@@ -1366,49 +1659,55 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                                 }}>
                                     {battleResult.grade}
                                 </div>
-                                {/* Boss battle result */}
+                                {/* Grid milestone result */}
                                 <div style={{
                                     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
                                     animation: 'puzzle-chain-pop 0.5s cubic-bezier(0.34,1.56,0.64,1)',
                                 }}>
                                     <div style={{
-                                        fontSize: '10px', fontWeight: '800', color: '#78716C',
-                                        letterSpacing: '0.5px',
-                                    }}>
-                                        vs {boss.name} (HP {boss.hp.toLocaleString()})
-                                    </div>
-                                    <div style={{
                                         fontSize: '18px', fontWeight: '900',
-                                        color: bossDefeated ? '#10B981' : '#EF4444',
+                                        color: '#10B981',
                                         letterSpacing: '2px',
-                                        textShadow: bossDefeated
-                                            ? '0 0 12px rgba(16,185,129,0.4)'
-                                            : '0 0 12px rgba(239,68,68,0.3)',
+                                        textShadow: '0 0 12px rgba(16,185,129,0.4)',
                                     }}>
-                                        {bossDefeated ? 'BOSS DEFEATED' : 'BOSS SURVIVED'}
+                                        GRID COMPLETE!
                                     </div>
-                                    {bossDefeated && (
-                                        <div style={{ fontSize: '10px', fontWeight: '700', color: '#D4AF37' }}>
-                                            GP x2 BONUS
-                                        </div>
-                                    )}
-                                    {/* Story generation link */}
+                                    {/* Story generation link + reset */}
                                     {battlePhase === 'done' && (
-                                        <a
-                                            href="/english/fujin-story"
-                                            style={{
-                                                marginTop: '8px',
-                                                display: 'inline-block',
-                                                padding: '6px 16px', borderRadius: '6px',
-                                                background: 'linear-gradient(135deg, #D4AF37, #F6C85F)',
-                                                color: '#1C1917', fontSize: '11px', fontWeight: '800',
-                                                textDecoration: 'none', letterSpacing: '0.5px',
-                                                boxShadow: '0 2px 6px rgba(212,175,55,0.3)',
-                                                pointerEvents: 'auto',
-                                            }}
-                                        >
-                                            布陣ストーリーを生成 →
-                                        </a>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', marginTop: '8px', pointerEvents: 'auto' }}>
+                                            <a
+                                                href="/english/fujin-story"
+                                                style={{
+                                                    display: 'inline-block',
+                                                    padding: '6px 16px', borderRadius: '6px',
+                                                    background: 'linear-gradient(135deg, #D4AF37, #F6C85F)',
+                                                    color: '#1C1917', fontSize: '11px', fontWeight: '800',
+                                                    textDecoration: 'none', letterSpacing: '0.5px',
+                                                    boxShadow: '0 2px 6px rgba(212,175,55,0.3)',
+                                                }}
+                                            >
+                                                会話ガチャを回す
+                                            </a>
+                                            <button
+                                                onClick={() => {
+                                                    const sz = sizeRef.current;
+                                                    setGrid(mk(sz));
+                                                    saveGrid(mk(sz), sz);
+                                                    setBattleResult(null);
+                                                    setBattlePhase('idle');
+                                                    setIsBattling(false);
+                                                    setShownSynergies(0);
+                                                }}
+                                                style={{
+                                                    border: 'none', cursor: 'pointer',
+                                                    padding: '5px 14px', borderRadius: '6px',
+                                                    background: '#F0EFED',
+                                                    color: '#78716C', fontSize: '10px', fontWeight: '700',
+                                                }}
+                                            >
+                                                次のバトルへ
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -1418,12 +1717,12 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, isMobi
                     </div>
                 </div>
 
-                {/* Side Panel -- PC only */}
-                {!isMobile && sidePanel}
+                {/* Side Panel -- PC only, hidden when hideSidePanel */}
+                {!isMobile && !hideSidePanel && sidePanel}
             </div>
 
             {/* Card Modal */}
-            {modalCard && <CardModal card={modalCard} onClose={() => setModalCard(null)} isMobile={isMobile} />}
+            {modalCard && <CardModal card={modalCard} onClose={() => setModalCard(null)} isMobile={isMobile} chakra={Math.min(masteryProp?.[modalCard.phraseId] || 0, 6)} />}
         </div>
     );
 }

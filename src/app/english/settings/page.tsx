@@ -5,20 +5,20 @@ import { getSettings, setSetting, type AppSettings } from '@/lib/settings';
 
 export default function SettingsPage() {
     const [settings, setLocalSettings] = useState<AppSettings | null>(null);
-    const [completedDays, setCompletedDays] = useState(0);
     const [totalPhrases, setTotalPhrases] = useState(0);
+    const [vocabCount, setVocabCount] = useState(0);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [showTutorialReset, setShowTutorialReset] = useState(false);
 
     useEffect(() => {
         setLocalSettings(getSettings());
         try {
-            const raw = localStorage.getItem('5min-completed-days');
-            if (raw) setCompletedDays(JSON.parse(raw).length);
+            const mastery = localStorage.getItem('quest-mastery');
+            if (mastery) setTotalPhrases(Object.keys(JSON.parse(mastery)).length);
         } catch { /* */ }
         try {
-            const raw = localStorage.getItem('5min-training-phrases');
-            if (raw) setTotalPhrases(JSON.parse(raw).length);
+            const deck = localStorage.getItem('izakaya_toeic_vocab_deck');
+            if (deck) setVocabCount(JSON.parse(deck).length);
         } catch { /* */ }
     }, []);
 
@@ -88,19 +88,20 @@ export default function SettingsPage() {
 
     const resetAllProgress = () => {
         const keys = [
-            '5min-completed-days', '5min-streak', '5min-history',
-            '5min-training-phrases', '5min-registered',
-            'quest-mastery', 'training-onboarding-done',
-            'training-show-runner', 'runner-goal-xp',
+            'quest-mastery', 'izakaya_toeic_vocab_deck',
+            'izakaya_card_points', 'toeic_30day_start',
+            'toeic_training_tutorial_done', 'toeic_episode_tutorial_done',
+            'quest-days-active',
         ];
         keys.forEach(k => localStorage.removeItem(k));
-        setCompletedDays(0);
         setTotalPhrases(0);
+        setVocabCount(0);
         setShowResetConfirm(false);
     };
 
     const resetTutorials = () => {
-        localStorage.removeItem('training-onboarding-done');
+        localStorage.removeItem('toeic_training_tutorial_done');
+        localStorage.removeItem('toeic_episode_tutorial_done');
         setShowTutorialReset(true);
         setTimeout(() => setShowTutorialReset(false), 2000);
     };
@@ -121,9 +122,9 @@ export default function SettingsPage() {
                     display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12,
                     padding: '4px 0',
                 }}>
-                    <StatBox label="5min クリア" value={`${completedDays}/30`} color="#10B981" />
-                    <StatBox label="登録フレーズ" value={String(totalPhrases)} color="#D4AF37" />
-                    <StatBox label="設定済み" value={settings.soundEnabled ? 'ON' : 'OFF'} color="#3B82F6" />
+                    <StatBox label="学習済み" value={String(totalPhrases)} color="#10B981" />
+                    <StatBox label="エピソード語彙" value={String(vocabCount)} color="#D4AF37" />
+                    <StatBox label="サウンド" value={settings.soundEnabled ? 'ON' : 'OFF'} color="#3B82F6" />
                 </div>
             </Section>
 
@@ -230,7 +231,7 @@ export default function SettingsPage() {
                     <div>
                         <div style={{ fontSize: 14, fontWeight: 500, color: '#1c1917' }}>チュートリアルをリセット</div>
                         <div style={{ fontSize: 12, color: '#a8a29e', marginTop: 2 }}>
-                            トレーニング画面のオンボーディングをもう一度表示します
+                            トレーニング・エピソードのチュートリアルをもう一度表示します
                         </div>
                     </div>
                     <button
