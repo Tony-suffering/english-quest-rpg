@@ -2781,58 +2781,15 @@ export default function PhrasesPage({ initialData }: { initialData?: TrainingIni
     }, [chainTransition]);
 
 
-    // ── Main BGM (always-on loop, independent of FEVER) ──
-    const mainBgmRef = useRef<HTMLAudioElement | null>(null);
+    // Main BGM is managed by layout.tsx (app-wide). No duplicate here.
+    // Clean up fever BGM on unmount only.
     useEffect(() => {
-        const st = getSettings();
-        if (!st.bgmEnabled || !st.soundEnabled) {
-            // stop if playing
-            if (mainBgmRef.current) {
-                mainBgmRef.current.pause();
-                mainBgmRef.current = null;
-            }
-            return;
-        }
-        // already playing
-        if (mainBgmRef.current) {
-            mainBgmRef.current.volume = (st.bgmVolume / 100) * (st.volume / 100);
-            return;
-        }
-        const audio = new Audio('/audio/bgm-main.mp3');
-        audio.loop = true;
-        audio.volume = (st.bgmVolume / 100) * (st.volume / 100);
-        audio.play().catch(() => { /* autoplay blocked — will start on first user interaction */ });
-        mainBgmRef.current = audio;
         return () => {
-            audio.pause();
-            mainBgmRef.current = null;
-            // Also clean up fever BGM on unmount
             if (feverDroneRef.current) {
                 stopFeverBGM(feverDroneRef.current);
                 feverDroneRef.current = null;
             }
         };
-    }, []);
-
-    // Listen for settings changes to update main BGM volume / toggle
-    useEffect(() => {
-        const onStorage = (e: StorageEvent) => {
-            if (e.key !== 'eigodamashii-settings') return;
-            const st = getSettings();
-            if (!st.bgmEnabled || !st.soundEnabled) {
-                if (mainBgmRef.current) { mainBgmRef.current.pause(); mainBgmRef.current = null; }
-            } else if (!mainBgmRef.current) {
-                const audio = new Audio('/audio/bgm-main.mp3');
-                audio.loop = true;
-                audio.volume = (st.bgmVolume / 100) * (st.volume / 100);
-                audio.play().catch(() => {});
-                mainBgmRef.current = audio;
-            } else {
-                mainBgmRef.current.volume = (st.bgmVolume / 100) * (st.volume / 100);
-            }
-        };
-        window.addEventListener('storage', onStorage);
-        return () => window.removeEventListener('storage', onStorage);
     }, []);
 
     // Auto-clear level-up effect
@@ -3413,9 +3370,7 @@ export default function PhrasesPage({ initialData }: { initialData?: TrainingIni
                 if (IS_PUBLIC) {
                     // 公開RPG (3004): TOEIC 30日コンテンツ + エピソードから追加した単語
                     const startDate = new Date(getToeicStartDate());
-                    const currentDay = getToeicCurrentDay();
-
-                    // Build date for each TOEIC day (startDate + day offset)
+                    // Distribute 600 items across 30 days from start date
                     const makeDayDate = (dayNum: number) => {
                         const d = new Date(startDate);
                         d.setDate(d.getDate() + (dayNum - 1));
@@ -3425,7 +3380,6 @@ export default function PhrasesPage({ initialData }: { initialData?: TrainingIni
                     const allPhrases: Phrase[] = [];
                     let idx = 0;
 
-                    // Load ALL TOEIC 30-day content at once
                     for (const day of TOEIC_30DAY) {
                         const dateStr = makeDayDate(day.day);
                         for (const item of day.items) {
