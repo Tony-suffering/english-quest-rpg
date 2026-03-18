@@ -7432,8 +7432,8 @@ export default function PhrasesPage({ initialData }: { initialData?: TrainingIni
                 </div>
             </div>
 
-            {/* Mini Runner - PC only (stage effects always visible) */}
-            {viewMode === 'calendar' && !isMobile && (
+            {/* Mini Runner - PC only, hidden in calendar tab (only GOD GRID) */}
+            {viewMode === 'calendar' && !isMobile && calendarTab === 'puzzle' && (
                 <div style={{ position: 'relative' }}>
                     {showRunner && <UpperScreenEffect effect={upperEffect} slotState={slotPanelState} />}
                     {showRunner && (
@@ -8483,8 +8483,8 @@ export default function PhrasesPage({ initialData }: { initialData?: TrainingIni
                         )}
                     </div>
 
-                    {/* Mini Runner - Mobile only (between calendar and cards) */}
-                    {isMobile && (
+                    {/* Mini Runner - Mobile only, hidden in calendar tab */}
+                    {isMobile && calendarTab === 'puzzle' && (
                         <div style={{ position: 'relative' }}>
                             {showRunner && (
                                 <MiniRunner
