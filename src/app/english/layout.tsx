@@ -411,7 +411,7 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', ...fadeIn(0.7) }}>
-                    <button onClick={() => finish('/english/training')} style={{
+                    <button onClick={() => finish('/english')} style={{
                         padding: '16px 48px', borderRadius: 14, backgroundColor: gold,
                         border: 'none', color: '#000', fontSize: 18, fontWeight: 800,
                         cursor: 'pointer', letterSpacing: '0.1em', width: '100%', maxWidth: 320,
@@ -420,18 +420,18 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                     onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
                     onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                     >
-                        START TRAINING
+                        HOME
                     </button>
-                    <button onClick={() => finish('/english')} style={{
+                    <button onClick={() => finish('/english/training')} style={{
                         padding: '10px 24px', backgroundColor: 'transparent',
                         border: '1px solid #333', borderRadius: 10, color: '#666',
                         fontSize: 13, cursor: 'pointer',
                     }}>
-                        まず全体を見てみる
+                        すぐトレーニングを始める
                     </button>
                 </div>
             </Screen>
-            <Nav nextLabel="START TRAINING" onNext={() => finish('/english/training')} />
+            <Nav nextLabel="HOME" onNext={() => finish('/english')} />
         </>
     );
 }
