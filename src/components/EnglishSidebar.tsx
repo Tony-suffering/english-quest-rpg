@@ -55,6 +55,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     // ── More features (collapsible) ──
     const moreItems = [
+        { id: '/english/izakaya-toeic', label: '居酒屋TOEIC' },
         { id: '/english/arena', label: 'Arena (バトル)' },
         { id: '/memoria', label: 'メモリア' },
         { id: '/english/pro', label: 'プロの解説' },
