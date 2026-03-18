@@ -54,46 +54,35 @@ export default function SettingsPage() {
 
     const playTestBGM = () => {
         try {
-            const ctx = new AudioContext();
-            if (ctx.state === 'suspended') ctx.resume();
-            const vol = (settings.feverBgmVolume / 100) * (settings.volume / 100) * 0.15;
-            const now = ctx.currentTime;
-            // Fever-style rising tones
-            [440, 554, 659, 880].forEach((freq, i) => {
-                const osc = ctx.createOscillator();
-                const g = ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.value = freq;
-                const t = now + i * 0.12;
-                g.gain.setValueAtTime(0, t);
-                g.gain.linearRampToValueAtTime(vol, t + 0.05);
-                g.gain.setValueAtTime(vol, t + 0.3);
-                g.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
-                osc.connect(g); g.connect(ctx.destination);
-                osc.start(t); osc.stop(t + 0.9);
-            });
+            const vol = Math.min((settings.feverBgmVolume / 100) * (settings.volume / 100) * 0.15, 0.15);
+            const audio = new Audio('/audio/fever-bgm.mp3');
+            audio.volume = vol;
+            audio.play().catch(() => {});
+            setTimeout(() => {
+                let step = 0;
+                const fade = setInterval(() => {
+                    step++;
+                    audio.volume = Math.max(0, vol * (1 - step / 8));
+                    if (step >= 8) { clearInterval(fade); audio.pause(); }
+                }, 80);
+            }, 2000);
         } catch { /* */ }
     };
 
     const playTestMainBGM = () => {
         try {
-            const ctx = new AudioContext();
-            if (ctx.state === 'suspended') ctx.resume();
-            const vol = (settings.bgmVolume / 100) * (settings.volume / 100) * 0.12;
-            const now = ctx.currentTime;
-            // Ambient pad chord preview
-            [261.6, 329.6, 392.0, 493.9].forEach((freq) => {
-                const osc = ctx.createOscillator();
-                const g = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.value = freq;
-                g.gain.setValueAtTime(0, now);
-                g.gain.linearRampToValueAtTime(vol * 0.25, now + 0.3);
-                g.gain.setValueAtTime(vol * 0.25, now + 2.5);
-                g.gain.exponentialRampToValueAtTime(0.001, now + 3);
-                osc.connect(g); g.connect(ctx.destination);
-                osc.start(now); osc.stop(now + 3.1);
-            });
+            const vol = Math.min((settings.bgmVolume / 100) * (settings.volume / 100) * 0.15, 0.15);
+            const audio = new Audio('/audio/bgm-main.mp3');
+            audio.volume = vol;
+            audio.play().catch(() => {});
+            setTimeout(() => {
+                let step = 0;
+                const fade = setInterval(() => {
+                    step++;
+                    audio.volume = Math.max(0, vol * (1 - step / 8));
+                    if (step >= 8) { clearInterval(fade); audio.pause(); }
+                }, 80);
+            }, 3000);
         } catch { /* */ }
     };
 

@@ -441,62 +441,34 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
     const [isLoading, setIsLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
     const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
-    const bgmCtxRef = useRef<AudioContext | null>(null);
-    const bgmGainRef = useRef<GainNode | null>(null);
+    const bgmRef = useRef<HTMLAudioElement | null>(null);
     const bgmStartedRef = useRef(false);
-    const bgmIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    // Procedural lo-fi BGM using Web Audio API (no mp3 files needed)
+    // Start BGM on first user interaction (autoplay policy requires gesture)
     const startBGM = useCallback(() => {
         if (bgmStartedRef.current) return;
         const st = getSettings();
         if (!st.bgmEnabled || !st.soundEnabled) return;
         bgmStartedRef.current = true;
 
-        try {
-            const ctx = new AudioContext();
-            if (ctx.state === 'suspended') ctx.resume();
-            const master = ctx.createGain();
-            master.gain.value = (st.bgmVolume / 100) * (st.volume / 100) * 0.12;
-            master.connect(ctx.destination);
-            bgmCtxRef.current = ctx;
-            bgmGainRef.current = master;
+        const audio = new Audio('/audio/bgm-main.mp3');
+        audio.loop = true;
+        // Keep volume low: multiply by 0.15 cap
+        audio.volume = Math.min((st.bgmVolume / 100) * (st.volume / 100) * 0.15, 0.15);
+        audio.play().catch(() => { bgmStartedRef.current = false; });
+        bgmRef.current = audio;
 
-            // Warm pad chord (C-E-G-B ambient loop)
-            const notes = [261.6, 329.6, 392.0, 493.9];
-            notes.forEach(freq => {
-                const osc = ctx.createOscillator();
-                const g = ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.value = freq;
-                g.gain.value = 0.25;
-                osc.connect(g);
-                g.connect(master);
-                osc.start();
-            });
-
-            // Slow LFO for gentle volume swell
-            const lfo = ctx.createOscillator();
-            const lfoGain = ctx.createGain();
-            lfo.type = 'sine';
-            lfo.frequency.value = 0.08; // very slow breathing
-            lfoGain.gain.value = 0.03;
-            lfo.connect(lfoGain);
-            lfoGain.connect(master.gain);
-            lfo.start();
-
-            // Poll settings
-            bgmIntervalRef.current = setInterval(() => {
-                const s = getSettings();
-                if (!s.bgmEnabled || !s.soundEnabled) {
-                    master.gain.value = 0;
-                } else {
-                    master.gain.value = (s.bgmVolume / 100) * (s.volume / 100) * 0.12;
-                }
-            }, 2000);
-        } catch {
-            bgmStartedRef.current = false;
-        }
+        // Poll settings every 2 seconds
+        const interval = setInterval(() => {
+            const s = getSettings();
+            if (!s.bgmEnabled || !s.soundEnabled) {
+                audio.pause();
+            } else {
+                audio.volume = Math.min((s.bgmVolume / 100) * (s.volume / 100) * 0.15, 0.15);
+                if (audio.paused) audio.play().catch(() => {});
+            }
+        }, 2000);
+        window.addEventListener('beforeunload', () => { clearInterval(interval); audio.pause(); });
     }, []);
 
     useEffect(() => {

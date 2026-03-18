@@ -2753,17 +2753,9 @@ export default function PhrasesPage({ initialData }: { initialData?: TrainingIni
         feverRef.current = { active: chainState.mode !== 'normal', streak: chainState.count };
     }, [chainState.mode, chainState.count]);
 
-    // Stop FEVER BGM when chain ends + duck/restore main BGM
+    // Stop FEVER BGM when chain ends
     useEffect(() => {
-        if (chainState.mode !== 'normal') {
-            // Mute main BGM during chain mode
-            if (mainBgmRef.current) mainBgmRef.current.volume = 0;
-        } else {
-            // Restore main BGM volume
-            if (mainBgmRef.current) {
-                const st = getSettings();
-                mainBgmRef.current.volume = (st.bgmVolume / 100) * (st.volume / 100);
-            }
+        if (chainState.mode === 'normal') {
             if (feverDroneRef.current) {
                 stopFeverBGM(feverDroneRef.current);
                 feverDroneRef.current = null;
