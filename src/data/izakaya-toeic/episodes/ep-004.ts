@@ -3,7 +3,7 @@ import { IzakayaEpisode } from '../types';
 const episode: IzakayaEpisode = {
   id: 'ep-004',
   number: 4,
-  title: 'ケンジ、否定疑問文に殺される',
+  title: '聞こえない壁',
   subtitle: 'Part 2: 否定疑問文・付加疑問文',
   description: '日本語の「はい/いいえ」と英語の「Yes/No」が逆になる。否定疑問文は、否定を無視して中身に答えろ。',
   targetPart: 2,
@@ -32,7 +32,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'kenji',
       japanese: '会社でトーイックの模試やらされた。Part 2 の否定疑問文、全滅。8問中8問不正解。完封された。',
-      english: 'They made us take a practice トーイック at work. Negative questions in Part 2... total wipeout. Eight out of eight wrong. A perfect zero.',
+      english: 'They made us take a practice test at work. Negative questions in Part 2... total wipeout. Eight out of eight wrong. A perfect zero.',
       mood: 'defeated',
     },
     {
@@ -46,6 +46,102 @@ const episode: IzakayaEpisode = {
       japanese: '褒めてねえだろそれ。',
       english: 'That ain\'t a compliment, kid.',
       mood: 'angry',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターがカウンターの奥からスピーカーを引っ張り出し、トーイックのリスニング音声を店内に流し始める。Part 3の会話問題。',
+      english: 'Master pulls a speaker from behind the counter and starts playing a TOEIC listening track. Part 3 conversation questions.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'タケシが目を閉じて集中するが、20秒で目を開けて首を振る。ユキは眉間にしわを寄せたまま動かない。ケンジは完全にフリーズしている。',
+      english: 'Takeshi closes his eyes to concentrate but opens them after twenty seconds, shaking his head. Yuki has her brow furrowed, frozen in place. Kenji is completely locked up.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '英語って、早送りで喋ってんのか？',
+      english: 'Do these people speak English on fast-forward or what?',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ミナだけが、ウーロン茶のコースターに指で正解の番号を書いている。3問全部。',
+      english: 'Only Mina is tracing answer numbers on her oolong tea coaster with her finger. All three correct.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'え、ミナちゃん全問正解？ なんで聞き取れるの？',
+      english: 'Wait, Mina got all of them? How can you hear that?',
+      mood: 'excited',
+    },
+    {
+      speaker: 'mina',
+      japanese: 'なんか...雰囲気で？',
+      english: 'I dunno... vibes, I guess?',
+      mood: 'normal',
+      action: 'コースターをいじりながら',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'リサがハイボールのグラスを両手で包んだまま、黙っている。いつもの「解説したがり」が出ない。ミナの正答率を、数えていた。',
+      english: 'Lisa sits holding her highball with both hands, silent. Her usual eagerness to explain is nowhere to be found. She was counting Mina\'s accuracy.',
+    },
+    {
+      speaker: 'master',
+      japanese: '聞こえないのは、耳が悪いからじゃない。',
+      english: 'The reason you can\'t hear it isn\'t because your ears are bad.',
+      action: '音声を止めて',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'じゃあなんで？',
+      english: 'Then why?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: '聞こうとしすぎている。全部聞こうとするな。捨てろ。会話の「幹」だけ聞け。',
+      english: 'You\'re trying too hard to hear everything. Stop it. Throw away the details. Listen only for the trunk of the conversation.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '幹......',
+      english: 'The trunk...',
+      mood: 'thinking',
+      action: '顔を上げる',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'パチスロで言えば、リーチ演出だけ見ろってことか。ハズレの演出は全部無視して、リーチ目だけ追え。',
+      english: 'In pachislot terms, that\'s like just watching for the reach animation. Ignore all the losing patterns and only track the winning signs.',
+      mood: 'excited',
+    },
+    {
+      speaker: 'master',
+      japanese: '...まあ、そうだ。',
+      english: '...Yeah. That\'s it.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ケンジが嬉しそうにスマホにメモし始める。45歳の建設部長が、パチスロの比喩で英語の本質をつかんだ瞬間だった。',
+      english: 'Kenji starts happily typing notes into his phone. A 45-year-old construction director just grasped the essence of English listening through a pachislot metaphor.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'ケンジさん、メモ帳じゃなくてスマホに書くの意外とハイテク。',
+      english: 'Kenji, using your phone instead of a notebook -- surprisingly high-tech for you.',
+      mood: 'excited',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'うるせえ。娘に教わったんだよ。',
+      english: 'Shut it. My daughter taught me how.',
+      mood: 'angry',
+    },
+    {
+      speaker: 'master',
+      japanese: '「捨てる」ってのは勇気がいる。全部聞かなきゃって思うだろう。でも全部聞こうとすると、全部聞こえなくなる。',
+      english: 'It takes guts to let go. You feel like you need to hear every word. But the moment you try to catch everything, you end up catching nothing.',
     },
     {
       speaker: 'yuki',
@@ -134,6 +230,11 @@ const episode: IzakayaEpisode = {
       mood: 'normal',
     },
     {
+      speaker: 'narration',
+      japanese: 'リサがハイボールのグラスを傾けたまま、ミナを見ている。自分が解説するはずだったのに。ミナの口から先に出た。',
+      english: 'Lisa tilts her highball, watching Mina. She was supposed to be the one explaining this. Mina got there first.',
+    },
+    {
       speaker: 'takeshi',
       japanese: 'おお、ミナちゃんが珍しくしゃべってる！',
       english: 'Whoa, Mina\'s actually talking for once!',
@@ -144,6 +245,22 @@ const episode: IzakayaEpisode = {
       japanese: '別に珍しくないです。',
       english: 'It\'s not that rare.',
       mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキがタケシの方を見て、小さく首を振る。「笑うな」という合図。タケシが間違えて笑われる空気を、ユキは嫌う。',
+      english: 'Yuki glances at Takeshi and gives a tiny shake of her head. A signal: don\'t laugh. Yuki hates it when people get mocked for getting things wrong.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '間違えたってことは、声に出したってこと。黙ってたやつに笑う資格はない。',
+      english: 'Getting it wrong means you spoke up. People who stay quiet don\'t get to laugh.',
+      mood: 'angry',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'カウンターが一瞬静まる。ユキの毒舌は、たまに刃物じゃなくて盾になる。',
+      english: 'The counter goes quiet for a beat. Yuki\'s sharp tongue sometimes works as a shield instead of a blade.',
     },
     {
       speaker: 'master',
@@ -170,8 +287,24 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'それだけだ。だがケンジさんは8問全滅した。「知ってる」と「できる」は違う。やるぞ。',
-      english: 'That\'s it. But Kenji got all eight wrong. Knowing and doing are two different things. Let\'s practice.',
+      japanese: 'それだけだ。だがケンジさんは8問全滅した。「知ってる」と「できる」は違う。',
+      english: 'That\'s it. But Kenji got all eight wrong. Knowing and doing are two different things.',
+    },
+    {
+      speaker: 'master',
+      japanese: '聞こえない壁ってのはな、知識の壁じゃない。「捨てる勇気」の壁だ。全部聞こうとするな。否定を捨てろ。枝を捨てろ。幹だけ残せ。',
+      english: 'The wall you can\'t hear through isn\'t a wall of knowledge. It\'s a wall of courage -- the courage to throw things away. Stop trying to hear everything. Discard the negative. Discard the branches. Keep only the trunk.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '捨てろか。現場でも言うわ。「余計な養生外せ」って。必要なとこだけ残せば、形が見える。',
+      english: 'Throw it away, huh. We say that on the job site too. "Strip the extra covering." Keep only what matters, and the shape shows itself.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: 'やるぞ。',
+      english: 'Let\'s go.',
     },
     {
       speaker: 'kenji',

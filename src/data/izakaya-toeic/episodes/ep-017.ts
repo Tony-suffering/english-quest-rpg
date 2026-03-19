@@ -144,6 +144,75 @@ const episode: IzakayaEpisode = {
       japanese: 'タケシは結局ナプキンをポケットにしまった。',
       english: 'Takeshi ended up stuffing the napkin into his pocket.',
     },
+    {
+      speaker: 'narration',
+      japanese: '問題演習のあと、リサがミナにリーディングを教え始めた。カウンターの隅に問題用紙を広げて、2人の即席授業が始まる。',
+      english: 'After the practice questions, Lisa started tutoring Mina on reading. They spread the problem sheets out at the end of the counter, an impromptu class for two.',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'ミナ、この文。主語が長いでしょ？ だからここは "feel" で読むのよ。全体の流れを感じ取って、細かい文法は後回し。',
+      english: 'Mina, look at this sentence. The subject is long, right? So you read this part by "feel." Get the flow first, worry about grammar later.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'mina',
+      japanese: 'feelってどういうことですか？',
+      english: 'What do you mean by "feel"?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'だから、なんていうか、雰囲気で掴むっていうか。',
+      english: 'I mean, like, you just sort of pick it up from the vibe.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'mina',
+      japanese: '雰囲気で読むって、具体的にどうすれば。',
+      english: 'Read by "vibe"? How do I actually do that, though?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'リサちゃん、それ私もわかんないんですよ。「そういうもの」じゃわかんないんです。',
+      english: 'Lisa, I don\'t get that either. "It just is" doesn\'t really help us understand.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'リサが言葉に詰まった。ハイボールを一口飲む。少し間を置いて、静かに言った。',
+      english: 'Lisa went quiet. She took a sip of her highball. After a pause, she spoke softly.',
+    },
+    {
+      speaker: 'lisa',
+      japanese: '私、6年アメリカにいたのに、英語の「教え方」は1日も学んだことなかった。',
+      english: 'I lived in America for six years, but I never spent a single day learning how to teach English.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'カウンターの奥で何かが動いた。マスターが引き出しから、色あせたプリントの束を取り出した。',
+      english: 'Something stirred behind the counter. Master pulled a stack of faded printouts from a drawer.',
+    },
+    {
+      speaker: 'master',
+      japanese: '使え。',
+      english: 'Use these.',
+      action: 'プリントの束をリサの前に置く',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'これ、マスターが作ったの？',
+      english: 'You made these, Master?',
+      mood: 'thinking',
+      action: 'プリントを手に取り、ページをめくる',
+    },
+    {
+      speaker: 'narration',
+      japanese: '文法の解説シートだった。丁寧に手書きされた図解と例文。かつて「権藤英語教室」で使っていた教材。マスターは何も答えなかった。',
+      english: 'Grammar explanation sheets. Hand-drawn diagrams and example sentences, carefully written out. Teaching materials from the old "Gondo English School." Master said nothing.',
+    },
   ],
   questions: [
     {

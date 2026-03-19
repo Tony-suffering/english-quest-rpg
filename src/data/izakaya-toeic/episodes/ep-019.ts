@@ -17,6 +17,61 @@ const episode: IzakayaEpisode = {
       english: 'Saturday, 8 PM. Tomorrow is the real トーイック. Yuki steps through the curtain. Something is different tonight. Her footsteps are quiet.',
     },
     {
+      speaker: 'narration',
+      japanese: 'ユキが来る少し前。ミナがカウンターで何かを見せていた。スマホからK-POPの歌詞が映っている。',
+      english: 'A little before Yuki arrived. Mina was showing something at the counter. K-POP lyrics glowed on her phone screen.',
+    },
+    {
+      speaker: 'mina',
+      japanese: 'ねえ、歌詞で文法覚えられませんか？ この歌、"If I were you, I would stay" って出てくるんです。仮定法過去ですよね？',
+      english: 'Hey, can we learn grammar through lyrics? This song has "If I were you, I would stay." That\'s the past subjunctive, right?',
+      mood: 'excited',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'ポップスの歌詞は文法的に正しくないことが多いわよ。',
+      english: 'Pop lyrics aren\'t always grammatically correct, you know.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'master',
+      japanese: 'やってみろ。',
+      english: 'Give it a shot.',
+    },
+    {
+      speaker: 'mina',
+      japanese: 'で、サビで "If I was there" に変わるんです。これ、口語だと "was" でもOKって権藤さんが前に言ってましたよね。',
+      english: 'And then in the chorus it switches to "If I was there." You said before that "was" is okay in spoken English, right, Master?',
+      mood: 'excited',
+    },
+    {
+      speaker: 'master',
+      japanese: 'ああ。トーイックでは "were" が正解だが。',
+      english: 'Yeah. But on the トーイック, "were" is the correct answer.',
+    },
+    {
+      speaker: 'mina',
+      japanese: 'だからトーイックは "were" を選べばいい。でも実際の会話では "was" もアリ。テストと実践の違いを覚える一番いい方法だと思うんです。',
+      english: 'So for the トーイック, pick "were." But in real conversation, "was" works too. I think this is the best way to remember the difference between the test and real life.',
+      mood: 'excited',
+    },
+    {
+      speaker: 'narration',
+      japanese: '全員が黙った。ミナの分析力に驚いている。リスニング満点の天然キャラの裏に、こんな鋭さが隠れていた。',
+      english: 'Everyone went quiet. They were stunned by Mina\'s analytical power. Behind the airheaded listening prodigy was a razor-sharp mind.',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'ミナ、あなたリーディングが低いんじゃなくて、「トーイックの読み方」を知らないだけじゃない。',
+      english: 'Mina, maybe your reading score isn\'t low because you\'re bad at reading. Maybe you just don\'t know the トーイック way of reading.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'リサの目が変わった。ミナを見る目に、初めて「教え甲斐がある」という光が宿った。',
+      english: 'Something shifted in Lisa\'s eyes. For the first time, she looked at Mina and saw someone truly worth teaching.',
+    },
+    {
       speaker: 'yuki',
       japanese: 'マスター。お茶...もらえますか。温かいやつ。',
       english: 'Master. Could I get some tea... the hot kind.',

@@ -193,6 +193,95 @@ const episode: IzakayaEpisode = {
       english: "Part 4 is the long monologue one, right...? Oh man.",
       mood: 'defeated',
     },
+    // --- KENJI'S PHO STORY ---
+    {
+      speaker: 'narration',
+      japanese: '話題が変わったのは、ケンジが焼酎を置いた時だった。いつもと違う、柔らかい顔をしていた。',
+      english: "The conversation shifted when Kenji set down his shochu. He had an expression they'd never seen before. Something soft.",
+    },
+    {
+      speaker: 'kenji',
+      japanese: '今日、現場のリンとフォー食ったんだよ。',
+      english: 'Today I had pho with Linh from the site.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'リンさん？ ベトナムの方？',
+      english: 'Linh? The Vietnamese worker?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'ああ。で、飯食いながら、一個だけ英語が通じたんだ。たった一文。',
+      english: "Yeah. And while we were eatin', one sentence got through. Just one.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '"Be careful, the scaffold is wet." 足場が濡れてるから気をつけろって。そしたらリンが笑って "Thank you, Kenji-san!" って。',
+      english: '"Be careful, the scaffold is wet." Watch out, the scaffolding\'s slippery. And Linh smiled and said, "Thank you, Kenji-san!"',
+      mood: 'normal',
+      action: '照れくさそうに頭を掻く',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'たった一文。でもケンジの目が光っていた。',
+      english: "Just one sentence. But Kenji's eyes were shining.",
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'トーイックの点数は関係ねえ。足場が濡れてるを伝えられなかったら、リンが怪我するかもしれねえんだ。俺が英語やる理由は、これなんだよ。',
+      english: "The トーイック score don't matter here. If I can't say 'the scaffold is wet,' Linh could get hurt. That's why I study English. That's the whole reason.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'カウンターが静まった。誰も何も言えなかった。試験の点数じゃない。人の命を守る英語。480点の男が、860点の帰国子女にも教えられない英語の本質を語っていた。',
+      english: "The counter fell silent. Nobody could speak. Not test scores. English that protects lives. The man with 480 was articulating the essence of language that even the 860-point returnee couldn't teach.",
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'ケンジさん、それが「英語力」よ。点数なんかじゃなく。',
+      english: "Kenji, that's what real English ability is. Not some number on a score sheet.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'やめろよ、リサ。柄じゃねえ。',
+      english: "Come on, Lisa. That's not my style.",
+      mood: 'normal',
+      action: '照れて焼酎を煽る',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターがカウンターの奥に消えた。少しして戻ってきた時、手に持っていたのは酒じゃなかった。',
+      english: 'Master disappeared behind the counter. When he returned a moment later, what he carried was not alcohol.',
+    },
+    {
+      speaker: 'narration',
+      japanese: '温かい味噌汁。ケンジの前に、そっと置かれた。酒ではなく、味噌汁を。',
+      english: "Warm miso soup. Placed gently in front of Kenji. Not sake. Not beer. Miso soup.",
+    },
+    {
+      speaker: 'master',
+      japanese: '今日は、よく頑張ったな。',
+      english: 'You did well today.',
+      action: '味噌汁をケンジの前に置く。目を合わせて、小さく頷く',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'この店で酒以外が出たのは、ミナにお茶を出した夜以来だった。マスターが味噌汁を出す時、それは言葉にならない敬意を意味していた。',
+      english: "It was only the second time anything non-alcoholic had been served at Noren -- since the night Master gave Mina tea. When Master served miso soup, it meant a respect that words couldn't carry.",
+    },
+    {
+      speaker: 'kenji',
+      japanese: '',
+      english: '',
+      mood: 'normal',
+      action: '味噌汁を両手で包む。何も言わない。でも手が温かい',
+    },
+    // --- CLOSING ---
     {
       speaker: 'master',
       japanese: '今夜は全員頑張った。乾杯だ。',

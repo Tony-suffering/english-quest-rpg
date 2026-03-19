@@ -131,6 +131,132 @@ const episode: IzakayaEpisode = {
       english: 'That\'s right. The nicer the words, the more they\'re hiding. Let\'s get to work.',
       action: 'カウンターに紙を広げて',
     },
+    // --- 第7夜「ホワイトアウト」: Week 1 finale emotional arc ---
+    {
+      speaker: 'narration',
+      japanese: '問題を解き終えた後。店内が静かになった。ユキがいつもよりハイペースで生ビールを空けている。',
+      english: 'After the questions are done. The bar falls quiet. Yuki is emptying her beer faster than usual.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'ユキさん、今日飛ばしてない？ どうかした？',
+      english: 'Yuki, you\'re knocking them back tonight. Something up?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキがグラスを置いた。少し酔っている。いつもの明るさの下に、何かが沈んでいる。',
+      english: 'Yuki sets her glass down. A little drunk. Something heavy sits beneath her usual brightness.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '3ヶ月前にね、大事な商談があったの。英語でプレゼンすることになって。',
+      english: 'Three months ago, there was an important deal. I was supposed to give a presentation. In English.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '準備は完璧だった。原稿も覚えたし、練習も何回もした。',
+      english: 'I was perfectly prepared. Memorized my script. Practiced it over and over.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'でも本番、外国人クライアントの前に立った瞬間 頭が真っ白になった。',
+      english: 'But the moment I stood up in front of the foreign clients, my mind went completely blank.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'カウンターが静まり返る。ケンジがビールを置いた。リサがスマホから顔を上げた。',
+      english: 'The counter goes dead silent. Kenji puts down his beer. Lisa looks up from her phone.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '30秒。30秒、黙ってた。みんな見てた。何も出てこなかった。',
+      english: 'Thirty seconds. I stood there for thirty seconds in silence. Everyone was watching. Nothing came out.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '先輩が横から入ってくれて、代わりにプレゼンしてくれた。私はそのまま席に戻った。',
+      english: 'A senior colleague stepped in from the side and took over the presentation. I just went back to my seat.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'narration',
+      japanese: '誰も何も言わない。グラスの氷が溶ける音だけが聞こえた。',
+      english: 'Nobody says a word. The only sound is ice melting in the glasses.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '620点って、一番つらい点数なんですよ。',
+      english: 'Six-twenty is the most frustrating score there is.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'できないわけじゃない。でもできるわけでもない。諦めるほど低くない。でも自信を持てるほど高くない。「あと少し」のところにいるのが、一番つらい。',
+      english: 'You\'re not bad enough to give up. But you\'re not good enough to feel confident. Not low enough to quit. Not high enough to believe in yourself. Being stuck at "almost there" is the worst place to be.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'わかるよ。俺なんか「あと少し」どころか、まだスタートラインにも立ててねえけどな。でもな、その気持ちはわかる。',
+      english: 'I get it. Me, I\'m not even at the "almost there" part. Still haven\'t made it to the starting line. But I know that feeling.',
+      mood: 'normal',
+      action: 'ユキの方を見て、静かに',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: '俺も、ある。人前で頭真っ白になったこと。',
+      english: 'I\'ve been there too. Going blank in front of people.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'タケシの表情が一瞬だけ曇った。何かを思い出したように。でもすぐに、いつもの笑顔に戻した。',
+      english: 'Takeshi\'s expression darkens for just a moment. Like something surfaced. But he pulls his usual smile back on almost instantly.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターが何も言わずにユキの前にお冷やを置いた。酒ではなく、水を。',
+      english: 'Without a word, Master places a glass of cold water in front of Yuki. Not alcohol. Water.',
+    },
+    {
+      speaker: 'master',
+      japanese: '白くなったら、また色を塗ればいい。',
+      english: 'When everything goes white, you just paint the colors back on.',
+      action: 'グラスを磨きながら、静かに',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキがその言葉の意味をすぐには理解できなかった。でも、なぜかその一言が胸に刺さった。',
+      english: 'Yuki doesn\'t fully understand what that means. But somehow, the words lodge themselves deep in her chest.',
+    },
+    {
+      speaker: 'narration',
+      japanese: '第1週目の終わり。6人がカウンターに並んでいる。誰も帰ろうとしない。ユキの30秒の沈黙が、全員の胸に残っている。',
+      english: 'The end of week one. Six people lined up at the counter. Nobody makes a move to leave. Yuki\'s thirty seconds of silence lingers in all of them.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'マスター、もう一杯。ユキちゃんにも。',
+      english: 'Master, one more round. For Yuki too.',
+      mood: 'normal',
+      action: '財布を出しながら',
+    },
+    {
+      speaker: 'master',
+      japanese: 'ユキは水でいい。明日も仕事だろう。',
+      english: 'Water for Yuki. She\'s got work tomorrow.',
+      action: 'お冷やをもう一杯注ぎながら',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキが小さく笑った。泣きそうな顔で、でも笑った。この店に来てよかった。そう思った夜だった。',
+      english: 'Yuki gives a small laugh. Her face looks like it could crumble into tears, but she laughs. This was the night she knew she was glad she found this place.',
+    },
   ],
   questions: [
     {

@@ -5,7 +5,7 @@ const episode: IzakayaEpisode = {
   number: 16,
   title: 'ミナ、100席予約の留守電',
   subtitle: 'Part 4: 留守電地獄の攻略法',
-  description: 'Part 4の留守電問題。「挨拶→用件→アクション要求」の3段構造を知れば、どんな留守電でも怖くない。ミナが居酒屋に100席の予約電話を入れたことから始まる伝説の特訓。',
+  description: 'ミナのリスニングは満点。でも留守電になると崩れる。音声だけで情報を整理する力が足りない。「聞こえてるのに、わからない」。挨拶、用件、アクション要求。留守電の3段構造を知れば、Part 4は半分勝ちだ。',
   targetPart: 4,
   targetSkill: 'voicemail-structure',
   targetSkillLabel: '留守電の3段構造',
@@ -54,7 +54,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'takeshi',
       japanese: '全員知り合いじゃないじゃないですか！',
-      english: 'You don\'t even know any of them!',
+      english: "You don't even know any of them!",
       mood: 'angry',
     },
     {
@@ -71,30 +71,46 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'mina',
       japanese: '100席の予約ができるかどうか、ということだけです。',
-      english: 'Just whether or not you could reserve 100 seats. That\'s all I was thinking about.',
+      english: "Just whether or not you could reserve 100 seats. That's all I was thinking about.",
       mood: 'thinking',
     },
     {
       speaker: 'master',
       japanese: '留守電には構造がある。挨拶→用件→アクション要求。この3段だ。ミナさんのメッセージには最初の2段しかなかった。「折り返し電話をくれ」もなかったし、電話番号もなかった。',
-      english: 'Voicemails have a structure. Greeting, purpose, action request. Three stages. Your message only had the first two. No "please call me back," no phone number.',
+      english: "Voicemails have a structure. Greeting, purpose, action request. Three stages. Your message only had the first two. No 'please call me back,' no phone number.",
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ミナの表情が変わった。「聞こえる」ことと「整理できる」ことは違う。ミナのリスニングは満点だ。しかし、音声だけの情報を構造化する力が、足りていなかった。',
+      english: "Mina's expression shifted. Hearing and organizing are not the same thing. Her listening score was perfect. But structuring audio-only information -- that was the gap.",
     },
     {
       speaker: 'lisa',
       japanese: 'Oh, that\'s actually super important. In business English, voicemails without a callback number are basically dead ends.',
-      english: 'Oh, that\'s actually super important. In business English, voicemails without a callback number are basically dead ends.',
+      english: "Oh, that's actually super important. In business English, voicemails without a callback number are basically dead ends.",
       mood: 'normal',
     },
     {
       speaker: 'mina',
-      japanese: '確かに。番号言い忘れた。',
-      english: 'You\'re right. I forgot to leave my number.',
+      japanese: '確かに。番号言い忘れた。...聞き取りは得意なのに、構造で考えたことなかった。',
+      english: "You're right. I forgot to leave my number. ...I'm good at catching words, but I never thought about structure.",
       mood: 'defeated',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'ミナちゃんの弱点って、「聞けない」じゃなくて「整理できない」だったんだ。',
+      english: "Mina's weakness isn't that she can't hear. It's that she can't organize what she hears.",
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: 'そうだ。リスニング495のミナさんがPart 4で落とすなら、耳の問題じゃない。情報の箱に入れる順番の問題だ。',
+      english: "Exactly. If Mina loses points in Part 4 with a 495 listening score, it's not an ear problem. It's a filing problem -- which box does the information go in, and in what order.",
     },
     {
       speaker: 'master',
       japanese: 'トーイックのPart 4に留守電問題が出る。設問は必ず「誰からのメッセージか」「用件は何か」「何をしてほしいか」の3点を聞く。これは留守電の3段構造と完全に一致している。',
-      english: 'トーイック Part 4 has voicemail questions. They always ask three things: "Who is the message from?" "What is the purpose?" "What action is requested?" That maps perfectly onto the three-stage structure.',
+      english: "トーイック Part 4 has voicemail questions. They always ask three things: 'Who is the message from?' 'What is the purpose?' 'What action is requested?' That maps perfectly onto the three-stage structure.",
     },
     {
       speaker: 'yuki',
@@ -105,12 +121,12 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'master',
       japanese: 'そうだ。最初の1文で発信者の名前と会社。中盤で用件の詳細。最後の文でアクション要求と連絡先。この流れは崩れない。',
-      english: 'Exactly. The first sentence gives you the caller\'s name and company. The middle covers the details. The last sentence is the action request and contact info. That flow never changes.',
+      english: "Exactly. The first sentence gives you the caller's name and company. The middle covers the details. The last sentence is the action request and contact info. That flow never changes.",
     },
     {
       speaker: 'kenji',
       japanese: '現場の電話と同じだな。「〇〇さんですか、×会社のAです、件名の件でお電話しました、折り返しをお願いします」。毎日やってる。',
-      english: 'Same as phone calls on the job site. "Is this so-and-so? This is A from X Company, calling about the project, please call me back." I do that every day.',
+      english: "Same as phone calls on the job site. 'Is this so-and-so? This is A from X Company, calling about the project, please call me back.' I do that every day.",
       mood: 'normal',
     },
     {
@@ -121,7 +137,24 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'kenji',
       japanese: '俺の現場経験、トーイック的に優秀だったのか。',
-      english: 'My on-site experience was actually useful for トーイック?',
+      english: "My on-site experience was actually useful for トーイック?",
+      mood: 'excited',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ケンジの顔が明るくなった。480点のケンジが、満点のミナと同じ土俵に立てる瞬間があった。知識は点数だけで測れない。マスターはそれを、さりげなく見せた。',
+      english: "Kenji's face lit up. For a moment, 480-point Kenji stood on the same ground as perfect-score Mina. Knowledge can't be measured by numbers alone. Master had shown that, quietly.",
+    },
+    {
+      speaker: 'mina',
+      japanese: '...ケンジさん、すごい。私、留守電の構造なんて考えたことなかったです。',
+      english: "...Kenji, that's amazing. I never once thought about voicemail structure.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '嬢ちゃんに褒められると照れるな。',
+      english: "Gettin' compliments from the young lady makes me blush.",
       mood: 'excited',
     },
     {
@@ -132,20 +165,37 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '（無言でカウンターを拭く）',
-      english: '(Silently wipes the counter.)',
-      action: 'カウンターを拭きながら',
+      japanese: '',
+      english: '',
+      action: '無言でカウンターを拭く',
     },
     {
       speaker: 'takeshi',
       japanese: 'ミナちゃん、それはちょっと別の話ですね。',
-      english: 'Mina, that\'s kind of a separate issue...',
+      english: "Mina, that's kind of a separate issue...",
       mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'リサがハイボールを傾けながら、小さな声で呟いた。',
+      english: 'Lisa tilted her highball and murmured under her breath.',
+    },
+    {
+      speaker: 'lisa',
+      japanese: '...私、ミナちゃんが羨ましい。「聞こえる」って、どんな世界なんだろう。',
+      english: "...I'm envious of Mina. What must it be like to just hear everything.",
+      mood: 'thinking',
+      action: '自分のグラスを見つめる',
+    },
+    {
+      speaker: 'narration',
+      japanese: '誰にも聞こえなかった。しかしマスターだけが、リサの口元を見ていた。',
+      english: "Nobody heard. But Master's eyes had caught the movement of Lisa's lips.",
     },
     {
       speaker: 'master',
       japanese: 'やるぞ。留守電、6問。構造を頭に入れて聴け。',
-      english: 'Let\'s begin. Six voicemail questions. Keep the structure in your head and listen.',
+      english: "Let's begin. Six voicemail questions. Keep the structure in your head and listen.",
       action: '問題用紙を配りながら',
     },
   ],
@@ -267,10 +317,10 @@ const episode: IzakayaEpisode = {
   ],
   masterTip: {
     japanese: '留守電は必ず「挨拶→用件→アクション要求」の3段で終わる。設問もその3点を聞く。最後の1文が一番重要だ。聞き逃したとしても、最後に必ず「電話番号か次のステップ」が来ると知っていれば、そこに集中できる。',
-    english: "Every voicemail ends with three beats: greeting, purpose, action request. The questions always target those same three points. Even if you miss the middle, you know the last line will always be a number or next step — so save your best focus for that.",
+    english: "Every voicemail ends with three beats: greeting, purpose, action request. The questions always target those same three points. Even if you miss the middle, you know the last line will always be a number or next step -- so save your best focus for that.",
   },
   vocabHighlights: [
-    { word: 'on behalf of', meaning: '〜の代理として、〜を代表して', example: 'I\'m calling on behalf of Sunrise Financial Group.', partOfSpeech: 'phrase' },
+    { word: 'on behalf of', meaning: '〜の代理として、〜を代表して', example: "I'm calling on behalf of Sunrise Financial Group.", partOfSpeech: 'phrase' },
     { word: 'at your earliest convenience', meaning: 'ご都合のよいときに', example: 'Please return my call at your earliest convenience.', partOfSpeech: 'phrase' },
     { word: 'apply a patch', meaning: 'パッチを当てる（修正プログラムを適用する）', example: "I've already applied a patch on our end.", partOfSpeech: 'phrase' },
     { word: 'follow-up', meaning: '後追い、フォローアップ', example: 'submit a follow-up ticket', partOfSpeech: 'adjective/noun' },

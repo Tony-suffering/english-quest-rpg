@@ -3,7 +3,7 @@ import { IzakayaEpisode } from '../types';
 const episode: IzakayaEpisode = {
   id: 'ep-005',
   number: 5,
-  title: '全員集合、Part 2 模擬テスト',
+  title: 'パラフレーズの魔法',
   subtitle: 'Part 2: 総合実戦',
   description: '金曜の夜、全員揃った。マスターが突然「テストだ」と宣言。居酒屋で4回分の知識が試される。',
   targetPart: 2,
@@ -26,7 +26,7 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '。',
+      japanese: '',
       english: '',
       mood: 'thinking',
       action: 'ハイボールのグラスを両手で持ったまま動かない',
@@ -81,6 +81,93 @@ const episode: IzakayaEpisode = {
       english: "Tonight is a test. Part 2, eight questions. Everything I've taught across four sessions. Indirect answers, repeat traps, WH-questions, negative questions.",
     },
     {
+      speaker: 'master',
+      japanese: 'その前にひとつ教える。パラフレーズだ。',
+      english: 'But first, one more thing. Paraphrasing.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'パラフレーズ？',
+      english: 'Paraphrasing?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: '同じ意味を、違う言葉で言い換えること。"postpone" と "put off"。意味は同じだ。トーイックはこの言い換えで引っ掛ける。',
+      english: 'Saying the same thing in different words. "Postpone" and "put off." Same meaning. The test uses this kind of swap to trip you up.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'あ、それITで言うリファクタリングじゃん！ コードの中身変えずに書き方だけ変える。同じ機能、違う書き方！',
+      english: 'Oh, that\'s like refactoring in IT! You change how the code looks without changing what it does. Same function, different syntax!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'タケシ、たまにいいこと言うね。',
+      english: 'Takeshi, you actually say smart things sometimes.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: '「たまに」は余計だよ。',
+      english: 'The "sometimes" part was unnecessary.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '同じ意味なのに別の単語にすんのか。ずるくねえか。',
+      english: 'Same meaning but different words? That\'s playing dirty.',
+      mood: 'angry',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'パチスロで言えば...あれか。「大当たり」と「ジャックポット」。同じだけど見た目違う。',
+      english: 'In pachislot terms... it\'s like "oatari" and "jackpot." Same thing, different wrapper.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'いや、それは日本語と英語だから。',
+      english: 'No, that\'s just Japanese and English.',
+      mood: 'normal',
+      action: '小声で',
+    },
+    {
+      speaker: 'narration',
+      japanese: '全員が笑った。ケンジも笑った。笑い声がカウンターに広がる。こういう時間が、この居酒屋の空気を作っている。',
+      english: 'Everyone laughed. Even Kenji. Laughter rippled across the counter. These moments are what give this izakaya its warmth.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '...あ。',
+      english: '...Oh.',
+      mood: 'thinking',
+      action: 'ハイボールのグラスを止める',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'パラフレーズって、私毎日やってる。商社の仕事で。クライアントに「値下げ」って言えないから「価格の最適化」って言い換えてる。それと同じこと？',
+      english: 'Wait, I do paraphrasing every single day. At the trading company. I can\'t tell clients "price cut" so I say "pricing optimization" instead. Is it the same thing?',
+      mood: 'excited',
+    },
+    {
+      speaker: 'master',
+      japanese: 'まったく同じだ。お前は日本語でもう使いこなしてる技術を、英語でもやればいいだけだ。',
+      english: 'Exactly the same. You\'re already a master of this technique in Japanese. Just do it in English.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキの目が少し光った。自分の仕事のスキルが、トーイックに直結していると気づいた瞬間。まだ本人は、それがどれだけの武器になるか知らない。',
+      english: 'A glimmer in Yuki\'s eyes. The moment she realized her work skills connect directly to the test. She doesn\'t yet know how powerful a weapon this will become.',
+    },
+    {
+      speaker: 'master',
+      japanese: 'じゃあ始めるぞ。',
+      english: "Let's begin.",
+      action: '紙を一枚ずつ、全員の前に表向きに置いていく',
+    },
+    {
       speaker: 'takeshi',
       japanese: 'よっしゃ！ やってやるよ！',
       english: "Hell yeah! Let's go!",
@@ -103,12 +190,6 @@ const episode: IzakayaEpisode = {
       japanese: 'ルール。全員同じ問題。正解したら、なぜその答えを選んだか説明しろ。人に教えるのが一番の勉強だ。',
       english: "Rules. Same questions for everyone. If you get one right, explain why. Teaching is the best way to learn.",
     },
-    {
-      speaker: 'master',
-      japanese: '始めるぞ。',
-      english: "let's begin.",
-      action: '紙を一枚ずつ、全員の前に表向きに置いていく',
-    },
     // --- POST-TEST: The Results ---
     {
       speaker: 'narration',
@@ -122,7 +203,7 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '。',
+      japanese: '',
       english: '',
       mood: 'defeated',
       action: 'ビールに手をつけない。初めてのことだった',
@@ -212,7 +293,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'narration',
       japanese: 'リサにとって860点は「当然」の数字だった。でもトーイックは英語力だけじゃない。それを今夜、1問で思い知った。',
-      english: "For Lisa, 860 was a given. But トーイック isn't just about English ability. One question tonight made that painfully clear.",
+      english: "For Lisa, 860 was a given. But the test isn't just about English ability. One question tonight made that painfully clear.",
     },
     {
       speaker: 'narration',
@@ -254,10 +335,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '。',
+      japanese: '',
       english: '',
       mood: 'defeated',
       action: '鼻をすする。ビールを飲んでごまかす',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'タケシがトイレに立った。1分で戻ってきた。目が少し赤い。誰も触れなかった。',
+      english: 'Takeshi got up for the restroom. Came back in a minute. His eyes were slightly red. Nobody said a word about it.',
     },
     {
       speaker: 'master',

@@ -13,6 +13,77 @@ const episode: IzakayaEpisode = {
   story: [
     {
       speaker: 'narration',
+      japanese: '前夜。閉店後。ユキが戻ってきた。',
+      english: 'The night before. After closing. Yuki came back.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'のれんの灯りはもう消えている。マスターが一人でカウンターを拭いていた。引き戸が開く音がした。',
+      english: 'The noren light was already off. Master was wiping the counter alone. The sliding door opened.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '忘れ物を。',
+      english: 'I forgot something.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターは何も言わず、お冷やを出した。忘れ物なんかないことは、二人ともわかっていた。',
+      english: 'Master said nothing and set out a glass of water. They both knew there was nothing to pick up.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'マスター。私、平凡で終わりたくないんです。',
+      english: 'Master. I don\'t want to end up ordinary.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '620って、平凡の象徴みたいな点数じゃないですか。上でもない、下でもない。何者でもない。',
+      english: '620 feels like the symbol of ordinary. Not high, not low. Nobody.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'master',
+      japanese: 'ユキ。620は平凡じゃない。',
+      english: 'Yuki. 620 is not ordinary.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'え？',
+      english: 'What?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: '日本人のトーイック平均は531だ。お前は平均より上にいる。「上でもない下でもない」と思っているのは、お前だけだ。',
+      english: 'The average トーイック score for Japanese people is 531. You\'re above average. The only person who thinks you\'re "not high, not low" is you.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '',
+      english: '',
+      mood: 'defeated',
+      action: '言葉が出ない',
+    },
+    {
+      speaker: 'master',
+      japanese: 'それにな。「何者でもない」人間は、夜中に居酒屋に戻ってきて勉強しようとしたりしない。',
+      english: 'And one more thing. A "nobody" doesn\'t come back to an izakaya in the middle of the night to study.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキの目から涙がこぼれた。声を出さずに、静かに泣いた。閉店後の居酒屋に、しゃくり上げる音だけが小さく響いた。',
+      english: 'Tears spilled from Yuki\'s eyes. She cried silently. In the closed izakaya, only the faint sound of her sobs echoed.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターは何も言わなかった。ただ、お冷やを少し足した。深い夜だった。師と生徒の、静かな夜だった。',
+      english: 'Master said nothing. He just topped off her water. It was a deep night. A quiet night between a teacher and his student.',
+    },
+    {
+      speaker: 'narration',
       japanese: '10日後。土曜日、午後10時。のれんの引き戸が開くたびに、誰かの視線がユキに向く。',
       english: 'Ten days later. Saturday, 10 PM. Every time the sliding door opens, someone glances at Yuki.',
       action: 'カウンターに全員集まっている',

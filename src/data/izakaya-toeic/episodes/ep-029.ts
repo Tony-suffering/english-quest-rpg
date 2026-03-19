@@ -281,6 +281,100 @@ const episode: IzakayaEpisode = {
       japanese: '全員が黙って頷いた。数字は嘘をつかない。3週間、居酒屋のカウンターで積み上げたものが、確かにそこにあった。',
       english: "Everyone nods in silence. Numbers don't lie. Three weeks of studying at this bar counter -- the results are real.",
     },
+    {
+      speaker: 'narration',
+      japanese: 'そして、トーイック本番の結果が届いた日。',
+      english: 'And then, the day the real トーイック results arrive.',
+    },
+    {
+      speaker: 'mina',
+      japanese: '810。810です！',
+      english: '810. It\'s 810!',
+      mood: 'excited',
+      action: 'スマホの画面を全員に見せる',
+    },
+    {
+      speaker: 'narration',
+      japanese: '全員が立ち上がって歓声を上げた。ケンジが一番うるさかった。',
+      english: 'Everyone jumps to their feet, cheering. Kenji is the loudest.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '確変来たな！！！',
+      english: 'The hot streak hit!!!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'mina',
+      japanese: '天井でした、ケンジさんの言う通り！',
+      english: 'It was the ceiling, just like you said, Kenji!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ミナの800突破。正社員登用が決まる。全員が祝う。リサがミナの肩を叩き、ユキがミナの手を握り、タケシがガッツポーズした。',
+      english: 'Mina breaks 800. The permanent position is secured. Everyone celebrates. Lisa pats Mina\'s shoulder, Yuki squeezes her hand, Takeshi pumps his fist.',
+    },
+    {
+      speaker: 'narration',
+      japanese: '歓喜の中、マスターが静かに口を開いた。',
+      english: 'In the midst of the joy, the Master speaks quietly.',
+    },
+    {
+      speaker: 'master',
+      japanese: 'ミナ、おめでとう。そして全員に言う。今日で、この勉強会は終わりだ。',
+      english: 'Mina, congratulations. And to all of you -- today, this study group ends.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'え？',
+      english: 'What?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'なんで。まだまだ勉強したいのに。',
+      english: 'Why? I still want to keep studying.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '続ければいいじゃないですか！',
+      english: 'Why not just keep going?!',
+      mood: 'angry',
+    },
+    {
+      speaker: 'master',
+      japanese: 'のれんは、くぐるためにある。くぐったら、外に出るんだ。',
+      english: 'A curtain exists to be passed through. Once you\'re through, you step outside.',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'でも',
+      english: 'But',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: 'お前たちはもう、ここがなくても歩ける。それが、俺が確認したかったことだ。',
+      english: 'You can walk on your own now, even without this place. That is what I needed to confirm.',
+    },
+    {
+      speaker: 'narration',
+      japanese: '長い沈黙。誰も反論できなかった。マスターの言葉の重さに、全員が息を止めた。',
+      english: 'A long silence. Nobody can argue. The weight of Master\'s words stops everyone in their tracks.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'マスター、最後に一つ聞いていいか。なんでこの店、「のれん」って名前なんだ？',
+      english: 'Master, can I ask one last thing? Why is this place called "Noren"?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: 'それは、明日話す。',
+      english: 'I\'ll tell you tomorrow.',
+    },
   ],
   questions: [
     {

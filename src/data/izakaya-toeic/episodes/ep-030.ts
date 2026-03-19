@@ -307,6 +307,217 @@ const episode: IzakayaEpisode = {
       japanese: '全員が目を合わせた。明日が最後の夜。誰も口には出さないが、全員がわかっている。この居酒屋での時間が、もうすぐ終わる。',
       english: "Everyone exchanges looks. Tomorrow is the last night. Nobody says it out loud, but they all know. Their time at this bar is almost over.",
     },
+    {
+      speaker: 'narration',
+      japanese: 'そして最終夜。マスターが初めて自分の過去を語り始めた。',
+      english: 'And then, the final night. The Master begins to tell his own story for the first time.',
+    },
+    {
+      speaker: 'master',
+      japanese: '5年前、俺は人気のトーイック講師だった。100人以上の生徒を教えた。',
+      english: 'Five years ago, I was a popular トーイック instructor. I taught over a hundred students.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'カウンターが静まった。マスターが自分のことを話すのは、誰も聞いたことがなかった。',
+      english: 'The counter goes silent. Nobody has ever heard the Master talk about himself.',
+    },
+    {
+      speaker: 'master',
+      japanese: 'でも一人の生徒がいた。名前はユウタ。22歳。就職のためにトーイックが必要で、俺の教室に通ってきた。',
+      english: 'But there was one student. His name was Yuta. Twenty-two years old. He needed トーイック for employment and came to my school.',
+    },
+    {
+      speaker: 'master',
+      japanese: 'ユウタは努力家だった。でも何度受けても、点数が上がらなかった。俺は「確変は来る。続ければ必ず上がる」と言い続けた。',
+      english: 'Yuta was hardworking. But no matter how many times he took it, his score wouldn\'t go up. I kept telling him, "The hot streak will come. Keep going and your score will rise."',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ケンジの目が揺れた。第3夜で、マスターが「確変は来ない」と言った意味が、初めて見え始めた。',
+      english: 'Kenji\'s eyes waver. For the first time, he begins to understand why Master said "the hot streak doesn\'t come" on Night Three.',
+    },
+    {
+      speaker: 'master',
+      japanese: 'ある夏、ユウタからの連絡が途絶えた。手紙が一通だけ残されていた。',
+      english: 'One summer, Yuta stopped making contact. He left behind a single letter.',
+    },
+    {
+      speaker: 'master',
+      japanese: '「先生、もうドアを開ける勇気がありません。」',
+      english: '"Teacher, I no longer have the courage to open the door."',
+    },
+    {
+      speaker: 'narration',
+      japanese: '教室に来なくなった。就職活動もやめた。引きこもった。',
+      english: 'He stopped coming to class. Quit his job search. Became a shut-in.',
+    },
+    {
+      speaker: 'master',
+      japanese: '俺は「続ければ上がる」と言い続けた。でもユウタには、「続けられない自分」が一番つらかったんだ。俺は気づかなかった。',
+      english: 'I kept saying "keep going and you\'ll improve." But for Yuta, what hurt most was being unable to keep going. I didn\'t see it.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'カウンターが完全に静まった。ユキの目が潤んでいる。リサが唇を噛んでいる。',
+      english: 'The counter goes completely silent. Yuki\'s eyes are wet. Lisa is biting her lip.',
+    },
+    {
+      speaker: 'master',
+      japanese: '俺は講師を辞めた。そして、この店を開いた。「のれん」という名前にした。',
+      english: 'I quit teaching. And I opened this place. I named it "Noren."',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'なんで「のれん」',
+      english: 'Why "Noren"?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: 'のれんは、くぐりたい人だけがくぐる。強制しない。入りたければ入ればいい。出たければ出ればいい。',
+      english: 'A curtain is passed through only by those who want to. No forcing. Come in if you want. Leave if you want.',
+    },
+    {
+      speaker: 'master',
+      japanese: '俺は二度と、「ドアを開けろ」と言わないと決めた。だから、のれんにした。',
+      english: 'I swore I would never again tell someone to open a door. That\'s why I chose a curtain.',
+    },
+    {
+      speaker: 'narration',
+      japanese: '長い沈黙。グラスを置く音すら聞こえなかった。',
+      english: 'A long silence. Not even the sound of a glass being set down.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'マスター。ユウタってやつ、今、どうしてんだ？',
+      english: 'Master. That Yuta guy. How is he now?',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: '3年前に連絡が来た。「先生、また勉強し始めました」と。',
+      english: 'Three years ago, I got a message. "Teacher, I\'ve started studying again."',
+    },
+    {
+      speaker: 'narration',
+      japanese: '全員が息を飲んだ。',
+      english: 'Everyone holds their breath.',
+    },
+    {
+      speaker: 'master',
+      japanese: '今は、ユウタは小さな翻訳会社で働いている。トーイック690だそうだ。',
+      english: 'Now Yuta works at a small translation company. トーイック 690, he says.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '690',
+      english: '690',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: '690は「ドアを開けた人間の点数」だ。第1夜で言っただろう。',
+      english: '690 is "the score of someone who opened the door." I said that on the first night, didn\'t I.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキが第1夜を思い出す。「620は、ドアを開けた人間の点数だ。」あの言葉は、ユウタに向けた言葉でもあったのだ。',
+      english: 'Yuki remembers the first night. "620 is the score of someone who opened the door." Those words were also meant for Yuta.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'マスター。俺たちは大丈夫だ。だって、のれんをくぐったのは俺たちだからな。',
+      english: 'Master. We\'re gonna be fine. Because we\'re the ones who stepped through the curtain.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'master',
+      japanese: 'ああ。',
+      english: 'Yeah.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターが初めて、少しだけ笑った。',
+      english: 'For the first time, the Master smiles. Just slightly.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'マスター！ 泣いてる！？',
+      english: 'Master! Are you crying?!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'master',
+      japanese: '泣いてない。玉ねぎを切ったんだ。',
+      english: 'I\'m not crying. I was cutting onions.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '嘘つけ、何も切ってねえだろ！',
+      english: 'Liar, you haven\'t cut anything!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'narration',
+      japanese: '全員が笑った。泣きながら笑った。',
+      english: 'Everyone laughs. Laughing through tears.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターがカウンターの奥から、一本の高級日本酒を出した。ずっと取っておいたものだ。',
+      english: 'The Master pulls out a bottle of premium sake from behind the counter. One he\'d been saving.',
+    },
+    {
+      speaker: 'master',
+      japanese: '最後の一杯だ。全員で飲もう。',
+      english: 'One last drink. Let\'s all have it together.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '乾杯！',
+      english: 'Cheers!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '乾杯！',
+      english: 'Cheers!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: '乾杯！',
+      english: 'Cheers!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'lisa',
+      japanese: '乾杯。',
+      english: 'Cheers.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'mina',
+      japanese: '乾杯！',
+      english: 'Cheers!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'master',
+      japanese: '乾杯。',
+      english: 'Cheers.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターが心の中で呟いた。',
+      english: 'The Master whispers to himself, silently.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユウタ、見てるか。お前のドアは、のれんになった。そして今、6人がくぐってくれた。',
+      english: 'Yuta, are you watching? Your door became a curtain. And tonight, six people stepped through it.',
+    },
   ],
   questions: [
     {

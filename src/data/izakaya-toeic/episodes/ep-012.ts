@@ -280,6 +280,83 @@ const episode: IzakayaEpisode = {
       mood: 'normal',
       action: '涙を拭いて、背筋を伸ばす',
     },
+    {
+      speaker: 'narration',
+      japanese: '問題に取り組む中、マスターがカウンターにPart 7のグラフ問題を広げた。棒グラフと表が並んだ、一見複雑な問題だった。',
+      english: 'As they worked through the problems, Master spread out a Part 7 graph question on the counter. Bar charts and tables side by side -- a seemingly complex question.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '待て。これ、俺に見せろ。',
+      english: 'Hold on. Let me see this one.',
+      mood: 'normal',
+      action: 'カウンターに身を乗り出す',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ケンジの目つきが変わった。25年間、建設現場で工程表やコスト計算書を読み続けてきた男の目だった。',
+      english: 'Kenji\'s eyes changed. These were the eyes of a man who had spent 25 years reading construction schedules and cost sheets.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '見ろ、この棒グラフ。第2四半期に売上が落ちてる。でも第3四半期に回復してる。設問は "What happened in Q3?" だろ？ "Sales increased." だ。英語読めなくてもわかんだよ。',
+      english: 'Look at this bar chart. Sales dipped in Q2. But they recovered in Q3. The question is "What happened in Q3?" right? "Sales increased." I don\'t need to read English to see that.',
+      mood: 'excited',
+      action: 'グラフを指で辿りながら',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'ケンジさん、それ正解。',
+      english: 'Kenji, that\'s correct.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'な！ 25年はダテじゃねえ！',
+      english: 'See!? Twenty-five years ain\'t for nothing!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'ケンジさん、すごいじゃないですか！',
+      english: 'Kenji, that\'s amazing!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'へへ。パチスロのデータ分析の応用だな。',
+      english: 'Heh. Just applying my pachislot data analysis skills.',
+      mood: 'normal',
+      action: '得意げにハイボールを飲む',
+    },
+    {
+      speaker: 'narration',
+      japanese: '全員が笑った。しかしマスターは笑わなかった。グラスを磨く手を止めて、ケンジの目を見た。',
+      english: 'Everyone laughed. But Master didn\'t. He stopped polishing the glass and looked Kenji in the eye.',
+    },
+    {
+      speaker: 'master',
+      japanese: 'ケンジ、お前の25年の経験は、英語ができないことで消えたりしない。',
+      english: 'Kenji. Your 25 years of experience don\'t disappear just because you can\'t read English.',
+      action: 'ケンジの目をまっすぐ見て',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ケンジが黙ってビールを一口飲んだ。返す言葉が見つからないのか、それとも返したくないのか。目が少し潤んでいた。',
+      english: 'Kenji silently took a sip of beer. Whether he couldn\'t find words or didn\'t want to -- his eyes glistened just slightly.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '',
+      english: '',
+      mood: 'normal',
+      action: '何も言わず、もう一口ビールを飲む。手が少し震えている',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'リサが一瞬、ケンジの横顔を見た。860点の自分が泣いていた夜に、480点の男が「贅沢な悩みだ」と言った。あの不器用な優しさの裏に、こんな顔があったのか。',
+      english: 'Lisa glanced at Kenji\'s profile. On the night she cried over 860, this man at 480 had called her problem a luxury. Behind that clumsy kindness was a face like this.',
+    },
   ],
   questions: [
     {

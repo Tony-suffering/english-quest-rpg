@@ -5,13 +5,13 @@ const episode: IzakayaEpisode = {
   number: 22,
   title: 'リサ参戦、全員で勝負',
   subtitle: 'Part 2: Week 1 総決算',
-  description: '金曜の夜。リサが久しぶりに来た。マスターが宣言する「Week 1の総決算」。全員 vs リサ、ナプキンに書くバトルロイヤル。',
+  description: '金曜の夜。リサが「もう一人で勉強するのは終わり」と宣言した。Week 1の総決算、全員 vs ナプキンバトルロイヤル。リサは他人に教えることで、自分の錆を見つけていく。',
   targetPart: 2,
   targetSkill: 'part2-comprehensive',
   targetSkillLabel: 'Part 2 総合力',
   targetScoreRange: [500, 800],
   story: [
-    // --- LISA'S RETURN ---
+    // --- LISA'S NEW ENERGY ---
     {
       speaker: 'narration',
       japanese: '金曜日、午後9時。居酒屋「のれん」。いつものメンバーが揃いかけたところに、扉が開いた。',
@@ -19,54 +19,54 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '久しぶり。出張続きで全然来れなかった。',
-      english: "Long time no see. Couldn't make it -- back-to-back business trips.",
+      japanese: '遅れてごめん。',
+      english: 'Sorry I\'m late.',
       mood: 'normal',
-      action: 'コートを脱ぎながらカウンターに座る',
+      action: 'コートを脱ぎながらカウンターに座る。火曜とは別人の顔',
     },
     {
       speaker: 'takeshi',
-      japanese: 'リサさん！ 3週間ぶりぐらいじゃない？ もう色々変わったよ、ここ。',
-      english: "Lisa! It's been like three weeks, right? A LOT has changed around here.",
+      japanese: 'リサさん。火曜と全然顔違うじゃん。何があった？',
+      english: "Lisa. You look totally different from Tuesday. What happened?",
       mood: 'excited',
     },
     {
       speaker: 'lisa',
-      japanese: 'ミナから聞いた。トーイックの勉強会やってるんでしょ？ ...かわいいね。',
-      english: "Mina told me. You guys are doing a トーイック study group? ...that's cute.",
+      japanese: '水曜から毎朝30分、リスニングとリーディングやってる。3日だけど。',
+      english: "I've been doing 30 minutes of listening and reading every morning since Wednesday. Only three days, but still.",
       mood: 'normal',
-      action: 'ワインを受け取りながら、少し口角が上がる',
     },
     {
       speaker: 'yuki',
-      japanese: '「かわいい」って。860点の人に言われると腹立つんだけど。',
-      english: '"Cute." That\'s really annoying coming from someone with 860.',
-      mood: 'angry',
-    },
-    {
-      speaker: 'lisa',
-      japanese: 'あ、ごめん。悪い意味じゃなくて。みんなで勉強するの、いいなって。わたし一人でやってたから。',
-      english: "Oh, sorry. I didn't mean it like that. Studying together sounds nice. I always did it alone.",
-      mood: 'normal',
-    },
-    {
-      speaker: 'kenji',
-      japanese: 'リサ。お前、付加疑問文で間違えたことあるか。',
-      english: 'Lisa. Have you ever gotten a tag question wrong?',
+      japanese: '3日で顔変わる人初めて見た。',
+      english: "I've never seen someone's face change in three days.",
       mood: 'normal',
     },
     {
       speaker: 'lisa',
-      japanese: '付加疑問？ ...まあ、ネイティブ感覚で読みすぎて引っかかったことはあるよ。',
-      english: "Tag questions? ...well, yeah. I've been tripped up by reading too much like a native.",
-      mood: 'thinking',
+      japanese: 'ケンジさんに言われたの。「錆びたなら研げ」って。だから研いでる。',
+      english: "Kenji told me: 'If it's rusty, sharpen it.' So I'm sharpening.",
+      mood: 'normal',
+      action: 'ケンジの方をチラッと見る',
     },
     {
       speaker: 'kenji',
-      japanese: 'そうか。',
-      english: 'I see.',
+      japanese: '俺が言ったんだっけ。覚えてねえな。',
+      english: "Did I say that? Don't remember.",
       mood: 'normal',
-      action: '少しだけ肩の力が抜ける',
+      action: '照れくさそうに焼酎を飲む',
+    },
+    {
+      speaker: 'mina',
+      japanese: 'リサさん、目がキラキラしてます。',
+      english: "Lisa, your eyes are sparkling.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'やめてよ、恥ずかしい。それより今日、わたしも混ぜて。一人で勉強するの、もう終わりにする。',
+      english: "Stop, that's embarrassing. Anyway, let me join in today. I'm done studying alone.",
+      mood: 'normal',
     },
     // --- THE CHALLENGE ---
     {
@@ -94,10 +94,17 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: 'いいよ。受けて立つ。',
-      english: "fine. I'll take you all on.",
+      japanese: 'いいよ。受けて立つ。ただし、わたしも本気で間違える可能性があるから。火曜に学んだでしょ。',
+      english: "Fine. I'll take you all on. But I might genuinely get some wrong too. You all saw that on Tuesday.",
       mood: 'normal',
-      action: 'ワインを一口飲んで、ペンを取る',
+      action: 'ハイボールを一口飲んで、ペンを取る',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'リサが本気で間違えるなら、俺が本気で勝つ可能性もあるってことか。',
+      english: "If Lisa can genuinely get some wrong, that means I've genuinely got a shot at beating her.",
+      mood: 'normal',
+      action: '目が光る',
     },
     {
       speaker: 'mina',
@@ -131,8 +138,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'narration',
-      japanese: 'リサがBを選んだ。でもナプキンに書いた後、一瞬Cに変えようとして、やめた。',
-      english: "Lisa picked B. But after writing it, she almost changed to C, then stopped herself.",
+      japanese: 'リサがBを選んだ。でもナプキンに書いた後、一瞬Cに変えようとして、やめた。火曜日のマスターの言葉が聞こえたのかもしれない。「テストは感情を聞いてない」。',
+      english: 'Lisa picked B. But after writing it, she almost changed to C, then stopped herself. Maybe she heard Master\'s words from Tuesday: "The test isn\'t asking for feelings."',
     },
     // --- THE RESULTS ---
     {
@@ -143,7 +150,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'master',
       japanese: '結果を言う。',
-      english: 'here are the results.',
+      english: 'Here are the results.',
       action: '全員のナプキンをカウンターに並べる',
     },
     {
@@ -154,7 +161,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'takeshi',
       japanese: '6？ 6 !? 前の模試3問だったのに！ 倍！ 俺、倍取った！',
-      english: "six? SIX!? I only got three on the last mock test! That's double! I DOUBLED it!",
+      english: "Six? SIX!? I only got three on the last mock test! That's double! I DOUBLED it!",
       mood: 'excited',
       action: 'ビールを持つ手が震えている',
     },
@@ -171,7 +178,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'yuki',
       japanese: '8。前回5。ちゃんと上がってる。',
-      english: 'eight. Last time was five. It\'s actually going up.',
+      english: "Eight. Last time was five. It's actually going up.",
       mood: 'normal',
       action: 'ハイボールを一口。手が少し震えている',
     },
@@ -189,8 +196,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'narration',
-      japanese: '火曜日に現場を止めた男が、金曜日に付加疑問で全問正解した。3日で。',
-      english: 'The man who shut down a construction site on Tuesday got every tag question right on Friday. Three days.',
+      japanese: '先週、英語の文法ひとつで現場を止めた男が、今週、付加疑問で全問正解した。',
+      english: 'The man who shut down a construction site over one grammar point last week just aced every tag question this week.',
     },
     {
       speaker: 'master',
@@ -200,8 +207,14 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'lisa',
       japanese: 'Q7でしょ。あの間接回答、考えすぎた。ネイティブ感覚で読んじゃって、テストの答え方を忘れた。',
-      english: "it was Q7, right? I overthought that indirect answer. Read it like a native and forgot to think like a test-taker.",
+      english: "It was Q7, right? I overthought that indirect answer. Read it like a native and forgot to think like a test-taker.",
       mood: 'thinking',
+    },
+    {
+      speaker: 'lisa',
+      japanese: '火曜と同じミス。まだ癖が抜けてない。でも、自分で気づけた。それは前と違う。',
+      english: "Same mistake as Tuesday. The habit's not gone yet. But I caught it myself. That's different from before.",
+      mood: 'normal',
     },
     {
       speaker: 'master',
@@ -228,14 +241,40 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: 'ミナ、すごいね。わたしが860取った時より正確かもしれない。',
-      english: "Mina, that's impressive. You might be more precise than I was when I got 860.",
+      japanese: 'ミナ、すごいね。わたしが間違えた問題、ミナは正解してる。わたしが正解した問題、ミナは間違えてる。弱点がきれいに逆。',
+      english: "Mina, that's impressive. The question I got wrong, you got right. The one you got wrong, I got right. Our weak spots are perfect mirrors.",
       mood: 'normal',
     },
     {
+      speaker: 'mina',
+      japanese: '逆。',
+      english: 'Mirrors.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'lisa',
+      japanese: 'わたしがリスニングの感覚を教える。ミナがテストの解き方を教える。そうしたら、お互い満点になれる。',
+      english: "I teach you listening instinct. You teach me test-taking strategy. Together we'd both hit perfect.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'mina',
+      japanese: 'わたしがリサさんに教える なんて。',
+      english: 'Me, teach Lisa something.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'lisa',
+      japanese: '火曜に泣いた女に遠慮しなくていいよ。',
+      english: "You don't need to go easy on the woman who cried on Tuesday.",
+      mood: 'normal',
+      action: '笑う。火曜日とは違う、前を向いた笑顔',
+    },
+    // --- YUKI'S MOMENT ---
+    {
       speaker: 'yuki',
-      japanese: 'ちょっと待って。Q4、あの間接回答の問題。ユキが "A" って書いてるのに、リサが "B" って書いてる。どっちが正解？',
-      english: 'wait. Q4, that indirect answer question. I wrote A, but Lisa wrote B. Which one is right?',
+      japanese: 'ちょっと待って。Q4、あの間接回答の問題。わたしが "A" って書いてるのに、リサが "B" って書いてる。どっちが正解？',
+      english: 'Wait. Q4, that indirect answer question. I wrote A, but Lisa wrote B. Which one is right?',
       mood: 'thinking',
     },
     {
@@ -267,6 +306,11 @@ const episode: IzakayaEpisode = {
       mood: 'normal',
       action: 'ハイボールを飲む。手はもう震えていない。でも目が光っている',
     },
+    {
+      speaker: 'narration',
+      japanese: 'ユキは知った。800の壁は、860を持つ人間にも穴がある壁だということを。そして自分の方が、その穴を見つけるのが上手いかもしれないということを。',
+      english: "Yuki realized something. The 800 wall had gaps -- gaps even someone at 860 could fall through. And maybe she was better at spotting those gaps.",
+    },
     // --- THE CELEBRATION ---
     {
       speaker: 'master',
@@ -291,44 +335,32 @@ const episode: IzakayaEpisode = {
       english: "Three last time. Six this time. You doubled. If that's not growth, what is.",
     },
     {
+      speaker: 'lisa',
+      japanese: 'わたしも来週から毎回来る。一人で研ぐより、ここで研いだ方が早い。',
+      english: "I'll be here every session from next week. Sharpening is faster here than alone.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '「研ぐ」って、俺の言葉が定着してんな。',
+      english: '"Sharpening." Hey, my line stuck.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'ケンジさん語録、増えすぎじゃない？',
+      english: "Kenji's quotable lines are piling up, aren't they?",
+      mood: 'excited',
+    },
+    {
       speaker: 'master',
       japanese: '来週からPart 3に入る。会話問題だ。1問1文のPart 2と違って、長い会話を聞いて3問答える。ここからが本番だ。',
       english: "Next week we start Part 3. Conversation questions. Unlike Part 2's one question per line, you'll listen to longer conversations and answer three questions each. This is where it gets real.",
     },
     {
-      speaker: 'kenji',
-      japanese: 'Part 3。長い会話か。',
-      english: 'Part 3. Longer conversations, huh.',
-      mood: 'normal',
-    },
-    {
-      speaker: 'yuki',
-      japanese: '聞き取りがもっと大変になるってこと？',
-      english: "so the listening gets even harder?",
-      mood: 'thinking',
-    },
-    {
       speaker: 'master',
       japanese: 'Part 2の力があれば戦える。間接回答を見抜く力、リピートトラップを避ける力、付加疑問に惑わされない力。全部使う。',
       english: "Your Part 2 skills carry over. The ability to spot indirect answers, avoid repeat traps, stay clear-headed on tag questions. You'll use all of it.",
-    },
-    {
-      speaker: 'lisa',
-      japanese: 'わたしも来週来ていい？ 一人で勉強するの、飽きてたんだよね。ここの方が楽しい。',
-      english: "can I come next week too? I was getting tired of studying alone. This is more fun.",
-      mood: 'normal',
-    },
-    {
-      speaker: 'takeshi',
-      japanese: 'もちろん！ リサさんがいた方が燃えるし！',
-      english: "Of course! It's way more exciting with you here!",
-      mood: 'excited',
-    },
-    {
-      speaker: 'mina',
-      japanese: 'リサさんがいると、わたしも頑張れます。',
-      english: 'having Lisa here motivates me too.',
-      mood: 'normal',
     },
     {
       speaker: 'narration',
@@ -338,13 +370,13 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'master',
       japanese: '今日の点数は、1ヶ月後に自慢話になる。ならなかったら、また俺のせいだ。',
-      english: "tonight's scores will be bragging rights in a month. If they're not, that's on me again.",
+      english: "Tonight's scores will be bragging rights in a month. If they're not, that's on me again.",
       action: 'グラスを小さく掲げる',
     },
     {
       speaker: 'narration',
-      japanese: 'グラスが鳴った。今度は誰かが「乾杯」と言った。タケシだった。泣き笑いの声だった。',
-      english: 'Glasses clinked. This time someone said "cheers." It was Takeshi. His voice was half-laughing, half-crying.',
+      japanese: 'グラスが鳴った。タケシが「乾杯」と言った。泣き笑いの声だった。リサが「乾杯」と返した。火曜日に泣いた声とは違う、前に進む声だった。',
+      english: 'Glasses clinked. Takeshi said "cheers." His voice was half-laughing, half-crying. Lisa echoed "cheers." A different voice from the one that cried on Tuesday -- a voice moving forward.',
     },
   ],
   questions: [

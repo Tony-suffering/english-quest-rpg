@@ -153,6 +153,112 @@ const episode: IzakayaEpisode = {
       english: "Draft beers, coming up. Now keep going.",
       action: 'グラスを並べながら',
     },
+    {
+      speaker: 'narration',
+      japanese: '問題演習が一段落した。タケシが「ちょっと見てほしいものがある」と言って立ち上がった。',
+      english: 'The practice round settled down. Takeshi stood up. "There\'s something I want you guys to see," he said.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: '来週、社内英語プレゼン大会があるんですけど。練習させてもらっていいですか。',
+      english: 'I have the company English presentation contest next week. Mind if I practice here?',
+      mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'タケシがスマホのメモを見ながらプレゼンを始めた。流暢で、構成も整っている。全員が感心した目で見ている。',
+      english: 'Takeshi started presenting, glancing at notes on his phone. It was fluent, well-structured. Everyone watched, impressed.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'タケシくん、上手い。全然つっかえないね。',
+      english: 'Takeshi, that was great. You didn\'t stumble once.',
+      mood: 'excited',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'しかしマスターだけが表情を変えなかった。',
+      english: 'But Master\'s expression didn\'t change.',
+    },
+    {
+      speaker: 'master',
+      japanese: 'タケシ。それはスクリプトだな。',
+      english: 'Takeshi. That\'s a script.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'バレた？',
+      english: 'You caught that?',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'master',
+      japanese: '暗記した文章は、「音」が違う。自分の言葉じゃない。',
+      english: 'Memorized lines have a different sound. They\'re not your own words.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'だって俺、550点だよ。自分の言葉で英語なんか話せないよ。',
+      english: 'I mean, I\'m at 550. I can\'t speak English in my own words.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'タケシが笑顔を崩した。ここに来て初めてだった。ムードメーカーの仮面が、静かに落ちた。',
+      english: 'Takeshi\'s smile broke. For the first time since he\'d started coming here. The mood-maker\'s mask fell away, quietly.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: '社内英語検定、3年連続落ちてんだよ。毎年、受けて、落ちて、笑って誤魔化して。',
+      english: 'I\'ve failed the company English certification three years running. Every year I take it, fail it, and laugh it off.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: '「ポジティブだね」って言われるたびに、ちょっとずつすり減ってくんだよ。',
+      english: 'Every time someone tells me "you\'re so positive," a little piece of me wears away.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'カウンターが沈黙した。タケシの声に、誰も笑わなかった。ケンジが焼酎を置いた。',
+      english: 'The counter went silent. Nobody laughed at Takeshi\'s words. Kenji set down his shochu.',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '3年連続か。俺、3回受験で偉そうにしてたけど、タケシは3年だもんな。',
+      english: 'Three years in a row. I was acting big about my three attempts, but you\'ve been at it for three whole years.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'ケンジさん。',
+      english: 'Kenji.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '打たなきゃ当たらねえ。お前が俺に教えた言葉だぞ。',
+      english: 'You can\'t win if you don\'t swing. That\'s what you told me.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'それ、俺じゃなくてケンジさんのパチスロの受け売りだよ。',
+      english: 'That wasn\'t me. You got that from your pachislot philosophy.',
+      mood: 'defeated',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '同じだ。',
+      english: 'Same thing.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'タケシが泣き笑いした。涙と笑顔が、同時に顔に浮かんだ。ケンジの言葉が、一周して本人に戻ってきた瞬間だった。',
+      english: 'Takeshi laughed through his tears. Tears and a smile on his face at the same time. The words had made a full circle, coming back to the one who needed them most.',
+    },
   ],
   questions: [
     {

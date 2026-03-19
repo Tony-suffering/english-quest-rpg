@@ -3,9 +3,9 @@ import { IzakayaEpisode } from '../types';
 const episode: IzakayaEpisode = {
   id: 'ep-015',
   number: 15,
-  title: 'ユキ、メニューを8秒で読む',
+  title: '8秒の革命',
   subtitle: 'Part 3: 先読みの極意',
-  description: 'Part 3のスコアが伸び悩むユキ。耳の問題ではなかった。「先読み」を知らなかっただけだ。マスターが出した特訓は、居酒屋のメニューを8秒で読むこと。',
+  description: '第3週の始まり。空気が変わり始めた夜。ユキのPart 3が伸び悩む原因は耳ではなかった。「先読み」を知らなかっただけだ。マスターが出した特訓は、居酒屋のメニューを8秒で読むこと。転機の予感が、カウンターに満ちる。',
   targetPart: 3,
   targetSkill: 'pre-reading-strategy',
   targetSkillLabel: '先読み戦略',
@@ -13,13 +13,78 @@ const episode: IzakayaEpisode = {
   story: [
     {
       speaker: 'narration',
-      japanese: '火曜日、午後8時。ユキが模試の結果を見ながらハイボールを飲んでいる。',
-      english: 'Tuesday, 8 PM. Yuki is sipping a highball, staring at her practice test results.',
+      japanese: '第3週、火曜日。午後8時。空気が変わり始めていた。ミナがリサにリーディングを教わる「課外授業」が始まっている。タケシは来月の社内プレゼン大会に向けて動き出した。全員が、何かに向かい始めた週だった。',
+      english: 'Week three. Tuesday, 8 PM. Something had shifted. Mina and Lisa had started their private reading sessions. Takeshi was gearing up for next month\'s company presentation competition. Everyone was moving toward something.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'カウンターの端で、ミナがリサの隣に座っている。リサが英文を指差しながら何かを教えている。二人の「課外授業」は、もう3回目になっていた。',
+      english: 'At the end of the counter, Mina sat next to Lisa. Lisa was pointing at English text, teaching something. Their private tutoring sessions had already hit their third meeting.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'あのさ、俺もちょっと報告がある。来月、社内の英語プレゼン大会に出ようと思う。',
+      english: 'Hey, I\'ve got news too. I\'m thinking of entering the company English presentation contest next month.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'え、タケシさん、本当に？',
+      english: 'Wait, Takeshi, seriously?',
+      mood: 'excited',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'まあ、恥かくだけかもしんないけどな。550点で英語プレゼンとか、無謀だろ。',
+      english: 'I mean, I\'ll probably just embarrass myself. Doing an English presentation with a 550 score is pretty reckless.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'kenji',
+      japanese: '確変の前には投資が必要なんだよ。打たなきゃ当たらねえ。',
+      english: 'You gotta invest before the hot streak hits. Can\'t win if you don\'t play.',
+      mood: 'normal',
+      action: '焼酎を一口飲んで',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'ケンジさん、それめっちゃいいこと言ってる。',
+      english: 'Kenji, that\'s actually deep.',
+      mood: 'excited',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'え、マジ？ パチスロの受け売りだけど。',
+      english: 'Wait, really? I just stole that from pachislot though.',
+      mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: '全員が笑った。しかしケンジの言葉は、この夜以降、何度もカウンターで繰り返されることになる。',
+      english: 'Everyone laughed. But Kenji\'s words would echo across this counter many times in the nights to come.',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキが模試の結果を見ながらハイボールを飲んでいる。眉間にしわが寄っている。',
+      english: 'Yuki was sipping a highball, staring at her practice test results. A crease between her eyebrows.',
     },
     {
       speaker: 'yuki',
       japanese: 'Part 3、また同じ点数。もう半年やってる。なんで上がらないんだろう。',
       english: "Part 3, same score again. I've been at this for six months. Why won't it budge?",
+      mood: 'defeated',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'ユキちゃん、そんな顔してたら酒がまずくなるぞ。',
+      english: "Yuki, you keep frownin' like that and the booze starts tastin' bad.",
+      mood: 'normal',
+      action: '焼酎のお湯割りを飲みながら',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '悔しいんですよ。リスニングは伸びてるのに、Part 3だけ止まってる。耳が悪いのかなって。',
+      english: "It's frustrating. My listening is improving everywhere else, but Part 3 just won't move. Maybe my ears are the problem.",
       mood: 'defeated',
     },
     {
@@ -31,8 +96,24 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'yuki',
       japanese: 'はい。',
-      english: 'Here...',
+      english: 'Here.',
       mood: 'defeated',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターがユキの答案を30秒ほど眺めた。指が、不正解のマークをひとつずつなぞる。それからゆっくりと顔を上げた。',
+      english: "Master studied Yuki's answer sheet for thirty seconds. His finger traced each wrong answer, one by one. Then he looked up slowly.",
+    },
+    {
+      speaker: 'master',
+      japanese: '耳じゃない。',
+      english: "It's not your ears.",
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'え？',
+      english: 'What?',
+      mood: 'thinking',
     },
     {
       speaker: 'master',
@@ -62,6 +143,12 @@ const episode: IzakayaEpisode = {
       english: "You just weren't taught. Part 3 gives you three questions per conversation. Between conversations, you get about eight seconds before the next set. In those eight seconds, you scan the keywords of the next questions.",
     },
     {
+      speaker: 'lisa',
+      japanese: 'That\'s actually the number one mistake I see. Most people don\'t pre-read. They try to catch everything live.',
+      english: "That's actually the number one mistake I see. Most people don't pre-read. They try to catch everything live.",
+      mood: 'normal',
+    },
+    {
       speaker: 'takeshi',
       japanese: '8秒って短くない？',
       english: "Eight seconds? Isn't that crazy short?",
@@ -85,10 +172,32 @@ const episode: IzakayaEpisode = {
       english: 'Take "What does the woman suggest the man do?" All you need is "woman, suggest, man, do something." Now when you listen, your ear is locked onto one thing: what does the woman suggest to the man.',
     },
     {
+      speaker: 'kenji',
+      japanese: 'パチスロで言えばさ、リール回す前にどの台が今日当たりそうか、データ見て絞るだろ。それと同じか？',
+      english: "It's like slots, right? Before you start spinnin', you check the data to figure out which machine's hot. Same thing?",
+      mood: 'thinking',
+    },
+    {
+      speaker: 'master',
+      japanese: 'そうだ。先読みは、音声が来る前に「当たりライン」を決める行為だ。',
+      english: "Exactly. Pre-reading is setting your winning line before the reels even spin.",
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'おい、今の俺にもわかったぞ。',
+      english: "Hey, even I got that one.",
+      mood: 'excited',
+    },
+    {
       speaker: 'yuki',
       japanese: 'あ...音声が終わってから設問読んでた。だから間に合わなかったんだ。',
       english: "Oh... I was reading the questions after the audio finished. That's why I kept running out of time.",
       mood: 'excited',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ユキの表情が変わった。半年間の壁が、一瞬で崩れる音がした。',
+      english: "Yuki's face changed. The sound of a six-month wall crumbling in an instant.",
     },
     {
       speaker: 'master',
@@ -109,8 +218,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'narration',
-      japanese: 'ユキが壁のメニューをじっと見る。8秒が過ぎる。',
-      english: 'Yuki locks her eyes on the menu on the wall. Eight seconds pass.',
+      japanese: 'ユキが壁のメニューをじっと見る。カウンターの全員が息を止める。8秒が過ぎた。',
+      english: 'Yuki locked her eyes on the menu on the wall. Everyone at the counter held their breath. Eight seconds passed.',
     },
     {
       speaker: 'yuki',
@@ -131,15 +240,36 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: 'やってみる。問題出して。',
-      english: "I want to try it. Give me a question.",
+      japanese: '若いからじゃなくて、悔しいからやるんです。やってみる。問題出して。',
+      english: "Not because I'm young. Because I'm frustrated. I want to try it. Give me a question.",
       mood: 'excited',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ケンジが小さくうなずいた。ユキの言葉が、刺さったらしい。「お前は若いから大丈夫だ」と言いかけた自分を、飲み込んだ顔をしていた。',
+      english: "Kenji nodded quietly. Yuki's words had struck something. He looked like he'd swallowed back the words 'you'll be fine, you're still young.'",
     },
     {
       speaker: 'master',
       japanese: 'やるぞ。先読みを使え。',
       english: "Let's go. Use pre-reading.",
       action: 'カウンターに問題用紙を出して',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターがカウンターの奥で、一瞬だけ目を細めた。独り言のように呟いた。',
+      english: 'Behind the counter, Master narrowed his eyes for just a moment. He murmured, as if to himself.',
+    },
+    {
+      speaker: 'master',
+      japanese: 'あの夏の生徒も、こんなふうに変わり始めた。',
+      english: 'That summer student started changing like this too.',
+      action: '誰にも聞こえない声で',
+    },
+    {
+      speaker: 'narration',
+      japanese: '誰も聞いていなかった。マスターは、それでいいと思っている。',
+      english: "Nobody heard. Master preferred it that way.",
     },
   ],
   questions: [

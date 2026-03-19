@@ -203,6 +203,98 @@ const episode: IzakayaEpisode = {
       japanese: 'よし、ミナの方法を全員で叩き込め。先読みはPart 3の命だ。',
       english: "Alright, everyone drill Mina's method into your heads. Pre-reading is the lifeblood of Part 3.",
     },
+    // --- TAKESHI'S RESULT & YUKI'S FRUSTRATION ---
+    {
+      speaker: 'narration',
+      japanese: '練習が一段落した頃、タケシがスマホを見て声を上げた。',
+      english: 'When practice wound down, Takeshi glanced at his phone and let out a shout.',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: 'プレゼン大会の結果出た！ 3位だって！',
+      english: 'The presentation contest results are out! I got third place!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '3位！ すごいじゃん、タケシさん！',
+      english: 'Third place! That\'s amazing, Takeshi!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: '優勝じゃねえけどな。でも上司が「タケシの英語、前より自信があるように聞こえた」って。それが一番嬉しかった。',
+      english: "Didn't win, though. But my boss said, 'Takeshi, your English sounds more confident than before.' That meant more than the trophy.",
+      mood: 'excited',
+    },
+    {
+      speaker: 'narration',
+      japanese: '一方、ユキは静かだった。模試のスコアシートを握りしめている。',
+      english: 'Meanwhile, Yuki was quiet. She was clutching her practice test score sheet.',
+    },
+    {
+      speaker: 'yuki',
+      japanese: '私、模試で700超えた。初めて。',
+      english: 'I broke 700 on the practice test. First time ever.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'takeshi',
+      japanese: '700!? おめでとう！',
+      english: '700!? Congrats!',
+      mood: 'excited',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'でも、全然嬉しくない。800じゃないと意味がないって思っちゃう。',
+      english: "But I can't feel happy about it. I keep thinking it's meaningless unless it's 800.",
+      mood: 'defeated',
+    },
+    {
+      speaker: 'kenji',
+      japanese: 'お前、贅沢だな。俺は500超えたら泣くぞ。',
+      english: "That's a luxury problem. I'd cry if I broke 500.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'ケンジの声に嫉妬はなかった。ただの事実だった。そしてその言葉は、誰も知らない未来を予言していた。',
+      english: "There was no jealousy in Kenji's voice. Just a fact. And that fact was a prophecy nobody recognized yet.",
+    },
+    {
+      speaker: 'mina',
+      japanese: '私も800欲しいです。正社員の条件だから。',
+      english: "I want 800 too. It's the requirement for full-time employment.",
+      mood: 'normal',
+    },
+    {
+      speaker: 'yuki',
+      japanese: 'ミナちゃんは切実だもんね。',
+      english: 'For you it\'s make-or-break, Mina.',
+      mood: 'thinking',
+    },
+    {
+      speaker: 'lisa',
+      japanese: '点数が全てじゃない。でも、点数がないと見てもらえない世界がある。矛盾してるのよ、この業界。',
+      english: "Scores aren't everything. But there are worlds where without a score, they won't even look at you. This industry is full of contradictions.",
+      mood: 'thinking',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'リサの言葉がカウンターに沈んだ。860の帰国子女が言うから重かった。',
+      english: "Lisa's words sank into the counter. They carried weight because they came from a returnee with 860.",
+    },
+    {
+      speaker: 'master',
+      japanese: '英語力を上げることと、トーイックの点数を上げることは、同じじゃない。だが、両方やれ。お前たちにはできる。',
+      english: "Building English skills and raising your トーイック score are not the same thing. But do both. You're capable of it.",
+      action: 'グラスを磨く手を止めて、全員を見る',
+    },
+    {
+      speaker: 'narration',
+      japanese: 'マスターが「お前たちにはできる」と言った。この男が軽々しく人を褒めないことを、全員が知っていた。',
+      english: "Master said 'you can do it.' Everyone knew this was not a man who handed out compliments lightly.",
+    },
   ],
   questions: [
     {
