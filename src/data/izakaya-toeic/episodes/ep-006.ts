@@ -41,14 +41,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: 'そのあとTOEICの模試やったら、Part 3で5問落とした。聞き取れてるのに。',
-      english: 'Then I took a TOEIC practice test and missed five questions on Part 3. Even though I could hear everything.',
+      japanese: 'そのあとトーイックの模試やったら、Part 3で5問落とした。聞き取れてるのに。',
+      english: 'Then I took a トーイック practice test and missed five questions on Part 3. Even though I could hear everything.',
       mood: 'defeated',
     },
     {
       speaker: 'master',
-      japanese: '...なるほど。パラフレーズか。',
-      english: '...I see. Paraphrasing.',
+      japanese: 'なるほど。パラフレーズか。',
+      english: 'I see. Paraphrasing.',
     },
     {
       speaker: 'yuki',
@@ -74,14 +74,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...出ない？',
-      english: '...They won\'t?',
+      japanese: '出ない？',
+      english: 'They won\'t?',
       mood: 'thinking',
     },
     {
       speaker: 'master',
-      japanese: '出ない。正解は "reschedule the appointment" とか "put off the conference" になる。TOEICの正解は、絶対に音声と同じ言葉を使わない。',
-      english: 'They won\'t. The correct answer would be something like "reschedule the appointment" or "put off the conference." On the TOEIC, the right answer never uses the same words as the audio.',
+      japanese: '出ない。正解は "reschedule the appointment" とか "put off the conference" になる。トーイックの正解は、絶対に音声と同じ言葉を使わない。',
+      english: 'They won\'t. The correct answer would be something like "reschedule the appointment" or "put off the conference." On the トーイック, the right answer never uses the same words as the audio.',
     },
     {
       speaker: 'takeshi',
@@ -131,14 +131,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: 'ケンジさん、「言い換え」の話っすよ。TOEICの正解って、聞いた言葉と全然違う言い方になるんすって。',
-      english: "Kenji-san, we're talking about paraphrasing! Apparently the right answers on TOEIC are worded totally different from what you hear!",
+      japanese: 'ケンジさん、「言い換え」の話っすよ。トーイックの正解って、聞いた言葉と全然違う言い方になるんすって。',
+      english: "Kenji-san, we're talking about paraphrasing! Apparently the right answers on トーイック are worded totally different from what you hear!",
       mood: 'excited',
     },
     {
       speaker: 'kenji',
-      japanese: '...それ、現場でもあるな。図面に「基礎工事」って書いてあるのに、外国人の監督が "foundation work" って言って、若いのが「？」ってなってた。同じことなんだけどな。',
-      english: '...Yeah, that happens on the job site too. The blueprints say "foundation construction," but when the foreign supervisor calls it "foundation work," the young guys just go "huh?" It\'s the same damn thing.',
+      japanese: 'それ、現場でもあるな。図面に「基礎工事」って書いてあるのに、外国人の監督が "foundation work" って言って、若いのが「？」ってなってた。同じことなんだけどな。',
+      english: 'Yeah, that happens on the job site too. The blueprints say "foundation construction," but when the foreign supervisor calls it "foundation work," the young guys just go "huh?" It\'s the same damn thing.',
       mood: 'thinking',
     },
     {
@@ -148,8 +148,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...悔しい。耳はできてるのに、変換ができてなかった。',
-      english: "...That's so frustrating. My ears were doing their job, but I couldn't make the translation.",
+      japanese: '悔しい。耳はできてるのに、変換ができてなかった。',
+      english: "That's so frustrating. My ears were doing their job, but I couldn't make the translation.",
       mood: 'defeated',
     },
     {

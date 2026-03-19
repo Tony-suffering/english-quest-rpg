@@ -36,8 +36,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...声で追ってるか。',
-      english: '...You\'re tracking by voice, aren\'t you.',
+      japanese: '声で追ってるか。',
+      english: 'You\'re tracking by voice, aren\'t you.',
     },
     {
       speaker: 'takeshi',
@@ -81,8 +81,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'そうだ。TOEICの3人会話は必ず、問題・提案・決定の3段構えになっている。3人の役割より、会話の流れを掴め。',
-      english: 'Exactly. TOEIC three-speaker conversations always follow a three-stage structure: problem, proposal, decision. Don\'t focus on who plays what role. Follow the flow of the conversation.',
+      japanese: 'そうだ。トーイックの3人会話は必ず、問題・提案・決定の3段構えになっている。3人の役割より、会話の流れを掴め。',
+      english: 'Exactly. トーイック three-speaker conversations always follow a three-stage structure: problem, proposal, decision. Don\'t focus on who plays what role. Follow the flow of the conversation.',
     },
     {
       speaker: 'yuki',
@@ -103,8 +103,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'TOEICの設問は「何が問題か」「誰の提案が採用されたか」「次に何をするか」の3種類だ。どれも「トピック」を追えば答えられる。',
-      english: 'TOEIC questions come in three types: "What\'s the problem?" "Whose suggestion was adopted?" and "What happens next?" All of them can be answered just by following the topic.',
+      japanese: 'トーイックの設問は「何が問題か」「誰の提案が採用されたか」「次に何をするか」の3種類だ。どれも「トピック」を追えば答えられる。',
+      english: 'トーイック questions come in three types: "What\'s the problem?" "Whose suggestion was adopted?" and "What happens next?" All of them can be answered just by following the topic.',
     },
     {
       speaker: 'lisa',

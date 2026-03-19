@@ -70,14 +70,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...でも前も直感で外して...',
-      english: "...But last time my gut was wrong too...",
+      japanese: 'でも前も直感で外して...',
+      english: "But last time my gut was wrong too...",
       mood: 'defeated',
     },
     {
       speaker: 'yuki',
-      japanese: 'TOEICは考えすぎると間違える。先読みして「これだ」と思ったら、変えない。それが鉄則よ。',
-      english: "On the TOEIC, overthinking leads to wrong answers. If you pre-read and think 'this is it,' don't change it. That's the golden rule.",
+      japanese: 'トーイックは考えすぎると間違える。先読みして「これだ」と思ったら、変えない。それが鉄則よ。',
+      english: "On the トーイック, overthinking leads to wrong answers. If you pre-read and think 'this is it,' don't change it. That's the golden rule.",
       mood: 'normal',
     },
     {
@@ -98,8 +98,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...設問がWhoで、音声で「department manager」って言ってたから...Dの「the supervisor」で合ってると思います。',
-      english: '...The question is Who, and the audio said "department manager"... so D, "the supervisor," should be correct.',
+      japanese: '設問がWhoで、音声で「department manager」って言ってたから...Dの「the supervisor」で合ってると思います。',
+      english: 'The question is Who, and the audio said "department manager"so D, "the supervisor," should be correct.',
       mood: 'normal',
     },
     {
@@ -150,8 +150,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...私もBだと思います。「a bit」は控えめに否定するときの表現です...',
-      english: '...I think it\'s B too. "A bit" is an expression used for politely disagreeing...',
+      japanese: '私もBだと思います。「a bit」は控えめに否定するときの表現です...',
+      english: 'I think it\'s B too. "A bit" is an expression used for politely disagreeing...',
       mood: 'thinking',
     },
     {
@@ -231,7 +231,7 @@ const episode: IzakayaEpisode = {
         { text: 'He wants to transfer to a different department.', isCorrect: false, trapType: 'topic-shift', explanation: '異動の話は出ていない。一時的なスペース共有への不満。' },
         { text: 'He thinks the renovation is unnecessary.', isCorrect: false, trapType: 'topic-shift', explanation: '改装自体が不要とは言っていない。一時移転の状況が嫌なだけ。' },
       ],
-      explanation: '意図問題。"I\'m not thrilled" は「嬉しくはない」= 控えめに不満を表す英語の婉曲表現。TOEICでは "not thrilled" "not exactly" "a bit" 等の控えめ否定が意図問題の頻出パターン。',
+      explanation: '意図問題。"I\'m not thrilled" は「嬉しくはない」= 控えめに不満を表す英語の婉曲表現。トーイックでは "not thrilled" "not exactly" "a bit" 等の控えめ否定が意図問題の頻出パターン。',
       paraphraseMap: [
         { original: "I'm not thrilled about sharing space", paraphrased: 'unhappy about the temporary arrangement', note: 'スペース共有に喜んでいない → 一時的な配置に不満' },
       ],

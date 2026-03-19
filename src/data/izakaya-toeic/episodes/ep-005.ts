@@ -26,8 +26,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...。',
-      english: '....',
+      japanese: '。',
+      english: '',
       mood: 'thinking',
       action: 'ハイボールのグラスを両手で持ったまま動かない',
     },
@@ -63,8 +63,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...はい。',
-      english: '...yeah.',
+      japanese: 'はい。',
+      english: 'yeah.',
       mood: 'normal',
       action: 'ウーロン茶のコースターをいじる',
     },
@@ -89,8 +89,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...タケシ、うるさい。',
-      english: '...Takeshi, shut up.',
+      japanese: 'タケシ、うるさい。',
+      english: 'Takeshi, shut up.',
       mood: 'thinking',
     },
     {
@@ -105,8 +105,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...始めるぞ。',
-      english: "...let's begin.",
+      japanese: '始めるぞ。',
+      english: "let's begin.",
       action: '紙を一枚ずつ、全員の前に表向きに置いていく',
     },
     // --- POST-TEST: The Results ---
@@ -122,8 +122,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'defeated',
       action: 'ビールに手をつけない。初めてのことだった',
     },
@@ -146,8 +146,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...わかってたのに。全部わかってたのに、本番になると選べない。なにこれ。',
-      english: "...I understood it. I understood ALL of it. But when it was for real, I couldn't pick the right one. What the hell is this.",
+      japanese: 'わかってたのに。全部わかってたのに、本番になると選べない。なにこれ。',
+      english: "I understood it. I understood ALL of it. But when it was for real, I couldn't pick the right one. What the hell is this.",
       mood: 'angry',
       action: 'ペンをカウンターに置く。少し強く',
     },
@@ -169,8 +169,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...え。',
-      english: '...huh.',
+      japanese: 'え。',
+      english: 'huh.',
       mood: 'normal',
       action: '焼酎のグラスが止まる',
     },
@@ -181,8 +181,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...否定を消して、中身だけ見る。それだけだろ。',
-      english: '...strip the negative, just look at the content. That\'s all it is.',
+      japanese: '否定を消して、中身だけ見る。それだけだろ。',
+      english: 'strip the negative, just look at the content. That\'s all it is.',
       mood: 'normal',
       action: '照れ隠しに焼酎を飲む',
     },
@@ -205,14 +205,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...Q7。 "handle" が入ってる選択肢、内容は合ってると思った。ネイティブ感覚で読んじゃった。',
-      english: "...Q7. The choice with 'handle' in it -- the content felt right. I read it like a native, not like a test-taker.",
+      japanese: 'Q7。 "handle" が入ってる選択肢、内容は合ってると思った。ネイティブ感覚で読んじゃった。',
+      english: "Q7. The choice with 'handle' in it -- the content felt right. I read it like a native, not like a test-taker.",
       mood: 'thinking',
     },
     {
       speaker: 'narration',
-      japanese: 'リサにとって860点は「当然」の数字だった。でもTOEICは英語力だけじゃない。それを今夜、1問で思い知った。',
-      english: "For Lisa, 860 was a given. But TOEIC isn't just about English ability. One question tonight made that painfully clear.",
+      japanese: 'リサにとって860点は「当然」の数字だった。でもトーイックは英語力だけじゃない。それを今夜、1問で思い知った。',
+      english: "For Lisa, 860 was a given. But トーイック isn't just about English ability. One question tonight made that painfully clear.",
     },
     {
       speaker: 'narration',
@@ -222,8 +222,8 @@ const episode: IzakayaEpisode = {
     // --- THE TURNING POINT ---
     {
       speaker: 'takeshi',
-      japanese: '...なあマスター。俺、向いてないのかな。勉強しても結果出ないって、けっこうキツいんだけど。',
-      english: "...hey, Master. Maybe I'm just not cut out for this. Studying and still bombing... it really sucks, y'know.",
+      japanese: 'なあマスター。俺、向いてないのかな。勉強しても結果出ないって、けっこうキツいんだけど。',
+      english: "hey, Master. Maybe I'm just not cut out for this. Studying and still bombing... it really sucks, y'know.",
       mood: 'defeated',
     },
     {
@@ -233,8 +233,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...タケシ。お前、Q1で何をした？',
-      english: '...Takeshi. What did you do on Q1?',
+      japanese: 'タケシ。お前、Q1で何をした？',
+      english: 'Takeshi. What did you do on Q1?',
     },
     {
       speaker: 'takeshi',
@@ -254,8 +254,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'defeated',
       action: '鼻をすする。ビールを飲んでごまかす',
     },
@@ -266,8 +266,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...「わかる」と「できる」は違う、ってこと？',
-      english: "...so understanding and actually doing it are two different things?",
+      japanese: '「わかる」と「できる」は違う、ってこと？',
+      english: "so understanding and actually doing it are two different things?",
       mood: 'thinking',
     },
     {
@@ -278,34 +278,34 @@ const episode: IzakayaEpisode = {
     // --- SOLIDARITY ---
     {
       speaker: 'kenji',
-      japanese: '...マスター。もう一杯くれ。あと来週もテストやってくれ。',
-      english: "...Master. One more drink. And do another test next week.",
+      japanese: 'マスター。もう一杯くれ。あと来週もテストやってくれ。',
+      english: "Master. One more drink. And do another test next week.",
       mood: 'normal',
       action: '空のグラスを差し出す',
     },
     {
       speaker: 'yuki',
-      japanese: '...私も。もう1回やりたい。今度は5問じゃ終わらない。',
-      english: "...me too. I want another shot. Next time I'm not stopping at five.",
+      japanese: '私も。もう1回やりたい。今度は5問じゃ終わらない。',
+      english: "me too. I want another shot. Next time I'm not stopping at five.",
       mood: 'angry',
     },
     {
       speaker: 'takeshi',
-      japanese: '...俺も。俺だって、あと1ヶ月やったらリピートトラップゼロにしてやるよ。',
-      english: "...me too. Give me one more month and I'll get the repeat trap count down to zero.",
+      japanese: '俺も。俺だって、あと1ヶ月やったらリピートトラップゼロにしてやるよ。',
+      english: "me too. Give me one more month and I'll get the repeat trap count down to zero.",
       mood: 'normal',
       action: 'やっとビールを飲む',
     },
     {
       speaker: 'lisa',
-      japanese: '...わたしもPart 2を舐めてた。テスト脳ってやつ、ちゃんと作らないとダメだわ。',
-      english: "...I underestimated Part 2. I need to actually build a test-taking brain, not just rely on instinct.",
+      japanese: 'わたしもPart 2を舐めてた。テスト脳ってやつ、ちゃんと作らないとダメだわ。',
+      english: "I underestimated Part 2. I need to actually build a test-taking brain, not just rely on instinct.",
       mood: 'thinking',
     },
     {
       speaker: 'mina',
-      japanese: '...あの、わたしも来週来ていいですか。',
-      english: '...um, can I come next week too?',
+      japanese: 'あの、わたしも来週来ていいですか。',
+      english: 'um, can I come next week too?',
       mood: 'normal',
     },
     {
@@ -315,8 +315,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...今日の点数は、来月笑い話になる。ならなかったら、俺の教え方が悪い。',
-      english: "...today's scores will be a funny story next month. If they're not, that's on me.",
+      japanese: '今日の点数は、来月笑い話になる。ならなかったら、俺の教え方が悪い。',
+      english: "today's scores will be a funny story next month. If they're not, that's on me.",
       action: '自分にも一杯注ぐ',
     },
     {
@@ -419,7 +419,7 @@ const episode: IzakayaEpisode = {
         { text: "We should handle it with care.", isCorrect: false, trapType: 'verbatim', explanation: '"handle" リピート。一見正解に見えるが、具体性ゼロ。「丁寧に対処すべき」は何も言ってないのと同じ。' },
         { text: "Let's offer a discount and a written apology.", isCorrect: true, explanation: '具体的な提案で回答。"handle" も "customer" も "complaint" も使わずに、値引き + 書面で謝罪という具体策を出してる。' },
       ],
-      explanation: 'リピートトラップの応用。選択肢Bは "handle" を使っていて内容も一見合ってるが、具体性がない。TOEICの正解は具体的で会話が前に進む。居酒屋で「どうする？」→「とりあえずビール」が具体策。「考えよう」は何も決まらない。',
+      explanation: 'リピートトラップの応用。選択肢Bは "handle" を使っていて内容も一見合ってるが、具体性がない。トーイックの正解は具体的で会話が前に進む。居酒屋で「どうする？」→「とりあえずビール」が具体策。「考えよう」は何も決まらない。',
       difficulty: 'hard',
       scoreLevel: 700,
       skillTag: 'verbatim-trap',

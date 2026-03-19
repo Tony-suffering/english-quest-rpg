@@ -3,10 +3,10 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { getEpisode, getNextEpisode } from '@/data/izakaya-toeic/episodes';
+import { getEpisode } from '@/data/izakaya-toeic/episodes';
 import { CHARACTER_MAP } from '@/data/izakaya-toeic/characters';
 import { StoryLine, ToeicQuestion } from '@/data/izakaya-toeic/types';
-import { recordEpisodeResult, getEpisodeResult, addVocabToDeck, getVocabDeck, updateVocabMastery, VocabDeckItem } from '@/data/izakaya-toeic/progress';
+import { recordEpisodeResult, getEpisodeResult, addVocabToDeck, getVocabDeck, VocabDeckItem } from '@/data/izakaya-toeic/progress';
 import { T, parseConversation, isConversation } from '@/data/izakaya-toeic/theme';
 import { THIRTY_DAY_PLAN, getCompletedDays, markDayComplete } from '@/data/izakaya-toeic/thirty-day-plan';
 import EpisodeTutorial from '../EpisodeTutorial';
@@ -14,7 +14,7 @@ import EpisodeTutorial from '../EpisodeTutorial';
 type Phase = 'story' | 'quiz' | 'results';
 
 // ── Sound FX ──
-function playSound(type: 'correct' | 'wrong' | 'tap' | 'complete' | 'levelup' | 'slot-spin' | 'slot-stop') {
+function playSound(type: 'correct' | 'wrong' | 'tap' | 'complete' | 'levelup') {
   if (typeof window === 'undefined') return;
   try {
     const ctx = new AudioContext();
@@ -32,8 +32,6 @@ function playSound(type: 'correct' | 'wrong' | 'tap' | 'complete' | 'levelup' | 
     if (type === 'tap') make(800, 0, 0.04, 'sine', 0.06);
     if (type === 'complete') { make(523, 0, 0.2); make(659, 0.1, 0.2); make(784, 0.2, 0.2); make(1047, 0.3, 0.4); }
     if (type === 'levelup') { make(392, 0, 0.15); make(523, 0.1, 0.15); make(659, 0.2, 0.15); make(784, 0.3, 0.3); }
-    if (type === 'slot-spin') { for (let i = 0; i < 6; i++) make(300 + i * 80, i * 0.05, 0.06, 'square', 0.04); }
-    if (type === 'slot-stop') make(600, 0, 0.08, 'triangle', 0.08);
   } catch { /* */ }
 }
 
@@ -168,13 +166,14 @@ function StoryLineView({ line, isNew, showEnglish }: { line: StoryLine; isNew: b
   const color = char?.color || T.textSub;
   return (
     <div style={{ display: 'flex', gap: 8, padding: '5px 0', animation: isNew ? 'izk-fadein 0.4s ease' : undefined }}>
-      <div style={{
-        width: 28, height: 28, borderRadius: '50%', background: color + '12', border: `2px solid ${color}`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontWeight: 900, fontSize: 10, color, flexShrink: 0, marginTop: 2,
-      }}>
-        {char?.initial || '?'}
-      </div>
+      <img
+        src={`/characters/${char?.id || 'master'}.png`}
+        alt={char?.name || '?'}
+        style={{
+          width: 48, height: 48, borderRadius: '50%', border: `2px solid ${color}`,
+          objectFit: 'cover', flexShrink: 0, marginTop: 2,
+        }}
+      />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', gap: 6, alignItems: 'baseline', marginBottom: 2 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color }}>{char?.name.split('\uFF08')[0]}</span>
@@ -416,153 +415,12 @@ function VocabCard({ item, onTap }: { item: VocabDeckItem; onTap?: () => void })
   );
 }
 
-// ── Vocab Slot Review Mini-Game ──
-function VocabSlotReview({ deck, onComplete }: { deck: VocabDeckItem[]; onComplete: () => void }) {
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [showMeaning, setShowMeaning] = useState(false);
-  const [spinning, setSpinning] = useState(false);
-  const [spinText, setSpinText] = useState('');
-  const [stats, setStats] = useState({ correct: 0, wrong: 0 });
-
-  const current = deck[currentIdx];
-  if (!current) return null;
-
-  const handleSpin = () => {
-    playSound('slot-spin');
-    setSpinning(true);
-    setShowMeaning(false);
-
-    // Slot-style text flicker
-    let count = 0;
-    const interval = setInterval(() => {
-      const randomWord = deck[Math.floor(Math.random() * deck.length)];
-      setSpinText(randomWord.meaning);
-      count++;
-      if (count > 8) {
-        clearInterval(interval);
-        setSpinText(current.meaning);
-        setSpinning(false);
-        setShowMeaning(true);
-        playSound('slot-stop');
-      }
-    }, 80);
-  };
-
-  const handleJudge = (correct: boolean) => {
-    updateVocabMastery(current.word, correct);
-    playSound(correct ? 'correct' : 'wrong');
-    setStats(s => ({ correct: s.correct + (correct ? 1 : 0), wrong: s.wrong + (correct ? 0 : 1) }));
-
-    if (currentIdx + 1 < deck.length) {
-      setTimeout(() => {
-        setCurrentIdx(p => p + 1);
-        setShowMeaning(false);
-        setSpinText('');
-      }, 400);
-    } else {
-      setTimeout(() => {
-        playSound('complete');
-        onComplete();
-      }, 400);
-    }
-  };
-
-  const progress = ((currentIdx + (showMeaning ? 1 : 0)) / deck.length) * 100;
-
-  return (
-    <div style={{ animation: 'izk-fadein 0.3s ease' }}>
-      {/* Progress */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <span style={{ fontSize: 10, color: T.gold, fontWeight: 700, letterSpacing: 1 }}>
-          SLOT REVIEW {currentIdx + 1}/{deck.length}
-        </span>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <span style={{ fontSize: 11, color: T.green, fontWeight: 700 }}>O:{stats.correct}</span>
-          <span style={{ fontSize: 11, color: T.red, fontWeight: 700 }}>X:{stats.wrong}</span>
-        </div>
-      </div>
-      <div style={{ height: 3, background: T.bgSecondary, borderRadius: 2, marginBottom: 16, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${progress}%`, background: `linear-gradient(90deg, ${T.gold}, ${T.goldLight})`, transition: 'width 0.4s' }} />
-      </div>
-
-      {/* Card */}
-      <div style={{
-        padding: '24px 20px', background: T.surface, borderRadius: 14,
-        border: `1.5px solid ${T.goldBorder}`, textAlign: 'center',
-        boxShadow: T.shadowMd, marginBottom: 14,
-        minHeight: 180, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      }}>
-        {/* English word */}
-        <div style={{ fontSize: 24, fontWeight: 900, color: T.text, marginBottom: 4 }}>{current.word}</div>
-        {current.partOfSpeech && (
-          <span style={{ padding: '2px 8px', background: T.goldBg, color: T.gold, fontSize: 10, fontWeight: 700, borderRadius: 3, marginBottom: 12 }}>
-            {current.partOfSpeech}
-          </span>
-        )}
-
-        {/* Meaning area */}
-        {!showMeaning && !spinning ? (
-          <button onClick={handleSpin} style={{
-            marginTop: 12, padding: '12px 32px',
-            background: `linear-gradient(135deg, ${T.gold}, #B8941F)`,
-            border: 'none', borderRadius: 8, color: '#fff', fontWeight: 800, fontSize: 14,
-            cursor: 'pointer', boxShadow: T.shadowMd,
-            animation: 'izk-pulse 2s infinite',
-          }}>
-            SPIN
-          </button>
-        ) : spinning ? (
-          <div style={{
-            marginTop: 12, fontSize: 18, fontWeight: 700, color: T.gold,
-            minHeight: 30, display: 'flex', alignItems: 'center',
-            animation: 'izk-shake 0.1s infinite',
-          }}>
-            {spinText}
-          </div>
-        ) : (
-          <div style={{ marginTop: 12, animation: 'izk-fadein 0.3s ease' }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: T.gold, marginBottom: 4 }}>{current.meaning}</div>
-            {current.example && (
-              <div style={{ fontSize: 12, color: T.textMuted, fontStyle: 'italic', marginTop: 8, lineHeight: 1.6 }}>
-                "{current.example}"
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Source episode */}
-        <div style={{ marginTop: 14, fontSize: 10, color: T.textMuted }}>
-          from: {current.sourceEpisodeTitle}
-        </div>
-      </div>
-
-      {/* Judge buttons */}
-      {showMeaning && (
-        <div style={{ display: 'flex', gap: 8, animation: 'izk-fadein 0.2s ease' }}>
-          <button onClick={() => handleJudge(false)} style={{
-            flex: 1, padding: '12px', background: T.red + '08', border: `1.5px solid ${T.red}30`,
-            borderRadius: 8, color: T.red, fontWeight: 800, fontSize: 14, cursor: 'pointer',
-          }}>
-            X 知らなかった
-          </button>
-          <button onClick={() => handleJudge(true)} style={{
-            flex: 1, padding: '12px', background: T.green + '08', border: `1.5px solid ${T.green}30`,
-            borderRadius: 8, color: T.green, fontWeight: 800, fontSize: 14, cursor: 'pointer',
-          }}>
-            O 知ってた
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
 
 // ── Main ──
 export default function EpisodeDetailPage() {
   const params = useParams();
   const episodeId = params.id as string;
   const episode = getEpisode(episodeId);
-  const nextEp = episodeId ? getNextEpisode(episodeId) : undefined;
 
   // 30-day program lock check
   const dayPlan = useMemo(() => THIRTY_DAY_PLAN.find(d => d.episodeId === episodeId), [episodeId]);
@@ -585,7 +443,6 @@ export default function EpisodeDetailPage() {
   const [quizIndex, setQuizIndex] = useState(0);
   const [results, setResults] = useState<boolean[]>([]);
   const [savedVocab, setSavedVocab] = useState<Set<string>>(new Set());
-  const [showSlotReview, setShowSlotReview] = useState(false);
   const [showEnglish, setShowEnglish] = useState(true);
   const [expandedQ, setExpandedQ] = useState<number | null>(null);
   const storyEndRef = useRef<HTMLDivElement>(null);
@@ -859,7 +716,7 @@ export default function EpisodeDetailPage() {
   const handleRestart = useCallback(() => {
     window.speechSynthesis?.cancel();
     setPhase('story'); setVisibleLines(5); setQuizIndex(0); setResults([]);
-    setShowSlotReview(false); setExpandedQ(null);
+    setExpandedQ(null);
     setStoryCurrentLine(-1); setStoryPlaying(false); storyPlayingRef.current = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
@@ -915,7 +772,7 @@ export default function EpisodeDetailPage() {
           <p style={{
             fontSize: 14, color: T.textSub, margin: '0 0 8px', lineHeight: 1.6,
           }}>
-            EP.{episode.number} -- {episode.title}
+            DAY {dayPlan?.day || episode.number} -- {episode.title}
           </p>
 
           <p style={{
@@ -979,7 +836,7 @@ export default function EpisodeDetailPage() {
             </div>
           </div>
           <div style={{ marginTop: 4, display: 'flex', gap: 8, alignItems: 'baseline' }}>
-            <span style={{ fontSize: 10, color: T.gold, fontWeight: 700, letterSpacing: 1 }}>EP.{episode.number}</span>
+            <span style={{ fontSize: 10, color: T.gold, fontWeight: 700, letterSpacing: 1 }}>DAY {dayPlan?.day || episode.number}</span>
             <span style={{ fontSize: 14, fontWeight: 700 }}>{episode.title}</span>
           </div>
         </div>
@@ -1036,13 +893,14 @@ export default function EpisodeDetailPage() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: activeColor, textTransform: 'uppercase' as const, letterSpacing: 1 }}>
                       {activeLine.speaker !== 'narration' ? (
-                        <div style={{
-                          width: 20, height: 20, borderRadius: '50%', backgroundColor: activeColor,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: 10, fontWeight: 700, color: '#fff',
-                        }}>
-                          {activeChar?.initial || '?'}
-                        </div>
+                        <img
+                          src={`/characters/${activeChar?.id || 'master'}.png`}
+                          alt={activeChar?.name || '?'}
+                          style={{
+                            width: 40, height: 40, borderRadius: '50%', border: `2px solid ${activeColor}`,
+                            objectFit: 'cover',
+                          }}
+                        />
                       ) : (
                         <div style={{
                           width: 20, height: 20, borderRadius: '50%', backgroundColor: T.textMuted,
@@ -1072,7 +930,7 @@ export default function EpisodeDetailPage() {
                           color: savedPhrases.has(activeLine.english!) ? T.green : T.gold,
                         }}
                       >
-                        {savedPhrases.has(activeLine.english!) ? 'ADDED' : 'トレーニングに追加'}
+                        {savedPhrases.has(activeLine.english!) ? '追加済み' : '仕込み帳に追加'}
                       </button>
                     )}
                   </div>
@@ -1273,13 +1131,14 @@ export default function EpisodeDetailPage() {
                             fontSize: 8, fontWeight: 700, color: '#fff', flexShrink: 0,
                           }}>N</div>
                         ) : (
-                          <div style={{
-                            width: 16, height: 16, borderRadius: '50%', backgroundColor: color,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 8, fontWeight: 700, color: '#fff', flexShrink: 0,
-                          }}>
-                            {char?.initial || '?'}
-                          </div>
+                          <img
+                            src={`/characters/${char?.id || 'master'}.png`}
+                            alt={char?.name || '?'}
+                            style={{
+                              width: 36, height: 36, borderRadius: '50%', border: `1.5px solid ${color}`,
+                              objectFit: 'cover', flexShrink: 0,
+                            }}
+                          />
                         )}
                         {isNarration ? 'Narration' : char?.name.split('\uFF08')[0]}
                       </div>
@@ -1320,7 +1179,7 @@ export default function EpisodeDetailPage() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        {savedPhrases.has(line.english!) ? 'ADDED' : '+Training'}
+                        {savedPhrases.has(line.english!) ? '追加済み' : '+仕込み帳'}
                       </button>
                     )}
                   </div>
@@ -1382,7 +1241,7 @@ export default function EpisodeDetailPage() {
         )}
 
         {/* RESULTS */}
-        {phase === 'results' && !showSlotReview && (
+        {phase === 'results' && (
           <div style={{ animation: 'izk-fadein 0.5s ease' }}>
             {/* Score */}
             <div style={{
@@ -1516,33 +1375,16 @@ export default function EpisodeDetailPage() {
 
             {/* Action buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
-              {/* Slot Review CTA */}
-              {vocabDeck.length > 0 && (
-                <button
-                  onClick={() => { setShowSlotReview(true); playSound('slot-spin'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                  style={{
-                    width: '100%', padding: '16px 20px',
-                    background: `linear-gradient(135deg, ${T.gold}, #B8941F)`,
-                    border: 'none', borderRadius: 12, color: '#fff', fontWeight: 800, fontSize: 15,
-                    cursor: 'pointer', boxShadow: T.shadowMd,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  }}
-                >
-                  <span style={{ fontSize: 18 }}>SLOT</span>
-                  <span>スロットで単語復習 ({vocabDeck.length}語)</span>
-                </button>
-              )}
-
               <div style={{ display: 'flex', gap: 8 }}>
                 <button onClick={handleRestart} style={{
                   flex: 1, padding: '12px 16px', background: T.surface, border: `1px solid ${T.border}`,
                   borderRadius: 8, color: T.textSub, fontWeight: 600, fontSize: 13, cursor: 'pointer',
                 }}>もう一度</button>
-                {nextEp && (
-                  <Link href={`/english/izakaya-toeic/episodes/${nextEp.id}`} style={{
+                {nextDayPlan && nextDayEpisode && (
+                  <Link href={`/english/izakaya-toeic/episodes/${nextDayEpisode.id}`} style={{
                     flex: 1, padding: '12px 16px', background: T.gold, borderRadius: 8,
                     color: '#fff', fontWeight: 800, fontSize: 13, textDecoration: 'none', textAlign: 'center',
-                  }}>次: EP.{nextEp.number}</Link>
+                  }}>次: DAY {nextDayPlan.day}</Link>
                 )}
               </div>
 
@@ -1560,30 +1402,11 @@ export default function EpisodeDetailPage() {
                 }}>T</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 700, fontSize: 13 }}>TOEIC単語トレーニング</div>
-                  <div style={{ fontSize: 11, color: T.textMuted }}>全エピソードの語彙をスロットで復習</div>
+                  <div style={{ fontSize: 11, color: T.textMuted }}>保存した語彙をトレーニングで復習</div>
                 </div>
                 <span style={{ fontSize: 12, color: T.green, fontWeight: 700 }}>{'>'}</span>
               </Link>
             </div>
-          </div>
-        )}
-
-        {/* SLOT REVIEW MODE */}
-        {phase === 'results' && showSlotReview && (
-          <div>
-            <button onClick={() => setShowSlotReview(false)} style={{
-              display: 'block', marginBottom: 14, fontSize: 11, color: T.textMuted,
-              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-            }}>
-              {'<'} 結果に戻る
-            </button>
-            <VocabSlotReview
-              deck={vocabDeck}
-              onComplete={() => {
-                playSound('levelup');
-                setShowSlotReview(false);
-              }}
-            />
           </div>
         )}
       </div>

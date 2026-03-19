@@ -24,13 +24,13 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...何かあったか。',
-      english: '...something happen?',
+      japanese: '何かあったか。',
+      english: 'something happen?',
     },
     {
       speaker: 'kenji',
-      japanese: '...現場に、英語しか話せない安全検査官が来た。',
-      english: '...an English-only safety inspector showed up at the site.',
+      japanese: '現場に、英語しか話せない安全検査官が来た。',
+      english: 'an English-only safety inspector showed up at the site.',
       mood: 'defeated',
       action: '焼酎を一口飲んで、グラスを置く。音が重い',
     },
@@ -60,8 +60,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...そう。俺の "Yes" は英語だと「換気されてます」の意味だった。検査官は「え、されてないだろ」って顔して、もう一回確認してきた。',
-      english: '...right. My "Yes" meant "it IS ventilated" in English. The inspector looked at me like I was insane, and asked again.',
+      japanese: 'そう。俺の "Yes" は英語だと「換気されてます」の意味だった。検査官は「え、されてないだろ」って顔して、もう一回確認してきた。',
+      english: 'right. My "Yes" meant "it IS ventilated" in English. The inspector looked at me like I was insane, and asked again.',
       mood: 'defeated',
     },
     {
@@ -86,8 +86,8 @@ const episode: IzakayaEpisode = {
     // --- MASTER'S EXPLANATION ---
     {
       speaker: 'master',
-      japanese: '...ケンジ。聞け。これはお前だけの問題じゃない。日本人が英語で一番間違える場所だ。',
-      english: "...Kenji. Listen. This isn't just your problem. It's the number one mistake Japanese speakers make in English.",
+      japanese: 'ケンジ。聞け。これはお前だけの問題じゃない。日本人が英語で一番間違える場所だ。',
+      english: "Kenji. Listen. This isn't just your problem. It's the number one mistake Japanese speakers make in English.",
     },
     {
       speaker: 'master',
@@ -102,8 +102,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...ちょっと待って。換気されてないのに "No" ？ "No" って「いいえ」でしょ？ 余計ややこしくない？',
-      english: '...hold on. It\'s NOT ventilated, but you say "No"? "No" means "no," right? That makes it even more confusing.',
+      japanese: 'ちょっと待って。換気されてないのに "No" ？ "No" って「いいえ」でしょ？ 余計ややこしくない？',
+      english: 'hold on. It\'s NOT ventilated, but you say "No"? "No" means "no," right? That makes it even more confusing.',
       mood: 'thinking',
     },
     {
@@ -113,8 +113,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...つまり、付加疑問の "is it?" とか "isn\'t it?" は無視して、中身だけ見ろってこと？',
-      english: '...so you\'re saying ignore the tag part -- the "is it?" or "isn\'t it?" -- and just focus on the content?',
+      japanese: 'つまり、付加疑問の "is it?" とか "isn\'t it?" は無視して、中身だけ見ろってこと？',
+      english: 'so you\'re saying ignore the tag part -- the "is it?" or "isn\'t it?" -- and just focus on the content?',
       mood: 'thinking',
     },
     {
@@ -131,14 +131,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'defeated',
     },
     {
       speaker: 'takeshi',
-      japanese: 'ケンジさんが納豆嫌いだとして、答えは "No, I don\'t" でしょ？ 日本語だと「うん、嫌いだよ」なのに英語だと "No" ...ってあれ、ケンジさん？',
-      english: 'If Kenji hates natto, the answer is "No, I don\'t," right? In Japanese you\'d say "un, kirai" but in English it\'s "No"... uh, Kenji?',
+      japanese: 'ケンジさんが納豆嫌いだとして、答えは "No, I don\'t" でしょ？ 日本語だと「うん、嫌いだよ」なのに英語だと "No" ってあれ、ケンジさん？',
+      english: 'If Kenji hates natto, the answer is "No, I don\'t," right? In Japanese you\'d say "un, kirai" but in English it\'s "No"uh, Kenji?',
       mood: 'thinking',
     },
     {
@@ -148,15 +148,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...タケシ。空気読んで。',
-      english: '...Takeshi. Read the room.',
+      japanese: 'タケシ。空気読んで。',
+      english: 'Takeshi. Read the room.',
       mood: 'angry',
     },
     // --- MINA'S SIMPLE RULE ---
     {
       speaker: 'mina',
-      japanese: '...あの。ケンジさん。',
-      english: '...um. Kenji.',
+      japanese: 'あの。ケンジさん。',
+      english: 'um. Kenji.',
       mood: 'normal',
       action: 'ウーロン茶のグラスを置いて、ケンジの方を向く',
     },
@@ -168,8 +168,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '換気されてない。それが事実。だから "No." ...それだけです。日本語の感覚は、一回捨ててください。',
-      english: 'It\'s not ventilated. That\'s the fact. So "No." ...that\'s all. Please throw away the Japanese instinct, just this once.',
+      japanese: '換気されてない。それが事実。だから "No." それだけです。日本語の感覚は、一回捨ててください。',
+      english: 'It\'s not ventilated. That\'s the fact. So "No." that\'s all. Please throw away the Japanese instinct, just this once.',
       mood: 'normal',
     },
     {
@@ -179,8 +179,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...事実で答える。日本語の感覚は捨てる。...それだけか。',
-      english: "...answer with the fact. Throw away the Japanese instinct. ...that's all?",
+      japanese: '事実で答える。日本語の感覚は捨てる。...それだけか。',
+      english: "answer with the fact. Throw away the Japanese instinct. ...that's all?",
       mood: 'normal',
     },
     // --- MASTER'S LESSON ---
@@ -192,8 +192,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'TOEICでも、現場でも同じだ。頭で翻訳するな。事実を見ろ。',
-      english: "Same rule for TOEIC and the job site. Don't translate in your head. Look at the fact.",
+      japanese: 'トーイックでも、現場でも同じだ。頭で翻訳するな。事実を見ろ。',
+      english: "Same rule for トーイック and the job site. Don't translate in your head. Look at the fact.",
     },
     // --- EMOTIONAL BEAT ---
     {
@@ -203,15 +203,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...マスター、もう一杯。',
-      english: '...Master. One more.',
+      japanese: 'マスター、もう一杯。',
+      english: 'Master. One more.',
       mood: 'normal',
       action: '少しだけ背筋を伸ばす',
     },
     {
       speaker: 'kenji',
-      japanese: '...俺、諦めてないよな？',
-      english: "...I'm not giving up, am I?",
+      japanese: '俺、諦めてないよな？',
+      english: "I'm not giving up, am I?",
       mood: 'normal',
     },
     {
@@ -221,8 +221,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...No, you\'re not.',
-      english: '...No, you\'re not.',
+      japanese: 'No, you\'re not.',
+      english: 'No, you\'re not.',
       action: '焼酎を注ぎながら、少しだけ笑う',
     },
     {
@@ -232,14 +232,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...うわ、ケンジさん今の完璧じゃん。 "I\'m not giving up, am I?" → "No, you\'re not." 事実で答えてる！',
-      english: '...whoa, Kenji, that was perfect! "I\'m not giving up, am I?" "No, you\'re not." Answered with the fact!',
+      japanese: 'うわ、ケンジさん今の完璧じゃん。 "I\'m not giving up, am I?" → "No, you\'re not." 事実で答えてる！',
+      english: 'whoa, Kenji, that was perfect! "I\'m not giving up, am I?" "No, you\'re not." Answered with the fact!',
       mood: 'excited',
     },
     {
       speaker: 'yuki',
-      japanese: '...ケンジさんの方がタケシより飲み込み早いんじゃない。',
-      english: "...Kenji might be a faster learner than you, Takeshi.",
+      japanese: 'ケンジさんの方がタケシより飲み込み早いんじゃない。',
+      english: "Kenji might be a faster learner than you, Takeshi.",
       mood: 'normal',
     },
     {
@@ -306,7 +306,7 @@ const episode: IzakayaEpisode = {
         { text: "Yes, it's been a while since the last revision.", isCorrect: true, explanation: '事実：更新すべきだと思う → "Yes." 「前回の改訂からだいぶ経ってる」で具体的な根拠を添えている。' },
         { text: 'The safety training is next month.', isCorrect: false, trapType: 'topic-shift', explanation: '"safety" リピート + 話題すり替え。マニュアル更新の話に研修の日程は関係ない。' },
       ],
-      explanation: '"Don\'t you think...?" の否定疑問。「更新すべきだと思わない？」→ 思う → "Yes." Aも文法的には正しい回答だが、TOEICでは具体的な根拠がある方が正解になりやすい。',
+      explanation: '"Don\'t you think...?" の否定疑問。「更新すべきだと思わない？」→ 思う → "Yes." Aも文法的には正しい回答だが、トーイックでは具体的な根拠がある方が正解になりやすい。',
       difficulty: 'hard',
       scoreLevel: 700,
       skillTag: 'tag-negative-questions',

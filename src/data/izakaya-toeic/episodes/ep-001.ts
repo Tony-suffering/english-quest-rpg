@@ -5,7 +5,7 @@ const episode: IzakayaEpisode = {
   number: 1,
   title: 'ユキ、昇進がかかってる',
   subtitle: 'Part 2: 間接回答って何？',
-  description: 'TOEICのPart 2で最もハマる罠「間接回答」。居酒屋の注文で、その正体を暴く。',
+  description: 'トーイックのPart 2で最もハマる罠「間接回答」。居酒屋の注文で、その正体を暴く。',
   targetPart: 2,
   targetSkill: 'indirect-answers-intro',
   targetSkillLabel: '間接回答の基本',
@@ -24,21 +24,21 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...マスター、生ビール。',
-      english: '...Master, draft beer.',
+      japanese: 'マスター、生ビール。',
+      english: 'Master, draft beer.',
       mood: 'defeated',
       action: 'カウンターに座る。手が少し震えている',
     },
     {
       speaker: 'master',
-      japanese: '...',
-      english: '...',
+      japanese: '',
+      english: '',
       action: 'グラスを拭く手を止めて、ユキの手元を見る',
     },
     {
       speaker: 'yuki',
-      japanese: '...なに見てんの。',
-      english: "...What're you looking at.",
+      japanese: 'なに見てんの。',
+      english: "What're you looking at.",
       mood: 'angry',
     },
     {
@@ -49,8 +49,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...別に。',
-      english: "...It's whatever.",
+      japanese: '別に。',
+      english: "It's whatever.",
       mood: 'defeated',
     },
     {
@@ -60,15 +60,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...海外営業部、落ちた。',
-      english: '...I got rejected. International sales.',
+      japanese: '海外営業部、落ちた。',
+      english: 'I got rejected. International sales.',
       mood: 'defeated',
       action: 'カウンターを見つめたまま',
     },
     {
       speaker: 'master',
-      japanese: 'TOEIC。',
-      english: 'TOEIC.',
+      japanese: 'トーイック。',
+      english: 'トーイック.',
     },
     {
       speaker: 'yuki',
@@ -92,8 +92,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...なんでそんな冷静なの。',
-      english: "...How can you be so calm about this.",
+      japanese: 'なんでそんな冷静なの。',
+      english: "How can you be so calm about this.",
       mood: 'angry',
     },
     {
@@ -103,8 +103,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...320。',
-      english: '...320.',
+      japanese: '320。',
+      english: '320.',
       mood: 'defeated',
     },
     {
@@ -137,8 +137,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...うるさい。',
-      english: '...Keep it down.',
+      japanese: 'うるさい。',
+      english: 'Keep it down.',
       mood: 'angry',
     },
     {
@@ -160,8 +160,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...今お前、俺の質問に答えたか？',
-      english: '...Did you just answer my question?',
+      japanese: '今お前、俺の質問に答えたか？',
+      english: 'Did you just answer my question?',
     },
     {
       speaker: 'takeshi',
@@ -176,8 +176,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '......あ。',
-      english: '......Oh.',
+      japanese: 'あ。',
+      english: 'Oh.',
       mood: 'excited',
     },
     {
@@ -193,8 +193,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...あー。だから "Let me check the schedule" が正解になるのか。質問に直接答えてないけど、会話としては自然。',
-      english: '...Oh. So THAT\'S why "Let me check the schedule" is the right answer. It doesn\'t directly answer the question, but as a conversation it totally works.',
+      japanese: 'あー。だから "Let me check the schedule" が正解になるのか。質問に直接答えてないけど、会話としては自然。',
+      english: 'Oh. So THAT\'S why "Let me check the schedule" is the right answer. It doesn\'t directly answer the question, but as a conversation it totally works.',
       mood: 'thinking',
     },
     {
@@ -210,8 +210,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'TOEICのPart 2は、25問中10問近くがこの間接回答だ。直接的な答えを探してる奴は、そこで全部落とす。',
-      english: "In TOEIC Part 2, nearly 10 out of 25 questions use indirect answers. Anyone hunting for the obvious direct answer is gonna miss every single one.",
+      japanese: 'トーイックのPart 2は、25問中10問近くがこの間接回答だ。直接的な答えを探してる奴は、そこで全部落とす。',
+      english: "In トーイック Part 2, nearly 10 out of 25 questions use indirect answers. Anyone hunting for the obvious direct answer is gonna miss every single one.",
     },
     {
       speaker: 'yuki',
@@ -239,14 +239,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: 'ケンジさん！今マスターがTOEICのすごいこと教えてくれてて！',
-      english: "Kenji-san! Master's droppin' some serious TOEIC knowledge right now!",
+      japanese: 'ケンジさん！今マスターがトーイックのすごいこと教えてくれてて！',
+      english: "Kenji-san! Master's droppin' some serious トーイック knowledge right now!",
       mood: 'excited',
     },
     {
       speaker: 'kenji',
-      japanese: '...ああ。',
-      english: '...Yeah.',
+      japanese: 'ああ。',
+      english: 'Yeah.',
       mood: 'normal',
       action: 'メニューを見るふりをする',
     },
@@ -262,13 +262,13 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...今の会話、覚えとけ。全員。',
-      english: '...Remember that exchange just now. All of you.',
+      japanese: '今の会話、覚えとけ。全員。',
+      english: 'Remember that exchange just now. All of you.',
     },
     {
       speaker: 'yuki',
-      japanese: '...え？ 何が？',
-      english: '...Huh? What do you mean?',
+      japanese: 'え？ 何が？',
+      english: 'Huh? What do you mean?',
       mood: 'thinking',
     },
     {
@@ -284,8 +284,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...俺もTOEIC受けなきゃいけないんだよ。会社の方針でさ。',
-      english: "...I gotta take the damn thing too. Company policy.",
+      japanese: '俺もトーイック受けなきゃいけないんだよ。会社の方針でさ。',
+      english: "I gotta take the damn thing too. Company policy.",
       mood: 'defeated',
       action: 'ビールを一口飲んでから、ぼそっと',
     },
@@ -297,8 +297,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...600。今480。',
-      english: "...600. I'm at 480.",
+      japanese: '600。今480。',
+      english: "600. I'm at 480.",
       mood: 'defeated',
       action: 'グラスを見つめる',
     },
@@ -309,30 +309,30 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '日本語でも英語でも、人間は質問にまっすぐ答えないことの方が多い。TOEICはそれをテストしてる。',
-      english: "In Japanese or English, people dodge direct answers more often than not. That's exactly what TOEIC is testing.",
+      japanese: '日本語でも英語でも、人間は質問にまっすぐ答えないことの方が多い。トーイックはそれをテストしてる。',
+      english: "In Japanese or English, people dodge direct answers more often than not. That's exactly what トーイック is testing.",
     },
     {
       speaker: 'master',
-      japanese: '...お前らもそうだろ。',
-      english: "...You three are doing it right now.",
+      japanese: 'お前らもそうだろ。',
+      english: "You three are doing it right now.",
     },
     {
       speaker: 'yuki',
-      japanese: '...え？',
-      english: '...What?',
+      japanese: 'え？',
+      english: 'What?',
       mood: 'thinking',
     },
     {
       speaker: 'master',
-      japanese: 'ユキは「落ちた」と言ったが、本当に言いたいのは「怖い」だろう。ケンジさんは遅れてきて「ああ」しか言わなかったが、本当はTOEICの話を聞きたかった。タケシだけだ、思ったことそのまま言うのは。',
-      english: "Yuki said 'I got rejected,' but what she really means is 'I'm scared.' Kenji-san showed up late and only said 'yeah,' but he actually wanted to hear the TOEIC talk. Takeshi's the only one who says exactly what he's thinking.",
+      japanese: 'ユキは「落ちた」と言ったが、本当に言いたいのは「怖い」だろう。ケンジさんは遅れてきて「ああ」しか言わなかったが、本当はトーイックの話を聞きたかった。タケシだけだ、思ったことそのまま言うのは。',
+      english: "Yuki said 'I got rejected,' but what she really means is 'I'm scared.' Kenji-san showed up late and only said 'yeah,' but he actually wanted to hear the トーイック talk. Takeshi's the only one who says exactly what he's thinking.",
       action: 'グラスを3つ並べながら',
     },
     {
       speaker: 'takeshi',
-      japanese: '...え、俺褒められてる？',
-      english: "...Wait, am I being complimented?",
+      japanese: 'え、俺褒められてる？',
+      english: "Wait, am I being complimented?",
       mood: 'excited',
     },
     {
@@ -347,15 +347,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...バレてたか。正直、もう歳だし、今さら英語とか無理だろって思ってた。',
-      english: "...That obvious, huh. Honestly, I figured at my age, it's too late for English.",
+      japanese: 'バレてたか。正直、もう歳だし、今さら英語とか無理だろって思ってた。',
+      english: "That obvious, huh. Honestly, I figured at my age, it's too late for English.",
       mood: 'defeated',
       action: '頭をかく',
     },
     {
       speaker: 'yuki',
-      japanese: '...私も。「どうせ無理」って言い訳してた方が楽だもん。',
-      english: "...Me too. It's easier to just tell yourself 'it's pointless anyway.'",
+      japanese: '私も。「どうせ無理」って言い訳してた方が楽だもん。',
+      english: "Me too. It's easier to just tell yourself 'it's pointless anyway.'",
       mood: 'defeated',
     },
     {
@@ -365,20 +365,20 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'TOEICはそれが聞こえるかをテストしてる。行間が読めるかどうか。',
-      english: "TOEIC is testing whether you can hear that. Whether you can read between the lines.",
+      japanese: 'トーイックはそれが聞こえるかをテストしてる。行間が読めるかどうか。',
+      english: "トーイック is testing whether you can hear that. Whether you can read between the lines.",
     },
     {
       speaker: 'yuki',
-      japanese: '...',
-      english: '...',
+      japanese: '',
+      english: '',
       mood: 'thinking',
       action: '目が少し潤む',
     },
     {
       speaker: 'takeshi',
-      japanese: '...なんかめっちゃ深い話になってません？俺ビール頼みに来ただけなんすけど。',
-      english: "...Didn't this get way too deep? I just came in for a beer.",
+      japanese: 'なんかめっちゃ深い話になってません？俺ビール頼みに来ただけなんすけど。',
+      english: "Didn't this get way too deep? I just came in for a beer.",
       mood: 'excited',
     },
     {
@@ -390,8 +390,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...ねえ、マスター。来月のTOEIC、間に合うかな。',
-      english: '...Hey, Master. You think I can make it? By next month?',
+      japanese: 'ねえ、マスター。来月のトーイック、間に合うかな。',
+      english: 'Hey, Master. You think I can make it? By next month?',
       mood: 'thinking',
     },
     {
@@ -406,14 +406,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...うん。助けて。',
-      english: '...Yeah. Help me.',
+      japanese: 'うん。助けて。',
+      english: 'Yeah. Help me.',
       mood: 'normal',
     },
     {
       speaker: 'kenji',
-      japanese: '...俺もだ。',
-      english: '...Me too.',
+      japanese: '俺もだ。',
+      english: 'Me too.',
       mood: 'normal',
       action: 'ビールを持ち上げる',
     },
@@ -425,8 +425,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...勝手に決めるな。',
-      english: "...Don't just decide that on your own.",
+      japanese: '勝手に決めるな。',
+      english: "Don't just decide that on your own.",
       action: '3人分のお通しを並べながら',
     },
     {

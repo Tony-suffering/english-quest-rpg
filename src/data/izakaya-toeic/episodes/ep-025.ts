@@ -68,8 +68,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...え、もう終わったの？ 音声まだ流れてるのに。',
-      english: "...Wait, you're done already? The audio is still playing.",
+      japanese: 'え、もう終わったの？ 音声まだ流れてるのに。',
+      english: "Wait, you're done already? The audio is still playing.",
       mood: 'excited',
     },
     {
@@ -114,8 +114,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...やっぱり俺は...Part 4は無理なのかな...',
-      english: '...I knew it... maybe Part 4 is just beyond me...',
+      japanese: 'やっぱり俺は...Part 4は無理なのかな...',
+      english: 'I knew it... maybe Part 4 is just beyond me...',
       mood: 'defeated',
     },
     {
@@ -130,8 +130,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...え？',
-      english: '...What?',
+      japanese: 'え？',
+      english: 'What?',
       mood: 'thinking',
     },
     {
@@ -158,8 +158,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...その話はまた今度だ。Day 30に全部話す。',
-      english: '...That story is for another time. I\'ll tell you everything on Day 30.',
+      japanese: 'その話はまた今度だ。Day 30に全部話す。',
+      english: 'That story is for another time. I\'ll tell you everything on Day 30.',
     },
     {
       speaker: 'narration',
@@ -173,8 +173,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...はい。',
-      english: '...Yes, sir.',
+      japanese: 'はい。',
+      english: 'Yes, sir.',
       mood: 'thinking',
     },
     {

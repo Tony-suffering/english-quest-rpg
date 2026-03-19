@@ -42,7 +42,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'takeshi',
       japanese: 'いや、それが聞き取れたんだよ。単語も全部わかった。でもさ、上司に「彼は何を言いたかったの？」って聞かれたら、答えられなかった。',
-      english: 'No, that\'s the thing-- I could hear it fine! I understood every single word. But when my boss asked me "So what was he trying to say?" ...I had nothing.',
+      english: 'No, that\'s the thing-- I could hear it fine! I understood every single word. But when my boss asked me "So what was he trying to say?" I had nothing.',
       mood: 'defeated',
     },
     {
@@ -58,8 +58,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...それ、丁寧に断ってるだけ。「忙しくて無理」の遠回し表現。',
-      english: '...He was just turning you down politely. It\'s a roundabout way of saying "I\'m too busy, can\'t do it."',
+      japanese: 'それ、丁寧に断ってるだけ。「忙しくて無理」の遠回し表現。',
+      english: 'He was just turning you down politely. It\'s a roundabout way of saying "I\'m too busy, can\'t do it."',
       mood: 'smug',
     },
     {
@@ -104,13 +104,13 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'TOEICのPart 3で "What does the man mean when he says...?" という設問が出る。これは言葉の意味じゃなく、話者の意図を聞いてる。',
-      english: 'In TOEIC Part 3, you get questions like "What does the man mean when he says...?" They\'re not asking what the words mean. They\'re asking what the speaker intended.',
+      japanese: 'トーイックのPart 3で "What does the man mean when he says...?" という設問が出る。これは言葉の意味じゃなく、話者の意図を聞いてる。',
+      english: 'In トーイック Part 3, you get questions like "What does the man mean when he says...?" They\'re not asking what the words mean. They\'re asking what the speaker intended.',
     },
     {
       speaker: 'mina',
-      japanese: '...わたし、K-POPのインタビューで覚えました。MCが "We\'ll have to see about that" って言ったら、次の曲の話題に切り替わる。つまり「ノー」なんですよね。',
-      english: '...I actually learned this from K-POP interviews. When the MC says "We\'ll have to see about that," they always switch to the next song right after. So it basically means "no."',
+      japanese: 'わたし、K-POPのインタビューで覚えました。MCが "We\'ll have to see about that" って言ったら、次の曲の話題に切り替わる。つまり「ノー」なんですよね。',
+      english: 'I actually learned this from K-POP interviews. When the MC says "We\'ll have to see about that," they always switch to the next song right after. So it basically means "no."',
       mood: 'thinking',
     },
     {
@@ -225,7 +225,7 @@ const episode: IzakayaEpisode = {
     { word: 'my plate is full', meaning: '手一杯、忙しすぎる', example: "I wish I could, but my plate is pretty full.", partOfSpeech: 'idiom' },
     { word: 'on track', meaning: '予定通り', example: 'Are we still on track?', partOfSpeech: 'phrase' },
     { word: 'run diagnostics', meaning: '診断テストを実行する', example: "We need another day to run diagnostics.", partOfSpeech: 'phrase' },
-    { word: "I'd rather... than...", meaning: '...するくらいなら...のほうがいい', example: "I'd rather explain a delay than a system outage.", partOfSpeech: 'phrase' },
+    { word: "I'd rather... than...", meaning: 'するくらいなら...のほうがいい', example: "I'd rather explain a delay than a system outage.", partOfSpeech: 'phrase' },
     { word: 'cover a shift', meaning: 'シフトを代わる', example: 'Could you cover my shift on Saturday?', partOfSpeech: 'phrase' },
   ],
   previousEpisodeId: 'ep-006',

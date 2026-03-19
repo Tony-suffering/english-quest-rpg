@@ -18,8 +18,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...ミナさん。',
-      english: '...Mina.',
+      japanese: 'ミナさん。',
+      english: 'Mina.',
       action: '留守電のメッセージを確認しながら',
     },
     {
@@ -59,8 +59,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...そのメッセージ、マスター聞いたのか。',
-      english: '...You actually listened to that message, Master?',
+      japanese: 'そのメッセージ、マスター聞いたのか。',
+      english: 'You actually listened to that message, Master?',
       mood: 'thinking',
     },
     {
@@ -70,8 +70,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...100席の予約ができるかどうか、ということだけです。',
-      english: '...Just whether or not you could reserve 100 seats. That\'s all I was thinking about.',
+      japanese: '100席の予約ができるかどうか、ということだけです。',
+      english: 'Just whether or not you could reserve 100 seats. That\'s all I was thinking about.',
       mood: 'thinking',
     },
     {
@@ -87,14 +87,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...確かに。番号言い忘れた。',
-      english: '...You\'re right. I forgot to leave my number.',
+      japanese: '確かに。番号言い忘れた。',
+      english: 'You\'re right. I forgot to leave my number.',
       mood: 'defeated',
     },
     {
       speaker: 'master',
-      japanese: 'TOEICのPart 4に留守電問題が出る。設問は必ず「誰からのメッセージか」「用件は何か」「何をしてほしいか」の3点を聞く。これは留守電の3段構造と完全に一致している。',
-      english: 'TOEIC Part 4 has voicemail questions. They always ask three things: "Who is the message from?" "What is the purpose?" "What action is requested?" That maps perfectly onto the three-stage structure.',
+      japanese: 'トーイックのPart 4に留守電問題が出る。設問は必ず「誰からのメッセージか」「用件は何か」「何をしてほしいか」の3点を聞く。これは留守電の3段構造と完全に一致している。',
+      english: 'トーイック Part 4 has voicemail questions. They always ask three things: "Who is the message from?" "What is the purpose?" "What action is requested?" That maps perfectly onto the three-stage structure.',
     },
     {
       speaker: 'yuki',
@@ -120,8 +120,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...俺の現場経験、TOEIC的に優秀だったのか。',
-      english: '...My on-site experience was actually useful for TOEIC?',
+      japanese: '俺の現場経験、トーイック的に優秀だったのか。',
+      english: 'My on-site experience was actually useful for トーイック?',
       mood: 'excited',
     },
     {
@@ -218,7 +218,7 @@ const episode: IzakayaEpisode = {
         { text: 'Send a brochure about corporate event packages', isCorrect: false, trapType: 'topic-shift', explanation: 'パンフレットの送付は求めていない。電話での打ち合わせを求めている。' },
         { text: 'Reserve a space for thirty people right away', isCorrect: false, trapType: 'topic-shift', explanation: '即座の予約確定ではなく、打ち合わせのための折り返し電話を求めている。' },
       ],
-      explanation: '留守電の「アクション要求」段を問う問題。"Please return my call at your earliest convenience" が核心。TOEICの留守電問題では最後の1〜2文に「何をしてほしいか」が凝縮されることが多い。先読みで "What does the caller ask?" を把握していれば、最後の文に集中できる。',
+      explanation: '留守電の「アクション要求」段を問う問題。"Please return my call at your earliest convenience" が核心。トーイックの留守電問題では最後の1〜2文に「何をしてほしいか」が凝縮されることが多い。先読みで "What does the caller ask?" を把握していれば、最後の文に集中できる。',
       paraphraseMap: [
         { original: 'return my call at your earliest convenience', paraphrased: 'call her back to discuss the arrangements', note: '都合のいいときに折り返し電話を → 打ち合わせのための折り返し' },
       ],

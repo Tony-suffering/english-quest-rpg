@@ -5,7 +5,7 @@ const episode: IzakayaEpisode = {
   number: 14,
   title: 'ケンジ復活戦！居酒屋模試',
   subtitle: 'Part 2: 25問模試・10問ミニ版',
-  description: '480点から600点を目指すケンジが、全力で模試に挑む。問題ごとに居酒屋の全員が反応する、実況中継付きTOEIC。',
+  description: '480点から600点を目指すケンジが、全力で模試に挑む。問題ごとに居酒屋の全員が反応する、実況中継付きトーイック。',
   targetPart: 2,
   targetSkill: 'part2-mixed-comprehensive',
   targetSkillLabel: 'Part 2 総合力',
@@ -24,14 +24,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...珍しい。',
-      english: '...That is unusual.',
+      japanese: '珍しい。',
+      english: 'That is unusual.',
       action: 'グラスを戻しながら',
     },
     {
       speaker: 'kenji',
-      japanese: '来月のTOEIC、2週間後なんだよ。Part 2を全問やる。',
-      english: "The TOEIC's in two weeks. I'm gonna go through all of Part 2.",
+      japanese: '来月のトーイック、2週間後なんだよ。Part 2を全問やる。',
+      english: "The トーイック's in two weeks. I'm gonna go through all of Part 2.",
     },
     {
       speaker: 'yuki',
@@ -58,8 +58,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...計算してないわ。',
-      english: "...Haven't done the math.",
+      japanese: '計算してないわ。',
+      english: "Haven't done the math.",
       mood: 'thinking',
     },
     {
@@ -92,8 +92,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...お前ら全員模試かい。',
-      english: "...So now everybody's taking the practice test, huh.",
+      japanese: 'お前ら全員模試かい。',
+      english: "So now everybody's taking the practice test, huh.",
       mood: 'normal',
     },
     {

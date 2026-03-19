@@ -12,7 +12,7 @@ import {
 } from '@/lib/training-sounds';
 import PuzzleBoard, { type GridMilestoneData } from '@/components/english/PuzzleBoard';
 import ReviewSlotPanel from '@/components/english/ReviewSlotPanel';
-import { TOEIC_30DAY, getToeicStartDate, getToeicCurrentDay } from '@/data/izakaya-toeic/toeic-30day-content';
+import { TOEIC_30DAY } from '@/data/izakaya-toeic/toeic-30day-content';
 import './training-animations.css';
 
 // 公開RPG: localhost:3004 or toniolab.com。DBなし、TOEIC 30日コンテンツで動く
@@ -2494,7 +2494,7 @@ export interface TrainingInitialData {
     links?: Record<string, PhraseLink[]>;
 }
 
-export default function PhrasesPage({ initialData }: { initialData?: TrainingInitialData }) {
+export default function PhrasesPage({ initialData, onHelpClick }: { initialData?: TrainingInitialData; onHelpClick?: () => void }) {
     // Data mode: phrases (default) or words
     const [dataMode, setDataMode] = useState<'phrases' | 'words'>(() => {
         if (typeof window !== 'undefined') {
@@ -3361,18 +3361,22 @@ export default function PhrasesPage({ initialData }: { initialData?: TrainingIni
             try {
                 if (IS_PUBLIC) {
                     // 公開RPG (3004): TOEIC 30日コンテンツ + エピソードから追加した単語
-                    const startDate = new Date(getToeicStartDate());
-                    // Distribute 600 items across 30 days from start date
+                    // カレンダーの各日に20個: Day 1→1日, Day 2→2日, ...
+                    const now = new Date();
+                    const y = now.getFullYear();
+                    const m = now.getMonth();
+                    const daysInMonth = new Date(y, m + 1, 0).getDate();
                     const makeDayDate = (dayNum: number) => {
-                        const d = new Date(startDate);
-                        d.setDate(d.getDate() + (dayNum - 1));
+                        const d = new Date(y, m, dayNum, 12, 0, 0);
                         return d.toISOString();
                     };
 
                     const allPhrases: Phrase[] = [];
                     let idx = 0;
 
+                    // その月の日数分だけコンテンツを配布（28-31日）
                     for (const day of TOEIC_30DAY) {
+                        if (day.day > daysInMonth) break;
                         const dateStr = makeDayDate(day.day);
                         for (const item of day.items) {
                             allPhrases.push({
@@ -7418,17 +7422,18 @@ export default function PhrasesPage({ initialData }: { initialData?: TrainingIni
                     >
                         +
                     </button>
-                    <Link
-                        href="/english/training/guide"
+                    <button
+                        onClick={onHelpClick}
                         style={{
-                            background: 'none', border: 'none',
+                            background: 'none', border: '1.5px solid #D4AF37',
+                            borderRadius: '50%', width: '26px', height: '26px',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: 'pointer', fontSize: '11px', color: '#A8A29E',
-                            textDecoration: 'none', padding: '4px',
+                            cursor: 'pointer', fontSize: '13px', fontWeight: '800', color: '#D4AF37',
+                            padding: 0, flexShrink: 0,
                         }}
                     >
                         ?
-                    </Link>
+                    </button>
                 </div>
             </div>
 

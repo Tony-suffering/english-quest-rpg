@@ -36,8 +36,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...ケンジ。ちょっと待ってろ。',
-      english: '...Kenji. Hang on a second.',
+      japanese: 'ケンジ。ちょっと待ってろ。',
+      english: 'Kenji. Hang on a second.',
       action: 'カウンターの奥に消える',
     },
     {
@@ -105,8 +105,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...知ってる。wannaもgonnaも知ってる。でもリスニングの音声で出てくると分からなくなるんだよ。',
-      english: '...I know these. I know wanna and gonna. But when they show up in a listening passage, I lose track.',
+      japanese: '知ってる。wannaもgonnaも知ってる。でもリスニングの音声で出てくると分からなくなるんだよ。',
+      english: 'I know these. I know wanna and gonna. But when they show up in a listening passage, I lose track.',
       mood: 'thinking',
     },
     {
@@ -145,8 +145,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '......あれ？ マスター、もう一回あのスクリプト読んでくれ。',
-      english: '......Wait. Master, read that script one more time.',
+      japanese: 'あれ？ マスター、もう一回あのスクリプト読んでくれ。',
+      english: 'Wait. Master, read that script one more time.',
       mood: 'thinking',
     },
     {
@@ -156,8 +156,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...聞こえた。"gonna"が聞こえた。さっきまで聞こえなかったのに。',
-      english: '...I heard it. I heard "gonna." I couldn\'t hear it before.',
+      japanese: '聞こえた。"gonna"が聞こえた。さっきまで聞こえなかったのに。',
+      english: 'I heard it. I heard "gonna." I couldn\'t hear it before.',
       mood: 'excited',
     },
     {
@@ -178,8 +178,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...マスター、このホワイトボード、写真撮っていいですか。',
-      english: '...Master, can I take a photo of this whiteboard?',
+      japanese: 'マスター、このホワイトボード、写真撮っていいですか。',
+      english: 'Master, can I take a photo of this whiteboard?',
       mood: 'thinking',
     },
     {
@@ -230,7 +230,7 @@ const episode: IzakayaEpisode = {
         { text: 'Three people need to review the documents.', isCorrect: false, trapType: 'verbatim', explanation: '"three"を「3人」と解釈する罠。ここでの"three"は時刻の3時。' },
         { text: 'She wants to schedule a meeting for the afternoon.', isCorrect: false, trapType: 'topic-shift', explanation: '会議の話は一切していない。ファイルを3時までに欲しいという要求。' },
       ],
-      explanation: '短縮形の聞き取り。"gonna" = "going to"。日常会話では"going to"はほぼ使われず、"gonna"が標準。TOEIC音声でも自然な速度では"gonna"に近い発音になることが多い。',
+      explanation: '短縮形の聞き取り。"gonna" = "going to"。日常会話では"going to"はほぼ使われず、"gonna"が標準。トーイック音声でも自然な速度では"gonna"に近い発音になることが多い。',
       paraphraseMap: [
         { original: 'gonna need', paraphrased: 'going to need / will need', note: '短縮: going to → gonna' },
         { original: 'by three', paraphrased: 'before three o\'clock', note: '弱形: "three"の前の"by"が弱く発音される' },
@@ -271,7 +271,7 @@ const episode: IzakayaEpisode = {
         { text: 'Canceling the meeting to take a break.', isCorrect: false, trapType: 'topic-shift', explanation: '会議をキャンセルする話はしていない。会議前にコーヒーを飲むという軽い提案。' },
         { text: 'Asking if the man wants to skip the meeting.', isCorrect: false, trapType: 'topic-shift', explanation: '会議をスキップする話ではない。"before the meeting"は時間の指定。' },
       ],
-      explanation: '連結と弱形の複合。"Want to" → "Wanna"（連結）、"a cup of" → "a cuppa"（弱形）。日常会話ではこの2つが同時に出現することが非常に多い。TOEICのPart 2でも自然な発話として出題される。',
+      explanation: '連結と弱形の複合。"Want to" → "Wanna"（連結）、"a cup of" → "a cuppa"（弱形）。日常会話ではこの2つが同時に出現することが非常に多い。トーイックのPart 2でも自然な発話として出題される。',
       paraphraseMap: [
         { original: 'wanna', paraphrased: 'want to', note: '連結: want to → wanna' },
         { original: 'cuppa coffee', paraphrased: 'cup of coffee', note: '弱形: cup of → cuppa' },

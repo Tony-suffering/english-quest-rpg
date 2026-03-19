@@ -36,8 +36,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...読む速度は？',
-      english: '...How fast do you read?',
+      japanese: '読む速度は？',
+      english: 'How fast do you read?',
     },
     {
       speaker: 'yuki',
@@ -98,8 +98,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...え？ 今？',
-      english: '...Wait, right now?',
+      japanese: 'え？ 今？',
+      english: 'Wait, right now?',
       mood: 'thinking',
     },
     {
@@ -114,8 +114,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...焼き鳥、刺身、揚げ物系、麺類。大項目は4つ。あと値段は全部500円以下。',
-      english: '...Yakitori, sashimi, fried stuff, noodles. Four main categories. And everything is under 500 yen.',
+      japanese: '焼き鳥、刺身、揚げ物系、麺類。大項目は4つ。あと値段は全部500円以下。',
+      english: 'Yakitori, sashimi, fried stuff, noodles. Four main categories. And everything is under 500 yen.',
       mood: 'excited',
     },
     {

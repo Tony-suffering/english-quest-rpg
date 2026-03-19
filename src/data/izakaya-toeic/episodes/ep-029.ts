@@ -28,8 +28,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'thinking',
       action: '両手を膝の上に置く。指先が震えている。',
     },
@@ -40,8 +40,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...大丈夫。震えてるけど、大丈夫。',
-      english: "...I'm fine. My hands are shaking, but I'm fine.",
+      japanese: '大丈夫。震えてるけど、大丈夫。',
+      english: "I'm fine. My hands are shaking, but I'm fine.",
       mood: 'normal',
       action: '自分の手を見て、ゆっくり拳を握る',
     },
@@ -117,8 +117,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...心臓うるさい。',
-      english: "...My heart's pounding.",
+      japanese: '心臓うるさい。',
+      english: "My heart's pounding.",
       mood: 'thinking',
     },
     {
@@ -140,8 +140,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...4？ 3週間前は6問中2問だった。',
-      english: '...Four? Three weeks ago I got two out of six.',
+      japanese: '4？ 3週間前は6問中2問だった。',
+      english: 'Four? Three weeks ago I got two out of six.',
       mood: 'thinking',
       action: '目を伏せる',
     },
@@ -152,8 +152,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'normal',
       action: '唇を噛んで、目が潤む',
     },
@@ -176,8 +176,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...7？ えっ。1問だけ間違い？ どこ間違えた？',
-      english: "...Seven? Wait. I only missed one? Which one did I get wrong?",
+      japanese: '7？ えっ。1問だけ間違い？ どこ間違えた？',
+      english: "Seven? Wait. I only missed one? Which one did I get wrong?",
       mood: 'excited',
     },
     {
@@ -232,8 +232,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...560。500超えた。',
-      english: "...560. I broke 500.",
+      japanese: '560。500超えた。',
+      english: "560. I broke 500.",
       mood: 'normal',
       action: '静かにグラスを握る',
     },
@@ -306,7 +306,7 @@ const episode: IzakayaEpisode = {
         { text: 'The policy was very effective last year.', isCorrect: false, trapType: 'similar-sound', explanation: '"takes effect"（施行される）と "effective"（効果的な）の音の罠。施行時期と効果は別の話。' },
         { text: "I haven't read the new policy yet.", isCorrect: false, trapType: 'verbatim', explanation: '"new policy" リピート。読んだかどうかは施行時期への確認に対する答えではない。' },
       ],
-      explanation: '付加疑問文 "...doesn\'t it?" は確認を求めている。正解は同意+具体的な日付で補足。"effect"（名詞：効果/施行）と "effective"（形容詞：効果的）の音似トラップが仕込まれている。',
+      explanation: '付加疑問文 "doesn\'t it?" は確認を求めている。正解は同意+具体的な日付で補足。"effect"（名詞：効果/施行）と "effective"（形容詞：効果的）の音似トラップが仕込まれている。',
       difficulty: 'medium',
       scoreLevel: 600,
       skillTag: 'full-mock-test',

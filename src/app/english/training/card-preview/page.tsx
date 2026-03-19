@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { TOEIC_30DAY, getToeicStartDate } from '@/data/izakaya-toeic/toeic-30day-content';
+import { TOEIC_30DAY } from '@/data/izakaya-toeic/toeic-30day-content';
 
 const IS_PUBLIC = true;
 
@@ -1319,16 +1319,19 @@ export default function CardCollectionPage() {
 
         if (IS_PUBLIC) {
             // Public mode: load TOEIC 30-day content + episode vocab deck
-            const startDate = getToeicStartDate();
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = now.getMonth();
+            const daysInMonth = new Date(y, m + 1, 0).getDate();
             const makeDayDate = (dayNum: number) => {
-                const d = new Date(startDate);
-                d.setDate(d.getDate() + (dayNum - 1));
+                const d = new Date(y, m, dayNum, 12, 0, 0);
                 return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
             };
 
             const allPhrases: Phrase[] = [];
             let idx = 0;
             for (const day of TOEIC_30DAY) {
+                if (day.day > daysInMonth) break;
                 const dateStr = makeDayDate(day.day);
                 for (const item of day.items) {
                     allPhrases.push({
@@ -1355,7 +1358,7 @@ export default function CardCollectionPage() {
                                 english: item.word,
                                 japanese: item.meaning,
                                 category: 'Episode Vocab',
-                                date: item.addedAt ? item.addedAt.slice(0, 10) : makeDayDate(1),
+                                date: item.addedAt ? item.addedAt.slice(0, 10) : makeDayDate(new Date().getDate()),
                             });
                         }
                     }

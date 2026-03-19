@@ -912,6 +912,36 @@ export const TOEIC_30DAY: ToeicDay[] = [
       { english: 'provisional', japanese: '暫定的な・仮の', type: 'word' },
     ],
   },
+  // ============================================================
+  // Day 31: Daily Life & Community (31日ある月用)
+  // ============================================================
+  {
+    day: 31,
+    theme: 'Daily Life & Community',
+    themeJa: '日常生活・地域コミュニティ',
+    items: [
+      { english: 'The community center is offering free yoga classes on weekends.', japanese: 'コミュニティセンターが週末に無料のヨガ教室を開催しています', type: 'phrase' },
+      { english: 'Could you pick up some groceries on your way home?', japanese: '帰りにスーパーで食料品を買ってきてくれない？', type: 'phrase' },
+      { english: 'The landlord said the rent will go up starting next month.', japanese: '大家が来月から家賃が上がると言っていた', type: 'phrase' },
+      { english: "I've been meaning to sign up for the neighborhood cleanup event.", japanese: '地域の清掃イベントに申し込もうと思ってたんだ', type: 'phrase' },
+      { english: 'The pharmacy closes at nine, so we should hurry.', japanese: '薬局は9時に閉まるから急いだ方がいい', type: 'phrase' },
+      { english: "There's a farmers' market every Saturday in the town square.", japanese: '毎週土曜日に町の広場でファーマーズマーケットがある', type: 'phrase' },
+      { english: 'My neighbor offered to water my plants while I was away.', japanese: '留守中に隣人が植物に水をやると申し出てくれた', type: 'phrase' },
+      { english: 'The recycling center only accepts certain types of plastic.', japanese: 'リサイクルセンターは特定の種類のプラスチックしか受け付けない', type: 'phrase' },
+      { english: 'I need to renew my library card before the end of the month.', japanese: '月末までに図書館のカードを更新しないといけない', type: 'phrase' },
+      { english: 'The volunteer group is looking for people to help at the food bank.', japanese: 'ボランティアグループがフードバンクの手伝いを探しています', type: 'phrase' },
+      { english: 'grocery', japanese: '食料品', type: 'word' },
+      { english: 'landlord', japanese: '大家・家主', type: 'word' },
+      { english: 'pharmacy', japanese: '薬局', type: 'word' },
+      { english: 'municipality', japanese: '自治体', type: 'word' },
+      { english: 'renovation', japanese: '改装・リノベーション', type: 'word' },
+      { english: 'pedestrian', japanese: '歩行者', type: 'word' },
+      { english: 'resident', japanese: '居住者', type: 'word' },
+      { english: 'household', japanese: '世帯・家庭', type: 'word' },
+      { english: 'subscription', japanese: '定期購読・サブスクリプション', type: 'word' },
+      { english: 'amenity', japanese: '設備・アメニティ', type: 'word' },
+    ],
+  },
 ];
 
 export function getToeicStartDate(): string {

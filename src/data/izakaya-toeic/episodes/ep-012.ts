@@ -18,8 +18,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...珍しいな。',
-      english: '...That\'s unusual.',
+      japanese: '珍しいな。',
+      english: 'That\'s unusual.',
       action: 'カウンターをゆっくり拭きながら、リサの顔を見ないようにしている',
     },
     {
@@ -30,8 +30,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '......。',
-      english: '......',
+      japanese: '。',
+      english: '',
       action: 'グラスを磨く手を止めない',
     },
     {
@@ -55,8 +55,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '......リサちゃん。',
-      english: '......Lisa.',
+      japanese: 'リサちゃん。',
+      english: 'Lisa.',
       mood: 'worried',
     },
     {
@@ -122,8 +122,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...グラスが割れた音。',
-      english: '...Glass breaking.',
+      japanese: 'グラスが割れた音。',
+      english: 'Glass breaking.',
       mood: 'surprised',
     },
     {
@@ -133,8 +133,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...え？',
-      english: '...What?',
+      japanese: 'え？',
+      english: 'What?',
       mood: 'surprised',
     },
     {
@@ -144,8 +144,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '......してない。ただ、わかった。',
-      english: '......No. I just... knew.',
+      japanese: 'してない。ただ、わかった。',
+      english: 'No. I just... knew.',
       mood: 'surprised',
     },
     {
@@ -166,8 +166,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...問題を読んで、音声を待ってます。',
-      english: '...Reading the questions and waiting for the audio.',
+      japanese: '問題を読んで、音声を待ってます。',
+      english: 'Reading the questions and waiting for the audio.',
       mood: 'thinking',
     },
     {
@@ -182,8 +182,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...予測？',
-      english: '...Predict?',
+      japanese: '予測？',
+      english: 'Predict?',
       mood: 'thinking',
     },
     {
@@ -199,8 +199,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '......先読みして「これは留守電だ」と思ったら、「誰からか」をただ待てばいい？',
-      english: '......So if I read ahead and think "this is a voicemail," I just wait for who it\'s from?',
+      japanese: '先読みして「これは留守電だ」と思ったら、「誰からか」をただ待てばいい？',
+      english: 'So if I read ahead and think "this is a voicemail," I just wait for who it\'s from?',
       mood: 'thinking',
     },
     {
@@ -215,8 +215,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '......なあ。',
-      english: '......Hey.',
+      japanese: 'なあ。',
+      english: 'Hey.',
       mood: 'normal',
     },
     {
@@ -244,8 +244,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '......ふっ。',
-      english: '......Pfft.',
+      japanese: 'ふっ。',
+      english: 'Pfft.',
       mood: 'laughing',
       action: '涙が残ったまま、笑い出す',
     },
@@ -275,8 +275,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '......はい。',
-      english: '......Yes, sir.',
+      japanese: 'はい。',
+      english: 'Yes, sir.',
       mood: 'normal',
       action: '涙を拭いて、背筋を伸ばす',
     },

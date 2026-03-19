@@ -5,7 +5,7 @@ const episode: IzakayaEpisode = {
   number: 19,
   title: '試験前夜、全員が来た',
   subtitle: 'Part 3: 推論と情報統合の最終形',
-  description: '明日がTOEIC本番。誰も呼んでないのに、全員が来た。御守り、肉じゃが、手書きのノート、そして「大丈夫」の一言。単語を聞くな。人を聞け。',
+  description: '明日がトーイック本番。誰も呼んでないのに、全員が来た。御守り、肉じゃが、手書きのノート、そして「大丈夫」の一言。単語を聞くな。人を聞け。',
   targetPart: 3,
   targetSkill: 'inference-and-integration',
   targetSkillLabel: '推論と情報統合',
@@ -13,8 +13,8 @@ const episode: IzakayaEpisode = {
   story: [
     {
       speaker: 'narration',
-      japanese: '土曜日、午後8時。明日はTOEIC本番。ユキがのれんをくぐった。いつもと違う。足音が静かだ。',
-      english: 'Saturday, 8 PM. Tomorrow is the real TOEIC. Yuki steps through the curtain. Something is different tonight. Her footsteps are quiet.',
+      japanese: '土曜日、午後8時。明日はトーイック本番。ユキがのれんをくぐった。いつもと違う。足音が静かだ。',
+      english: 'Saturday, 8 PM. Tomorrow is the real トーイック. Yuki steps through the curtain. Something is different tonight. Her footsteps are quiet.',
     },
     {
       speaker: 'yuki',
@@ -61,15 +61,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...これ。帰りに神社寄ってきた。合格祈願の御守り。...こういうの馬鹿みたいだけど、なんか素通りできなくて。',
-      english: "...Here. I stopped by the shrine on the way over. A good luck charm. ...I know it's stupid, but I couldn't just walk past it.",
+      japanese: 'これ。帰りに神社寄ってきた。合格祈願の御守り。...こういうの馬鹿みたいだけど、なんか素通りできなくて。',
+      english: "Here. I stopped by the shrine on the way over. A good luck charm. ...I know it's stupid, but I couldn't just walk past it.",
       mood: 'normal',
       action: '紙袋からお守りを出して、目を合わせずに差し出す',
     },
     {
       speaker: 'yuki',
-      japanese: '...タケシくん。',
-      english: '...Takeshi.',
+      japanese: 'タケシくん。',
+      english: 'Takeshi.',
       mood: 'thinking',
       action: 'お守りを受け取り、手のひらで握る',
     },
@@ -87,8 +87,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...お前が料理。',
-      english: "...You. Cooked.",
+      japanese: 'お前が料理。',
+      english: "You. Cooked.",
       action: '鍋の蓋を開けて中を見る',
     },
     {
@@ -154,15 +154,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...みんな、なんで来たの。誰も呼んでないのに。',
-      english: "...Why did you all come. I didn't ask anyone to come.",
+      japanese: 'みんな、なんで来たの。誰も呼んでないのに。',
+      english: "Why did you all come. I didn't ask anyone to come.",
       mood: 'defeated',
       action: '湯呑みを握りしめる',
     },
     {
       speaker: 'takeshi',
-      japanese: '...なんとなく。ユキちゃん今日一人かなって。',
-      english: "...I dunno. Just thought you might be alone tonight.",
+      japanese: 'なんとなく。ユキちゃん今日一人かなって。',
+      english: "I dunno. Just thought you might be alone tonight.",
       mood: 'normal',
     },
     {
@@ -178,8 +178,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'ユキ。最後に1つだけ教える。TOEICのテクニックじゃない。',
-      english: "Yuki. One last thing. It's not a TOEIC technique.",
+      japanese: 'ユキ。最後に1つだけ教える。トーイックのテクニックじゃない。',
+      english: "Yuki. One last thing. It's not a トーイック technique.",
       action: 'グラスを拭く手を止めて、カウンター越しにユキを見る',
     },
     {
@@ -207,8 +207,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...それはな、お前がこの店で毎晩やってきたことと同じだ。人の話を聞いて、状況を読んで、気持ちを汲む。お前はそれを英語でできるようになった。',
-      english: "...That's the same thing you've been doing every night in this izakaya. Listening to people. Reading the situation. Understanding how they feel. You learned to do that in English.",
+      japanese: 'それはな、お前がこの店で毎晩やってきたことと同じだ。人の話を聞いて、状況を読んで、気持ちを汲む。お前はそれを英語でできるようになった。',
+      english: "That's the same thing you've been doing every night in this izakaya. Listening to people. Reading the situation. Understanding how they feel. You learned to do that in English.",
     },
     {
       speaker: 'narration',
@@ -217,22 +217,22 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...ごめん。泣くつもりなかった。怖いんじゃなくて。...なんか、こうなると思ってなくて。',
-      english: "...Sorry. I didn't mean to cry. I'm not scared. I just... I didn't expect any of this.",
+      japanese: 'ごめん。泣くつもりなかった。怖いんじゃなくて。...なんか、こうなると思ってなくて。',
+      english: "Sorry. I didn't mean to cry. I'm not scared. I just... I didn't expect any of this.",
       mood: 'defeated',
       action: '涙を拭う',
     },
     {
       speaker: 'takeshi',
-      japanese: '...ユキちゃん。泣いていいっすよ。俺も泣きそうだし。',
-      english: "...Yuki. It's okay to cry. I'm about to cry too.",
+      japanese: 'ユキちゃん。泣いていいっすよ。俺も泣きそうだし。',
+      english: "Yuki. It's okay to cry. I'm about to cry too.",
       mood: 'normal',
       action: '自分の目元をさりげなくこする',
     },
     {
       speaker: 'mina',
-      japanese: '...私も。',
-      english: '...Me too.',
+      japanese: '私も。',
+      english: 'Me too.',
       mood: 'normal',
       action: '小さく鼻をすする',
     },
@@ -243,8 +243,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...よし。全員グラスを持て。ユキは茶でいい。',
-      english: "...All right. Everyone, pick up your glass. Yuki, tea is fine.",
+      japanese: 'よし。全員グラスを持て。ユキは茶でいい。',
+      english: "All right. Everyone, pick up your glass. Yuki, tea is fine.",
       action: 'グラスにビールを注ぎ、自分のも満たす',
     },
     {
@@ -274,8 +274,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...行ってきます。',
-      english: "...I'll be going now.",
+      japanese: '行ってきます。',
+      english: "I'll be going now.",
       mood: 'normal',
       action: '涙の跡が残る顔で、笑う',
     },
@@ -302,7 +302,7 @@ const episode: IzakayaEpisode = {
         { text: 'Her order was delivered to the wrong address', isCorrect: false, trapType: 'topic-shift', explanation: '住所間違いの話は全く出ていない。商品が発送されていないのが問題だ。' },
         { text: 'The company canceled her order without notice', isCorrect: false, trapType: 'topic-shift', explanation: 'キャンセルはされていない。在庫切れで遅れているだけだ。' },
       ],
-      explanation: '状況把握問題。女性の訴えを状況として読む。「発送確認が来ない」→「何も更新情報がない」→「注文の進捗が不明な状態」。TOEICの正解はこの「状況」を別の言葉で言う。言葉ではなく、この人が今どういう困り方をしているかを掴む。',
+      explanation: '状況把握問題。女性の訴えを状況として読む。「発送確認が来ない」→「何も更新情報がない」→「注文の進捗が不明な状態」。トーイックの正解はこの「状況」を別の言葉で言う。言葉ではなく、この人が今どういう困り方をしているかを掴む。',
       paraphraseMap: [
         { original: "haven't received a shipping confirmation", paraphrased: 'no delivery update for her purchase', note: '発送確認未受領 → 購入品の配送更新なし' },
         { original: 'backordered', paraphrased: 'temporarily out of stock', note: '在庫切れで受注待ち → 一時的な品切れ' },
@@ -362,7 +362,7 @@ const episode: IzakayaEpisode = {
         { text: 'Stopping the current medication immediately', isCorrect: false, trapType: 'topic-shift', explanation: '薬を止めるとは言っていない。治療計画の「調整」を検討すると言っている。' },
         { text: 'Reducing the patient\'s dosage', isCorrect: false, trapType: 'verbatim', explanation: '"dosage" が音声に出てくるが、dosageを下げると言ったわけではない。増やしたことへの言及があるだけだ。' },
       ],
-      explanation: '"bring this to the multidisciplinary team" と "specialist referral" という2つの提案がある。どちらも「他の専門家に意見を求める」という同じ方向性だ。TOEICはこの2つを統合して "consulting with other medical professionals" にまとめる。複数の情報を統合して1つの状況として理解する力が必要。',
+      explanation: '"bring this to the multidisciplinary team" と "specialist referral" という2つの提案がある。どちらも「他の専門家に意見を求める」という同じ方向性だ。トーイックはこの2つを統合して "consulting with other medical professionals" にまとめる。複数の情報を統合して1つの状況として理解する力が必要。',
       paraphraseMap: [
         { original: 'bring this to the multidisciplinary team', paraphrased: 'consulting with other medical professionals', note: '多職種チームに持ち込む → 他の医療専門家に相談する' },
         { original: 'consider a specialist referral', paraphrased: 'seek expert opinion', note: '専門医への紹介を検討 → 専門家の意見を求める' },

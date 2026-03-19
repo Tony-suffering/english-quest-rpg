@@ -36,8 +36,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...秘密っていうか...ちょっとしたメモがあるだけで...',
-      english: "...It's not really a secret... I just have some notes...",
+      japanese: '秘密っていうか...ちょっとしたメモがあるだけで...',
+      english: "It's not really a secret... I just have some notes...",
       mood: 'normal',
     },
     {
@@ -52,8 +52,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...笑わないでくださいね。自分なりに整理しただけなんで。',
-      english: "...Please don't laugh. I just organized things in my own way.",
+      japanese: '笑わないでくださいね。自分なりに整理しただけなんで。',
+      english: "Please don't laugh. I just organized things in my own way.",
       mood: 'normal',
     },
     {
@@ -111,8 +111,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...俺が教えるより上手い説明だ。',
-      english: "...That's a better explanation than anything I could teach.",
+      japanese: '俺が教えるより上手い説明だ。',
+      english: "That's a better explanation than anything I could teach.",
       action: '腕を組んで感心しながら',
     },
     {
@@ -140,8 +140,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...あっ、聞こえた！ 「next Monday」って言った！ Whenの答えこれだ！',
-      english: '...Oh, I heard it! He said "next Monday"! That\'s the When answer!',
+      japanese: 'あっ、聞こえた！ 「next Monday」って言った！ Whenの答えこれだ！',
+      english: 'Oh, I heard it! He said "next Monday"! That\'s the When answer!',
       mood: 'excited',
     },
     {
@@ -168,8 +168,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...すみません。私、ずっと「派遣の子」で、何かを教えるなんて...初めてで...',
-      english: "...Sorry. I've always just been 'the temp worker,' and teaching someone something... this is the first time...",
+      japanese: 'すみません。私、ずっと「派遣の子」で、何かを教えるなんて...初めてで...',
+      english: "Sorry. I've always just been 'the temp worker,' and teaching someone something... this is the first time...",
       mood: 'normal',
     },
     {
@@ -194,8 +194,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...ありがとうございます。...えへへ。',
-      english: '...Thank you. ...Hehe.',
+      japanese: 'ありがとうございます。...えへへ。',
+      english: 'Thank you. ...Hehe.',
       mood: 'excited',
     },
     {

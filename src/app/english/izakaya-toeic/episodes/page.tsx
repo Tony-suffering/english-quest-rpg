@@ -7,6 +7,11 @@ import { CHARACTER_MAP } from '@/data/izakaya-toeic/characters';
 import { ToeicPart } from '@/data/izakaya-toeic/types';
 import { getProgress, isEpisodeCompleted, ToeicProgress } from '@/data/izakaya-toeic/progress';
 import { T, PART_COLORS } from '@/data/izakaya-toeic/theme';
+import { THIRTY_DAY_PLAN } from '@/data/izakaya-toeic/thirty-day-plan';
+
+// Episode ID → Day number lookup
+const EP_TO_DAY: Record<string, number> = {};
+for (const d of THIRTY_DAY_PLAN) EP_TO_DAY[d.episodeId] = d.day;
 
 // Group episodes by part
 function groupByPart(episodes: typeof EPISODES) {
@@ -118,7 +123,7 @@ export default function EpisodesListPage() {
                           color: completed ? T.green : partColor,
                           flexShrink: 0,
                         }}>
-                          {completed ? 'O' : ep.number}
+                          {completed ? 'O' : (EP_TO_DAY[ep.id] || ep.number)}
                         </div>
 
                         <div style={{ flex: 1, minWidth: 0 }}>
@@ -151,16 +156,12 @@ export default function EpisodesListPage() {
                                 const ch = CHARACTER_MAP[sid];
                                 if (!ch) return null;
                                 return (
-                                  <div key={sid} style={{
+                                  <img key={sid} src={`/characters/${ch.id}.png`} alt={ch.name} style={{
                                     width: 18, height: 18, borderRadius: '50%',
-                                    background: ch.color + '25',
                                     border: `1.5px solid ${ch.color}`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 8, fontWeight: 800, color: ch.color,
+                                    objectFit: 'cover',
                                     marginLeft: -3,
-                                  }}>
-                                    {ch.initial}
-                                  </div>
+                                  }} />
                                 );
                               })}
                             </div>

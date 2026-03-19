@@ -5,7 +5,7 @@ const episode: IzakayaEpisode = {
   number: 20,
   title: 'マスター、満点の秘密',
   subtitle: 'Part 4: 広告問題と990点の真実',
-  description: '権藤マスターがTOEICを受け続けた理由、2度の失敗、そして満点。最終話は広告問題と、1人の男の話だ。',
+  description: '権藤マスターがトーイックを受け続けた理由、2度の失敗、そして満点。最終話は広告問題と、1人の男の話だ。',
   targetPart: 4,
   targetSkill: 'advertisement-traps',
   targetSkillLabel: '広告問題の罠を見抜く',
@@ -19,8 +19,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...810。',
-      english: '...810.',
+      japanese: '810。',
+      english: '810.',
       mood: 'normal',
       action: 'スマホの画面をカウンターに置く',
     },
@@ -69,8 +69,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...ありがとうございます。ここで勉強しなかったら、絶対無理でした。',
-      english: '...Thank you. There\'s no way I could have done it without studying here.',
+      japanese: 'ありがとうございます。ここで勉強しなかったら、絶対無理でした。',
+      english: 'Thank you. There\'s no way I could have done it without studying here.',
       mood: 'normal',
       action: '少し目が潤んでいる',
     },
@@ -82,13 +82,13 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...なんだ。',
-      english: '...What.',
+      japanese: 'なんだ。',
+      english: 'What.',
     },
     {
       speaker: 'takeshi',
-      japanese: 'マスターって... 何者なんすか。なんで居酒屋のオヤジがTOEICのことそんなに知ってるの。',
-      english: 'Master... who ARE you? Why does a bar owner know so much about TOEIC?',
+      japanese: 'マスターって... 何者なんすか。なんで居酒屋のオヤジがトーイックのことそんなに知ってるの。',
+      english: 'Master... who ARE you? Why does a bar owner know so much about トーイック?',
       mood: 'thinking',
     },
     {
@@ -98,8 +98,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...権藤。権藤健三。それが本名だ。',
-      english: '...Gonda. Gonda Kenzou. That\'s my real name.',
+      japanese: '権藤。権藤健三。それが本名だ。',
+      english: 'Gonda. Gonda Kenzou. That\'s my real name.',
       action: 'グラスを置く',
     },
     {
@@ -109,8 +109,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '英語は苦手だった。ずっと苦手だった。40のとき、初めてTOEICを受けた。530だった。',
-      english: 'I was bad at English. Always had been. At forty, I took the TOEIC for the first time. Scored 530.',
+      japanese: '英語は苦手だった。ずっと苦手だった。40のとき、初めてトーイックを受けた。530だった。',
+      english: 'I was bad at English. Always had been. At forty, I took the トーイック for the first time. Scored 530.',
       action: 'カウンターに視線を落とす',
     },
     {
@@ -143,8 +143,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...俺より下だったのかよ。あんたが。',
-      english: '...You were worse than ME? You?',
+      japanese: '俺より下だったのかよ。あんたが。',
+      english: 'You were worse than ME? You?',
       mood: 'thinking',
       action: 'グラスを持つ手が止まる',
     },
@@ -188,8 +188,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...じゃあ、この居酒屋はTOEICがあったから存在するんですね。',
-      english: '...So this bar exists because of TOEIC.',
+      japanese: 'じゃあ、この居酒屋はトーイックがあったから存在するんですね。',
+      english: 'So this bar exists because of トーイック.',
       mood: 'thinking',
     },
     {
@@ -218,14 +218,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...俺、600取ったら何がしたいか、考えたことなかった。点数のことしか考えてなかった。',
-      english: '...I never once thought about what I\'d do AFTER I hit 600. All I ever thought about was the number.',
+      japanese: '俺、600取ったら何がしたいか、考えたことなかった。点数のことしか考えてなかった。',
+      english: 'I never once thought about what I\'d do AFTER I hit 600. All I ever thought about was the number.',
       mood: 'thinking',
     },
     {
       speaker: 'yuki',
-      japanese: '......。',
-      english: '......',
+      japanese: '。',
+      english: '',
       action: '静かに涙を拭く',
     },
     {
@@ -266,14 +266,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       action: '少しだけ笑う',
     },
     {
       speaker: 'master',
-      japanese: '...来週も、同じ時間でいいか。',
-      english: '...Same time next week?',
+      japanese: '来週も、同じ時間でいいか。',
+      english: 'Same time next week?',
     },
     {
       speaker: 'narration',
@@ -293,8 +293,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'さあ、最後の問題だ。広告問題。TOEICで一番嘘をつくパートだ。',
-      english: 'Now then. One last set of questions. Advertisement problems. The part of TOEIC that lies the most.',
+      japanese: 'さあ、最後の問題だ。広告問題。トーイックで一番嘘をつくパートだ。',
+      english: 'Now then. One last set of questions. Advertisement problems. The part of トーイック that lies the most.',
       action: '問題用紙をカウンターに置く',
     },
     {
@@ -305,8 +305,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '感動してる暇があったら解け。広告は、良いことを前に言う。本当のことは後ろに言う。TOEICも人生も同じだ。',
-      english: 'If you\'ve got time to be moved, you\'ve got time to solve problems. Ads front-load the good news. The truth is always at the back. TOEIC and life are the same that way.',
+      japanese: '感動してる暇があったら解け。広告は、良いことを前に言う。本当のことは後ろに言う。トーイックも人生も同じだ。',
+      english: 'If you\'ve got time to be moved, you\'ve got time to solve problems. Ads front-load the good news. The truth is always at the back. トーイック and life are the same that way.',
     },
     {
       speaker: 'takeshi',
@@ -352,7 +352,7 @@ const episode: IzakayaEpisode = {
         { text: 'A free device with every subscription', isCorrect: false, trapType: 'topic-shift', explanation: 'デバイスの無料配布の話はない。無料なのはinstallation（工事）だ。' },
         { text: 'A discount for existing customers', isCorrect: false, trapType: 'verbatim', explanation: '割引は "new customers only" と明示されている。既存顧客は対象外だ。音声に出てくる「新規顧客」を「既存顧客」と読み違えさせる罠。' },
       ],
-      explanation: '広告問題の典型的なパラフレーズ問題。"unlimited data" → "no data usage limits"。TOEICは広告のキャッチコピー（unlimited, free, fastest）を正確に言い換えて選択肢に出す。また "new customers only" という制限条件は別の設問で使われる罠として仕込まれている。',
+      explanation: '広告問題の典型的なパラフレーズ問題。"unlimited data" → "no data usage limits"。トーイックは広告のキャッチコピー（unlimited, free, fastest）を正確に言い換えて選択肢に出す。また "new customers only" という制限条件は別の設問で使われる罠として仕込まれている。',
       paraphraseMap: [
         { original: 'unlimited data', paraphrased: 'no data usage limits', note: '無制限データ → データ使用量の制限なし' },
         { original: 'free installation', paraphrased: 'no setup fee', note: '無料工事 → 設置費用なし' },
@@ -372,7 +372,7 @@ const episode: IzakayaEpisode = {
         { text: 'Consultants receive a fixed hourly wage', isCorrect: false, trapType: 'topic-shift', explanation: '時給の話は出ていない。収入は実績に基づく構造が示唆されている。' },
         { text: 'The company guarantees an income of eighty thousand dollars', isCorrect: false, trapType: 'verbatim', explanation: '80,000ドルはtop performersの実績値であって、保証額ではない。数字は音声に出てくるが、意味を正確に読まないと罠にはまる。' },
       ],
-      explanation: '広告の「罠言葉」を見抜く問題。"Top performers earned over eighty thousand dollars" は「稼いでいる人がいる」という事実であり、「全員が稼げる」の保証ではない。TOEICの広告問題でもっとも多い罠：数字を全員に適用させる読み間違い。"top performers only" という暗示を推論する力が必要。',
+      explanation: '広告の「罠言葉」を見抜く問題。"Top performers earned over eighty thousand dollars" は「稼いでいる人がいる」という事実であり、「全員が稼げる」の保証ではない。トーイックの広告問題でもっとも多い罠：数字を全員に適用させる読み間違い。"top performers only" という暗示を推論する力が必要。',
       paraphraseMap: [
         { original: 'top performers earned over eighty thousand', paraphrased: 'only the highest performers make significant income', note: 'トップパフォーマーが80,000超 → 高収入なのは高成績者のみ' },
         { original: 'financial independence', paraphrased: 'self-determined income', note: '経済的自立 → 自己決定の収入（実績次第）' },
@@ -392,7 +392,7 @@ const episode: IzakayaEpisode = {
         { text: 'Access to an existing client list', isCorrect: false, trapType: 'verbatim', explanation: '"build your own client base" とあるので、既存の顧客リストを提供されるわけではない。自分で作るのだ。' },
         { text: 'A guaranteed income for the first year', isCorrect: false, trapType: 'topic-shift', explanation: '初年度の保証収入という話は出ていない。収入は実績次第だ。' },
       ],
-      explanation: '"at no cost to you" → "free of charge"。広告でよく使われる「無料」の表現：at no cost / free of charge / complimentary / on the house。全部覚えておく価値がある。TOEICは必ずこれらを言い換えて出す。',
+      explanation: '"at no cost to you" → "free of charge"。広告でよく使われる「無料」の表現：at no cost / free of charge / complimentary / on the house。全部覚えておく価値がある。トーイックは必ずこれらを言い換えて出す。',
       paraphraseMap: [
         { original: 'at no cost to you', paraphrased: 'free of charge', note: '費用なし → 無料' },
         { original: 'comprehensive training program', paraphrased: 'training program for new consultants', note: '総合的な研修プログラム → 新コンサルタント向け研修' },
@@ -472,7 +472,7 @@ const episode: IzakayaEpisode = {
         { text: 'The free bulb offer is only available in stores', isCorrect: false, trapType: 'verbatim', explanation: '無料電球はオンライン購入でも対象。"online at luminasmart.com" でも購入可能と言っている。' },
         { text: 'The energy savings figure is not guaranteed', isCorrect: false, trapType: 'topic-shift', explanation: '省エネ数値の保証について特に言及はない。互換性についての警告が本題だ。' },
       ],
-      explanation: '広告問題で最も重要なスキル：最後の注意事項を拾う。"Not compatible with all legacy home automation systems. Check our website for a full compatibility list before purchasing." = 「全ての既存システムと互換性があるわけではない」。広告は良いことを先に言い、注意事項を最後に小さく言う。TOEICはその「小さな注意」を問う。最後まで気を抜くな。',
+      explanation: '広告問題で最も重要なスキル：最後の注意事項を拾う。"Not compatible with all legacy home automation systems. Check our website for a full compatibility list before purchasing." = 「全ての既存システムと互換性があるわけではない」。広告は良いことを先に言い、注意事項を最後に小さく言う。トーイックはその「小さな注意」を問う。最後まで気を抜くな。',
       paraphraseMap: [
         { original: 'not compatible with all legacy home automation systems', paraphrased: 'may not work with all existing systems', note: '全ての旧型ホームオートメーションシステムと互換性なし → 全ての既存システムで動作するとは限らない' },
         { original: 'check our website before purchasing', paraphrased: 'verify compatibility before buying', note: '購入前にウェブサイトを確認 → 購入前に互換性を確認' },

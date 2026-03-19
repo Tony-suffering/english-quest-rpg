@@ -57,8 +57,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...え、私が？',
-      english: '...Wait, me?',
+      japanese: 'え、私が？',
+      english: 'Wait, me?',
       mood: 'thinking',
     },
     {
@@ -98,13 +98,13 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'yuki',
       japanese: '「遅すぎる、早くしろ」ってこと...？',
-      english: 'She\'s saying "this is way too slow, hurry up"...?',
+      english: 'She\'s saying "this is way too slow, hurry up"?',
       mood: 'thinking',
     },
     {
       speaker: 'master',
-      japanese: 'そう。TOEICも同じ。"Is this the way things are normally done here?" は批判だ。情報を求めてるんじゃない。',
-      english: 'Exactly. Same thing on the TOEIC. "Is this the way things are normally done here?" is criticism. She\'s not asking for information.',
+      japanese: 'そう。トーイックも同じ。"Is this the way things are normally done here?" は批判だ。情報を求めてるんじゃない。',
+      english: 'Exactly. Same thing on the トーイック. "Is this the way things are normally done here?" is criticism. She\'s not asking for information.',
     },
     {
       speaker: 'mina',
@@ -119,8 +119,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...なるほど。日本語でも「まあ、こんなもんですか」って言われたら、クレームだよな。',
-      english: '...Yeah, I get it. In Japanese too, if someone says "well, I guess this is what you get," that\'s a complaint.',
+      japanese: 'なるほど。日本語でも「まあ、こんなもんですか」って言われたら、クレームだよな。',
+      english: 'Yeah, I get it. In Japanese too, if someone says "well, I guess this is what you get," that\'s a complaint.',
       mood: 'thinking',
     },
     {

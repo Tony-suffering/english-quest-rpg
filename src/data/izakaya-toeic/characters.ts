@@ -78,7 +78,7 @@ export const IZAKAYA_CHARACTERS: IzakayaCharacter[] = [
     jobEn: 'Construction Company Director',
     currentScore: 480,
     targetScore: 600,
-    personality: '昭和のおっさん。でも部下のために必死。感情移入ポイント。',
+    personality: '昭和のおっさん。でも部下のために必死。唯一の趣味はパチスロ。感情移入ポイント。',
     catchphrase: '俺な、部下の前で恥かきたくないんだよ。',
     catchphraseEn: "I don't wanna look dumb in front of my guys.",
     weakPoints: [3, 4, 7],

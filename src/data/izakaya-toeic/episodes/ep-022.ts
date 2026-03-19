@@ -32,15 +32,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: 'ミナから聞いた。TOEICの勉強会やってるんでしょ？ ...かわいいね。',
-      english: "Mina told me. You guys are doing a TOEIC study group? ...that's cute.",
+      japanese: 'ミナから聞いた。トーイックの勉強会やってるんでしょ？ ...かわいいね。',
+      english: "Mina told me. You guys are doing a トーイック study group? ...that's cute.",
       mood: 'normal',
       action: 'ワインを受け取りながら、少し口角が上がる',
     },
     {
       speaker: 'yuki',
-      japanese: '...「かわいい」って。860点の人に言われると腹立つんだけど。',
-      english: '..."Cute." That\'s really annoying coming from someone with 860.',
+      japanese: '「かわいい」って。860点の人に言われると腹立つんだけど。',
+      english: '"Cute." That\'s really annoying coming from someone with 860.',
       mood: 'angry',
     },
     {
@@ -51,8 +51,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...リサ。お前、付加疑問文で間違えたことあるか。',
-      english: '...Lisa. Have you ever gotten a tag question wrong?',
+      japanese: 'リサ。お前、付加疑問文で間違えたことあるか。',
+      english: 'Lisa. Have you ever gotten a tag question wrong?',
       mood: 'normal',
     },
     {
@@ -63,8 +63,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...そうか。',
-      english: '...I see.',
+      japanese: 'そうか。',
+      english: 'I see.',
       mood: 'normal',
       action: '少しだけ肩の力が抜ける',
     },
@@ -94,15 +94,15 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...いいよ。受けて立つ。',
-      english: "...fine. I'll take you all on.",
+      japanese: 'いいよ。受けて立つ。',
+      english: "fine. I'll take you all on.",
       mood: 'normal',
       action: 'ワインを一口飲んで、ペンを取る',
     },
     {
       speaker: 'mina',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'thinking',
       action: '静かにペンを握る。目が真剣',
     },
@@ -124,8 +124,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'thinking',
       action: 'ペンをくるくる回す。珍しく迷っている',
     },
@@ -142,8 +142,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...結果を言う。',
-      english: '...here are the results.',
+      japanese: '結果を言う。',
+      english: 'here are the results.',
       action: '全員のナプキンをカウンターに並べる',
     },
     {
@@ -153,8 +153,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...6？ 6 !? 前の模試3問だったのに！ 倍！ 俺、倍取った！',
-      english: "...six? SIX!? I only got three on the last mock test! That's double! I DOUBLED it!",
+      japanese: '6？ 6 !? 前の模試3問だったのに！ 倍！ 俺、倍取った！',
+      english: "six? SIX!? I only got three on the last mock test! That's double! I DOUBLED it!",
       mood: 'excited',
       action: 'ビールを持つ手が震えている',
     },
@@ -170,8 +170,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...8。前回5。ちゃんと上がってる。',
-      english: '...eight. Last time was five. It\'s actually going up.',
+      japanese: '8。前回5。ちゃんと上がってる。',
+      english: 'eight. Last time was five. It\'s actually going up.',
       mood: 'normal',
       action: 'ハイボールを一口。手が少し震えている',
     },
@@ -182,8 +182,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'normal',
       action: '拳を小さく握る。声は出さない。でもグラスが揺れた',
     },
@@ -199,8 +199,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...Q7でしょ。あの間接回答、考えすぎた。ネイティブ感覚で読んじゃって、テストの答え方を忘れた。',
-      english: "...it was Q7, right? I overthought that indirect answer. Read it like a native and forgot to think like a test-taker.",
+      japanese: 'Q7でしょ。あの間接回答、考えすぎた。ネイティブ感覚で読んじゃって、テストの答え方を忘れた。',
+      english: "it was Q7, right? I overthought that indirect answer. Read it like a native and forgot to think like a test-taker.",
       mood: 'thinking',
     },
     {
@@ -221,21 +221,21 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...1問落としました。似た音の罠に引っかかりました。',
-      english: '...I missed one. Got caught by a similar-sound trap.',
+      japanese: '1問落としました。似た音の罠に引っかかりました。',
+      english: 'I missed one. Got caught by a similar-sound trap.',
       mood: 'normal',
       action: 'うつむく',
     },
     {
       speaker: 'lisa',
-      japanese: '...ミナ、すごいね。わたしが860取った時より正確かもしれない。',
-      english: "...Mina, that's impressive. You might be more precise than I was when I got 860.",
+      japanese: 'ミナ、すごいね。わたしが860取った時より正確かもしれない。',
+      english: "Mina, that's impressive. You might be more precise than I was when I got 860.",
       mood: 'normal',
     },
     {
       speaker: 'yuki',
-      japanese: '...ちょっと待って。Q4、あの間接回答の問題。ユキが "A" って書いてるのに、リサが "B" って書いてる。どっちが正解？',
-      english: '...wait. Q4, that indirect answer question. I wrote A, but Lisa wrote B. Which one is right?',
+      japanese: 'ちょっと待って。Q4、あの間接回答の問題。ユキが "A" って書いてるのに、リサが "B" って書いてる。どっちが正解？',
+      english: 'wait. Q4, that indirect answer question. I wrote A, but Lisa wrote B. Which one is right?',
       mood: 'thinking',
     },
     {
@@ -250,8 +250,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...わたしが、リサさんに勝った？ 1問だけど？',
-      english: '...I beat Lisa? Just one question, but still?',
+      japanese: 'わたしが、リサさんに勝った？ 1問だけど？',
+      english: 'I beat Lisa? Just one question, but still?',
       mood: 'thinking',
     },
     {
@@ -262,8 +262,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       mood: 'normal',
       action: 'ハイボールを飲む。手はもう震えていない。でも目が光っている',
     },
@@ -297,14 +297,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...Part 3。長い会話か。',
-      english: '...Part 3. Longer conversations, huh.',
+      japanese: 'Part 3。長い会話か。',
+      english: 'Part 3. Longer conversations, huh.',
       mood: 'normal',
     },
     {
       speaker: 'yuki',
-      japanese: '...聞き取りがもっと大変になるってこと？',
-      english: "...so the listening gets even harder?",
+      japanese: '聞き取りがもっと大変になるってこと？',
+      english: "so the listening gets even harder?",
       mood: 'thinking',
     },
     {
@@ -314,8 +314,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...わたしも来週来ていい？ 一人で勉強するの、飽きてたんだよね。ここの方が楽しい。',
-      english: "...can I come next week too? I was getting tired of studying alone. This is more fun.",
+      japanese: 'わたしも来週来ていい？ 一人で勉強するの、飽きてたんだよね。ここの方が楽しい。',
+      english: "can I come next week too? I was getting tired of studying alone. This is more fun.",
       mood: 'normal',
     },
     {
@@ -326,8 +326,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...リサさんがいると、わたしも頑張れます。',
-      english: '...having Lisa here motivates me too.',
+      japanese: 'リサさんがいると、わたしも頑張れます。',
+      english: 'having Lisa here motivates me too.',
       mood: 'normal',
     },
     {
@@ -337,8 +337,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...今日の点数は、1ヶ月後に自慢話になる。ならなかったら、また俺のせいだ。',
-      english: "...tonight's scores will be bragging rights in a month. If they're not, that's on me again.",
+      japanese: '今日の点数は、1ヶ月後に自慢話になる。ならなかったら、また俺のせいだ。',
+      english: "tonight's scores will be bragging rights in a month. If they're not, that's on me again.",
       action: 'グラスを小さく掲げる',
     },
     {
@@ -399,7 +399,7 @@ const episode: IzakayaEpisode = {
         { text: "Yes, I joined the company last year.", isCorrect: false, trapType: 'similar-sound', explanation: '"join" → "joined" の音の罠 + 話題の完全すり替え。ランチの誘いに入社時期は意味不明。' },
         { text: "We usually have lunch at the cafeteria.", isCorrect: false, trapType: 'topic-shift', explanation: '"lunch" リピート + 話題すり替え。「一緒にどう？」に「いつもカフェテリアで食べる」は誘いへの返答になっていない。' },
       ],
-      explanation: '提案に対する間接回答。ユキがリサに勝った問題。リサは「直接的に断ってる選択肢を探してた」が、TOEICは間接的な断りが正解になりやすい。',
+      explanation: '提案に対する間接回答。ユキがリサに勝った問題。リサは「直接的に断ってる選択肢を探してた」が、トーイックは間接的な断りが正解になりやすい。',
       difficulty: 'medium',
       scoreLevel: 600,
       skillTag: 'indirect-answers',

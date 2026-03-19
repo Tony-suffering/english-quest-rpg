@@ -29,8 +29,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '......え？ 自分で答えるの？ A, B, Cから選ぶんじゃなくて？',
-      english: '......What? We answer ourselves? Not pick from A, B, C?',
+      japanese: 'え？ 自分で答えるの？ A, B, Cから選ぶんじゃなくて？',
+      english: 'What? We answer ourselves? Not pick from A, B, C?',
       mood: 'thinking',
     },
     {
@@ -55,14 +55,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...えっと...post office...is...あの...um...',
-      english: '...Uh...post office...is...um...uh...',
+      japanese: 'えっと...post office...is...あの...um...',
+      english: 'Uh...post office...is...um...uh...',
       mood: 'defeated',
     },
     {
       speaker: 'yuki',
-      japanese: '...ダメだ。答え分かってるのに、口から出てこない。選択肢があれば一瞬なのに。',
-      english: '...I can\'t. I know the answer, but it won\'t come out. If there were choices, I\'d get it instantly.',
+      japanese: 'ダメだ。答え分かってるのに、口から出てこない。選択肢があれば一瞬なのに。',
+      english: 'I can\'t. I know the answer, but it won\'t come out. If there were choices, I\'d get it instantly.',
       mood: 'defeated',
     },
     {
@@ -72,8 +72,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '"Two blocks! That way!" ...あ、文になってない。',
-      english: '"Two blocks! That way!" ...Oh, that\'s not even a sentence.',
+      japanese: '"Two blocks! That way!" あ、文になってない。',
+      english: '"Two blocks! That way!" Oh, that\'s not even a sentence.',
       mood: 'excited',
     },
     {
@@ -83,8 +83,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...え？ 俺ので合ってるんですか？',
-      english: '...Huh? Mine was correct?',
+      japanese: 'え？ 俺ので合ってるんですか？',
+      english: 'Huh? Mine was correct?',
       mood: 'thinking',
     },
     {
@@ -99,8 +99,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '"Well, actually, I think it\'s free after two. Let me double-check the schedule though." ...みたいな？',
-      english: '"Well, actually, I think it\'s free after two. Let me double-check the schedule though." ...Like that?',
+      japanese: '"Well, actually, I think it\'s free after two. Let me double-check the schedule though." みたいな？',
+      english: '"Well, actually, I think it\'s free after two. Let me double-check the schedule though." Like that?',
       mood: 'normal',
     },
     {
@@ -136,8 +136,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '......yes...please...',
-      english: '......yes...please...',
+      japanese: 'yes...please...',
+      english: 'yes...please...',
       mood: 'defeated',
       action: 'ほぼ聞こえない声で',
     },
@@ -148,8 +148,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '"...Yes, please send it...to my email." ......こう？',
-      english: '"...Yes, please send it...to my email." ......Like this?',
+      japanese: '"Yes, please send it...to my email." こう？',
+      english: '"Yes, please send it...to my email." Like this?',
       mood: 'thinking',
     },
     {
@@ -164,8 +164,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '"Not yet. Tomorrow." ......短すぎますか？',
-      english: '"Not yet. Tomorrow." ......Too short?',
+      japanese: '"Not yet. Tomorrow." 短すぎますか？',
+      english: '"Not yet. Tomorrow." Too short?',
       mood: 'thinking',
     },
     {
@@ -175,8 +175,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...ちょっと待って。今気づいた。Part 2の選択肢って、全部スピーキングの型なんじゃない？',
-      english: '...Hold on. I just realized something. Aren\'t all Part 2 answer choices basically speaking templates?',
+      japanese: 'ちょっと待って。今気づいた。Part 2の選択肢って、全部スピーキングの型なんじゃない？',
+      english: 'Hold on. I just realized something. Aren\'t all Part 2 answer choices basically speaking templates?',
       mood: 'excited',
     },
     {
@@ -186,14 +186,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: 'じゃあ俺たち、TOEICの勉強しながらスピーキングも練習してたってこと？',
-      english: 'So we\'ve been practicing speaking while studying for TOEIC this whole time?',
+      japanese: 'じゃあ俺たち、トーイックの勉強しながらスピーキングも練習してたってこと？',
+      english: 'So we\'ve been practicing speaking while studying for トーイック this whole time?',
       mood: 'excited',
     },
     {
       speaker: 'master',
-      japanese: 'TOEICを「解く」から「使う」に変えろ。そうすればリスニングもスピーキングも同時に伸びる。選ぶ側から、答える側に回れ。',
-      english: 'Switch from "solving" TOEIC to "using" it. Then listening and speaking grow together. Stop being the one who picks. Become the one who answers.',
+      japanese: 'トーイックを「解く」から「使う」に変えろ。そうすればリスニングもスピーキングも同時に伸びる。選ぶ側から、答える側に回れ。',
+      english: 'Switch from "solving" トーイック to "using" it. Then listening and speaking grow together. Stop being the one who picks. Become the one who answers.',
     },
     {
       speaker: 'narration',

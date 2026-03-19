@@ -5,7 +5,7 @@ const episode: IzakayaEpisode = {
   number: 30,
   title: '弱点ゼロへ、最後の特訓',
   subtitle: '総合: 個別弱点克服',
-  description: 'TOEIC本番まであと2日。全員が自分の弱点と向き合う。マスターが組んだ個別メニュー。最後の特訓で見えたのは、成長だけじゃなかった。',
+  description: 'トーイック本番まであと2日。全員が自分の弱点と向き合う。マスターが組んだ個別メニュー。最後の特訓で見えたのは、成長だけじゃなかった。',
   targetPart: 3,
   targetSkill: 'weakness-elimination',
   targetSkillLabel: '弱点克服',
@@ -18,8 +18,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...早いな。まだのれん出してない。',
-      english: "...You're early. I haven't even put the curtain up yet.",
+      japanese: '早いな。まだのれん出してない。',
+      english: "You're early. I haven't even put the curtain up yet.",
       action: 'ドアの鍵を開けながら',
     },
     {
@@ -40,8 +40,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...わかってる。途中で頭が別のこと考え始めるんだよ。',
-      english: "...I know. My mind starts wandering halfway through.",
+      japanese: 'わかってる。途中で頭が別のこと考え始めるんだよ。',
+      english: "I know. My mind starts wandering halfway through.",
       mood: 'defeated',
     },
     {
@@ -81,8 +81,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...ミナちゃん、準備良すぎない？',
-      english: "...Mina, you came a little too prepared, didn't you?",
+      japanese: 'ミナちゃん、準備良すぎない？',
+      english: "Mina, you came a little too prepared, didn't you?",
       mood: 'excited',
     },
     {
@@ -118,8 +118,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...「Please contact the front desk at extension 220.」 最後の文、聞こえた。全部聞こえた。',
-      english: '..."Please contact the front desk at extension 220." I heard the last sentence. I heard all of it.',
+      japanese: '「Please contact the front desk at extension 220.」 最後の文、聞こえた。全部聞こえた。',
+      english: '"Please contact the front desk at extension 220." I heard the last sentence. I heard all of it.',
       mood: 'excited',
       action: 'イヤホンを外して、呆然とする',
     },
@@ -130,8 +130,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...マジか。',
-      english: '...For real?',
+      japanese: 'マジか。',
+      english: 'For real?',
       mood: 'thinking',
     },
     {
@@ -218,8 +218,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...The stakeholder meeting will include a fiscal year-end review and updated quarterly projections.',
-      english: '...The stakeholder meeting will include a fiscal year-end review and updated quarterly projections.',
+      japanese: 'The stakeholder meeting will include a fiscal year-end review and updated quarterly projections.',
+      english: 'The stakeholder meeting will include a fiscal year-end review and updated quarterly projections.',
       mood: 'thinking',
     },
     {
@@ -239,8 +239,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...。',
-      english: '...',
+      japanese: '。',
+      english: '',
       action: 'カウンターの奥から、全員を静かに見ている',
     },
     {
@@ -250,8 +250,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...今日は終わりだ。',
-      english: "...That's enough for today.",
+      japanese: '今日は終わりだ。',
+      english: "That's enough for today.",
     },
     {
       speaker: 'takeshi',
@@ -276,8 +276,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...答え？',
-      english: '...Answer?',
+      japanese: '答え？',
+      english: 'Answer?',
       mood: 'thinking',
     },
     {
@@ -287,8 +287,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...俺、タケシに教えてもらってただけだけど。',
-      english: '...I was just getting taught by Takeshi, though.',
+      japanese: '俺、タケシに教えてもらってただけだけど。',
+      english: 'I was just getting taught by Takeshi, though.',
       mood: 'defeated',
     },
     {
@@ -428,7 +428,7 @@ const episode: IzakayaEpisode = {
     { word: 'escalate', meaning: '上位に報告する、エスカレーションする', example: 'We need to escalate this to the warehouse team.', partOfSpeech: 'verb' },
     { word: 'fiscal year', meaning: '会計年度', example: 'The fiscal year ends in March for most Japanese companies.', partOfSpeech: 'noun phrase' },
     { word: 'mandatory', meaning: '義務的な、必須の', example: 'Attendance is mandatory for all team leads.', partOfSpeech: 'adjective' },
-    { word: 'paraphrase', meaning: '言い換える、パラフレーズする', example: 'TOEIC answers paraphrase the original audio.', partOfSpeech: 'verb' },
+    { word: 'paraphrase', meaning: '言い換える、パラフレーズする', example: 'トーイック answers paraphrase the original audio.', partOfSpeech: 'verb' },
     { word: 'loop in', meaning: '(会議・メールに)巻き込む、参加させる', example: 'Loop in quality assurance too.', partOfSpeech: 'phrasal verb' },
   ],
   previousEpisodeId: 'ep-029',

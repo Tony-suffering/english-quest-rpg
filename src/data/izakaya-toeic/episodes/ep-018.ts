@@ -86,8 +86,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...えー。「Attention passengers. Flight JL507 to Osaka has been delayed due to a technical inspection. The new departure time is 6:45 PM. Passengers are asked to remain in the boarding area.」...これでいい？',
-      english: '...Uh. "Attention passengers. Flight JL507 to Osaka has been delayed due to a technical inspection. The new departure time is 6:45 PM. Passengers are asked to remain in the boarding area." ...That good enough?',
+      japanese: 'えー。「Attention passengers. Flight JL507 to Osaka has been delayed due to a technical inspection. The new departure time is 6:45 PM. Passengers are asked to remain in the boarding area.」...これでいい？',
+      english: 'Uh. "Attention passengers. Flight JL507 to Osaka has been delayed due to a technical inspection. The new departure time is 6:45 PM. Passengers are asked to remain in the boarding area." That good enough?',
       mood: 'thinking',
     },
     {
@@ -149,8 +149,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...。生ビール出す。続けろ。',
-      english: "...Draft beers, coming up. Now keep going.",
+      japanese: '。生ビール出す。続けろ。',
+      english: "Draft beers, coming up. Now keep going.",
       action: 'グラスを並べながら',
     },
   ],

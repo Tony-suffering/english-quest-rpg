@@ -25,8 +25,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...図表付きのPart 3か。',
-      english: '...Part 3 with graphics, huh.',
+      japanese: '図表付きのPart 3か。',
+      english: 'Part 3 with graphics, huh.',
       action: 'グラスを拭きながら',
     },
     {
@@ -95,8 +95,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '...テーブルA！カウンターは1人ずつだから！',
-      english: '...Table A! The counter seats are all singles!',
+      japanese: 'テーブルA！カウンターは1人ずつだから！',
+      english: 'Table A! The counter seats are all singles!',
       mood: 'excited',
     },
     {
@@ -106,8 +106,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '......それだけ？',
-      english: '......That\'s it?',
+      japanese: 'それだけ？',
+      english: 'That\'s it?',
       mood: 'thinking',
     },
     {

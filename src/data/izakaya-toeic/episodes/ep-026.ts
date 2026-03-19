@@ -5,7 +5,7 @@ const episode: IzakayaEpisode = {
   number: 26,
   title: 'パラフレーズ道場、開店',
   subtitle: '総合: 聞く→言い換える→話す',
-  description: 'TOEICの問題を「解く」から「使う」へ。聞いた英語を自分の言葉で言い換える。それがスピーキングの筋肉だと気づく夜。',
+  description: 'トーイックの問題を「解く」から「使う」へ。聞いた英語を自分の言葉で言い換える。それがスピーキングの筋肉だと気づく夜。',
   targetPart: 3,
   targetSkill: 'paraphrase-production',
   targetSkillLabel: 'パラフレーズ発話',
@@ -13,8 +13,8 @@ const episode: IzakayaEpisode = {
   story: [
     {
       speaker: 'narration',
-      japanese: '木曜日、午後9時半。マスターがいつもと違う雰囲気でカウンターに立っている。テーブルの上にはTOEICの問題用紙ではなく、白紙のノートが5冊。',
-      english: 'Thursday, 9:30 PM. The Master stands behind the counter with an unusual air about him. On the table -- not TOEIC practice tests, but five blank notebooks.',
+      japanese: '木曜日、午後9時半。マスターがいつもと違う雰囲気でカウンターに立っている。テーブルの上にはトーイックの問題用紙ではなく、白紙のノートが5冊。',
+      english: 'Thursday, 9:30 PM. The Master stands behind the counter with an unusual air about him. On the table -- not トーイック practice tests, but five blank notebooks.',
     },
     {
       speaker: 'yuki',
@@ -24,13 +24,13 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '今日からTOEICの問題を解くだけじゃない。英語を使う。',
-      english: 'Starting today, we\'re not just solving TOEIC problems. We\'re using English.',
+      japanese: '今日からトーイックの問題を解くだけじゃない。英語を使う。',
+      english: 'Starting today, we\'re not just solving トーイック problems. We\'re using English.',
     },
     {
       speaker: 'takeshi',
-      japanese: '...使う？TOEICって選択肢選ぶだけじゃないんですか？',
-      english: '...Using it? Isn\'t TOEIC just picking from multiple choice?',
+      japanese: '使う？トーイックって選択肢選ぶだけじゃないんですか？',
+      english: 'Using it? Isn\'t トーイック just picking from multiple choice?',
       mood: 'thinking',
     },
     {
@@ -47,8 +47,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '無理じゃない。TOEICの正解選択肢は毎回これをやっている。パラフレーズだ。聞いた英語を別の英語で表現する。これがTOEICの核心だ。',
-      english: 'It\'s not impossible. Every correct answer in TOEIC does exactly this. Paraphrasing. Expressing what you heard in different English. This is the core of TOEIC.',
+      japanese: '無理じゃない。トーイックの正解選択肢は毎回これをやっている。パラフレーズだ。聞いた英語を別の英語で表現する。これがトーイックの核心だ。',
+      english: 'It\'s not impossible. Every correct answer in トーイック does exactly this. Paraphrasing. Expressing what you heard in different English. This is the core of トーイック.',
     },
     {
       speaker: 'narration',
@@ -62,8 +62,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '"The financial document for this quarter is due Friday." ...こんな感じ？',
-      english: '"The financial document for this quarter is due Friday." ...Something like that?',
+      japanese: '"The financial document for this quarter is due Friday." こんな感じ？',
+      english: '"The financial document for this quarter is due Friday." Something like that?',
       mood: 'normal',
     },
     {
@@ -78,8 +78,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...私もやってみる。えっと..."The money report for three months...has to be...given...before the week finishes."',
-      english: '...Let me try. Um..."The money report for three months...has to be...given...before the week finishes."',
+      japanese: '私もやってみる。えっと..."The money report for three months...has to be...given...before the week finishes."',
+      english: 'Let me try. Um..."The money report for three months...has to be...given...before the week finishes."',
       mood: 'thinking',
     },
     {
@@ -100,8 +100,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '......あっ。',
-      english: '......Oh.',
+      japanese: 'あっ。',
+      english: 'Oh.',
       mood: 'excited',
     },
     {
@@ -117,8 +117,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: 'TOEICで鍛えてたのは、スピーキングの筋肉だったんだ...。パラフレーズを選ぶ力は、パラフレーズを作る力の入口だったんだ。',
-      english: 'What TOEIC was training all along was the muscle for speaking... The ability to recognize paraphrases is the gateway to producing them.',
+      japanese: 'トーイックで鍛えてたのは、スピーキングの筋肉だったんだ...。パラフレーズを選ぶ力は、パラフレーズを作る力の入口だったんだ。',
+      english: 'What トーイック was training all along was the muscle for speaking... The ability to recognize paraphrases is the gateway to producing them.',
       mood: 'excited',
     },
     {
@@ -133,8 +133,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: '"New people meeting...is change...Monday, next week." ......すみません。',
-      english: '"New people meeting...is change...Monday, next week." ......Sorry.',
+      japanese: '"New people meeting...is change...Monday, next week." すみません。',
+      english: '"New people meeting...is change...Monday, next week." Sorry.',
       mood: 'defeated',
     },
     {
@@ -155,19 +155,19 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'lisa',
-      japanese: '...マスター、それ地味にいいこと言ってる。TOEICのスコアとコミュニケーション力って別物なんだよね。',
-      english: '...Master, that\'s quietly profound. TOEIC scores and communication skills are actually different things.',
+      japanese: 'マスター、それ地味にいいこと言ってる。トーイックのスコアとコミュニケーション力って別物なんだよね。',
+      english: 'Master, that\'s quietly profound. トーイック scores and communication skills are actually different things.',
       mood: 'thinking',
     },
     {
       speaker: 'master',
-      japanese: 'だが両方鍛えられるのがパラフレーズだ。正確さを上げればTOEICのスコアが上がる。伝達力を上げればスピーキングが上がる。同じ筋肉だ。',
-      english: 'But paraphrasing trains both. Improve accuracy and your TOEIC score goes up. Improve communicability and your speaking goes up. Same muscle.',
+      japanese: 'だが両方鍛えられるのがパラフレーズだ。正確さを上げればトーイックのスコアが上がる。伝達力を上げればスピーキングが上がる。同じ筋肉だ。',
+      english: 'But paraphrasing trains both. Improve accuracy and your トーイック score goes up. Improve communicability and your speaking goes up. Same muscle.',
     },
     {
       speaker: 'mina',
-      japanese: '...私も...やってみる。"The training for newcomers...will happen on a different day...next Monday."',
-      english: '...I\'ll...try too. "The training for newcomers...will happen on a different day...next Monday."',
+      japanese: '私も...やってみる。"The training for newcomers...will happen on a different day...next Monday."',
+      english: 'I\'ll...try too. "The training for newcomers...will happen on a different day...next Monday."',
       mood: 'thinking',
     },
     {
@@ -205,7 +205,7 @@ const episode: IzakayaEpisode = {
         { text: 'They want to reduce spending on traditional media.', isCorrect: false, trapType: 'verbatim', explanation: '"expand"を"reduce"と逆に捉える罠。拡大であって削減ではない。' },
         { text: 'They want to move the campaign to a later date.', isCorrect: false, trapType: 'topic-shift', explanation: 'スケジュール変更の話はしていない。"upcoming"に引っ張られる罠。' },
       ],
-      explanation: 'パラフレーズ認識の基本問題。"expand into social media advertising" = "start promoting on online platforms"。直接的な単語の一致はないが、意味は完全に同じ。TOEICの正解はほぼ必ずこのパターンで作られる。',
+      explanation: 'パラフレーズ認識の基本問題。"expand into social media advertising" = "start promoting on online platforms"。直接的な単語の一致はないが、意味は完全に同じ。トーイックの正解はほぼ必ずこのパターンで作られる。',
       paraphraseMap: [
         { original: 'expand into social media advertising', paraphrased: 'start promoting on online platforms', note: 'SNS広告に拡大 → オンラインでの宣伝を開始' },
         { original: 'additional funding', paraphrased: 'more money', note: '追加予算 → より多くの資金' },
@@ -296,8 +296,8 @@ const episode: IzakayaEpisode = {
     },
   ],
   masterTip: {
-    japanese: 'パラフレーズは「翻訳」じゃない。「言い換え」だ。同じ英語を別の英語で言う力。これがTOEICの正解を見抜く力であり、スピーキングで自分の考えを伝える力でもある。同じ筋肉だ。毎日1文でいい、聞いた英語を自分の言葉で言い直せ。',
-    english: 'Paraphrasing isn\'t translating. It\'s re-expressing. Saying the same English in different English. This is the skill that spots TOEIC answers AND the skill that lets you speak your mind. Same muscle. One sentence a day -- rephrase what you heard in your own words.',
+    japanese: 'パラフレーズは「翻訳」じゃない。「言い換え」だ。同じ英語を別の英語で言う力。これがトーイックの正解を見抜く力であり、スピーキングで自分の考えを伝える力でもある。同じ筋肉だ。毎日1文でいい、聞いた英語を自分の言葉で言い直せ。',
+    english: 'Paraphrasing isn\'t translating. It\'s re-expressing. Saying the same English in different English. This is the skill that spots トーイック answers AND the skill that lets you speak your mind. Same muscle. One sentence a day -- rephrase what you heard in your own words.',
   },
   vocabHighlights: [
     { word: 'rephrase', meaning: '言い換える', example: 'Can you rephrase that in simpler terms?', partOfSpeech: 'verb' },

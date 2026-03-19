@@ -18,8 +18,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...マスター、焼酎ダブルで。',
-      english: '...Master, shochu. Double.',
+      japanese: 'マスター、焼酎ダブルで。',
+      english: 'Master, shochu. Double.',
       mood: 'defeated',
       action: '額をカウンターにつけたまま',
     },
@@ -31,8 +31,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '会社でTOEICの模試やらされた。Part 2 の否定疑問文、全滅。8問中8問不正解。完封された。',
-      english: 'They made us take a practice TOEIC at work. Negative questions in Part 2... total wipeout. Eight out of eight wrong. A perfect zero.',
+      japanese: '会社でトーイックの模試やらされた。Part 2 の否定疑問文、全滅。8問中8問不正解。完封された。',
+      english: 'They made us take a practice トーイック at work. Negative questions in Part 2... total wipeout. Eight out of eight wrong. A perfect zero.',
       mood: 'defeated',
     },
     {
@@ -67,7 +67,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'kenji',
       japanese: '日本語だったら「はい、思います」でしょ。だから "Yes" を選んだ。...不正解だった。',
-      english: 'In Japanese you\'d say "Yes, I think so," right? So I picked "Yes." ...Wrong answer.',
+      english: 'In Japanese you\'d say "Yes, I think so," right? So I picked "Yes." Wrong answer.',
       mood: 'defeated',
     },
     {
@@ -78,8 +78,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...そこだ。日本語と英語で Yes/No が逆になるケース。',
-      english: '...That\'s the trap. Cases where Yes and No flip between Japanese and English.',
+      japanese: 'そこだ。日本語と英語で Yes/No が逆になるケース。',
+      english: 'That\'s the trap. Cases where Yes and No flip between Japanese and English.',
     },
     {
       speaker: 'master',
@@ -89,8 +89,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...ん？ じゃあ「思わない」場合は？',
-      english: '...Huh? Then what if you don\'t think so?',
+      japanese: 'ん？ じゃあ「思わない」場合は？',
+      english: 'Huh? Then what if you don\'t think so?',
       mood: 'thinking',
     },
     {
@@ -100,8 +100,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...待って。つまり "Don\'t you like coffee?" って聞かれて、コーヒー好きなら "Yes"、嫌いなら "No" ってこと？ 否定とか関係なく？',
-      english: '...Hold on. So if someone asks "Don\'t you like coffee?" -- if you like it, "Yes," if you don\'t, "No"? The negative part doesn\'t matter at all?',
+      japanese: '待って。つまり "Don\'t you like coffee?" って聞かれて、コーヒー好きなら "Yes"、嫌いなら "No" ってこと？ 否定とか関係なく？',
+      english: 'Hold on. So if someone asks "Don\'t you like coffee?" -- if you like it, "Yes," if you don\'t, "No"? The negative part doesn\'t matter at all?',
       mood: 'thinking',
     },
     {
@@ -111,14 +111,14 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...シンプルすぎん？ 俺なんで8問全部間違えたんだ？',
-      english: '...That\'s way too simple. How the hell did I get all eight wrong?',
+      japanese: 'シンプルすぎん？ 俺なんで8問全部間違えたんだ？',
+      english: 'That\'s way too simple. How the hell did I get all eight wrong?',
       mood: 'defeated',
     },
     {
       speaker: 'mina',
-      japanese: '...あの、わたし否定疑問文得意ですよ。答え方にコツがあるんです。',
-      english: '...Um, I\'m actually pretty good at negative questions. There\'s a trick to answering them.',
+      japanese: 'あの、わたし否定疑問文得意ですよ。答え方にコツがあるんです。',
+      english: 'Um, I\'m actually pretty good at negative questions. There\'s a trick to answering them.',
       mood: 'normal',
     },
     {
@@ -141,8 +141,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...別に珍しくないです。',
-      english: '...It\'s not that rare.',
+      japanese: '別に珍しくないです。',
+      english: 'It\'s not that rare.',
       mood: 'normal',
     },
     {
@@ -175,8 +175,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...はい。',
-      english: '...Yes, sir.',
+      japanese: 'はい。',
+      english: 'Yes, sir.',
       mood: 'defeated',
     },
   ],

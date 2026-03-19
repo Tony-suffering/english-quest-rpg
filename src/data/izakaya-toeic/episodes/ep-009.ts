@@ -37,8 +37,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...で？',
-      english: '...And?',
+      japanese: 'で？',
+      english: 'And?',
     },
     {
       speaker: 'kenji',
@@ -48,8 +48,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...それは断ってないぞ。',
-      english: '...You didn\'t turn him down. You turned down the beer.',
+      japanese: 'それは断ってないぞ。',
+      english: 'You didn\'t turn him down. You turned down the beer.',
     },
     {
       speaker: 'kenji',
@@ -64,8 +64,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...つまり俺、ビール勧められてたのに断ったのか。接待なのに。',
-      english: '...So he was offering me a beer and I said no. During a business dinner.',
+      japanese: 'つまり俺、ビール勧められてたのに断ったのか。接待なのに。',
+      english: 'So he was offering me a beer and I said no. During a business dinner.',
       mood: 'defeated',
     },
     {
@@ -148,8 +148,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'kenji',
-      japanese: '...俺、接待失敗したな。',
-      english: '...I blew the business dinner.',
+      japanese: '俺、接待失敗したな。',
+      english: 'I blew the business dinner.',
       mood: 'defeated',
       action: 'ビールを飲み干して',
     },

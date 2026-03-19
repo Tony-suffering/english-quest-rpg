@@ -5,7 +5,7 @@ const episode: IzakayaEpisode = {
   number: 2,
   title: 'タケシ、リピートトラップに引っかかる',
   subtitle: 'Part 2: 単語リピートの罠',
-  description: '聞こえた単語に飛びつくな。TOEICが仕掛ける「リピートトラップ」の正体を暴く。',
+  description: '聞こえた単語に飛びつくな。トーイックが仕掛ける「リピートトラップ」の正体を暴く。',
   targetPart: 2,
   targetSkill: 'verbatim-trap',
   targetSkillLabel: '単語リピートの罠',
@@ -18,8 +18,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'takeshi',
-      japanese: 'マスター！ 俺、今日会社でTOEICの模試やったんだけど、Part 2 で12問しか合ってなかった。25問中12問。半分以下。',
-      english: 'Master! I took a practice TOEIC at work today and only got 12 right on Part 2. Twelve out of twenty-five. Less than half.',
+      japanese: 'マスター！ 俺、今日会社でトーイックの模試やったんだけど、Part 2 で12問しか合ってなかった。25問中12問。半分以下。',
+      english: 'Master! I took a practice トーイック at work today and only got 12 right on Part 2. Twelve out of twenty-five. Less than half.',
       mood: 'defeated',
     },
     {
@@ -36,8 +36,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '...それ、予定通りだ。',
-      english: '...That went exactly as expected.',
+      japanese: 'それ、予定通りだ。',
+      english: 'That went exactly as expected.',
     },
     {
       speaker: 'takeshi',
@@ -46,8 +46,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'TOEICは、お前みたいなやつを落とすために問題を作ってる。',
-      english: 'TOEIC designs its questions specifically to trip up people like you.',
+      japanese: 'トーイックは、お前みたいなやつを落とすために問題を作ってる。',
+      english: 'トーイック designs its questions specifically to trip up people like you.',
     },
     {
       speaker: 'takeshi',
@@ -64,8 +64,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: 'そういうこと。TOEICの不正解選択肢は、わざと質問と同じ単語を入れてる。聞こえた単語がある ＝ 罠だと思え。',
-      english: 'Exactly. TOEIC wrong answers deliberately reuse words from the question. If you hear the same word, assume it\'s a trap.',
+      japanese: 'そういうこと。トーイックの不正解選択肢は、わざと質問と同じ単語を入れてる。聞こえた単語がある ＝ 罠だと思え。',
+      english: 'Exactly. トーイック wrong answers deliberately reuse words from the question. If you hear the same word, assume it\'s a trap.',
     },
     {
       speaker: 'takeshi',
@@ -92,8 +92,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'master',
-      japanese: '質問: "Where did you park your car?" 選択肢A: "Yes, I went to the park." ...これ、何がおかしい？',
-      english: 'Question: "Where did you park your car?" Choice A: "Yes, I went to the park." ...What\'s wrong with that?',
+      japanese: '質問: "Where did you park your car?" 選択肢A: "Yes, I went to the park." これ、何がおかしい？',
+      english: 'Question: "Where did you park your car?" Choice A: "Yes, I went to the park." What\'s wrong with that?',
     },
     {
       speaker: 'takeshi',
@@ -115,8 +115,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'mina',
-      japanese: '...え、それ普通に聞いたらわかりません？ "park your car" と "went to the park" 全然違くないですか？',
-      english: '...Wait, can\'t you just tell by listening? "Park your car" and "went to the park" sound totally different, don\'t they?',
+      japanese: 'え、それ普通に聞いたらわかりません？ "park your car" と "went to the park" 全然違くないですか？',
+      english: 'Wait, can\'t you just tell by listening? "Park your car" and "went to the park" sound totally different, don\'t they?',
       mood: 'normal',
     },
     {
@@ -132,8 +132,8 @@ const episode: IzakayaEpisode = {
     },
     {
       speaker: 'yuki',
-      japanese: '...音を聞くか、意味を聞くか。深いな。',
-      english: '...Listening for sounds versus listening for meaning. That\'s deep.',
+      japanese: '音を聞くか、意味を聞くか。深いな。',
+      english: 'Listening for sounds versus listening for meaning. That\'s deep.',
       mood: 'thinking',
     },
     {
@@ -166,7 +166,7 @@ const episode: IzakayaEpisode = {
         { text: 'About two hours, I think.', isCorrect: true, explanation: '「どのくらい？」→「2時間くらい」。シンプルだが、"training" も "session" も "last" も使ってない。' },
         { text: 'I trained for the marathon.', isCorrect: false, trapType: 'verbatim', explanation: '"training" → "trained" のリピート。研修の話なのにマラソンの訓練にすり替え。' },
       ],
-      explanation: '"last" は「続く」（How long will it last?）と「最後の」（the last session）の2つの意味がある。同じ音に2つの意味を持たせるのがTOEICの得意技。',
+      explanation: '"last" は「続く」（How long will it last?）と「最後の」（the last session）の2つの意味がある。同じ音に2つの意味を持たせるのがトーイックの得意技。',
       difficulty: 'medium',
       scoreLevel: 600,
       skillTag: 'verbatim-trap',
@@ -208,15 +208,15 @@ const episode: IzakayaEpisode = {
         { text: 'The contract expires next month.', isCorrect: false, trapType: 'verbatim', explanation: '"contract" リピート。「確認した？」に対して契約の期限を答えている。質問にズレてる。' },
         { text: "I'm still going through it.", isCorrect: true, explanation: '"review" を "go through"（目を通す）に言い換え。「まだ読んでる途中」= まだ終わってない、の間接的な No。' },
       ],
-      explanation: '"review" → "go through" のパラフレーズ。正解は質問の単語を一切使わずに、同じ意味を伝えている。これがTOEICの正解パターン。',
+      explanation: '"review" → "go through" のパラフレーズ。正解は質問の単語を一切使わずに、同じ意味を伝えている。これがトーイックの正解パターン。',
       difficulty: 'medium',
       scoreLevel: 600,
       skillTag: 'verbatim-trap',
     },
   ],
   masterTip: {
-    japanese: '聞こえた単語がある選択肢は、まず疑え。TOEICの正解は、同じ意味を違う言葉で言い換える。',
-    english: "If you hear the same word in the answer, be suspicious. TOEIC answers rephrase, they don't repeat.",
+    japanese: '聞こえた単語がある選択肢は、まず疑え。トーイックの正解は、同じ意味を違う言葉で言い換える。',
+    english: "If you hear the same word in the answer, be suspicious. トーイック answers rephrase, they don't repeat.",
   },
   vocabHighlights: [
     { word: 'file (verb)', meaning: '書類を整理する/提出する', example: 'Can you file these documents?', partOfSpeech: 'verb' },
