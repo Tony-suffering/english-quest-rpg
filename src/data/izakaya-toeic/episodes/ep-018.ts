@@ -3,9 +3,9 @@ import { IzakayaEpisode } from '../types';
 const episode: IzakayaEpisode = {
   id: 'ep-018',
   number: 18,
-  title: '全員集合！アナウンス特訓',
+  title: 'ムードメーカーの裏側',
   subtitle: 'Part 4: アナウンスの法則',
-  description: '空港、店内、会議室。アナウンスは全部同じ構造をしている。最初と最後を押さえれば、Part 4は半分勝ちだ。',
+  description: '空港、店内、会議室。アナウンスは全部同じ構造をしている。最初と最後を押さえれば、Part 4は半分勝ちだ。そして今夜、ムードメーカーの仮面が落ちる。',
   targetPart: 4,
   targetSkill: 'announcement-structure',
   targetSkillLabel: 'アナウンス構造の把握',

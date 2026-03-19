@@ -3,9 +3,9 @@ import { IzakayaEpisode } from '../types';
 const episode: IzakayaEpisode = {
   id: 'ep-030',
   number: 30,
-  title: '弱点ゼロへ、最後の特訓',
-  subtitle: '総合: 個別弱点克服',
-  description: 'トーイック本番まであと2日。全員が自分の弱点と向き合う。マスターが組んだ個別メニュー。最後の特訓で見えたのは、成長だけじゃなかった。',
+  title: 'あの夏の生徒',
+  subtitle: '総合: のれんの向こうへ',
+  description: '最終夜。マスターが初めて自分の過去を語る。「のれん」という名前に込められた秘密。30夜すべての言葉が、たった一人の生徒に繋がっていた。',
   targetPart: 3,
   targetSkill: 'weakness-elimination',
   targetSkillLabel: '弱点克服',
