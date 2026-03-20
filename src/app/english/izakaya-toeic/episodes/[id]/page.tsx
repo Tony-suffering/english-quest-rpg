@@ -181,7 +181,7 @@ function StoryLineView({ line, isNew, showEnglish }: { line: StoryLine; isNew: b
       animation: isNew ? 'izk-fadein 0.4s ease' : undefined,
     }}>
       <img
-        src={`/izakaya-scenes/${line.sceneImage}`}
+        src={line.sceneImage.startsWith('http') ? line.sceneImage : `/izakaya-scenes/${line.sceneImage}`}
         alt={line.action || line.japanese}
         style={{ width: '100%', height: 'auto', display: 'block' }}
       />
@@ -929,7 +929,7 @@ export default function EpisodeDetailPage() {
                 position: 'relative',
               }}>
                 <img
-                  src="/izakaya-scenes/ep-001/hero.webp"
+                  src="https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/toeic-ep001-hero/public"
                   alt={episode.title}
                   style={{ width: '100%', height: 'auto', display: 'block' }}
                 />
@@ -1209,7 +1209,7 @@ export default function EpisodeDetailPage() {
                         boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
                       }}>
                         <img
-                          src={`/izakaya-scenes/${line.sceneImage}`}
+                          src={line.sceneImage.startsWith('http') ? line.sceneImage : `/izakaya-scenes/${line.sceneImage}`}
                           alt={line.action || line.japanese}
                           style={{ width: '100%', height: 'auto', display: 'block' }}
                         />
