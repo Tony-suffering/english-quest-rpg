@@ -171,7 +171,7 @@ export default function IzakayaToeicPage() {
           border: `3px solid rgba(212,175,55,0.3)`,
         }}>
           <img
-            src="/izakaya-scenes/group-portrait.png"
+            src="/izakaya-scenes/group-portrait.webp"
             alt="のれんの常連たち"
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />

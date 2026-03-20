@@ -929,7 +929,7 @@ export default function EpisodeDetailPage() {
                 position: 'relative',
               }}>
                 <img
-                  src="/izakaya-scenes/ep-001/hero.png"
+                  src="/izakaya-scenes/ep-001/hero.webp"
                   alt={episode.title}
                   style={{ width: '100%', height: 'auto', display: 'block' }}
                 />
