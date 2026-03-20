@@ -1,0 +1,28 @@
+{
+  "name": "居酒屋TOEIC",
+  "short_name": "TOEIC酒場",
+  "description": "ストーリーで学ぶTOEIC対策アプリ",
+  "start_url": "/english/izakaya-toeic",
+  "scope": "/english/",
+  "display": "standalone",
+  "background_color": "#FAFAF9",
+  "theme_color": "#D4AF37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/english-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/english-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education"],
+  "lang": "ja",
+  "dir": "ltr"
+}

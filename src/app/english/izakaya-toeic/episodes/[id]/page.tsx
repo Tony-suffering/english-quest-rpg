@@ -10,6 +10,7 @@ import { recordEpisodeResult, getEpisodeResult, addVocabToDeck, getVocabDeck, Vo
 import { T, parseConversation, isConversation } from '@/data/izakaya-toeic/theme';
 import { THIRTY_DAY_PLAN, getCompletedDays, markDayComplete } from '@/data/izakaya-toeic/thirty-day-plan';
 import EpisodeTutorial from '../EpisodeTutorial';
+import BookRecommendation from '../../BookRecommendation';
 
 type Phase = 'story' | 'quiz' | 'results';
 
@@ -54,6 +55,24 @@ function speakText(text: string, gender: 'male' | 'female' = 'male', rate = 0.9)
     utter.pitch = 0.95;
   }
   window.speechSynthesis.speak(utter);
+}
+
+// ── Pre-generated audio playback (OpenAI TTS) with browser TTS fallback ──
+function playAudioFile(src: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    const audio = new Audio(src);
+    audio.onended = () => resolve(true);
+    audio.onerror = () => resolve(false);
+    audio.play().catch(() => resolve(false));
+  });
+}
+
+async function playQuizAudio(episodeId: string, qIndex: number, fallbackText: string) {
+  const src = `/audio/${episodeId}/q${qIndex + 1}.mp3`;
+  const played = await playAudioFile(src);
+  if (!played) {
+    speakText(fallbackText);
+  }
 }
 
 // ── Conversation Player (Memoria-style) ──
@@ -151,21 +170,44 @@ function ConversationPlayer({ script, onDone }: { script: string; onDone?: () =>
 
 // ── Story Line (bilingual: Japanese + English) ──
 function StoryLineView({ line, isNew, showEnglish }: { line: StoryLine; isNew: boolean; showEnglish: boolean }) {
+  // Scene image (light-novel style illustration)
+  const sceneImageEl = line.sceneImage ? (
+    <div style={{
+      maxWidth: '100%',
+      borderRadius: 12,
+      overflow: 'hidden',
+      marginBottom: 12,
+      boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+      animation: isNew ? 'izk-fadein 0.4s ease' : undefined,
+    }}>
+      <img
+        src={`/izakaya-scenes/${line.sceneImage}`}
+        alt={line.action || line.japanese}
+        style={{ width: '100%', height: 'auto', display: 'block' }}
+      />
+    </div>
+  ) : null;
+
   const char = line.speaker !== 'narration' ? CHARACTER_MAP[line.speaker] : null;
   if (line.speaker === 'narration') {
     return (
-      <div style={{ padding: '12px 0', textAlign: 'center', animation: isNew ? 'izk-fadein 0.4s ease' : undefined }}>
-        {line.action && <div style={{ fontSize: 11, color: T.textMuted, fontStyle: 'italic', marginBottom: 2 }}>{line.action}</div>}
-        <div style={{ fontSize: 13, color: T.textMuted, fontStyle: 'italic' }}>{line.japanese}</div>
-        {showEnglish && line.english && (
-          <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2, opacity: 0.7 }}>{line.english}</div>
-        )}
-      </div>
+      <>
+        {sceneImageEl}
+        <div style={{ padding: '12px 0', textAlign: 'center', animation: isNew ? 'izk-fadein 0.4s ease' : undefined }}>
+          {line.action && <div style={{ fontSize: 11, color: T.textMuted, fontStyle: 'italic', marginBottom: 2 }}>{line.action}</div>}
+          <div style={{ fontSize: 13, color: T.textMuted, fontStyle: 'italic' }}>{line.japanese}</div>
+          {showEnglish && line.english && (
+            <div style={{ fontSize: 11, color: T.textMuted, marginTop: 2, opacity: 0.7 }}>{line.english}</div>
+          )}
+        </div>
+      </>
     );
   }
   const color = char?.color || T.textSub;
   return (
-    <div style={{ display: 'flex', gap: 8, padding: '5px 0', animation: isNew ? 'izk-fadein 0.4s ease' : undefined }}>
+    <>
+      {sceneImageEl}
+      <div style={{ display: 'flex', gap: 8, padding: '5px 0', animation: isNew ? 'izk-fadein 0.4s ease' : undefined }}>
       <img
         src={`/characters/${char?.id || 'master'}.png`}
         alt={char?.name || '?'}
@@ -194,15 +236,16 @@ function StoryLineView({ line, isNew, showEnglish }: { line: StoryLine; isNew: b
         </div>
       </div>
     </div>
+    </>
   );
 }
 
 // ── Quiz Question (NO auto-advance -- user clicks "次へ") ──
 function QuizQuestion({
-  question, qIndex, total, onNext,
+  question, qIndex, total, onNext, episodeId,
 }: {
   question: ToeicQuestion; qIndex: number; total: number;
-  onNext: (correct: boolean) => void;
+  onNext: (correct: boolean) => void; episodeId: string;
 }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -211,10 +254,10 @@ function QuizQuestion({
 
   useEffect(() => {
     if (question.audioScript && !hasConvo) {
-      const timer = setTimeout(() => speakText(question.audioScript!), 500);
+      const timer = setTimeout(() => playQuizAudio(episodeId, qIndex, question.audioScript!), 500);
       return () => clearTimeout(timer);
     }
-  }, [question.audioScript, hasConvo]);
+  }, [question.audioScript, hasConvo, episodeId, qIndex]);
 
   const handleSelect = useCallback((idx: number) => {
     if (revealed) return;
@@ -246,7 +289,7 @@ function QuizQuestion({
           <ConversationPlayer script={question.audioScript} />
         </div>
       ) : question.audioScript ? (
-        <button onClick={() => speakText(question.audioScript!)} style={{
+        <button onClick={() => playQuizAudio(episodeId, qIndex, question.audioScript!)} style={{
           width: '100%', padding: '12px 16px', background: T.surface, borderRadius: 10,
           marginBottom: 16, textAlign: 'left', cursor: 'pointer',
           border: `1px solid ${T.border}`, borderLeftWidth: 3, borderLeftColor: T.gold,
@@ -462,6 +505,7 @@ export default function EpisodeDetailPage() {
     try { return parseFloat(localStorage.getItem('izakaya_tts_speed') || '0.9'); } catch { return 0.9; }
   });
   const storyPlayingRef = useRef(false);
+  const storyAudioRef = useRef<HTMLAudioElement | null>(null);
   const storyLineRefs = useRef<(HTMLDivElement | null)[]>([]);
   const storyListRef = useRef<HTMLDivElement>(null);
 
@@ -580,19 +624,49 @@ export default function EpisodeDetailPage() {
     setShowVocabModal(true);
   };
 
-  const speakStoryLine = useCallback((line: StoryLine, rate: number) => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
+  const stopStoryAudio = useCallback(() => {
+    if (storyAudioRef.current) {
+      storyAudioRef.current.pause();
+      storyAudioRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+  }, []);
+
+  // Returns a promise that resolves when playback ends (true=audio, false=TTS fallback used)
+  const speakStoryLine = useCallback((line: StoryLine, rate: number, lineIndex: number): Promise<void> => {
+    stopStoryAudio();
     const txt = line.english || line.japanese;
-    const utterance = new SpeechSynthesisUtterance(txt);
-    const isFemale = line.speaker !== 'narration' && /female|lisa|mina|yuki/i.test(line.speaker);
-    const voiceName = isFemale ? femaleVoice : maleVoice;
-    const voice = getVoiceByName(voiceName);
-    if (voice) utterance.voice = voice;
-    utterance.lang = 'en-US';
-    utterance.rate = rate;
-    window.speechSynthesis.speak(utterance);
-  }, [maleVoice, femaleVoice, getVoiceByName]);
+    if (!txt) return Promise.resolve();
+
+    // Try pre-generated MP3 first
+    const padded = String(lineIndex + 1).padStart(3, '0');
+    const src = `/audio/${episodeId}/story-${padded}.mp3`;
+
+    return new Promise<void>((resolve) => {
+      const audio = new Audio(src);
+      storyAudioRef.current = audio;
+      audio.playbackRate = rate;
+      audio.onended = () => { storyAudioRef.current = null; resolve(); };
+      audio.onerror = () => {
+        // Fallback to browser TTS
+        storyAudioRef.current = null;
+        if (typeof window === 'undefined' || !window.speechSynthesis) { resolve(); return; }
+        const utterance = new SpeechSynthesisUtterance(txt);
+        const isFemale = line.speaker !== 'narration' && /female|lisa|mina|yuki/i.test(line.speaker);
+        const voiceName = isFemale ? femaleVoice : maleVoice;
+        const voice = getVoiceByName(voiceName);
+        if (voice) utterance.voice = voice;
+        utterance.lang = 'en-US';
+        utterance.rate = rate;
+        utterance.onend = () => resolve();
+        utterance.onerror = () => resolve();
+        window.speechSynthesis.speak(utterance);
+      };
+      audio.play().catch(() => {
+        audio.onerror?.(new Event('error'));
+      });
+    });
+  }, [episodeId, maleVoice, femaleVoice, getVoiceByName, stopStoryAudio]);
 
   const playStoryLine = useCallback((idx: number) => {
     if (!episode || idx < 0 || idx >= episode.story.length) {
@@ -603,52 +677,46 @@ export default function EpisodeDetailPage() {
     }
     setStoryCurrentLine(idx);
     const line = episode.story[idx];
-    speakStoryLine(line, storySpeed);
     startStoryProgress();
 
-    const check = setInterval(() => {
-      if (!window.speechSynthesis.speaking) {
-        clearInterval(check);
-        stopStoryProgress();
-        setStoryProgress(100);
-        if (storyPlayingRef.current) {
-          const nextIdx = getNextStoryIndex(idx);
-          if (nextIdx >= 0) {
-            setTimeout(() => playStoryLine(nextIdx), 400);
-          } else {
-            setStoryPlaying(false);
-            storyPlayingRef.current = false;
-          }
+    speakStoryLine(line, storySpeed, idx).then(() => {
+      stopStoryProgress();
+      setStoryProgress(100);
+      if (storyPlayingRef.current) {
+        const nextIdx = getNextStoryIndex(idx);
+        if (nextIdx >= 0) {
+          setTimeout(() => playStoryLine(nextIdx), 400);
+        } else {
+          setStoryPlaying(false);
+          storyPlayingRef.current = false;
         }
       }
-    }, 100);
+    });
   }, [episode, storySpeed, speakStoryLine, getNextStoryIndex]);
 
   const playStoryPrevious = useCallback(() => {
     if (!episode) return;
-    window.speechSynthesis.cancel();
+    stopStoryAudio();
     stopStoryProgress();
     const prev = storyCurrentLine <= 0 ? episode.story.length - 1 : storyCurrentLine - 1;
     setStoryCurrentLine(prev);
-    speakStoryLine(episode.story[prev], storySpeed);
+    speakStoryLine(episode.story[prev], storySpeed, prev);
     startStoryProgress();
-    // no auto-scroll -- user controls their own scroll position
-  }, [episode, storyCurrentLine, storySpeed, speakStoryLine]);
+  }, [episode, storyCurrentLine, storySpeed, speakStoryLine, stopStoryAudio]);
 
   const playStoryNext = useCallback(() => {
     if (!episode) return;
-    window.speechSynthesis.cancel();
+    stopStoryAudio();
     stopStoryProgress();
     const next = storyCurrentLine + 1 >= episode.story.length ? 0 : storyCurrentLine + 1;
     setStoryCurrentLine(next);
-    speakStoryLine(episode.story[next], storySpeed);
+    speakStoryLine(episode.story[next], storySpeed, next);
     startStoryProgress();
-    // no auto-scroll
-  }, [episode, storyCurrentLine, storySpeed, speakStoryLine]);
+  }, [episode, storyCurrentLine, storySpeed, speakStoryLine, stopStoryAudio]);
 
   const toggleStoryPlay = useCallback(() => {
     if (storyPlaying) {
-      window.speechSynthesis.cancel();
+      stopStoryAudio();
       setStoryPlaying(false);
       storyPlayingRef.current = false;
       stopStoryProgress();
@@ -662,7 +730,7 @@ export default function EpisodeDetailPage() {
 
   // Cleanup TTS on unmount or phase change
   useEffect(() => {
-    return () => { window.speechSynthesis?.cancel(); storyPlayingRef.current = false; stopStoryProgress(); };
+    return () => { stopStoryAudio(); storyPlayingRef.current = false; stopStoryProgress(); };
   }, [phase]);
 
   const previousBest = useMemo(() => episodeId ? getEpisodeResult(episodeId) : undefined, [episodeId]);
@@ -854,6 +922,32 @@ export default function EpisodeDetailPage() {
 
           return (
           <div>
+            {/* Hero image */}
+            {episode.id === 'ep-001' && (
+              <div style={{
+                margin: '-16px -16px 16px', overflow: 'hidden',
+                position: 'relative',
+              }}>
+                <img
+                  src="/izakaya-scenes/ep-001/hero.png"
+                  alt={episode.title}
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
+                />
+                <div style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0,
+                  background: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
+                  padding: '40px 20px 16px',
+                }}>
+                  <div style={{ fontSize: 10, fontWeight: 700, color: T.gold, letterSpacing: 2, marginBottom: 4 }}>
+                    EPISODE 1
+                  </div>
+                  <div style={{ fontSize: 20, fontWeight: 900, color: '#fff', lineHeight: 1.3 }}>
+                    {episode.title}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Guide banner */}
             <div style={{
               padding: '12px 14px', background: T.goldBg, borderRadius: 10,
@@ -1098,27 +1192,38 @@ export default function EpisodeDetailPage() {
                 const isNarration = line.speaker === 'narration';
 
                 const handleLineClick = () => {
-                  window.speechSynthesis.cancel();
+                  stopStoryAudio();
                   stopStoryProgress();
                   setStoryPlaying(false);
                   storyPlayingRef.current = false;
                   setStoryCurrentLine(i);
-                  speakStoryLine(line, storySpeed);
+                  speakStoryLine(line, storySpeed, i);
                   startStoryProgress();
                 };
 
                 return (
-                  <div
-                    key={i}
-                    ref={el => { storyLineRefs.current[i] = el; }}
-                    onClick={handleLineClick}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 16,
-                      padding: '12px 16px',
-                      backgroundColor: isActive ? T.bgSecondary : 'transparent',
-                      borderRadius: 8, cursor: 'pointer',
-                    }}
-                  >
+                  <div key={i} ref={el => { storyLineRefs.current[i] = el; }}>
+                    {line.sceneImage && (
+                      <div style={{
+                        margin: '12px 0', borderRadius: 12, overflow: 'hidden',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.08)',
+                      }}>
+                        <img
+                          src={`/izakaya-scenes/${line.sceneImage}`}
+                          alt={line.action || line.japanese}
+                          style={{ width: '100%', height: 'auto', display: 'block' }}
+                        />
+                      </div>
+                    )}
+                    <div
+                      onClick={handleLineClick}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 16,
+                        padding: '12px 16px',
+                        backgroundColor: isActive ? T.bgSecondary : 'transparent',
+                        borderRadius: 8, cursor: 'pointer',
+                      }}
+                    >
                     <div style={{ width: 24, textAlign: 'center', fontSize: 13, color: isActive ? T.gold : T.textMuted }}>
                       {isActive && storyPlaying ? '\u266B' : i + 1}
                     </div>
@@ -1182,6 +1287,7 @@ export default function EpisodeDetailPage() {
                         {savedPhrases.has(line.english!) ? '追加済み' : '+仕込み帳'}
                       </button>
                     )}
+                    </div>
                   </div>
                 );
               })}
@@ -1211,10 +1317,9 @@ export default function EpisodeDetailPage() {
                 border: `1px solid ${T.border}`, borderLeftWidth: 3, borderLeftColor: T.gold,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 4 }}>
-                  <div style={{
-                    width: 24, height: 24, borderRadius: '50%', background: '#78716C12', border: '2px solid #78716C',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 9, color: '#78716C',
-                  }}>権</div>
+                  <img src="/characters/master.png" alt="マスター" style={{
+                    width: 28, height: 28, borderRadius: '50%', border: '2px solid #78716C', objectFit: 'cover',
+                  }} />
                   <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted }}>マスター</span>
                 </div>
                 <p style={{ fontSize: 13, color: T.textSub, margin: 0, lineHeight: 1.7 }}>
@@ -1236,6 +1341,7 @@ export default function EpisodeDetailPage() {
               qIndex={quizIndex}
               total={totalQ}
               onNext={handleNext}
+              episodeId={episode.id}
             />
           </div>
         )}
@@ -1275,10 +1381,9 @@ export default function EpisodeDetailPage() {
               boxShadow: T.shadow,
             }}>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}>
-                <div style={{
-                  width: 22, height: 22, borderRadius: '50%', background: '#78716C12', border: '1.5px solid #78716C',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 8, color: '#78716C',
-                }}>権</div>
+                <img src="/characters/master.png" alt="マスター" style={{
+                  width: 24, height: 24, borderRadius: '50%', border: '1.5px solid #78716C', objectFit: 'cover',
+                }} />
                 <span style={{ fontSize: 10, fontWeight: 700, color: T.gold, letterSpacing: 1 }}>MASTER'S TIP</span>
               </div>
               <p style={{ fontSize: 14, color: T.text, lineHeight: 1.8, margin: 0, fontWeight: 500 }}>
@@ -1372,6 +1477,9 @@ export default function EpisodeDetailPage() {
                 </div>
               </div>
             )}
+
+            {/* Book recommendations */}
+            <BookRecommendation skill={episode.targetSkill} limit={2} context="episode" />
 
             {/* Action buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>

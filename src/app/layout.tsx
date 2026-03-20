@@ -24,21 +24,22 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora', weight: ['400', '700'], display: 'swap', preload: false })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://english-quest-rpg.vercel.app'),
-  title: 'English Quest RPG',
-  description: 'RPG-style English learning app. Master natural English through quests, conversations, and daily practice.',
-  keywords: ['English learning', 'RPG', 'English quest', 'conversation practice'],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.toniolab.com'),
+  title: '居酒屋TOEIC -- ストーリーで学ぶTOEIC対策',
+  description: 'ストーリーの続きが気になるTOEIC対策アプリ。居酒屋の常連キャラと一緒にリスニング力を鍛えよう。',
+  keywords: ['TOEIC', 'TOEIC対策', '居酒屋TOEIC', 'リスニング', '英語学習'],
   authors: [{ name: 'tonio' }],
+  manifest: '/manifest.json',
   icons: {
     icon: '/english-icon.png',
     shortcut: '/english-icon.png',
     apple: '/english-icon.png',
   },
   openGraph: {
-    title: 'English Quest RPG',
-    description: 'RPG-style English learning app. Master natural English through quests, conversations, and daily practice.',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://english-quest-rpg.vercel.app',
-    siteName: 'English Quest RPG',
+    title: '居酒屋TOEIC -- ストーリーで学ぶTOEIC対策',
+    description: 'ストーリーの続きが気になるTOEIC対策アプリ。居酒屋の常連キャラと一緒にリスニング力を鍛えよう。',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.toniolab.com',
+    siteName: '居酒屋TOEIC',
     locale: 'ja_JP',
     type: 'website',
     images: [
@@ -46,14 +47,14 @@ export const metadata: Metadata = {
         url: '/english-icon.png',
         width: 512,
         height: 512,
-        alt: 'English Quest RPG',
+        alt: '居酒屋TOEIC',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'English Quest RPG',
-    description: 'RPG-style English learning app. Master natural English through quests, conversations, and daily practice.',
+    title: '居酒屋TOEIC -- ストーリーで学ぶTOEIC対策',
+    description: 'ストーリーの続きが気になるTOEIC対策アプリ。居酒屋の常連キャラと一緒にリスニング力を鍛えよう。',
     images: ['/english-icon.png'],
   },
   robots: {
@@ -82,6 +83,7 @@ export default function RootLayout({
         <CinematicOverlay />
         {children}
         <Toaster />
+        <script dangerouslySetInnerHTML={{ __html: `if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){})});}` }} />
       </body>
     </html>
   );

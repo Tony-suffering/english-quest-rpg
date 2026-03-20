@@ -6,6 +6,7 @@ import { IZAKAYA_CHARACTERS } from '@/data/izakaya-toeic/characters';
 import { EPISODES } from '@/data/izakaya-toeic/episodes';
 import { getProgress, ToeicProgress, isEpisodeCompleted } from '@/data/izakaya-toeic/progress';
 import { T } from '@/data/izakaya-toeic/theme';
+import { calculateRank } from '@/data/izakaya-toeic/ranking';
 import {
   THIRTY_DAY_PLAN,
   WEEK_THEMES,
@@ -15,6 +16,8 @@ import {
   getStreakDays,
   getProgramProgress,
 } from '@/data/izakaya-toeic/thirty-day-plan';
+import InstantPlay from './InstantPlay';
+import ScoreImpact from './ScoreImpact';
 
 const CHAR_READ_KEY = 'izakaya_characters_read';
 
@@ -57,10 +60,12 @@ export default function IzakayaToeicPage() {
   const [completed, setCompleted] = useState<number[]>([]);
   const [mounted, setMounted] = useState(false);
   const [onboardingStep, setOnboardingStep] = useState(0); // 0=not started, 1=chars, 2=calendar, 3=start
+  const [rankInfo, setRankInfo] = useState<ReturnType<typeof calculateRank> | null>(null);
 
   useEffect(() => {
     setMounted(true);
     setProgress(getProgress());
+    setRankInfo(calculateRank());
     const charsRead = localStorage.getItem(CHAR_READ_KEY) === 'true';
     setHasReadChars(charsRead);
     const c = getCompletedDays();
@@ -157,6 +162,20 @@ export default function IzakayaToeicPage() {
         }}>
           路地裏の居酒屋「のれん」
         </p>
+
+        {/* Group portrait */}
+        <div style={{
+          width: 200, height: 200, margin: '0 auto 20px',
+          borderRadius: '50%', overflow: 'hidden',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+          border: `3px solid rgba(212,175,55,0.3)`,
+        }}>
+          <img
+            src="/izakaya-scenes/group-portrait.png"
+            alt="のれんの常連たち"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        </div>
 
         <p style={{
           fontSize: 16, color: T.textSub, maxWidth: 400,
@@ -257,6 +276,53 @@ export default function IzakayaToeicPage() {
         </div>
       </div>
 
+      {/* ====== INSTANT PLAY (try before you commit) ====== */}
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '32px 16px 0' }}>
+        <InstantPlay />
+      </div>
+
+      {/* ====== RANK BADGE + TONIGHT LINK ====== */}
+      {mounted && rankInfo && (
+        <div style={{
+          maxWidth: 640, margin: '0 auto', padding: '24px 16px 0',
+          display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap',
+        }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '8px 16px', background: T.surface,
+            border: `1px solid ${rankInfo.color}30`, borderRadius: 20,
+            boxShadow: T.shadow,
+          }}>
+            <div style={{
+              width: 8, height: 8, borderRadius: '50%',
+              background: rankInfo.color,
+            }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: rankInfo.color }}>
+              {rankInfo.rank}
+            </span>
+            {rankInfo.nextRank && (
+              <span style={{ fontSize: 10, color: T.textMuted }}>
+                -- 次: {rankInfo.nextRank} ({rankInfo.progress}%)
+              </span>
+            )}
+          </div>
+          <Link href="/english/izakaya-toeic/tonight" style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            padding: '8px 16px', background: T.goldBg,
+            border: `1px solid ${T.goldBorder}`, borderRadius: 20,
+            textDecoration: 'none', color: T.gold,
+            fontSize: 13, fontWeight: 700,
+          }}>
+            今夜の1杯
+          </Link>
+        </div>
+      )}
+
+      {/* ====== SCORE IMPACT ====== */}
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '24px 16px 0' }}>
+        <ScoreImpact />
+      </div>
+
       {/* ====== CHARACTERS TEASER ====== */}
       <div style={{ padding: '48px 16px', maxWidth: 640, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
@@ -327,7 +393,7 @@ export default function IzakayaToeicPage() {
         </div>
       </div>
 
-      {/* ====== 30-DAY CALENDAR (merged from /program) ====== */}
+      {/* ====== 30-DAY CALENDAR (常連コース) ====== */}
       <div id="calendar-section" style={{
         padding: '40px 16px',
         maxWidth: 720,
@@ -336,15 +402,15 @@ export default function IzakayaToeicPage() {
       }}>
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <div style={{ fontSize: 10, color: T.gold, fontWeight: 700, letterSpacing: 3, marginBottom: 8 }}>
-            30 NIGHTS AT NOREN
+            {isReturning ? '30 NIGHTS AT NOREN' : 'REGULAR COURSE'}
           </div>
           <h2 style={{ fontSize: 22, fontWeight: 900, margin: '0 0 4px' }}>
-            のれん30夜
+            {isReturning ? 'のれん30夜' : '常連コース'}
           </h2>
           <p style={{
             fontSize: 13, color: T.textMuted, fontStyle: 'italic', margin: '0 0 20px',
           }}>
-            カウンターに座ってから、卒業するまで
+            {isReturning ? 'カウンターに座ってから、卒業するまで' : 'まずは第1夜から。続きが気になったら、常連になろう。'}
           </p>
 
           {/* Stats Row */}
@@ -684,6 +750,7 @@ export default function IzakayaToeicPage() {
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
             {[
+              { href: '/english/izakaya-toeic/tonight', icon: '1', iconColor: T.gold, title: '今夜の1杯', sub: '毎日1問、5秒で解ける' },
               { href: '/english/training', icon: 'V', iconColor: T.green, title: '仕込み帳', sub: '毎日20語ずつ仕込む' },
               { href: '/english/izakaya-toeic/guide', icon: 'G', iconColor: T.blue, title: 'マスターの攻略メモ', sub: 'Part別の裏技' },
               { href: '/english/izakaya-toeic/paraphrase', icon: 'P', iconColor: T.gold, title: '言い換えお品書き', sub: '167パターン' },
@@ -692,6 +759,7 @@ export default function IzakayaToeicPage() {
               { href: '/english/izakaya-toeic/score', icon: 'D', iconColor: T.purple, title: 'スコア通知表', sub: '弱点診断' },
               { href: '/english/izakaya-toeic/mistakes', icon: 'M', iconColor: T.orange, title: '反省ノート', sub: 'ミスの傾向分析' },
               { href: '/english/izakaya-toeic/achievements', icon: 'B', iconColor: T.gold, title: 'のれんの勲章', sub: '23個の実績バッジ' },
+              { href: '/english/izakaya-toeic/my-story', icon: 'S', iconColor: T.gold, title: '俺のストーリー', sub: '学習の軌跡を共有' },
             ].map(item => (
               <Link key={item.href} href={item.href} style={{
                 display: 'flex', gap: 8, alignItems: 'center',

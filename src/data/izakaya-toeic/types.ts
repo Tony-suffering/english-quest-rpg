@@ -39,6 +39,7 @@ export interface StoryLine {
   english?: string;
   mood?: CharacterMood;
   action?: string;       // (ビールを飲みながら)
+  sceneImage?: string;   // path relative to /izakaya-scenes/, e.g. "ep-001/opening.webp"
 }
 
 export interface ParaphraseMapping {

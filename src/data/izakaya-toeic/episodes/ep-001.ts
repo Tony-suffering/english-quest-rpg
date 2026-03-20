@@ -16,6 +16,7 @@ const episode: IzakayaEpisode = {
       japanese: '金曜日、午後9時。路地裏の居酒屋「のれん」。雨が降り始めている。',
       english: 'Friday, 9 PM. A tucked-away izakaya called "Noren," down a narrow alley. Rain starting to fall.',
       action: '暖簾をくぐる音',
+      sceneImage: 'ep-001/opening.png',
     },
     {
       speaker: 'narration',
@@ -28,6 +29,7 @@ const episode: IzakayaEpisode = {
       english: 'Master, draft beer.',
       mood: 'defeated',
       action: 'カウンターに座る。手が少し震えている',
+      sceneImage: 'ep-001/yuki-arrives.png',
     },
     {
       speaker: 'master',
@@ -127,6 +129,7 @@ const episode: IzakayaEpisode = {
       speaker: 'narration',
       japanese: 'ガラッ。勢いよく暖簾が揺れる。',
       english: 'The door flies open. The noren curtain swings wildly.',
+      sceneImage: 'ep-001/takeshi-entrance.png',
     },
     {
       speaker: 'takeshi',
@@ -228,6 +231,7 @@ const episode: IzakayaEpisode = {
     {
       speaker: 'narration',
       japanese: '静かにドアが開く。ケンジが入ってくる。いつもより遅い。',
+      sceneImage: 'ep-001/kenji-arrives.png',
       english: 'The door opens quietly. Kenji walks in. Later than usual.',
     },
     {
@@ -344,6 +348,7 @@ const episode: IzakayaEpisode = {
       speaker: 'narration',
       japanese: '3人が同時に笑う。小さく、でも確かに。',
       english: 'All three laugh at the same time. Quiet, but real.',
+      sceneImage: 'ep-001/three-laugh.png',
     },
     {
       speaker: 'kenji',
@@ -403,6 +408,7 @@ const episode: IzakayaEpisode = {
       speaker: 'narration',
       japanese: 'ユキが、今度こそ笑う。泣き笑いに近い顔で。',
       english: 'This time, Yuki really laughs. The kind that sits right next to tears.',
+      sceneImage: 'ep-001/everyone-laughs.png',
     },
     {
       speaker: 'yuki',
