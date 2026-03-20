@@ -108,3 +108,8 @@ export const IZAKAYA_CHARACTERS: IzakayaCharacter[] = [
 export const CHARACTER_MAP = Object.fromEntries(
   IZAKAYA_CHARACTERS.map(c => [c.id, c])
 ) as Record<string, IzakayaCharacter>;
+
+const CF_IMG = 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q';
+export function charIcon(id: string): string {
+  return `${CF_IMG}/toeic-char-${id}/public`;
+}

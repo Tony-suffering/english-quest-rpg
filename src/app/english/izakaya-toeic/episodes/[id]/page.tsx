@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getEpisode } from '@/data/izakaya-toeic/episodes';
-import { CHARACTER_MAP } from '@/data/izakaya-toeic/characters';
+import { CHARACTER_MAP, charIcon } from '@/data/izakaya-toeic/characters';
 import { StoryLine, ToeicQuestion } from '@/data/izakaya-toeic/types';
 import { recordEpisodeResult, getEpisodeResult, addVocabToDeck, getVocabDeck, VocabDeckItem } from '@/data/izakaya-toeic/progress';
 import { T, parseConversation, isConversation } from '@/data/izakaya-toeic/theme';
@@ -209,7 +209,7 @@ function StoryLineView({ line, isNew, showEnglish }: { line: StoryLine; isNew: b
       {sceneImageEl}
       <div style={{ display: 'flex', gap: 8, padding: '5px 0', animation: isNew ? 'izk-fadein 0.4s ease' : undefined }}>
       <img
-        src={`/characters/${char?.id || 'master'}.png`}
+        src={charIcon(char?.id || 'master')}
         alt={char?.name || '?'}
         style={{
           width: 48, height: 48, borderRadius: '50%', border: `2px solid ${color}`,
@@ -988,7 +988,7 @@ export default function EpisodeDetailPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: activeColor, textTransform: 'uppercase' as const, letterSpacing: 1 }}>
                       {activeLine.speaker !== 'narration' ? (
                         <img
-                          src={`/characters/${activeChar?.id || 'master'}.png`}
+                          src={charIcon(activeChar?.id || 'master')}
                           alt={activeChar?.name || '?'}
                           style={{
                             width: 40, height: 40, borderRadius: '50%', border: `2px solid ${activeColor}`,
@@ -1237,7 +1237,7 @@ export default function EpisodeDetailPage() {
                           }}>N</div>
                         ) : (
                           <img
-                            src={`/characters/${char?.id || 'master'}.png`}
+                            src={charIcon(char?.id || 'master')}
                             alt={char?.name || '?'}
                             style={{
                               width: 36, height: 36, borderRadius: '50%', border: `1.5px solid ${color}`,
@@ -1317,7 +1317,7 @@ export default function EpisodeDetailPage() {
                 border: `1px solid ${T.border}`, borderLeftWidth: 3, borderLeftColor: T.gold,
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 4 }}>
-                  <img src="/characters/master.png" alt="マスター" style={{
+                  <img src={charIcon('master')} alt="マスター" style={{
                     width: 28, height: 28, borderRadius: '50%', border: '2px solid #78716C', objectFit: 'cover',
                   }} />
                   <span style={{ fontSize: 11, fontWeight: 700, color: T.textMuted }}>マスター</span>
@@ -1381,7 +1381,7 @@ export default function EpisodeDetailPage() {
               boxShadow: T.shadow,
             }}>
               <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}>
-                <img src="/characters/master.png" alt="マスター" style={{
+                <img src={charIcon('master')} alt="マスター" style={{
                   width: 24, height: 24, borderRadius: '50%', border: '1.5px solid #78716C', objectFit: 'cover',
                 }} />
                 <span style={{ fontSize: 10, fontWeight: 700, color: T.gold, letterSpacing: 1 }}>MASTER'S TIP</span>

@@ -6,7 +6,7 @@ import { getProgress, ToeicProgress, EpisodeResult } from '@/data/izakaya-toeic/
 import { calculateRank, RankInfo } from '@/data/izakaya-toeic/ranking';
 import { T } from '@/data/izakaya-toeic/theme';
 import { getCompletedDays, getStreakDays } from '@/data/izakaya-toeic/thirty-day-plan';
-import { IZAKAYA_CHARACTERS } from '@/data/izakaya-toeic/characters';
+import { IZAKAYA_CHARACTERS, charIcon } from '@/data/izakaya-toeic/characters';
 import { EPISODES } from '@/data/izakaya-toeic/episodes';
 import ShareCard from '../ShareCard';
 
@@ -240,7 +240,7 @@ export default function MyStoryPage() {
           }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`/characters/${affinityChar.id}.png`}
+              src={charIcon(affinityChar.id)}
               alt={affinityChar.name}
               style={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', flexShrink: 0,
                 border: `2px solid ${affinityChar.color}40` }}

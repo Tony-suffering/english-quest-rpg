@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { IZAKAYA_CHARACTERS } from '@/data/izakaya-toeic/characters';
+import { IZAKAYA_CHARACTERS, charIcon } from '@/data/izakaya-toeic/characters';
 import { ToeicPart } from '@/data/izakaya-toeic/types';
 import { T } from '@/data/izakaya-toeic/theme';
 
@@ -233,7 +233,7 @@ export default function CharactersPage() {
                   <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
                     {/* Initial badge */}
                     <img
-                      src={`/characters/${char.id}.png`}
+                      src={charIcon(char.id)}
                       alt={char.name}
                       style={{
                         width: 56, height: 56, borderRadius: '50%',

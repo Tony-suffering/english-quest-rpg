@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { EPISODES } from '@/data/izakaya-toeic/episodes';
-import { CHARACTER_MAP } from '@/data/izakaya-toeic/characters';
+import { CHARACTER_MAP, charIcon } from '@/data/izakaya-toeic/characters';
 import { ToeicPart } from '@/data/izakaya-toeic/types';
 import { getProgress, isEpisodeCompleted, ToeicProgress } from '@/data/izakaya-toeic/progress';
 import { T, PART_COLORS } from '@/data/izakaya-toeic/theme';
@@ -156,7 +156,7 @@ export default function EpisodesListPage() {
                                 const ch = CHARACTER_MAP[sid];
                                 if (!ch) return null;
                                 return (
-                                  <img key={sid} src={`/characters/${ch.id}.png`} alt={ch.name} style={{
+                                  <img key={sid} src={charIcon(ch.id)} alt={ch.name} style={{
                                     width: 18, height: 18, borderRadius: '50%',
                                     border: `1.5px solid ${ch.color}`,
                                     objectFit: 'cover',

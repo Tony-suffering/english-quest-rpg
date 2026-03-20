@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { IZAKAYA_CHARACTERS } from '@/data/izakaya-toeic/characters';
+import { IZAKAYA_CHARACTERS, charIcon } from '@/data/izakaya-toeic/characters';
 import { EPISODES } from '@/data/izakaya-toeic/episodes';
 import { getProgress, ToeicProgress, isEpisodeCompleted } from '@/data/izakaya-toeic/progress';
 import { T } from '@/data/izakaya-toeic/theme';
@@ -355,7 +355,7 @@ export default function IzakayaToeicPage() {
               }}
             >
               <img
-                src={`/characters/${char.id}.png`}
+                src={charIcon(char.id)}
                 alt={char.name}
                 style={{
                   width: 40, height: 40, borderRadius: '50%',

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { charIcon } from '@/data/izakaya-toeic/characters';
 
 const GOLD = '#D4AF37';
 const STONE_BG = '#FAFAF9';
@@ -56,7 +57,7 @@ function CharAvatar({ src, color, alt }: { src: string; color: string; alt: stri
 function DialogueLine({ charId, color, name, text }: { charId: string; color: string; name: string; text: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 10 }}>
-      <CharAvatar src={`/characters/${charId}.png`} color={color} alt={name} />
+      <CharAvatar src={charIcon(charId)} color={color} alt={name} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color, marginBottom: 2 }}>{name}</div>
         <div style={{

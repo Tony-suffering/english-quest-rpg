@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { EPISODES } from '@/data/izakaya-toeic/episodes';
-import { CHARACTER_MAP } from '@/data/izakaya-toeic/characters';
+import { CHARACTER_MAP, charIcon } from '@/data/izakaya-toeic/characters';
 import { T } from '@/data/izakaya-toeic/theme';
 import { ToeicQuestion } from '@/data/izakaya-toeic/types';
 import { calculateRank } from '@/data/izakaya-toeic/ranking';
@@ -154,7 +154,7 @@ export default function TonightPage() {
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <img
-              src="/characters/master.png"
+              src={charIcon('master')}
               alt="マスター"
               style={{ width: 36, height: 36, borderRadius: '50%', border: `2px solid ${T.gold}`, objectFit: 'cover' }}
             />
@@ -354,7 +354,7 @@ export default function TonightPage() {
                         return (
                           <img
                             key={spk}
-                            src={`/characters/${ch.id}.png`}
+                            src={charIcon(ch.id)}
                             alt={ch.name}
                             style={{
                               width: 28, height: 28, borderRadius: '50%',
