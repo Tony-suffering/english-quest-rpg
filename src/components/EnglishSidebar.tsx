@@ -28,6 +28,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         { id: '/english/izakaya-toeic/characters', label: '常連ファイル', color: '#92400E' },
         { id: '/english/izakaya-toeic/episodes', label: 'エピソード一覧', color: '#D4AF37' },
         { id: '/english/training', label: '仕込み帳', color: '#10B981' },
+        { id: '/english/izakaya-toeic/words', label: '今日の単語', color: '#3B82F6' },
     ];
 
     // ── マスターの棚 ──
@@ -47,6 +48,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     // ── More (legacy features) ──
     const moreItems = [
+        { id: '/journal', label: 'ジャーナル' },
         { id: '/english/5min', label: '5min 英会話' },
         { id: '/english/quest', label: 'Quest (冒険)' },
         { id: '/memoria', label: 'メモリア' },

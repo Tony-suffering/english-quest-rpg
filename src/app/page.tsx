@@ -155,10 +155,23 @@ export default function HomePage() {
                     </div>
 
                     <motion.div variants={f} className="mt-6">
+                        <Link href="/journal" className="block border border-[#DAE2E8] bg-white hover:border-[#D4AF37]/30 transition-all duration-300 group p-6 sm:p-8">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-[10px] tracking-[0.3em] text-[#D4AF37] font-mono mb-2">05 / JOURNAL</p>
+                                    <h3 className="text-lg font-black group-hover:text-[#D4AF37] transition-colors">ジャーナル</h3>
+                                    <p className="text-xs text-[#252423]/50 mt-1">開発と英語学習の全記録。133+エントリ。毎日更新中。カレンダーUIで日付ごとに読める。</p>
+                                </div>
+                                <span className="text-[10px] font-mono tracking-widest text-[#252423]/30 group-hover:text-[#D4AF37] transition-colors shrink-0 ml-6">READ MORE →</span>
+                            </div>
+                        </Link>
+                    </motion.div>
+
+                    <motion.div variants={f} className="mt-6">
                         <Link href="/tech" className="block border border-[#DAE2E8] bg-white hover:border-[#D4AF37]/30 transition-all duration-300 group p-6 sm:p-8">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-[10px] tracking-[0.3em] text-[#D4AF37] font-mono mb-2">05 / TECHNOLOGY</p>
+                                    <p className="text-[10px] tracking-[0.3em] text-[#D4AF37] font-mono mb-2">06 / TECHNOLOGY</p>
                                     <h3 className="text-lg font-black group-hover:text-[#D4AF37] transition-colors">テクノロジー / 開発状況</h3>
                                     <p className="text-xs text-[#252423]/50 mt-1">Next.js 15, Tailwind v4, Web Audio API, D3-zoom, Cloudflare Workers. 月額0円。オフライン動作。全データlocalStorage。開発ステータス一覧。</p>
                                 </div>
