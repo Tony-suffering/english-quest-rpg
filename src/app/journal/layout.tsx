@@ -62,7 +62,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
                     animation: shake ? 'passShake 0.4s ease' : undefined,
                 }}>
                     <input
-                        type="password"
+                        type="text"
                         value={pass}
                         onChange={(e) => { setPass(e.target.value); setError(false); }}
                         onKeyDown={(e) => { if (e.key === 'Enter') submit(); }}
