@@ -25,9 +25,9 @@ const sora = Sora({ subsets: ['latin'], variable: '--font-sora', weight: ['400',
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.toniolab.com'),
-  title: '居酒屋TOEIC -- ストーリーで学ぶTOEIC対策',
-  description: 'ストーリーの続きが気になるTOEIC対策アプリ。居酒屋の常連キャラと一緒にリスニング力を鍛えよう。',
-  keywords: ['TOEIC', 'TOEIC対策', '居酒屋TOEIC', 'リスニング', '英語学習'],
+  title: 'とにおラボ | TONIO LAB',
+  description: 'TOEIC900点なのに喋れない男が、自分で英語アプリを作ってる。英語フレーズをポケモンみたいに捕まえて、育てて、戦わせる。',
+  keywords: ['とにおラボ', 'TONIO LAB', 'TOEIC', '英語学習', '居酒屋TOEIC', '英語アプリ'],
   authors: [{ name: 'tonio' }],
   manifest: '/manifest.json',
   icons: {
@@ -36,10 +36,10 @@ export const metadata: Metadata = {
     apple: '/english-icon.png',
   },
   openGraph: {
-    title: '居酒屋TOEIC -- ストーリーで学ぶTOEIC対策',
-    description: 'ストーリーの続きが気になるTOEIC対策アプリ。居酒屋の常連キャラと一緒にリスニング力を鍛えよう。',
+    title: 'とにおラボ | TONIO LAB',
+    description: 'TOEIC900点なのに喋れない男が、自分で英語アプリを作ってる。',
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.toniolab.com',
-    siteName: '居酒屋TOEIC',
+    siteName: 'とにおラボ',
     locale: 'ja_JP',
     type: 'website',
     images: [
@@ -47,14 +47,14 @@ export const metadata: Metadata = {
         url: '/english-icon.png',
         width: 512,
         height: 512,
-        alt: '居酒屋TOEIC',
+        alt: 'とにおラボ',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: '居酒屋TOEIC -- ストーリーで学ぶTOEIC対策',
-    description: 'ストーリーの続きが気になるTOEIC対策アプリ。居酒屋の常連キャラと一緒にリスニング力を鍛えよう。',
+    title: 'とにおラボ | TONIO LAB',
+    description: 'TOEIC900点なのに喋れない男が、自分で英語アプリを作ってる。',
     images: ['/english-icon.png'],
   },
   robots: {
