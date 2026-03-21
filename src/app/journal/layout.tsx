@@ -7,7 +7,7 @@ const MEMBER_KEY = 'tl_member_auth';
 
 function checkPass(input: string): boolean {
     const hash = Array.from(input).reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
-    return hash === 105006906; // "noren"
+    return hash === 745279117; // "思いやり"
 }
 
 function PasswordGate({ onAuth }: { onAuth: () => void }) {
