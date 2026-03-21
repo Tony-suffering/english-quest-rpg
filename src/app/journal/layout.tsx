@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const MEMBER_KEY = 'tl_member_auth';
+const MEMBER_VERSION = 'v2'; // bump to invalidate old sessions
 
 function checkPass(input: string): boolean {
     const hash = Array.from(input).reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 0);
@@ -17,7 +18,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
 
     const submit = () => {
         if (checkPass(pass)) {
-            localStorage.setItem(MEMBER_KEY, 'true');
+            localStorage.setItem(MEMBER_KEY, MEMBER_VERSION);
             onAuth();
         } else {
             setError(true);
@@ -177,7 +178,7 @@ export default function JournalLayout({ children }: { children: React.ReactNode 
 
     useEffect(() => {
         const memberAuth = localStorage.getItem(MEMBER_KEY);
-        if (memberAuth === 'true') {
+        if (memberAuth === MEMBER_VERSION) {
             setIsAuthed(true);
         }
         setIsLoading(false);
