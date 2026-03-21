@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { journalEntries } from '@/data/journal';
+import { PUBLISHED_JOURNAL_IDS } from '@/data/journal/published';
 
 export default function JournalPage() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -27,18 +28,24 @@ export default function JournalPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    const publishedEntries = useMemo(() => {
+        if (PUBLISHED_JOURNAL_IDS.length === 0) return [];
+        const idSet = new Set(PUBLISHED_JOURNAL_IDS);
+        return journalEntries.filter(e => idSet.has(e.id));
+    }, []);
+
     const entriesByDate = useMemo(() => {
         const map = new Map<string, typeof journalEntries>();
-        journalEntries.forEach(entry => {
+        publishedEntries.forEach(entry => {
             const existing = map.get(entry.date) || [];
             map.set(entry.date, [...existing, entry]);
         });
         return map;
-    }, []);
+    }, [publishedEntries]);
 
     const sortedEntries = useMemo(() => {
-        return [...journalEntries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    }, []);
+        return [...publishedEntries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }, [publishedEntries]);
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -176,7 +183,7 @@ export default function JournalPage() {
                     </div>
                 ) : (
                     <div style={{ fontSize: '14px', color: '#888' }}>
-                        {journalEntries.length} entries
+                        {publishedEntries.length} entries
                     </div>
                 )}
 
@@ -451,7 +458,7 @@ export default function JournalPage() {
                                 {monthNames[month]} -- {monthEntryCount} entries
                             </div>
                             <div style={{ fontSize: '11px', color: '#888', lineHeight: '1.5' }}>
-                                Total: {journalEntries.length} journal entries
+                                Total: {publishedEntries.length} journal entries
                             </div>
                         </div>
                     </div>
@@ -643,21 +650,24 @@ export default function JournalPage() {
                                     Journal
                                 </div>
                                 <div style={{ fontSize: '12px', color: '#888', lineHeight: '1.5' }}>
-                                    カレンダーから日付を選択して
-                                    <br />
-                                    記事を読む
+                                    {publishedEntries.length > 0
+                                        ? <>カレンダーから日付を選択して<br />記事を読む</>
+                                        : <>記事を準備中です<br />もう少しお待ちください</>
+                                    }
                                 </div>
-                                <div style={{
-                                    marginTop: '24px',
-                                    padding: '12px 16px',
-                                    backgroundColor: '#fff',
-                                    borderRadius: '8px',
-                                    border: '1px solid #e5e5e5',
-                                    fontSize: '11px',
-                                    color: '#666',
-                                }}>
-                                    {journalEntries.length} entries available
-                                </div>
+                                {publishedEntries.length > 0 && (
+                                    <div style={{
+                                        marginTop: '24px',
+                                        padding: '12px 16px',
+                                        backgroundColor: '#fff',
+                                        borderRadius: '8px',
+                                        border: '1px solid #e5e5e5',
+                                        fontSize: '11px',
+                                        color: '#666',
+                                    }}>
+                                        {publishedEntries.length} entries available
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
