@@ -183,6 +183,52 @@ export default function HomePage() {
             </section>
 
 
+            {/* ━━━ MEMBERSHIP ━━━ */}
+            <section className="px-6 sm:px-12 lg:px-24 py-20 bg-[#0a0a0a] text-white relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} transition={{ staggerChildren: 0.1 }} className="max-w-3xl relative z-10">
+                    <motion.p variants={f} className="text-[10px] tracking-[0.3em] text-[#D4AF37] font-mono mb-6">MEMBERSHIP</motion.p>
+                    <motion.h2 variants={f} className="text-2xl sm:text-3xl font-black leading-[1.4] mb-4">
+                        傍聴席プラン<span className="text-[#D4AF37]"> -- 100円/月</span>
+                    </motion.h2>
+                    <motion.p variants={f} className="text-[15px] text-white/50 leading-[1.9] mb-8">
+                        ジャーナル全記録にアクセスできる。開発の裏側、英語学習の過程、失敗と発見。133+エントリ、毎日更新中。noteメンバーシップ加入後に合言葉をお知らせします。
+                    </motion.p>
+                    <motion.div variants={f} className="flex flex-wrap gap-4">
+                        <a
+                            href="https://note.com/tonio_english/membership"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-3 px-6 py-3 bg-[#D4AF37] text-black text-sm font-bold tracking-wide hover:bg-[#C4A030] transition-colors"
+                        >
+                            メンバーシップに参加する <span className="text-xs opacity-50">→</span>
+                        </a>
+                        <Link
+                            href="/journal"
+                            className="inline-flex items-center gap-2 px-6 py-3 border border-[#D4AF37]/40 text-sm font-bold text-[#D4AF37] hover:border-[#D4AF37] transition-colors"
+                        >
+                            ジャーナルを開く
+                        </Link>
+                    </motion.div>
+                    <motion.div variants={f} className="mt-10 grid grid-cols-3 gap-6 max-w-md">
+                        <div>
+                            <p className="text-2xl font-black text-[#D4AF37]">133+</p>
+                            <p className="text-[10px] text-white/30 tracking-widest mt-0.5">ENTRIES</p>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-black text-[#D4AF37]">365</p>
+                            <p className="text-[10px] text-white/30 tracking-widest mt-0.5">DAYS STREAK</p>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-black text-[#D4AF37]">100</p>
+                            <p className="text-[10px] text-white/30 tracking-widest mt-0.5">YEN / MONTH</p>
+                        </div>
+                    </motion.div>
+                </motion.div>
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
+            </section>
+
+
             {/* ━━━ NUMBERS ━━━ */}
             <section className="px-6 sm:px-12 lg:px-24 py-16 bg-[#F5F5F7]">
                 <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} transition={{ staggerChildren: 0.05 }} className="max-w-5xl">
