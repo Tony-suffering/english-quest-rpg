@@ -62,6 +62,10 @@ const navigation: NavItem[] = [
         href: '/tech',
     },
     {
+        name: 'ジャーナル',
+        href: '/journal',
+    },
+    {
         name: 'アプリを開く',
         href: '/english/training',
     },
@@ -143,7 +147,7 @@ export default function Header() {
                                 </span>
                                 <div className="flex items-center gap-2 mt-0.5">
                                     <span className="h-[1px] w-3 bg-[#D4AF37]/50" />
-                                    <span className="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#252423]/60 font-medium">English Quest RPG</span>
+                                    <span className="text-[8px] md:text-[9px] uppercase tracking-[0.3em] text-[#252423]/60 font-medium">とにおラボ</span>
                                     <span className="h-[1px] w-3 bg-[#D4AF37]/50" />
                                 </div>
                             </Link>
