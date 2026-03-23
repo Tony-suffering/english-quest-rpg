@@ -22,63 +22,44 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     useEffect(() => { setIsOpen(false); }, [pathname]);
 
-    // ── TOEIC酒場 30日プログラム ──
+    // ── のれん30夜 (Main) ──
     const programItems = [
-        { id: '/english/izakaya-toeic/program', label: '30日間プログラム', color: '#D4AF37' },
-        { id: '/english/izakaya-toeic', label: 'エピソード一覧', color: '#D4AF37' },
-        { id: '/english/izakaya-toeic/drills', label: 'Part 2 速射ドリル', color: '#EC4899' },
-        { id: '/english/training', label: '単語トレーニング', color: '#10B981' },
+        { id: '/english/izakaya-toeic', label: 'のれん30夜', color: '#D4AF37' },
+        { id: '/english/izakaya-toeic/characters', label: '常連ファイル', color: '#92400E' },
+        { id: '/english/izakaya-toeic/episodes', label: 'エピソード一覧', color: '#D4AF37' },
+        { id: '/english/training', label: '仕込み帳', color: '#10B981' },
+        { id: '/english/izakaya-toeic/words', label: '今日の単語', color: '#3B82F6' },
     ];
 
-    // ── 365 English Master ──
-    const masterItems = [
-        { id: '/english/365', label: 'コース TOP', color: '#8B5CF6' },
-        { id: '/english/365/episodes', label: 'エピソード一覧', color: '#8B5CF6' },
-        { id: '/english/365/characters', label: 'キャラクター相関図', color: '#8B5CF6' },
-    ];
-
-    // ── Tokyo 52 ──
-    const tokyo52Items = [
-        { id: '/english/tokyo52', label: 'Episode 01', color: '#06B6D4' },
-        { id: '/english/tokyo52/words', label: 'Expressions', color: '#06B6D4' },
-    ];
-
-    // ── Shared: Memoria + Study ──
-    const sharedItems = [
-        { id: '/memoria', label: 'メモリア (会話)', color: '#D4AF37' },
-    ];
-
-    // ── Study Materials ──
+    // ── マスターの棚 ──
     const studyItems = [
-        { id: '/english/izakaya-toeic/guide', label: 'Part別攻略ガイド' },
-        { id: '/english/izakaya-toeic/paraphrase', label: 'パラフレーズ辞典' },
-        { id: '/english/izakaya-toeic/sounds', label: '音変化辞典' },
-        { id: '/english/izakaya-toeic/traps', label: '罠パターン' },
+        { id: '/english/izakaya-toeic/guide', label: 'マスターの攻略メモ' },
+        { id: '/english/izakaya-toeic/paraphrase', label: '言い換えお品書き' },
+        { id: '/english/izakaya-toeic/sounds', label: '聞き酒ノート' },
+        { id: '/english/izakaya-toeic/traps', label: '引っかけ毒見帳' },
     ];
 
-    // ── Progress ──
+    // ── 通知表 ──
     const progressItems = [
-        { id: '/english/izakaya-toeic/score', label: 'スコア診断' },
-        { id: '/english/izakaya-toeic/mistakes', label: '間違いノート' },
-        { id: '/english/izakaya-toeic/achievements', label: '実績バッジ' },
+        { id: '/english/izakaya-toeic/score', label: 'スコア通知表' },
+        { id: '/english/izakaya-toeic/mistakes', label: '反省ノート' },
+        { id: '/english/izakaya-toeic/achievements', label: 'のれんの勲章' },
     ];
 
     // ── More (legacy features) ──
     const moreItems = [
+        { id: '/journal', label: 'ジャーナル' },
         { id: '/english/5min', label: '5min 英会話' },
         { id: '/english/quest', label: 'Quest (冒険)' },
+        { id: '/memoria', label: 'メモリア' },
         { id: '/english/goroku', label: '俺語録' },
         { id: '/english/dashboard-v2', label: 'ダッシュボード' },
         { id: '/english/tonio-words', label: 'TONIO WORDS' },
-        { id: '/english/settings', label: '設定' },
     ];
 
     const isActive = (path: string) => {
         if (!pathname) return false;
-        if (path === '/english') return pathname === '/english';
-        if (path === '/english/izakaya-toeic') return pathname === '/english/izakaya-toeic';
-        if (path === '/english/365') return pathname === '/english/365';
-        if (path === '/english/tokyo52') return pathname === '/english/tokyo52';
+        if (path === '/english/izakaya-toeic') return pathname === '/english/izakaya-toeic' || pathname === '/english/izakaya-toeic/program';
         if (path === '/english/training') return pathname === '/english/training' || pathname.startsWith('/english/training/card');
         if (path === '/memoria') return pathname.startsWith('/memoria');
         return pathname.startsWith(path);
@@ -86,10 +67,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     // Auto-expand "more" if on a legacy page
     useEffect(() => {
-        const mainItems = [
-            ...programItems, ...masterItems, ...tokyo52Items, ...sharedItems,
-            ...studyItems, ...progressItems, { id: '/english' },
-        ];
+        const mainItems = [...programItems, ...studyItems, ...progressItems];
         if (pathname && !mainItems.some(item => isActive(item.id))) {
             setShowMore(true);
         }
@@ -197,39 +175,28 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                                 </span>
                             </div>
                             <div style={{ fontSize: 10, color: '#bbb', marginTop: 4, letterSpacing: '0.3px' }}>
-                                TOEIC + 英会話 + ストーリー
+                                30日で点数UP + 英会話 + 作文力
                             </div>
                         </Link>
                     </div>
                 )}
 
                 <nav style={{ flex: 1 }}>
-                    {/* HOME */}
-                    {renderItem({ id: '/english', label: 'HOME' })}
-
-                    {/* 居酒屋TOEIC 30-Day Program */}
-                    <SectionLabel text="IZAKAYA TOEIC" />
+                    {/* のれん30夜 */}
+                    <SectionLabel text="のれん30夜" />
                     {programItems.map(item => renderProgramItem(item))}
 
-                    {/* 365 English Master */}
-                    <SectionLabel text="365 ENGLISH MASTER" />
-                    {masterItems.map(item => renderProgramItem(item))}
-
-                    {/* Tokyo 52 */}
-                    <SectionLabel text="TOKYO 52" />
-                    {tokyo52Items.map(item => renderProgramItem(item))}
-
-                    {/* Shared Platform */}
-                    <SectionLabel text="LISTENING" />
-                    {sharedItems.map(item => renderProgramItem(item))}
-
-                    {/* Study Materials */}
-                    <SectionLabel text="STUDY MATERIALS" />
+                    {/* マスターの棚 */}
+                    <SectionLabel text="マスターの棚" />
                     {studyItems.map(item => renderItem(item))}
 
-                    {/* Progress */}
-                    <SectionLabel text="PROGRESS" />
+                    {/* 通知表 */}
+                    <SectionLabel text="通知表" />
                     {progressItems.map(item => renderItem(item))}
+
+                    {/* 設定 */}
+                    <SectionLabel text="設定" />
+                    {renderItem({ id: '/english/settings', label: '設定' })}
 
                     {/* More toggle */}
                     <div style={{ height: 1, backgroundColor: '#e5e5e5', margin: '12px 20px 8px' }} />
