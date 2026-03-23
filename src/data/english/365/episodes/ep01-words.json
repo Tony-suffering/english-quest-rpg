@@ -1,0 +1,562 @@
+[
+  {
+    "dayNum": 1,
+    "index": 0,
+    "word": "work",
+    "meaning": "仕事・働く",
+    "type": "word",
+    "exampleContext": "Yuki works at a trading company"
+  },
+  {
+    "dayNum": 1,
+    "index": 1,
+    "word": "job",
+    "meaning": "仕事・職",
+    "type": "word",
+    "exampleContext": "Her job requires English but she cannot speak it"
+  },
+  {
+    "dayNum": 1,
+    "index": 2,
+    "word": "assignment",
+    "meaning": "任務・割り当て",
+    "type": "word",
+    "exampleContext": "Yuki got a new assignment with a foreign client"
+  },
+  {
+    "dayNum": 1,
+    "index": 3,
+    "word": "foreign",
+    "meaning": "外国の",
+    "type": "word",
+    "exampleContext": "A foreign client visited the office today"
+  },
+  {
+    "dayNum": 1,
+    "index": 4,
+    "word": "English",
+    "meaning": "英語",
+    "type": "word",
+    "exampleContext": "Yuki realizes she needs to speak English"
+  },
+  {
+    "dayNum": 1,
+    "index": 5,
+    "word": "nervous",
+    "meaning": "緊張している",
+    "type": "word",
+    "exampleContext": "Yuki feels nervous when someone speaks English"
+  },
+  {
+    "dayNum": 1,
+    "index": 6,
+    "word": "understand",
+    "meaning": "理解する・わかる",
+    "type": "word",
+    "exampleContext": "I can understand the words but I cannot answer"
+  },
+  {
+    "dayNum": 1,
+    "index": 7,
+    "word": "speak",
+    "meaning": "話す",
+    "type": "word",
+    "exampleContext": "Yuki can read English but cannot speak it"
+  },
+  {
+    "dayNum": 1,
+    "index": 8,
+    "word": "worry",
+    "meaning": "心配する",
+    "type": "word",
+    "exampleContext": "Yuki worries about the next time a client visits"
+  },
+  {
+    "dayNum": 1,
+    "index": 9,
+    "word": "try",
+    "meaning": "やってみる・試す",
+    "type": "word",
+    "exampleContext": "Gondo tells Yuki to just try"
+  },
+  {
+    "dayNum": 2,
+    "index": 10,
+    "word": "office",
+    "meaning": "事務所・オフィス",
+    "type": "word",
+    "exampleContext": "Takeshi sits in his office reading English emails"
+  },
+  {
+    "dayNum": 2,
+    "index": 11,
+    "word": "meeting",
+    "meaning": "会議・打ち合わせ",
+    "type": "word",
+    "exampleContext": "Takeshi had an English meeting and understood nothing"
+  },
+  {
+    "dayNum": 2,
+    "index": 12,
+    "word": "name",
+    "meaning": "名前",
+    "type": "word",
+    "exampleContext": "My name is Yuki"
+  },
+  {
+    "dayNum": 2,
+    "index": 13,
+    "word": "nice",
+    "meaning": "いい・素敵な",
+    "type": "word",
+    "exampleContext": "Nice to meet you"
+  },
+  {
+    "dayNum": 2,
+    "index": 14,
+    "word": "please",
+    "meaning": "お願いします・どうぞ",
+    "type": "word",
+    "exampleContext": "Please have a seat"
+  },
+  {
+    "dayNum": 2,
+    "index": 15,
+    "word": "thank you",
+    "meaning": "ありがとう",
+    "type": "expression",
+    "exampleContext": "Mina says thank you when Gondo serves her food"
+  },
+  {
+    "dayNum": 2,
+    "index": 16,
+    "word": "welcome",
+    "meaning": "ようこそ・歓迎する",
+    "type": "word",
+    "exampleContext": "Welcome to the English Hour at the izakaya"
+  },
+  {
+    "dayNum": 2,
+    "index": 17,
+    "word": "together",
+    "meaning": "一緒に",
+    "type": "word",
+    "exampleContext": "We will practice English together"
+  },
+  {
+    "dayNum": 2,
+    "index": 18,
+    "word": "happy",
+    "meaning": "嬉しい・幸せな",
+    "type": "word",
+    "exampleContext": "Gondo is happy that everyone came to the izakaya"
+  },
+  {
+    "dayNum": 2,
+    "index": 19,
+    "word": "sorry",
+    "meaning": "すみません・ごめんなさい",
+    "type": "word",
+    "exampleContext": "Sorry, my English is not very good"
+  },
+  {
+    "dayNum": 3,
+    "index": 20,
+    "word": "idea",
+    "meaning": "考え・アイデア",
+    "type": "word",
+    "exampleContext": "Gondo has an idea for English practice"
+  },
+  {
+    "dayNum": 3,
+    "index": 21,
+    "word": "practice",
+    "meaning": "練習する",
+    "type": "word",
+    "exampleContext": "We will practice speaking every week"
+  },
+  {
+    "dayNum": 3,
+    "index": 22,
+    "word": "hour",
+    "meaning": "時間（1時間）",
+    "type": "word",
+    "exampleContext": "One hour of English conversation every Thursday"
+  },
+  {
+    "dayNum": 3,
+    "index": 23,
+    "word": "every",
+    "meaning": "毎〜・すべての",
+    "type": "word",
+    "exampleContext": "We will meet every week at the izakaya"
+  },
+  {
+    "dayNum": 3,
+    "index": 24,
+    "word": "start",
+    "meaning": "始める・始まる",
+    "type": "word",
+    "exampleContext": "Let us start with simple greetings"
+  },
+  {
+    "dayNum": 3,
+    "index": 25,
+    "word": "this",
+    "meaning": "これ・この",
+    "type": "word",
+    "exampleContext": "Lisa says this is a good first step"
+  },
+  {
+    "dayNum": 3,
+    "index": 26,
+    "word": "how",
+    "meaning": "どう・どのように",
+    "type": "word",
+    "exampleContext": "How do you say this in English?"
+  },
+  {
+    "dayNum": 3,
+    "index": 27,
+    "word": "say",
+    "meaning": "言う",
+    "type": "word",
+    "exampleContext": "Yuki wants to say something but the words will not come"
+  },
+  {
+    "dayNum": 3,
+    "index": 28,
+    "word": "need",
+    "meaning": "必要とする",
+    "type": "word",
+    "exampleContext": "We need to practice speaking, not just reading"
+  },
+  {
+    "dayNum": 3,
+    "index": 29,
+    "word": "think",
+    "meaning": "思う・考える",
+    "type": "word",
+    "exampleContext": "I think we can do this if we practice"
+  },
+  {
+    "dayNum": 4,
+    "index": 30,
+    "word": "drink",
+    "meaning": "飲む・飲み物",
+    "type": "word",
+    "exampleContext": "Gondo serves everyone a drink before English Hour"
+  },
+  {
+    "dayNum": 4,
+    "index": 31,
+    "word": "beer",
+    "meaning": "ビール",
+    "type": "word",
+    "exampleContext": "Kenji orders a beer to calm his nerves"
+  },
+  {
+    "dayNum": 4,
+    "index": 32,
+    "word": "tired",
+    "meaning": "疲れた",
+    "type": "word",
+    "exampleContext": "Yuki is tired after work but she came to practice"
+  },
+  {
+    "dayNum": 4,
+    "index": 33,
+    "word": "hard",
+    "meaning": "難しい・大変な",
+    "type": "word",
+    "exampleContext": "Speaking English is harder than reading it"
+  },
+  {
+    "dayNum": 4,
+    "index": 34,
+    "word": "good",
+    "meaning": "良い・上手な",
+    "type": "word",
+    "exampleContext": "That was good, Yuki. Keep going."
+  },
+  {
+    "dayNum": 4,
+    "index": 35,
+    "word": "relax",
+    "meaning": "リラックスする・くつろぐ",
+    "type": "word",
+    "exampleContext": "Gondo tells everyone to relax and just talk"
+  },
+  {
+    "dayNum": 4,
+    "index": 36,
+    "word": "cheers",
+    "meaning": "乾杯",
+    "type": "expression",
+    "exampleContext": "Everyone raises their glasses and says cheers"
+  },
+  {
+    "dayNum": 4,
+    "index": 37,
+    "word": "fun",
+    "meaning": "楽しい・楽しみ",
+    "type": "word",
+    "exampleContext": "Takeshi says English Hour is actually fun"
+  },
+  {
+    "dayNum": 4,
+    "index": 38,
+    "word": "go home",
+    "meaning": "家に帰る",
+    "type": "phrasal verb",
+    "exampleContext": "It is late, time to go home"
+  },
+  {
+    "dayNum": 4,
+    "index": 39,
+    "word": "tomorrow",
+    "meaning": "明日",
+    "type": "word",
+    "exampleContext": "Tomorrow I will try to use English at work"
+  },
+  {
+    "dayNum": 5,
+    "index": 40,
+    "word": "better",
+    "meaning": "もっと良い・上達した",
+    "type": "word",
+    "exampleContext": "Everyone is getting a little better each week"
+  },
+  {
+    "dayNum": 5,
+    "index": 41,
+    "word": "question",
+    "meaning": "質問",
+    "type": "word",
+    "exampleContext": "Lisa asks a simple question and Mina answers"
+  },
+  {
+    "dayNum": 5,
+    "index": 42,
+    "word": "answer",
+    "meaning": "答える・答え",
+    "type": "word",
+    "exampleContext": "Kenji tries to answer in English"
+  },
+  {
+    "dayNum": 5,
+    "index": 43,
+    "word": "live",
+    "meaning": "住む・住んでいる",
+    "type": "word",
+    "exampleContext": "Where do you live? I live in Shimokitazawa."
+  },
+  {
+    "dayNum": 5,
+    "index": 44,
+    "word": "year",
+    "meaning": "年",
+    "type": "word",
+    "exampleContext": "I have worked here for ten years"
+  },
+  {
+    "dayNum": 5,
+    "index": 45,
+    "word": "almost",
+    "meaning": "もう少し・ほとんど",
+    "type": "word",
+    "exampleContext": "Mina almost finished her self-introduction"
+  },
+  {
+    "dayNum": 5,
+    "index": 46,
+    "word": "great",
+    "meaning": "素晴らしい・すごい",
+    "type": "word",
+    "exampleContext": "Great job, everyone. You are improving."
+  },
+  {
+    "dayNum": 5,
+    "index": 47,
+    "word": "help",
+    "meaning": "手伝う・助ける",
+    "type": "word",
+    "exampleContext": "Lisa is here to help everyone practice"
+  },
+  {
+    "dayNum": 5,
+    "index": 48,
+    "word": "ready",
+    "meaning": "準備できた",
+    "type": "word",
+    "exampleContext": "Are you ready to try again?"
+  },
+  {
+    "dayNum": 5,
+    "index": 49,
+    "word": "again",
+    "meaning": "もう一度",
+    "type": "word",
+    "exampleContext": "Let us try again from the beginning"
+  },
+  {
+    "dayNum": 6,
+    "index": 50,
+    "word": "different",
+    "meaning": "違う・異なる",
+    "type": "word",
+    "exampleContext": "Speaking English feels different from reading it"
+  },
+  {
+    "dayNum": 6,
+    "index": 51,
+    "word": "morning",
+    "meaning": "朝",
+    "type": "word",
+    "exampleContext": "Yuki says good morning to the foreign colleague"
+  },
+  {
+    "dayNum": 6,
+    "index": 52,
+    "word": "today",
+    "meaning": "今日",
+    "type": "word",
+    "exampleContext": "Today I spoke English for the first time at work"
+  },
+  {
+    "dayNum": 6,
+    "index": 53,
+    "word": "eat",
+    "meaning": "食べる",
+    "type": "word",
+    "exampleContext": "Let us eat something at the izakaya"
+  },
+  {
+    "dayNum": 6,
+    "index": 54,
+    "word": "like",
+    "meaning": "好き・〜のような",
+    "type": "word",
+    "exampleContext": "I like coming to this izakaya"
+  },
+  {
+    "dayNum": 6,
+    "index": 55,
+    "word": "tell me",
+    "meaning": "教えて",
+    "type": "expression",
+    "exampleContext": "Tell me about your day"
+  },
+  {
+    "dayNum": 6,
+    "index": 56,
+    "word": "feel",
+    "meaning": "感じる・気持ち",
+    "type": "word",
+    "exampleContext": "Yuki feels proud after speaking English at work"
+  },
+  {
+    "dayNum": 6,
+    "index": 57,
+    "word": "same",
+    "meaning": "同じ",
+    "type": "word",
+    "exampleContext": "We all have the same problem with speaking"
+  },
+  {
+    "dayNum": 6,
+    "index": 58,
+    "word": "delicious",
+    "meaning": "おいしい",
+    "type": "word",
+    "exampleContext": "The food at Gondo's izakaya is delicious"
+  },
+  {
+    "dayNum": 6,
+    "index": 59,
+    "word": "friend",
+    "meaning": "友達",
+    "type": "word",
+    "exampleContext": "The izakaya group is becoming friends"
+  },
+  {
+    "dayNum": 7,
+    "index": 60,
+    "word": "afraid",
+    "meaning": "怖い・恐れている",
+    "type": "word",
+    "exampleContext": "Yuki was afraid but she spoke anyway"
+  },
+  {
+    "dayNum": 7,
+    "index": 61,
+    "word": "brave",
+    "meaning": "勇敢な",
+    "type": "word",
+    "exampleContext": "It was brave of Kenji to come here"
+  },
+  {
+    "dayNum": 7,
+    "index": 62,
+    "word": "learn",
+    "meaning": "学ぶ・覚える",
+    "type": "word",
+    "exampleContext": "We are all here to learn together"
+  },
+  {
+    "dayNum": 7,
+    "index": 63,
+    "word": "keep going",
+    "meaning": "続ける・諦めない",
+    "type": "phrasal verb",
+    "exampleContext": "Gondo says the important thing is to keep going"
+  },
+  {
+    "dayNum": 7,
+    "index": 64,
+    "word": "believe",
+    "meaning": "信じる",
+    "type": "word",
+    "exampleContext": "I believe we can all improve"
+  },
+  {
+    "dayNum": 7,
+    "index": 65,
+    "word": "future",
+    "meaning": "未来・将来",
+    "type": "word",
+    "exampleContext": "Yuki thinks about her future with English"
+  },
+  {
+    "dayNum": 7,
+    "index": 66,
+    "word": "change",
+    "meaning": "変わる・変える",
+    "type": "word",
+    "exampleContext": "This week changed everything for the group"
+  },
+  {
+    "dayNum": 7,
+    "index": 67,
+    "word": "strong",
+    "meaning": "強い",
+    "type": "word",
+    "exampleContext": "Mina feels stronger after speaking in front of everyone"
+  },
+  {
+    "dayNum": 7,
+    "index": 68,
+    "word": "possible",
+    "meaning": "可能な・できる",
+    "type": "word",
+    "exampleContext": "Maybe speaking English is possible after all"
+  },
+  {
+    "dayNum": 7,
+    "index": 69,
+    "word": "next",
+    "meaning": "次の",
+    "type": "word",
+    "exampleContext": "Everyone is ready for the next English Hour"
+  }
+]

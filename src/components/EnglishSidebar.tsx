@@ -22,12 +22,30 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     useEffect(() => { setIsOpen(false); }, [pathname]);
 
-    // ── TOEIC酒場 30日プログラム (Main) ──
+    // ── TOEIC酒場 30日プログラム ──
     const programItems = [
         { id: '/english/izakaya-toeic/program', label: '30日間プログラム', color: '#D4AF37' },
         { id: '/english/izakaya-toeic', label: 'エピソード一覧', color: '#D4AF37' },
         { id: '/english/izakaya-toeic/drills', label: 'Part 2 速射ドリル', color: '#EC4899' },
         { id: '/english/training', label: '単語トレーニング', color: '#10B981' },
+    ];
+
+    // ── 365 English Master ──
+    const masterItems = [
+        { id: '/english/365', label: 'コース TOP', color: '#8B5CF6' },
+        { id: '/english/365/episodes', label: 'エピソード一覧', color: '#8B5CF6' },
+        { id: '/english/365/characters', label: 'キャラクター相関図', color: '#8B5CF6' },
+    ];
+
+    // ── Tokyo 52 ──
+    const tokyo52Items = [
+        { id: '/english/tokyo52', label: 'Episode 01', color: '#06B6D4' },
+        { id: '/english/tokyo52/words', label: 'Expressions', color: '#06B6D4' },
+    ];
+
+    // ── Shared: Memoria + Study ──
+    const sharedItems = [
+        { id: '/memoria', label: 'メモリア (会話)', color: '#D4AF37' },
     ];
 
     // ── Study Materials ──
@@ -49,7 +67,6 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     const moreItems = [
         { id: '/english/5min', label: '5min 英会話' },
         { id: '/english/quest', label: 'Quest (冒険)' },
-        { id: '/memoria', label: 'メモリア' },
         { id: '/english/goroku', label: '俺語録' },
         { id: '/english/dashboard-v2', label: 'ダッシュボード' },
         { id: '/english/tonio-words', label: 'TONIO WORDS' },
@@ -60,6 +77,8 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         if (!pathname) return false;
         if (path === '/english') return pathname === '/english';
         if (path === '/english/izakaya-toeic') return pathname === '/english/izakaya-toeic';
+        if (path === '/english/365') return pathname === '/english/365';
+        if (path === '/english/tokyo52') return pathname === '/english/tokyo52';
         if (path === '/english/training') return pathname === '/english/training' || pathname.startsWith('/english/training/card');
         if (path === '/memoria') return pathname.startsWith('/memoria');
         return pathname.startsWith(path);
@@ -67,7 +86,10 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     // Auto-expand "more" if on a legacy page
     useEffect(() => {
-        const mainItems = [...programItems, ...studyItems, ...progressItems, { id: '/english' }];
+        const mainItems = [
+            ...programItems, ...masterItems, ...tokyo52Items, ...sharedItems,
+            ...studyItems, ...progressItems, { id: '/english' },
+        ];
         if (pathname && !mainItems.some(item => isActive(item.id))) {
             setShowMore(true);
         }
@@ -175,7 +197,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                                 </span>
                             </div>
                             <div style={{ fontSize: 10, color: '#bbb', marginTop: 4, letterSpacing: '0.3px' }}>
-                                30日で点数UP + 英会話 + 作文力
+                                TOEIC + 英会話 + ストーリー
                             </div>
                         </Link>
                     </div>
@@ -185,9 +207,21 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     {/* HOME */}
                     {renderItem({ id: '/english', label: 'HOME' })}
 
-                    {/* 30-Day Program */}
-                    <SectionLabel text="30-DAY PROGRAM" />
+                    {/* 居酒屋TOEIC 30-Day Program */}
+                    <SectionLabel text="IZAKAYA TOEIC" />
                     {programItems.map(item => renderProgramItem(item))}
+
+                    {/* 365 English Master */}
+                    <SectionLabel text="365 ENGLISH MASTER" />
+                    {masterItems.map(item => renderProgramItem(item))}
+
+                    {/* Tokyo 52 */}
+                    <SectionLabel text="TOKYO 52" />
+                    {tokyo52Items.map(item => renderProgramItem(item))}
+
+                    {/* Shared Platform */}
+                    <SectionLabel text="LISTENING" />
+                    {sharedItems.map(item => renderProgramItem(item))}
 
                     {/* Study Materials */}
                     <SectionLabel text="STUDY MATERIALS" />
