@@ -85,7 +85,7 @@ export default function HomePage() {
                         月額100円。初月無料。
                     </motion.p>
                     <motion.p variants={f} className="text-[15px] sm:text-base text-white/50 leading-[2] mb-10 max-w-2xl">
-                        開発と英語学習の全記録にアクセスできる。毎日更新中のジャーナル、未公開記事、没ネタ、反省文。TOEIC900点なのに喋れない男が毎日もがいてる過程。noteメンバーシップ加入後に合言葉をお知らせします。
+                        開発と英語学習の全記録にアクセスできる。毎日更新中のジャーナル、未公開記事、没ネタ、反省文。TOEIC900点なのに喋れない男が毎日もがいてる過程。
                     </motion.p>
                     <motion.div variants={f} className="flex flex-wrap gap-5 mb-14">
                         <a
@@ -96,12 +96,6 @@ export default function HomePage() {
                         >
                             メンバーシップに参加する <span className="text-sm opacity-50">→</span>
                         </a>
-                        <Link
-                            href="/journal"
-                            className="inline-flex items-center gap-2 px-8 py-4 border border-[#D4AF37]/40 text-base font-bold text-[#D4AF37] hover:border-[#D4AF37] transition-colors"
-                        >
-                            ジャーナルを開く
-                        </Link>
                     </motion.div>
                     <motion.div variants={f} className="grid grid-cols-3 gap-8 max-w-lg">
                         <div>
@@ -203,19 +197,6 @@ export default function HomePage() {
                         />
 
                     </div>
-
-                    <motion.div variants={f} className="mt-6">
-                        <Link href="/journal" className="block border border-[#DAE2E8] bg-white hover:border-[#D4AF37]/30 transition-all duration-300 group p-6 sm:p-8">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-[10px] tracking-[0.3em] text-[#D4AF37] font-mono mb-2">05 / JOURNAL</p>
-                                    <h3 className="text-lg font-black group-hover:text-[#D4AF37] transition-colors">ジャーナル</h3>
-                                    <p className="text-xs text-[#252423]/50 mt-1">開発と英語学習の全記録。133+エントリ。毎日更新中。カレンダーUIで日付ごとに読める。</p>
-                                </div>
-                                <span className="text-[10px] font-mono tracking-widest text-[#252423]/30 group-hover:text-[#D4AF37] transition-colors shrink-0 ml-6">READ MORE →</span>
-                            </div>
-                        </Link>
-                    </motion.div>
 
                     <motion.div variants={f} className="mt-6">
                         <Link href="/tech" className="block border border-[#DAE2E8] bg-white hover:border-[#D4AF37]/30 transition-all duration-300 group p-6 sm:p-8">
