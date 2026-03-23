@@ -72,50 +72,6 @@ export default function HomePage() {
             </section>
 
 
-            {/* ━━━ MEMBERSHIP (TOP) ━━━ */}
-            <section className="px-6 sm:px-12 lg:px-24 py-24 sm:py-32 bg-[#0a0a0a] text-white relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_50%,_rgba(212,175,55,0.06)_0%,_transparent_60%)]" />
-                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} transition={{ staggerChildren: 0.12 }} className="max-w-4xl relative z-10">
-                    <motion.p variants={f} className="text-[11px] tracking-[0.4em] text-[#D4AF37] font-mono mb-8">MEMBERSHIP</motion.p>
-                    <motion.h2 variants={f} className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.3] mb-6">
-                        傍聴席プラン
-                    </motion.h2>
-                    <motion.p variants={f} className="text-xl sm:text-2xl font-bold text-[#D4AF37] mb-8">
-                        月額100円。初月無料。
-                    </motion.p>
-                    <motion.p variants={f} className="text-[15px] sm:text-base text-white/50 leading-[2] mb-10 max-w-2xl">
-                        開発と英語学習の全記録にアクセスできる。毎日更新中のジャーナル、未公開記事、没ネタ、反省文。TOEIC900点なのに喋れない男が毎日もがいてる過程。
-                    </motion.p>
-                    <motion.div variants={f} className="flex flex-wrap gap-5 mb-14">
-                        <a
-                            href="https://note.com/tonio_english/membership"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-3 px-8 py-4 bg-[#D4AF37] text-black text-base font-bold tracking-wide hover:bg-[#C4A030] transition-colors"
-                        >
-                            メンバーシップに参加する <span className="text-sm opacity-50">→</span>
-                        </a>
-                    </motion.div>
-                    <motion.div variants={f} className="grid grid-cols-3 gap-8 max-w-lg">
-                        <div>
-                            <p className="text-3xl sm:text-4xl font-black text-[#D4AF37]">133+</p>
-                            <p className="text-[10px] text-white/30 tracking-widest mt-1">JOURNAL ENTRIES</p>
-                        </div>
-                        <div>
-                            <p className="text-3xl sm:text-4xl font-black text-[#D4AF37]">365</p>
-                            <p className="text-[10px] text-white/30 tracking-widest mt-1">DAYS STREAK</p>
-                        </div>
-                        <div>
-                            <p className="text-3xl sm:text-4xl font-black text-[#D4AF37]">100</p>
-                            <p className="text-[10px] text-white/30 tracking-widest mt-1">YEN / MONTH</p>
-                        </div>
-                    </motion.div>
-                </motion.div>
-                <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
-            </section>
-
-
             {/* ━━━ OVERVIEW STATEMENT ━━━ */}
             <section className="px-6 sm:px-12 lg:px-24 py-16 bg-[#F5F5F7]">
                 <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} transition={{ staggerChildren: 0.08 }} className="max-w-3xl">

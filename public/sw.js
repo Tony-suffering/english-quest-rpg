@@ -23,10 +23,12 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
+  const url = new URL(event.request.url);
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') return;
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        if (response.ok) {
+        if (response.ok && response.type === 'basic') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
         }
