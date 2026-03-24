@@ -125,7 +125,7 @@ export default function KaiwaGuidePage() {
           <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, marginBottom: 28 }}>
             <Link href="/english/izakaya-toeic" style={{ color: T.gold, textDecoration: 'none', fontWeight: 500 }}>TOEIC酒場</Link>
             <span style={{ color: T.textMuted }}>/</span>
-            <Link href="/english/izakaya-toeic/kaiwa" style={{ color: T.gold, textDecoration: 'none', fontWeight: 500 }}>会話マスター365</Link>
+            <Link href="/english/izakaya-toeic/kaiwa" style={{ color: T.gold, textDecoration: 'none', fontWeight: 500 }}>英会話マスター365</Link>
             <span style={{ color: T.textMuted }}>/</span>
             <span style={{ color: T.textSub, fontWeight: 600 }}>メソッド</span>
           </nav>
@@ -395,7 +395,7 @@ export default function KaiwaGuidePage() {
               でも、それだけだと<strong style={{ color: T.text }}>口から出せるフレーズの在庫は増えない。</strong>
             </p>
             <p style={{ fontSize: 15, color: T.textSub, lineHeight: 2, margin: '0 0 20px' }}>
-              会話マスター365は、その穴を埋めるためのアプリ。
+              英会話マスター365は、その穴を埋めるためのアプリ。
               <br />他のアプリと<strong style={{ color: T.text }}>一緒に使う</strong>ために設計してる。
             </p>
 
@@ -415,7 +415,7 @@ export default function KaiwaGuidePage() {
                 background: T.goldBg, border: `1px solid ${T.goldBorder}`, borderRadius: 8,
                 padding: '12px 20px', textAlign: 'center',
               }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: T.gold }}>会話マスター365</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: T.gold }}>英会話マスター365</div>
                 <div style={{ fontSize: 18, fontWeight: 800, color: T.gold, marginTop: 4 }}>5分</div>
               </div>
               <span style={{ fontSize: 20, color: T.textMuted }}>=</span>

@@ -280,6 +280,20 @@ export default function EnglishMaster365Page() {
     const [batchRegistering, setBatchRegistering] = useState(false);
     const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
 
+    // Guide panel state (persisted in localStorage)
+    const [showGuide, setShowGuide] = useState(false);
+    useEffect(() => {
+        const saved = localStorage.getItem('kaiwa-guide-open');
+        if (saved === 'true') setShowGuide(true);
+    }, []);
+    const toggleGuide = useCallback(() => {
+        setShowGuide(prev => {
+            const next = !prev;
+            localStorage.setItem('kaiwa-guide-open', String(next));
+            return next;
+        });
+    }, []);
+
     const monthKey = getMonthKey(viewYear, viewMonth);
 
     // ── Day slot offset ──
@@ -519,7 +533,8 @@ export default function EnglishMaster365Page() {
                 padding: isMobile ? '20px 16px 16px' : '28px 32px 20px',
             }}>
                 <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                    {/* Title row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                         <span style={{
                             background: '#D4AF37', color: '#fff',
                             padding: '3px 10px', borderRadius: 4,
@@ -530,33 +545,84 @@ export default function EnglishMaster365Page() {
                         </span>
                     </div>
                     <h1 style={{
-                        fontSize: isMobile ? 20 : 24, fontWeight: 900,
-                        color: '#1C1917', margin: '0 0 4px', letterSpacing: '-0.02em',
+                        fontSize: isMobile ? 22 : 26, fontWeight: 900,
+                        color: '#1C1917', margin: '0 0 6px', letterSpacing: '-0.02em',
                     }}>
-                        英会話マスター
+                        英会話マスター365
                     </h1>
-                    <p style={{ fontSize: 13, color: '#78716C', margin: '0 0 12px' }}>
-                        {monthMeta ? `${monthMeta.title} / ${monthMeta.titleEn}` : '毎日10表現。1年で英語が話せるようになる。'}
+                    <p style={{ fontSize: 14, color: '#57534E', margin: '0 0 4px', lineHeight: 1.6 }}>
+                        毎日10フレーズ。ストーリーで覚える。1年で英語が話せるようになる。
                     </p>
-                    <Link href="/english/izakaya-toeic/kaiwa/guide" style={{
+                    {monthMeta && (
+                        <p style={{ fontSize: 12, color: '#A8A29E', margin: '0 0 12px', fontWeight: 600 }}>
+                            {monthMeta.title} / {monthMeta.titleEn}
+                        </p>
+                    )}
+
+                    {/* Collapsible guide panel */}
+                    <div style={{ marginBottom: 12 }}>
+                        <button
+                            onClick={toggleGuide}
+                            style={{
+                                display: 'inline-flex', alignItems: 'center', gap: 8,
+                                fontSize: 13, fontWeight: 700, color: '#10B981',
+                                background: 'rgba(16,185,129,0.06)',
+                                border: '1px solid rgba(16,185,129,0.2)',
+                                padding: '7px 14px', borderRadius: showGuide ? '8px 8px 0 0' : 8,
+                                cursor: 'pointer', transition: 'all 0.15s',
+                            }}
+                        >
+                            <span style={{
+                                display: 'inline-block', fontSize: 12, fontWeight: 800,
+                                transform: showGuide ? 'rotate(90deg)' : 'rotate(0deg)',
+                                transition: 'transform 0.2s',
+                            }}>&#9654;</span>
+                            このページの使い方
+                        </button>
+                        {showGuide && (
+                            <div style={{
+                                background: 'rgba(16,185,129,0.04)',
+                                border: '1px solid rgba(16,185,129,0.2)',
+                                borderTop: 'none',
+                                borderRadius: '0 8px 8px 8px',
+                                padding: isMobile ? '14px 16px' : '16px 20px',
+                            }}>
+                                <ol style={{
+                                    margin: 0, paddingLeft: 20,
+                                    fontSize: 13, color: '#44403C', lineHeight: 2,
+                                }}>
+                                    <li>下のカレンダーから<strong style={{ color: '#1C1917' }}>今日の日付</strong>をクリック</li>
+                                    <li>その日の<strong style={{ color: '#1C1917' }}>フレーズ10個</strong>が右側に表示される</li>
+                                    <li>日本語を見て、4段階の英語で覚える（Vibe → Native）</li>
+                                    <li>覚えたらカードをクリックして<strong style={{ color: '#D4AF37' }}>マスター</strong>に切り替え</li>
+                                </ol>
+                                <p style={{ fontSize: 12, color: '#78716C', margin: '10px 0 0', lineHeight: 1.5 }}>
+                                    各フレーズには居酒屋キャラクターのストーリーがついています。文脈で覚えるから忘れにくい。
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* LP link */}
+                    <Link href="/english/izakaya-toeic/kaiwa/lp" style={{
                         display: 'inline-flex', alignItems: 'center', gap: 8,
                         fontSize: 13, fontWeight: 700, color: '#D4AF37',
                         textDecoration: 'none',
                         background: 'rgba(212,175,55,0.08)',
                         border: '1px solid rgba(212,175,55,0.25)',
                         padding: '8px 16px', borderRadius: 8,
+                        marginBottom: 4,
                     }}>
-                        <span style={{ fontSize: 16 }}>?</span>
-                        このアプリの使い方と学習メソッド
+                        英会話マスター365とは？ -- 科学的メソッドと使い方
                     </Link>
 
                     {/* Progress + Milestones */}
-                    <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                    <div style={{ marginTop: 14, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
                         {/* Progress bar */}
                         <div style={{ flex: 1, minWidth: 160 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                                 <span style={{ fontSize: 11, fontWeight: 700, color: '#D4AF37' }}>
-                                    {totalMastered}/{totalExpressions}
+                                    {totalMastered}/{totalExpressions} マスター済
                                 </span>
                                 {nextMilestone && (
                                     <span style={{ fontSize: 10, color: '#A8A29E' }}>

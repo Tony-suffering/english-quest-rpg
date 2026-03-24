@@ -1,5 +1,5 @@
 /**
- * 会話マスター365 -- Story Scenes (Days 1-10)
+ * 英会話マスター365 -- Story Scenes (Days 1-10)
  *
  * Short izakaya scenes (15-25 lines) where characters naturally use
  * each day's expressions. Funny, character-consistent, never textbook-y.

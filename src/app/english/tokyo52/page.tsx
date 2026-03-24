@@ -644,7 +644,7 @@ function GuideSection({ onClose }: { onClose: () => void }) {
 
             <p style={{ fontSize: 15, color: STONE[700], lineHeight: 2, margin: '0 0 24px' }}>
                 Tokyo 52は、居酒屋「のれん」を舞台にした連続ドラマ形式の英語学習プログラムです。<br />
-                会話マスター365が「毎日の在庫づくり」なら、Tokyo 52は「在庫を使う練習場」。<br />
+                英会話マスター365が「毎日の在庫づくり」なら、Tokyo 52は「在庫を使う練習場」。<br />
                 キャラクターたちの会話を聴いて、リアルな英語の流れに慣れていきます。
             </p>
 
@@ -675,11 +675,11 @@ function GuideSection({ onClose }: { onClose: () => void }) {
                 border: `1px solid ${STONE[200]}`,
             }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: STONE[800], marginBottom: 8 }}>
-                    会話マスター365との違い
+                    英会話マスター365との違い
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                     <div>
-                        <div style={{ fontSize: 11, fontWeight: 700, color: GOLD, marginBottom: 4 }}>会話マスター365</div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: GOLD, marginBottom: 4 }}>英会話マスター365</div>
                         <div style={{ fontSize: 13, color: STONE[600], lineHeight: 1.7 }}>
                             毎日10フレーズ。サバイバル英語の在庫をつくる。初心者向け。1日5分。
                         </div>
