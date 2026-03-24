@@ -17,6 +17,7 @@ import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
 import { bbqNeighborhoodEntries } from '@/data/english/bbq-neighborhood';
 import { theJobEntries } from '@/data/english/365-the-job';
 import { tokyo52Ep01Entries } from '@/data/english/tokyo52/ep01';
+import { tokyo52Ep02Entries } from '@/data/english/tokyo52/ep02';
 
 export default function MemoriaPage() {
     const [entries, setEntries] = useState<MemoriaEntry[]>([]);
@@ -251,7 +252,21 @@ export default function MemoriaPage() {
                 tags: e.tags,
             }));
 
-            const allEntries = [...theJobMemoriaEntries, ...tokyo52MemoriaEntries];
+            const tokyo52Ep02MemoriaEntries: MemoriaEntry[] = tokyo52Ep02Entries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const allEntries = [...theJobMemoriaEntries, ...tokyo52MemoriaEntries, ...tokyo52Ep02MemoriaEntries];
             setEntries(allEntries);
             setTangentEntries([]);
             localStorage.setItem('memoria_total', String(allEntries.length));

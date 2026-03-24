@@ -282,6 +282,24 @@ export default function EnglishMaster365Page() {
 
     const monthKey = getMonthKey(viewYear, viewMonth);
 
+    // ── Day slot offset ──
+    // Month 1 (April): daySlots 1-30, offset=0
+    // Month 2 (May): daySlots 31-60, offset=30
+    const monthMeta = MASTER_MONTHS.find(m => m.key === monthKey);
+    const daySlotOffset = useMemo(() => {
+        const meta = MASTER_MONTHS.find(m => m.key === monthKey);
+        if (!meta) return 0;
+        // Sum up days from all previous months
+        let offset = 0;
+        for (const m of MASTER_MONTHS) {
+            if (m.month >= meta.month) break;
+            // Month 1 = 30 days (April), Month 2 = 31 days (May), etc.
+            const daysInMonthN = m.month === 1 ? 30 : 31;
+            offset += daysInMonthN;
+        }
+        return offset;
+    }, [monthKey]);
+
     // ── Init ──
 
     useEffect(() => {
@@ -310,14 +328,16 @@ export default function EnglishMaster365Page() {
         if (daysWithContent.length > 0) {
             const todayDate = now.getDate();
             const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth();
-            if (isCurrentMonth && daysWithContent.includes(todayDate)) {
-                setSelectedDay(todayDate);
+            // Convert today's calendar date to daySlot for this month
+            const todayDaySlot = todayDate + daySlotOffset;
+            if (isCurrentMonth && daysWithContent.includes(todayDaySlot)) {
+                setSelectedDay(todayDaySlot);
             } else {
                 setSelectedDay(daysWithContent[0]);
             }
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [monthKey]);
+    }, [monthKey, daySlotOffset]);
 
     // Fetch registered phrases
     useEffect(() => {
@@ -343,8 +363,8 @@ export default function EnglishMaster365Page() {
     }, [entries, selectedDay, categoryFilter]);
 
     const calendarEntries = useMemo(() =>
-        entries.map(e => ({ id: e.id, day_slot: e.day_slot, japanese: e.japanese, category: e.category })),
-    [entries]);
+        entries.map(e => ({ id: e.id, day_slot: e.day_slot - daySlotOffset, japanese: e.japanese, category: e.category })),
+    [entries, daySlotOffset]);
 
     const calendarCategoryColors = useMemo(() => {
         const map: Record<string, { fg: string; bg: string }> = {};
@@ -448,21 +468,29 @@ export default function EnglishMaster365Page() {
         setBatchProgress(null);
     }, [dayEntries, registeredPhrases, registerPhrase]);
 
-    // ── Month Nav ──
+    // ── Month Nav (constrained to months with content) ──
 
     const prevMonth = useCallback(() => {
         setViewMonth(m => {
-            if (m === 0) { setViewYear(y => y - 1); return 11; }
-            return m - 1;
+            const newM = m === 0 ? 11 : m - 1;
+            const newY = m === 0 ? viewYear - 1 : viewYear;
+            const newKey = `${newY}-${String(newM + 1).padStart(2, '0')}`;
+            if (!MASTER_MONTHS.some(mm => mm.key === newKey)) return m;
+            if (m === 0) setViewYear(y => y - 1);
+            return newM;
         });
-    }, []);
+    }, [viewYear]);
 
     const nextMonth = useCallback(() => {
         setViewMonth(m => {
-            if (m === 11) { setViewYear(y => y + 1); return 0; }
-            return m + 1;
+            const newM = m === 11 ? 0 : m + 1;
+            const newY = m === 11 ? viewYear + 1 : viewYear;
+            const newKey = `${newY}-${String(newM + 1).padStart(2, '0')}`;
+            if (!MASTER_MONTHS.some(mm => mm.key === newKey)) return m;
+            if (m === 11) setViewYear(y => y + 1);
+            return newM;
         });
-    }, []);
+    }, [viewYear]);
 
     const goToday = useCallback(() => {
         setViewYear(2026);
@@ -478,10 +506,6 @@ export default function EnglishMaster365Page() {
             </div>
         );
     }
-
-    // ── Month info ──
-
-    const monthMeta = MASTER_MONTHS.find(m => m.key === monthKey);
 
     // ── Render ──
 
@@ -511,9 +535,20 @@ export default function EnglishMaster365Page() {
                     }}>
                         英会話マスター
                     </h1>
-                    <p style={{ fontSize: 13, color: '#78716C', margin: 0 }}>
+                    <p style={{ fontSize: 13, color: '#78716C', margin: '0 0 12px' }}>
                         {monthMeta ? `${monthMeta.title} / ${monthMeta.titleEn}` : '毎日10表現。1年で英語が話せるようになる。'}
                     </p>
+                    <Link href="/english/izakaya-toeic/kaiwa/guide" style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 8,
+                        fontSize: 13, fontWeight: 700, color: '#D4AF37',
+                        textDecoration: 'none',
+                        background: 'rgba(212,175,55,0.08)',
+                        border: '1px solid rgba(212,175,55,0.25)',
+                        padding: '8px 16px', borderRadius: 8,
+                    }}>
+                        <span style={{ fontSize: 16 }}>?</span>
+                        このアプリの使い方と学習メソッド
+                    </Link>
 
                     {/* Progress + Milestones */}
                     <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
@@ -579,14 +614,14 @@ export default function EnglishMaster365Page() {
                     background: '#fff',
                 }}>
                     <ReviewCalendar
-                        title="365 -- Month 1"
+                        title={`365 -- Month ${monthMeta?.month || 1}`}
                         subtitle={monthMeta?.title || ''}
                         accent="#D4AF37"
                         accentBg="#FEF9E7"
                         entries={calendarEntries}
                         categoryColors={calendarCategoryColors}
-                        selectedDay={selectedDay}
-                        onSelectDay={(d) => { setSelectedDay(d); setCategoryFilter(null); setExpandedId(null); }}
+                        selectedDay={selectedDay !== null ? selectedDay - daySlotOffset : null}
+                        onSelectDay={(d) => { setSelectedDay(d + daySlotOffset); setCategoryFilter(null); setExpandedId(null); }}
                         viewYear={viewYear}
                         viewMonth={viewMonth}
                         onPrevMonth={prevMonth}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { TOKYO52_EP01_EXPRESSIONS, type Tokyo52Expression } from '@/data/english/tokyo52/tokyo52-ep01-expressions';
+import { TOKYO52_EP02_EXPRESSIONS } from '@/data/english/tokyo52/tokyo52-ep02-expressions';
 
 const MASTERY_LABELS = ['未習得', '学習中', '復習中', '習得済'] as const;
 const MASTERY_STYLES = [
@@ -13,18 +14,24 @@ const MASTERY_STYLES = [
 ] as const;
 
 const DAY_NAMES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] as const;
-const CONTENT_DATES = [1, 2, 3, 4, 5]; // Apr 1-5, 2026
+const CONTENT_DATES = [1, 2, 3, 4, 5, 8, 9, 10, 11, 12]; // Apr 1-5 (Ep1), Apr 8-12 (Ep2)
 const YEAR = 2026;
 const MONTH = 3; // April (0-indexed)
 const DAYS_IN_MONTH = 30;
 const FIRST_DOW = new Date(YEAR, MONTH, 1).getDay(); // 0=Sun
+
+// Combine Ep1 + Ep2 expressions, remap Ep2 days to 6-10
+const ALL_EXPRESSIONS: Tokyo52Expression[] = [
+  ...TOKYO52_EP01_EXPRESSIONS,
+  ...TOKYO52_EP02_EXPRESSIONS.map(e => ({ ...e, day: e.day + 5 })),
+];
 
 function getMasteryKey(expr: Tokyo52Expression): string {
   return `tokyo52_mastery_${expr.day}_${expr.expression.replace(/\s+/g, '_').slice(0, 30)}`;
 }
 
 function getDayExpressions(day: number): Tokyo52Expression[] {
-  return TOKYO52_EP01_EXPRESSIONS.filter(e => e.day === day);
+  return ALL_EXPRESSIONS.filter(e => e.day === day);
 }
 
 export default function Tokyo52WordsPage() {
@@ -34,7 +41,7 @@ export default function Tokyo52WordsPage() {
   // Load mastery from localStorage
   useEffect(() => {
     const loaded: Record<string, number> = {};
-    TOKYO52_EP01_EXPRESSIONS.forEach(expr => {
+    ALL_EXPRESSIONS.forEach(expr => {
       const key = getMasteryKey(expr);
       const val = localStorage.getItem(key);
       if (val !== null) loaded[key] = parseInt(val, 10);
@@ -50,7 +57,7 @@ export default function Tokyo52WordsPage() {
     setMastery(prev => ({ ...prev, [key]: next }));
   }, [mastery]);
 
-  const totalMastered = TOKYO52_EP01_EXPRESSIONS.filter(
+  const totalMastered = ALL_EXPRESSIONS.filter(
     e => (mastery[getMasteryKey(e)] ?? 0) === 3
   ).length;
 
@@ -90,11 +97,11 @@ export default function Tokyo52WordsPage() {
             </Link>
             <span style={{ color: '#D6D3D1', fontSize: 14 }}>/</span>
             <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1C1917', letterSpacing: '0.05em', margin: 0 }}>
-              TOKYO 52 -- Ep 1 Words
+              TOKYO 52 -- Words
             </h1>
           </div>
           <div style={{ fontSize: 14, color: '#78716C', fontWeight: 500 }}>
-            <span style={{ color: '#D4AF37', fontWeight: 700 }}>{totalMastered}</span> / 75 mastered
+            <span style={{ color: '#D4AF37', fontWeight: 700 }}>{totalMastered}</span> / {ALL_EXPRESSIONS.length} mastered
           </div>
         </div>
 

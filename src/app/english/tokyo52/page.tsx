@@ -9,10 +9,14 @@ import {
     TOKYO52_EP01_EXPRESSIONS,
     type ScriptSection,
 } from '@/data/english/tokyo52/ep01';
+import { tokyo52Ep02Entries } from '@/data/english/tokyo52/ep02';
 import {
-    TOKYO52_EP01_EXPRESSIONS as T52_EXPRESSIONS,
+    TOKYO52_EP01_EXPRESSIONS as T52_EP01_EXPRESSIONS,
     type Tokyo52Expression,
 } from '@/data/english/tokyo52/tokyo52-ep01-expressions';
+import {
+    TOKYO52_EP02_EXPRESSIONS as T52_EP02_EXPRESSIONS,
+} from '@/data/english/tokyo52/tokyo52-ep02-expressions';
 
 /* ---- Colors ---- */
 const GOLD = '#D4AF37';
@@ -28,6 +32,9 @@ const SPEAKER_COLORS: Record<string, string> = {
     'Rina': EMERALD,
     'Foreign Customer': '#3B82F6',
     'Master Gondo': '#B45309',
+    'Takeshi': '#F59E0B',
+    'Kenji': '#06B6D4',
+    'Lisa': '#EC4899',
 };
 
 function extractSpeaker(text: string): { name: string; dialogue: string } {
@@ -133,8 +140,10 @@ function Narrative({ section, lang }: { section: Extract<ScriptSection, { type: 
     );
 }
 
+const allTokyo52Entries = [...tokyo52Ep01Entries, ...tokyo52Ep02Entries];
+
 function MemoriaScene({ section, lang }: { section: Extract<ScriptSection, { type: 'memoria' }>; lang: Lang }) {
-    const entry = tokyo52Ep01Entries[section.entryIndex];
+    const entry = allTokyo52Entries[section.entryIndex];
     const [expanded, setExpanded] = useState(true);
     if (!entry) return null;
 
@@ -348,18 +357,25 @@ function ExpressionsSection() {
 
 /* ---- Listening Tab (inline Memoria) ---- */
 
-function ListeningTab({ lang }: { lang: Lang }) {
+function ListeningTab({ lang, filterEpisode }: { lang: Lang; filterEpisode: number }) {
+    const episodeGroups = [
+        { num: 1, label: 'Episode 1 -- ここから始まる', entries: tokyo52Ep01Entries },
+        { num: 2, label: 'Episode 2 -- 常連', entries: tokyo52Ep02Entries },
+    ];
+    const filtered = episodeGroups.filter(g => g.num === filterEpisode);
     return (
         <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px 80px' }}>
+            {filtered.map((group, gi) => (
+            <div key={gi}>
             <div style={{ padding: '32px 0 16px' }}>
                 <h2 style={{ fontSize: 20, fontWeight: 700, color: STONE[900], margin: '0 0 8px' }}>
-                    Episode 1 -- 全会話
+                    {group.label}
                 </h2>
                 <p style={{ fontSize: 14, color: STONE[500], margin: 0, lineHeight: 1.7 }}>
-                    ドラマに登場する4つの会話。言語切り替えで日本語・英語・両方を表示。
+                    ドラマに登場する会話。言語切り替えで日本語・英語・両方を表示。
                 </p>
             </div>
-            {tokyo52Ep01Entries.map((entry, idx) => (
+            {group.entries.map((entry, idx) => (
                 <div key={entry.id} style={{ marginBottom: 32 }}>
                     <div style={{
                         display: 'flex', alignItems: 'center', gap: 12,
@@ -416,6 +432,8 @@ function ListeningTab({ lang }: { lang: Lang }) {
                     })}
                 </div>
             ))}
+            </div>
+            ))}
         </div>
     );
 }
@@ -431,11 +449,17 @@ const W_MASTERY_STYLES = [
 ] as const;
 
 const W_DAY_NAMES = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'] as const;
-const W_CONTENT_DATES = [1, 2, 3, 4, 5];
+const W_CONTENT_DATES = [1, 2, 3, 4, 5, 8, 9, 10, 11, 12]; // Apr 1-5 (Ep1), Apr 8-12 (Ep2)
 const W_YEAR = 2026;
 const W_MONTH = 3; // April (0-indexed)
 const W_DAYS_IN_MONTH = 30;
 const W_FIRST_DOW = new Date(W_YEAR, W_MONTH, 1).getDay();
+
+// Combine Ep1 + Ep2 expressions, remap Ep2 days to 6-10
+const T52_EXPRESSIONS: Tokyo52Expression[] = [
+    ...T52_EP01_EXPRESSIONS,
+    ...T52_EP02_EXPRESSIONS.map(e => ({ ...e, day: e.day + 5 })),
+];
 
 function wMasteryKey(expr: Tokyo52Expression): string {
     return `tokyo52_mastery_${expr.day}_${expr.expression.replace(/\s+/g, '_').slice(0, 30)}`;
@@ -462,6 +486,7 @@ function WordsTab() {
     };
 
     const totalMastered = T52_EXPRESSIONS.filter(e => (mastery[wMasteryKey(e)] ?? 0) === 3).length;
+    const totalExpressions = T52_EXPRESSIONS.length; // 150 total (75 + 75)
     const dateToDay = (d: number) => { const i = W_CONTENT_DATES.indexOf(d); return i >= 0 ? i + 1 : null; };
     const getDayExprs = (d: number) => { const day = dateToDay(d); return day ? T52_EXPRESSIONS.filter(e => e.day === day) : []; };
     const getDayMastered = (d: number) => getDayExprs(d).filter(e => (mastery[wMasteryKey(e)] ?? 0) === 3).length;
@@ -481,7 +506,7 @@ function WordsTab() {
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 24px 80px' }}>
             {/* Stats */}
             <div style={{ marginBottom: 20, fontSize: 14, color: STONE[500] }}>
-                <span style={{ color: GOLD, fontWeight: 700 }}>{totalMastered}</span> / 75 mastered
+                <span style={{ color: GOLD, fontWeight: 700 }}>{totalMastered}</span> / {totalExpressions} mastered
             </div>
 
             <div style={{ display: 'flex', gap: 32, alignItems: 'flex-start', flexWrap: 'wrap' }}>
@@ -576,12 +601,135 @@ function WordsTab() {
                         </div>
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 200, color: STONE[500], fontSize: 14, textAlign: 'center', padding: 32 }}>
-                            <div style={{ fontSize: 28, color: STONE[300], marginBottom: 12 }}>17 - 21</div>
+                            <div style={{ fontSize: 28, color: STONE[300], marginBottom: 12 }}>--</div>
                             <div>カレンダーの日付をクリックして表現を表示</div>
                         </div>
                     )}
                 </div>
             </div>
+        </div>
+    );
+}
+
+/* ---- Episode Meta ---- */
+
+const EPISODES = [
+    { num: 1, title: 'ここから始まる', titleEn: 'It Starts Here', dateRange: '4/1 - 4/5', days: 5, hasScript: true },
+    { num: 2, title: '常連', titleEn: 'The Regular', dateRange: '4/8 - 4/12', days: 5, hasScript: false },
+] as const;
+
+/* ---- Guide Section ---- */
+
+function GuideSection({ onClose }: { onClose: () => void }) {
+    return (
+        <div style={{
+            maxWidth: 700, margin: '0 auto 32px', padding: '32px',
+            background: `linear-gradient(135deg, #FFFBEB 0%, #ECFDF5 100%)`,
+            borderRadius: 20, border: `1px solid ${STONE[200]}`,
+        }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+                <div>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', color: GOLD, marginBottom: 6 }}>
+                        Tokyo 52 の使い方
+                    </div>
+                    <h2 style={{ fontSize: 22, fontWeight: 800, color: STONE[900], margin: 0, lineHeight: 1.4 }}>
+                        週1エピソード、1年で52話。<br />ドラマを観るように英語が身につく。
+                    </h2>
+                </div>
+                <button onClick={onClose} style={{
+                    background: 'transparent', border: 'none', cursor: 'pointer',
+                    fontSize: 18, color: STONE[400], padding: 4,
+                }}>x</button>
+            </div>
+
+            <p style={{ fontSize: 15, color: STONE[700], lineHeight: 2, margin: '0 0 24px' }}>
+                Tokyo 52は、居酒屋「のれん」を舞台にした連続ドラマ形式の英語学習プログラムです。<br />
+                会話マスター365が「毎日の在庫づくり」なら、Tokyo 52は「在庫を使う練習場」。<br />
+                キャラクターたちの会話を聴いて、リアルな英語の流れに慣れていきます。
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
+                {[
+                    { step: '1', title: 'ドラマを読む', desc: 'STORYタブでエピソードのストーリーを読む。日本語/英語/両方を切り替えて、自分のペースで。' },
+                    { step: '2', title: '会話を聴く', desc: 'LISTENタブでキャラクターの会話を確認。Memoriaで音声再生もできる。' },
+                    { step: '3', title: '表現を覚える', desc: 'WORDSタブでエピソードの表現をチェック。習得度を管理して、使える在庫を増やす。' },
+                ].map(s => (
+                    <div key={s.step} style={{
+                        background: 'rgba(255,255,255,0.8)', borderRadius: 12, padding: '16px 20px',
+                        border: `1px solid ${STONE[200]}`,
+                    }}>
+                        <div style={{
+                            width: 28, height: 28, borderRadius: '50%',
+                            background: `${GOLD}15`, border: `1.5px solid ${GOLD}40`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 13, fontWeight: 800, color: GOLD, marginBottom: 10,
+                        }}>{s.step}</div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: STONE[900], marginBottom: 6 }}>{s.title}</div>
+                        <div style={{ fontSize: 13, color: STONE[600], lineHeight: 1.7 }}>{s.desc}</div>
+                    </div>
+                ))}
+            </div>
+
+            <div style={{
+                background: 'rgba(255,255,255,0.6)', borderRadius: 12, padding: '16px 20px',
+                border: `1px solid ${STONE[200]}`,
+            }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: STONE[800], marginBottom: 8 }}>
+                    会話マスター365との違い
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: GOLD, marginBottom: 4 }}>会話マスター365</div>
+                        <div style={{ fontSize: 13, color: STONE[600], lineHeight: 1.7 }}>
+                            毎日10フレーズ。サバイバル英語の在庫をつくる。初心者向け。1日5分。
+                        </div>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: EMERALD, marginBottom: 4 }}>Tokyo 52</div>
+                        <div style={{ fontSize: 13, color: STONE[600], lineHeight: 1.7 }}>
+                            週1エピソード。ドラマの中でリアルな会話を体験。中級者向け。じっくり30分。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+/* ---- Episode Selector ---- */
+
+function EpisodeSelector({ selected, onSelect }: { selected: number; onSelect: (n: number) => void }) {
+    return (
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {EPISODES.map(ep => {
+                const active = selected === ep.num;
+                return (
+                    <button key={ep.num} onClick={() => onSelect(ep.num)} style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        padding: '10px 18px', borderRadius: 12,
+                        border: active ? `2px solid ${GOLD}` : `1px solid ${STONE[200]}`,
+                        background: active ? `${GOLD}08` : '#fff',
+                        cursor: 'pointer', transition: 'all 0.15s',
+                        outline: 'none',
+                    }}>
+                        <div style={{
+                            width: 32, height: 32, borderRadius: '50%',
+                            background: active ? `${GOLD}20` : STONE[100],
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 13, fontWeight: 800,
+                            color: active ? GOLD : STONE[500],
+                        }}>{ep.num}</div>
+                        <div style={{ textAlign: 'left' }}>
+                            <div style={{ fontSize: 14, fontWeight: 700, color: active ? STONE[900] : STONE[600] }}>
+                                {ep.title}
+                            </div>
+                            <div style={{ fontSize: 11, color: STONE[500] }}>
+                                {ep.titleEn} -- {ep.dateRange}
+                            </div>
+                        </div>
+                    </button>
+                );
+            })}
         </div>
     );
 }
@@ -592,18 +740,26 @@ type TabKey = 'story' | 'words' | 'listen';
 
 const TABS: { key: TabKey; label: string; sublabel: string; color: string }[] = [
     { key: 'story', label: 'STORY', sublabel: 'ドラマ', color: GOLD },
-    { key: 'words', label: 'WORDS', sublabel: '単語', color: GOLD },
+    { key: 'words', label: 'WORDS', sublabel: '表現', color: GOLD },
     { key: 'listen', label: 'LISTEN', sublabel: '会話', color: EMERALD },
 ];
 
 export default function Tokyo52Page() {
     const [lang, setLang] = useState<Lang>('both');
     const [tab, setTab] = useState<TabKey>('story');
+    const [episode, setEpisode] = useState(1);
+    const [showGuide, setShowGuide] = useState(false);
     const topRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        topRef.current?.scrollIntoView({ behavior: 'smooth' });
+        const seen = localStorage.getItem('tokyo52_guide_seen');
+        if (!seen) setShowGuide(true);
     }, []);
+
+    const closeGuide = () => {
+        setShowGuide(false);
+        localStorage.setItem('tokyo52_guide_seen', '1');
+    };
 
     return (
         <div ref={topRef} style={{ minHeight: '100vh', background: '#fff', color: STONE[900] }}>
@@ -624,10 +780,21 @@ export default function Tokyo52Page() {
                         </span>
                         <span style={{ fontSize: 11, color: STONE[300] }}>|</span>
                         <span style={{ fontSize: 12, color: STONE[500], letterSpacing: '0.04em' }}>
-                            Ep 1 -- ここから始まる
+                            週1ドラマ -- 全52話
                         </span>
                     </div>
-                    {tab !== 'words' && <LangToggle lang={lang} setLang={setLang} />}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <button onClick={() => setShowGuide(!showGuide)} style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            fontSize: 12, fontWeight: 700, color: GOLD,
+                            background: `${GOLD}08`, border: `1px solid ${GOLD}25`,
+                            padding: '5px 12px', borderRadius: 8, cursor: 'pointer',
+                        }}>
+                            <span style={{ fontSize: 14 }}>?</span>
+                            使い方
+                        </button>
+                        {tab !== 'words' && <LangToggle lang={lang} setLang={setLang} />}
+                    </div>
                 </div>
 
                 {/* Tab navigation */}
@@ -667,8 +834,25 @@ export default function Tokyo52Page() {
                 </div>
             </div>
 
+            {/* Guide */}
+            {showGuide && (
+                <div style={{ padding: '24px 24px 0' }}>
+                    <GuideSection onClose={closeGuide} />
+                </div>
+            )}
+
+            {/* Episode Selector (for STORY and LISTEN tabs) */}
+            {(tab === 'story' || tab === 'listen') && (
+                <div style={{ maxWidth: 700, margin: '0 auto', padding: '24px 32px 0' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: STONE[500], marginBottom: 10 }}>
+                        エピソード選択
+                    </div>
+                    <EpisodeSelector selected={episode} onSelect={setEpisode} />
+                </div>
+            )}
+
             {/* Tab: STORY */}
-            {tab === 'story' && (
+            {tab === 'story' && episode === 1 && (
                 <div style={{ maxWidth: 700, margin: '0 auto', padding: '0 32px 80px' }}>
                     {TOKYO52_EP01_SCRIPT.map((section, i) => {
                         switch (section.type) {
@@ -704,25 +888,143 @@ export default function Tokyo52Page() {
                 </div>
             )}
 
+            {/* Tab: STORY -- Episode 2 (conversation-based, no full script yet) */}
+            {tab === 'story' && episode === 2 && (
+                <div style={{ maxWidth: 700, margin: '0 auto', padding: '24px 32px 80px' }}>
+                    <div style={{
+                        padding: '48px 0 32px', textAlign: 'center',
+                        borderBottom: `1px solid ${STONE[200]}`, marginBottom: 32,
+                    }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.3em', color: GOLD, marginBottom: 24 }}>
+                            EPISODE 2
+                        </div>
+                        <h1 style={{ fontSize: 32, fontWeight: 800, color: STONE[900], margin: '0 0 8px', lineHeight: 1.4 }}>
+                            常連
+                        </h1>
+                        <p style={{ fontSize: 15, color: STONE[500], margin: '0 0 24px' }}>The Regular</p>
+                        <p style={{ fontSize: 14, color: STONE[600], lineHeight: 2, maxWidth: 480, margin: '0 auto' }}>
+                            一週間ぶりにのれんに戻ったユキ。同僚のアヤを連れて再訪。<br />
+                            ケンジが新たに加わり、リサが「考えていること」と「言えること」の差を解説する。<br />
+                            そしてマスター権藤が提案する「英語の時間」とは。
+                        </p>
+                    </div>
+
+                    {/* Episode 2 conversations */}
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', color: STONE[500], marginBottom: 16 }}>
+                        5日間の会話
+                    </div>
+                    {tokyo52Ep02Entries.map((entry, idx) => (
+                        <div key={entry.id} style={{ marginBottom: 32 }}>
+                            <div style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                padding: '12px 0', borderBottom: `1px solid ${STONE[200]}`, marginBottom: 16,
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <div style={{
+                                        width: 28, height: 28, borderRadius: '50%',
+                                        background: `${GOLD}15`, border: `1.5px solid ${GOLD}40`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 12, fontWeight: 700, color: GOLD,
+                                    }}>{idx + 1}</div>
+                                    <div>
+                                        <div style={{ fontSize: 15, fontWeight: 600, color: STONE[900] }}>{entry.title}</div>
+                                        <div style={{ fontSize: 12, color: STONE[500] }}>{entry.titleJa}</div>
+                                    </div>
+                                </div>
+                                <Link href={`/memoria/${entry.id}?autoplay=true`} style={{
+                                    fontSize: 11, fontWeight: 700, color: EMERALD, textDecoration: 'none',
+                                    padding: '4px 12px', borderRadius: 6,
+                                    border: `1px solid ${EMERALD}30`, background: `${EMERALD}08`,
+                                }}>
+                                    Memoria で聴く
+                                </Link>
+                            </div>
+                            {/* Synopsis */}
+                            <div style={{ fontSize: 14, color: STONE[600], lineHeight: 1.9, marginBottom: 16, padding: '0 4px' }}>
+                                {entry.content}
+                            </div>
+                            {/* Conversation preview */}
+                            {entry.conversation.english.slice(0, 6).map((line, i) => {
+                                const { name, dialogue } = extractSpeaker(line.text);
+                                const jaLine = entry.conversation.japanese[i];
+                                const { dialogue: jaDialogue } = jaLine ? extractSpeaker(jaLine.text) : { dialogue: '' };
+                                const color = SPEAKER_COLORS[name] || STONE[600];
+                                return (
+                                    <div key={i} style={{
+                                        display: 'flex', gap: 10, padding: '8px 14px',
+                                        borderLeft: `3px solid ${color}20`,
+                                        borderRadius: '0 8px 8px 0', marginBottom: 2,
+                                        background: i % 2 === 0 ? `${STONE[100]}80` : 'transparent',
+                                    }}>
+                                        <div style={{ fontSize: 10, color: STONE[300], minWidth: 20, paddingTop: 3, fontWeight: 600 }}>{i + 1}</div>
+                                        <div style={{ flex: 1 }}>
+                                            {name && <div style={{ fontSize: 11, fontWeight: 700, color, marginBottom: 3 }}>{name}</div>}
+                                            {(lang !== 'ja') && <div style={{ fontSize: 14, color: STONE[800], lineHeight: 1.8 }}>{dialogue}</div>}
+                                            {(lang !== 'en') && jaDialogue && (
+                                                <div style={{ fontSize: 13, color: STONE[500], lineHeight: 1.7, marginTop: lang === 'both' ? 3 : 0 }}>{jaDialogue}</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {entry.conversation.english.length > 6 && (
+                                <Link href={`/memoria/${entry.id}`} style={{
+                                    display: 'block', textAlign: 'center', padding: '12px 0',
+                                    fontSize: 13, color: GOLD, textDecoration: 'none', fontWeight: 600,
+                                }}>
+                                    ...残り{entry.conversation.english.length - 6}行を Memoria で読む
+                                </Link>
+                            )}
+                        </div>
+                    ))}
+
+                    {/* Ep2 Expressions */}
+                    <div style={{ marginTop: 48, paddingTop: 48, borderTop: `1px solid ${STONE[200]}` }}>
+                        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', color: EMERALD, marginBottom: 8 }}>
+                            EPISODE 2 STUDY MATERIAL
+                        </div>
+                        <p style={{ fontSize: 14, color: STONE[600], margin: '0 0 24px', lineHeight: 1.7 }}>
+                            Episode 2で使われた表現。WORDSタブでも習得度を管理できます。
+                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            {T52_EP02_EXPRESSIONS.slice(0, 15).map((exp, i) => (
+                                <div key={i} style={{
+                                    border: `1px solid ${STONE[200]}`, borderRadius: 12,
+                                    padding: '14px 18px', background: '#fff',
+                                    borderLeft: `3px solid ${EMERALD}`,
+                                }}>
+                                    <div style={{ fontSize: 15, fontWeight: 700, color: STONE[900], marginBottom: 2 }}>{exp.expression}</div>
+                                    <div style={{ fontSize: 13, color: EMERALD, marginBottom: 6 }}>{exp.meaning}</div>
+                                    <div style={{ fontSize: 13, color: STONE[500], fontStyle: 'italic' }}>&ldquo;{exp.example}&rdquo;</div>
+                                </div>
+                            ))}
+                            {T52_EP02_EXPRESSIONS.length > 15 && (
+                                <div style={{ textAlign: 'center', padding: 12, fontSize: 13, color: STONE[500] }}>
+                                    ...他{T52_EP02_EXPRESSIONS.length - 15}表現はWORDSタブで確認
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Tab: WORDS -- inline calendar */}
             {tab === 'words' && <WordsTab />}
 
             {/* Tab: LISTEN */}
-            {tab === 'listen' && <ListeningTab lang={lang} />}
+            {tab === 'listen' && <ListeningTab lang={lang} filterEpisode={episode} />}
 
             {/* Footer */}
-            {tab !== 'words' && (
-                <div style={{
-                    maxWidth: 700, margin: '0 auto', padding: '0 32px 40px',
-                    textAlign: 'center',
-                }}>
-                    <div style={{ borderTop: `1px solid ${STONE[200]}`, paddingTop: 24 }}>
-                        <p style={{ fontSize: 12, color: STONE[400], margin: 0 }}>
-                            Tokyo 52 -- toniolab.com
-                        </p>
-                    </div>
+            <div style={{
+                maxWidth: 700, margin: '0 auto', padding: '0 32px 40px',
+                textAlign: 'center',
+            }}>
+                <div style={{ borderTop: `1px solid ${STONE[200]}`, paddingTop: 24 }}>
+                    <p style={{ fontSize: 12, color: STONE[400], margin: 0 }}>
+                        Tokyo 52 -- toniolab.com
+                    </p>
                 </div>
-            )}
+            </div>
         </div>
     );
 }

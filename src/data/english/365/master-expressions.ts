@@ -17,6 +17,10 @@
 import { WEEK2_EXPRESSIONS, WEEK2_DAY_THEMES } from './master-expressions-w2';
 import { WEEK3_EXPRESSIONS, WEEK3_DAY_THEMES } from './master-expressions-w3';
 import { WEEK4_EXPRESSIONS, WEEK4_DAY_THEMES } from './master-expressions-w4';
+import { MONTH2_W5_EXPRESSIONS, MONTH2_W5_DAY_THEMES } from './master-expressions-m2-w5';
+import { MONTH2_W6_EXPRESSIONS, MONTH2_W6_DAY_THEMES } from './master-expressions-m2-w6';
+import { MONTH2_W7_EXPRESSIONS, MONTH2_W7_DAY_THEMES } from './master-expressions-m2-w7';
+import { MONTH2_W8_EXPRESSIONS, MONTH2_W8_DAY_THEMES } from './master-expressions-m2-w8';
 
 // ============================================================
 // TYPES
@@ -106,6 +110,34 @@ export const MASTER_WEEKS: WeekMeta[] = [
         days: [22, 23, 24, 25, 26, 27, 28, 29, 30],
         scene: '褒める、夢を語る、思い出を話す。英語で自分を表現する4週目。そして卒業の夜',
     },
+    {
+        week: 5,
+        title: '毎日の英語',
+        titleEn: 'Everyday English',
+        days: [31, 32, 33, 34, 35, 36, 37],
+        scene: '朝の挨拶から仕事、ランチ、天気、予定、体調、趣味。日常を英語で回す5週目',
+    },
+    {
+        week: 6,
+        title: '暮らしの英語',
+        titleEn: 'Life in English',
+        days: [38, 39, 40, 41, 42, 43, 44],
+        scene: '家のこと、テクノロジー、意見、約束、電話、道案内、週末。生活の英語を完成させる6週目',
+    },
+    {
+        week: 7,
+        title: '社会とつながる',
+        titleEn: 'Connecting with Society',
+        days: [45, 46, 47, 48, 49, 50, 51],
+        scene: 'ニュース、お金、健康、環境、文化、教育、ボランティア。社会の話題を英語で語る7週目',
+    },
+    {
+        week: 8,
+        title: '自分の世界を広げる',
+        titleEn: 'Expanding Your World',
+        days: [52, 53, 54, 55, 56, 57, 58, 59, 60],
+        scene: '旅行計画、異文化理解、将来の夢、仕事の英語、SNS、エンタメ、料理、スポーツ、Month 2卒業。世界が広がる8週目',
+    },
 ];
 
 export const MASTER_MONTHS: MonthMeta[] = [
@@ -114,6 +146,13 @@ export const MASTER_MONTHS: MonthMeta[] = [
         key: '2026-04',
         title: 'サバイバル英語',
         titleEn: 'Survival English',
+        totalExpressions: 300,
+    },
+    {
+        month: 2,
+        key: '2026-05',
+        title: '日常生活',
+        titleEn: 'Daily Life',
         totalExpressions: 300,
     },
 ];
@@ -231,6 +270,10 @@ export const MASTER_DAY_THEMES: Record<number, {
     ...WEEK2_DAY_THEMES,
     ...WEEK3_DAY_THEMES,
     ...WEEK4_DAY_THEMES,
+    ...MONTH2_W5_DAY_THEMES,
+    ...MONTH2_W6_DAY_THEMES,
+    ...MONTH2_W7_DAY_THEMES,
+    ...MONTH2_W8_DAY_THEMES,
 };
 
 // ============================================================
@@ -1073,4 +1116,8 @@ export const MASTER_EXPRESSIONS: MasterExpression[] = [
     ...WEEK2_EXPRESSIONS,
     ...WEEK3_EXPRESSIONS,
     ...WEEK4_EXPRESSIONS,
+    ...MONTH2_W5_EXPRESSIONS,
+    ...MONTH2_W6_EXPRESSIONS,
+    ...MONTH2_W7_EXPRESSIONS,
+    ...MONTH2_W8_EXPRESSIONS,
 ];

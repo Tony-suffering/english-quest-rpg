@@ -16,6 +16,7 @@ import { gameNightEntries } from '@/data/english/game-night-chaos';
 import { antiquesHouseEntries } from '@/data/english/antiques-house';
 import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
 import { tokyo52Ep01Entries } from '@/data/english/tokyo52/ep01';
+import { tokyo52Ep02Entries } from '@/data/english/tokyo52/ep02';
 import { theJobEntries } from '@/data/english/365-the-job';
 import { SavedPhrasesStorage } from '@/lib/saved-phrases';
 import { charIcon } from '@/data/izakaya-toeic/characters';
@@ -448,6 +449,20 @@ export default function MemoriaDetailPage() {
                 tags: e.tags,
             }));
 
+            const tokyo52Ep02MemoriaEntries: MemoriaEntry[] = tokyo52Ep02Entries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
             const theJobMemoriaEntries: MemoriaEntry[] = theJobEntries.map(e => ({
                 id: e.id,
                 date: e.date,
@@ -462,7 +477,7 @@ export default function MemoriaDetailPage() {
                 tags: e.tags,
             }));
 
-            const all = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries, ...tokyo52MemoriaEntries, ...theJobMemoriaEntries, ...tangentMemoriaEntries].sort(
+            const all = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries, ...tokyo52MemoriaEntries, ...tokyo52Ep02MemoriaEntries, ...theJobMemoriaEntries, ...tangentMemoriaEntries].sort(
                 (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
             );
             setAllEntries(all);
@@ -678,6 +693,23 @@ export default function MemoriaDetailPage() {
                         createdAt: jobEntry.createdAt,
                         updatedAt: jobEntry.updatedAt,
                         tags: jobEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('tokyo52-ep02-')) {
+                const t52Ep02Entry = tokyo52Ep02Entries.find(e => e.id === id);
+                if (t52Ep02Entry) {
+                    loadedEntry = {
+                        id,
+                        date: t52Ep02Entry.date,
+                        title: t52Ep02Entry.title,
+                        content: t52Ep02Entry.content,
+                        conversation: t52Ep02Entry.conversation,
+                        tone: t52Ep02Entry.tone,
+                        series: t52Ep02Entry.series,
+                        seriesTitle: t52Ep02Entry.seriesTitle,
+                        createdAt: t52Ep02Entry.createdAt,
+                        updatedAt: t52Ep02Entry.updatedAt,
+                        tags: t52Ep02Entry.tags,
                     };
                 }
             } else if (id.startsWith('tokyo52-')) {
