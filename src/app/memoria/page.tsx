@@ -14,6 +14,9 @@ import { movieNightEntries } from '@/data/english/movie-night';
 import { gameNightEntries } from '@/data/english/game-night-chaos';
 import { antiquesHouseEntries } from '@/data/english/antiques-house';
 import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
+import { bbqNeighborhoodEntries } from '@/data/english/bbq-neighborhood';
+import { theJobEntries } from '@/data/english/365-the-job';
+import { tokyo52Ep01Entries } from '@/data/english/tokyo52/ep01';
 
 export default function MemoriaPage() {
     const [entries, setEntries] = useState<MemoriaEntry[]>([]);
@@ -206,10 +209,52 @@ export default function MemoriaPage() {
                 tags: e.tags,
             }));
 
-            const allEntries = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries];
+            const bbqMemoriaEntries: MemoriaEntry[] = bbqNeighborhoodEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const theJobMemoriaEntries: MemoriaEntry[] = theJobEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const tokyo52MemoriaEntries: MemoriaEntry[] = tokyo52Ep01Entries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const allEntries = [...theJobMemoriaEntries, ...tokyo52MemoriaEntries];
             setEntries(allEntries);
-            setTangentEntries(tangentMemoriaEntries);
-            localStorage.setItem('memoria_total', String(allEntries.length + tangentMemoriaEntries.length));
+            setTangentEntries([]);
+            localStorage.setItem('memoria_total', String(allEntries.length));
         };
         loadEntries();
     }, []);

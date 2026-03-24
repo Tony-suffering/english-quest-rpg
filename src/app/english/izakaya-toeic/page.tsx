@@ -719,6 +719,49 @@ export default function IzakayaToeicPage() {
         </div>
       </div>
 
+      {/* ====== 会話マスター365 BANNER ====== */}
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px 32px' }}>
+        <Link href="/english/izakaya-toeic/kaiwa" style={{
+          display: 'block', textDecoration: 'none', color: T.text,
+          background: `linear-gradient(135deg, #ECFDF5 0%, #FEF3C7 100%)`,
+          border: `1px solid ${T.goldBorder}`,
+          borderRadius: 14, padding: '24px 20px',
+          boxShadow: `0 4px 20px ${T.gold}15`,
+          transition: 'all 0.2s',
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{
+            position: 'absolute', top: 12, right: 16,
+            fontSize: 10, fontWeight: 700, letterSpacing: 2,
+            color: T.gold, opacity: 0.6,
+          }}>
+            365 DAYS
+          </div>
+          <div style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: 3,
+            color: '#10B981', marginBottom: 8,
+          }}>
+            DAILY CONVERSATION
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 4 }}>
+            会話マスター365
+          </div>
+          <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.6, marginBottom: 12 }}>
+            毎日10フレーズ。日常会話・旅行で本当に使う表現だけ。
+            <br />
+            日本語から4段階の英語で覚える。1年で完全マスター。
+          </div>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '8px 16px', background: 'rgba(212,175,55,0.12)',
+            borderRadius: 8, fontSize: 12, fontWeight: 700, color: T.gold,
+          }}>
+            カレンダーを開く
+            <span style={{ fontSize: 14 }}>{'>'}</span>
+          </div>
+        </Link>
+      </div>
+
       {/* ====== WHY LISTENING ====== */}
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 16px 32px' }}>
         <div style={{
@@ -750,6 +793,7 @@ export default function IzakayaToeicPage() {
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
             {[
+              { href: '/english/izakaya-toeic/kaiwa', icon: 'K', iconColor: '#10B981', title: '会話マスター365', sub: '毎日10フレーズ' },
               { href: '/english/izakaya-toeic/tonight', icon: '1', iconColor: T.gold, title: '今夜の1杯', sub: '毎日1問、5秒で解ける' },
               { href: '/english/training', icon: 'V', iconColor: T.green, title: '仕込み帳', sub: '毎日20語ずつ仕込む' },
               { href: '/english/izakaya-toeic/guide', icon: 'G', iconColor: T.blue, title: 'マスターの攻略メモ', sub: 'Part別の裏技' },

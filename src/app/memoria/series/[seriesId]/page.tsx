@@ -46,6 +46,10 @@ const seriesInfo: Record<string, { title: string; description: string; sourceJou
         description: '4時間の実際の会話を英語にポーティング。10の日本語スピーチパターンがそのまま英語になる実験。Journal #115より。',
         sourceJournal: '115',
     },
+    'tokyo52-spring': {
+        title: 'Tokyo 52 -- 春・出会い',
+        description: '52週の東京英語ドラマ。Episode 1: ユキが渋谷のカフェで打ちのめされ、裏路地の居酒屋「のれん」でTOEIC990点の謎の老人と出会う。',
+    },
 };
 
 export default function SeriesPage() {

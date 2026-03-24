@@ -25,6 +25,8 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     // ── のれん30夜 (Main) ──
     const programItems = [
         { id: '/english/izakaya-toeic', label: 'のれん30夜', color: '#D4AF37' },
+        { id: '/english/izakaya-toeic/kaiwa', label: '会話マスター365', color: '#10B981' },
+        { id: '/english/tokyo52', label: 'Tokyo52', color: '#8B5CF6' },
         { id: '/english/izakaya-toeic/characters', label: '常連ファイル', color: '#92400E' },
         { id: '/english/izakaya-toeic/episodes', label: 'エピソード一覧', color: '#D4AF37' },
         { id: '/english/training', label: '仕込み帳', color: '#10B981' },

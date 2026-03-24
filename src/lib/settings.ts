@@ -22,7 +22,7 @@ const DEFAULTS: AppSettings = {
     feverEnabled: true,
     volume: 100,
     feverBgmVolume: 35,
-    bgmEnabled: true,
+    bgmEnabled: false,
     bgmVolume: 30,
     beginnerMode: true,
     tapToLevel: false,

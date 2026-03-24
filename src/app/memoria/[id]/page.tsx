@@ -15,7 +15,21 @@ import { movieNightEntries } from '@/data/english/movie-night';
 import { gameNightEntries } from '@/data/english/game-night-chaos';
 import { antiquesHouseEntries } from '@/data/english/antiques-house';
 import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
+import { tokyo52Ep01Entries } from '@/data/english/tokyo52/ep01';
+import { theJobEntries } from '@/data/english/365-the-job';
 import { SavedPhrasesStorage } from '@/lib/saved-phrases';
+import { charIcon } from '@/data/izakaya-toeic/characters';
+
+// Map speaker display names → charIcon IDs
+const SPEAKER_CHAR_ID: Record<string, string> = {
+    'Yuki': 'yuki',
+    'Master Gondo': 'master',
+    'Gondo': 'master',
+    'Takeshi': 'takeshi',
+    'Lisa': 'lisa',
+    'Kenji': 'kenji',
+    'Mina': 'mina',
+};
 
 type ThemeMode = 'dark' | 'light';
 type LineMode = 'sequential' | 'shuffle' | 'repeat-one';
@@ -115,6 +129,18 @@ const CHARACTER_COLORS: Record<string, string> = {
     'Aunt Margot': '#BE185D',
     'Cody': '#059669',
     'Pearl': '#9D174D',
+    // Tokyo 52 & 365
+    'Yuki': '#D4AF37',
+    'Aya': '#8B5CF6',
+    'Rina': '#10B981',
+    'Master Gondo': '#B45309',
+    'Gondo': '#B45309',
+    'Foreign Customer': '#3B82F6',
+    'Tourist': '#3B82F6',
+    'Takeshi': '#F59E0B',
+    'Lisa': '#EC4899',
+    'Kenji': '#06B6D4',
+    'Mina': '#A78BFA',
 };
 
 export default function MemoriaDetailPage() {
@@ -408,7 +434,35 @@ export default function MemoriaDetailPage() {
                 tags: e.tags,
             }));
 
-            const all = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries, ...tangentMemoriaEntries].sort(
+            const tokyo52MemoriaEntries: MemoriaEntry[] = tokyo52Ep01Entries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const theJobMemoriaEntries: MemoriaEntry[] = theJobEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const all = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries, ...tokyo52MemoriaEntries, ...theJobMemoriaEntries, ...tangentMemoriaEntries].sort(
                 (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
             );
             setAllEntries(all);
@@ -607,6 +661,40 @@ export default function MemoriaDetailPage() {
                         createdAt: labEntry.conversationData.generatedAt,
                         updatedAt: labEntry.conversationData.generatedAt,
                         tags: [...labEntry.businessTags, ...labEntry.techTags],
+                    };
+                }
+            } else if (id.startsWith('365-ep01-')) {
+                const jobEntry = theJobEntries.find(e => e.id === id);
+                if (jobEntry) {
+                    loadedEntry = {
+                        id,
+                        date: jobEntry.date,
+                        title: jobEntry.title,
+                        content: jobEntry.content,
+                        conversation: jobEntry.conversation,
+                        tone: jobEntry.tone,
+                        series: jobEntry.series,
+                        seriesTitle: jobEntry.seriesTitle,
+                        createdAt: jobEntry.createdAt,
+                        updatedAt: jobEntry.updatedAt,
+                        tags: jobEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('tokyo52-')) {
+                const t52Entry = tokyo52Ep01Entries.find(e => e.id === id);
+                if (t52Entry) {
+                    loadedEntry = {
+                        id,
+                        date: t52Entry.date,
+                        title: t52Entry.title,
+                        content: t52Entry.content,
+                        conversation: t52Entry.conversation,
+                        tone: t52Entry.tone,
+                        series: t52Entry.series,
+                        seriesTitle: t52Entry.seriesTitle,
+                        createdAt: t52Entry.createdAt,
+                        updatedAt: t52Entry.updatedAt,
+                        tags: t52Entry.tags,
                     };
                 }
             } else {
@@ -1223,7 +1311,9 @@ export default function MemoriaDetailPage() {
                                     <>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: speakerColor, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                                {extracted?.name ? (
+                                                {extracted?.name && SPEAKER_CHAR_ID[extracted.name] ? (
+                                                    <img src={charIcon(SPEAKER_CHAR_ID[extracted.name])} alt="" style={{ width: '20px', height: '20px', borderRadius: '50%', objectFit: 'cover' }} />
+                                                ) : extracted?.name ? (
                                                     <div style={{
                                                         width: '20px',
                                                         height: '20px',
@@ -1462,7 +1552,9 @@ export default function MemoriaDetailPage() {
                                         </div>
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: speakerColor, marginBottom: '4px', textTransform: 'uppercase' }}>
-                                                {extracted.name ? (
+                                                {extracted.name && SPEAKER_CHAR_ID[extracted.name] ? (
+                                                    <img src={charIcon(SPEAKER_CHAR_ID[extracted.name])} alt="" style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                                                ) : extracted.name ? (
                                                     <div style={{
                                                         width: '16px',
                                                         height: '16px',
