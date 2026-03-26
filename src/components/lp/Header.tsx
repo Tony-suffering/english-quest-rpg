@@ -62,10 +62,6 @@ const navigation: NavItem[] = [
         href: '/tech',
     },
     {
-        name: 'ジャーナル',
-        href: '/journal',
-    },
-    {
         name: 'アプリを開く',
         href: '/english/training',
     },
