@@ -1,20 +1,27 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import EnglishSidebar from '@/components/EnglishSidebar';
+import InstallBanner from '@/components/InstallBanner';
 import { installLocalApi } from '@/lib/local-api';
 import { getSettings } from '@/lib/settings';
 
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 function WelcomeFlow({ onDone }: { onDone: () => void }) {
-    const router = useRouter();
     const [step, setStep] = useState(0);
     const [phase, setPhase] = useState(0);
     const [closing, setClosing] = useState(false);
+    const [detectedPlatform, setDetectedPlatform] = useState<'ios' | 'android' | 'desktop'>('desktop');
 
-    const totalSteps = 7;
+    const totalSteps = 5;
+
+    useEffect(() => {
+        const ua = navigator.userAgent;
+        if (/iPad|iPhone|iPod/.test(ua)) setDetectedPlatform('ios');
+        else if (/Android/.test(ua)) setDetectedPlatform('android');
+        else setDetectedPlatform('desktop');
+    }, []);
 
     useEffect(() => {
         setPhase(0);
@@ -25,13 +32,9 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
 
     const next = () => {
         if (step === 0 && phase < 2) return;
-        if (step < totalSteps - 1) {
-            setStep(s => s + 1);
-        }
+        if (step < totalSteps - 1) setStep(s => s + 1);
     };
-
     const prev = () => { if (step > 0) setStep(s => s - 1); };
-
     const finish = (dest: string) => {
         setClosing(true);
         localStorage.setItem('tl_welcome_seen', 'true');
@@ -56,68 +59,8 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
         transition: `all 0.5s ease-out ${0.2 + i * 0.15}s`,
     });
 
-    // Mock UI card for demonstration
-    const MockCard = ({ en, ja }: { en: string; ja: string; showAnswer?: boolean }) => (
-        <div style={{
-            backgroundColor: '#fff', borderRadius: 16, padding: '20px 24px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)', border: '1px solid #E7E5E4',
-            maxWidth: 320, margin: '0 auto', textAlign: 'center',
-        }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.1em' }}>PHRASE</div>
-                <div style={{ fontSize: 9, color: '#CD7F32', fontWeight: 700 }}>BRONZE 12GP</div>
-            </div>
-            <div style={{ fontSize: 20, fontWeight: 600, color: '#1C1917', marginBottom: 8 }}>{en}</div>
-            <div style={{ fontSize: 14, color: '#666', padding: '8px 0', borderTop: '1px solid #F5F5F4' }}>{ja}</div>
-        </div>
-    );
-
-    // Mock slot result
-    const MockSlot = ({ tier, dmg }: { tier: string; dmg: string }) => (
-        <div style={{
-            backgroundColor: '#1C1917', borderRadius: 14, padding: '16px 20px',
-            border: `1px solid ${tier === 'LEGENDARY' ? gold : tier === 'MEGA' ? '#EF4444' : '#333'}`,
-            maxWidth: 280, margin: '0 auto', textAlign: 'center',
-        }}>
-            <div style={{
-                fontSize: 22, fontWeight: 900, letterSpacing: '0.1em',
-                color: tier === 'LEGENDARY' ? gold : tier === 'MEGA' ? '#EF4444' : tier === 'SUPER' ? '#8B5CF6' : green,
-                marginBottom: 8,
-            }}>
-                {tier}!
-            </div>
-            <div style={{ fontSize: 13, color: '#888' }}>{dmg} damage</div>
-        </div>
-    );
-
-    // Mock chakra bar
-    const MockChakra = () => (
-        <div style={{ display: 'flex', gap: 4, justifyContent: 'center', flexWrap: 'wrap' }}>
-            {[
-                { name: 'EGG', ja: 'タマゴ', color: '#DC2626' },
-                { name: 'HATCH', ja: '孵化', color: '#EA580C' },
-                { name: 'ROOKIE', ja: 'ルーキー', color: '#CA8A04' },
-                { name: 'FIGHTER', ja: 'ファイター', color: '#16A34A' },
-                { name: 'CHAMPION', ja: 'チャンピオン', color: '#2563EB' },
-                { name: 'ELITE', ja: 'エリート', color: '#4F46E5' },
-                { name: 'MASTER', ja: 'マスター', color: '#7C3AED' },
-            ].map((s, i) => (
-                <div key={s.name} style={{
-                    padding: '4px 8px', borderRadius: 6, fontSize: 9, fontWeight: 700,
-                    backgroundColor: i <= 2 ? s.color : '#333',
-                    color: i <= 2 ? '#fff' : '#555',
-                    letterSpacing: '0.05em',
-                }}>
-                    {s.name}
-                </div>
-            ))}
-        </div>
-    );
-
-    // Navigation dots + buttons
     const Nav = ({ showPrev = true, nextLabel = '次へ', onNext = next }: { showPrev?: boolean; nextLabel?: string; onNext?: () => void }) => (
         <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10000, padding: '20px 24px 32px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, background: 'linear-gradient(transparent, rgba(0,0,0,0.95) 40%)' }}>
-            {/* Progress dots */}
             <div style={{ display: 'flex', gap: 6 }}>
                 {Array.from({ length: totalSteps }, (_, i) => (
                     <div key={i} style={{
@@ -172,7 +115,7 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
         </div>
     );
 
-    // ── Step 0: Gratitude ──
+    // ── Step 0: Welcome + What is this ──
     if (step === 0) return (
         <>
             <div onClick={next} style={{
@@ -182,19 +125,19 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
             }}>
                 <div style={{ position: 'absolute', width: 200, height: 200, borderRadius: '50%', border: '2px solid ' + gold, opacity: phase >= 1 ? 0.5 : 0, transform: phase >= 2 ? 'scale(3)' : 'scale(0.5)', transition: 'all 2.5s ease-out', pointerEvents: 'none' }} />
                 <div style={{ textAlign: 'center', ...fadeIn(0.3) }}>
-                    <div style={{ fontSize: 14, letterSpacing: '0.3em', color: gold, fontWeight: 700, marginBottom: 16 }}>THANK YOU</div>
-                    <div style={{ fontSize: 28, fontWeight: 300, color: '#fff', lineHeight: 1.6, marginBottom: 24 }}>開いてくれて、ありがとう。</div>
-                </div>
-                <div style={{ textAlign: 'center', maxWidth: 400, ...fadeIn(0.8) }}>
-                    <div style={{ fontSize: 15, color: '#ccc', lineHeight: 2, fontWeight: 300, opacity: phase >= 2 ? 1 : 0, transition: 'opacity 1s ease' }}>
-                        これはまだ完成品じゃない。<br />
-                        全体の<span style={{ color: gold, fontWeight: 700 }}>10分の1</span>もできてない。<br />
-                        バグもある。壊れてるところもある。<br />
-                        それでも触ってくれるあなたの存在が、<br />
-                        開発を続ける理由になってます。
+                    <div style={{ fontSize: 10, letterSpacing: '0.3em', color: gold, fontWeight: 700, marginBottom: 16 }}>EIGODAMASHII</div>
+                    <div style={{ fontSize: 32, fontWeight: 900, color: '#fff', lineHeight: 1.4, marginBottom: 8 }}>英語魂</div>
+                    <div style={{ fontSize: 15, color: '#aaa', lineHeight: 1.8, fontWeight: 300 }}>
+                        ネイティブの「本物の英語」を学ぶアプリ
                     </div>
-                    <div style={{ fontSize: 13, color: '#666', marginTop: 20, opacity: phase >= 2 ? 1 : 0, transition: 'opacity 1s ease 0.5s' }}>
-                        感想、バグ報告、「ここ好き」 -- 何でもください。
+                </div>
+                <div style={{ textAlign: 'center', maxWidth: 400, marginTop: 32, ...fadeIn(0.8) }}>
+                    <div style={{ fontSize: 14, color: '#ccc', lineHeight: 2, fontWeight: 300, opacity: phase >= 2 ? 1 : 0, transition: 'opacity 1s ease' }}>
+                        教科書の英語じゃない。<br />
+                        ネイティブが実際に喋ってる構造を分析して、<br />
+                        <span style={{ color: gold, fontWeight: 700 }}>15,000フレーズ</span>に落とし込んだ。<br />
+                        毎日タップして、スロット回して、<br />
+                        気づいたら英語が頭に残ってる。
                     </div>
                 </div>
                 <Nav showPrev={false} nextLabel="タップして次へ" />
@@ -202,33 +145,27 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
         </>
     );
 
-    // ── Step 1: What is this app? ──
+    // ── Step 1: What's inside ──
     if (step === 1) return (
         <>
             <Screen>
-                <Label>WHAT IS THIS?</Label>
+                <Label>WHAT YOU GET</Label>
                 <Title>
-                    英語フレーズを<span style={{ fontWeight: 700 }}>カード</span>にして、<br />
-                    毎日タップして<span style={{ fontWeight: 700 }}>育てる</span>ゲーム。
+                    これが全部、<span style={{ fontWeight: 700 }}>無料</span>で入ってる。
                 </Title>
-                <div style={{ fontSize: 14, color: '#aaa', lineHeight: 2, textAlign: 'center', marginBottom: 24, ...fadeIn(0.3) }}>
-                    教科書じゃない。テストでもない。<br />
-                    カードをタップ → レベルが上がる → スロットが回る。<br />
-                    毎日触ってたらフレーズが頭に残る。そういう設計。
-                </div>
-                <div style={{ backgroundColor: '#111', borderRadius: 14, padding: '20px 16px', border: '1px solid #222', ...fadeIn(0.5) }}>
-                    <div style={{ fontSize: 10, color: '#555', letterSpacing: '0.15em', marginBottom: 12, textAlign: 'center' }}>TRAINING MODE</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, ...fadeIn(0.3) }}>
                     {[
-                        { icon: 'S', label: '3リールスロット', desc: 'レベルアップ → スロット回転。LEGENDARY出たら5倍ダメージ', c: gold },
-                        { icon: 'B', label: '布陣バトル', desc: 'カードを落としてボスにダメージ。属性相性でダメージ倍率変化', c: '#EF4444' },
-                        { icon: 'R', label: 'ランナーモード', desc: '横スクロール。XPを貯めてマイルストーン突破。GODモード到達で全解放', c: '#3B82F6' },
-                        { icon: 'C', label: '連荘チェーン', desc: '3連続でフィーバー突入。10連続でGODモード。倍率が跳ね上がる', c: '#8B5CF6' },
+                        { icon: 'S', label: 'スロット+バトル', desc: 'フレーズを覚える → スロットが回る → ボスにダメージ', c: gold },
+                        { icon: 'T', label: 'TOEIC 30日プログラム', desc: 'ストーリーで学ぶTOEIC対策。Part 1-7完全対応', c: '#10B981' },
+                        { icon: 'M', label: 'メモリア(会話リスニング)', desc: '7つのシナリオ、40人以上のキャラ。ネイティブの会話を聴く', c: '#3B82F6' },
+                        { icon: 'G', label: '俺語録(310表現)', desc: '日本語の感覚を、ネイティブならこう言う、に変換', c: '#8B5CF6' },
+                        { icon: 'R', label: '毎日レビュー(15,000語)', desc: '日めくりで単語+イディオム+例文。365日分', c: '#EF4444' },
                     ].map((f, i) => (
-                        <div key={f.label} style={{ display: 'flex', gap: 12, marginBottom: 14, ...slideIn(i) }}>
+                        <div key={f.label} style={{ display: 'flex', gap: 12, padding: '12px 14px', backgroundColor: '#111', borderRadius: 12, border: '1px solid #222', ...slideIn(i) }}>
                             <div style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: f.c, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0 }}>{f.icon}</div>
                             <div>
                                 <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{f.label}</div>
-                                <div style={{ fontSize: 11, color: '#666' }}>{f.desc}</div>
+                                <div style={{ fontSize: 11, color: '#666', lineHeight: 1.5 }}>{f.desc}</div>
                             </div>
                         </div>
                     ))}
@@ -238,136 +175,118 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
         </>
     );
 
-    // ── Step 2: Training screen walkthrough ──
+    // ── Step 2: Why add to home screen ──
     if (step === 2) return (
         <>
             <Screen>
-                <Label>HOW TO PLAY -- STEP 1</Label>
-                <Title>フレーズカードが<br /><span style={{ fontWeight: 700 }}>表示される</span>。</Title>
-                <div style={{ marginBottom: 20, ...fadeIn(0.3) }}>
-                    <MockCard en="How's it going?" ja="調子どう？" showAnswer={true} />
+                <Label>ONE MORE THING</Label>
+                <Title>
+                    ホーム画面に追加すると、<br />
+                    <span style={{ fontWeight: 700 }}>もっと使いやすくなる</span>。
+                </Title>
+                <div style={{ fontSize: 14, color: '#aaa', lineHeight: 2, textAlign: 'center', marginBottom: 24, ...fadeIn(0.3) }}>
+                    App Store からのダウンロードは不要。<br />
+                    今開いてるブラウザから<span style={{ color: '#fff', fontWeight: 600 }}>3ステップ</span>で追加できる。
                 </div>
-                <div style={{ fontSize: 13, color: '#aaa', lineHeight: 2, textAlign: 'center', ...fadeIn(0.5) }}>
-                    600個のフレーズが<br />
-                    <span style={{ color: '#fff', fontWeight: 600 }}>ランダムシャッフル</span>で出てくる。<br /><br />
-                    英語と日本語がセットで表示される。<br />
-                    声に出して読んでみて。<br /><br />
-                    覚えたら<span style={{ color: '#EF4444', fontWeight: 700 }}>赤いボタン</span>をタップ！
-                </div>
-            </Screen>
-            <Nav />
-        </>
-    );
-
-    // ── Step 3: Level-up button ──
-    if (step === 3) return (
-        <>
-            <Screen>
-                <Label>HOW TO PLAY -- STEP 2</Label>
-                <Title>カードの下にある<br /><span style={{ fontWeight: 700 }}>レベルアップボタン</span>を押す。</Title>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center', marginBottom: 20, ...fadeIn(0.3) }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, ...fadeIn(0.5) }}>
                     {[
-                        { lv: 'Lv.1', name: 'EGG', color: '#DC2626' },
-                        { lv: 'Lv.2', name: 'HATCH', color: '#EA580C' },
-                        { lv: 'Lv.3', name: 'ROOKIE', color: '#CA8A04' },
-                    ].map((b) => (
-                        <div key={b.name} style={{
-                            padding: '12px 32px', borderRadius: 12, fontWeight: 700, fontSize: 14,
-                            background: `linear-gradient(135deg, ${b.color}, ${b.color}99)`,
-                            color: '#fff', textAlign: 'center', width: 240,
-                        }}>
-                            {b.lv} {b.name}
+                        { text: 'ホーム画面のアイコンからワンタップ起動', color: gold },
+                        { text: 'ブラウザのバーが消えてフルスクリーン表示', color: '#3B82F6' },
+                        { text: '容量ほぼゼロ。スマホのストレージを食わない', color: green },
+                        { text: 'アプリストアの審査なし。毎日最新版が使える', color: '#8B5CF6' },
+                    ].map((tip, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 14px', backgroundColor: '#111', borderRadius: 10, border: '1px solid #222', ...slideIn(i) }}>
+                            <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: tip.color, marginTop: 7, flexShrink: 0 }} />
+                            <div style={{ fontSize: 13, color: '#ccc', lineHeight: 1.7 }}>{tip.text}</div>
                         </div>
                     ))}
                 </div>
-                <div style={{ fontSize: 13, color: '#aaa', lineHeight: 2, textAlign: 'center', ...fadeIn(0.5) }}>
-                    フレーズを覚えたと思ったら<span style={{ color: '#fff', fontWeight: 600 }}>ボタンをタップ</span>。<br />
-                    タップするたびにレベルが上がる。<br /><br />
-                    EGG → HATCH → ROOKIE → FIGHTER...<br />
-                    <span style={{ color: '#7C3AED', fontWeight: 600 }}>MASTER</span>まで全7段階。<br /><br />
-                    <span style={{ fontSize: 12, color: '#666' }}>
-                        1日3回までレベルアップ可能。<br />
-                        レベルアップするたびにスロットが回る。
-                    </span>
-                </div>
             </Screen>
             <Nav />
         </>
     );
 
-    // ── Step 4: Slot machine ──
-    if (step === 4) return (
+    // ── Step 3: Platform-specific install instructions ──
+    if (step === 3) return (
         <>
             <Screen>
-                <Label>HOW TO PLAY -- STEP 3</Label>
-                <Title>レベルアップすると<br /><span style={{ fontWeight: 700 }}>3リールスロット</span>が回る。</Title>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
-                    <div style={fadeIn(0.2)}><MockSlot tier="BONUS" dmg="x1" /></div>
-                    <div style={fadeIn(0.4)}><MockSlot tier="SUPER" dmg="x2" /></div>
-                    <div style={fadeIn(0.6)}><MockSlot tier="LEGENDARY" dmg="x5" /></div>
-                </div>
-                <div style={{ fontSize: 13, color: '#aaa', lineHeight: 2, textAlign: 'center', ...fadeIn(0.7) }}>
-                    揃った絵柄でダメージ倍率が変わる。<br />
-                    カードが布陣バトルに<span style={{ color: '#fff', fontWeight: 600 }}>ドロップ</span>して<br />
-                    ボスにダメージを与える。<br /><br />
-                    6段階: MISS → BONUS → GREAT → SUPER → MEGA → <span style={{ color: gold }}>LEGENDARY</span><br /><br />
-                    <span style={{ fontSize: 12, color: '#666' }}>
-                        リーチ演出が入ることもある。<br />
-                        連荘チェーン中はさらに倍率UP。
-                    </span>
+                <Label color={green}>HOW TO INSTALL</Label>
+                {detectedPlatform === 'ios' ? (
+                    <>
+                        <Title>Safari で<span style={{ fontWeight: 700 }}>3ステップ</span>。</Title>
+                        <div style={{ padding: '10px 14px', backgroundColor: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: 10, marginBottom: 20, ...fadeIn(0.2) }}>
+                            <div style={{ fontSize: 12, color: '#F97316', fontWeight: 700, marginBottom: 2 }}>Safari で開いてください</div>
+                            <div style={{ fontSize: 11, color: '#aaa', lineHeight: 1.6 }}>Chrome や LINE のブラウザではインストールできません。</div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, ...fadeIn(0.4) }}>
+                            {[
+                                { n: 1, title: '画面下の共有ボタンをタップ', desc: '四角に上矢印のアイコン' },
+                                { n: 2, title: '「ホーム画面に追加」を選択', desc: 'メニューを下にスクロールすると見つかる' },
+                                { n: 3, title: '右上の「追加」をタップ', desc: 'ホーム画面に英語魂のアイコンが出る' },
+                            ].map(s => (
+                                <div key={s.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                                    <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: gold, color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{s.n}</div>
+                                    <div>
+                                        <div style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 2 }}>{s.title}</div>
+                                        <div style={{ fontSize: 12, color: '#666' }}>{s.desc}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                ) : detectedPlatform === 'android' ? (
+                    <>
+                        <Title>Chrome で<span style={{ fontWeight: 700 }}>3ステップ</span>。</Title>
+                        <div style={{ padding: '10px 14px', backgroundColor: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 10, marginBottom: 20, ...fadeIn(0.2) }}>
+                            <div style={{ fontSize: 12, color: green, fontWeight: 700, marginBottom: 2 }}>自動バナーが出る場合</div>
+                            <div style={{ fontSize: 11, color: '#aaa', lineHeight: 1.6 }}>画面下部に「インストール」が出たらそのままタップでOK。</div>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, ...fadeIn(0.4) }}>
+                            {[
+                                { n: 1, title: '右上のメニュー(3点)をタップ', desc: 'Chrome のメニューボタン' },
+                                { n: 2, title: '「アプリをインストール」を選択', desc: '確認画面で「インストール」をタップ' },
+                                { n: 3, title: 'ホーム画面から起動', desc: '自動でアイコンが追加される' },
+                            ].map(s => (
+                                <div key={s.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                                    <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: gold, color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{s.n}</div>
+                                    <div>
+                                        <div style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 2 }}>{s.title}</div>
+                                        <div style={{ fontSize: 12, color: '#666' }}>{s.desc}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <Title>Chrome アドレスバーから<span style={{ fontWeight: 700 }}>追加</span>。</Title>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, ...fadeIn(0.4) }}>
+                            {[
+                                { n: 1, title: 'アドレスバー右のインストールアイコン', desc: 'モニタに下矢印のマークをクリック' },
+                                { n: 2, title: '「インストール」をクリック', desc: '独立ウインドウで起動するショートカットが作成される' },
+                            ].map(s => (
+                                <div key={s.n} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                                    <div style={{ width: 28, height: 28, borderRadius: '50%', backgroundColor: gold, color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, flexShrink: 0 }}>{s.n}</div>
+                                    <div>
+                                        <div style={{ fontSize: 14, fontWeight: 600, color: '#fff', marginBottom: 2 }}>{s.title}</div>
+                                        <div style={{ fontSize: 12, color: '#666' }}>{s.desc}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+                <div style={{ textAlign: 'center', marginTop: 28, ...fadeIn(0.6) }}>
+                    <div style={{ fontSize: 12, color: '#555' }}>
+                        詳しい手順は <a href="/install" style={{ color: gold, textDecoration: 'underline' }}>こちら</a> でも確認できます
+                    </div>
                 </div>
             </Screen>
             <Nav />
         </>
     );
 
-    // ── Step 5: Card evolution ──
-    if (step === 5) return (
-        <>
-            <Screen>
-                <Label color="#8B5CF6">CARD SYSTEM</Label>
-                <Title>カードは<span style={{ fontWeight: 700 }}>2軸</span>で成長する。</Title>
-
-                <div style={{ backgroundColor: '#111', borderRadius: 14, padding: 20, border: '1px solid #222', marginBottom: 20, ...fadeIn(0.2) }}>
-                    <div style={{ fontSize: 10, color: '#555', letterSpacing: '0.15em', marginBottom: 12, textAlign: 'center' }}>EVOLUTION LEVEL（タップで上がる）</div>
-                    <MockChakra />
-                    <div style={{ fontSize: 12, color: '#666', textAlign: 'center', marginTop: 12, lineHeight: 1.8 }}>
-                        タップ1回 = 1レベルUP（1日3回まで）<br />
-                        EGG → HATCH → ROOKIE → FIGHTER → CHAMPION → ELITE → <span style={{ color: '#7C3AED' }}>MASTER</span>
-                    </div>
-                </div>
-
-                <div style={{ backgroundColor: '#111', borderRadius: 14, padding: 20, border: '1px solid #222', marginBottom: 20, ...fadeIn(0.4) }}>
-                    <div style={{ fontSize: 10, color: '#555', letterSpacing: '0.15em', marginBottom: 12, textAlign: 'center' }}>CARD RANK（GPで上がる）</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
-                        {[
-                            { name: 'NORMAL', color: '#78716C' },
-                            { name: 'BRONZE', color: '#CD7F32' },
-                            { name: 'SILVER', color: '#94A3B8' },
-                            { name: 'GOLD', color: '#F6C85F' },
-                            { name: 'HOLO', color: '#A855F7' },
-                            { name: 'LEGEND', color: gold },
-                        ].map(r => (
-                            <div key={r.name} style={{ padding: '4px 10px', borderRadius: 6, fontSize: 10, fontWeight: 700, backgroundColor: r.color + '20', color: r.color, border: `1px solid ${r.color}40` }}>
-                                {r.name}
-                            </div>
-                        ))}
-                    </div>
-                    <div style={{ fontSize: 12, color: '#666', textAlign: 'center', marginTop: 12 }}>
-                        バトルで獲得したGP（カードポイント）でランクアップ
-                    </div>
-                </div>
-
-                <div style={{ fontSize: 13, color: '#888', textAlign: 'center', lineHeight: 1.8, ...fadeIn(0.6) }}>
-                    最終目標: 全カードを<br />
-                    <span style={{ color: '#7C3AED', fontWeight: 700 }}>MASTER</span> + <span style={{ color: gold, fontWeight: 700 }}>LEGENDARY</span> にすること。
-                </div>
-            </Screen>
-            <Nav />
-        </>
-    );
-
-    // ── Step 6: Chain & Let's go ──
+    // ── Step 4: Let's go ──
     return (
         <>
             <Screen>
@@ -375,44 +294,22 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                 <Title>
                     あとは<span style={{ fontWeight: 700 }}>触るだけ</span>。
                 </Title>
-
-                <div style={{ backgroundColor: '#111', borderRadius: 14, padding: 20, border: '1px solid #222', marginBottom: 20, ...fadeIn(0.2) }}>
-                    <div style={{ fontSize: 10, color: '#555', letterSpacing: '0.15em', marginBottom: 12, textAlign: 'center' }}>CHAIN SYSTEM（連荘）</div>
-                    <div style={{ fontSize: 13, color: '#aaa', lineHeight: 1.9, textAlign: 'center' }}>
-                        連続レベルアップでチェーンが積み上がる。<br />
-                        <span style={{ color: '#EA580C' }}>3連荘</span> → 角変（1.5x）<br />
-                        <span style={{ color: '#EF4444' }}>5連荘</span> → 激厚（2x）フィーバー突入<br />
-                        <span style={{ color: gold }}>10連荘</span> → GOD（3x）全画面演出<br />
-                        画面が光ってパーティクルが降る。
-                    </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28, ...fadeIn(0.3) }}>
+                    {[
+                        { text: '1日3回までレベルアップ可能。毎日来る理由がある', color: gold },
+                        { text: '左のサイドバーから全機能にアクセスできる', color: '#3B82F6' },
+                        { text: 'スマホでもPCでも使える。データはブラウザに保存', color: '#8B5CF6' },
+                    ].map((tip, i) => (
+                        <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 14px', backgroundColor: '#111', borderRadius: 10, border: '1px solid #222', ...slideIn(i) }}>
+                            <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: tip.color, marginTop: 7, flexShrink: 0 }} />
+                            <div style={{ fontSize: 13, color: '#ccc', lineHeight: 1.7 }}>{tip.text}</div>
+                        </div>
+                    ))}
                 </div>
-
-                <div style={{ backgroundColor: '#111', borderRadius: 14, padding: 20, border: '1px solid #222', marginBottom: 24, ...fadeIn(0.4) }}>
-                    <div style={{ fontSize: 10, color: '#555', letterSpacing: '0.15em', marginBottom: 12, textAlign: 'center' }}>TIPS</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                        {[
-                            { text: '1日3回までレベルアップ可能。毎日来る理由がある', color: gold },
-                            { text: '左のサイドバーから他の機能にもアクセスできる', color: '#3B82F6' },
-                            { text: 'BGMが流れます。音量は設定から調整可能', color: green },
-                            { text: 'スマホでもPCでも遊べる。データはブラウザに保存', color: '#8B5CF6' },
-                        ].map((tip, i) => (
-                            <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', ...slideIn(i) }}>
-                                <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: tip.color, marginTop: 6, flexShrink: 0 }} />
-                                <div style={{ fontSize: 12, color: '#999', lineHeight: 1.7 }}>{tip.text}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div style={{ fontSize: 14, color: '#fff', textAlign: 'center', lineHeight: 1.8, marginBottom: 24, ...fadeIn(0.6) }}>
-                    フレーズは<span style={{ color: gold, fontWeight: 700 }}>600個</span>入ってる。<br />
-                    まずは<span style={{ color: '#EF4444', fontWeight: 700 }}>赤いボタン</span>を押してみよう。
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', ...fadeIn(0.7) }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', ...fadeIn(0.5) }}>
                     <button onClick={() => finish('/english')} style={{
-                        padding: '16px 48px', borderRadius: 14, backgroundColor: gold,
-                        border: 'none', color: '#000', fontSize: 18, fontWeight: 800,
+                        padding: '16px 48px', borderRadius: 0, backgroundColor: gold,
+                        border: 'none', color: '#000', fontSize: 16, fontWeight: 800,
                         cursor: 'pointer', letterSpacing: '0.1em', width: '100%', maxWidth: 320,
                         boxShadow: '0 4px 24px rgba(212,175,55,0.5)',
                     }}
@@ -423,7 +320,7 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                     </button>
                     <button onClick={() => finish('/english/training')} style={{
                         padding: '10px 24px', backgroundColor: 'transparent',
-                        border: '1px solid #333', borderRadius: 10, color: '#666',
+                        border: '1px solid #333', borderRadius: 0, color: '#666',
                         fontSize: 13, cursor: 'pointer',
                     }}>
                         すぐトレーニングを始める
@@ -545,6 +442,8 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
             }}>
                 {children}
             </div>
+
+            <InstallBanner />
         </div>
     );
 }

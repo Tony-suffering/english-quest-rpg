@@ -2,31 +2,30 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'English Quest RPG',
-    short_name: 'English',
-    description: 'Daily English phrases learning app with Spotify-style player',
+    name: '英語魂 - EIGODAMASHII',
+    short_name: '英語魂',
+    description: 'TOEIC900点なのに喋れない男が作った、ネイティブの「本物の英語」を学ぶアプリ',
     start_url: '/english',
     display: 'standalone',
-    background_color: '#0a0a0a',
+    background_color: '#FAFAF9',
     theme_color: '#D4AF37',
     orientation: 'portrait',
     icons: [
       {
-        src: '/english-icon.png',
-        sizes: '192x192',
-        type: 'image/png',
+        src: '/english-icon.svg',
+        sizes: 'any',
+        type: 'image/svg+xml',
+        purpose: 'any',
       },
       {
         src: '/english-icon.png',
         sizes: '512x512',
         type: 'image/png',
-      },
-      {
-        src: '/english-icon.png',
-        sizes: '512x512',
-        type: 'image/png',
-        purpose: 'maskable',
+        purpose: 'any maskable',
       },
     ],
+    categories: ['education'],
+    lang: 'ja',
+    dir: 'ltr',
   }
 }

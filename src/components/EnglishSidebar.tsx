@@ -137,8 +137,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     padding: '0 16px', zIndex: 1001,
                 }}>
                     <Link href="/english" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 16, fontWeight: 900, color: '#92400E' }}>TOEIC</span>
-                        <span style={{ fontSize: 16, fontWeight: 900, color: '#D4AF37' }}>酒場</span>
+                        <span style={{ fontSize: 16, fontWeight: 900, color: '#D4AF37' }}>英語魂</span>
                     </Link>
                     <button
                         onClick={() => setIsOpen(!isOpen)}
@@ -172,15 +171,12 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     <div style={{ padding: '0 24px', marginBottom: 24 }}>
                         <Link href="/english" style={{ textDecoration: 'none' }}>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                                <span style={{ fontSize: 20, fontWeight: 900, color: '#92400E' }}>
-                                    TOEIC
-                                </span>
                                 <span style={{ fontSize: 20, fontWeight: 900, color: '#D4AF37' }}>
-                                    酒場
+                                    英語魂
                                 </span>
                             </div>
                             <div style={{ fontSize: 10, color: '#bbb', marginTop: 4, letterSpacing: '0.3px' }}>
-                                30日で点数UP + 英会話 + 作文力
+                                EIGODAMASHII
                             </div>
                         </Link>
                     </div>
@@ -199,8 +195,9 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     <SectionLabel text="通知表" />
                     {progressItems.map(item => renderItem(item))}
 
-                    {/* 設定 */}
-                    <SectionLabel text="設定" />
+                    {/* その他 */}
+                    <SectionLabel text="その他" />
+                    {renderProgramItem({ id: '/install', label: 'ホーム画面に追加', color: '#D4AF37' })}
                     {renderItem({ id: '/english/settings', label: '設定' })}
 
                     {/* More toggle */}
