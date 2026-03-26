@@ -27,6 +27,10 @@ const KAIWA_STYLES = `
     0%, 100% { box-shadow: 0 0 0 3px rgba(212,175,55,0.3); }
     50% { box-shadow: 0 0 0 6px rgba(212,175,55,0.1); }
 }
+@keyframes toastSlideUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
 `;
 
 // ── Types ──
@@ -387,6 +391,19 @@ export default function EnglishMaster365Page() {
     // 仕込み帳 registration (individual, not batch)
     const [registeredPhrases, setRegisteredPhrases] = useState<Set<string>>(new Set());
     const [registeringId, setRegisteringId] = useState<string | null>(null);
+    const [shikomiToast, setShikomiToast] = useState<string | null>(null);
+    const [shikomiCount, setShikomiCount] = useState(0);
+
+    // Load total shikomi count from localStorage
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem('tl_phrases');
+            if (raw) {
+                const arr = JSON.parse(raw) as unknown[];
+                setShikomiCount(arr.length);
+            }
+        } catch { /* */ }
+    }, []);
 
     // Streak state
     const [streak, setStreak] = useState<StreakData>({ current: 0, lastDate: '', best: 0 });
@@ -581,6 +598,9 @@ export default function EnglishMaster365Page() {
                     next.add(english.toLowerCase());
                     return next;
                 });
+                setShikomiCount(prev => prev + 1);
+                setShikomiToast(english.length > 40 ? english.slice(0, 37) + '...' : english);
+                setTimeout(() => setShikomiToast(null), 3000);
             }
         } catch { /* */ }
         setRegisteringId(null);
@@ -735,6 +755,37 @@ export default function EnglishMaster365Page() {
     return (
         <div style={{ minHeight: '100vh', background: '#FAFAF9' }}>
             <style dangerouslySetInnerHTML={{ __html: KAIWA_STYLES }} />
+
+            {/* 仕込み帳 Toast */}
+            {shikomiToast && (
+                <div style={{
+                    position: 'fixed', bottom: 24, left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#1C1917', color: '#fff',
+                    padding: '12px 20px', borderRadius: 12,
+                    fontSize: 13, fontWeight: 600, zIndex: 1000,
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    animation: 'toastSlideUp 0.3s ease-out',
+                    maxWidth: '90vw',
+                }}>
+                    <span style={{ color: '#10B981', fontSize: 16 }}>{'\u2713'}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 11, color: '#A8A29E', marginBottom: 2 }}>仕込み帳に追加</div>
+                        <div style={{ fontSize: 12, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {shikomiToast}
+                        </div>
+                    </div>
+                    <Link href="/english/training" style={{
+                        textDecoration: 'none',
+                        background: '#10B981', color: '#fff',
+                        padding: '6px 12px', borderRadius: 6,
+                        fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
+                    }}>
+                        仕込み帳を開く
+                    </Link>
+                </div>
+            )}
 
             {/* ── Header ── */}
             <div style={{
@@ -1269,6 +1320,9 @@ export default function EnglishMaster365Page() {
                                                                                 next.add(kw.en.toLowerCase());
                                                                                 return next;
                                                                             });
+                                                                            setShikomiCount(prev => prev + 1);
+                                                                            setShikomiToast(kw.en);
+                                                                            setTimeout(() => setShikomiToast(null), 3000);
                                                                         }
                                                                     } catch { /* */ }
                                                                 }}
@@ -1786,10 +1840,86 @@ export default function EnglishMaster365Page() {
                                 );
                             })()}
 
+                            {/* 仕込み帳 CTA */}
+                            {registeredPhrases.size > 0 && (
+                                <Link href="/english/training" style={{ textDecoration: 'none' }}>
+                                    <div style={{
+                                        marginTop: 20, padding: '16px 20px',
+                                        background: 'linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%)',
+                                        border: '1px solid #A7F3D0', borderRadius: 12,
+                                        display: 'flex', alignItems: 'center', gap: 14,
+                                        cursor: 'pointer', transition: 'all 0.15s',
+                                    }}>
+                                        <div style={{
+                                            width: 40, height: 40, borderRadius: 10,
+                                            background: '#10B981', color: '#fff',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            fontSize: 18, fontWeight: 900, flexShrink: 0,
+                                        }}>
+                                            {registeredPhrases.size}
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontSize: 13, fontWeight: 800, color: '#065F46' }}>
+                                                仕込み帳を開く
+                                            </div>
+                                            <div style={{ fontSize: 11, color: '#047857', marginTop: 2 }}>
+                                                今日追加した表現を復習しよう
+                                            </div>
+                                        </div>
+                                        <span style={{ fontSize: 18, color: '#10B981' }}>{'\u203A'}</span>
+                                    </div>
+                                </Link>
+                            )}
+
+                            {/* 仕込み帳 説明 */}
+                            {registeredPhrases.size === 0 && (
+                                <div style={{
+                                    marginTop: 20, padding: '16px 20px',
+                                    background: '#fff', border: '1px solid #E7E5E4', borderRadius: 12,
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                                        <span style={{
+                                            fontSize: 10, fontWeight: 800, color: '#10B981',
+                                            background: '#ECFDF5', padding: '2px 8px', borderRadius: 4,
+                                        }}>TRAINING</span>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>
+                                            仕込み帳とは？
+                                        </span>
+                                    </div>
+                                    <div style={{ fontSize: 12, color: '#57534E', lineHeight: 1.8 }}>
+                                        <p style={{ margin: '0 0 8px' }}>
+                                            気になった表現の横にある <span style={{
+                                                display: 'inline-block', border: '1px solid #E7E5E4',
+                                                borderRadius: 4, padding: '1px 6px', fontSize: 10,
+                                                fontWeight: 700, color: '#A8A29E',
+                                            }}>+Vibe</span> ボタンを押すと、その表現が仕込み帳に追加される。
+                                        </p>
+                                        <p style={{ margin: '0 0 8px' }}>
+                                            仕込み帳は<strong style={{ color: '#1C1917' }}>毎日開いて復習する場所</strong>。
+                                            今日365で出会った表現を、明日もう一度思い出す。それだけで定着率が変わる。
+                                        </p>
+                                        <p style={{ margin: 0, color: '#A8A29E', fontSize: 11 }}>
+                                            まずは今日の表現から1つ、仕込み帳に追加してみよう。
+                                        </p>
+                                    </div>
+                                    {shikomiCount > 0 && (
+                                        <Link href="/english/training" style={{
+                                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                                            marginTop: 12, textDecoration: 'none',
+                                            background: '#10B981', color: '#fff',
+                                            padding: '8px 16px', borderRadius: 8,
+                                            fontSize: 12, fontWeight: 700,
+                                        }}>
+                                            仕込み帳を開く ({shikomiCount}個の表現)
+                                        </Link>
+                                    )}
+                                </div>
+                            )}
+
                             {/* Navigation */}
                             <div style={{
                                 display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
-                                marginTop: 20,
+                                marginTop: 12,
                             }}>
                                 <Link href="/english/365/episodes" style={{ textDecoration: 'none' }}>
                                     <div style={{
