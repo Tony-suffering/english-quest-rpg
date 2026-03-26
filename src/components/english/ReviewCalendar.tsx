@@ -293,16 +293,20 @@ export default function ReviewCalendar({
                     const progress = count > 0 ? masteredCount / count : 0;
                     const isComplete = progress === 1 && count > 0;
 
-                    // Background: interpolate from white to warm gold based on progress
+                    // Background: GitHub-style heatmap based on mastery progress
                     const bgColor = count === 0
                         ? 'transparent'
                         : isSelected
                             ? accentBg
                             : isComplete
-                                ? '#FBF5E4'
-                                : progress > 0
-                                    ? '#FEFCF6'
-                                    : '#fff';
+                                ? '#F5E6B8'  // deep gold
+                                : progress >= 0.7
+                                    ? '#FBF0D1' // warm gold
+                                    : progress >= 0.3
+                                        ? '#FEF7E5' // light gold
+                                        : progress > 0
+                                            ? '#FEFCF4' // faint gold
+                                            : '#fff';
 
                     return (
                         <div
@@ -322,9 +326,11 @@ export default function ReviewCalendar({
                                     ? `2px solid ${accent}`
                                     : isToday
                                         ? `2px solid ${accent}`
-                                        : count > 0
-                                            ? '1px solid #EEECE7'
-                                            : '1px solid transparent',
+                                        : isComplete
+                                            ? `1px solid ${accent}40`
+                                            : count > 0
+                                                ? '1px solid #EEECE7'
+                                                : '1px solid transparent',
                                 transition: 'all 0.15s',
                                 position: 'relative',
                             }}

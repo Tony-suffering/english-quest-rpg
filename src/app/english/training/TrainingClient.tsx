@@ -3628,7 +3628,7 @@ export default function PhrasesPage({ initialData, onHelpClick }: { initialData?
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     english: fullText,
-                    japanese: `(${youglishPhrase?.english.slice(0, 30) || 'YouGlish'})`,
+                    japanese: `(${youglishPhrase ? youglishPhrase.english.slice(0, 30) : 'YouGlish'})`,
                     category: 'YouGlish',
                     date: youglishSaveDate
                 })
@@ -4400,7 +4400,7 @@ export default function PhrasesPage({ initialData, onHelpClick }: { initialData?
                                     const hr = (voiceRecordings[pid] || []).length > 0;
                                     const hl = (phraseLinks[pid] || []).length > 0;
                                     const chakra = getChakraLevel(bm, hr, hl);
-                                    const text = displayedCard?.english || '';
+                                    const text = displayedCard ? displayedCard.english : '';
                                     // Tap to Level: plain text, no links (whole card is tap target)
                                     if (getSettings().tapToLevel) {
                                         return <span style={{ color: '#1a1a1a' }}>{text}</span>;
@@ -5042,7 +5042,7 @@ export default function PhrasesPage({ initialData, onHelpClick }: { initialData?
 
                         {/* Writing Practice Panel */}
                         {showQuickAdd && displayedCard && (() => {
-                            const targetText = displayedCard.english || '';
+                            const targetText = displayedCard ? displayedCard.english : '';
                             const inputVal = quickAddEnglish;
                             const useExactMatch = dataMode === 'words' || getSettings().typingMatch;
                             const isMatch = useExactMatch

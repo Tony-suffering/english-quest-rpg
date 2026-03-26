@@ -71,6 +71,29 @@ const routes: Record<string, Handler> = {
         return json({ success: false }, 400)
     },
 
+    // Consolidated endpoint for Training page (returns phrases + mastery + links in one call)
+    '/api/training-init': () => {
+        const phrases = store('phrases') as Record<string, unknown>[]
+        const mastery = storeObj('mastery') as Record<string, Record<string, unknown>>
+        const links = store('phrase_links') as Record<string, unknown>[]
+        const m: Record<string, number> = {}
+        const ll: Record<string, string> = {}
+        const cp: Record<string, number> = {}
+        for (const [pid, data] of Object.entries(mastery)) {
+            m[pid] = (data.level as number) || 0
+            ll[pid] = (data.lastLeveled as string) || ''
+            cp[pid] = (data.cardPoints as number) || 0
+        }
+        // Group links by phrase_id
+        const groupedLinks: Record<string, unknown[]> = {}
+        for (const link of links) {
+            const pid = link.phrase_id as string
+            if (!groupedLinks[pid]) groupedLinks[pid] = []
+            groupedLinks[pid].push(link)
+        }
+        return json({ phrases, mastery: m, lastLeveled: ll, cardPoints: cp, recordings: {}, links: groupedLinks, success: true })
+    },
+
     '/api/phrases/mastery': (url, method, body) => {
         const mastery = storeObj('mastery') as Record<string, Record<string, unknown>>
         if (method === 'GET') {

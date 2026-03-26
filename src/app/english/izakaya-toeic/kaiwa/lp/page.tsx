@@ -109,6 +109,160 @@ function FAQItem({ q, a }: { q: string; a: string }) {
   );
 }
 
+/* ──────────────────────────── Try It Quiz ──────────────────────────── */
+const QUIZ_DATA = [
+  {
+    ja: 'ビールください',
+    levels: [
+      { label: 'CORE', text: 'Beer, please.', color: TEXT_MUTED },
+      { label: 'VIBE', text: "I'll start with a beer.", color: GOLD },
+      { label: 'SCENE', text: "Let me get a beer. Whatever you have on tap.", color: '#D97706' },
+      { label: 'FLOW', text: "Beer first. I need to unwind before I can even think about food.", color: EMERALD },
+    ],
+  },
+  {
+    ja: '今日めっちゃ疲れた',
+    levels: [
+      { label: 'CORE', text: "I'm tired.", color: TEXT_MUTED },
+      { label: 'VIBE', text: "I'm so exhausted today.", color: GOLD },
+      { label: 'SCENE', text: "I'm absolutely wiped out from work today.", color: '#D97706' },
+      { label: 'FLOW', text: "You know when you just hit that wall? Yeah, that's me right now.", color: EMERALD },
+    ],
+  },
+  {
+    ja: 'ちょっと待って',
+    levels: [
+      { label: 'CORE', text: 'Wait.', color: TEXT_MUTED },
+      { label: 'VIBE', text: 'Hold on a sec.', color: GOLD },
+      { label: 'SCENE', text: "Hang on, let me think about that for a second.", color: '#D97706' },
+      { label: 'FLOW', text: "Wait wait wait -- before you go any further, let me catch up.", color: EMERALD },
+    ],
+  },
+];
+
+function TryItQuiz() {
+  const [revealed, setRevealed] = useState<Set<number>>(new Set());
+
+  const reveal = (idx: number) => {
+    setRevealed(prev => { const next = new Set(prev); next.add(idx); return next; });
+  };
+
+  const speak = (text: string) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {QUIZ_DATA.map((q, qi) => {
+        const isRevealed = revealed.has(qi);
+        return (
+          <div key={qi} style={{
+            borderRadius: 14, overflow: 'hidden',
+            border: `1px solid ${isRevealed ? BORDER : GOLD}60`,
+            boxShadow: SHADOW_SM,
+            transition: 'all 0.3s',
+          }}>
+            {/* Japanese */}
+            <div style={{
+              padding: '14px 20px', background: BG_WHITE,
+              borderBottom: `1px solid ${BORDER_LIGHT}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              <div>
+                <span style={{
+                  fontSize: 10, fontWeight: 700, color: TEXT_LIGHT,
+                  marginRight: 10,
+                }}>Q{qi + 1}</span>
+                <span style={{ fontSize: 17, fontWeight: 700, color: TEXT_DARK }}>
+                  {q.ja}
+                </span>
+              </div>
+              {isRevealed && (
+                <span style={{
+                  fontSize: 10, fontWeight: 700, color: EMERALD,
+                  background: BG_EMERALD, padding: '2px 8px', borderRadius: 4,
+                }}>REVEALED</span>
+              )}
+            </div>
+
+            {/* Answer area */}
+            {isRevealed ? (
+              <div style={{ background: BG_WHITE }}>
+                {q.levels.map((lvl, i) => (
+                  <div
+                    key={lvl.label}
+                    onClick={() => speak(lvl.text)}
+                    style={{
+                      display: 'flex', alignItems: 'flex-start', gap: 10,
+                      padding: '8px 20px',
+                      borderLeft: `3px solid ${lvl.color}`,
+                      borderBottom: i < 3 ? `1px solid ${BORDER_LIGHT}` : 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <span style={{
+                      fontSize: 9, fontWeight: 800, color: lvl.color,
+                      width: 40, flexShrink: 0, paddingTop: 3,
+                    }}>{lvl.label}</span>
+                    <span style={{
+                      fontSize: i === 2 ? 15 : 13,
+                      fontWeight: i === 2 ? 600 : 400,
+                      color: i === 0 ? TEXT_LIGHT : TEXT_DARK,
+                      lineHeight: 1.6,
+                    }}>{lvl.text}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div
+                onClick={() => reveal(qi)}
+                style={{
+                  padding: '28px 20px', textAlign: 'center',
+                  background: `linear-gradient(135deg, ${BG_AMBER} 0%, ${BG_EMERALD}40 100%)`,
+                  cursor: 'pointer',
+                  transition: 'background 0.2s',
+                }}
+              >
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#EA580C', marginBottom: 4 }}>
+                  Tap to reveal
+                </div>
+                <div style={{ fontSize: 12, color: TEXT_MED }}>
+                  まず頭の中で英語にしてみよう
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {/* Score */}
+      {revealed.size === 3 && (
+        <div style={{
+          padding: '20px 24px', borderRadius: 14,
+          background: `linear-gradient(135deg, ${BG_AMBER} 0%, ${BG_EMERALD} 100%)`,
+          border: `2px solid ${GOLD}`,
+          textAlign: 'center',
+        }}>
+          <div style={{ fontSize: 18, fontWeight: 800, color: GOLD, marginBottom: 4 }}>
+            3/3 COMPLETE
+          </div>
+          <div style={{ fontSize: 14, color: TEXT_DARK }}>
+            Core と Flow の差、感じましたか？
+          </div>
+          <div style={{ fontSize: 13, color: TEXT_MED, marginTop: 4 }}>
+            この感覚を、毎日10フレーズ。
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ──────────────────────────── Character Card ──────────────────────────── */
 function CharacterCard({ name, age, role, desc, color }: { name: string; age: string; role: string; desc: string; color: string }) {
   return (
@@ -162,6 +316,117 @@ function CharacterCard({ name, age, role, desc, color }: { name: string; age: st
   );
 }
 
+/* ──────────────────────────── Interactive Demo ──────────────────────────── */
+function HeroDemo() {
+  const [revealed, setRevealed] = useState(false);
+  const speak = (text: string) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  };
+
+  const DEMO_LEVELS = [
+    { label: 'CORE', ja: '核', text: "Nice to meet you.", desc: '通じればOK', color: TEXT_MUTED },
+    { label: 'VIBE', ja: '空気', text: "Hey, great to finally meet you!", desc: '感情を乗せる', color: GOLD },
+    { label: 'SCENE', ja: '場面', text: "I've heard so much about you. It's really great to finally put a face to the name.", desc: '場面で使える一言', color: '#D97706' },
+    { label: 'FLOW', ja: '流れ', text: "Oh, you're the one everyone keeps talking about! I feel like I already know you.", desc: 'ネイティブの脳内', color: EMERALD },
+  ];
+
+  return (
+    <div style={{ maxWidth: 520, width: '100%', margin: '0 auto' }}>
+      {/* Japanese prompt */}
+      <div style={{
+        background: BG_WHITE, borderRadius: '14px 14px 0 0',
+        padding: '16px 20px', border: `1px solid ${BORDER}`, borderBottom: 'none',
+        boxShadow: SHADOW_LG,
+      }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_LIGHT, letterSpacing: '0.1em', marginBottom: 6 }}>
+          DAY 1 -- PHRASE 1
+        </div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: TEXT_DARK }}>
+          はじめまして
+        </div>
+      </div>
+
+      {/* Build-up reveal */}
+      <div
+        onClick={() => setRevealed(true)}
+        style={{
+          borderRadius: '0 0 14px 14px',
+          border: `1px solid ${revealed ? BORDER : GOLD}60`,
+          overflow: 'hidden',
+          cursor: revealed ? 'default' : 'pointer',
+          boxShadow: SHADOW_LG,
+          transition: 'all 0.3s',
+        }}
+      >
+        {revealed ? (
+          <div style={{ background: BG_WHITE }}>
+            {DEMO_LEVELS.map((lvl, i) => (
+              <div
+                key={lvl.label}
+                onClick={(e) => { e.stopPropagation(); speak(lvl.text); }}
+                style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 12,
+                  padding: '10px 20px',
+                  borderLeft: `4px solid ${lvl.color}`,
+                  borderBottom: i < 3 ? `1px solid ${BORDER_LIGHT}` : 'none',
+                  background: i === 3 ? `${lvl.color}06` : BG_WHITE,
+                  cursor: 'pointer',
+                  transition: 'background 0.15s',
+                }}
+              >
+                <div style={{ flexShrink: 0, width: 48, paddingTop: 3 }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: lvl.color, letterSpacing: '0.05em' }}>
+                    {lvl.label}
+                  </div>
+                  <div style={{ fontSize: 9, color: TEXT_LIGHT }}>{lvl.ja}</div>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontSize: i === 2 ? 15 : 14,
+                    fontWeight: i === 2 ? 600 : 400,
+                    color: i === 0 ? TEXT_LIGHT : TEXT_DARK,
+                    lineHeight: 1.6,
+                    fontStyle: i === 3 ? 'italic' : 'normal',
+                  }}>
+                    {lvl.text}
+                  </div>
+                  <div style={{ fontSize: 10, color: TEXT_LIGHT, marginTop: 2 }}>
+                    {lvl.desc}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div style={{
+              padding: '8px 20px', background: `${GOLD}08`,
+              borderTop: `1px solid ${BORDER_LIGHT}`,
+              fontSize: 11, color: TEXT_LIGHT, textAlign: 'center',
+            }}>
+              Click any level to hear the pronunciation
+            </div>
+          </div>
+        ) : (
+          <div style={{
+            padding: '32px 20px', textAlign: 'center',
+            background: `linear-gradient(135deg, ${BG_AMBER} 0%, ${BG_EMERALD}60 100%)`,
+          }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: GOLD, marginBottom: 6 }}>
+              Tap to see the 4-level build-up
+            </div>
+            <div style={{ fontSize: 12, color: TEXT_MED }}>
+              同じ日本語を、4段階の英語で分解
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ──────────────────────────── Main Page ──────────────────────────── */
 export default function KaiwaLandingPage() {
   return (
@@ -203,7 +468,7 @@ export default function KaiwaLandingPage() {
         <h1
           style={{
             fontFamily: FONT,
-            fontSize: 'clamp(32px, 6vw, 56px)',
+            fontSize: 'clamp(28px, 5vw, 48px)',
             fontWeight: 800,
             color: TEXT_DARK,
             textAlign: 'center',
@@ -213,60 +478,65 @@ export default function KaiwaLandingPage() {
             letterSpacing: '-0.02em',
           }}
         >
-          英語が口から出ない。
+          同じ日本語を、
           <br />
-          その悩み、<GradientText>30日</GradientText>で終わる。
+          <GradientText>4段階の英語</GradientText>で分解する。
         </h1>
 
         {/* Sub headline */}
         <p
           style={{
             fontFamily: FONT,
-            fontSize: 'clamp(15px, 2vw, 18px)',
+            fontSize: 'clamp(14px, 2vw, 17px)',
             color: TEXT_MED,
             textAlign: 'center',
             lineHeight: 1.9,
             maxWidth: 560,
-            margin: '28px 0 48px',
+            margin: '24px 0 40px',
           }}
         >
-          1日10フレーズ。ストーリーで覚える。
+          ネイティブが頭の中で文を組み立てるプロセスを可視化。
           <br />
-          論文5本で裏付けた科学的メソッド。
+          他にないメソッドで、1日10フレーズ、365日。
         </p>
 
+        {/* Interactive Demo -- the hero */}
+        <HeroDemo />
+
         {/* CTA */}
-        <Link href="/english/izakaya-toeic/kaiwa" style={{ textDecoration: 'none' }}>
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '18px 52px',
-              borderRadius: 14,
-              background: `linear-gradient(135deg, ${GOLD}, #C49B2F)`,
-              color: BG_WHITE,
-              fontFamily: FONT,
-              fontSize: 17,
-              fontWeight: 700,
-              letterSpacing: '0.04em',
-              boxShadow: `0 4px 16px ${GOLD}44, 0 1px 3px rgba(28,25,23,0.1)`,
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-              cursor: 'pointer',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = `0 8px 28px ${GOLD}55, 0 2px 6px rgba(28,25,23,0.12)`;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = `0 4px 16px ${GOLD}44, 0 1px 3px rgba(28,25,23,0.1)`;
-            }}
-          >
-            無料で始める
-          </div>
-        </Link>
-        <p style={{ fontFamily: FONT, fontSize: 13, color: TEXT_LIGHT, marginTop: 16, textAlign: 'center' }}>
-          登録不要 -- ブラウザだけで始められます
-        </p>
+        <div style={{ marginTop: 40, textAlign: 'center' }}>
+          <Link href="/english/izakaya-toeic/kaiwa" style={{ textDecoration: 'none' }}>
+            <div
+              style={{
+                display: 'inline-block',
+                padding: '18px 52px',
+                borderRadius: 14,
+                background: `linear-gradient(135deg, ${GOLD}, #C49B2F)`,
+                color: BG_WHITE,
+                fontFamily: FONT,
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                boxShadow: `0 4px 16px ${GOLD}44, 0 1px 3px rgba(28,25,23,0.1)`,
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = `0 8px 28px ${GOLD}55, 0 2px 6px rgba(28,25,23,0.12)`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = `0 4px 16px ${GOLD}44, 0 1px 3px rgba(28,25,23,0.1)`;
+              }}
+            >
+              無料で始める
+            </div>
+          </Link>
+          <p style={{ fontFamily: FONT, fontSize: 13, color: TEXT_LIGHT, marginTop: 16 }}>
+            登録不要 -- ブラウザだけで始められます
+          </p>
+        </div>
 
         {/* Stats row */}
         <div
@@ -274,7 +544,7 @@ export default function KaiwaLandingPage() {
             display: 'flex',
             justifyContent: 'center',
             gap: 'clamp(32px, 6vw, 80px)',
-            marginTop: 64,
+            marginTop: 48,
             flexWrap: 'wrap',
           }}
         >
@@ -782,6 +1052,52 @@ export default function KaiwaLandingPage() {
 
       <SectionDivider />
 
+      {/* ━━━━━━━━━━━━━━━━━━ TRY IT NOW ━━━━━━━━━━━━━━━━━━ */}
+      <section style={{ ...sectionPadding, background: `linear-gradient(180deg, ${BG_AMBER}30 0%, ${BG_WHITE} 100%)` }}>
+        <div style={{ ...narrowContainer, maxWidth: 580 }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <p style={{ fontFamily: FONT, fontSize: 13, fontWeight: 600, color: '#EA580C', letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 16px' }}>
+              TRY IT NOW
+            </p>
+            <h2 style={{ fontFamily: FONT, fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: TEXT_DARK, margin: 0, letterSpacing: '-0.01em', lineHeight: 1.5 }}>
+              3問だけ、やってみよう
+            </h2>
+            <p style={{ fontFamily: FONT, fontSize: 14, color: TEXT_MED, marginTop: 12 }}>
+              日本語を見て、英語を考えてからタップ。4段階が出てくる。
+            </p>
+          </div>
+
+          <TryItQuiz />
+
+          <div style={{ textAlign: 'center', marginTop: 40 }}>
+            <Link href="/english/izakaya-toeic/kaiwa" style={{ textDecoration: 'none' }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  padding: '16px 44px',
+                  borderRadius: 14,
+                  background: `linear-gradient(135deg, ${GOLD}, #C49B2F)`,
+                  color: BG_WHITE,
+                  fontFamily: FONT,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                  boxShadow: `0 4px 16px ${GOLD}44`,
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+              >
+                Day 1 から始める
+              </div>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <SectionDivider />
+
       {/* ━━━━━━━━━━━━━━━━━━ CHARACTERS ━━━━━━━━━━━━━━━━━━ */}
       <section style={{ ...sectionPadding, background: `linear-gradient(180deg, ${BG_STONE} 0%, ${BG_AMBER}20 100%)` }}>
         <div style={wideContainer}>
@@ -911,6 +1227,69 @@ export default function KaiwaLandingPage() {
 
       <SectionDivider />
 
+      {/* ━━━━━━━━━━━━━━━━━━ CREATOR ━━━━━━━━━━━━━━━━━━ */}
+      <section style={{ ...sectionPadding, background: BG_WHITE }}>
+        <div style={{ ...narrowContainer, maxWidth: 640 }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <p style={{ fontFamily: FONT, fontSize: 13, fontWeight: 600, color: TEXT_MUTED, letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 16px' }}>
+              CREATOR
+            </p>
+            <h2 style={{ fontFamily: FONT, fontSize: 'clamp(22px, 4vw, 32px)', fontWeight: 800, color: TEXT_DARK, margin: 0, letterSpacing: '-0.01em', lineHeight: 1.5 }}>
+              TOEIC 900。喋れない。
+            </h2>
+          </div>
+
+          <div style={{
+            background: BG_STONE, borderRadius: 16, padding: '32px 28px',
+            border: `1px solid ${BORDER_LIGHT}`,
+          }}>
+            <div style={{ fontFamily: FONT, fontSize: 15, color: TEXT_MED, lineHeight: 2.2 }}>
+              <p style={{ margin: '0 0 16px' }}>
+                読める。聞ける。書ける。でも喋れない。
+              </p>
+              <p style={{ margin: '0 0 16px' }}>
+                4技能のうち3つクリアして、最後の1つで永遠に死んでいる。それが僕です。
+              </p>
+              <p style={{ margin: '0 0 16px' }}>
+                原因はわかっていました。<strong style={{ color: TEXT_DARK }}>口から出せるフレーズの在庫がゼロ</strong>。文法は知っている。単語も知っている。でも、会話になると「何て言えばいいかわからない」。
+              </p>
+              <p style={{ margin: '0 0 16px' }}>
+                市販のフレーズ帳を買いました。続きませんでした。アプリも試しました。翌日には忘れていました。
+              </p>
+              <p style={{ margin: '0 0 16px' }}>
+                だから自分で作りました。ストーリーの中で出会い、4段階で分解し、文脈ごと体に入れる。自分が本当に欲しかったものを、そのまま形にしました。
+              </p>
+              <p style={{ margin: 0 }}>
+                毎日更新しています。一緒にやりませんか。
+              </p>
+            </div>
+
+            <div style={{
+              marginTop: 24, paddingTop: 20,
+              borderTop: `1px solid ${BORDER}`,
+              display: 'flex', alignItems: 'center', gap: 16,
+            }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: '50%',
+                background: `linear-gradient(135deg, ${GOLD}, ${EMERALD})`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontFamily: FONT, fontSize: 16, fontWeight: 800, color: BG_WHITE,
+              }}>T</div>
+              <div>
+                <div style={{ fontFamily: FONT, fontSize: 14, fontWeight: 700, color: TEXT_DARK }}>
+                  Tonio
+                </div>
+                <div style={{ fontFamily: FONT, fontSize: 12, color: TEXT_LIGHT }}>
+                  TOEIC 900 / Speaking 0 / Builder
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <SectionDivider />
+
       {/* ━━━━━━━━━━━━━━━━━━ FAQ ━━━━━━━━━━━━━━━━━━ */}
       <section style={{ ...sectionPadding, background: BG_STONE }}>
         <div style={{ ...narrowContainer, maxWidth: 680 }}>
@@ -945,7 +1324,7 @@ export default function KaiwaLandingPage() {
             />
             <FAQItem
               q="他のアプリと何が違う？"
-              a="フレーズの在庫を増やすことに特化しています。既存アプリとの併用を前提に設計しました。"
+              a="4段階メソッド。同じ日本語をCore（骨格）→Vibe（感情）→Scene（場面）→Flow（ネイティブの脳内）の4レベルで分解します。ネイティブの思考プロセスを可視化するアプローチは他にありません。"
             />
             <FAQItem
               q="TOEICに効く？"
