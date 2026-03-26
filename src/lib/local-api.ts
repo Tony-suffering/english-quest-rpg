@@ -62,7 +62,8 @@ const routes: Record<string, Handler> = {
         if (method === 'POST' && body) {
             const id = nanoid()
             const entry = { id, english: body.english, japanese: body.japanese || '', category: body.category || '', date: body.date || today(), created_at: now() }
-            const dup = phrases.find((p: Record<string, unknown>) => (p.english as string)?.toLowerCase() === (entry.english as string)?.toLowerCase() && p.date === entry.date)
+            const toStr = (v: unknown): string => typeof v === 'string' ? v : ''
+            const dup = phrases.find((p: Record<string, unknown>) => toStr(p.english).toLowerCase() === toStr(entry.english).toLowerCase() && p.date === entry.date)
             if (dup) return json({ phrase: dup, success: true, duplicate: true })
             phrases.push(entry)
             save('phrases', phrases)
@@ -593,6 +594,17 @@ let installed = false
 export function installLocalApi() {
     if (installed || typeof window === 'undefined') return
     installed = true
+    // Clean up any phrases with array english (from old batch registration)
+    try {
+        const raw = localStorage.getItem('tl_phrases')
+        if (raw) {
+            const arr = JSON.parse(raw) as Record<string, unknown>[]
+            const cleaned = arr.filter(p => typeof p.english === 'string')
+            if (cleaned.length !== arr.length) {
+                localStorage.setItem('tl_phrases', JSON.stringify(cleaned))
+            }
+        }
+    } catch { /* */ }
     seedPhrasesIfEmpty().then(() => {
         bridgeQuestToApi()
     })
