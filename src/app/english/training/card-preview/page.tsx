@@ -9,12 +9,35 @@ const IS_PUBLIC = true;
 // Read from same localStorage keys as TrainingClient
 function getCardPoints(): Record<string, number> {
     try {
+        // Try tl_mastery first (local-api format)
+        const tlRaw = localStorage.getItem('tl_mastery');
+        if (tlRaw) {
+            const tlData = JSON.parse(tlRaw);
+            const points: Record<string, number> = {};
+            for (const [pid, data] of Object.entries(tlData)) {
+                points[pid] = (data as any).cardPoints || 0;
+            }
+            return points;
+        }
+        // Fallback to legacy key
         const raw = localStorage.getItem('izakaya_card_points');
         return raw ? JSON.parse(raw) : {};
     } catch { return {}; }
 }
+
 function getMastery(): Record<string, number> {
     try {
+        // Try tl_mastery first
+        const tlRaw = localStorage.getItem('tl_mastery');
+        if (tlRaw) {
+            const tlData = JSON.parse(tlRaw);
+            const mastery: Record<string, number> = {};
+            for (const [pid, data] of Object.entries(tlData)) {
+                mastery[pid] = (data as any).level || 0;
+            }
+            return mastery;
+        }
+        // Fallback
         const raw = localStorage.getItem('quest-mastery');
         return raw ? JSON.parse(raw) : {};
     } catch { return {}; }
@@ -75,10 +98,9 @@ const MAX_TILT: Record<CardRank, number> = {
     NORMAL: 8, BRONZE: 10, SILVER: 12, GOLD: 15, HOLOGRAPHIC: 15, LEGENDARY: 18,
 };
 
-import { ELEMENT_COLORS, ELEMENT_ADVANTAGE, ELEMENT_LABELS, calcBstStats, calcBstTotal, getBstTier, BST_STAT_NAMES_JA, BST_TIERS, type BstTier } from '@/data/english/elements';
+import { ELEMENT_ADVANTAGE, ELEMENT_LABELS } from '@/data/english/elements';
 import { ElementBadge } from '@/components/english/ElementIcon';
 import { getFlavorText } from '@/data/english/flavor-text';
-const TYPE_COLORS = ELEMENT_COLORS;
 
 // ===== Card Visual Helpers =====
 function getCardRank(points: number): RankConfig {
@@ -469,8 +491,6 @@ function CollectionCard({
 
                 {/* Bottom Bar */}
                 {(() => {
-                    const bstTotal = calcBstTotal(phrase.id);
-                    const bstTier = getBstTier(bstTotal);
                     const ci = CHAKRA[card.chakra] || CHAKRA[0];
                     return (
                         <div style={{
@@ -522,26 +542,12 @@ function CollectionCard({
                                 </span>
                             </div>
                             <span style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '4px',
+                                fontSize: '7px',
+                                fontWeight: '600',
+                                color: isTextLight ? 'rgba(255,255,255,0.3)' : '#A8A29E',
+                                fontFamily: 'monospace',
                             }}>
-                                <span style={{
-                                    fontSize: '7px',
-                                    fontWeight: '800',
-                                    color: bstTier.color,
-                                    letterSpacing: '0.5px',
-                                }}>
-                                    {bstTier.tier} {bstTotal}
-                                </span>
-                                <span style={{
-                                    fontSize: '7px',
-                                    fontWeight: '600',
-                                    color: isTextLight ? 'rgba(255,255,255,0.3)' : '#A8A29E',
-                                    fontFamily: 'monospace',
-                                }}>
-                                    {phrase.id.slice(0, 6)}
-                                </span>
+                                {phrase.id.slice(0, 6)}
                             </span>
                         </div>
                     );
@@ -820,17 +826,7 @@ function CardModal({ card, onClose, isMobile, nickname, onNicknameChange }: {
     const [mounted, setMounted] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const bstStats = calcBstStats(card.phrase.id);
-    const bstTotal = bstStats.reduce((a, b) => a + b, 0);
-    const bstTier = getBstTier(bstTotal);
     const ci = CHAKRA[card.chakra] || CHAKRA[0];
-    const statColors = ['#EF4444', '#F97316', '#EAB308', '#10B981', '#3B82F6', '#A855F7'];
-
-    // Find highest + lowest stats
-    const maxStat = Math.max(...bstStats);
-    const minStat = Math.min(...bstStats);
-    const maxIdx = bstStats.indexOf(maxStat);
-    const minIdx = bstStats.lastIndexOf(minStat);
 
     // Element advantage
     const el = card.phrase.category;
@@ -856,18 +852,6 @@ function CardModal({ card, onClose, isMobile, nickname, onNicknameChange }: {
     const accent = card.rankConfig.borderColor;
     const isLeg = card.rankConfig.rank === 'LEGENDARY';
     const isHolo = card.rankConfig.rank === 'HOLOGRAPHIC';
-
-    // Radar chart helpers
-    const cx = 90, cy = 90, radarR = 60;
-    const STAT_MAX = 120;
-    const STAT_MIN_VISUAL = 0.08; // floor so lowest stats don't collapse to center
-    const getPoint = (i: number, val: number) => {
-        const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-        const pct = Math.max(val / STAT_MAX, STAT_MIN_VISUAL);
-        return { x: cx + radarR * pct * Math.cos(angle), y: cy + radarR * pct * Math.sin(angle) };
-    };
-    const statPoints = bstStats.map((v, i) => getPoint(i, v));
-    const polygon = statPoints.map(p => `${p.x},${p.y}`).join(' ');
 
     return (
         <div
@@ -1053,121 +1037,6 @@ function CardModal({ card, onClose, isMobile, nickname, onNicknameChange }: {
                         )}
                     </div>
 
-                    {/* BST Radar + Stats */}
-                    <div style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        borderRadius: '12px', padding: '14px 16px',
-                        border: '1px solid rgba(255,255,255,0.04)',
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.45)', letterSpacing: '1.2px' }}>BST</span>
-                                <span style={{
-                                    fontSize: '9px', fontWeight: '700', letterSpacing: '0.5px',
-                                    color: bstTier.color, backgroundColor: bstTier.color + '18',
-                                    padding: '1px 6px', borderRadius: '4px',
-                                }}>
-                                    {bstTier.ja}
-                                </span>
-                            </div>
-                            <span style={{ fontSize: '16px', fontWeight: '900', color: bstTier.color, fontFamily: 'monospace' }}>
-                                {bstTotal}
-                            </span>
-                        </div>
-                        <svg viewBox="0 0 180 185" style={{ width: '100%', maxWidth: '220px', display: 'block', margin: '0 auto' }}>
-                            {[0.25, 0.5, 0.75, 1.0].map(level => {
-                                const pts = Array.from({ length: 6 }, (_, i) => {
-                                    const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-                                    return `${cx + radarR * level * Math.cos(angle)},${cy + radarR * level * Math.sin(angle)}`;
-                                }).join(' ');
-                                return <polygon key={level} points={pts} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="0.5" />;
-                            })}
-                            {Array.from({ length: 6 }, (_, i) => {
-                                const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-                                return <line key={i} x1={cx} y1={cy} x2={cx + radarR * Math.cos(angle)} y2={cy + radarR * Math.sin(angle)} stroke="rgba(255,255,255,0.05)" strokeWidth="0.5" />;
-                            })}
-                            <polygon points={polygon}
-                                fill={`${bstTier.color}20`}
-                                stroke={bstTier.color} strokeWidth="1.5"
-                                style={{
-                                    opacity: mounted ? 1 : 0,
-                                    transition: 'opacity 0.6s ease 0.3s',
-                                }}
-                            />
-                            {statPoints.map((p, i) => (
-                                <circle key={i} cx={p.x} cy={p.y}
-                                    r={i === maxIdx ? '4' : i === minIdx ? '2.5' : '3'}
-                                    fill={statColors[i]}
-                                    stroke={i === maxIdx ? '#fff' : 'rgba(0,0,0,0.3)'}
-                                    strokeWidth={i === maxIdx ? '1' : '0.5'}
-                                    style={{ opacity: mounted ? 1 : 0, transition: `opacity 0.4s ease ${0.3 + i * 0.05}s` }}
-                                />
-                            ))}
-                            {BST_STAT_NAMES_JA.map((name, i) => {
-                                const angle = (Math.PI * 2 * i) / 6 - Math.PI / 2;
-                                const lx = cx + (radarR + 18) * Math.cos(angle);
-                                const ly = cy + (radarR + 18) * Math.sin(angle);
-                                return (
-                                    <g key={i}>
-                                        <text x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
-                                            style={{
-                                                fontSize: '8px', fontWeight: i === maxIdx ? '900' : '700',
-                                                fill: i === maxIdx ? statColors[i] : 'rgba(255,255,255,0.5)',
-                                            }}>
-                                            {name}
-                                        </text>
-                                        <text x={lx} y={ly + 11} textAnchor="middle" dominantBaseline="middle"
-                                            style={{
-                                                fontSize: '8px', fontWeight: '700',
-                                                fill: statColors[i], fontFamily: 'monospace',
-                                            }}>
-                                            {bstStats[i]}
-                                        </text>
-                                    </g>
-                                );
-                            })}
-                        </svg>
-                        {/* Stat bars - single column for clarity */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginTop: '6px' }}>
-                            {BST_STAT_NAMES_JA.map((name, i) => {
-                                const pct = (bstStats[i] / STAT_MAX) * 100;
-                                const isMax = i === maxIdx;
-                                const isMin = i === minIdx;
-                                return (
-                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span style={{
-                                            fontSize: '10px', fontWeight: isMax ? '900' : '700',
-                                            color: statColors[i], width: '24px',
-                                            textShadow: isMax ? `0 0 6px ${statColors[i]}40` : 'none',
-                                        }}>{name}</span>
-                                        <div style={{
-                                            flex: 1, height: '6px',
-                                            background: 'rgba(255,255,255,0.06)',
-                                            borderRadius: '3px', overflow: 'hidden',
-                                        }}>
-                                            <div style={{
-                                                height: '100%',
-                                                width: mounted ? `${pct}%` : '0%',
-                                                background: isMax
-                                                    ? `linear-gradient(90deg, ${statColors[i]}, ${statColors[i]}cc)`
-                                                    : statColors[i] + (isMin ? '80' : 'bb'),
-                                                borderRadius: '3px',
-                                                transition: `width 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${0.2 + i * 0.06}s`,
-                                                boxShadow: isMax ? `0 0 4px ${statColors[i]}30` : 'none',
-                                            }} />
-                                        </div>
-                                        <span style={{
-                                            fontSize: '11px',
-                                            fontWeight: isMax ? '900' : '700',
-                                            color: statColors[i],
-                                            fontFamily: 'monospace', width: '24px', textAlign: 'right',
-                                        }}>{bstStats[i]}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-
                     {/* Evolution (Chakra) */}
                     <div style={{
                         background: 'rgba(255,255,255,0.05)',
@@ -1274,9 +1143,6 @@ function CardModal({ card, onClose, isMobile, nickname, onNicknameChange }: {
                         <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.2)', fontFamily: 'monospace', letterSpacing: '0.3px' }}>
                             {card.phrase.id}
                         </span>
-                        <span style={{ fontSize: '9px', color: 'rgba(255,255,255,0.15)', letterSpacing: '0.5px' }}>
-                            {bstTier.tier}-TIER / {bstTier.ja}
-                        </span>
                     </div>
                 </div>
             </div>
@@ -1306,8 +1172,6 @@ export default function CardCollectionPage() {
     const [loading, setLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
     const [activeFilter, setActiveFilter] = useState<CardRank | 'ALL'>('ALL');
-    const [sortBy, setSortBy] = useState<'sp' | 'bst'>('sp');
-    const [bstFilter, setBstFilter] = useState<BstTier | 'ALL'>('ALL');
     const [selectedCard, setSelectedCard] = useState<CardData | null>(null);
     const [nicknames, setNicknames] = useState<Record<string, string>>({});
     const [mastery, setMastery] = useState<Record<string, number>>({});
@@ -1365,6 +1229,26 @@ export default function CardCollectionPage() {
                 }
             } catch { /* */ }
 
+            // Also merge tl_phrases from localStorage (user-registered phrases from 365 page)
+            try {
+                const tlPhrasesRaw = localStorage.getItem('tl_phrases');
+                if (tlPhrasesRaw) {
+                    const tlPhrases = JSON.parse(tlPhrasesRaw) as { id: string; phrase: string; meaning: string; type?: string; created_at?: string }[];
+                    for (const item of tlPhrases) {
+                        const tlId = `tl_${item.id}`;
+                        if (!allPhrases.find(p => p.id === tlId)) {
+                            allPhrases.push({
+                                id: tlId,
+                                english: item.phrase,
+                                japanese: item.meaning,
+                                category: item.type || 'Custom',
+                                date: item.created_at ? item.created_at.slice(0, 10) : makeDayDate(new Date().getDate()),
+                            });
+                        }
+                    }
+                }
+            } catch { /* */ }
+
             setPhrases(allPhrases);
             setCardPoints(getCardPoints());
             setMastery(getMastery());
@@ -1400,26 +1284,15 @@ export default function CardCollectionPage() {
     const filteredCards = useMemo(() => {
         let result = cards;
         if (activeFilter !== 'ALL') result = result.filter(c => c.rankConfig.rank === activeFilter);
-        if (bstFilter !== 'ALL') result = result.filter(c => getBstTier(calcBstTotal(c.phrase.id)).tier === bstFilter);
-        if (sortBy === 'bst') {
-            result = [...result].sort((a, b) => calcBstTotal(b.phrase.id) - calcBstTotal(a.phrase.id));
-        } else {
-            result = [...result].sort((a, b) => b.points - a.points);
-        }
+        result = [...result].sort((a, b) => b.points - a.points);
         return result;
-    }, [cards, activeFilter, bstFilter, sortBy]);
+    }, [cards, activeFilter]);
 
     const rankCounts = useMemo(() => {
         const counts: Record<CardRank | 'ALL', number> = {
             ALL: cards.length, LEGENDARY: 0, HOLOGRAPHIC: 0, GOLD: 0, SILVER: 0, BRONZE: 0, NORMAL: 0,
         };
         cards.forEach(c => { counts[c.rankConfig.rank]++; });
-        return counts;
-    }, [cards]);
-
-    const bstCounts = useMemo(() => {
-        const counts: Record<BstTier | 'ALL', number> = { ALL: cards.length, S: 0, A: 0, B: 0, C: 0, D: 0, F: 0 };
-        cards.forEach(c => { counts[getBstTier(calcBstTotal(c.phrase.id)).tier]++; });
         return counts;
     }, [cards]);
 
@@ -1496,119 +1369,57 @@ export default function CardCollectionPage() {
                 {/* Dashboard */}
                 {!loading && <CollectionDashboard cards={cards} />}
 
-                {/* Sort + Filter Bar */}
+                {/* Filter Bar */}
                 <div style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '12px',
-                    marginBottom: '12px',
-                    flexWrap: 'wrap',
-                }}>
-                    {/* Sort toggle */}
-                    <div style={{
-                        display: 'flex', gap: '2px',
-                        backgroundColor: '#1C1917',
-                        borderRadius: '10px',
-                        padding: '3px',
-                    }}>
-                        {([['sp', 'SP順'], ['bst', '種族値順']] as const).map(([key, label]) => (
-                            <button key={key} onClick={() => setSortBy(key)}
-                                style={{
-                                    padding: '6px 16px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                                    fontSize: '12px', fontWeight: '700',
-                                    backgroundColor: sortBy === key ? '#D4AF37' : 'transparent',
-                                    color: sortBy === key ? '#1C1917' : 'rgba(255,255,255,0.4)',
-                                    transition: 'all 0.2s ease',
-                                    letterSpacing: '0.3px',
-                                }}>
-                                {label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Vertical separator */}
-                    <div style={{ width: '1px', height: '24px', backgroundColor: '#E7E5E4' }} />
-
-                    {/* Rank filter pills */}
-                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', flex: 1 }}>
-                        {filterOptions.map(opt => {
-                            const isActive = activeFilter === opt.key;
-                            return (
-                                <button
-                                    key={opt.key}
-                                    onClick={() => setActiveFilter(opt.key)}
-                                    style={{
-                                        padding: isActive ? '5px 12px' : '5px 10px',
-                                        borderRadius: '8px',
-                                        border: 'none',
-                                        backgroundColor: isActive ? opt.color + (opt.key === 'NORMAL' ? '30' : '18') : '#F5F5F4',
-                                        fontSize: '11px',
-                                        fontWeight: '700',
-                                        color: isActive ? (opt.key === 'NORMAL' ? '#57534E' : opt.color) : '#A8A29E',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '5px',
-                                        transition: 'all 0.15s ease',
-                                        boxShadow: isActive ? `0 2px 8px ${opt.color}20` : 'none',
-                                    }}
-                                >
-                                    {opt.key !== 'ALL' && (
-                                        <span style={{
-                                            width: '6px', height: '6px', borderRadius: '50%',
-                                            backgroundColor: opt.color,
-                                            opacity: isActive ? 1 : 0.4,
-                                        }} />
-                                    )}
-                                    {opt.label}
-                                    <span style={{
-                                        fontSize: '10px', fontWeight: '800',
-                                        opacity: isActive ? 0.8 : 0.4,
-                                    }}>
-                                        {opt.count}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* BST filter row */}
-                <div style={{
-                    display: 'flex',
                     gap: '4px',
                     marginBottom: '20px',
                     flexWrap: 'wrap',
-                    alignItems: 'center',
                 }}>
-                    <span style={{ fontSize: '10px', fontWeight: '600', color: '#A8A29E', marginRight: '4px' }}>種族値</span>
-                    {BST_TIERS.map(t => {
-                        const count = bstCounts[t.tier];
-                        const isActive = bstFilter === t.tier;
+                    {filterOptions.map(opt => {
+                        const isActive = activeFilter === opt.key;
                         return (
-                            <button key={t.tier}
-                                onClick={() => setBstFilter(bstFilter === t.tier ? 'ALL' : t.tier)}
+                            <button
+                                key={opt.key}
+                                onClick={() => setActiveFilter(opt.key)}
                                 style={{
-                                    padding: '4px 10px', borderRadius: '6px',
+                                    padding: isActive ? '5px 12px' : '5px 10px',
+                                    borderRadius: '8px',
                                     border: 'none',
-                                    backgroundColor: isActive ? t.color + '15' : '#F5F5F4',
-                                    fontSize: '11px', fontWeight: '700',
-                                    color: isActive ? t.color : '#A8A29E',
-                                    cursor: 'pointer', whiteSpace: 'nowrap',
-                                    display: 'flex', alignItems: 'center', gap: '4px',
+                                    backgroundColor: isActive ? opt.color + (opt.key === 'NORMAL' ? '30' : '18') : '#F5F5F4',
+                                    fontSize: '11px',
+                                    fontWeight: '700',
+                                    color: isActive ? (opt.key === 'NORMAL' ? '#57534E' : opt.color) : '#A8A29E',
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '5px',
                                     transition: 'all 0.15s ease',
-                                    boxShadow: isActive ? `0 2px 6px ${t.color}15` : 'none',
+                                    boxShadow: isActive ? `0 2px 8px ${opt.color}20` : 'none',
+                                }}
+                            >
+                                {opt.key !== 'ALL' && (
+                                    <span style={{
+                                        width: '6px', height: '6px', borderRadius: '50%',
+                                        backgroundColor: opt.color,
+                                        opacity: isActive ? 1 : 0.4,
+                                    }} />
+                                )}
+                                {opt.label}
+                                <span style={{
+                                    fontSize: '10px', fontWeight: '800',
+                                    opacity: isActive ? 0.8 : 0.4,
                                 }}>
-                                <span style={{ fontWeight: '900', fontSize: '12px' }}>{t.tier}</span>
-                                <span style={{ opacity: 0.6 }}>{t.label}</span>
-                                <span style={{ fontSize: '10px', opacity: 0.5 }}>{count}</span>
+                                    {opt.count}
+                                </span>
                             </button>
                         );
                     })}
-                    {(activeFilter !== 'ALL' || bstFilter !== 'ALL') && (
+                    {activeFilter !== 'ALL' && (
                         <button
-                            onClick={() => { setActiveFilter('ALL'); setBstFilter('ALL'); }}
+                            onClick={() => setActiveFilter('ALL')}
                             style={{
                                 fontSize: '10px', color: '#D4AF37', border: 'none',
                                 background: 'none', cursor: 'pointer', fontWeight: '700',
@@ -1622,7 +1433,7 @@ export default function CardCollectionPage() {
                 </div>
 
                 {/* Results count */}
-                {!loading && (activeFilter !== 'ALL' || bstFilter !== 'ALL') && (
+                {!loading && activeFilter !== 'ALL' && (
                     <div style={{
                         fontSize: '12px', color: '#78716C', marginBottom: '14px',
                         display: 'flex', alignItems: 'center', gap: '6px',
@@ -1654,14 +1465,14 @@ export default function CardCollectionPage() {
                         boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
                     }}>
                         <div style={{ fontSize: '14px', color: '#78716C', fontWeight: '500' }}>
-                            {activeFilter === 'ALL' && bstFilter === 'ALL'
+                            {activeFilter === 'ALL'
                                 ? 'まだカードがありません。レビューでSPを貯めよう。'
                                 : '条件に合うカードがありません。'
                             }
                         </div>
-                        {(activeFilter !== 'ALL' || bstFilter !== 'ALL') && (
+                        {activeFilter !== 'ALL' && (
                             <button
-                                onClick={() => { setActiveFilter('ALL'); setBstFilter('ALL'); }}
+                                onClick={() => setActiveFilter('ALL')}
                                 style={{
                                     marginTop: '16px',
                                     fontSize: '12px',
