@@ -31,6 +31,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         { id: '/english/izakaya-toeic/characters', label: '常連ファイル', color: '#92400E' },
         { id: '/english/izakaya-toeic/episodes', label: 'エピソード一覧', color: '#D4AF37' },
         { id: '/english/training', label: '仕込み帳', color: '#10B981' },
+        { id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' },
         { id: '/english/izakaya-toeic/words', label: '今日の単語', color: '#3B82F6' },
     ];
 
@@ -63,7 +64,8 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     const isActive = (path: string) => {
         if (!pathname) return false;
         if (path === '/english/izakaya-toeic') return pathname === '/english/izakaya-toeic' || pathname === '/english/izakaya-toeic/program';
-        if (path === '/english/training') return pathname === '/english/training' || pathname.startsWith('/english/training/card');
+        if (path === '/english/training/card-preview') return pathname === '/english/training/card-preview';
+        if (path === '/english/training') return pathname === '/english/training' || pathname.startsWith('/english/training/card-slot');
         if (path === '/memoria') return pathname.startsWith('/memoria');
         return pathname.startsWith(path);
     };
