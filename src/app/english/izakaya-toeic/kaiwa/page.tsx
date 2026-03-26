@@ -1225,25 +1225,70 @@ export default function EnglishMaster365Page() {
                                                         {kw.note}
                                                     </div>
                                                 </div>
-                                                <button
-                                                    onClick={() => {
-                                                        if (!synthRef.current) return;
-                                                        synthRef.current.cancel();
-                                                        const u = new SpeechSynthesisUtterance(kw.en);
-                                                        u.lang = 'en-US';
-                                                        u.rate = 0.85;
-                                                        synthRef.current.speak(u);
-                                                    }}
-                                                    style={{
-                                                        width: 28, height: 28, borderRadius: '50%',
-                                                        border: 'none', cursor: 'pointer',
-                                                        background: '#F5F5F4', color: '#78716C',
-                                                        fontSize: 12, flexShrink: 0,
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    }}
-                                                >
-                                                    {'\u25B6'}
-                                                </button>
+                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flexShrink: 0 }}>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (!synthRef.current) return;
+                                                            synthRef.current.cancel();
+                                                            const u = new SpeechSynthesisUtterance(kw.en);
+                                                            u.lang = 'en-US';
+                                                            u.rate = 0.85;
+                                                            synthRef.current.speak(u);
+                                                        }}
+                                                        style={{
+                                                            width: 28, height: 28, borderRadius: '50%',
+                                                            border: 'none', cursor: 'pointer',
+                                                            background: '#F5F5F4', color: '#78716C',
+                                                            fontSize: 12,
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        }}
+                                                    >
+                                                        {'\u25B6'}
+                                                    </button>
+                                                    {(() => {
+                                                        const kwRegistered = registeredPhrases.has(kw.en.toLowerCase());
+                                                        return (
+                                                            <button
+                                                                onClick={async (e) => {
+                                                                    e.stopPropagation();
+                                                                    if (kwRegistered) return;
+                                                                    try {
+                                                                        const res = await fetch('/api/phrases', {
+                                                                            method: 'POST',
+                                                                            headers: { 'Content-Type': 'application/json' },
+                                                                            body: JSON.stringify({
+                                                                                english: kw.en,
+                                                                                japanese: kw.ja,
+                                                                                category: '365-word',
+                                                                                date: new Date().toISOString().slice(0, 10),
+                                                                            }),
+                                                                        });
+                                                                        if (res.ok) {
+                                                                            setRegisteredPhrases(prev => {
+                                                                                const next = new Set(prev);
+                                                                                next.add(kw.en.toLowerCase());
+                                                                                return next;
+                                                                            });
+                                                                        }
+                                                                    } catch { /* */ }
+                                                                }}
+                                                                disabled={kwRegistered}
+                                                                title={kwRegistered ? '仕込み帳に登録済み' : '仕込み帳に追加'}
+                                                                style={{
+                                                                    border: kwRegistered ? '1px solid #D1FAE5' : '1px solid #E7E5E4',
+                                                                    borderRadius: 6,
+                                                                    background: kwRegistered ? '#ECFDF5' : '#fff',
+                                                                    color: kwRegistered ? '#059669' : '#A8A29E',
+                                                                    padding: '4px 8px', fontSize: 10, fontWeight: 700,
+                                                                    cursor: kwRegistered ? 'default' : 'pointer',
+                                                                    minHeight: 28,
+                                                                }}
+                                                            >
+                                                                {kwRegistered ? '済' : '+仕込み'}
+                                                            </button>
+                                                        );
+                                                    })()}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -1451,7 +1496,7 @@ export default function EnglishMaster365Page() {
                                                         const lvlName = ['Core', 'Vibe', 'Scene', 'Flow'][lvlIdx];
                                                         return (
                                                             <button
-                                                                onClick={() => !isRegistered && registerPhrase(entry)}
+                                                                onClick={(e) => { e.stopPropagation(); if (!isRegistered) registerPhrase(entry); }}
                                                                 disabled={isRegistered || registeringId === entry.id}
                                                                 title={isRegistered ? '仕込み帳に登録済み' : `${lvlName}レベルを仕込み帳に追加`}
                                                                 style={{
@@ -1459,8 +1504,9 @@ export default function EnglishMaster365Page() {
                                                                     borderRadius: 6,
                                                                     background: isRegistered ? '#ECFDF5' : '#fff',
                                                                     color: isRegistered ? '#059669' : '#A8A29E',
-                                                                    padding: '4px 8px', fontSize: 9, fontWeight: 700,
+                                                                    padding: '6px 12px', fontSize: 11, fontWeight: 700,
                                                                     cursor: isRegistered ? 'default' : 'pointer',
+                                                                    minHeight: 32,
                                                                 }}
                                                             >
                                                                 {registeringId === entry.id ? '...' : isRegistered ? '仕込み済' : `+${lvlName}`}
