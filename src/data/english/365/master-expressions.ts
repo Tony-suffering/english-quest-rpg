@@ -25,6 +25,43 @@ import { MONTH3_W9_EXPRESSIONS, MONTH3_W9_DAY_THEMES } from './master-expression
 import { MONTH3_W10_EXPRESSIONS, MONTH3_W10_DAY_THEMES } from './master-expressions-m3-w10';
 import { MONTH3_W11_EXPRESSIONS, MONTH3_W11_DAY_THEMES } from './master-expressions-m3-w11';
 import { MONTH3_W12_EXPRESSIONS, MONTH3_W12_DAY_THEMES } from './master-expressions-m3-w12';
+import { MONTH4_W13_EXPRESSIONS, MONTH4_W13_DAY_THEMES } from './master-expressions-m4-w13';
+import { MONTH4_W14_EXPRESSIONS, MONTH4_W14_DAY_THEMES } from './master-expressions-m4-w14';
+import { MONTH4_W15_EXPRESSIONS, MONTH4_W15_DAY_THEMES } from './master-expressions-m4-w15';
+import { MONTH4_W16_EXPRESSIONS, MONTH4_W16_DAY_THEMES } from './master-expressions-m4-w16';
+import { MONTH5_W17_EXPRESSIONS, MONTH5_W17_DAY_THEMES } from './master-expressions-m5-w17';
+import { MONTH5_W18_EXPRESSIONS, MONTH5_W18_DAY_THEMES } from './master-expressions-m5-w18';
+import { MONTH5_W19_EXPRESSIONS, MONTH5_W19_DAY_THEMES } from './master-expressions-m5-w19';
+import { MONTH5_W20_EXPRESSIONS, MONTH5_W20_DAY_THEMES } from './master-expressions-m5-w20';
+import { MONTH6_W21_EXPRESSIONS, MONTH6_W21_DAY_THEMES } from './master-expressions-m6-w21';
+import { MONTH6_W22_EXPRESSIONS, MONTH6_W22_DAY_THEMES } from './master-expressions-m6-w22';
+import { MONTH6_W23_EXPRESSIONS, MONTH6_W23_DAY_THEMES } from './master-expressions-m6-w23';
+import { MONTH6_W24_EXPRESSIONS, MONTH6_W24_DAY_THEMES } from './master-expressions-m6-w24';
+import { MONTH7_W25_EXPRESSIONS, MONTH7_W25_DAY_THEMES } from './master-expressions-m7-w25';
+import { MONTH7_W26_EXPRESSIONS, MONTH7_W26_DAY_THEMES } from './master-expressions-m7-w26';
+import { MONTH7_W27_EXPRESSIONS, MONTH7_W27_DAY_THEMES } from './master-expressions-m7-w27';
+import { MONTH7_W28_EXPRESSIONS, MONTH7_W28_DAY_THEMES } from './master-expressions-m7-w28';
+import { MONTH8_W29_EXPRESSIONS, MONTH8_W29_DAY_THEMES } from './master-expressions-m8-w29';
+import { MONTH8_W30_EXPRESSIONS, MONTH8_W30_DAY_THEMES } from './master-expressions-m8-w30';
+import { MONTH8_W31_EXPRESSIONS, MONTH8_W31_DAY_THEMES } from './master-expressions-m8-w31';
+import { MONTH8_W32_EXPRESSIONS, MONTH8_W32_DAY_THEMES } from './master-expressions-m8-w32';
+import { MONTH9_W33_EXPRESSIONS, MONTH9_W33_DAY_THEMES } from './master-expressions-m9-w33';
+import { MONTH9_W34_EXPRESSIONS, MONTH9_W34_DAY_THEMES } from './master-expressions-m9-w34';
+import { MONTH9_W35_EXPRESSIONS, MONTH9_W35_DAY_THEMES } from './master-expressions-m9-w35';
+import { MONTH9_W36_EXPRESSIONS, MONTH9_W36_DAY_THEMES } from './master-expressions-m9-w36';
+import { MONTH10_W37_EXPRESSIONS, MONTH10_W37_DAY_THEMES } from './master-expressions-m10-w37';
+import { MONTH10_W38_EXPRESSIONS, MONTH10_W38_DAY_THEMES } from './master-expressions-m10-w38';
+import { MONTH10_W39_EXPRESSIONS, MONTH10_W39_DAY_THEMES } from './master-expressions-m10-w39';
+import { MONTH10_W40_EXPRESSIONS, MONTH10_W40_DAY_THEMES } from './master-expressions-m10-w40';
+import { MONTH11_W41_EXPRESSIONS, MONTH11_W41_DAY_THEMES } from './master-expressions-m11-w41';
+import { MONTH11_W42_EXPRESSIONS, MONTH11_W42_DAY_THEMES } from './master-expressions-m11-w42';
+import { MONTH11_W43_EXPRESSIONS, MONTH11_W43_DAY_THEMES } from './master-expressions-m11-w43';
+import { MONTH11_W44_EXPRESSIONS, MONTH11_W44_DAY_THEMES } from './master-expressions-m11-w44';
+import { MONTH12_W45_EXPRESSIONS, MONTH12_W45_DAY_THEMES } from './master-expressions-m12-w45';
+import { MONTH12_W46_EXPRESSIONS, MONTH12_W46_DAY_THEMES } from './master-expressions-m12-w46';
+import { MONTH12_W47_EXPRESSIONS, MONTH12_W47_DAY_THEMES } from './master-expressions-m12-w47';
+import { MONTH12_W48_EXPRESSIONS, MONTH12_W48_DAY_THEMES } from './master-expressions-m12-w48';
+import { MONTH12_W49_EXPRESSIONS, MONTH12_W49_DAY_THEMES } from './master-expressions-m12-w49';
 
 // ============================================================
 // TYPES
@@ -170,6 +207,52 @@ export const MASTER_WEEKS: WeekMeta[] = [
         days: [82, 83, 84, 85, 86, 87, 88, 89, 90],
         scene: '誘い方、約束、噂話、お世辞、別れ際、SNS、人間関係の総復習。Month 3卒業の12週目',
     },
+    // ── Month 4: エンタメ英語 ──
+    { week: 13, title: '映画とドラマ', titleEn: 'Movies and TV Shows', days: [91,92,93,94,95,96,97], scene: 'ユキが居酒屋で「最近面白い映画ない？」と話を振る。映画・ドラマを英語で語る13週目' },
+    { week: 14, title: '音楽とライブ', titleEn: 'Music and Concerts', days: [98,99,100,101,102,103,104], scene: '音楽の趣味からライブ、カラオケ、フェスまで。音を英語で楽しむ14週目' },
+    { week: 15, title: 'ゲームとネット', titleEn: 'Games and Internet', days: [105,106,107,108,109,110,111], scene: 'ゲーム、SNS、動画配信、ネット用語。デジタルライフを英語で回す15週目' },
+    { week: 16, title: 'スポーツと推し活', titleEn: 'Sports and Fandom', days: [112,113,114,115,116,117,118,119,120], scene: 'スポーツ観戦、推し活、イベント。Month 4卒業の16週目' },
+    // ── Month 5: 食と暮らしの英語 ──
+    { week: 17, title: '食べ物の話', titleEn: 'Talking About Food', days: [121,122,123,124,125,126,127], scene: 'レストラン、料理、味の表現、食文化。食を英語で味わう17週目' },
+    { week: 18, title: '健康と体', titleEn: 'Health and Body', days: [128,129,130,131,132,133,134], scene: '体調、病院、ダイエット、睡眠、ストレス。体の英語を覚える18週目' },
+    { week: 19, title: '家と暮らし', titleEn: 'Home and Living', days: [135,136,137,138,139,140,141], scene: '部屋探し、インテリア、ペット、節約。暮らしの英語を完成させる19週目' },
+    { week: 20, title: '季節と天気', titleEn: 'Seasons and Weather', days: [142,143,144,145,146,147,148,149,150], scene: '天気、四季、災害、行事。Month 5卒業の20週目' },
+    // ── Month 6: 旅の英語 ──
+    { week: 21, title: '旅行の準備', titleEn: 'Travel Prep', days: [151,152,153,154,155,156,157], scene: '計画、予約、パッキング、空港、飛行機。旅の始まりの21週目' },
+    { week: 22, title: '旅先で', titleEn: 'At the Destination', days: [158,159,160,161,162,163,164], scene: 'ホテル、道案内、タクシー、観光、お土産。旅を楽しむ22週目' },
+    { week: 23, title: '旅のトラブル', titleEn: 'Travel Troubles', days: [165,166,167,168,169,170,171], scene: '道に迷う、紛失、体調不良、緊急事態。ピンチを乗り切る23週目' },
+    { week: 24, title: '旅の思い出', titleEn: 'Travel Memories', days: [172,173,174,175,176,177,178,179,180], scene: 'グルメ、異文化体験、思い出話。Month 6卒業の24週目' },
+    // ── Month 7: 仕事の英語 ──
+    { week: 25, title: '職場の基本', titleEn: 'Office Basics', days: [181,182,183,184,185,186,187], scene: '出退勤、会議、メール、電話、上司、愚痴。仕事英語の基礎の25週目' },
+    { week: 26, title: 'プレゼンと交渉', titleEn: 'Presentations and Negotiation', days: [188,189,190,191,192,193,194], scene: 'プレゼン、質疑応答、交渉、提案。ビジネスの核心の26週目' },
+    { week: 27, title: 'キャリアと成長', titleEn: 'Career and Growth', days: [195,196,197,198,199,200,201], scene: '面接、自己紹介、転職、スキルアップ。キャリアを語る27週目' },
+    { week: 28, title: 'ビジネスシーン', titleEn: 'Business Situations', days: [202,203,204,205,206,207,208,209,210], scene: '接待、出張、リモート、締め切り。Month 7卒業の28週目' },
+    // ── Month 8: 意見と議論の英語 ──
+    { week: 29, title: '意見を言う', titleEn: 'Sharing Opinions', days: [211,212,213,214,215,216,217], scene: '賛成、反対、理由、比較。意見を英語で伝える29週目' },
+    { week: 30, title: '議論する', titleEn: 'Debating', days: [218,219,220,221,222,223,224], scene: '話題振り、立場、反論、譲歩、まとめ。議論の技術の30週目' },
+    { week: 31, title: '社会の話題', titleEn: 'Social Issues', days: [225,226,227,228,229,230,231], scene: '環境、テクノロジー、教育、働き方。社会を語る31週目' },
+    { week: 32, title: '説得と合意', titleEn: 'Persuasion and Agreement', days: [232,233,234,235,236,237,238,239,240], scene: '説得、条件、妥協、仲直り。Month 8卒業の32週目' },
+    // ── Month 9: 物語を語る英語 ──
+    { week: 33, title: '話を始める', titleEn: 'Starting Stories', days: [241,242,243,244,245,246,247], scene: '昔話、子供時代、怖い話、夢。物語の入口の33週目' },
+    { week: 34, title: '描写力', titleEn: 'Descriptive Language', days: [248,249,250,251,252,253,254], scene: '見た目、場所、感覚、比喩。描写する英語の34週目' },
+    { week: 35, title: 'ドラマチックに語る', titleEn: 'Dramatic Storytelling', days: [255,256,257,258,259,260,261], scene: '盛り上げ、オチ、大げさ、リアクション。語りの技術の35週目' },
+    { week: 36, title: '自分の物語', titleEn: 'Your Own Story', days: [262,263,264,265,266,267,268,269,270], scene: '人生の転機、失敗、成功、感謝。Month 9卒業の36週目' },
+    // ── Month 10: 異文化コミュニケーション ──
+    { week: 37, title: '日本を説明する', titleEn: 'Explaining Japan', days: [271,272,273,274,275,276,277], scene: '食文化、礼儀、祭り、アニメ。日本を英語で伝える37週目' },
+    { week: 38, title: '外国を知る', titleEn: 'Learning About Other Cultures', days: [278,279,280,281,282,283,284], scene: 'マナー、挨拶、時間感覚、ユーモア。異文化を理解する38週目' },
+    { week: 39, title: '誤解と理解', titleEn: 'Misunderstanding and Understanding', days: [285,286,287,288,289,290,291], scene: 'カルチャーショック、ステレオタイプ、歩み寄り。壁を越える39週目' },
+    { week: 40, title: '世界とつながる', titleEn: 'Connecting with the World', days: [292,293,294,295,296,297,298,299,300], scene: '外国人の友達、海外生活、世界市民。Month 10卒業の40週目' },
+    // ── Month 11: 実践英語 ──
+    { week: 41, title: '実用シーン', titleEn: 'Practical Situations', days: [301,302,303,304,305,306,307], scene: '病院、銀行、役所、不動産。実生活の英語の41週目' },
+    { week: 42, title: 'お金と契約', titleEn: 'Money and Contracts', days: [308,309,310,311,312,313,314], scene: '給料、投資、税金、サブスク。お金の英語の42週目' },
+    { week: 43, title: '人生の節目', titleEn: 'Life Milestones', days: [315,316,317,318,319,320,321], scene: '卒業、結婚、出産、引退。人生を語る43週目' },
+    { week: 44, title: '社会参加', titleEn: 'Social Participation', days: [322,323,324,325,326,327,328,329,330], scene: '選挙、ボランティア、スピーチ。Month 11卒業の44週目' },
+    // ── Month 12: 卒業 ──
+    { week: 45, title: '総復習1', titleEn: 'Review: Survival to Daily', days: [331,332,333,334,335,336,337], scene: '挨拶から雑談まで、1年の極意を振り返る45週目' },
+    { week: 46, title: '総復習2', titleEn: 'Review: People and Entertainment', days: [338,339,340,341,342,343,344], scene: '人間関係からエンタメまで、成長を確認する46週目' },
+    { week: 47, title: '総復習3', titleEn: 'Review: Life and Travel', days: [345,346,347,348,349,350,351], scene: '暮らし、旅、仕事、議論。応用力の総仕上げの47週目' },
+    { week: 48, title: '応用編', titleEn: 'Advanced: Your Own English', days: [352,353,354,355,356,357,358], scene: '笑わせる、怒る、愛する、夢を語る。自分だけの英語の48週目' },
+    { week: 49, title: '卒業週', titleEn: 'Graduation Week', days: [359,360,361,362,363,364,365], scene: '1年を振り返り、仲間に感謝し、世界へ旅立つ。最後の乾杯の49週目' },
 ];
 
 export const MASTER_MONTHS: MonthMeta[] = [
@@ -194,6 +277,15 @@ export const MASTER_MONTHS: MonthMeta[] = [
         titleEn: 'Talking About People',
         totalExpressions: 300,
     },
+    { month: 4, key: '2026-07', title: 'エンタメ英語', titleEn: 'Entertainment English', totalExpressions: 300 },
+    { month: 5, key: '2026-08', title: '食と暮らしの英語', titleEn: 'Food and Lifestyle', totalExpressions: 300 },
+    { month: 6, key: '2026-09', title: '旅の英語', titleEn: 'Travel English', totalExpressions: 300 },
+    { month: 7, key: '2026-10', title: '仕事の英語', titleEn: 'Business English', totalExpressions: 300 },
+    { month: 8, key: '2026-11', title: '意見と議論の英語', titleEn: 'Opinions and Debates', totalExpressions: 300 },
+    { month: 9, key: '2026-12', title: '物語を語る英語', titleEn: 'Storytelling', totalExpressions: 300 },
+    { month: 10, key: '2027-01', title: '異文化コミュニケーション', titleEn: 'Cross-Cultural Communication', totalExpressions: 300 },
+    { month: 11, key: '2027-02', title: '実践英語', titleEn: 'Real-World English', totalExpressions: 300 },
+    { month: 12, key: '2027-03', title: '卒業', titleEn: 'Graduation', totalExpressions: 350 },
 ];
 
 // ============================================================
@@ -317,6 +409,43 @@ export const MASTER_DAY_THEMES: Record<number, {
     ...MONTH3_W10_DAY_THEMES,
     ...MONTH3_W11_DAY_THEMES,
     ...MONTH3_W12_DAY_THEMES,
+    ...MONTH4_W13_DAY_THEMES,
+    ...MONTH4_W14_DAY_THEMES,
+    ...MONTH4_W15_DAY_THEMES,
+    ...MONTH4_W16_DAY_THEMES,
+    ...MONTH5_W17_DAY_THEMES,
+    ...MONTH5_W18_DAY_THEMES,
+    ...MONTH5_W19_DAY_THEMES,
+    ...MONTH5_W20_DAY_THEMES,
+    ...MONTH6_W21_DAY_THEMES,
+    ...MONTH6_W22_DAY_THEMES,
+    ...MONTH6_W23_DAY_THEMES,
+    ...MONTH6_W24_DAY_THEMES,
+    ...MONTH7_W25_DAY_THEMES,
+    ...MONTH7_W26_DAY_THEMES,
+    ...MONTH7_W27_DAY_THEMES,
+    ...MONTH7_W28_DAY_THEMES,
+    ...MONTH8_W29_DAY_THEMES,
+    ...MONTH8_W30_DAY_THEMES,
+    ...MONTH8_W31_DAY_THEMES,
+    ...MONTH8_W32_DAY_THEMES,
+    ...MONTH9_W33_DAY_THEMES,
+    ...MONTH9_W34_DAY_THEMES,
+    ...MONTH9_W35_DAY_THEMES,
+    ...MONTH9_W36_DAY_THEMES,
+    ...MONTH10_W37_DAY_THEMES,
+    ...MONTH10_W38_DAY_THEMES,
+    ...MONTH10_W39_DAY_THEMES,
+    ...MONTH10_W40_DAY_THEMES,
+    ...MONTH11_W41_DAY_THEMES,
+    ...MONTH11_W42_DAY_THEMES,
+    ...MONTH11_W43_DAY_THEMES,
+    ...MONTH11_W44_DAY_THEMES,
+    ...MONTH12_W45_DAY_THEMES,
+    ...MONTH12_W46_DAY_THEMES,
+    ...MONTH12_W47_DAY_THEMES,
+    ...MONTH12_W48_DAY_THEMES,
+    ...MONTH12_W49_DAY_THEMES,
 };
 
 // ============================================================
@@ -1167,4 +1296,41 @@ export const MASTER_EXPRESSIONS: MasterExpression[] = [
     ...MONTH3_W10_EXPRESSIONS,
     ...MONTH3_W11_EXPRESSIONS,
     ...MONTH3_W12_EXPRESSIONS,
+    ...MONTH4_W13_EXPRESSIONS,
+    ...MONTH4_W14_EXPRESSIONS,
+    ...MONTH4_W15_EXPRESSIONS,
+    ...MONTH4_W16_EXPRESSIONS,
+    ...MONTH5_W17_EXPRESSIONS,
+    ...MONTH5_W18_EXPRESSIONS,
+    ...MONTH5_W19_EXPRESSIONS,
+    ...MONTH5_W20_EXPRESSIONS,
+    ...MONTH6_W21_EXPRESSIONS,
+    ...MONTH6_W22_EXPRESSIONS,
+    ...MONTH6_W23_EXPRESSIONS,
+    ...MONTH6_W24_EXPRESSIONS,
+    ...MONTH7_W25_EXPRESSIONS,
+    ...MONTH7_W26_EXPRESSIONS,
+    ...MONTH7_W27_EXPRESSIONS,
+    ...MONTH7_W28_EXPRESSIONS,
+    ...MONTH8_W29_EXPRESSIONS,
+    ...MONTH8_W30_EXPRESSIONS,
+    ...MONTH8_W31_EXPRESSIONS,
+    ...MONTH8_W32_EXPRESSIONS,
+    ...MONTH9_W33_EXPRESSIONS,
+    ...MONTH9_W34_EXPRESSIONS,
+    ...MONTH9_W35_EXPRESSIONS,
+    ...MONTH9_W36_EXPRESSIONS,
+    ...MONTH10_W37_EXPRESSIONS,
+    ...MONTH10_W38_EXPRESSIONS,
+    ...MONTH10_W39_EXPRESSIONS,
+    ...MONTH10_W40_EXPRESSIONS,
+    ...MONTH11_W41_EXPRESSIONS,
+    ...MONTH11_W42_EXPRESSIONS,
+    ...MONTH11_W43_EXPRESSIONS,
+    ...MONTH11_W44_EXPRESSIONS,
+    ...MONTH12_W45_EXPRESSIONS,
+    ...MONTH12_W46_EXPRESSIONS,
+    ...MONTH12_W47_EXPRESSIONS,
+    ...MONTH12_W48_EXPRESSIONS,
+    ...MONTH12_W49_EXPRESSIONS,
 ];
