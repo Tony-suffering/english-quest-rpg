@@ -21,6 +21,10 @@ import { MONTH2_W5_EXPRESSIONS, MONTH2_W5_DAY_THEMES } from './master-expression
 import { MONTH2_W6_EXPRESSIONS, MONTH2_W6_DAY_THEMES } from './master-expressions-m2-w6';
 import { MONTH2_W7_EXPRESSIONS, MONTH2_W7_DAY_THEMES } from './master-expressions-m2-w7';
 import { MONTH2_W8_EXPRESSIONS, MONTH2_W8_DAY_THEMES } from './master-expressions-m2-w8';
+import { MONTH3_W9_EXPRESSIONS, MONTH3_W9_DAY_THEMES } from './master-expressions-m3-w9';
+import { MONTH3_W10_EXPRESSIONS, MONTH3_W10_DAY_THEMES } from './master-expressions-m3-w10';
+import { MONTH3_W11_EXPRESSIONS, MONTH3_W11_DAY_THEMES } from './master-expressions-m3-w11';
+import { MONTH3_W12_EXPRESSIONS, MONTH3_W12_DAY_THEMES } from './master-expressions-m3-w12';
 
 // ============================================================
 // TYPES
@@ -138,6 +142,34 @@ export const MASTER_WEEKS: WeekMeta[] = [
         days: [52, 53, 54, 55, 56, 57, 58, 59, 60],
         scene: '旅行計画、異文化理解、将来の夢、仕事の英語、SNS、エンタメ、料理、スポーツ、Month 2卒業。世界が広がる8週目',
     },
+    {
+        week: 9,
+        title: '紹介と第一印象',
+        titleEn: 'Introductions & First Impressions',
+        days: [61, 62, 63, 64, 65, 66, 67],
+        scene: 'ユキが居酒屋に外国人の同僚を連れてくる。人を紹介し、第一印象を語り、人物を描写する9週目',
+    },
+    {
+        week: 10,
+        title: '職場の人間関係',
+        titleEn: 'Workplace Relationships',
+        days: [68, 69, 70, 71, 72, 73, 74],
+        scene: '外国人上司、英語の会議、ビジネスメール、電話対応。仕事の英語に立ち向かう10週目',
+    },
+    {
+        week: 11,
+        title: '気持ちを伝える',
+        titleEn: 'Expressing Feelings',
+        days: [75, 76, 77, 78, 79, 80, 81],
+        scene: '感謝、謝罪、励まし、断り、愚痴、共感、怒り。感情を英語で伝える11週目',
+    },
+    {
+        week: 12,
+        title: '人との距離感',
+        titleEn: 'Social Distance',
+        days: [82, 83, 84, 85, 86, 87, 88, 89, 90],
+        scene: '誘い方、約束、噂話、お世辞、別れ際、SNS、人間関係の総復習。Month 3卒業の12週目',
+    },
 ];
 
 export const MASTER_MONTHS: MonthMeta[] = [
@@ -153,6 +185,13 @@ export const MASTER_MONTHS: MonthMeta[] = [
         key: '2026-05',
         title: '日常生活',
         titleEn: 'Daily Life',
+        totalExpressions: 300,
+    },
+    {
+        month: 3,
+        key: '2026-06',
+        title: '人間関係の英語',
+        titleEn: 'Talking About People',
         totalExpressions: 300,
     },
 ];
@@ -274,6 +313,10 @@ export const MASTER_DAY_THEMES: Record<number, {
     ...MONTH2_W6_DAY_THEMES,
     ...MONTH2_W7_DAY_THEMES,
     ...MONTH2_W8_DAY_THEMES,
+    ...MONTH3_W9_DAY_THEMES,
+    ...MONTH3_W10_DAY_THEMES,
+    ...MONTH3_W11_DAY_THEMES,
+    ...MONTH3_W12_DAY_THEMES,
 };
 
 // ============================================================
@@ -1120,4 +1163,8 @@ export const MASTER_EXPRESSIONS: MasterExpression[] = [
     ...MONTH2_W6_EXPRESSIONS,
     ...MONTH2_W7_EXPRESSIONS,
     ...MONTH2_W8_EXPRESSIONS,
+    ...MONTH3_W9_EXPRESSIONS,
+    ...MONTH3_W10_EXPRESSIONS,
+    ...MONTH3_W11_EXPRESSIONS,
+    ...MONTH3_W12_EXPRESSIONS,
 ];
