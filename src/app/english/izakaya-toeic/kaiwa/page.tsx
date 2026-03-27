@@ -17,6 +17,7 @@ import DailyCheckin, {
 } from '@/components/english/DailyCheckin';
 import StreakMilestone from '@/components/english/StreakMilestone';
 import CheckinOnboarding, { isOnboardingComplete } from '@/components/english/CheckinOnboarding';
+import { addPhrase } from '@/lib/local-store';
 import Link from 'next/link';
 import { theJobEntries } from '@/data/english/365-the-job';
 import { charIcon } from '@/data/izakaya-toeic/characters';
@@ -621,14 +622,27 @@ export default function EnglishMaster365Page() {
         return localStorage.getItem(`365-checkin-${daySlot}`) !== null;
     }, []);
 
-    // Check-in completion handler
+    // Check-in completion handler: save checkin + register 3 picks to 仕込み帳
     const handleCheckinComplete = useCallback((picks: string[]) => {
         if (!selectedDay) return;
-        // Save checkin by daySlot (not calendar date)
+        // Save checkin by daySlot
         localStorage.setItem(`365-checkin-${selectedDay}`, JSON.stringify({
             picks,
             timestamp: new Date().toISOString(),
         }));
+        // Register picked expressions to 仕込み帳
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const pickedEntries = entries.filter(e => picks.includes(e.id));
+        pickedEntries.forEach(entry => {
+            addPhrase({
+                english: entry.english[1], // Vibe level
+                japanese: entry.japanese,
+                category: '365-master',
+                date: dateStr,
+            });
+        });
+        setShikomiCount(prev => prev + pickedEntries.length);
         setTodayPicks(picks);
         setShowCheckin(false);
         // Update streak
@@ -638,7 +652,7 @@ export default function EnglishMaster365Page() {
         if (milestone) {
             setTimeout(() => setShowMilestone(milestone), 500);
         }
-    }, [selectedDay]);
+    }, [selectedDay, entries]);
 
     // Onboarding completion → set start date + go to checkin
     const handleOnboardingComplete = useCallback(() => {

@@ -221,7 +221,7 @@ export default function DailyCheckin({ day, expressions, onComplete, streak }: D
                     今日の10表現から、<span style={{ color: '#fff', fontWeight: 600 }}>気になる3つ</span>を選んでください。
                 </div>
                 <div style={{ fontSize: 11, color: '#666', lineHeight: 1.6, marginTop: 4 }}>
-                    選んだ表現は仕込み帳に保存して、トレーニングで育てられます。
+                    選んだ3つは自動で<span style={{ color: '#10B981' }}>仕込み帳</span>に追加されます。
                 </div>
             </div>
 
