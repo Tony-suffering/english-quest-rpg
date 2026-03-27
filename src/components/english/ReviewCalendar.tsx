@@ -35,6 +35,7 @@ export interface ReviewCalendarProps {
     masteredIds?: Set<string>;
     isMobile: boolean;
     headerRight?: React.ReactNode;
+    checkinDays?: Set<number>;
 }
 
 // --- Helpers ---
@@ -84,6 +85,7 @@ export default function ReviewCalendar({
     masteredIds,
     isMobile,
     headerRight,
+    checkinDays,
 }: ReviewCalendarProps) {
     const now = new Date();
     const todayDate = now.getDate();
@@ -333,6 +335,8 @@ export default function ReviewCalendar({
                                                 : '1px solid transparent',
                                 transition: 'all 0.15s',
                                 position: 'relative',
+                                animation: isToday && !checkinDays?.has(day) && count > 0
+                                    ? 'todayPulse 2s ease-in-out infinite' : undefined,
                             }}
                         >
                             {/* Day number */}
@@ -388,6 +392,15 @@ export default function ReviewCalendar({
                                     }
                                 </span>
                             )}
+
+                            {/* Check-in dot */}
+                            {checkinDays?.has(day) && (
+                                <div style={{
+                                    position: 'absolute', top: 3, right: 3,
+                                    width: 5, height: 5, borderRadius: '50%',
+                                    backgroundColor: '#D4AF37',
+                                }} />
+                            )}
                         </div>
                     );
                 })}
@@ -407,6 +420,10 @@ export default function ReviewCalendar({
                 @keyframes toastSlide {
                     from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
                     to { opacity: 1; transform: translateX(-50%) translateY(0); }
+                }
+                @keyframes todayPulse {
+                    0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.3); }
+                    50% { box-shadow: 0 0 0 3px rgba(212,175,55,0.15); }
                 }
             `}</style>
         </div>

@@ -413,7 +413,7 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
                         position: 'fixed',
                         top: '50%',
                         transform: 'translateY(-50%)',
-                        left: desktopSidebarOpen ? '240px' : '0',
+                        left: desktopSidebarOpen ? '260px' : '0',
                         zIndex: 1002,
                         backgroundColor: '#164038',
                         color: '#fff',
@@ -436,7 +436,7 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
 
             <div style={{
                 flex: 1,
-                marginLeft: isMobile ? 0 : (desktopSidebarOpen ? '240px' : '0'),
+                marginLeft: isMobile ? 0 : (desktopSidebarOpen ? '260px' : '0'),
                 paddingTop: isMobile ? '56px' : 0,
                 transition: 'margin-left 0.25s ease',
             }}>

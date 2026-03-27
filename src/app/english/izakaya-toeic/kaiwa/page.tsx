@@ -12,6 +12,11 @@ import {
     type KeyWord,
 } from '@/data/english/365/master-expressions';
 import ReviewCalendar from '@/components/english/ReviewCalendar';
+import DailyCheckin, {
+    loadCheckinStreak, checkMilestone,
+} from '@/components/english/DailyCheckin';
+import StreakMilestone from '@/components/english/StreakMilestone';
+import CheckinOnboarding, { isOnboardingComplete } from '@/components/english/CheckinOnboarding';
 import Link from 'next/link';
 import { theJobEntries } from '@/data/english/365-the-job';
 import { charIcon } from '@/data/izakaya-toeic/characters';
@@ -339,12 +344,34 @@ const DAILY_MESSAGES = [
     'Fluency is built in minutes, not hours.',
 ];
 
+// ── User Start Date ──
+
+const START_DATE_KEY = '365-start-date';
+
+function getStartDate(): Date {
+    if (typeof window === 'undefined') return new Date();
+    const saved = localStorage.getItem(START_DATE_KEY);
+    if (saved) return new Date(saved + 'T00:00:00');
+    // First visit: set start date to today
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    localStorage.setItem(START_DATE_KEY, dateStr);
+    return new Date(dateStr + 'T00:00:00');
+}
+
+function daysBetween(from: Date, to: Date): number {
+    const msPerDay = 86400000;
+    return Math.floor((to.getTime() - from.getTime()) / msPerDay);
+}
+
 // ── Build entries ──
 
-function buildEntries(monthKey: string): KaiwaEntry[] {
+function buildEntriesForRange(minSlot: number, maxSlot: number): KaiwaEntry[] {
+    const clamped = { min: Math.max(1, minSlot), max: Math.min(365, maxSlot) };
+    if (clamped.min > clamped.max) return [];
     const counters: Record<number, number> = {};
     return MASTER_EXPRESSIONS
-        .filter(e => e.month === monthKey)
+        .filter(e => e.daySlot >= clamped.min && e.daySlot <= clamped.max)
         .map(seed => {
             const idx = counters[seed.daySlot] || 0;
             counters[seed.daySlot] = idx + 1;
@@ -361,16 +388,23 @@ function buildEntries(monthKey: string): KaiwaEntry[] {
         });
 }
 
-function getMonthKey(year: number, month: number): string {
-    return `${year}-${String(month + 1).padStart(2, '0')}`;
+// Find which program month a daySlot belongs to
+function getProgramMonth(daySlot: number): typeof MASTER_MONTHS[0] | null {
+    let cumDays = 0;
+    for (const m of MASTER_MONTHS) {
+        const daysInM = m.totalExpressions / 10; // 10 expressions per day
+        if (daySlot <= cumDays + daysInM) return m;
+        cumDays += daysInM;
+    }
+    return MASTER_MONTHS[MASTER_MONTHS.length - 1];
 }
 
 // ── Component ──
 
 export default function EnglishMaster365Page() {
     const now = new Date();
-    const [viewYear, setViewYear] = useState(2026);
-    const [viewMonth, setViewMonth] = useState(3); // April = index 3
+    const [viewYear, setViewYear] = useState(now.getFullYear());
+    const [viewMonth, setViewMonth] = useState(now.getMonth());
     const [entries, setEntries] = useState<KaiwaEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
@@ -408,6 +442,13 @@ export default function EnglishMaster365Page() {
     // Streak state
     const [streak, setStreak] = useState<StreakData>({ current: 0, lastDate: '', best: 0 });
 
+    // Daily check-in state
+    const [showOnboarding, setShowOnboarding] = useState(false);
+    const [showCheckin, setShowCheckin] = useState(false);
+    const [showMilestone, setShowMilestone] = useState<{ days: number; title: string; message: string } | null>(null);
+    const [todayPicks, setTodayPicks] = useState<string[]>([]);
+    const [checkinStreak, setCheckinStreak] = useState({ current: 0, best: 0 });
+
     // Guide panel state (persisted in localStorage)
     const [showGuide, setShowGuide] = useState(false);
     useEffect(() => {
@@ -422,25 +463,20 @@ export default function EnglishMaster365Page() {
         });
     }, []);
 
-    const monthKey = getMonthKey(viewYear, viewMonth);
-
-    // ── Day slot offset ──
-    // Month 1 (April): daySlots 1-30, offset=0
-    // Month 2 (May): daySlots 31-60, offset=30
-    const monthMeta = MASTER_MONTHS.find(m => m.key === monthKey);
+    // ── User-relative day mapping ──
+    // daySlotOffset = days between startDate and first of view month
+    // Calendar day d → daySlot = daySlotOffset + d
+    const startDate = useMemo(() => getStartDate(), []);
     const daySlotOffset = useMemo(() => {
-        const meta = MASTER_MONTHS.find(m => m.key === monthKey);
-        if (!meta) return 0;
-        // Sum up days from all previous months
-        let offset = 0;
-        for (const m of MASTER_MONTHS) {
-            if (m.month >= meta.month) break;
-            // Month 1 = 30 days (April), Month 2 = 31 days (May), etc.
-            const daysInMonthN = m.month === 1 ? 30 : 31;
-            offset += daysInMonthN;
-        }
-        return offset;
-    }, [monthKey]);
+        const firstOfMonth = new Date(viewYear, viewMonth, 1);
+        return daysBetween(startDate, firstOfMonth);
+    }, [startDate, viewYear, viewMonth]);
+
+    // Program month for selected day (for title display)
+    const monthMeta = useMemo(() => {
+        if (!selectedDay) return null;
+        return getProgramMonth(selectedDay);
+    }, [selectedDay]);
 
     // ── Init ──
 
@@ -450,11 +486,24 @@ export default function EnglishMaster365Page() {
         window.addEventListener('resize', handler);
         synthRef.current = window.speechSynthesis;
         setStreak(recordStreak());
+
+        // Load checkin streak
+        const checkinStreakData = loadCheckinStreak();
+        setCheckinStreak({ current: checkinStreakData.current, best: checkinStreakData.best });
+
+        // Show onboarding if first visit
+        if (!isOnboardingComplete()) {
+            setShowOnboarding(true);
+        }
+
         return () => window.removeEventListener('resize', handler);
     }, []);
 
     useEffect(() => {
-        const all = buildEntries(monthKey);
+        const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+        const minSlot = daySlotOffset + 1;
+        const maxSlot = daySlotOffset + daysInMonth;
+        const all = buildEntriesForRange(minSlot, maxSlot);
         const mastery = loadMastery();
         const mSet = new Set<string>();
         const updated = all.map(e => {
@@ -466,21 +515,33 @@ export default function EnglishMaster365Page() {
         setMasteredIds(mSet);
         setLoading(false);
 
-        // Auto-select first day with content
+        // Auto-select: today's daySlot if current month, else first day with content
         const daysWithContent = [...new Set(updated.map(e => e.day_slot))].sort((a, b) => a - b);
         if (daysWithContent.length > 0) {
-            const todayDate = now.getDate();
             const isCurrentMonth = viewYear === now.getFullYear() && viewMonth === now.getMonth();
-            // Convert today's calendar date to daySlot for this month
-            const todayDaySlot = todayDate + daySlotOffset;
-            if (isCurrentMonth && daysWithContent.includes(todayDaySlot)) {
-                setSelectedDay(todayDaySlot);
+            const todaySlot = daySlotOffset + now.getDate();
+            if (isCurrentMonth && daysWithContent.includes(todaySlot)) {
+                setSelectedDay(todaySlot);
             } else {
                 setSelectedDay(daysWithContent[0]);
             }
+        } else {
+            setSelectedDay(null);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [monthKey, daySlotOffset]);
+    }, [viewYear, viewMonth, daySlotOffset]);
+
+    // Trigger checkin overlay when selectedDay is set (first load)
+    const checkinTriggered = useRef(false);
+    useEffect(() => {
+        if (!selectedDay || checkinTriggered.current) return;
+        checkinTriggered.current = true;
+        const alreadyCheckedIn = typeof window !== 'undefined' && localStorage.getItem(`365-checkin-${selectedDay}`) !== null;
+        if (!showOnboarding && !alreadyCheckedIn) {
+            setShowCheckin(true);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedDay, showOnboarding]);
 
     // Fetch registered phrases
     useEffect(() => {
@@ -523,6 +584,71 @@ export default function EnglishMaster365Page() {
     const nextMilestone = MILESTONES.find(m => totalMastered < m.threshold);
 
     const dayTheme = selectedDay ? MASTER_DAY_THEMES[selectedDay] : null;
+
+    // Checkin days for calendar display (convert daySlot-based keys to calendar day numbers)
+    const checkinDays = useMemo(() => {
+        const days = new Set<number>();
+        // Check each day in current month for checkin data
+        const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+        for (let d = 1; d <= daysInMonth; d++) {
+            const daySlot = d + daySlotOffset;
+            const key = `365-checkin-${daySlot}`;
+            if (typeof window !== 'undefined' && localStorage.getItem(key) !== null) {
+                days.add(d);
+            }
+        }
+        return days;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [viewYear, viewMonth, daySlotOffset, todayPicks]);
+
+    // Build check-in expressions from selected day's entries
+    const checkinExpressions = useMemo(() => {
+        if (!selectedDay) return [];
+        return entries
+            .filter(e => e.day_slot === selectedDay)
+            .map(e => ({
+                id: e.id,
+                japanese: e.japanese,
+                english: e.english[1], // Vibe level
+                character: e.character,
+                category: e.category,
+            }));
+    }, [entries, selectedDay]);
+
+    // Check if selected day already checked in
+    const isSelectedDayCheckedIn = useCallback((daySlot: number) => {
+        if (typeof window === 'undefined') return false;
+        return localStorage.getItem(`365-checkin-${daySlot}`) !== null;
+    }, []);
+
+    // Check-in completion handler
+    const handleCheckinComplete = useCallback((picks: string[]) => {
+        if (!selectedDay) return;
+        // Save checkin by daySlot (not calendar date)
+        localStorage.setItem(`365-checkin-${selectedDay}`, JSON.stringify({
+            picks,
+            timestamp: new Date().toISOString(),
+        }));
+        setTodayPicks(picks);
+        setShowCheckin(false);
+        // Update streak
+        const streakData = loadCheckinStreak();
+        setCheckinStreak({ current: streakData.current, best: streakData.best });
+        const milestone = checkMilestone(streakData.current);
+        if (milestone) {
+            setTimeout(() => setShowMilestone(milestone), 500);
+        }
+    }, [selectedDay]);
+
+    // Onboarding completion → set start date + go to checkin
+    const handleOnboardingComplete = useCallback(() => {
+        // Ensure start date is set (getStartDate auto-sets on first call)
+        getStartDate();
+        setShowOnboarding(false);
+        if (selectedDay && !isSelectedDayCheckedIn(selectedDay)) {
+            setShowCheckin(true);
+        }
+    }, [selectedDay, isSelectedDayCheckedIn]);
 
     // ── Actions ──
 
@@ -606,33 +732,33 @@ export default function EnglishMaster365Page() {
         setRegisteringId(null);
     }, [globalLevel]);
 
-    // ── Month Nav (constrained to months with content) ──
+    // ── Month Nav (constrained to start date through +12 months) ──
 
     const prevMonth = useCallback(() => {
+        // Can't go before start date's month
+        if (viewYear === startDate.getFullYear() && viewMonth === startDate.getMonth()) return;
         setViewMonth(m => {
-            const newM = m === 0 ? 11 : m - 1;
-            const newY = m === 0 ? viewYear - 1 : viewYear;
-            const newKey = `${newY}-${String(newM + 1).padStart(2, '0')}`;
-            if (!MASTER_MONTHS.some(mm => mm.key === newKey)) return m;
-            if (m === 0) setViewYear(y => y - 1);
-            return newM;
+            if (m === 0) { setViewYear(y => y - 1); return 11; }
+            return m - 1;
         });
-    }, [viewYear]);
+    }, [viewYear, viewMonth, startDate]);
 
     const nextMonth = useCallback(() => {
+        // Can't go beyond start date + 12 months
+        const endDate = new Date(startDate);
+        endDate.setFullYear(endDate.getFullYear() + 1);
+        const viewEnd = new Date(viewYear, viewMonth + 1, 1);
+        if (viewEnd >= endDate) return;
         setViewMonth(m => {
-            const newM = m === 11 ? 0 : m + 1;
-            const newY = m === 11 ? viewYear + 1 : viewYear;
-            const newKey = `${newY}-${String(newM + 1).padStart(2, '0')}`;
-            if (!MASTER_MONTHS.some(mm => mm.key === newKey)) return m;
-            if (m === 11) setViewYear(y => y + 1);
-            return newM;
+            if (m === 11) { setViewYear(y => y + 1); return 0; }
+            return m + 1;
         });
-    }, [viewYear]);
+    }, [viewYear, viewMonth, startDate]);
 
     const goToday = useCallback(() => {
-        setViewYear(2026);
-        setViewMonth(3);
+        setViewYear(now.getFullYear());
+        setViewMonth(now.getMonth());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // ── AutoPlay ──
@@ -756,6 +882,54 @@ export default function EnglishMaster365Page() {
         <div style={{ minHeight: '100vh', background: '#FAFAF9' }}>
             <style dangerouslySetInnerHTML={{ __html: KAIWA_STYLES }} />
 
+            {/* ── Check-in Overlays ── */}
+            {showOnboarding && (
+                <CheckinOnboarding onComplete={handleOnboardingComplete} />
+            )}
+            {showCheckin && checkinExpressions.length > 0 && (
+                <DailyCheckin
+                    day={selectedDay || 1}
+                    expressions={checkinExpressions}
+                    onComplete={handleCheckinComplete}
+                    streak={checkinStreak}
+                />
+            )}
+            {showMilestone && (
+                <StreakMilestone
+                    milestone={showMilestone}
+                    onDismiss={() => setShowMilestone(null)}
+                />
+            )}
+
+            {/* ── Checked-in Banner ── */}
+            {!showCheckin && !showOnboarding && selectedDay && isSelectedDayCheckedIn(selectedDay) && (
+                <div style={{
+                    background: 'linear-gradient(135deg, #D4AF3710, #10B98110)',
+                    borderBottom: '1px solid #D4AF3730',
+                    padding: '10px 16px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                }}>
+                    <div style={{
+                        width: 20, height: 20, borderRadius: '50%',
+                        backgroundColor: '#D4AF37', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                    }}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                    </div>
+                    <span style={{ fontSize: 12, color: '#78716C', fontWeight: 500 }}>
+                        Today&apos;s 3-Pick complete
+                    </span>
+                    {checkinStreak.current >= 2 && (
+                        <span style={{
+                            fontSize: 11, color: '#D4AF37', fontWeight: 700,
+                            marginLeft: 4,
+                        }}>
+                            {checkinStreak.current} day streak
+                        </span>
+                    )}
+                </div>
+            )}
+
             {/* 仕込み帳 Toast */}
             {shikomiToast && (
                 <div style={{
@@ -842,7 +1016,7 @@ export default function EnglishMaster365Page() {
                     </p>
                     {monthMeta && (
                         <p style={{ fontSize: 12, color: '#A8A29E', margin: '0 0 12px', fontWeight: 600 }}>
-                            {monthMeta.title} / {monthMeta.titleEn}
+                            Month {monthMeta.month}: {monthMeta.title} / {monthMeta.titleEn}
                         </p>
                     )}
 
@@ -1007,8 +1181,8 @@ export default function EnglishMaster365Page() {
                     background: '#fff',
                 }}>
                     <ReviewCalendar
-                        title={`365 -- Month ${monthMeta?.month || 1}`}
-                        subtitle={monthMeta?.title || ''}
+                        title={monthMeta ? `Month ${monthMeta.month}` : '365'}
+                        subtitle={monthMeta?.title || 'Start your journey'}
                         accent="#D4AF37"
                         accentBg="#FEF9E7"
                         entries={calendarEntries}
@@ -1024,6 +1198,7 @@ export default function EnglishMaster365Page() {
                         playedIds={playedIds}
                         masteredIds={masteredIds}
                         isMobile={isMobile}
+                        checkinDays={checkinDays}
                     />
                 </div>
 
