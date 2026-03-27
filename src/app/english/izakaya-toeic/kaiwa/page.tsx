@@ -544,18 +544,16 @@ export default function EnglishMaster365Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDay, showOnboarding]);
 
-    // Fetch registered phrases
+    // Load registered phrases from localStorage
     useEffect(() => {
-        (async () => {
-            try {
-                const res = await fetch('/api/phrases');
-                if (res.ok) {
-                    const data = await res.json();
-                    const set = new Set<string>();
-                    (data.phrases || []).forEach((p: { english: string }) => set.add(p.english.toLowerCase()));
-                    setRegisteredPhrases(set);
-                }
-            } catch { /* */ }
+        try {
+            const raw = localStorage.getItem('rpg_custom_phrases');
+            if (raw) {
+                const customs = JSON.parse(raw) as { english: string }[];
+                const set = new Set<string>();
+                customs.forEach(p => set.add(p.english.toLowerCase()));
+                setRegisteredPhrases(set);
+            }
         })();
     }, []);
 
@@ -715,34 +713,28 @@ export default function EnglishMaster365Page() {
         synthRef.current.speak(utterance);
     }, [playingId, globalLevel]);
 
-    // Register one level of expression to 仕込み帳
+    // Register one level of expression to 仕込み帳 (localStorage)
     // Uses current view level: Core(0)/Vibe(1)/Scene(2)/Flow(3). BUILD-UP/QUIZ default to Vibe(1).
-    const registerPhrase = useCallback(async (entry: KaiwaEntry) => {
+    const registerPhrase = useCallback((entry: KaiwaEntry) => {
         const lvlIdx = globalLevel >= 0 && globalLevel <= 3 ? globalLevel : 1;
         const english = entry.english[lvlIdx];
         setRegisteringId(entry.id);
-        try {
-            const res = await fetch('/api/phrases', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    english,
-                    japanese: entry.japanese,
-                    category: '365-master',
-                    date: new Date().toISOString().slice(0, 10),
-                }),
-            });
-            if (res.ok) {
-                setRegisteredPhrases(prev => {
-                    const next = new Set(prev);
-                    next.add(english.toLowerCase());
-                    return next;
-                });
-                setShikomiCount(prev => prev + 1);
-                setShikomiToast(english.length > 40 ? english.slice(0, 37) + '...' : english);
-                setTimeout(() => setShikomiToast(null), 3000);
-            }
-        } catch { /* */ }
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        addPhrase({
+            english,
+            japanese: entry.japanese,
+            category: '365-master',
+            date: dateStr,
+        });
+        setRegisteredPhrases(prev => {
+            const next = new Set(prev);
+            next.add(english.toLowerCase());
+            return next;
+        });
+        setShikomiCount(prev => prev + 1);
+        setShikomiToast(english.length > 40 ? english.slice(0, 37) + '...' : english);
+        setTimeout(() => setShikomiToast(null), 3000);
         setRegisteringId(null);
     }, [globalLevel]);
 
@@ -1489,31 +1481,25 @@ export default function EnglishMaster365Page() {
                                                         const kwRegistered = registeredPhrases.has(kw.en.toLowerCase());
                                                         return (
                                                             <button
-                                                                onClick={async (e) => {
+                                                                onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     if (kwRegistered) return;
-                                                                    try {
-                                                                        const res = await fetch('/api/phrases', {
-                                                                            method: 'POST',
-                                                                            headers: { 'Content-Type': 'application/json' },
-                                                                            body: JSON.stringify({
-                                                                                english: kw.en,
-                                                                                japanese: kw.ja,
-                                                                                category: '365-word',
-                                                                                date: new Date().toISOString().slice(0, 10),
-                                                                            }),
-                                                                        });
-                                                                        if (res.ok) {
-                                                                            setRegisteredPhrases(prev => {
-                                                                                const next = new Set(prev);
-                                                                                next.add(kw.en.toLowerCase());
-                                                                                return next;
-                                                                            });
-                                                                            setShikomiCount(prev => prev + 1);
-                                                                            setShikomiToast(kw.en);
-                                                                            setTimeout(() => setShikomiToast(null), 3000);
-                                                                        }
-                                                                    } catch { /* */ }
+                                                                    const today = new Date();
+                                                                    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                                                                    addPhrase({
+                                                                        english: kw.en,
+                                                                        japanese: kw.ja,
+                                                                        category: '365-word',
+                                                                        date: dateStr,
+                                                                    });
+                                                                    setRegisteredPhrases(prev => {
+                                                                        const next = new Set(prev);
+                                                                        next.add(kw.en.toLowerCase());
+                                                                        return next;
+                                                                    });
+                                                                    setShikomiCount(prev => prev + 1);
+                                                                    setShikomiToast(kw.en);
+                                                                    setTimeout(() => setShikomiToast(null), 3000);
                                                                 }}
                                                                 disabled={kwRegistered}
                                                                 title={kwRegistered ? '仕込み帳に登録済み' : '仕込み帳に追加'}
