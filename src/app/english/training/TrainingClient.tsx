@@ -3445,22 +3445,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         }
                     } catch { /* */ }
 
-                    // Append 仕込み帳 (rpg_custom_phrases from 3-Pick check-in & manual adds)
-                    try {
-                        const customRaw = localStorage.getItem('rpg_custom_phrases');
-                        if (customRaw) {
-                            const customPhrases = JSON.parse(customRaw);
-                            for (const cp of customPhrases) {
-                                allPhrases.push({
-                                    id: cp.id,
-                                    english: cp.english || '',
-                                    japanese: cp.japanese || '',
-                                    category: cp.category || '365-master',
-                                    date: cp.date || new Date().toISOString(),
-                                });
-                            }
-                        }
-                    } catch { /* */ }
+                    // Tutorial mode: TOEIC_30DAY + vocab deck only. No custom phrases.
+                    // User-registered phrases go to /english/my-training (production) instead.
 
                     setPhrases(allPhrases);
                     try {

@@ -279,12 +279,10 @@ export default function ReviewCalendar({
                 display: 'grid',
                 gridTemplateColumns: 'repeat(7, 1fr)',
                 gap: '4px',
-                flex: 1,
-                minHeight: 0,
             }}>
                 {calendarCells.map((day, i) => {
                     if (day === null) {
-                        return <div key={`empty-${i}`} style={{ aspectRatio: '1', borderRadius: '10px' }} />;
+                        return <div key={`empty-${i}`} />;
                     }
 
                     const dayEntries = byDay[day] || [];
@@ -323,15 +321,14 @@ export default function ReviewCalendar({
                             key={day}
                             onClick={() => { if (count > 0) onSelectDay(day); }}
                             style={{
-                                borderRadius: '12px',
+                                borderRadius: '10px',
                                 cursor: count > 0 ? 'pointer' : 'default',
                                 display: 'flex',
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '3px',
-                                aspectRatio: '1',
-                                padding: isMobile ? '4px 2px' : '6px 4px',
+                                gap: '2px',
+                                padding: isMobile ? '6px 2px' : '8px 4px',
                                 background: isGradient ? bgColor : undefined,
                                 backgroundColor: isGradient ? undefined : bgColor,
                                 border: isSelected

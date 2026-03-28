@@ -153,7 +153,6 @@ export function addQuestPhraseToTraining(qp: { id: string; english: string; japa
 
 // ── Phrase CRUD ──────────────────────────────────────────
 export function addPhrase(p: { english: string; japanese: string; category: string; date: string }): TrainingPhrase {
-    const custom = getJSON<TrainingPhrase[]>(K.CUSTOM_PHRASES, []);
     const newPhrase: TrainingPhrase = {
         id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
         english: p.english,
@@ -161,6 +160,14 @@ export function addPhrase(p: { english: string; japanese: string; category: stri
         category: p.category,
         date: p.date,
     };
+    // Write to my-training-phrases (production Daily Training)
+    try {
+        const myPhrases = JSON.parse(localStorage.getItem('my-training-phrases') || '[]');
+        myPhrases.push(newPhrase);
+        localStorage.setItem('my-training-phrases', JSON.stringify(myPhrases));
+    } catch { /* */ }
+    // Also keep rpg_custom_phrases for backward compat
+    const custom = getJSON<TrainingPhrase[]>(K.CUSTOM_PHRASES, []);
     custom.push(newPhrase);
     setJSON(K.CUSTOM_PHRASES, custom);
     return newPhrase;
