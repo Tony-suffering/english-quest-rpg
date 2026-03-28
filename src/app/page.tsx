@@ -61,7 +61,7 @@ export default function HomePage() {
                         読める。聴ける。書ける。喋れない。<br />既存のアプリでは足りなかったから、自分で全部作ってる。<br />英語フレーズをポケモンみたいに捕まえて、育てて、戦わせる。<br />そういうアプリ。
                     </motion.p>
                     <motion.div variants={f} className="flex flex-wrap gap-4">
-                        <Link href="/english/training" className="inline-flex items-center gap-3 px-6 py-3 bg-[#252423] text-white text-sm font-bold tracking-wide hover:bg-[#D4AF37] transition-colors">
+                        <Link href="/english/izakaya-toeic/kaiwa" className="inline-flex items-center gap-3 px-6 py-3 bg-[#252423] text-white text-sm font-bold tracking-wide hover:bg-[#D4AF37] transition-colors">
                             アプリを開く <span className="text-xs opacity-50">→</span>
                         </Link>
                         <a href="https://note.com/tonio_english" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 border border-[#DAE2E8] text-sm font-bold text-[#252423]/60 hover:border-[#252423]/30 transition-colors">

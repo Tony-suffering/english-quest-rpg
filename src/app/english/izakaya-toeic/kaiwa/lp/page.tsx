@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { MessageCircle, ShieldAlert, Plane, Brain, Smartphone, BookOpen, Sparkles, Eye, Lightbulb, Users, Map, Pen } from 'lucide-react';
 
 /* ──────────────────────────── Design Tokens ──────────────────────────── */
 const GOLD = '#D4AF37';
@@ -104,6 +105,153 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         <p style={{ fontFamily: FONT, fontSize: 15, color: TEXT_MED, lineHeight: 1.9, margin: 0, paddingBottom: 22 }}>
           {a}
         </p>
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────── Research Data ──────────────────────────── */
+const RESEARCH = [
+  {
+    author: 'Erman & Warren',
+    year: 2000,
+    finding: 'ネイティブの発話の58.6%は、文法から組み立てた文ではなく「定型フレーズ」だった。',
+    detail: 'つまりネイティブは「主語 + 動詞 + 目的語」と組み立てて喋ってるわけじゃない。頭の中の棚から、状況に合うフレーズを丸ごと引っ張り出してる。文法力じゃなくて、在庫量が流暢さを決める。',
+    color: GOLD,
+  },
+  {
+    author: 'Lewis',
+    year: 1993,
+    finding: '言語は「文法化された語彙」であって、「語彙化された文法」ではない。',
+    detail: '文法ドリルだけでは自然な英語は出てこない。フレーズを丸ごと覚えるほうが速いし、定着する。文法は後からついてくる。',
+    color: EMERALD,
+  },
+  {
+    author: 'Krashen',
+    year: 1982,
+    finding: '不安があると、脳は言語の習得をブロックする（情意フィルター仮説）。',
+    detail: 'テストや教科書は不安を上げる。楽しければフィルターが下がって、言語がすっと入ってくる。だからストーリーで学ぶ。居酒屋の会話を聞いてるだけで、フレーズが自然に頭に入る。',
+    color: '#3B82F6',
+  },
+  {
+    author: 'Schmidt',
+    year: 1990,
+    finding: '言語が身につくには「あ、これ使える」と気づく瞬間が必要（気づき仮説）。',
+    detail: 'ただ聞き流すだけじゃダメ。意識的に「このフレーズ、こういう意味なんだ」と気づく瞬間が必要。だからカードで取り出して、解説をつける。気づきの瞬間を設計してる。',
+    color: '#8B5CF6',
+  },
+  {
+    author: 'Nation',
+    year: 2001,
+    finding: 'ストーリーの中で出会った語彙は、単語帳で覚えた語彙より記憶に残りやすい。',
+    detail: 'フレーズにキャラクター、場面、感情がくっつくから。「ユキがフリーズしたあの場面で出てきたやつ」という記憶の紐がつく。単語帳にはこの紐がない。',
+    color: '#F97316',
+  },
+];
+
+/* ──────────────────────────── Research Card ──────────────────────────── */
+function ResearchCard({ paper }: { paper: typeof RESEARCH[0] }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div
+      onClick={() => setExpanded(!expanded)}
+      style={{
+        background: BG_WHITE,
+        borderRadius: 16,
+        overflow: 'hidden',
+        border: `1px solid ${BORDER}`,
+        boxShadow: SHADOW_SM,
+        cursor: 'pointer',
+        transition: 'box-shadow 0.3s ease, transform 0.3s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = SHADOW_MD;
+        e.currentTarget.style.transform = 'translateY(-2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = SHADOW_SM;
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}
+    >
+      {/* Top accent bar */}
+      <div style={{ height: 3, background: `linear-gradient(90deg, ${paper.color}, ${paper.color}66)` }} />
+
+      <div style={{ padding: '24px 28px' }}>
+        {/* Author & Year */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+          <span
+            style={{
+              fontFamily: FONT,
+              fontSize: 11,
+              fontWeight: 700,
+              color: paper.color,
+              background: `${paper.color}12`,
+              padding: '4px 12px',
+              borderRadius: 100,
+              letterSpacing: '0.02em',
+            }}
+          >
+            {paper.author} ({paper.year})
+          </span>
+        </div>
+
+        {/* Finding */}
+        <p style={{
+          fontFamily: FONT,
+          fontSize: 15,
+          fontWeight: 600,
+          color: TEXT_DARK,
+          lineHeight: 1.8,
+          margin: 0,
+        }}>
+          {paper.finding}
+        </p>
+
+        {/* Expandable detail */}
+        <div
+          style={{
+            maxHeight: expanded ? 200 : 0,
+            overflow: 'hidden',
+            transition: 'max-height 0.4s ease, opacity 0.3s ease',
+            opacity: expanded ? 1 : 0,
+          }}
+        >
+          <div style={{
+            marginTop: 14,
+            paddingTop: 14,
+            borderTop: `1px solid ${BORDER_LIGHT}`,
+          }}>
+            <p style={{
+              fontFamily: FONT,
+              fontSize: 14,
+              color: TEXT_MED,
+              lineHeight: 1.9,
+              margin: 0,
+            }}>
+              {paper.detail}
+            </p>
+          </div>
+        </div>
+
+        {/* Expand hint */}
+        <div style={{
+          marginTop: 12,
+          fontSize: 11,
+          color: TEXT_LIGHT,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          transition: 'color 0.2s',
+        }}>
+          <span style={{
+            display: 'inline-block',
+            transition: 'transform 0.3s ease',
+            transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
+          }}>
+            &#9654;
+          </span>
+          {expanded ? '閉じる' : '詳しく見る'}
+        </div>
       </div>
     </div>
   );
@@ -592,38 +740,42 @@ export default function KaiwaLandingPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {[
-              'How are you? に Good. しか返せない',
-              'オンライン英会話の無料体験が怖くて申し込めない',
-              '海外旅行でレストランの注文ができなくて指差し',
-              '文法は勉強した。単語も覚えた。でも口から出ない',
-              'Duolingoは続けている。でも会話になると真っ白',
-            ].map((text, i) => (
-              <div
-                key={i}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 20,
-                  padding: '22px 28px',
-                  background: BG_STONE,
-                  borderRadius: 14,
-                  borderLeft: `4px solid ${GOLD}`,
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateX(4px)';
-                  e.currentTarget.style.boxShadow = SHADOW_SM;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateX(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                <span style={{ fontFamily: FONT, fontSize: 15, color: TEXT_DARK, lineHeight: 1.8 }}>
-                  {text}
-                </span>
-              </div>
-            ))}
+              { text: 'How are you? に Good. しか返せない', icon: MessageCircle },
+              { text: 'オンライン英会話の無料体験が怖くて申し込めない', icon: ShieldAlert },
+              { text: '海外旅行でレストランの注文ができなくて指差し', icon: Plane },
+              { text: '文法は勉強した。単語も覚えた。でも口から出ない', icon: Brain },
+              { text: 'Duolingoは続けている。でも会話になると真っ白', icon: Smartphone },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 20,
+                    padding: '22px 28px',
+                    background: BG_STONE,
+                    borderRadius: 14,
+                    borderLeft: `4px solid ${GOLD}`,
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateX(4px)';
+                    e.currentTarget.style.boxShadow = SHADOW_SM;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateX(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  <Icon size={20} style={{ color: GOLD, flexShrink: 0 }} />
+                  <span style={{ fontFamily: FONT, fontSize: 15, color: TEXT_DARK, lineHeight: 1.8 }}>
+                    {item.text}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -754,6 +906,49 @@ export default function KaiwaLandingPage() {
 
       <SectionDivider />
 
+      {/* ━━━━━━━━━━━━━━━━━━ RESEARCH (5 Papers) ━━━━━━━━━━━━━━━━━━ */}
+      <section style={{ ...sectionPadding, background: BG_WHITE }}>
+        <div style={narrowContainer}>
+          <div style={{ textAlign: 'center', marginBottom: 64 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
+              <Sparkles size={16} style={{ color: '#8B5CF6' }} />
+              <p style={{ fontFamily: FONT, fontSize: 13, fontWeight: 600, color: '#8B5CF6', letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+                RESEARCH
+              </p>
+            </div>
+            <h2 style={{ fontFamily: FONT, fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: TEXT_DARK, margin: '0 0 12px', letterSpacing: '-0.01em', lineHeight: 1.4 }}>
+              論文5本が証明している
+            </h2>
+            <p style={{ fontFamily: FONT, fontSize: 15, color: TEXT_MED, margin: 0, lineHeight: 1.8, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
+              このアプリの全ての設計は、第二言語習得の研究論文に基づいています。根拠のないメソッドは一つもありません。
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+            {RESEARCH.map((paper) => (
+              <ResearchCard key={paper.author} paper={paper} />
+            ))}
+          </div>
+
+          {/* Bottom summary */}
+          <div style={{
+            marginTop: 40,
+            textAlign: 'center',
+            padding: '24px 28px',
+            background: `linear-gradient(135deg, ${BG_AMBER} 0%, ${BG_EMERALD} 100%)`,
+            borderRadius: 14,
+          }}>
+            <p style={{ fontFamily: FONT, fontSize: 16, fontWeight: 600, color: TEXT_DARK, margin: 0, lineHeight: 1.8 }}>
+              ストーリーで出会い、カードで気づき、解説で理解する。
+              <br />
+              <GradientText style={{ fontWeight: 700 }}>5本の論文</GradientText>がこの3ステップの正しさを裏付けている。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <SectionDivider />
+
       {/* ━━━━━━━━━━━━━━━━━━ METHOD (3 Steps) ━━━━━━━━━━━━━━━━━━ */}
       <section style={{ ...sectionPadding, background: BG_WHITE }}>
         <div style={narrowContainer}>
@@ -787,6 +982,7 @@ export default function KaiwaLandingPage() {
                 theory: 'Krashen -- Input Hypothesis',
                 desc: '居酒屋を舞台にした会話の中で、自然にフレーズと出会う。教科書のように「覚えろ」とは言わない。物語の流れで、意味ごと体に入る。',
                 color: GOLD,
+                icon: BookOpen,
               },
               {
                 step: '2',
@@ -794,6 +990,7 @@ export default function KaiwaLandingPage() {
                 theory: 'Schmidt -- Noticing Hypothesis',
                 desc: '出会ったフレーズをカード形式で振り返る。「あ、さっきの場面で使われていたやつだ」。この"気づき"が記憶を定着させる鍵。',
                 color: '#D97706',
+                icon: Eye,
               },
               {
                 step: '3',
@@ -801,10 +998,13 @@ export default function KaiwaLandingPage() {
                 theory: 'Nation -- Four Strands',
                 desc: '4段階の英語表現で、同じ意味の言い方を深掘り。ニュアンスの違いが分かると、自分の言葉として使えるようになる。',
                 color: EMERALD,
+                icon: Lightbulb,
               },
-            ].map((item, i) => (
+            ].map((item, i) => {
+              const StepIcon = item.icon;
+              return (
               <div key={i} style={{ position: 'relative', marginBottom: i < 2 ? 48 : 0 }}>
-                {/* Step number circle */}
+                {/* Step icon circle */}
                 <div
                   style={{
                     position: 'absolute',
@@ -824,7 +1024,7 @@ export default function KaiwaLandingPage() {
                     boxShadow: `0 2px 8px ${item.color}44`,
                   }}
                 >
-                  {item.step}
+                  <StepIcon size={18} style={{ color: BG_WHITE }} />
                 </div>
 
                 <div
@@ -836,7 +1036,7 @@ export default function KaiwaLandingPage() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12, flexWrap: 'wrap' }}>
                     <h3 style={{ fontFamily: FONT, fontSize: 18, fontWeight: 700, color: TEXT_DARK, margin: 0 }}>
-                      {item.title}
+                      {item.step}. {item.title}
                     </h3>
                     <span
                       style={{
@@ -858,7 +1058,8 @@ export default function KaiwaLandingPage() {
                   </p>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1102,9 +1303,12 @@ export default function KaiwaLandingPage() {
       <section style={{ ...sectionPadding, background: `linear-gradient(180deg, ${BG_STONE} 0%, ${BG_AMBER}20 100%)` }}>
         <div style={wideContainer}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: FONT, fontSize: 13, fontWeight: 600, color: EMERALD, letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 16px' }}>
-              CHARACTERS
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
+              <Users size={16} style={{ color: EMERALD }} />
+              <p style={{ fontFamily: FONT, fontSize: 13, fontWeight: 600, color: EMERALD, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+                CHARACTERS
+              </p>
+            </div>
             <h2 style={{ fontFamily: FONT, fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: TEXT_DARK, margin: 0, letterSpacing: '-0.01em', lineHeight: 1.4 }}>
               居酒屋「のれん」の仲間たち
             </h2>
@@ -1138,9 +1342,12 @@ export default function KaiwaLandingPage() {
       <section style={{ ...sectionPadding, background: BG_WHITE }}>
         <div style={narrowContainer}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: FONT, fontSize: 13, fontWeight: 600, color: GOLD, letterSpacing: '0.1em', textTransform: 'uppercase', margin: '0 0 16px' }}>
-              ROADMAP
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 16 }}>
+              <Map size={16} style={{ color: GOLD }} />
+              <p style={{ fontFamily: FONT, fontSize: 13, fontWeight: 600, color: GOLD, letterSpacing: '0.1em', textTransform: 'uppercase', margin: 0 }}>
+                ROADMAP
+              </p>
+            </div>
             <h2 style={{ fontFamily: FONT, fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: 800, color: TEXT_DARK, margin: 0, letterSpacing: '-0.01em', lineHeight: 1.4 }}>
               12ヶ月のロードマップ
             </h2>
@@ -1274,7 +1481,7 @@ export default function KaiwaLandingPage() {
                 background: `linear-gradient(135deg, ${GOLD}, ${EMERALD})`,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontFamily: FONT, fontSize: 16, fontWeight: 800, color: BG_WHITE,
-              }}>T</div>
+              }}><Pen size={18} style={{ color: BG_WHITE }} /></div>
               <div>
                 <div style={{ fontFamily: FONT, fontSize: 14, fontWeight: 700, color: TEXT_DARK }}>
                   Tonio

@@ -28,6 +28,18 @@ interface Program {
 
 const PROGRAMS: Program[] = [
     {
+        id: 'kaiwa',
+        label: '英会話マスター365',
+        tagline: '毎日の英会話トレーニング',
+        color: C.green,
+        basePath: '/english/izakaya-toeic/kaiwa',
+        items: [
+            { id: '/english/izakaya-toeic/kaiwa', label: 'マスター365 HOME' },
+            { id: '/english/izakaya-toeic/kaiwa/lp', label: '英会話マスター365とは？' },
+            { id: '/english/izakaya-toeic/characters', label: '常連ファイル' },
+        ],
+    },
+    {
         id: 'izakaya',
         label: '居酒屋TOEIC',
         tagline: '30日でスコアUP',
@@ -44,18 +56,6 @@ const PROGRAMS: Program[] = [
             { id: '/english/izakaya-toeic/score', label: 'スコア通知表' },
             { id: '/english/izakaya-toeic/mistakes', label: '反省ノート' },
             { id: '/english/izakaya-toeic/achievements', label: 'のれんの勲章' },
-        ],
-    },
-    {
-        id: 'kaiwa',
-        label: '英会話マスター365',
-        tagline: '毎日の英会話トレーニング',
-        color: C.green,
-        basePath: '/english/izakaya-toeic/kaiwa',
-        items: [
-            { id: '/english/izakaya-toeic/kaiwa', label: 'マスター365 HOME' },
-            { id: '/english/izakaya-toeic/kaiwa/lp', label: '英会話マスター365とは？' },
-            { id: '/english/izakaya-toeic/kaiwa/guide', label: 'ガイド' },
         ],
     },
     {
@@ -337,9 +337,40 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     <SectionLabel text="PROGRAMS" />
                     {PROGRAMS.map(p => <ProgramCard key={p.id} program={p} />)}
 
+                    {/* ── MAIN TOOL ── */}
+                    <div style={{ margin: '10px 12px 4px' }}>
+                        <Link href="/english/my-training" style={{ textDecoration: 'none', display: 'block' }}>
+                            <div style={{
+                                padding: '12px 16px',
+                                background: `linear-gradient(135deg, ${C.green}14, ${C.gold}10)`,
+                                border: `1.5px solid ${C.green}40`,
+                                borderRadius: 10,
+                                transition: 'all 0.2s ease',
+                            }}>
+                                <div style={{
+                                    fontSize: 14,
+                                    fontWeight: 800,
+                                    color: '#1a1a1a',
+                                    letterSpacing: '0.02em',
+                                    lineHeight: 1.3,
+                                }}>
+                                    Daily Training
+                                </div>
+                                <div style={{
+                                    fontSize: 10,
+                                    color: C.green,
+                                    marginTop: 2,
+                                    letterSpacing: '0.02em',
+                                }}>
+                                    登録フレーズを復習
+                                </div>
+                            </div>
+                        </Link>
+                    </div>
+
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />
-                    {renderToolItem({ id: '/english/training', label: '仕込み帳', color: C.green })}
+                    {renderToolItem({ id: '/english/training', label: 'チュートリアル版', color: C.gold })}
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
                     {renderToolItem({ id: '/english/izakaya-toeic/words', label: '今日の単語', color: C.blue })}
 

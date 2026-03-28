@@ -37,6 +37,27 @@ const KAIWA_STYLES = `
     from { opacity: 0; transform: translateX(-50%) translateY(20px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+@keyframes registerPop {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.15); }
+    60% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+@keyframes sparkle {
+    0% { opacity: 0; transform: scale(0) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+    100% { opacity: 0; transform: scale(0) rotate(360deg); }
+}
+@keyframes checkFade {
+    0% { opacity: 0; transform: scale(0.5); }
+    60% { opacity: 1; transform: scale(1.2); }
+    100% { opacity: 1; transform: scale(1); }
+}
+@keyframes questComplete {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
 `;
 
 // ── Types ──
@@ -428,6 +449,17 @@ export default function EnglishMaster365Page() {
     const [registeringId, setRegisteringId] = useState<string | null>(null);
     const [shikomiToast, setShikomiToast] = useState<string | null>(null);
     const [shikomiCount, setShikomiCount] = useState(0);
+    // Celebration effect for registration
+    const [celebrateId, setCelebrateId] = useState<string | null>(null);
+
+    // Beginner level preference (persisted)
+    const [beginnerLevel, setBeginnerLevel] = useState<number | null>(null);
+    const [showLevelPicker, setShowLevelPicker] = useState(false);
+
+    // Daily mini-quest
+    const [questListenCount, setQuestListenCount] = useState(0);
+    const [questRegisterCount, setQuestRegisterCount] = useState(0);
+    const [questDismissed, setQuestDismissed] = useState(false);
 
     // Load total shikomi count from localStorage
     useEffect(() => {
@@ -436,6 +468,26 @@ export default function EnglishMaster365Page() {
             if (raw) {
                 const arr = JSON.parse(raw) as unknown[];
                 setShikomiCount(arr.length);
+            }
+        } catch { /* */ }
+        // Load beginner level preference
+        try {
+            const saved = localStorage.getItem('kaiwa-beginner-level');
+            if (saved !== null) {
+                setBeginnerLevel(parseInt(saved, 10));
+            } else {
+                setShowLevelPicker(true); // First time: show picker
+            }
+        } catch { /* */ }
+        // Load daily quest progress
+        try {
+            const today = getTodayStr();
+            const questData = localStorage.getItem(`kaiwa-quest-${today}`);
+            if (questData) {
+                const q = JSON.parse(questData);
+                setQuestListenCount(q.listened || 0);
+                setQuestRegisterCount(q.registered || 0);
+                setQuestDismissed(q.dismissed || false);
             }
         } catch { /* */ }
     }, []);
@@ -504,6 +556,7 @@ export default function EnglishMaster365Page() {
         const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
         const minSlot = daySlotOffset + 1;
         const maxSlot = daySlotOffset + daysInMonth;
+
         const all = buildEntriesForRange(minSlot, maxSlot);
         const mastery = loadMastery();
         const mSet = new Set<string>();
@@ -554,7 +607,7 @@ export default function EnglishMaster365Page() {
                 customs.forEach(p => set.add(p.english.toLowerCase()));
                 setRegisteredPhrases(set);
             }
-        })();
+        } catch { /* ignore */ }
     }, []);
 
     // ── Derived ──
@@ -691,7 +744,7 @@ export default function EnglishMaster365Page() {
         }
 
         setPlayingId(entry.id);
-        const lvlIdx = globalLevel === -1 ? 1 : globalLevel; // BUILD-UP mode defaults to Vibe
+        const lvlIdx = globalLevel === -1 ? 1 : globalLevel === -2 ? 1 : globalLevel; // BUILD-UP/QUIZ default to Vibe
         const text = entry.english[lvlIdx];
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
@@ -708,15 +761,31 @@ export default function EnglishMaster365Page() {
                 next.add(entry.id);
                 return next;
             });
+            // Auto-checkmark: listening = done
+            if (entry.mastery !== 3) {
+                toggleMastery(entry.id);
+            }
+            // Update daily quest listen count
+            setQuestListenCount(prev => {
+                const next = prev + 1;
+                try {
+                    const today = getTodayStr();
+                    const raw = localStorage.getItem(`kaiwa-quest-${today}`);
+                    const q = raw ? JSON.parse(raw) : {};
+                    q.listened = next;
+                    localStorage.setItem(`kaiwa-quest-${today}`, JSON.stringify(q));
+                } catch { /* */ }
+                return next;
+            });
         };
         utterance.onerror = () => setPlayingId(null);
         synthRef.current.speak(utterance);
-    }, [playingId, globalLevel]);
+    }, [playingId, globalLevel, toggleMastery]);
 
     // Register one level of expression to 仕込み帳 (localStorage)
     // Uses current view level: Core(0)/Vibe(1)/Scene(2)/Flow(3). BUILD-UP/QUIZ default to Vibe(1).
     const registerPhrase = useCallback((entry: KaiwaEntry) => {
-        const lvlIdx = globalLevel >= 0 && globalLevel <= 3 ? globalLevel : 1;
+        const lvlIdx = globalLevel >= 0 && globalLevel <= 3 ? globalLevel : (beginnerLevel ?? 1);
         const english = entry.english[lvlIdx];
         setRegisteringId(entry.id);
         const today = new Date();
@@ -733,10 +802,25 @@ export default function EnglishMaster365Page() {
             return next;
         });
         setShikomiCount(prev => prev + 1);
+        // Celebration effect
+        setCelebrateId(entry.id);
+        setTimeout(() => setCelebrateId(null), 1200);
         setShikomiToast(english.length > 40 ? english.slice(0, 37) + '...' : english);
         setTimeout(() => setShikomiToast(null), 3000);
         setRegisteringId(null);
-    }, [globalLevel]);
+        // Update daily quest register count
+        setQuestRegisterCount(prev => {
+            const next = prev + 1;
+            try {
+                const todayStr = getTodayStr();
+                const raw = localStorage.getItem(`kaiwa-quest-${todayStr}`);
+                const q = raw ? JSON.parse(raw) : {};
+                q.registered = next;
+                localStorage.setItem(`kaiwa-quest-${todayStr}`, JSON.stringify(q));
+            } catch { /* */ }
+            return next;
+        });
+    }, [globalLevel, beginnerLevel]);
 
     // ── Month Nav (constrained to start date through +12 months) ──
 
@@ -1206,6 +1290,25 @@ export default function EnglishMaster365Page() {
                         isMobile={isMobile}
                         checkinDays={checkinDays}
                     />
+                    {/* Calendar encouragement */}
+                    <div style={{
+                        padding: '12px 20px',
+                        background: '#FAFAF9',
+                        borderTop: '1px solid #F5F5F4',
+                    }}>
+                        <div style={{ fontSize: 11, color: '#A8A29E', lineHeight: 1.6, textAlign: 'center' }}>
+                            {checkinDays.size > 0 ? (
+                                <>
+                                    <span style={{ fontWeight: 700, color: '#D4AF37' }}>{checkinDays.size}日</span> やった
+                                    {checkinDays.size < 5 && ' -- 三日坊主OK、4日目にまたやろう'}
+                                    {checkinDays.size >= 5 && checkinDays.size < 15 && ' -- いい感じ。自分のペースで'}
+                                    {checkinDays.size >= 15 && ' -- すごい。もう習慣になってる'}
+                                </>
+                            ) : (
+                                'いつ始めてもいい。いつ休んでもいい。'
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Right: Detail Panel */}
@@ -1555,6 +1658,150 @@ export default function EnglishMaster365Page() {
                                 </button>
                             )}
 
+                            {/* Beginner Level Picker */}
+                            {showLevelPicker && (
+                                <div style={{
+                                    marginBottom: 16, padding: '20px',
+                                    background: 'linear-gradient(135deg, #ECFDF5 0%, #FEF3C7 100%)',
+                                    border: '2px solid #D4AF3740',
+                                    borderRadius: 16,
+                                }}>
+                                    <div style={{ fontSize: 14, fontWeight: 800, color: '#1C1917', marginBottom: 4 }}>
+                                        まずはレベルを選ぼう
+                                    </div>
+                                    <div style={{ fontSize: 12, color: '#57534E', marginBottom: 16, lineHeight: 1.6 }}>
+                                        初心者は <strong style={{ color: '#10B981' }}>Core</strong> か <strong style={{ color: '#3B82F6' }}>Vibe</strong> がおすすめ。いつでも変えられるから気軽に。
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                                        <button onClick={() => {
+                                            setBeginnerLevel(0);
+                                            setGlobalLevel(0);
+                                            setShowLevelPicker(false);
+                                            localStorage.setItem('kaiwa-beginner-level', '0');
+                                        }} style={{
+                                            border: '2px solid #10B98140', borderRadius: 12,
+                                            background: '#fff', cursor: 'pointer', padding: '16px 12px',
+                                            transition: 'all 0.2s',
+                                        }}>
+                                            <div style={{ fontSize: 16, fontWeight: 900, color: '#10B981', marginBottom: 4 }}>Core</div>
+                                            <div style={{ fontSize: 11, color: '#78716C', lineHeight: 1.5 }}>シンプルな基本表現<br />まずはここから</div>
+                                        </button>
+                                        <button onClick={() => {
+                                            setBeginnerLevel(1);
+                                            setGlobalLevel(1);
+                                            setShowLevelPicker(false);
+                                            localStorage.setItem('kaiwa-beginner-level', '1');
+                                        }} style={{
+                                            border: '2px solid #3B82F640', borderRadius: 12,
+                                            background: '#fff', cursor: 'pointer', padding: '16px 12px',
+                                            transition: 'all 0.2s',
+                                        }}>
+                                            <div style={{ fontSize: 16, fontWeight: 900, color: '#3B82F6', marginBottom: 4 }}>Vibe</div>
+                                            <div style={{ fontSize: 11, color: '#78716C', lineHeight: 1.5 }}>自然なニュアンス<br />少し慣れてきたら</div>
+                                        </button>
+                                    </div>
+                                    <button onClick={() => {
+                                        setShowLevelPicker(false);
+                                        localStorage.setItem('kaiwa-beginner-level', '1');
+                                        setBeginnerLevel(1);
+                                    }} style={{
+                                        marginTop: 10, background: 'none', border: 'none',
+                                        color: '#A8A29E', fontSize: 11, cursor: 'pointer',
+                                        width: '100%', textAlign: 'center',
+                                    }}>
+                                        あとで選ぶ
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Daily Mini Quest */}
+                            {!questDismissed && selectedDay && (
+                                <div style={{
+                                    marginBottom: 16, padding: '14px 18px',
+                                    background: questListenCount >= 3 && questRegisterCount >= 1
+                                        ? 'linear-gradient(135deg, #FEF3C7, #ECFDF5, #FEF3C7)'
+                                        : '#fff',
+                                    backgroundSize: questListenCount >= 3 && questRegisterCount >= 1 ? '200% 200%' : 'auto',
+                                    animation: questListenCount >= 3 && questRegisterCount >= 1 ? 'questComplete 3s ease infinite' : 'none',
+                                    border: questListenCount >= 3 && questRegisterCount >= 1
+                                        ? '2px solid #D4AF37'
+                                        : '1px solid #E7E5E4',
+                                    borderRadius: 12,
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <span style={{
+                                                fontSize: 10, fontWeight: 800, color: '#D4AF37',
+                                                background: '#FEF3C7', padding: '2px 8px', borderRadius: 4,
+                                            }}>TODAY</span>
+                                            <span style={{ fontSize: 12, fontWeight: 700, color: '#44403C' }}>
+                                                {questListenCount >= 3 && questRegisterCount >= 1 ? 'Quest Complete!' : "Today's Mini Quest"}
+                                            </span>
+                                        </div>
+                                        <button onClick={() => {
+                                            setQuestDismissed(true);
+                                            try {
+                                                const today = getTodayStr();
+                                                const raw = localStorage.getItem(`kaiwa-quest-${today}`);
+                                                const q = raw ? JSON.parse(raw) : {};
+                                                q.dismissed = true;
+                                                localStorage.setItem(`kaiwa-quest-${today}`, JSON.stringify(q));
+                                            } catch { /* */ }
+                                        }} style={{
+                                            background: 'none', border: 'none', color: '#D6D3D1',
+                                            fontSize: 16, cursor: 'pointer', padding: '0 4px',
+                                        }}>
+                                            x
+                                        </button>
+                                    </div>
+                                    <div style={{ display: 'flex', gap: 12 }}>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontSize: 11, color: '#78716C', marginBottom: 4 }}>
+                                                3つ聴く
+                                            </div>
+                                            <div style={{ display: 'flex', gap: 4 }}>
+                                                {[0, 1, 2].map(i => (
+                                                    <div key={i} style={{
+                                                        width: 24, height: 24, borderRadius: '50%',
+                                                        background: i < questListenCount ? '#D4AF37' : '#F5F5F4',
+                                                        color: i < questListenCount ? '#fff' : '#D6D3D1',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        fontSize: 12, fontWeight: 700,
+                                                        transition: 'all 0.3s',
+                                                        animation: i < questListenCount ? 'checkFade 0.4s ease' : 'none',
+                                                    }}>
+                                                        {i < questListenCount ? '\u2713' : ''}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontSize: 11, color: '#78716C', marginBottom: 4 }}>
+                                                1つ登録
+                                            </div>
+                                            <div style={{ display: 'flex', gap: 4 }}>
+                                                <div style={{
+                                                    width: 24, height: 24, borderRadius: '50%',
+                                                    background: questRegisterCount >= 1 ? '#10B981' : '#F5F5F4',
+                                                    color: questRegisterCount >= 1 ? '#fff' : '#D6D3D1',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    fontSize: 12, fontWeight: 700,
+                                                    transition: 'all 0.3s',
+                                                    animation: questRegisterCount >= 1 ? 'checkFade 0.4s ease' : 'none',
+                                                }}>
+                                                    {questRegisterCount >= 1 ? '\u2713' : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style={{ fontSize: 10, color: '#A8A29E', marginTop: 8 }}>
+                                        {questListenCount >= 3 && questRegisterCount >= 1
+                                            ? 'Nice! 今日もやったね'
+                                            : 'Skip OK -- 三日坊主でも4日目にまたやろう'}
+                                    </div>
+                                </div>
+                            )}
+
                             {/* View Mode Toggle */}
                             <div style={{
                                 display: 'flex', gap: 4, marginBottom: 16,
@@ -1696,8 +1943,8 @@ export default function EnglishMaster365Page() {
                                                     <button onClick={() => playTTS(entry)} style={{
                                                         width: 30, height: 30, borderRadius: '50%',
                                                         border: 'none', cursor: 'pointer',
-                                                        background: isPlaying ? '#D4AF37' : '#F5F5F4',
-                                                        color: isPlaying ? '#fff' : '#78716C',
+                                                        background: isPlaying ? '#D4AF37' : playedIds.has(entry.id) ? '#D4AF3720' : '#F5F5F4',
+                                                        color: isPlaying ? '#fff' : playedIds.has(entry.id) ? '#D4AF37' : '#78716C',
                                                         fontSize: 14, display: 'flex',
                                                         alignItems: 'center', justifyContent: 'center',
                                                         transition: 'all 0.15s',
@@ -1706,7 +1953,7 @@ export default function EnglishMaster365Page() {
                                                     }}>
                                                         {isPlaying ? '\u25A0' : '\u25B6'}
                                                     </button>
-                                                    {/* Mastery */}
+                                                    {/* Mastery (auto-checked on listen) */}
                                                     <button onClick={() => toggleMastery(entry.id)} style={{
                                                         width: 30, height: 30, borderRadius: '50%',
                                                         border: isMastered ? '2px solid #D4AF37' : '2px solid #E7E5E4',
@@ -1716,30 +1963,58 @@ export default function EnglishMaster365Page() {
                                                         fontSize: 14, fontWeight: 700,
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                         transition: 'all 0.2s',
+                                                        animation: isMastered && playedIds.has(entry.id) ? 'checkFade 0.4s ease' : 'none',
                                                     }}>
                                                         {isMastered ? '\u2713' : ''}
                                                     </button>
-                                                    {/* 仕込み帳 */}
+                                                    {/* 仕込み帳 Registration */}
                                                     {(() => {
-                                                        const lvlIdx = globalLevel >= 0 && globalLevel <= 3 ? globalLevel : 1;
+                                                        const lvlIdx = globalLevel >= 0 && globalLevel <= 3 ? globalLevel : (beginnerLevel ?? 1);
                                                         const lvlName = ['Core', 'Vibe', 'Scene', 'Flow'][lvlIdx];
+                                                        const isCelebrating = celebrateId === entry.id;
                                                         return (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); if (!isRegistered) registerPhrase(entry); }}
-                                                                disabled={isRegistered || registeringId === entry.id}
-                                                                title={isRegistered ? '仕込み帳に登録済み' : `${lvlName}レベルを仕込み帳に追加`}
-                                                                style={{
-                                                                    border: isRegistered ? '1px solid #D1FAE5' : '1px solid #E7E5E4',
-                                                                    borderRadius: 6,
-                                                                    background: isRegistered ? '#ECFDF5' : '#fff',
-                                                                    color: isRegistered ? '#059669' : '#A8A29E',
-                                                                    padding: '6px 12px', fontSize: 11, fontWeight: 700,
-                                                                    cursor: isRegistered ? 'default' : 'pointer',
-                                                                    minHeight: 32,
-                                                                }}
-                                                            >
-                                                                {registeringId === entry.id ? '...' : isRegistered ? '仕込み済' : `+${lvlName}`}
-                                                            </button>
+                                                            <div style={{ position: 'relative' }}>
+                                                                {isCelebrating && (
+                                                                    <>
+                                                                        <span style={{
+                                                                            position: 'absolute', top: -8, left: -4,
+                                                                            fontSize: 10, color: '#D4AF37',
+                                                                            animation: 'sparkle 0.8s ease forwards',
+                                                                            pointerEvents: 'none',
+                                                                        }}>+</span>
+                                                                        <span style={{
+                                                                            position: 'absolute', top: -6, right: -6,
+                                                                            fontSize: 10, color: '#10B981',
+                                                                            animation: 'sparkle 0.8s ease 0.15s forwards',
+                                                                            pointerEvents: 'none',
+                                                                        }}>+</span>
+                                                                        <span style={{
+                                                                            position: 'absolute', bottom: -6, left: 8,
+                                                                            fontSize: 10, color: '#3B82F6',
+                                                                            animation: 'sparkle 0.8s ease 0.3s forwards',
+                                                                            pointerEvents: 'none',
+                                                                        }}>+</span>
+                                                                    </>
+                                                                )}
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); if (!isRegistered) registerPhrase(entry); }}
+                                                                    disabled={isRegistered || registeringId === entry.id}
+                                                                    title={isRegistered ? 'Daily Trainingに登録済み' : `${lvlName}レベルをDaily Trainingに追加`}
+                                                                    style={{
+                                                                        border: isRegistered ? '2px solid #10B981' : '2px solid #10B98160',
+                                                                        borderRadius: 8,
+                                                                        background: isRegistered ? '#ECFDF5' : 'linear-gradient(135deg, #ECFDF5, #fff)',
+                                                                        color: isRegistered ? '#059669' : '#10B981',
+                                                                        padding: '6px 14px', fontSize: 11, fontWeight: 800,
+                                                                        cursor: isRegistered ? 'default' : 'pointer',
+                                                                        minHeight: 32,
+                                                                        transition: 'all 0.2s',
+                                                                        animation: isCelebrating ? 'registerPop 0.5s ease' : 'none',
+                                                                    }}
+                                                                >
+                                                                    {registeringId === entry.id ? '...' : isRegistered ? '\u2713 Training' : `+ ${lvlName}`}
+                                                                </button>
+                                                            </div>
                                                         );
                                                     })()}
                                                 </div>
@@ -2015,79 +2290,100 @@ export default function EnglishMaster365Page() {
                                 );
                             })()}
 
-                            {/* 仕込み帳 CTA */}
+                            {/* Daily Training CTA */}
                             {registeredPhrases.size > 0 && (
-                                <Link href="/english/training" style={{ textDecoration: 'none' }}>
+                                <Link href="/english/my-training" style={{ textDecoration: 'none' }}>
                                     <div style={{
                                         marginTop: 20, padding: '16px 20px',
-                                        background: 'linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%)',
-                                        border: '1px solid #A7F3D0', borderRadius: 12,
+                                        background: 'linear-gradient(135deg, #ECFDF5 0%, #FEF3C7 50%, #ECFDF5 100%)',
+                                        border: '2px solid #10B98140', borderRadius: 14,
                                         display: 'flex', alignItems: 'center', gap: 14,
-                                        cursor: 'pointer', transition: 'all 0.15s',
+                                        cursor: 'pointer', transition: 'all 0.2s',
                                     }}>
                                         <div style={{
-                                            width: 40, height: 40, borderRadius: 10,
-                                            background: '#10B981', color: '#fff',
+                                            width: 44, height: 44, borderRadius: 12,
+                                            background: 'linear-gradient(135deg, #10B981, #059669)',
+                                            color: '#fff',
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             fontSize: 18, fontWeight: 900, flexShrink: 0,
+                                            boxShadow: '0 2px 8px rgba(16,185,129,0.3)',
                                         }}>
-                                            {registeredPhrases.size}
+                                            {shikomiCount}
                                         </div>
                                         <div style={{ flex: 1 }}>
-                                            <div style={{ fontSize: 13, fontWeight: 800, color: '#065F46' }}>
-                                                仕込み帳を開く
+                                            <div style={{ fontSize: 14, fontWeight: 800, color: '#065F46' }}>
+                                                Daily Training
                                             </div>
                                             <div style={{ fontSize: 11, color: '#047857', marginTop: 2 }}>
-                                                今日追加した表現を復習しよう
+                                                登録した表現を復習 -- ここが成長の場所
                                             </div>
                                         </div>
-                                        <span style={{ fontSize: 18, color: '#10B981' }}>{'\u203A'}</span>
+                                        <span style={{ fontSize: 20, color: '#10B981', fontWeight: 700 }}>{'\u203A'}</span>
                                     </div>
                                 </Link>
                             )}
 
-                            {/* 仕込み帳 説明 */}
+                            {/* Daily Training Onboarding */}
                             {registeredPhrases.size === 0 && (
                                 <div style={{
-                                    marginTop: 20, padding: '16px 20px',
-                                    background: '#fff', border: '1px solid #E7E5E4', borderRadius: 12,
+                                    marginTop: 20, padding: '20px',
+                                    background: 'linear-gradient(135deg, #ECFDF508, #FEF3C708)',
+                                    border: '1px dashed #10B98140', borderRadius: 14,
                                 }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                                        <span style={{
-                                            fontSize: 10, fontWeight: 800, color: '#10B981',
-                                            background: '#ECFDF5', padding: '2px 8px', borderRadius: 4,
-                                        }}>TRAINING</span>
-                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>
-                                            仕込み帳とは？
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                                        <div style={{
+                                            width: 28, height: 28, borderRadius: 8,
+                                            background: 'linear-gradient(135deg, #10B981, #059669)',
+                                            color: '#fff', display: 'flex', alignItems: 'center',
+                                            justifyContent: 'center', fontSize: 14, fontWeight: 900,
+                                        }}>D</div>
+                                        <span style={{ fontSize: 14, fontWeight: 800, color: '#1C1917' }}>
+                                            Daily Training
                                         </span>
                                     </div>
                                     <div style={{ fontSize: 12, color: '#57534E', lineHeight: 1.8 }}>
-                                        <p style={{ margin: '0 0 8px' }}>
-                                            気になった表現の横にある <span style={{
-                                                display: 'inline-block', border: '1px solid #E7E5E4',
-                                                borderRadius: 4, padding: '1px 6px', fontSize: 10,
-                                                fontWeight: 700, color: '#A8A29E',
-                                            }}>+Vibe</span> ボタンを押すと、その表現が仕込み帳に追加される。
+                                        <p style={{ margin: '0 0 10px' }}>
+                                            <span style={{ fontWeight: 700, color: '#1C1917' }}>3 Steps:</span>
                                         </p>
-                                        <p style={{ margin: '0 0 8px' }}>
-                                            仕込み帳は<strong style={{ color: '#1C1917' }}>毎日開いて復習する場所</strong>。
-                                            今日365で出会った表現を、明日もう一度思い出す。それだけで定着率が変わる。
-                                        </p>
-                                        <p style={{ margin: 0, color: '#A8A29E', fontSize: 11 }}>
-                                            まずは今日の表現から1つ、仕込み帳に追加してみよう。
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                                                <span style={{
+                                                    width: 22, height: 22, borderRadius: '50%',
+                                                    background: '#D4AF37', color: '#fff',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    fontSize: 11, fontWeight: 800, flexShrink: 0,
+                                                }}>1</span>
+                                                <span style={{ fontSize: 12 }}>再生ボタンで聴く -- 自動でチェックがつく</span>
+                                            </div>
+                                            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                                                <span style={{
+                                                    width: 22, height: 22, borderRadius: '50%',
+                                                    background: '#10B981', color: '#fff',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    fontSize: 11, fontWeight: 800, flexShrink: 0,
+                                                }}>2</span>
+                                                <span style={{ fontSize: 12 }}>
+                                                    気に入った表現の <span style={{
+                                                        display: 'inline-block', border: '2px solid #10B98160',
+                                                        borderRadius: 6, padding: '0 6px', fontSize: 10,
+                                                        fontWeight: 800, color: '#10B981', background: '#ECFDF5',
+                                                    }}>+ {['Core', 'Vibe', 'Scene', 'Flow'][beginnerLevel ?? 1]}</span> をタップ
+                                                </span>
+                                            </div>
+                                            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                                                <span style={{
+                                                    width: 22, height: 22, borderRadius: '50%',
+                                                    background: '#3B82F6', color: '#fff',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    fontSize: 11, fontWeight: 800, flexShrink: 0,
+                                                }}>3</span>
+                                                <span style={{ fontSize: 12 }}>Daily Trainingで毎日復習 -- これだけで定着率が変わる</span>
+                                            </div>
+                                        </div>
+                                        <p style={{ margin: '12px 0 0', color: '#A8A29E', fontSize: 11, lineHeight: 1.5 }}>
+                                            全部やらなくていい。1つでも登録したらそれが今日の成果。
                                         </p>
                                     </div>
-                                    {shikomiCount > 0 && (
-                                        <Link href="/english/training" style={{
-                                            display: 'inline-flex', alignItems: 'center', gap: 6,
-                                            marginTop: 12, textDecoration: 'none',
-                                            background: '#10B981', color: '#fff',
-                                            padding: '8px 16px', borderRadius: 8,
-                                            fontSize: 12, fontWeight: 700,
-                                        }}>
-                                            仕込み帳を開く ({shikomiCount}個の表現)
-                                        </Link>
-                                    )}
                                 </div>
                             )}
 

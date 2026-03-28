@@ -2494,7 +2494,7 @@ export interface TrainingInitialData {
     links?: Record<string, PhraseLink[]>;
 }
 
-export default function PhrasesPage({ initialData, onHelpClick }: { initialData?: TrainingInitialData; onHelpClick?: () => void }) {
+export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData = false }: { initialData?: TrainingInitialData; onHelpClick?: () => void; skipDefaultData?: boolean }) {
     // Data mode: phrases (default) or words
     const [dataMode, setDataMode] = useState<'phrases' | 'words'>(() => {
         if (typeof window !== 'undefined') {
@@ -3360,7 +3360,33 @@ export default function PhrasesPage({ initialData, onHelpClick }: { initialData?
         const fetchData = async () => {
             try {
                 if (IS_PUBLIC) {
-                    // 公開RPG (3004): TOEIC 30日コンテンツ + エピソードから追加した単語
+                    if (skipDefaultData) {
+                        // 本番モード: 完全に空からスタート。my-training専用のlocalStorageキーのみ使用
+                        const myPhrases: Phrase[] = [];
+                        try {
+                            const raw = localStorage.getItem('my-training-phrases');
+                            if (raw) {
+                                const saved = JSON.parse(raw);
+                                for (const p of saved) {
+                                    myPhrases.push({
+                                        id: p.id,
+                                        english: p.english || '',
+                                        japanese: p.japanese || '',
+                                        category: p.category || 'my-training',
+                                        date: p.date || new Date().toISOString(),
+                                    });
+                                }
+                            }
+                        } catch { /* */ }
+                        setPhrases(myPhrases);
+                        try {
+                            const saved = localStorage.getItem('my-training-mastery');
+                            if (saved) setPhraseMastery(JSON.parse(saved));
+                        } catch { /* */ }
+                        setVoiceRecordings({});
+                        setPhraseLinks({});
+                    } else {
+                    // チュートリアル: TOEIC 30日コンテンツ + エピソードから追加した単語
                     // カレンダーの各日に20個: Day 1→1日, Day 2→2日, ...
                     const now = new Date();
                     const y = now.getFullYear();
@@ -3443,6 +3469,7 @@ export default function PhrasesPage({ initialData, onHelpClick }: { initialData?
                     } catch { /* */ }
                     setVoiceRecordings({});
                     setPhraseLinks({});
+                    } // end else (tutorial mode)
                 } else if (dataMode === 'words') {
                     // Word mode: load from user-words API (with retry for cold-start compile)
                     const [wordsRes, masteryRes] = await Promise.all([
