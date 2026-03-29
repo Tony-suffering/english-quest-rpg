@@ -1620,52 +1620,54 @@ export default function EnglishMaster365Page() {
                             {showLevelPicker && (
                                 <div style={{
                                     marginBottom: 16, padding: '20px',
-                                    background: 'linear-gradient(135deg, #ECFDF5 0%, #FEF3C7 100%)',
-                                    border: '2px solid #D4AF3740',
+                                    background: '#fff',
+                                    border: '1px solid #E7E5E4',
                                     borderRadius: 16,
                                 }}>
-                                    <div style={{ fontSize: 14, fontWeight: 800, color: '#1C1917', marginBottom: 4 }}>
-                                        まずはレベルを選ぼう
+                                    <div style={{ fontSize: 15, fontWeight: 800, color: '#1C1917', marginBottom: 8 }}>
+                                        使い方
                                     </div>
-                                    <div style={{ fontSize: 12, color: '#57534E', marginBottom: 16, lineHeight: 1.6 }}>
-                                        初心者は <strong style={{ color: '#10B981' }}>Core</strong> か <strong style={{ color: '#3B82F6' }}>Vibe</strong> がおすすめ。いつでも変えられるから気軽に。
+                                    <div style={{ fontSize: 13, color: '#44403C', lineHeight: 1.8, marginBottom: 12 }}>
+                                        1つの日本語に対して4段階の英語が出ます。<br />
+                                        自分に合うレベルの <span style={{
+                                            display: 'inline-block', border: '1.5px solid #D4AF3780',
+                                            borderRadius: 5, padding: '0 6px', fontSize: 11,
+                                            fontWeight: 800, color: '#D4AF37', background: '#FFFBEB',
+                                            verticalAlign: 'middle',
+                                        }}>+</span> を押して登録するだけ。
                                     </div>
-                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                                        <button onClick={() => {
-                                            setBeginnerLevel(0);
-                                            setShowLevelPicker(false);
-                                            localStorage.setItem('kaiwa-beginner-level', '0');
-                                        }} style={{
-                                            border: '2px solid #10B98140', borderRadius: 12,
-                                            background: '#fff', cursor: 'pointer', padding: '16px 12px',
-                                            transition: 'all 0.2s',
-                                        }}>
-                                            <div style={{ fontSize: 16, fontWeight: 900, color: '#10B981', marginBottom: 4 }}>Core</div>
-                                            <div style={{ fontSize: 11, color: '#78716C', lineHeight: 1.5 }}>シンプルな基本表現<br />まずはここから</div>
-                                        </button>
-                                        <button onClick={() => {
-                                            setBeginnerLevel(1);
-                                            setShowLevelPicker(false);
-                                            localStorage.setItem('kaiwa-beginner-level', '1');
-                                        }} style={{
-                                            border: '2px solid #3B82F640', borderRadius: 12,
-                                            background: '#fff', cursor: 'pointer', padding: '16px 12px',
-                                            transition: 'all 0.2s',
-                                        }}>
-                                            <div style={{ fontSize: 16, fontWeight: 900, color: '#3B82F6', marginBottom: 4 }}>Vibe</div>
-                                            <div style={{ fontSize: 11, color: '#78716C', lineHeight: 1.5 }}>自然なニュアンス<br />少し慣れてきたら</div>
-                                        </button>
+                                    <div style={{
+                                        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8,
+                                        marginBottom: 12, fontSize: 12, lineHeight: 1.5,
+                                    }}>
+                                        <div style={{ padding: '8px 10px', borderLeft: '3px solid #78716C', background: '#FAFAF9', borderRadius: 6 }}>
+                                            <strong style={{ color: '#78716C' }}>Core</strong> -- 最短の型
+                                        </div>
+                                        <div style={{ padding: '8px 10px', borderLeft: '3px solid #D4AF37', background: '#FFFBEB', borderRadius: 6 }}>
+                                            <strong style={{ color: '#D4AF37' }}>Vibe</strong> -- 感情込み
+                                        </div>
+                                        <div style={{ padding: '8px 10px', borderLeft: '3px solid #10B981', background: '#ECFDF5', borderRadius: 6 }}>
+                                            <strong style={{ color: '#10B981' }}>Scene</strong> -- 実際の一言
+                                        </div>
+                                        <div style={{ padding: '8px 10px', borderLeft: '3px solid #3B82F6', background: '#EFF6FF', borderRadius: 6 }}>
+                                            <strong style={{ color: '#3B82F6' }}>Flow</strong> -- ネイティブの脳内
+                                        </div>
+                                    </div>
+                                    <div style={{ fontSize: 11, color: '#A8A29E', lineHeight: 1.6, marginBottom: 12 }}>
+                                        複数選んでOK。迷ったらまず Vibe から。
                                     </div>
                                     <button onClick={() => {
                                         setShowLevelPicker(false);
                                         localStorage.setItem('kaiwa-beginner-level', '1');
                                         setBeginnerLevel(1);
                                     }} style={{
-                                        marginTop: 10, background: 'none', border: 'none',
-                                        color: '#A8A29E', fontSize: 11, cursor: 'pointer',
-                                        width: '100%', textAlign: 'center',
+                                        width: '100%', padding: '10px',
+                                        background: '#D4AF37', color: '#fff',
+                                        border: 'none', borderRadius: 10,
+                                        fontSize: 13, fontWeight: 700, cursor: 'pointer',
+                                        transition: 'all 0.2s',
                                     }}>
-                                        あとで選ぶ
+                                        OK
                                     </button>
                                 </div>
                             )}

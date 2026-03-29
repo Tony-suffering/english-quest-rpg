@@ -12,8 +12,10 @@ import { wbcJapanEntry } from './wbc-japan-entry';
 import { wbcChibiCodingEntry } from './wbc-chibi-coding-entry';
 import { siteExorcismEntry } from './site-exorcism-entry';
 import { standfmKaraokeEntry } from './standfm-karaoke-entry';
+import { sidebarCleanupEntry } from './sidebar-cleanup-entry';
 
 export const march2026Entries: JournalEntry[] = [
+    sidebarCleanupEntry,
     standfmKaraokeEntry,
     siteExorcismEntry,
     wbcChibiCodingEntry,
