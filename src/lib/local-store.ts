@@ -8,6 +8,8 @@ export interface TrainingPhrase {
     japanese: string;
     category: string;
     date: string;
+    situation?: string;
+    context?: string;
 }
 
 export interface PlayerStats {
@@ -152,13 +154,15 @@ export function addQuestPhraseToTraining(qp: { id: string; english: string; japa
 }
 
 // ── Phrase CRUD ──────────────────────────────────────────
-export function addPhrase(p: { english: string; japanese: string; category: string; date: string }): TrainingPhrase {
+export function addPhrase(p: { english: string; japanese: string; category: string; date: string; situation?: string; context?: string }): TrainingPhrase {
     const newPhrase: TrainingPhrase = {
         id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
         english: p.english,
         japanese: p.japanese,
         category: p.category,
         date: p.date,
+        ...(p.situation && { situation: p.situation }),
+        ...(p.context && { context: p.context }),
     };
     // Write to my-training-phrases (production Daily Training)
     try {

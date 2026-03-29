@@ -366,6 +366,8 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                         </Link>
                     </div>
 
+                    {renderToolItem({ id: '/english/my-training/practice', label: '実習', color: C.green })}
+
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}

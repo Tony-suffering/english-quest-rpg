@@ -787,11 +787,18 @@ export default function EnglishMaster365Page() {
         setRegisteringId(entry.id);
         const today = new Date();
         const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        // Build situation from day theme
+        const theme = selectedDay ? MASTER_DAY_THEMES[selectedDay] : null;
+        const situation = theme
+            ? `${theme.title} -- ${theme.scene}`
+            : undefined;
         addPhrase({
             english,
             japanese: entry.japanese,
             category: '365-master',
             date: dateStr,
+            situation,
+            context: entry.context,
         });
         setRegisteredPhrases(prev => {
             const next = new Set(prev);
@@ -817,7 +824,7 @@ export default function EnglishMaster365Page() {
             } catch { /* */ }
             return next;
         });
-    }, []);
+    }, [selectedDay]);
 
     // ── Month Nav (constrained to start date through +12 months) ──
 
