@@ -29,7 +29,7 @@ export default function JournalPage() {
     }, []);
 
     const publishedEntries = useMemo(() => {
-        if (PUBLISHED_JOURNAL_IDS.length === 0) return [];
+        if (PUBLISHED_JOURNAL_IDS.length === 0) return journalEntries;
         const idSet = new Set(PUBLISHED_JOURNAL_IDS);
         return journalEntries.filter(e => idSet.has(e.id));
     }, []);

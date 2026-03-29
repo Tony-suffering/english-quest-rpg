@@ -5,6 +5,5 @@
  * Add entry IDs as you curate and publish them.
  */
 export const PUBLISHED_JOURNAL_IDS: string[] = [
-    // Start empty -- add IDs as entries are curated and published
-    // Example: '048', '133', etc.
+    // Empty = show all entries. Add specific IDs to filter.
 ];
