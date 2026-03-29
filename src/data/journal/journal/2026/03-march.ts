@@ -13,8 +13,10 @@ import { wbcChibiCodingEntry } from './wbc-chibi-coding-entry';
 import { siteExorcismEntry } from './site-exorcism-entry';
 import { standfmKaraokeEntry } from './standfm-karaoke-entry';
 import { sidebarCleanupEntry } from './sidebar-cleanup-entry';
+import { iconRebrandEntry } from './icon-rebrand-entry';
 
 export const march2026Entries: JournalEntry[] = [
+    iconRebrandEntry,
     sidebarCleanupEntry,
     standfmKaraokeEntry,
     siteExorcismEntry,
