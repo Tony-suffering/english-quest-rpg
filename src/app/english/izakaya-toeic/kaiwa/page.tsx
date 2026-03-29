@@ -433,10 +433,10 @@ export default function EnglishMaster365Page() {
     const [playingId, setPlayingId] = useState<string | null>(null);
     const [playedIds, setPlayedIds] = useState<Set<string>>(new Set());
     const [masteredIds, setMasteredIds] = useState<Set<string>>(new Set());
-    const [globalLevel, setGlobalLevel] = useState<number>(-1); // default to BUILD-UP view
+    // Always BUILD-UP (4-level) view — no mode toggle
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-    const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
+    // removed: revealedIds (quiz mode deleted)
     const [autoPlaying, setAutoPlaying] = useState(false);
     const [autoPlayIdx, setAutoPlayIdx] = useState(-1);
     const autoPlayRef = useRef(false);
@@ -744,8 +744,7 @@ export default function EnglishMaster365Page() {
         }
 
         setPlayingId(entry.id);
-        const lvlIdx = globalLevel === -1 ? 1 : globalLevel === -2 ? 1 : globalLevel; // BUILD-UP/QUIZ default to Vibe
-        const text = entry.english[lvlIdx];
+        const text = entry.english[1]; // Always play Vibe level
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
         utterance.rate = 0.9;
@@ -780,12 +779,10 @@ export default function EnglishMaster365Page() {
         };
         utterance.onerror = () => setPlayingId(null);
         synthRef.current.speak(utterance);
-    }, [playingId, globalLevel, toggleMastery]);
+    }, [playingId, toggleMastery]);
 
-    // Register one level of expression to 仕込み帳 (localStorage)
-    // Uses current view level: Core(0)/Vibe(1)/Scene(2)/Flow(3). BUILD-UP/QUIZ default to Vibe(1).
-    const registerPhrase = useCallback((entry: KaiwaEntry) => {
-        const lvlIdx = globalLevel >= 0 && globalLevel <= 3 ? globalLevel : (beginnerLevel ?? 1);
+    // Register a specific level of expression to 仕込み帳 (localStorage)
+    const registerPhrase = useCallback((entry: KaiwaEntry, lvlIdx: number = 1) => {
         const english = entry.english[lvlIdx];
         setRegisteringId(entry.id);
         const today = new Date();
@@ -820,7 +817,7 @@ export default function EnglishMaster365Page() {
             } catch { /* */ }
             return next;
         });
-    }, [globalLevel, beginnerLevel]);
+    }, []);
 
     // ── Month Nav (constrained to start date through +12 months) ──
 
@@ -915,46 +912,7 @@ export default function EnglishMaster365Page() {
         playEntry(0);
     }, [dayEntries]);
 
-    // ── Keyboard nav for QUIZ mode ──
-
-    const [focusIdx, setFocusIdx] = useState(0);
-
-    useEffect(() => {
-        if (globalLevel !== -2) return;
-        const handler = (e: KeyboardEvent) => {
-            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                e.preventDefault();
-                setFocusIdx(prev => Math.min(prev + 1, dayEntries.length - 1));
-            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                e.preventDefault();
-                setFocusIdx(prev => Math.max(prev - 1, 0));
-            } else if (e.key === ' ' || e.key === 'Enter') {
-                e.preventDefault();
-                const entry = dayEntries[focusIdx];
-                if (entry && !revealedIds.has(entry.id)) {
-                    setRevealedIds(prev => {
-                        const next = new Set(prev);
-                        next.add(entry.id);
-                        return next;
-                    });
-                }
-            }
-        };
-        window.addEventListener('keydown', handler);
-        return () => window.removeEventListener('keydown', handler);
-    }, [globalLevel, dayEntries, focusIdx, revealedIds]);
-
-    // Reset focus when switching days or mode
-    useEffect(() => {
-        setFocusIdx(0);
-    }, [selectedDay, globalLevel]);
-
-    // Scroll focused card into view
-    useEffect(() => {
-        if (globalLevel !== -2) return;
-        const el = document.getElementById(`kaiwa-card-${focusIdx}`);
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, [focusIdx, globalLevel]);
+    // (Quiz keyboard nav removed — always BUILD-UP view now)
 
     // ── Loading ──
 
@@ -1675,7 +1633,6 @@ export default function EnglishMaster365Page() {
                                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                                         <button onClick={() => {
                                             setBeginnerLevel(0);
-                                            setGlobalLevel(0);
                                             setShowLevelPicker(false);
                                             localStorage.setItem('kaiwa-beginner-level', '0');
                                         }} style={{
@@ -1688,7 +1645,6 @@ export default function EnglishMaster365Page() {
                                         </button>
                                         <button onClick={() => {
                                             setBeginnerLevel(1);
-                                            setGlobalLevel(1);
                                             setShowLevelPicker(false);
                                             localStorage.setItem('kaiwa-beginner-level', '1');
                                         }} style={{
@@ -1802,88 +1758,7 @@ export default function EnglishMaster365Page() {
                                 </div>
                             )}
 
-                            {/* View Mode Toggle */}
-                            <div style={{
-                                display: 'flex', gap: 4, marginBottom: 16,
-                                background: '#F5F5F4', borderRadius: 8, padding: 3,
-                            }}>
-                                <button onClick={() => { setGlobalLevel(-1); setRevealedIds(new Set()); }} style={{
-                                    flex: 1, border: 'none', borderRadius: 6,
-                                    background: globalLevel === -1 ? '#fff' : 'transparent',
-                                    boxShadow: globalLevel === -1 ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                                    cursor: 'pointer', padding: '6px 4px',
-                                    transition: 'all 0.15s',
-                                }}>
-                                    <div style={{ fontSize: 11, fontWeight: 700, color: globalLevel === -1 ? '#D4AF37' : '#A8A29E' }}>
-                                        BUILD-UP
-                                    </div>
-                                    <div style={{ fontSize: 9, color: globalLevel === -1 ? '#78716C' : '#D6D3D1' }}>
-                                        4段階表示
-                                    </div>
-                                </button>
-                                <button onClick={() => { setGlobalLevel(-2); setRevealedIds(new Set()); }} style={{
-                                    flex: 1, border: 'none', borderRadius: 6,
-                                    background: globalLevel === -2 ? '#fff' : 'transparent',
-                                    boxShadow: globalLevel === -2 ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                                    cursor: 'pointer', padding: '6px 4px',
-                                    transition: 'all 0.15s',
-                                }}>
-                                    <div style={{ fontSize: 11, fontWeight: 700, color: globalLevel === -2 ? '#EA580C' : '#A8A29E' }}>
-                                        QUIZ
-                                    </div>
-                                    <div style={{ fontSize: 9, color: globalLevel === -2 ? '#78716C' : '#D6D3D1' }}>
-                                        腕試し
-                                    </div>
-                                </button>
-                                {MASTER_LEVELS.map((lvl, i) => (
-                                    <button key={lvl.key} onClick={() => setGlobalLevel(i)} style={{
-                                        flex: 1, border: 'none', borderRadius: 6,
-                                        background: globalLevel === i ? '#fff' : 'transparent',
-                                        boxShadow: globalLevel === i ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-                                        cursor: 'pointer', padding: '6px 4px',
-                                        transition: 'all 0.15s',
-                                    }}>
-                                        <div style={{
-                                            fontSize: 11, fontWeight: 700,
-                                            color: globalLevel === i ? lvl.color : '#A8A29E',
-                                        }}>
-                                            {lvl.label}
-                                        </div>
-                                        <div style={{
-                                            fontSize: 9, color: globalLevel === i ? '#78716C' : '#D6D3D1',
-                                        }}>
-                                            {lvl.ja}
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                            {/* Quiz mode header */}
-                            {globalLevel === -2 && (
-                                <div style={{
-                                    marginBottom: 16, padding: '10px 14px',
-                                    borderRadius: 8, fontSize: 12, lineHeight: 1.5,
-                                    color: '#EA580C',
-                                    background: '#FFF7ED',
-                                    border: '1px solid #FED7AA',
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-                                        <span>
-                                            <span style={{ fontWeight: 700 }}>QUIZ MODE</span>
-                                            <span style={{ color: '#78716C', margin: '0 8px' }}>--</span>
-                                            <span style={{ color: '#57534E' }}>日本語を見て英語を考えてからタップ</span>
-                                        </span>
-                                        <span style={{ fontSize: 11, fontWeight: 700, color: '#EA580C' }}>
-                                            {revealedIds.size}/{dayEntries.length}
-                                        </span>
-                                    </div>
-                                    {!isMobile && (
-                                        <div style={{ fontSize: 10, color: '#A8A29E', display: 'flex', gap: 12 }}>
-                                            <span>Space / Enter = reveal</span>
-                                            <span>Arrow keys = navigate</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                            {/* Always BUILD-UP view — no mode toggle */}
 
                             {/* Expression Cards */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -1892,17 +1767,14 @@ export default function EnglishMaster365Page() {
                                     const isPlaying = playingId === entry.id;
                                     const isExpanded = expandedId === entry.id;
                                     const isMastered = entry.mastery === 3;
-                                    const regLvlIdx = globalLevel >= 0 && globalLevel <= 3 ? globalLevel : 1;
-                                    const isRegistered = registeredPhrases.has(entry.english[regLvlIdx].toLowerCase());
                                     const isAutoPlayActive = autoPlaying && autoPlayIdx === idx;
-                                    const isQuizFocused = globalLevel === -2 && focusIdx === idx;
 
                                     return (
                                         <div key={entry.id} id={`kaiwa-card-${idx}`} style={{
                                             background: isAutoPlayActive ? '#FFFBEB' : isMastered ? '#FAFAF9' : '#fff',
                                             borderRadius: 12,
-                                            border: isQuizFocused ? '2px solid #EA580C' : isAutoPlayActive ? '2px solid #D4AF37' : isMastered ? '1px solid #D4AF3740' : '1px solid #E7E5E4',
-                                            boxShadow: isQuizFocused ? '0 0 0 3px rgba(234,88,12,0.15)' : 'none',
+                                            border: isAutoPlayActive ? '2px solid #D4AF37' : isMastered ? '1px solid #D4AF3740' : '1px solid #E7E5E4',
+                                            boxShadow: 'none',
                                             padding: isMobile ? '14px' : '16px 20px',
                                             opacity: isMastered ? 0.65 : 1,
                                             transition: 'all 0.3s',
@@ -1967,56 +1839,7 @@ export default function EnglishMaster365Page() {
                                                     }}>
                                                         {isMastered ? '\u2713' : ''}
                                                     </button>
-                                                    {/* 仕込み帳 Registration */}
-                                                    {(() => {
-                                                        const lvlIdx = globalLevel >= 0 && globalLevel <= 3 ? globalLevel : (beginnerLevel ?? 1);
-                                                        const lvlName = ['Core', 'Vibe', 'Scene', 'Flow'][lvlIdx];
-                                                        const isCelebrating = celebrateId === entry.id;
-                                                        return (
-                                                            <div style={{ position: 'relative' }}>
-                                                                {isCelebrating && (
-                                                                    <>
-                                                                        <span style={{
-                                                                            position: 'absolute', top: -8, left: -4,
-                                                                            fontSize: 10, color: '#D4AF37',
-                                                                            animation: 'sparkle 0.8s ease forwards',
-                                                                            pointerEvents: 'none',
-                                                                        }}>+</span>
-                                                                        <span style={{
-                                                                            position: 'absolute', top: -6, right: -6,
-                                                                            fontSize: 10, color: '#10B981',
-                                                                            animation: 'sparkle 0.8s ease 0.15s forwards',
-                                                                            pointerEvents: 'none',
-                                                                        }}>+</span>
-                                                                        <span style={{
-                                                                            position: 'absolute', bottom: -6, left: 8,
-                                                                            fontSize: 10, color: '#3B82F6',
-                                                                            animation: 'sparkle 0.8s ease 0.3s forwards',
-                                                                            pointerEvents: 'none',
-                                                                        }}>+</span>
-                                                                    </>
-                                                                )}
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); if (!isRegistered) registerPhrase(entry); }}
-                                                                    disabled={isRegistered || registeringId === entry.id}
-                                                                    title={isRegistered ? 'Daily Trainingに登録済み' : `${lvlName}レベルをDaily Trainingに追加`}
-                                                                    style={{
-                                                                        border: isRegistered ? '2px solid #10B981' : '2px solid #10B98160',
-                                                                        borderRadius: 8,
-                                                                        background: isRegistered ? '#ECFDF5' : 'linear-gradient(135deg, #ECFDF5, #fff)',
-                                                                        color: isRegistered ? '#059669' : '#10B981',
-                                                                        padding: '6px 14px', fontSize: 11, fontWeight: 800,
-                                                                        cursor: isRegistered ? 'default' : 'pointer',
-                                                                        minHeight: 32,
-                                                                        transition: 'all 0.2s',
-                                                                        animation: isCelebrating ? 'registerPop 0.5s ease' : 'none',
-                                                                    }}
-                                                                >
-                                                                    {registeringId === entry.id ? '...' : isRegistered ? '\u2713 Training' : `+ ${lvlName}`}
-                                                                </button>
-                                                            </div>
-                                                        );
-                                                    })()}
+                                                    {/* Registration moved to per-level rows below */}
                                                 </div>
                                             </div>
 
@@ -2028,171 +1851,89 @@ export default function EnglishMaster365Page() {
                                                 {entry.japanese}
                                             </div>
 
-                                            {/* English - Quiz / Build-up / Single level */}
-                                            {globalLevel === -2 ? (
-                                                /* QUIZ MODE */
-                                                (() => {
-                                                    const isRevealed = revealedIds.has(entry.id);
+                                            {/* English - BUILD-UP 4-level with per-row register */}
+                                            <div style={{
+                                                display: 'flex', flexDirection: 'column', gap: 0,
+                                                marginBottom: 8,
+                                                borderRadius: 8, overflow: 'hidden',
+                                                border: '1px solid #E7E5E4',
+                                            }}>
+                                                {MASTER_LEVELS.map((lvl, i) => {
+                                                    const text = entry.english[i];
+                                                    const isLast = i === 3;
+                                                    const isLvlRegistered = registeredPhrases.has(text.toLowerCase());
                                                     return (
                                                         <div
+                                                            key={lvl.key}
                                                             onClick={() => {
-                                                                if (!isRevealed) {
-                                                                    setRevealedIds(prev => {
-                                                                        const next = new Set(prev);
-                                                                        next.add(entry.id);
-                                                                        return next;
-                                                                    });
-                                                                }
+                                                                if (!synthRef.current) return;
+                                                                synthRef.current.cancel();
+                                                                const u = new SpeechSynthesisUtterance(text);
+                                                                u.lang = 'en-US';
+                                                                u.rate = 0.9;
+                                                                synthRef.current.speak(u);
                                                             }}
                                                             style={{
-                                                                marginBottom: 8,
-                                                                borderRadius: 8,
-                                                                overflow: 'hidden',
-                                                                cursor: isRevealed ? 'default' : 'pointer',
-                                                                border: isRevealed ? '1px solid #E7E5E4' : '1px dashed #FED7AA',
-                                                                background: isRevealed ? '#fff' : '#FFF7ED',
-                                                                transition: 'all 0.3s',
+                                                                display: 'flex', alignItems: 'center', gap: 8,
+                                                                padding: '8px 10px',
+                                                                borderLeft: `3px solid ${lvl.color}`,
+                                                                borderBottom: isLast ? 'none' : '1px solid #F5F5F4',
+                                                                background: i === 0 ? '#FAFAF9' : i === 3 ? `${lvl.color}06` : '#fff',
+                                                                cursor: 'pointer',
+                                                                transition: 'background 0.15s',
                                                             }}
                                                         >
-                                                            {isRevealed ? (
-                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                                                                    {MASTER_LEVELS.map((lvl, i) => (
-                                                                        <div key={lvl.key} style={{
-                                                                            display: 'flex', alignItems: 'flex-start', gap: 10,
-                                                                            padding: '6px 12px',
-                                                                            borderLeft: `3px solid ${lvl.color}`,
-                                                                            borderBottom: i < 3 ? '1px solid #F5F5F4' : 'none',
-                                                                        }}>
-                                                                            <span style={{
-                                                                                fontSize: 9, fontWeight: 800, color: lvl.color,
-                                                                                width: 40, flexShrink: 0, paddingTop: 3,
-                                                                            }}>
-                                                                                {lvl.label.toUpperCase()}
-                                                                            </span>
-                                                                            <span style={{
-                                                                                fontSize: i === 2 ? 14 : 13,
-                                                                                fontWeight: i === 2 ? 600 : 400,
-                                                                                color: i === 2 ? '#1C1917' : '#57534E',
-                                                                                lineHeight: 1.5,
-                                                                            }}>
-                                                                                {entry.english[i]}
-                                                                            </span>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                            ) : (
-                                                                <div style={{
-                                                                    padding: '16px 14px',
-                                                                    textAlign: 'center',
+                                                            <div style={{
+                                                                flexShrink: 0, width: 38,
+                                                                display: 'flex', flexDirection: 'column', alignItems: 'center',
+                                                                gap: 1, paddingTop: 2,
+                                                            }}>
+                                                                <span style={{
+                                                                    fontSize: 9, fontWeight: 800, color: lvl.color,
+                                                                    letterSpacing: '0.05em',
                                                                 }}>
-                                                                    <div style={{
-                                                                        fontSize: 13, fontWeight: 600,
-                                                                        color: '#EA580C',
-                                                                        marginBottom: 4,
-                                                                    }}>
-                                                                        Tap to reveal
-                                                                    </div>
-                                                                    <div style={{
-                                                                        fontSize: 11, color: '#C2410C',
-                                                                        opacity: 0.6,
-                                                                    }}>
-                                                                        まず頭の中で英語にしてみよう
-                                                                    </div>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                })()
-                                            ) : globalLevel === -1 ? (
-                                                <div style={{
-                                                    display: 'flex', flexDirection: 'column', gap: 0,
-                                                    marginBottom: 8,
-                                                    borderRadius: 8, overflow: 'hidden',
-                                                    border: '1px solid #E7E5E4',
-                                                }}>
-                                                    {MASTER_LEVELS.map((lvl, i) => {
-                                                        const text = entry.english[i];
-                                                        const isLast = i === 3;
-                                                        return (
-                                                            <div
-                                                                key={lvl.key}
-                                                                onClick={() => {
-                                                                    if (!synthRef.current) return;
-                                                                    synthRef.current.cancel();
-                                                                    const u = new SpeechSynthesisUtterance(text);
-                                                                    u.lang = 'en-US';
-                                                                    u.rate = 0.9;
-                                                                    synthRef.current.speak(u);
+                                                                    {lvl.label.toUpperCase()}
+                                                                </span>
+                                                                <span style={{ fontSize: 8, color: '#A8A29E' }}>
+                                                                    {lvl.ja}
+                                                                </span>
+                                                            </div>
+                                                            <div style={{
+                                                                flex: 1, minWidth: 0,
+                                                                fontSize: i === 0 ? 13 : i === 3 ? 12 : 14,
+                                                                fontWeight: i === 2 ? 600 : 400,
+                                                                color: i === 0 ? '#A8A29E' : i === 3 ? lvl.color : '#1C1917',
+                                                                lineHeight: 1.5,
+                                                                fontStyle: i === 3 ? 'italic' : 'normal',
+                                                            }}>
+                                                                {text}
+                                                            </div>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    if (!isLvlRegistered) registerPhrase(entry, i);
                                                                 }}
+                                                                disabled={isLvlRegistered}
+                                                                title={isLvlRegistered ? 'Training登録済み' : `${lvl.label}をTrainingに追加`}
                                                                 style={{
-                                                                    display: 'flex', alignItems: 'flex-start', gap: 10,
-                                                                    padding: '8px 12px',
-                                                                    borderLeft: `3px solid ${lvl.color}`,
-                                                                    borderBottom: isLast ? 'none' : '1px solid #F5F5F4',
-                                                                    background: i === 0 ? '#FAFAF9' : i === 3 ? `${lvl.color}06` : '#fff',
-                                                                    cursor: 'pointer',
-                                                                    transition: 'background 0.15s',
+                                                                    flexShrink: 0,
+                                                                    border: isLvlRegistered ? `1.5px solid ${lvl.color}` : `1.5px solid ${lvl.color}50`,
+                                                                    borderRadius: 6,
+                                                                    background: isLvlRegistered ? `${lvl.color}15` : '#fff',
+                                                                    color: lvl.color,
+                                                                    padding: '4px 10px', fontSize: 10, fontWeight: 700,
+                                                                    cursor: isLvlRegistered ? 'default' : 'pointer',
+                                                                    transition: 'all 0.2s',
+                                                                    opacity: isLvlRegistered ? 0.7 : 1,
+                                                                    whiteSpace: 'nowrap',
                                                                 }}
                                                             >
-                                                                <div style={{
-                                                                    flexShrink: 0, width: 44,
-                                                                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                                                    gap: 1, paddingTop: 2,
-                                                                }}>
-                                                                    <span style={{
-                                                                        fontSize: 9, fontWeight: 800, color: lvl.color,
-                                                                        letterSpacing: '0.05em',
-                                                                    }}>
-                                                                        {lvl.label.toUpperCase()}
-                                                                    </span>
-                                                                    <span style={{ fontSize: 8, color: '#A8A29E' }}>
-                                                                        {lvl.ja}
-                                                                    </span>
-                                                                </div>
-                                                                <div style={{
-                                                                    flex: 1,
-                                                                    fontSize: i === 0 ? 13 : i === 3 ? 12 : 14,
-                                                                    fontWeight: i === 2 ? 600 : 400,
-                                                                    color: i === 0 ? '#A8A29E' : i === 3 ? lvl.color : '#1C1917',
-                                                                    lineHeight: 1.5,
-                                                                    fontStyle: i === 3 ? 'italic' : 'normal',
-                                                                }}>
-                                                                    {text}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <div style={{
-                                                        fontSize: globalLevel === 3 ? 13 : 15,
-                                                        fontWeight: 500,
-                                                        color: MASTER_LEVELS[globalLevel].color,
-                                                        lineHeight: 1.5,
-                                                        marginBottom: 6,
-                                                    }}>
-                                                        {entry.english[globalLevel]}
-                                                    </div>
-                                                    {/* Level dots */}
-                                                    <div style={{ display: 'flex', gap: 4, marginBottom: 0 }}>
-                                                        {MASTER_LEVELS.map((lvl, i) => (
-                                                            <button key={lvl.key} onClick={() => setGlobalLevel(i)} style={{
-                                                                width: 8, height: 8, borderRadius: '50%',
-                                                                border: 'none', cursor: 'pointer', padding: 0,
-                                                                background: i === globalLevel ? lvl.color : '#E7E5E4',
-                                                                transition: 'background 0.15s',
-                                                            }} title={`${lvl.label} (${lvl.ja})`} />
-                                                        ))}
-                                                        <span style={{
-                                                            fontSize: 9, fontWeight: 600, marginLeft: 4,
-                                                            color: MASTER_LEVELS[globalLevel].color,
-                                                        }}>
-                                                            {MASTER_LEVELS[globalLevel].label}
-                                                        </span>
-                                                    </div>
-                                                </>
-                                            )}
+                                                                {isLvlRegistered ? '\u2713' : '+'}
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
 
                                             {/* Context */}
                                             {entry.context && (
@@ -2363,11 +2104,11 @@ export default function EnglishMaster365Page() {
                                                     fontSize: 11, fontWeight: 800, flexShrink: 0,
                                                 }}>2</span>
                                                 <span style={{ fontSize: 12 }}>
-                                                    気に入った表現の <span style={{
-                                                        display: 'inline-block', border: '2px solid #10B98160',
+                                                    気に入ったレベルの <span style={{
+                                                        display: 'inline-block', border: '1.5px solid #D4AF3780',
                                                         borderRadius: 6, padding: '0 6px', fontSize: 10,
-                                                        fontWeight: 800, color: '#10B981', background: '#ECFDF5',
-                                                    }}>+ {['Core', 'Vibe', 'Scene', 'Flow'][beginnerLevel ?? 1]}</span> をタップ
+                                                        fontWeight: 800, color: '#D4AF37', background: '#fff',
+                                                    }}>+</span> をタップして登録
                                                 </span>
                                             </div>
                                             <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>

@@ -6225,56 +6225,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 );
             })()}
 
-            {/* RUSH test panel -- compact pill toggle, bottom-left to avoid card overlap */}
-            <div style={{
-                position: 'fixed',
-                bottom: isMobile ? '8px' : '12px',
-                left: isMobile ? '8px' : '12px',
-                zIndex: 9999,
-                display: 'flex',
-                gap: '3px',
-                opacity: 0.5,
-                transition: 'opacity 0.2s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
-            onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
-            >
-                {(['kakuhen', 'gekiatsu', 'god'] as const).map((mode, i) => {
-                    const labels = ['R', 'F', 'G'];
-                    const colors = ['#D4AF37', '#DC2626', '#7C3AED'];
-                    const counts = [3, 5, 10];
-                    const active = chainState.mode === mode;
-                    return (
-                        <button key={mode} onClick={() => {
-                            if (active) {
-                                setChainState({ count: 0, mode: 'normal', key: Date.now() });
-                            } else {
-                                setChainState({ count: counts[i], mode, key: Date.now() });
-                            }
-                        }} style={{
-                            background: active ? colors[i] : 'rgba(0,0,0,0.7)',
-                            color: active ? '#fff' : colors[i],
-                            border: `1.5px solid ${active ? colors[i] : colors[i] + '60'}`,
-                            borderRadius: '50%',
-                            width: isMobile ? '28px' : '24px',
-                            height: isMobile ? '28px' : '24px',
-                            padding: 0,
-                            fontSize: '9px',
-                            fontWeight: 900,
-                            cursor: 'pointer',
-                            fontFamily: 'monospace',
-                            lineHeight: 1,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: active ? `0 0 12px ${colors[i]}80` : 'none',
-                            transition: 'all 0.15s ease',
-                        }}>
-                            {labels[i]}
-                        </button>
-                    );
-                })}
-            </div>
+            {/* RUSH test panel removed */}
 
             {/* Chain mode HUD -- pachinko RUSH counter (fixed bottom-right) */}
             {feverMode.active && (

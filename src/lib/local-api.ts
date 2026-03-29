@@ -605,9 +605,8 @@ export function installLocalApi() {
             }
         }
     } catch { /* */ }
-    seedPhrasesIfEmpty().then(() => {
-        bridgeQuestToApi()
-    })
+    // Auto-seed disabled — users register phrases themselves via kaiwa/quest
+    bridgeQuestToApi()
     seedGorokuIfEmpty()
 
     const originalFetch = window.fetch.bind(window)

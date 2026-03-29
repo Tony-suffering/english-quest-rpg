@@ -37,6 +37,8 @@ const PROGRAMS: Program[] = [
             { id: '/english/izakaya-toeic/kaiwa', label: 'マスター365 HOME' },
             { id: '/english/izakaya-toeic/kaiwa/lp', label: '英会話マスター365とは？' },
             { id: '/english/izakaya-toeic/characters', label: '常連ファイル' },
+            { id: '/english/5min', label: '5分トーク' },
+            { id: '/english/goroku', label: 'ひとこと英語帳' },
         ],
     },
     {
@@ -56,6 +58,8 @@ const PROGRAMS: Program[] = [
             { id: '/english/izakaya-toeic/score', label: 'スコア通知表' },
             { id: '/english/izakaya-toeic/mistakes', label: '反省ノート' },
             { id: '/english/izakaya-toeic/achievements', label: 'のれんの勲章' },
+            { id: '/english/izakaya-toeic/words', label: 'TOEIC頻出310語' },
+            { id: '/english/tonio-words', label: 'TOEIC英単語' },
         ],
     },
     {
@@ -67,6 +71,7 @@ const PROGRAMS: Program[] = [
         items: [
             { id: '/english/tokyo52', label: 'Tokyo52 HOME' },
             { id: '/english/tokyo52/words', label: '単語リスト' },
+            { id: '/memoria', label: 'メモリア' },
         ],
     },
 ];
@@ -78,7 +83,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     const [isOpen, setIsOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
-    const [showMore, setShowMore] = useState(false);
+    // showMore removed -- all items in programs now
 
     useEffect(() => {
         const checkMobile = () => {
@@ -96,21 +101,14 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     useEffect(() => {
         if (!pathname) return;
         // Check kaiwa first (more specific path)
-        if (pathname.startsWith('/english/izakaya-toeic/kaiwa')) {
+        if (pathname.startsWith('/english/izakaya-toeic/kaiwa') || pathname.startsWith('/english/5min') || pathname.startsWith('/english/goroku')) {
             setExpandedProgram('kaiwa');
-        } else if (pathname.startsWith('/english/izakaya-toeic')) {
+        } else if (pathname.startsWith('/english/izakaya-toeic') || pathname.startsWith('/english/tonio-words')) {
             setExpandedProgram('izakaya');
-        } else if (pathname.startsWith('/english/tokyo52')) {
+        } else if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) {
             setExpandedProgram('tokyo52');
         }
-        // Auto-expand more if on a legacy page
-        const allProgramPaths = PROGRAMS.flatMap(p => p.items.map(i => i.id));
-        const toolPaths = ['/english/training', '/english/training/card-preview', '/english/izakaya-toeic/words'];
-        const contentPaths = ['/memoria', '/english/goroku', '/english/pro', '/english/requiem'];
-        const allKnown = [...allProgramPaths, ...toolPaths, ...contentPaths, '/install', '/english/settings'];
-        if (pathname && !allKnown.some(p => pathname.startsWith(p) || pathname === p)) {
-            setShowMore(true);
-        }
+        // (legacy auto-expand removed)
     }, [pathname]);
 
     const isActive = (path: string) => {
@@ -370,50 +368,16 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />
-                    {renderToolItem({ id: '/english/training', label: 'チュートリアル版', color: C.gold })}
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
-                    {renderToolItem({ id: '/english/izakaya-toeic/words', label: '今日の単語', color: C.blue })}
 
-                    {/* ── CONTENT ── */}
-                    <SectionLabel text="CONTENT" />
-                    {renderToolItem({ id: '/memoria', label: 'メモリア', color: C.blue })}
-                    {renderToolItem({ id: '/english/requiem', label: 'デイリーレビュー', color: C.red })}
-                    {renderToolItem({ id: '/english/goroku', label: '俺語録', color: C.orange })}
-                    {renderToolItem({ id: '/english/pro', label: 'Pro', color: C.gold })}
+                    {/* CONTENT section removed -- items moved into programs */}
 
                     {/* ── その他 ── */}
                     <SectionLabel text="その他" />
                     {renderToolItem({ id: '/install', label: 'ホーム画面に追加', color: C.gold })}
                     {renderToolItem({ id: '/english/settings', label: '設定', color: '#78716C' })}
 
-                    {/* ── MORE ── */}
-                    <div style={{ height: 1, backgroundColor: '#e5e5e5', margin: '10px 20px 6px' }} />
-                    <button
-                        onClick={() => setShowMore(!showMore)}
-                        style={{
-                            width: '100%', padding: '6px 20px', background: 'none',
-                            border: 'none', cursor: 'pointer', display: 'flex',
-                            alignItems: 'center', justifyContent: 'space-between',
-                            fontSize: 9, fontWeight: 700, color: '#bbb', letterSpacing: '0.2em',
-                        }}
-                    >
-                        <span>MORE</span>
-                        <span style={{
-                            fontSize: 10, transition: 'transform 0.2s',
-                            transform: showMore ? 'rotate(180deg)' : 'rotate(0deg)',
-                        }}>&#9660;</span>
-                    </button>
-                    {showMore && (
-                        <div style={{ paddingBottom: 8 }}>
-                            {[
-                                { id: '/journal', label: 'ジャーナル' },
-                                { id: '/english/5min', label: '5min 英会話' },
-                                { id: '/english/quest', label: 'Quest' },
-                                { id: '/english/dashboard-v2', label: 'ダッシュボード' },
-                                { id: '/english/tonio-words', label: 'TONIO WORDS' },
-                            ].map(item => renderCompactItem(item))}
-                        </div>
-                    )}
+                    {/* MORE section removed -- all items in programs now */}
                 </nav>
             </div>
 
