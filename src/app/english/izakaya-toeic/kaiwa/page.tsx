@@ -24,6 +24,10 @@ import { charIcon } from '@/data/izakaya-toeic/characters';
 import { KAIWA_STORIES, type KaiwaStory } from '@/data/english/365/kaiwa-stories';
 import { KAIWA_STORIES_2 } from '@/data/english/365/kaiwa-stories-2';
 import { KAIWA_STORIES_3 } from '@/data/english/365/kaiwa-stories-3';
+import {
+    playTapPlay, playMasteryOn, playMasteryOff, playDayComplete,
+    playRegister, playDaySwitch, playStoryToggle, playLevelSwitch, playNavClick,
+} from '@/lib/kaiwa-sounds';
 
 const ALL_KAIWA_STORIES = [...KAIWA_STORIES, ...KAIWA_STORIES_2, ...KAIWA_STORIES_3];
 
@@ -58,6 +62,27 @@ const KAIWA_STYLES = `
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
+@keyframes masteredGlow {
+    0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); }
+    50% { box-shadow: 0 0 20px 4px rgba(212,175,55,0.15); }
+    100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+}
+@keyframes masteredBounce {
+    0% { transform: scale(1); }
+    20% { transform: scale(1.08); }
+    40% { transform: scale(0.96); }
+    60% { transform: scale(1.03); }
+    80% { transform: scale(0.99); }
+    100% { transform: scale(1); }
+}
+@keyframes confettiBurst {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-40px) scale(0.5); }
+}
+@keyframes playPulseRing {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2); opacity: 0; }
+}
 `;
 
 // ── Types ──
@@ -67,6 +92,7 @@ interface KaiwaEntry {
     day_slot: number;
     japanese: string;
     english: [string, string, string, string];
+    jaTranslations?: [string, string, string, string];
     context: string;
     character: string;
     category: string;
@@ -233,66 +259,66 @@ function StoryViewer({ story }: { story: KaiwaStory }) {
                 </div>
             </div>
 
-            {/* Preview lines (always visible) */}
-            <div style={{ padding: '8px 0' }}>
-                {previewLines.map((line, i) => (
-                    <StoryLine
-                        key={i}
-                        line={line}
-                        index={i}
-                        isActive={i === currentLine}
-                        showEn={showEn}
-                        onClick={() => {
-                            setCurrentLine(i);
-                            if (line.english && line.speaker !== 'narration') speakLine(line.english, line.speaker);
-                        }}
-                    />
-                ))}
-            </div>
+            {/* Story lines */}
+            {expanded ? (
+                /* Expanded: all lines in one scrollable container */
+                <div style={{
+                    padding: '8px 0',
+                    maxHeight: 450, overflowY: 'auto',
+                }}>
+                    {story.story.map((line, i) => (
+                        <StoryLine
+                            key={i}
+                            line={line}
+                            index={i}
+                            isActive={i === currentLine}
+                            showEn={showEn}
+                            onClick={() => {
+                                setCurrentLine(i);
+                                if (line.english && line.speaker !== 'narration') speakLine(line.english, line.speaker);
+                            }}
+                        />
+                    ))}
+                </div>
+            ) : (
+                /* Collapsed: preview only */
+                <div style={{ padding: '8px 0' }}>
+                    {previewLines.map((line, i) => (
+                        <StoryLine
+                            key={i}
+                            line={line}
+                            index={i}
+                            isActive={i === currentLine}
+                            showEn={showEn}
+                            onClick={() => {
+                                setCurrentLine(i);
+                                if (line.english && line.speaker !== 'narration') speakLine(line.english, line.speaker);
+                            }}
+                        />
+                    ))}
+                </div>
+            )}
 
-            {/* Expand/collapse for remaining lines */}
+            {/* Expand/collapse button */}
             {hasMore && (
-                <>
-                    {expanded && (
-                        <div style={{
-                            padding: '0 0 8px',
-                            maxHeight: 350, overflowY: 'auto',
-                        }}>
-                            {remainingLines.map((line, i) => (
-                                <StoryLine
-                                    key={previewLines.length + i}
-                                    line={line}
-                                    index={previewLines.length + i}
-                                    isActive={previewLines.length + i === currentLine}
-                                    showEn={showEn}
-                                    onClick={() => {
-                                        const idx = previewLines.length + i;
-                                        setCurrentLine(idx);
-                                        if (line.english && line.speaker !== 'narration') speakLine(line.english, line.speaker);
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    )}
-                    <button
-                        onClick={() => setExpanded(!expanded)}
-                        style={{
-                            width: '100%', padding: '8px 16px',
-                            background: expanded ? '#FDE68A20' : 'linear-gradient(to bottom, transparent, #FDE68A30)',
-                            border: 'none', borderTop: '1px solid #FDE68A30',
-                            cursor: 'pointer', fontSize: 11, fontWeight: 700,
-                            color: '#92400E', display: 'flex',
-                            alignItems: 'center', justifyContent: 'center', gap: 6,
-                        }}
-                    >
-                        {expanded ? 'Close' : `Read full story (${remainingLines.length} more)`}
-                        <span style={{
-                            display: 'inline-block',
-                            transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                            transition: 'transform 0.2s',
-                        }}>v</span>
-                    </button>
-                </>
+                <button
+                    onClick={() => { setExpanded(!expanded); playStoryToggle(!expanded); }}
+                    style={{
+                        width: '100%', padding: '8px 16px',
+                        background: expanded ? '#FDE68A20' : 'linear-gradient(to bottom, transparent, #FDE68A30)',
+                        border: 'none', borderTop: '1px solid #FDE68A30',
+                        cursor: 'pointer', fontSize: 11, fontWeight: 700,
+                        color: '#92400E', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center', gap: 6,
+                    }}
+                >
+                    {expanded ? 'Close' : `Read full story (${remainingLines.length} more)`}
+                    <span style={{
+                        display: 'inline-block',
+                        transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s',
+                    }}>v</span>
+                </button>
             )}
         </div>
     );
@@ -386,6 +412,15 @@ function daysBetween(from: Date, to: Date): number {
     return Math.floor((to.getTime() - from.getTime()) / msPerDay);
 }
 
+// ── Level Japanese descriptions ──
+
+const LEVEL_JA_DESC: [string, string, string, string] = [
+    '直訳・最短',
+    '感情を乗せた自然な表現',
+    '場面に合った実際の一言',
+    'ネイティブが頭の中で組み立てる流れ',
+];
+
 // ── Build entries ──
 
 function buildEntriesForRange(minSlot: number, maxSlot: number): KaiwaEntry[] {
@@ -402,6 +437,7 @@ function buildEntriesForRange(minSlot: number, maxSlot: number): KaiwaEntry[] {
                 day_slot: seed.daySlot,
                 japanese: seed.japanese,
                 english: seed.english,
+                jaTranslations: seed.jaTranslations,
                 context: seed.context,
                 character: seed.character,
                 category: seed.category,
@@ -444,7 +480,7 @@ export default function EnglishMaster365Page() {
     const detailRef = useRef<HTMLDivElement>(null);
     const synthRef = useRef<SpeechSynthesis | null>(null);
 
-    // 仕込み帳 registration (individual, not batch)
+    // Daily Training registration (individual, not batch)
     const [registeredPhrases, setRegisteredPhrases] = useState<Set<string>>(new Set());
     const [registeringId, setRegisteringId] = useState<string | null>(null);
     const [shikomiToast, setShikomiToast] = useState<string | null>(null);
@@ -673,7 +709,7 @@ export default function EnglishMaster365Page() {
         return localStorage.getItem(`365-checkin-${daySlot}`) !== null;
     }, []);
 
-    // Check-in completion handler: save checkin + register 3 picks to 仕込み帳
+    // Check-in completion handler: save checkin + register 3 picks to Daily Training
     const handleCheckinComplete = useCallback((picks: string[]) => {
         if (!selectedDay) return;
         // Save checkin by daySlot
@@ -681,7 +717,7 @@ export default function EnglishMaster365Page() {
             picks,
             timestamp: new Date().toISOString(),
         }));
-        // Register picked expressions to 仕込み帳
+        // Register picked expressions to Daily Training
         const today = new Date();
         const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         const pickedEntries = entries.filter(e => picks.includes(e.id));
@@ -720,16 +756,26 @@ export default function EnglishMaster365Page() {
     const toggleMastery = useCallback((id: string) => {
         setEntries(prev => {
             const mastery = loadMastery();
+            let soundPlayed = false;
             const updated = prev.map(e => {
                 if (e.id !== id) return e;
                 const newM = e.mastery === 3 ? 0 : 3;
                 mastery[e.id] = newM;
+                if (!soundPlayed) {
+                    if (newM === 3) playMasteryOn(); else playMasteryOff();
+                    soundPlayed = true;
+                }
                 return { ...e, mastery: newM };
             });
             saveMastery(mastery);
             const mSet = new Set<string>();
             updated.forEach(e => { if (e.mastery === 3) mSet.add(e.id); });
             setMasteredIds(mSet);
+            // Check if all entries for this day are now mastered
+            const dayEntries = updated.filter(e => e.daySlot === updated.find(x => x.id === id)?.daySlot);
+            if (dayEntries.length > 0 && dayEntries.every(e => e.mastery === 3)) {
+                setTimeout(() => playDayComplete(), 300);
+            }
             return updated;
         });
     }, []);
@@ -742,6 +788,7 @@ export default function EnglishMaster365Page() {
             setPlayingId(null);
             return;
         }
+        playTapPlay();
 
         setPlayingId(entry.id);
         const text = entry.english[1]; // Always play Vibe level
@@ -781,10 +828,11 @@ export default function EnglishMaster365Page() {
         synthRef.current.speak(utterance);
     }, [playingId, toggleMastery]);
 
-    // Register a specific level of expression to 仕込み帳 (localStorage)
+    // Register a specific level of expression to Daily Training (localStorage)
     const registerPhrase = useCallback((entry: KaiwaEntry, lvlIdx: number = 1) => {
         const english = entry.english[lvlIdx];
         setRegisteringId(entry.id);
+        playRegister();
         const today = new Date();
         const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         // Build situation from day theme
@@ -831,6 +879,7 @@ export default function EnglishMaster365Page() {
     const prevMonth = useCallback(() => {
         // Can't go before start date's month
         if (viewYear === startDate.getFullYear() && viewMonth === startDate.getMonth()) return;
+        playNavClick();
         setViewMonth(m => {
             if (m === 0) { setViewYear(y => y - 1); return 11; }
             return m - 1;
@@ -843,6 +892,7 @@ export default function EnglishMaster365Page() {
         endDate.setFullYear(endDate.getFullYear() + 1);
         const viewEnd = new Date(viewYear, viewMonth + 1, 1);
         if (viewEnd >= endDate) return;
+        playNavClick();
         setViewMonth(m => {
             if (m === 11) { setViewYear(y => y + 1); return 0; }
             return m + 1;
@@ -985,7 +1035,7 @@ export default function EnglishMaster365Page() {
                 </div>
             )}
 
-            {/* 仕込み帳 Toast */}
+            {/* Daily Training Toast */}
             {shikomiToast && (
                 <div style={{
                     position: 'fixed', bottom: 24, left: '50%',
@@ -1000,7 +1050,7 @@ export default function EnglishMaster365Page() {
                 }}>
                     <span style={{ color: '#10B981', fontSize: 16 }}>{'\u2713'}</span>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ fontSize: 11, color: '#A8A29E', marginBottom: 2 }}>仕込み帳に追加</div>
+                        <div style={{ fontSize: 11, color: '#A8A29E', marginBottom: 2 }}>Daily Trainingに追加</div>
                         <div style={{ fontSize: 12, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {shikomiToast}
                         </div>
@@ -1011,7 +1061,7 @@ export default function EnglishMaster365Page() {
                         padding: '6px 12px', borderRadius: 6,
                         fontSize: 11, fontWeight: 700, whiteSpace: 'nowrap',
                     }}>
-                        仕込み帳を開く
+                        Daily Trainingを開く
                     </Link>
                 </div>
             )}
@@ -1243,7 +1293,7 @@ export default function EnglishMaster365Page() {
                         entries={calendarEntries}
                         categoryColors={calendarCategoryColors}
                         selectedDay={selectedDay !== null ? selectedDay - daySlotOffset : null}
-                        onSelectDay={(d) => { setSelectedDay(d + daySlotOffset); setCategoryFilter(null); setExpandedId(null); }}
+                        onSelectDay={(d) => { setSelectedDay(d + daySlotOffset); setCategoryFilter(null); setExpandedId(null); playDaySwitch(); }}
                         viewYear={viewYear}
                         viewMonth={viewMonth}
                         onPrevMonth={prevMonth}
@@ -1301,7 +1351,7 @@ export default function EnglishMaster365Page() {
 
                                 return (
                                     <button
-                                        onClick={() => { setSelectedDay(yesterdaySlot); setCategoryFilter(null); setExpandedId(null); }}
+                                        onClick={() => { setSelectedDay(yesterdaySlot); setCategoryFilter(null); setExpandedId(null); playDaySwitch(); }}
                                         style={{
                                             width: '100%', marginBottom: 12,
                                             padding: '10px 16px',
@@ -1570,7 +1620,7 @@ export default function EnglishMaster365Page() {
                                                                     setTimeout(() => setShikomiToast(null), 3000);
                                                                 }}
                                                                 disabled={kwRegistered}
-                                                                title={kwRegistered ? '仕込み帳に登録済み' : '仕込み帳に追加'}
+                                                                title={kwRegistered ? 'Daily Trainingに登録済み' : 'Daily Trainingに追加'}
                                                                 style={{
                                                                     border: kwRegistered ? '1px solid #D1FAE5' : '1px solid #E7E5E4',
                                                                     borderRadius: 6,
@@ -1581,7 +1631,7 @@ export default function EnglishMaster365Page() {
                                                                     minHeight: 28,
                                                                 }}
                                                             >
-                                                                {kwRegistered ? '済' : '+仕込み'}
+                                                                {kwRegistered ? '済' : '+登録'}
                                                             </button>
                                                         );
                                                     })()}
@@ -1780,22 +1830,31 @@ export default function EnglishMaster365Page() {
 
                                     return (
                                         <div key={entry.id} id={`kaiwa-card-${idx}`} style={{
-                                            background: isAutoPlayActive ? '#FFFBEB' : isMastered ? '#FAFAF9' : '#fff',
+                                            background: isAutoPlayActive ? '#FFFBEB' : isMastered ? 'linear-gradient(135deg, #FFFBEB 0%, #ECFDF5 100%)' : '#fff',
                                             borderRadius: 12,
-                                            border: isAutoPlayActive ? '2px solid #D4AF37' : isMastered ? '1px solid #D4AF3740' : '1px solid #E7E5E4',
-                                            boxShadow: 'none',
+                                            border: isAutoPlayActive ? '2px solid #D4AF37' : isMastered ? '2px solid #D4AF3760' : '1px solid #E7E5E4',
+                                            boxShadow: isMastered ? '0 2px 12px rgba(212,175,55,0.1)' : 'none',
                                             padding: isMobile ? '14px' : '16px 20px',
-                                            opacity: isMastered ? 0.65 : 1,
+                                            opacity: 1,
                                             transition: 'all 0.3s',
                                             position: 'relative' as const,
                                             overflow: 'hidden',
                                         }}>
-                                            {/* Mastered accent stripe */}
+                                            {/* Mastered accent stripe + badge */}
                                             {isMastered && (
-                                                <div style={{
-                                                    position: 'absolute', top: 0, left: 0, right: 0, height: 3,
-                                                    background: 'linear-gradient(90deg, #D4AF37, #10B981)',
-                                                }} />
+                                                <>
+                                                    <div style={{
+                                                        position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+                                                        background: 'linear-gradient(90deg, #D4AF37, #10B981)',
+                                                    }} />
+                                                    <div style={{
+                                                        position: 'absolute', top: 8, right: 12,
+                                                        background: 'linear-gradient(135deg, #D4AF37, #B45309)',
+                                                        color: '#fff', fontSize: 9, fontWeight: 800,
+                                                        padding: '2px 8px', borderRadius: 4,
+                                                        letterSpacing: '0.08em',
+                                                    }}>CLEAR</div>
+                                                </>
                                             )}
                                             {/* Top row: number + character + actions */}
                                             <div style={{
@@ -1819,45 +1878,78 @@ export default function EnglishMaster365Page() {
                                                         {char?.nameJa || entry.character}
                                                     </span>
                                                 </div>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                    {/* Play */}
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                                    {/* Play -- prominent */}
                                                     <button onClick={() => playTTS(entry)} style={{
-                                                        width: 30, height: 30, borderRadius: '50%',
+                                                        position: 'relative',
+                                                        width: 40, height: 40, borderRadius: '50%',
                                                         border: 'none', cursor: 'pointer',
-                                                        background: isPlaying ? '#D4AF37' : playedIds.has(entry.id) ? '#D4AF3720' : '#F5F5F4',
-                                                        color: isPlaying ? '#fff' : playedIds.has(entry.id) ? '#D4AF37' : '#78716C',
-                                                        fontSize: 14, display: 'flex',
+                                                        background: isPlaying
+                                                            ? 'linear-gradient(135deg, #D4AF37, #B45309)'
+                                                            : playedIds.has(entry.id)
+                                                                ? 'linear-gradient(135deg, #D4AF3730, #D4AF3715)'
+                                                                : 'linear-gradient(135deg, #D4AF37, #D4AF37CC)',
+                                                        color: isPlaying ? '#fff' : playedIds.has(entry.id) ? '#D4AF37' : '#fff',
+                                                        fontSize: 16, display: 'flex',
                                                         alignItems: 'center', justifyContent: 'center',
                                                         transition: 'all 0.15s',
-                                                        boxShadow: isPlaying ? '0 0 0 3px rgba(212,175,55,0.3)' : 'none',
+                                                        boxShadow: isPlaying
+                                                            ? '0 0 0 4px rgba(212,175,55,0.3)'
+                                                            : playedIds.has(entry.id)
+                                                                ? 'none'
+                                                                : '0 2px 8px rgba(212,175,55,0.3)',
                                                         animation: isPlaying ? 'pulse-play 1.5s ease infinite' : 'none',
                                                     }}>
                                                         {isPlaying ? '\u25A0' : '\u25B6'}
+                                                        {/* Pulse ring on unplayed */}
+                                                        {!playedIds.has(entry.id) && !isPlaying && (
+                                                            <span style={{
+                                                                position: 'absolute', inset: 0,
+                                                                borderRadius: '50%',
+                                                                border: '2px solid #D4AF37',
+                                                                animation: 'playPulseRing 2s ease-out infinite',
+                                                                pointerEvents: 'none',
+                                                            }} />
+                                                        )}
                                                     </button>
                                                     {/* Mastery (auto-checked on listen) */}
                                                     <button onClick={() => toggleMastery(entry.id)} style={{
-                                                        width: 30, height: 30, borderRadius: '50%',
+                                                        width: 32, height: 32, borderRadius: '50%',
                                                         border: isMastered ? '2px solid #D4AF37' : '2px solid #E7E5E4',
                                                         cursor: 'pointer',
-                                                        background: isMastered ? '#D4AF37' : '#fff',
+                                                        background: isMastered ? 'linear-gradient(135deg, #D4AF37, #B45309)' : '#fff',
                                                         color: isMastered ? '#fff' : '#D6D3D1',
                                                         fontSize: 14, fontWeight: 700,
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                         transition: 'all 0.2s',
-                                                        animation: isMastered && playedIds.has(entry.id) ? 'checkFade 0.4s ease' : 'none',
+                                                        boxShadow: isMastered ? '0 2px 8px rgba(212,175,55,0.25)' : 'none',
+                                                        animation: isMastered && playedIds.has(entry.id) ? 'masteredBounce 0.6s ease' : 'none',
                                                     }}>
                                                         {isMastered ? '\u2713' : ''}
                                                     </button>
-                                                    {/* Registration moved to per-level rows below */}
                                                 </div>
                                             </div>
 
-                                            {/* Japanese */}
+                                            {/* Japanese + play hint */}
                                             <div style={{
-                                                fontSize: 17, fontWeight: 700, color: '#1C1917',
-                                                marginBottom: 6, lineHeight: 1.4,
+                                                display: 'flex', alignItems: 'center', gap: 10,
+                                                marginBottom: 8,
                                             }}>
-                                                {entry.japanese}
+                                                <div style={{
+                                                    fontSize: 17, fontWeight: 700, color: '#1C1917',
+                                                    lineHeight: 1.4, flex: 1,
+                                                }}>
+                                                    {entry.japanese}
+                                                </div>
+                                                {!playedIds.has(entry.id) && !isMastered && (
+                                                    <span style={{
+                                                        fontSize: 10, color: '#D4AF37', fontWeight: 600,
+                                                        whiteSpace: 'nowrap', flexShrink: 0,
+                                                        animation: 'pulse-play 2s ease infinite',
+                                                    }}>
+                                                        tap play
+                                                    </span>
+                                                )}
                                             </div>
 
                                             {/* English - BUILD-UP 4-level with per-row register */}
@@ -1875,6 +1967,7 @@ export default function EnglishMaster365Page() {
                                                         <div
                                                             key={lvl.key}
                                                             onClick={() => {
+                                                                playLevelSwitch();
                                                                 if (!synthRef.current) return;
                                                                 synthRef.current.cancel();
                                                                 const u = new SpeechSynthesisUtterance(text);
@@ -1907,15 +2000,22 @@ export default function EnglishMaster365Page() {
                                                                     {lvl.ja}
                                                                 </span>
                                                             </div>
-                                                            <div style={{
-                                                                flex: 1, minWidth: 0,
-                                                                fontSize: i === 0 ? 13 : i === 3 ? 12 : 14,
-                                                                fontWeight: i === 2 ? 600 : 400,
-                                                                color: i === 0 ? '#A8A29E' : i === 3 ? lvl.color : '#1C1917',
-                                                                lineHeight: 1.5,
-                                                                fontStyle: i === 3 ? 'italic' : 'normal',
-                                                            }}>
-                                                                {text}
+                                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                                <div style={{
+                                                                    fontSize: i === 0 ? 13 : i === 3 ? 12 : 14,
+                                                                    fontWeight: i === 2 ? 600 : 400,
+                                                                    color: i === 0 ? '#A8A29E' : i === 3 ? lvl.color : '#1C1917',
+                                                                    lineHeight: 1.5,
+                                                                    fontStyle: i === 3 ? 'italic' : 'normal',
+                                                                }}>
+                                                                    {text}
+                                                                </div>
+                                                                <div style={{
+                                                                    fontSize: 11, color: '#78716C',
+                                                                    marginTop: 2, lineHeight: 1.4,
+                                                                }}>
+                                                                    {entry.jaTranslations ? entry.jaTranslations[i] : (i === 0 ? entry.japanese : `${entry.japanese} -- ${LEVEL_JA_DESC[i]}`)}
+                                                                </div>
                                                             </div>
                                                             <button
                                                                 onClick={(e) => {
@@ -1923,7 +2023,7 @@ export default function EnglishMaster365Page() {
                                                                     if (!isLvlRegistered) registerPhrase(entry, i);
                                                                 }}
                                                                 disabled={isLvlRegistered}
-                                                                title={isLvlRegistered ? 'Training登録済み' : `${lvl.label}をTrainingに追加`}
+                                                                title={isLvlRegistered ? 'Daily Trainingに登録済み' : `${lvl.label}をDaily Trainingに追加`}
                                                                 style={{
                                                                     flexShrink: 0,
                                                                     border: isLvlRegistered ? `1.5px solid ${lvl.color}` : `1.5px solid ${lvl.color}50`,
@@ -1944,19 +2044,18 @@ export default function EnglishMaster365Page() {
                                                 })}
                                             </div>
 
-                                            {/* Context */}
+                                            {/* Context -- always visible */}
                                             {entry.context && (
-                                                <div
-                                                    onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                                                    style={{ cursor: 'pointer' }}
-                                                >
+                                                <div style={{
+                                                    marginTop: 4,
+                                                    padding: '8px 12px',
+                                                    background: '#FAFAF9',
+                                                    borderRadius: 8,
+                                                    borderLeft: '3px solid #E7E5E4',
+                                                }}>
                                                     <p style={{
-                                                        fontSize: 12, color: '#78716C', lineHeight: 1.6,
+                                                        fontSize: 12, color: '#57534E', lineHeight: 1.7,
                                                         margin: 0,
-                                                        display: isExpanded ? 'block' : '-webkit-box',
-                                                        WebkitLineClamp: isExpanded ? undefined : 2,
-                                                        WebkitBoxOrient: isExpanded ? undefined : 'vertical',
-                                                        overflow: isExpanded ? 'visible' : 'hidden',
                                                     }}>
                                                         {entry.context}
                                                     </p>
@@ -1976,32 +2075,57 @@ export default function EnglishMaster365Page() {
 
                                 return (
                                     <div style={{
-                                        marginTop: 20, padding: isComplete ? '20px 16px' : '16px',
-                                        borderRadius: 12, textAlign: 'center',
+                                        marginTop: 20, padding: isComplete ? '28px 20px' : '16px',
+                                        borderRadius: 16, textAlign: 'center',
                                         background: isComplete
-                                            ? 'linear-gradient(135deg, #FEF3C7 0%, #ECFDF5 50%, #FEF3C7 100%)'
+                                            ? 'linear-gradient(135deg, #FEF3C7 0%, #FFFBEB 30%, #ECFDF5 70%, #FEF3C7 100%)'
                                             : '#fff',
+                                        backgroundSize: isComplete ? '200% 200%' : 'auto',
+                                        animation: isComplete ? 'questComplete 4s ease infinite' : 'none',
                                         border: isComplete ? '2px solid #D4AF37' : '1px solid #E7E5E4',
+                                        boxShadow: isComplete ? '0 4px 24px rgba(212,175,55,0.2)' : 'none',
                                         transition: 'all 0.3s',
+                                        position: 'relative' as const,
+                                        overflow: 'hidden',
                                     }}>
                                         {isComplete ? (
                                             <>
+                                                {/* Decorative gold lines */}
                                                 <div style={{
-                                                    fontSize: 20, fontWeight: 900, color: '#D4AF37',
-                                                    marginBottom: 4, letterSpacing: '0.1em',
+                                                    position: 'absolute', top: 0, left: 0, right: 0, height: 4,
+                                                    background: 'linear-gradient(90deg, #D4AF37, #10B981, #D4AF37)',
+                                                }} />
+                                                <div style={{
+                                                    fontSize: 11, fontWeight: 800, color: '#D4AF37',
+                                                    letterSpacing: '0.15em', marginBottom: 6,
+                                                }}>
+                                                    -- MISSION COMPLETE --
+                                                </div>
+                                                <div style={{
+                                                    fontSize: 28, fontWeight: 900, color: '#1C1917',
+                                                    marginBottom: 6, letterSpacing: '-0.02em',
                                                 }}>
                                                     DAY {selectedDay} CLEAR
                                                 </div>
-                                                <div style={{ fontSize: 13, color: '#44403C', fontWeight: 600, marginBottom: 8 }}>
+                                                <div style={{ fontSize: 14, color: '#44403C', fontWeight: 600, marginBottom: 14 }}>
                                                     {total}フレーズ全てマスター
                                                 </div>
                                                 <div style={{
-                                                    display: 'inline-flex', alignItems: 'center', gap: 6,
-                                                    background: '#D4AF37', color: '#fff',
-                                                    padding: '6px 16px', borderRadius: 20,
-                                                    fontSize: 12, fontWeight: 800,
+                                                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                                                    background: 'linear-gradient(135deg, #D4AF37, #B45309)',
+                                                    color: '#fff',
+                                                    padding: '10px 28px', borderRadius: 24,
+                                                    fontSize: 14, fontWeight: 800,
+                                                    letterSpacing: '0.1em',
+                                                    boxShadow: '0 4px 16px rgba(212,175,55,0.35)',
                                                 }}>
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
                                                     PERFECT
+                                                </div>
+                                                <div style={{
+                                                    fontSize: 11, color: '#78716C', marginTop: 12, fontStyle: 'italic',
+                                                }}>
+                                                    {streak.current >= 3 ? `${streak.current} day streak -- keep it going` : 'Nice work. See you tomorrow.'}
                                                 </div>
                                             </>
                                         ) : (

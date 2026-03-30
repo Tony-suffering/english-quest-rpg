@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import EnglishSidebar from '@/components/EnglishSidebar';
 import InstallBanner from '@/components/InstallBanner';
 import { installLocalApi } from '@/lib/local-api';
@@ -333,6 +334,8 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
 }
 
 export default function EnglishLayout({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
+    const isKaiwaPage = pathname?.startsWith('/english/izakaya-toeic/kaiwa') ?? false;
     const [showWelcome, setShowWelcome] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isMobile, setIsMobile] = useState(false);
@@ -405,8 +408,8 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
         <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f5f6fa' }}>
             <EnglishSidebar desktopOpen={desktopSidebarOpen} />
 
-            {/* Desktop Sidebar Toggle - Middle Left Tab */}
-            {!isMobile && (
+            {/* Desktop Sidebar Toggle - Middle Left Tab (hidden on kaiwa/365 pages) */}
+            {!isKaiwaPage && !isMobile && (
                 <button
                     onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
                     style={{
