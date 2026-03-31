@@ -1,31 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface FeatureData {
-  label: string;
-  color: string;
-  href: string;
-  type: 'progress' | 'cumulative' | 'streak' | 'level' | 'cards' | 'days';
-  touched: number;
-  total: number | null;
-  extra?: string;
-  sublabel?: string;
-}
-
-interface CardRankBreakdown {
-  legendary: number;
-  holographic: number;
-  gold: number;
-  silver: number;
-  bronze: number;
-  normal: number;
-}
+import Link from 'next/link';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -40,584 +16,369 @@ function xpForLevel(level: number): number {
   return (level ** 2) * 100;
 }
 
-function safeParseJSON<T>(raw: string | null, fallback: T): T {
-  if (!raw) return fallback;
-  try {
-    return JSON.parse(raw) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function formatDate(date: Date): string {
-  const y = date.getFullYear();
-  const m = date.getMonth() + 1;
-  const d = date.getDate();
-  const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const w = weekdays[date.getDay()];
-  return `${y}.${String(m).padStart(2, '0')}.${String(d).padStart(2, '0')} ${w}`;
+function safe<T>(raw: string | null, fb: T): T {
+  if (!raw) return fb;
+  try { return JSON.parse(raw) as T; } catch { return fb; }
 }
 
 // ---------------------------------------------------------------------------
-// Data loaders (all from localStorage)
+// Data loaders
 // ---------------------------------------------------------------------------
 
-function loadMaster365(): { touched: number; total: number } {
-  const raw = safeParseJSON<Record<string, number>>(
-    localStorage.getItem('master-365-mastery'),
-    {},
-  );
-  const touched = Object.values(raw).filter((v) => v >= 1).length;
-  return { touched, total: 3650 };
-}
+function loadAll() {
+  // Master 365
+  const m365raw = safe<Record<string, number>>(localStorage.getItem('master-365-mastery'), {});
+  const m365touched = Object.values(m365raw).filter(v => v >= 1).length;
 
-function loadDailyTraining(): { registered: number; mastered: number } {
-  const phrases = safeParseJSON<unknown[]>(
-    localStorage.getItem('my-training-phrases'),
-    [],
+  // Daily Training
+  const phrases = safe<unknown[]>(localStorage.getItem('my-training-phrases'), []);
+  const mastery = safe<Record<string, number>>(
+    localStorage.getItem('my-training-mastery') || localStorage.getItem('quest-mastery'), {}
   );
-  const mastery = safeParseJSON<Record<string, number>>(
-    localStorage.getItem('my-training-mastery') ||
-      localStorage.getItem('quest-mastery'),
-    {},
-  );
-  const mastered = Object.values(mastery).filter((v) => v >= 3).length;
-  return { registered: phrases.length, mastered };
-}
+  const mastered = Object.values(mastery).filter(v => v >= 3).length;
 
-function loadCheckinStreak(): { current: number; best: number } {
-  const data = safeParseJSON<{ current?: number; lastDate?: string; best?: number }>(
-    localStorage.getItem('365-checkin-streak'),
-    {},
+  // Streak
+  const streakData = safe<{ current?: number; best?: number }>(
+    localStorage.getItem('365-checkin-streak'), {}
   );
-  return { current: data.current ?? 0, best: data.best ?? 0 };
-}
 
-function loadPlayerLevel(): { level: number; xp: number; sparks: number; nextXP: number; currentLevelXP: number } {
-  const stats = safeParseJSON<{ total_xp?: number; sparks?: number }>(
-    localStorage.getItem('quest-playerStats'),
-    {},
+  // Player
+  const stats = safe<{ total_xp?: number; sparks?: number }>(
+    localStorage.getItem('quest-playerStats'), {}
   );
   const xp = stats.total_xp ?? 0;
-  const sparks = stats.sparks ?? 0;
   const level = levelFromXP(xp);
-  const currentLevelXP = xpForLevel(level - 1);
-  const nextXP = xpForLevel(level);
-  return { level, xp, sparks, nextXP, currentLevelXP };
-}
 
-function loadCardCollection(): { total: number; breakdown: CardRankBreakdown } {
-  const points = safeParseJSON<Record<string, number>>(
-    localStorage.getItem('quest-cardPoints'),
-    {},
-  );
-  const breakdown: CardRankBreakdown = {
-    legendary: 0,
-    holographic: 0,
-    gold: 0,
-    silver: 0,
-    bronze: 0,
-    normal: 0,
-  };
-  let total = 0;
-  for (const p of Object.values(points)) {
+  // Cards
+  const cardPts = safe<Record<string, number>>(localStorage.getItem('quest-cardPoints'), {});
+  let cardTotal = 0;
+  const ranks = { legendary: 0, holo: 0, gold: 0, silver: 0, bronze: 0 };
+  for (const p of Object.values(cardPts)) {
     if (p < 1) continue;
-    total++;
-    if (p >= 250) breakdown.legendary++;
-    else if (p >= 100) breakdown.holographic++;
-    else if (p >= 50) breakdown.gold++;
-    else if (p >= 20) breakdown.silver++;
-    else if (p >= 5) breakdown.bronze++;
-    else breakdown.normal++;
+    cardTotal++;
+    if (p >= 250) ranks.legendary++;
+    else if (p >= 100) ranks.holo++;
+    else if (p >= 50) ranks.gold++;
+    else if (p >= 20) ranks.silver++;
+    else if (p >= 5) ranks.bronze++;
   }
-  return { total, breakdown };
-}
 
-function loadActiveDays(): number {
-  let count = 0;
-  const seen = new Set<string>();
+  // Active days
+  let days = 0;
   for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (!key) continue;
-    if (/^365-checkin-\d+$/.test(key)) {
-      seen.add(key);
-      count++;
-    }
-    if (/^kaiwa-quest-/.test(key)) {
-      if (!seen.has(key)) count++;
-    }
+    const k = localStorage.key(i);
+    if (k && /^365-checkin-\d+$/.test(k)) days++;
   }
-  return count;
+
+  return {
+    m365: { touched: m365touched, total: 3650 },
+    training: { registered: phrases.length, mastered },
+    streak: { current: streakData.current ?? 0, best: streakData.best ?? 0 },
+    player: { level, xp, sparks: stats.sparks ?? 0, nextXP: xpForLevel(level), currentXP: xpForLevel(level - 1) },
+    cards: { total: cardTotal, ranks },
+    days,
+  };
 }
 
 // ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
-function ProgressBar({
-  value,
-  max,
-  color,
-  height = 6,
-}: {
-  value: number;
-  max: number;
-  color: string;
-  height?: number;
-}) {
-  const pct = max > 0 ? Math.min((value / max) * 100, 100) : 0;
-  return (
-    <div
-      style={{
-        height,
-        backgroundColor: '#E7E5E4',
-        borderRadius: height / 2,
-        overflow: 'hidden',
-        width: '100%',
-      }}
-    >
-      <div
-        style={{
-          height: '100%',
-          width: `${pct}%`,
-          backgroundColor: color,
-          borderRadius: height / 2,
-          transition: 'width 0.6s ease',
-        }}
-      />
-    </div>
-  );
-}
-
-function RankBadge({ label, count, color }: { label: string; count: number; color: string }) {
-  if (count === 0) return null;
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '2px 8px',
-        borderRadius: 6,
-        backgroundColor: color + '18',
-        color,
-        fontSize: 11,
-        fontWeight: 700,
-        fontVariantNumeric: 'tabular-nums',
-      }}
-    >
-      {label} {count}
-    </span>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main page
+// Page
 // ---------------------------------------------------------------------------
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [loaded, setLoaded] = useState(false);
+  const [d, setD] = useState<ReturnType<typeof loadAll> | null>(null);
 
-  // Data state
-  const [master365, setMaster365] = useState({ touched: 0, total: 3650 });
-  const [training, setTraining] = useState({ registered: 0, mastered: 0 });
-  const [streak, setStreak] = useState({ current: 0, best: 0 });
-  const [player, setPlayer] = useState({ level: 1, xp: 0, sparks: 0, nextXP: 100, currentLevelXP: 0 });
-  const [cards, setCards] = useState<{ total: number; breakdown: CardRankBreakdown }>({
-    total: 0,
-    breakdown: { legendary: 0, holographic: 0, gold: 0, silver: 0, bronze: 0, normal: 0 },
-  });
-  const [activeDays, setActiveDays] = useState(0);
+  useEffect(() => { setD(loadAll()); }, []);
 
-  useEffect(() => {
-    setMaster365(loadMaster365());
-    setTraining(loadDailyTraining());
-    setStreak(loadCheckinStreak());
-    setPlayer(loadPlayerLevel());
-    setCards(loadCardCollection());
-    setActiveDays(loadActiveDays());
-    setLoaded(true);
-  }, []);
+  if (!d) return <div style={{ minHeight: '100vh', background: '#FAFAF9' }} />;
 
-  const grandTotal = master365.touched + training.registered + cards.total + activeDays;
-
-  const today = formatDate(new Date());
-
-  if (!loaded) {
-    return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#FAFAF9' }} />
-    );
-  }
+  const { m365, training, streak, player, cards, days } = d;
+  const totalActions = m365.touched + training.registered + cards.total + days;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#FAFAF9' }}>
-      {/* Sticky Header */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 50,
-          backgroundColor: '#FAFAF9',
-          borderBottom: '1px solid #E7E5E4',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 640,
-            margin: '0 auto',
-            padding: '12px 16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <button
-            onClick={() => router.back()}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '4px 8px',
-              fontSize: 14,
-              fontWeight: 600,
-              color: '#78716C',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <span style={{ fontSize: 18, lineHeight: 1 }}>&larr;</span>
-            Back
-          </button>
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              color: '#44403C',
-              letterSpacing: '0.05em',
-            }}
-          >
-            積み上げ
+    <div style={{ minHeight: '100vh', background: '#F5F5F4' }}>
+      {/* Header */}
+      <div style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        background: 'rgba(245,245,244,0.92)', backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid #E7E5E4',
+      }}>
+        <div style={{
+          maxWidth: 520, margin: '0 auto', padding: '10px 20px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <Link href="/english" style={{
+            fontSize: 13, color: '#78716C', textDecoration: 'none', fontWeight: 600,
+          }}>
+            ← Back
+          </Link>
+          <span style={{ fontSize: 13, fontWeight: 800, color: '#1C1917', letterSpacing: '0.08em' }}>
+            MY PROGRESS
           </span>
-          <span
-            style={{
-              fontSize: 11,
-              color: '#A8A29E',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {today}
+          <span style={{ fontSize: 11, color: '#A8A29E', fontVariantNumeric: 'tabular-nums' }}>
+            {new Date().toLocaleDateString('ja-JP')}
           </span>
         </div>
       </div>
 
-      {/* Content */}
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '20px 16px 60px' }}>
-        {/* Hero Section */}
-        <div
-          style={{
-            backgroundColor: '#fff',
-            borderRadius: 16,
-            border: '1px solid #E7E5E4',
-            padding: '32px 24px 24px',
-            marginBottom: 20,
-            textAlign: 'center',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: '#A8A29E',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginBottom: 8,
-            }}
-          >
-            GRAND TOTAL
+      <div style={{ maxWidth: 520, margin: '0 auto', padding: '20px 16px 80px' }}>
+
+        {/* ===== Hero ===== */}
+        <div style={{
+          background: 'linear-gradient(145deg, #1C1917, #292524)',
+          borderRadius: 20, padding: '36px 28px 28px',
+          marginBottom: 16, position: 'relative', overflow: 'hidden',
+        }}>
+          {/* Subtle gold accent line */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, height: 3,
+            background: 'linear-gradient(90deg, #D4AF37, #F59E0B, #D4AF37)',
+          }} />
+          <div style={{
+            fontSize: 10, fontWeight: 700, color: '#D4AF37',
+            letterSpacing: '0.15em', marginBottom: 12,
+          }}>
+            TOTAL PROGRESS
           </div>
-          <div
-            style={{
-              fontSize: 56,
-              fontWeight: 800,
-              color: '#D4AF37',
-              lineHeight: 1.1,
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
+            <span style={{
+              fontSize: 52, fontWeight: 900, color: '#fff', lineHeight: 1,
               fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            {grandTotal.toLocaleString()}
+            }}>
+              {totalActions.toLocaleString()}
+            </span>
+            <span style={{ fontSize: 13, color: '#78716C', fontWeight: 600 }}>
+              actions
+            </span>
           </div>
-          <div
-            style={{
-              fontSize: 13,
-              color: '#78716C',
-              marginTop: 8,
-              marginBottom: 20,
-            }}
-          >
+          <div style={{ fontSize: 13, color: '#57534E', lineHeight: 1.6 }}>
             これだけの英語に触れてきた
           </div>
-          <ProgressBar
-            value={master365.touched}
-            max={master365.total}
-            color="#D4AF37"
-            height={8}
-          />
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: 6,
-              fontSize: 11,
-              color: '#A8A29E',
-              fontVariantNumeric: 'tabular-nums',
-            }}
-          >
-            <span>{master365.touched.toLocaleString()}</span>
-            <span>{master365.total.toLocaleString()}</span>
+
+          {/* Master 365 overall bar */}
+          <div style={{ marginTop: 20 }}>
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', marginBottom: 6,
+              fontSize: 11, color: '#78716C',
+            }}>
+              <span>英会話マスター365</span>
+              <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                {m365.touched} / {m365.total.toLocaleString()}
+              </span>
+            </div>
+            <div style={{
+              height: 6, background: '#44403C', borderRadius: 3, overflow: 'hidden',
+            }}>
+              <div style={{
+                height: '100%', borderRadius: 3,
+                width: `${Math.min((m365.touched / m365.total) * 100, 100)}%`,
+                background: 'linear-gradient(90deg, #D4AF37, #F59E0B)',
+                transition: 'width 0.8s ease',
+              }} />
+            </div>
           </div>
         </div>
 
-        {/* Feature Rows */}
-        <div
-          style={{
-            backgroundColor: '#fff',
-            borderRadius: 16,
+        {/* ===== Stats Grid (2x2) ===== */}
+        <div style={{
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
+          marginBottom: 16,
+        }}>
+          {/* Streak */}
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: '20px 18px',
             border: '1px solid #E7E5E4',
-            overflow: 'hidden',
-          }}
-        >
-          {/* 英会話マスター365 */}
-          <FeatureRow
-            label="英会話マスター365"
-            color="#D4AF37"
-            href="/english/izakaya-toeic/kaiwa"
-            onClick={() => router.push('/english/izakaya-toeic/kaiwa')}
-          >
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#44403C', fontVariantNumeric: 'tabular-nums' }}>
-                  {master365.touched.toLocaleString()} / {master365.total.toLocaleString()}
-                </span>
-                <span style={{ fontSize: 11, color: '#A8A29E', fontVariantNumeric: 'tabular-nums' }}>
-                  {master365.total > 0 ? ((master365.touched / master365.total) * 100).toFixed(1) : '0.0'}%
-                </span>
-              </div>
-              <ProgressBar value={master365.touched} max={master365.total} color="#D4AF37" />
+          }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#10B981', letterSpacing: '0.1em', marginBottom: 8 }}>
+              STREAK
             </div>
-          </FeatureRow>
-
-          <Divider />
-
-          {/* Daily Training */}
-          <FeatureRow
-            label="Daily Training"
-            color="#EF4444"
-            href="/english/my-training"
-            onClick={() => router.push('/english/my-training')}
-          >
-            <div style={{ display: 'flex', gap: 16, alignItems: 'baseline' }}>
-              <div>
-                <span style={{ fontSize: 22, fontWeight: 700, color: '#EF4444', fontVariantNumeric: 'tabular-nums' }}>
-                  {training.registered}
-                </span>
-                <span style={{ fontSize: 11, color: '#A8A29E', marginLeft: 4 }}>registered</span>
-              </div>
-              <div>
-                <span style={{ fontSize: 22, fontWeight: 700, color: '#44403C', fontVariantNumeric: 'tabular-nums' }}>
-                  {training.mastered}
-                </span>
-                <span style={{ fontSize: 11, color: '#A8A29E', marginLeft: 4 }}>mastered</span>
-              </div>
-            </div>
-          </FeatureRow>
-
-          <Divider />
-
-          {/* チェックイン連続 */}
-          <FeatureRow
-            label="チェックイン連続"
-            color="#10B981"
-            href="/english/izakaya-toeic/kaiwa"
-            onClick={() => router.push('/english/izakaya-toeic/kaiwa')}
-          >
-            <div style={{ display: 'flex', gap: 20, alignItems: 'baseline' }}>
-              <div>
-                <span style={{ fontSize: 22, fontWeight: 700, color: '#10B981', fontVariantNumeric: 'tabular-nums' }}>
-                  {streak.current}
-                </span>
-                <span style={{ fontSize: 11, color: '#A8A29E', marginLeft: 4 }}>days</span>
-              </div>
-              <div style={{ fontSize: 11, color: '#A8A29E' }}>
-                best: <span style={{ fontWeight: 700, color: '#78716C', fontVariantNumeric: 'tabular-nums' }}>{streak.best}</span>
-              </div>
-            </div>
-          </FeatureRow>
-
-          <Divider />
-
-          {/* プレイヤーレベル */}
-          <FeatureRow
-            label="プレイヤーレベル"
-            color="#7C3AED"
-            href="/english/my-training"
-            onClick={() => router.push('/english/my-training')}
-          >
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
-                <span style={{ fontSize: 22, fontWeight: 700, color: '#7C3AED', fontVariantNumeric: 'tabular-nums' }}>
-                  Lv. {player.level}
-                </span>
-                <span style={{ fontSize: 11, color: '#A8A29E', fontVariantNumeric: 'tabular-nums' }}>
-                  {player.xp.toLocaleString()} / {player.nextXP.toLocaleString()} XP
-                </span>
-              </div>
-              <ProgressBar
-                value={player.xp - player.currentLevelXP}
-                max={player.nextXP - player.currentLevelXP}
-                color="#7C3AED"
-              />
-            </div>
-          </FeatureRow>
-
-          <Divider />
-
-          {/* カードコレクション */}
-          <FeatureRow
-            label="カードコレクション"
-            color="#D97706"
-            href="/english/my-training"
-            onClick={() => router.push('/english/my-training')}
-          >
-            <div style={{ flex: 1 }}>
-              <div style={{ marginBottom: 8 }}>
-                <span style={{ fontSize: 22, fontWeight: 700, color: '#D97706', fontVariantNumeric: 'tabular-nums' }}>
-                  {cards.total}
-                </span>
-                <span style={{ fontSize: 11, color: '#A8A29E', marginLeft: 4 }}>cards</span>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                <RankBadge label="LEGENDARY" count={cards.breakdown.legendary} color="#D97706" />
-                <RankBadge label="HOLO" count={cards.breakdown.holographic} color="#7C3AED" />
-                <RankBadge label="GOLD" count={cards.breakdown.gold} color="#D4AF37" />
-                <RankBadge label="SILVER" count={cards.breakdown.silver} color="#78716C" />
-                <RankBadge label="BRONZE" count={cards.breakdown.bronze} color="#B45309" />
-                <RankBadge label="NORMAL" count={cards.breakdown.normal} color="#A8A29E" />
-              </div>
-            </div>
-          </FeatureRow>
-
-          <Divider />
-
-          {/* アクティブ日数 */}
-          <FeatureRow
-            label="アクティブ日数"
-            color="#2563EB"
-            href="/english/izakaya-toeic/kaiwa"
-            onClick={() => router.push('/english/izakaya-toeic/kaiwa')}
-          >
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-              <span style={{ fontSize: 22, fontWeight: 700, color: '#2563EB', fontVariantNumeric: 'tabular-nums' }}>
-                {activeDays}
+              <span style={{
+                fontSize: 36, fontWeight: 900, lineHeight: 1,
+                color: streak.current > 0 ? '#10B981' : '#D6D3D1',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {streak.current}
               </span>
-              <span style={{ fontSize: 11, color: '#A8A29E' }}>days</span>
+              <span style={{ fontSize: 12, color: '#A8A29E', fontWeight: 600 }}>days</span>
             </div>
-          </FeatureRow>
+            {streak.best > 0 && (
+              <div style={{ fontSize: 11, color: '#A8A29E', marginTop: 6 }}>
+                best: <span style={{ fontWeight: 700, color: '#78716C' }}>{streak.best}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Level */}
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: '20px 18px',
+            border: '1px solid #E7E5E4',
+          }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', letterSpacing: '0.1em', marginBottom: 8 }}>
+              PLAYER
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <span style={{
+                fontSize: 36, fontWeight: 900, lineHeight: 1, color: '#7C3AED',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {player.level}
+              </span>
+              <span style={{ fontSize: 12, color: '#A8A29E', fontWeight: 600 }}>Lv.</span>
+            </div>
+            <div style={{
+              height: 4, background: '#E7E5E4', borderRadius: 2, overflow: 'hidden', marginTop: 8,
+            }}>
+              <div style={{
+                height: '100%', borderRadius: 2,
+                width: `${player.nextXP > player.currentXP ? Math.min(((player.xp - player.currentXP) / (player.nextXP - player.currentXP)) * 100, 100) : 0}%`,
+                background: '#7C3AED', transition: 'width 0.6s',
+              }} />
+            </div>
+            <div style={{ fontSize: 10, color: '#A8A29E', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
+              {player.xp.toLocaleString()} XP
+            </div>
+          </div>
+
+          {/* Active Days */}
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: '20px 18px',
+            border: '1px solid #E7E5E4',
+          }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', letterSpacing: '0.1em', marginBottom: 8 }}>
+              ACTIVE DAYS
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <span style={{
+                fontSize: 36, fontWeight: 900, lineHeight: 1,
+                color: days > 0 ? '#2563EB' : '#D6D3D1',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {days}
+              </span>
+              <span style={{ fontSize: 12, color: '#A8A29E', fontWeight: 600 }}>days</span>
+            </div>
+          </div>
+
+          {/* Sparks */}
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: '20px 18px',
+            border: '1px solid #E7E5E4',
+          }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#D97706', letterSpacing: '0.1em', marginBottom: 8 }}>
+              SPARKS
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+              <span style={{
+                fontSize: 36, fontWeight: 900, lineHeight: 1,
+                color: player.sparks > 0 ? '#D97706' : '#D6D3D1',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {player.sparks.toLocaleString()}
+              </span>
+              <span style={{ fontSize: 12, color: '#A8A29E', fontWeight: 600 }}>GP</span>
+            </div>
+          </div>
         </div>
+
+        {/* ===== Detail Cards ===== */}
+
+        {/* Daily Training */}
+        <Link href="/english/my-training" style={{ textDecoration: 'none', display: 'block', marginBottom: 10 }}>
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: '18px 20px',
+            border: '1px solid #E7E5E4',
+            transition: 'border-color 0.15s',
+          }}>
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              marginBottom: 12,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444' }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#44403C' }}>Daily Training</span>
+              </div>
+              <span style={{ fontSize: 13, color: '#D6D3D1' }}>&rsaquo;</span>
+            </div>
+            <div style={{ display: 'flex', gap: 24 }}>
+              <div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: '#EF4444', fontVariantNumeric: 'tabular-nums' }}>
+                  {training.registered}
+                </div>
+                <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>registered</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: '#44403C', fontVariantNumeric: 'tabular-nums' }}>
+                  {training.mastered}
+                </div>
+                <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>mastered</div>
+              </div>
+            </div>
+          </div>
+        </Link>
+
+        {/* Card Collection */}
+        <Link href="/english/training/card-preview" style={{ textDecoration: 'none', display: 'block', marginBottom: 10 }}>
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: '18px 20px',
+            border: '1px solid #E7E5E4',
+          }}>
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              marginBottom: 12,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#D97706' }} />
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#44403C' }}>Card Collection</span>
+              </div>
+              <span style={{ fontSize: 13, color: '#D6D3D1' }}>&rsaquo;</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
+              <span style={{ fontSize: 28, fontWeight: 800, color: '#D97706', fontVariantNumeric: 'tabular-nums' }}>
+                {cards.total}
+              </span>
+              <span style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>cards</span>
+            </div>
+            {cards.total > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {[
+                  { label: 'LEGENDARY', count: cards.ranks.legendary, color: '#D97706' },
+                  { label: 'HOLO', count: cards.ranks.holo, color: '#7C3AED' },
+                  { label: 'GOLD', count: cards.ranks.gold, color: '#D4AF37' },
+                  { label: 'SILVER', count: cards.ranks.silver, color: '#78716C' },
+                  { label: 'BRONZE', count: cards.ranks.bronze, color: '#B45309' },
+                ].filter(r => r.count > 0).map(r => (
+                  <span key={r.label} style={{
+                    fontSize: 10, fontWeight: 700, color: r.color,
+                    background: r.color + '15', padding: '3px 8px', borderRadius: 6,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}>
+                    {r.label} {r.count}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </Link>
+
+        {/* Creator link */}
+        <Link href="/english/note" style={{ textDecoration: 'none', display: 'block' }}>
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: '18px 20px',
+            border: '1px solid #E7E5E4',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#44403C' }}>
+                作ってる人の話
+              </div>
+              <div style={{ fontSize: 11, color: '#A8A29E', marginTop: 2 }}>
+                TOEIC 900、喋れない、毎日更新中
+              </div>
+            </div>
+            <span style={{ fontSize: 13, color: '#D6D3D1' }}>&rsaquo;</span>
+          </div>
+        </Link>
       </div>
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Shared row + divider
-// ---------------------------------------------------------------------------
-
-function FeatureRow({
-  label,
-  color,
-  href,
-  onClick,
-  children,
-}: {
-  label: string;
-  color: string;
-  href: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 10,
-        width: '100%',
-        padding: '16px 20px',
-        background: 'none',
-        border: 'none',
-        cursor: 'pointer',
-        textAlign: 'left',
-        transition: 'background-color 0.15s',
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#FAFAF9';
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
-      }}
-    >
-      {/* Label row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            backgroundColor: color,
-            flexShrink: 0,
-          }}
-        />
-        <span
-          style={{
-            fontSize: 12,
-            fontWeight: 700,
-            color: '#78716C',
-            letterSpacing: '0.04em',
-          }}
-        >
-          {label}
-        </span>
-        <span
-          style={{
-            marginLeft: 'auto',
-            fontSize: 14,
-            color: '#D6D3D1',
-            lineHeight: 1,
-          }}
-        >
-          &rsaquo;
-        </span>
-      </div>
-      {/* Content */}
-      <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 16 }}>
-        {children}
-      </div>
-    </button>
-  );
-}
-
-function Divider() {
-  return (
-    <div
-      style={{
-        height: 1,
-        backgroundColor: '#F5F5F4',
-        marginLeft: 20,
-        marginRight: 20,
-      }}
-    />
   );
 }

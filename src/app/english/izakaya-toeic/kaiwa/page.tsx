@@ -1131,6 +1131,37 @@ export default function EnglishMaster365Page() {
                         </p>
                     )}
 
+                    {/* Dashboard banner */}
+                    <Link href="/english/dashboard" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
+                        <div style={{
+                            background: 'linear-gradient(135deg, #1C1917, #292524)',
+                            borderRadius: 12, padding: '14px 16px',
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            border: '1px solid #44403C',
+                            transition: 'opacity 0.15s',
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                <div style={{ fontSize: 10, fontWeight: 700, color: '#D4AF37', letterSpacing: '0.1em' }}>
+                                    MY PROGRESS
+                                </div>
+                                <div style={{
+                                    height: 12, width: 1, background: '#44403C',
+                                }} />
+                                <div style={{ display: 'flex', gap: 12 }}>
+                                    {streak.current > 0 && (
+                                        <span style={{ fontSize: 12, fontWeight: 800, color: '#10B981' }}>
+                                            {streak.current}d streak
+                                        </span>
+                                    )}
+                                    <span style={{ fontSize: 12, fontWeight: 700, color: '#78716C' }}>
+                                        {masteredIds.size}/{entries.length} cleared
+                                    </span>
+                                </div>
+                            </div>
+                            <span style={{ fontSize: 14, color: '#57534E' }}>&rsaquo;</span>
+                        </div>
+                    </Link>
+
                     {/* 4-Level Demo */}
                     <div style={{ marginBottom: 12 }}>
                         <button
