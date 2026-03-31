@@ -9162,6 +9162,11 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             </div>
                                             <div style={{ width: '1px', backgroundColor: '#eee' }} />
                                             <div style={{ textAlign: 'center' }}>
+                                                <div style={{ fontSize: '16px', fontWeight: '700', color: chakraAnalytics.streak > 0 ? '#10B981' : '#ccc' }}>{chakraAnalytics.streak}</div>
+                                                <div style={{ fontSize: '8px', color: '#999', fontWeight: '600' }}>STREAK</div>
+                                            </div>
+                                            <div style={{ width: '1px', backgroundColor: '#eee' }} />
+                                            <div style={{ textAlign: 'center' }}>
                                                 <div style={{ fontSize: '16px', fontWeight: '700', color: '#333' }}>{chakraAnalytics.activeDays}<span style={{ fontSize: '10px', color: '#999' }}>/{chakraAnalytics.daysInMonth}</span></div>
                                                 <div style={{ fontSize: '8px', color: '#999', fontWeight: '600' }}>ACTIVE DAYS</div>
                                             </div>
