@@ -1157,6 +1157,20 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, lastReviewedWord, dr
         localStorage.setItem('inline-slot-state', JSON.stringify({ state: slotState, ceiling, spinsLeft: stateSpinsLeft, kakuhenBoost }));
     }, [slotState, ceiling, stateSpinsLeft, kakuhenBoost]);
 
+    // Reset kakuhen + slot state when SLOT is turned off
+    useEffect(() => {
+        const check = () => {
+            if (!getSettings().slotEnabled) {
+                setKakuhenBoost(0);
+                setSlotState('normal');
+                setCeiling(0);
+                setStateSpinsLeft(0);
+            }
+        };
+        const interval = setInterval(check, 500);
+        return () => clearInterval(interval);
+    }, []);
+
     // State transition handler
     const transitionSlotState = useCallback((to: SlotMachineState) => {
         setStateTransition({ from: slotState, to, key: Date.now() });

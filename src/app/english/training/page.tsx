@@ -10,7 +10,7 @@ export default function TrainingPage() {
 
     return (
         <>
-            <PhrasesPage initialData={undefined} onHelpClick={() => setShowHelp(true)} />
+            <PhrasesPage initialData={undefined} onHelpClick={() => setShowHelp(true)} skipDefaultData />
             <TrainingTutorial forceOpen={showHelp} key={showHelp ? 'open' : 'auto'} />
         </>
     );
