@@ -371,6 +371,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
+                    {renderToolItem({ id: '/english/dashboard', label: '積み上げ', color: '#D4AF37' })}
 
                     {/* CONTENT section removed -- items moved into programs */}
 
