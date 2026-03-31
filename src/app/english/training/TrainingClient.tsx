@@ -2564,8 +2564,24 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     } | null>(null);
     const [voiceRecordings, setVoiceRecordings] = useState<Record<string, VoiceRecording[]>>(initialData?.recordings || {});
     const [phraseLinks, setPhraseLinks] = useState<Record<string, PhraseLink[]>>(initialData?.links || {});
-    const [phraseLastLeveled, setPhraseLastLeveled] = useState<Record<string, string>>(initialData?.lastLeveled || {});
-    const [cardPoints, setCardPoints] = useState<Record<string, number>>(initialData?.cardPoints || {});
+    const [phraseLastLeveled, setPhraseLastLeveled] = useState<Record<string, string>>(() => {
+        if (IS_PUBLIC && !initialData?.lastLeveled) {
+            try {
+                const saved = localStorage.getItem('quest-lastLeveled');
+                if (saved) return JSON.parse(saved);
+            } catch { /* */ }
+        }
+        return initialData?.lastLeveled || {};
+    });
+    const [cardPoints, setCardPoints] = useState<Record<string, number>>(() => {
+        if (IS_PUBLIC && !initialData?.cardPoints) {
+            try {
+                const saved = localStorage.getItem('quest-cardPoints');
+                if (saved) return JSON.parse(saved);
+            } catch { /* */ }
+        }
+        return initialData?.cardPoints || {};
+    });
 
     // Card pool for slot reels (different cards on non-triple)
     const slotCardPool = useMemo(() => {
@@ -2634,8 +2650,24 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const [dateTouchMap, setDateTouchMap] = useState<Record<string, number>>({});
 
     // Player level state — initialized from Server Component data when available
-    const [playerTotalXP, setPlayerTotalXP] = useState(() => initialData?.playerStats?.total_xp || 0);
-    const [playerLevel, setPlayerLevel] = useState(() => levelFromXP(initialData?.playerStats?.total_xp || 0));
+    const [playerTotalXP, setPlayerTotalXP] = useState(() => {
+        if (IS_PUBLIC && !initialData?.playerStats?.total_xp) {
+            try {
+                const saved = localStorage.getItem('quest-playerStats');
+                if (saved) return JSON.parse(saved).total_xp || 0;
+            } catch { /* */ }
+        }
+        return initialData?.playerStats?.total_xp || 0;
+    });
+    const [playerLevel, setPlayerLevel] = useState(() => {
+        if (IS_PUBLIC && !initialData?.playerStats?.total_xp) {
+            try {
+                const saved = localStorage.getItem('quest-playerStats');
+                if (saved) return levelFromXP(JSON.parse(saved).total_xp || 0);
+            } catch { /* */ }
+        }
+        return levelFromXP(initialData?.playerStats?.total_xp || 0);
+    });
     const [levelUpEffect, setLevelUpEffect] = useState<{ level: number; title: string; color: string; key: number } | null>(null);
 
     // Daily level-up effect
@@ -2643,7 +2675,15 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const prevDailyLevelRef = useRef(-1);
 
     // Gacha bonus system state
-    const [playerSparks, setPlayerSparks] = useState(() => initialData?.playerStats?.sparks || 0);
+    const [playerSparks, setPlayerSparks] = useState(() => {
+        if (IS_PUBLIC && !initialData?.playerStats?.sparks) {
+            try {
+                const saved = localStorage.getItem('quest-playerStats');
+                if (saved) return JSON.parse(saved).sparks || 0;
+            } catch { /* */ }
+        }
+        return initialData?.playerStats?.sparks || 0;
+    });
     const [gachaEffect, setGachaEffect] = useState<{
         phase: 'reel' | 'reveal';
         tier: string;
@@ -2699,6 +2739,25 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     useEffect(() => {
         localStorage.setItem('training-chain-state', JSON.stringify({ count: chainState.count, mode: chainState.mode }));
     }, [chainState.count, chainState.mode]);
+
+    // Persist player stats, card points, and last-leveled dates to localStorage (public mode)
+    useEffect(() => {
+        if (!IS_PUBLIC) return;
+        localStorage.setItem('quest-playerStats', JSON.stringify({ total_xp: playerTotalXP, sparks: playerSparks }));
+    }, [playerTotalXP, playerSparks]);
+    useEffect(() => {
+        if (!IS_PUBLIC) return;
+        if (Object.keys(cardPoints).length > 0) {
+            localStorage.setItem('quest-cardPoints', JSON.stringify(cardPoints));
+        }
+    }, [cardPoints]);
+    useEffect(() => {
+        if (!IS_PUBLIC) return;
+        if (Object.keys(phraseLastLeveled).length > 0) {
+            localStorage.setItem('quest-lastLeveled', JSON.stringify(phraseLastLeveled));
+        }
+    }, [phraseLastLeveled]);
+
     const [chainTransition, setChainTransition] = useState<{ from: ChainMode; to: ChainMode; key: number } | null>(null);
     // Keep backward-compat aliases for FEVER visuals
     const feverMode = { active: chainState.mode !== 'normal', streak: chainState.count, key: chainState.key };
@@ -3383,6 +3442,23 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             const saved = localStorage.getItem('my-training-mastery');
                             if (saved) setPhraseMastery(JSON.parse(saved));
                         } catch { /* */ }
+                        try {
+                            const cp = localStorage.getItem('quest-cardPoints');
+                            if (cp) setCardPoints(JSON.parse(cp));
+                        } catch { /* */ }
+                        try {
+                            const ll = localStorage.getItem('quest-lastLeveled');
+                            if (ll) setPhraseLastLeveled(JSON.parse(ll));
+                        } catch { /* */ }
+                        try {
+                            const ps = localStorage.getItem('quest-playerStats');
+                            if (ps) {
+                                const stats = JSON.parse(ps);
+                                setPlayerTotalXP(stats.total_xp || 0);
+                                setPlayerLevel(levelFromXP(stats.total_xp || 0));
+                                setPlayerSparks(stats.sparks || 0);
+                            }
+                        } catch { /* */ }
                         setVoiceRecordings({});
                         setPhraseLinks({});
                     } else {
@@ -3452,6 +3528,23 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     try {
                         const saved = localStorage.getItem('quest-mastery');
                         if (saved) setPhraseMastery(JSON.parse(saved));
+                    } catch { /* */ }
+                    try {
+                        const cp = localStorage.getItem('quest-cardPoints');
+                        if (cp) setCardPoints(JSON.parse(cp));
+                    } catch { /* */ }
+                    try {
+                        const ll = localStorage.getItem('quest-lastLeveled');
+                        if (ll) setPhraseLastLeveled(JSON.parse(ll));
+                    } catch { /* */ }
+                    try {
+                        const ps = localStorage.getItem('quest-playerStats');
+                        if (ps) {
+                            const stats = JSON.parse(ps);
+                            setPlayerTotalXP(stats.total_xp || 0);
+                            setPlayerLevel(levelFromXP(stats.total_xp || 0));
+                            setPlayerSparks(stats.sparks || 0);
+                        }
                     } catch { /* */ }
                     setVoiceRecordings({});
                     setPhraseLinks({});
@@ -5671,6 +5764,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 // 3004: localStorageに保存
                 const updated = { ...phraseMastery, [phraseId]: next };
                 localStorage.setItem('quest-mastery', JSON.stringify(updated));
+                if (skipDefaultData) {
+                    localStorage.setItem('my-training-mastery', JSON.stringify(updated));
+                }
                 // Sync back to TOEIC酒場 vocab deck if this is a toeic_ phrase
                 if (phraseId.startsWith('toeic_')) {
                     try {
