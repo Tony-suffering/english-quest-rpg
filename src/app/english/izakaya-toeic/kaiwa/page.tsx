@@ -28,6 +28,7 @@ import {
     playTapPlay, playMasteryOn, playMasteryOff, playDayComplete,
     playRegister, playDaySwitch, playStoryToggle, playLevelSwitch, playNavClick,
 } from '@/lib/kaiwa-sounds';
+import { getStreakComment, getMissionCompleteComment, CREATOR_PROFILE } from '@/data/english/creator-voice';
 
 const ALL_KAIWA_STORIES = [...KAIWA_STORIES, ...KAIWA_STORIES_2, ...KAIWA_STORIES_3];
 
@@ -551,6 +552,9 @@ export default function EnglishMaster365Page() {
             return next;
         });
     }, []);
+
+    // Creator voice — stable per session
+    const creatorStreakLine = useMemo(() => getStreakComment(streak.current), [streak.current]);
 
     // ── User-relative day mapping ──
     // daySlotOffset = days between startDate and first of view month
@@ -1159,6 +1163,13 @@ export default function EnglishMaster365Page() {
                                 </div>
                             </div>
                             <span style={{ fontSize: 14, color: '#57534E' }}>&rsaquo;</span>
+                        </div>
+                        {/* Creator voice line */}
+                        <div style={{
+                            padding: '6px 16px 0', fontSize: 11, color: '#78716C',
+                            lineHeight: 1.5, fontStyle: 'italic',
+                        }}>
+                            {creatorStreakLine}
                         </div>
                     </Link>
 
@@ -2162,7 +2173,7 @@ export default function EnglishMaster365Page() {
                                                 <div style={{
                                                     fontSize: 11, color: '#78716C', marginTop: 12, fontStyle: 'italic',
                                                 }}>
-                                                    {streak.current >= 3 ? `${streak.current} day streak -- keep it going` : 'Nice work. See you tomorrow.'}
+                                                    {getMissionCompleteComment(selectedDay, streak.current)}
                                                 </div>
                                             </>
                                         ) : (
@@ -2351,20 +2362,20 @@ export default function EnglishMaster365Page() {
                                         </div>
                                     </div>
                                 </Link>
-                                <Link href="/english/note" style={{ textDecoration: 'none', flex: 1 }}>
+                                <a href={CREATOR_PROFILE.noteUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', flex: 1 }}>
                                     <div style={{
-                                        background: '#fff', borderRadius: 10,
+                                        background: '#FAFAF9', borderRadius: 10,
                                         border: '1px solid #E7E5E4', padding: 14,
                                         cursor: 'pointer', transition: 'border-color 0.15s',
                                     }}>
-                                        <div style={{ fontSize: 10, fontWeight: 700, color: '#78716C', marginBottom: 2 }}>
-                                            FROM THE CREATOR
+                                        <div style={{ fontSize: 10, fontWeight: 700, color: '#D4AF37', marginBottom: 2 }}>
+                                            THE CREATOR
                                         </div>
-                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>
-                                            作ってる人の話
+                                        <div style={{ fontSize: 12, fontWeight: 600, color: '#44403C', lineHeight: 1.5 }}>
+                                            {CREATOR_PROFILE.tagline}
                                         </div>
                                     </div>
-                                </Link>
+                                </a>
                             </div>
                         </>
                     ) : (
@@ -2374,7 +2385,7 @@ export default function EnglishMaster365Page() {
                         }}>
                             {entries.length === 0
                                 ? 'まだコンテンツがありません'
-                                : 'カレンダーから日付を選んでください'
+                                : 'カレンダーから日付を選んで。毎日10フレーズ、全部俺が作った。'
                             }
                         </div>
                     )}

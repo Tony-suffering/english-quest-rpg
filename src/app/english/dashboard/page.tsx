@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { getDashboardComment, getStreakComment, CREATOR_PROFILE } from '@/data/english/creator-voice';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -94,6 +95,13 @@ export default function DashboardPage() {
   const { m365, training, streak, player, cards, days } = d;
   const totalActions = m365.touched + training.registered + cards.total + days;
 
+  // Creator voice — stable per session (useMemo with no deps = mount only)
+  const creatorComment = useMemo(() => getDashboardComment({
+    totalActions, streak: streak.current, level: player.level,
+    mastered: m365.touched, days,
+  }), []); // eslint-disable-line react-hooks/exhaustive-deps
+  const streakComment = useMemo(() => getStreakComment(streak.current), []); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <div style={{ minHeight: '100vh', background: '#F5F5F4' }}>
       {/* Header */}
@@ -151,7 +159,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <div style={{ fontSize: 13, color: '#57534E', lineHeight: 1.6 }}>
-            これだけの英語に触れてきた
+            {creatorComment}
           </div>
 
           {/* Master 365 overall bar */}
@@ -360,24 +368,38 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        {/* Creator link */}
-        <Link href="/english/note" style={{ textDecoration: 'none', display: 'block' }}>
+        {/* Creator voice — inline, not a separate page */}
+        <div style={{
+          background: '#FAFAF9', borderRadius: 16, padding: '18px 20px',
+          border: '1px solid #E7E5E4', marginTop: 6,
+        }}>
           <div style={{
-            background: '#fff', borderRadius: 16, padding: '18px 20px',
-            border: '1px solid #E7E5E4',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+            fontSize: 10, fontWeight: 700, color: '#A8A29E',
+            letterSpacing: '0.1em', marginBottom: 8,
           }}>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#44403C' }}>
-                作ってる人の話
-              </div>
-              <div style={{ fontSize: 11, color: '#A8A29E', marginTop: 2 }}>
-                TOEIC 900、喋れない、毎日更新中
-              </div>
-            </div>
-            <span style={{ fontSize: 13, color: '#D6D3D1' }}>&rsaquo;</span>
+            FROM THE CREATOR
           </div>
-        </Link>
+          <div style={{ fontSize: 13, color: '#44403C', lineHeight: 1.7, marginBottom: 10 }}>
+            {streakComment}
+          </div>
+          <div style={{
+            fontSize: 11, color: '#A8A29E', lineHeight: 1.5,
+            borderTop: '1px solid #E7E5E4', paddingTop: 10,
+          }}>
+            {CREATOR_PROFILE.description}
+          </div>
+          <a
+            href={CREATOR_PROFILE.noteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block', marginTop: 8,
+              fontSize: 11, color: '#D4AF37', textDecoration: 'none', fontWeight: 600,
+            }}
+          >
+            note.com で開発記録を読む →
+          </a>
+        </div>
       </div>
     </div>
   );
