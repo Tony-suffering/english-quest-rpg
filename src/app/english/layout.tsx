@@ -156,11 +156,10 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                 </Title>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, ...fadeIn(0.3) }}>
                     {[
-                        { icon: 'S', label: 'スロット+バトル', desc: 'フレーズを覚える → スロットが回る → ボスにダメージ', c: gold },
+                        { icon: 'K', label: '英会話マスター365', desc: '毎日更新の英会話レッスン。5分トーク+ひとこと英語帳', c: gold },
+                        { icon: 'T', label: '居酒屋TOEIC', desc: '居酒屋トークで学ぶTOEIC対策。Part 1-7完全対応', c: '#10B981' },
                         { icon: 'M', label: 'メモリア(会話リスニング)', desc: '7つのシナリオ、40人以上のキャラ。ネイティブの会話を聴く', c: '#3B82F6' },
-                        { icon: 'G', label: '俺語録(310表現)', desc: '日本語の感覚を、ネイティブならこう言う、に変換', c: '#8B5CF6' },
-                        { icon: 'R', label: '毎日レビュー(15,000語)', desc: '日めくりで単語+イディオム+例文。365日分', c: '#EF4444' },
-                        { icon: 'T', label: 'TOEIC酒場', desc: '居酒屋トークで学ぶTOEIC対策。Part 1-7完全対応', c: '#10B981' },
+                        { icon: 'S', label: 'スロット+バトル', desc: 'フレーズを覚える → スロットが回る → カードが育つ', c: '#EF4444' },
                     ].map((f, i) => (
                         <div key={f.label} style={{ display: 'flex', gap: 12, padding: '12px 14px', backgroundColor: '#111', borderRadius: 12, border: '1px solid #222', ...slideIn(i) }}>
                             <div style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: f.c, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0 }}>{f.icon}</div>
