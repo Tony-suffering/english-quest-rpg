@@ -1086,29 +1086,35 @@ export default function EnglishMaster365Page() {
                             </span>
                         </div>
                         {/* Streak badge */}
-                        {streak.current > 0 && (
-                            <div style={{
-                                display: 'flex', alignItems: 'center', gap: 6,
-                                background: streak.current >= 7 ? 'linear-gradient(135deg, #FEF3C7, #FDE68A)' : '#FEF9E7',
-                                border: `1px solid ${streak.current >= 7 ? '#D4AF37' : '#FDE68A'}`,
-                                padding: '4px 12px', borderRadius: 20,
+                        <div style={{
+                            display: 'flex', alignItems: 'center', gap: 6,
+                            background: streak.current >= 7
+                                ? 'linear-gradient(135deg, #FEF3C7, #FDE68A)'
+                                : streak.current > 0 ? '#FEF9E7' : '#F5F5F4',
+                            border: `1px solid ${streak.current >= 7 ? '#D4AF37' : streak.current > 0 ? '#FDE68A' : '#E7E5E4'}`,
+                            padding: '4px 12px', borderRadius: 20,
+                        }}>
+                            <span style={{
+                                fontSize: 14, fontWeight: 900,
+                                color: streak.current > 0 ? '#D4AF37' : '#A8A29E',
                             }}>
-                                <span style={{ fontSize: 14, fontWeight: 900, color: '#D4AF37' }}>
-                                    {streak.current}
+                                {streak.current}
+                            </span>
+                            <span style={{
+                                fontSize: 10, fontWeight: 700,
+                                color: streak.current > 0 ? '#92400E' : '#A8A29E',
+                            }}>
+                                {streak.current === 1 ? 'day' : 'days'}
+                            </span>
+                            {streak.current >= 3 && (
+                                <span style={{
+                                    fontSize: 9, fontWeight: 800, color: '#D4AF37',
+                                    background: '#fff', padding: '1px 6px', borderRadius: 4,
+                                }}>
+                                    STREAK
                                 </span>
-                                <span style={{ fontSize: 10, fontWeight: 700, color: '#92400E' }}>
-                                    {streak.current === 1 ? 'day' : 'days'}
-                                </span>
-                                {streak.current >= 3 && (
-                                    <span style={{
-                                        fontSize: 9, fontWeight: 800, color: '#D4AF37',
-                                        background: '#fff', padding: '1px 6px', borderRadius: 4,
-                                    }}>
-                                        STREAK
-                                    </span>
-                                )}
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                     <h1 style={{
                         fontSize: isMobile ? 22 : 26, fontWeight: 900,
@@ -2291,6 +2297,40 @@ export default function EnglishMaster365Page() {
                                         </div>
                                         <div style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>
                                             キャラ相関図
+                                        </div>
+                                    </div>
+                                </Link>
+                            </div>
+
+                            {/* Quick links to dashboard & creator */}
+                            <div style={{
+                                display: 'flex', gap: 8, marginTop: 20,
+                            }}>
+                                <Link href="/english/dashboard" style={{ textDecoration: 'none', flex: 1 }}>
+                                    <div style={{
+                                        background: '#fff', borderRadius: 10,
+                                        border: '1px solid #E7E5E4', padding: 14,
+                                        cursor: 'pointer', transition: 'border-color 0.15s',
+                                    }}>
+                                        <div style={{ fontSize: 10, fontWeight: 700, color: '#D4AF37', marginBottom: 2 }}>
+                                            PROGRESS
+                                        </div>
+                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>
+                                            積み上げ
+                                        </div>
+                                    </div>
+                                </Link>
+                                <Link href="/english/note" style={{ textDecoration: 'none', flex: 1 }}>
+                                    <div style={{
+                                        background: '#fff', borderRadius: 10,
+                                        border: '1px solid #E7E5E4', padding: 14,
+                                        cursor: 'pointer', transition: 'border-color 0.15s',
+                                    }}>
+                                        <div style={{ fontSize: 10, fontWeight: 700, color: '#78716C', marginBottom: 2 }}>
+                                            FROM THE CREATOR
+                                        </div>
+                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>
+                                            作ってる人の話
                                         </div>
                                     </div>
                                 </Link>
