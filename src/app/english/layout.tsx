@@ -157,9 +157,9 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, ...fadeIn(0.3) }}>
                     {[
                         { icon: 'K', label: '英会話マスター365', desc: '毎日更新の英会話レッスン。5分トーク+ひとこと英語帳', c: gold },
+                        { icon: 'D', label: 'Daily Training', desc: '自分のフレーズを登録して覚える。スロット+カード育成つき', c: '#EF4444' },
                         { icon: 'T', label: '居酒屋TOEIC', desc: '居酒屋トークで学ぶTOEIC対策。Part 1-7完全対応', c: '#10B981' },
                         { icon: 'M', label: 'メモリア(会話リスニング)', desc: '7つのシナリオ、40人以上のキャラ。ネイティブの会話を聴く', c: '#3B82F6' },
-                        { icon: 'S', label: 'スロット+バトル', desc: 'フレーズを覚える → スロットが回る → カードが育つ', c: '#EF4444' },
                     ].map((f, i) => (
                         <div key={f.label} style={{ display: 'flex', gap: 12, padding: '12px 14px', backgroundColor: '#111', borderRadius: 12, border: '1px solid #222', ...slideIn(i) }}>
                             <div style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: f.c, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0 }}>{f.icon}</div>
