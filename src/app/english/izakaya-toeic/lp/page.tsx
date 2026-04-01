@@ -117,12 +117,12 @@ export default function IzakayaToeicLP() {
           ))}
         </div>
 
-        <Link href="/english/izakaya-toeic" style={{
+        <Link href="/english/izakaya-toeic/episodes/ep-001" style={{
           display: 'inline-block', padding: '14px 40px', background: G, color: '#fff',
           borderRadius: 10, fontWeight: 800, fontSize: 15, textDecoration: 'none',
           boxShadow: SHADOW_MD,
         }}>
-          のれんをくぐる
+          第1夜を始める
         </Link>
 
         <p style={{ fontSize: 11, color: TEXT_MUTED, marginTop: 10 }}>
@@ -460,7 +460,7 @@ export default function IzakayaToeicLP() {
           マスターが言ってた。のれんは、くぐりたい人だけがくぐる。
         </p>
 
-        <Link href="/english/izakaya-toeic" style={{
+        <Link href="/english/izakaya-toeic/episodes/ep-001" style={{
           display: 'inline-block', padding: '16px 48px', background: G, color: '#fff',
           borderRadius: 12, fontWeight: 800, fontSize: 16, textDecoration: 'none',
           boxShadow: '0 8px 24px rgba(212,175,55,0.3)',

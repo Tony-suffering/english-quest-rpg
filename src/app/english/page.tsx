@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-// /english は英会話マスター365に統一
+// /english は2択ページにリダイレクト
 export default function EnglishHomePage() {
-    redirect('/english/izakaya-toeic/kaiwa');
+    redirect('/');
 }
