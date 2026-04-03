@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { charIcon } from '@/data/izakaya-toeic/characters';
 
@@ -20,6 +21,13 @@ const SHADOW_LG = '0 8px 32px rgba(28,25,23,0.08)';
 const FONT = 'system-ui, -apple-system, sans-serif';
 
 export default function HomePage() {
+  // Seeing the app selection page counts as welcomed
+  useEffect(() => {
+    if (!localStorage.getItem('tl_welcome_seen')) {
+      localStorage.setItem('tl_welcome_seen', 'true');
+    }
+  }, []);
+
   return (
     <div style={{
       minHeight: '100dvh', background: BG, fontFamily: FONT,

@@ -160,6 +160,8 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                         { icon: 'D', label: 'Daily Training', desc: '自分のフレーズを登録して覚える。スロット+カード育成つき', c: '#EF4444' },
                         { icon: 'T', label: '居酒屋TOEIC', desc: '居酒屋トークで学ぶTOEIC対策。Part 1-7完全対応', c: '#10B981' },
                         { icon: 'M', label: 'メモリア(会話リスニング)', desc: '7つのシナリオ、40人以上のキャラ。ネイティブの会話を聴く', c: '#3B82F6' },
+                        { icon: 'L', label: 'リスクエ(リスニング特訓)', desc: '30日で英語が聞こえる耳を作る。1日10問、聞こえない原因を潰す', c: '#2563EB' },
+                        { icon: 'R', label: 'ヨミクエ(リーディング特訓)', desc: '30日で英語が読める脳を作る。看板からニュースまで読む力', c: '#F59E0B' },
                         { icon: 'G', label: '積み上げ(成長記録)', desc: '自分がどれだけ英語に触れたか、全部の記録が見える', c: '#7C3AED' },
                         { icon: 'N', label: '作ってる人の話', desc: 'TOEIC 900で喋れない男の開発日記。毎日note.comで更新中', c: '#78716C' },
                     ].map((f, i) => (
@@ -371,10 +373,16 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
         window.addEventListener('beforeunload', () => { clearInterval(interval); audio.pause(); });
     }, []);
 
+    // LP pages ARE the welcome -- skip WelcomeFlow for them and auto-set flag
+    const isLpPage = pathname?.endsWith('/lp') ?? false;
+
     useEffect(() => {
         installLocalApi();
         const hasSeenWelcome = localStorage.getItem('tl_welcome_seen');
-        if (!hasSeenWelcome) {
+        if (isLpPage) {
+            // LP serves as the welcome -- mark as seen, don't show WelcomeFlow
+            if (!hasSeenWelcome) localStorage.setItem('tl_welcome_seen', 'true');
+        } else if (!hasSeenWelcome) {
             setShowWelcome(true);
         }
         setIsLoading(false);
