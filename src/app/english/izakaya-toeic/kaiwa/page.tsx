@@ -776,7 +776,7 @@ export default function EnglishMaster365Page() {
             updated.forEach(e => { if (e.mastery === 3) mSet.add(e.id); });
             setMasteredIds(mSet);
             // Check if all entries for this day are now mastered
-            const dayEntries = updated.filter(e => e.daySlot === updated.find(x => x.id === id)?.daySlot);
+            const dayEntries = updated.filter(e => e.day_slot === updated.find(x => x.id === id)?.day_slot);
             if (dayEntries.length > 0 && dayEntries.every(e => e.mastery === 3)) {
                 setTimeout(() => playDayComplete(), 300);
             }
