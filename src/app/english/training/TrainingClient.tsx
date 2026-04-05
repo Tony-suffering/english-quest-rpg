@@ -421,9 +421,9 @@ function UpperScreenEffect({ effect, slotState }: {
         return () => { timerRef.current.forEach(t => clearTimeout(t)); };
     }, [effect.key, effect.type]);
 
-    const isRush = slotState === 'RUSH' || slotState === 'SPECIAL' || slotState === 'FEVER';
-    const isFever = slotState === 'FEVER';
-    const isSpecial = slotState === 'SPECIAL';
+    const isRush = slotState === 'rush' || slotState === 'RUSH' || slotState === 'special' || slotState === 'SPECIAL' || slotState === 'fever' || slotState === 'FEVER';
+    const isFever = slotState === 'fever' || slotState === 'FEVER';
+    const isSpecial = slotState === 'special' || slotState === 'SPECIAL';
 
     // GARO makai BURST color palette
     const rushColor = isFever ? '#D4AF37' : isSpecial ? '#A855F7' : '#EF4444';
@@ -2579,7 +2579,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const [voiceRecordings, setVoiceRecordings] = useState<Record<string, VoiceRecording[]>>(initialData?.recordings || {});
     const [phraseLinks, setPhraseLinks] = useState<Record<string, PhraseLink[]>>(initialData?.links || {});
     const [phraseLastLeveled, setPhraseLastLeveled] = useState<Record<string, string>>(() => {
-        if (IS_PUBLIC && !initialData?.lastLeveled) {
+        if (typeof window !== 'undefined') {
             try {
                 const saved = localStorage.getItem('quest-lastLeveled');
                 if (saved) return JSON.parse(saved);
@@ -2588,7 +2588,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         return initialData?.lastLeveled || {};
     });
     const [cardPoints, setCardPoints] = useState<Record<string, number>>(() => {
-        if (IS_PUBLIC && !initialData?.cardPoints) {
+        if (typeof window !== 'undefined') {
             try {
                 const saved = localStorage.getItem('quest-cardPoints');
                 if (saved) return JSON.parse(saved);
@@ -2663,21 +2663,21 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     // Cumulative review touches per phrase-date (dateKey → total count from D1)
     const [dateTouchMap, setDateTouchMap] = useState<Record<string, number>>({});
 
-    // Player level state — initialized from Server Component data when available
+    // Player level state — initialized from localStorage first, then Server Component data
     const [playerTotalXP, setPlayerTotalXP] = useState(() => {
-        if (IS_PUBLIC && !initialData?.playerStats?.total_xp) {
+        if (typeof window !== 'undefined') {
             try {
                 const saved = localStorage.getItem('quest-playerStats');
-                if (saved) return JSON.parse(saved).total_xp || 0;
+                if (saved) { const xp = JSON.parse(saved).total_xp; if (xp) return xp; }
             } catch { /* */ }
         }
         return initialData?.playerStats?.total_xp || 0;
     });
     const [playerLevel, setPlayerLevel] = useState(() => {
-        if (IS_PUBLIC && !initialData?.playerStats?.total_xp) {
+        if (typeof window !== 'undefined') {
             try {
                 const saved = localStorage.getItem('quest-playerStats');
-                if (saved) return levelFromXP(JSON.parse(saved).total_xp || 0);
+                if (saved) { const xp = JSON.parse(saved).total_xp; if (xp) return levelFromXP(xp); }
             } catch { /* */ }
         }
         return levelFromXP(initialData?.playerStats?.total_xp || 0);
@@ -2690,10 +2690,10 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
     // Gacha bonus system state
     const [playerSparks, setPlayerSparks] = useState(() => {
-        if (IS_PUBLIC && !initialData?.playerStats?.sparks) {
+        if (typeof window !== 'undefined') {
             try {
                 const saved = localStorage.getItem('quest-playerStats');
-                if (saved) return JSON.parse(saved).sparks || 0;
+                if (saved) { const s = JSON.parse(saved).sparks; if (s) return s; }
             } catch { /* */ }
         }
         return initialData?.playerStats?.sparks || 0;
@@ -2754,19 +2754,16 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         localStorage.setItem('training-chain-state', JSON.stringify({ count: chainState.count, mode: chainState.mode }));
     }, [chainState.count, chainState.mode]);
 
-    // Persist player stats, card points, and last-leveled dates to localStorage (public mode)
+    // Persist player stats, card points, review counts, and last-leveled dates to localStorage
     useEffect(() => {
-        if (!IS_PUBLIC) return;
         localStorage.setItem('quest-playerStats', JSON.stringify({ total_xp: playerTotalXP, sparks: playerSparks }));
     }, [playerTotalXP, playerSparks]);
     useEffect(() => {
-        if (!IS_PUBLIC) return;
         if (Object.keys(cardPoints).length > 0) {
             localStorage.setItem('quest-cardPoints', JSON.stringify(cardPoints));
         }
     }, [cardPoints]);
     useEffect(() => {
-        if (!IS_PUBLIC) return;
         if (Object.keys(phraseLastLeveled).length > 0) {
             localStorage.setItem('quest-lastLeveled', JSON.stringify(phraseLastLeveled));
         }
@@ -2779,6 +2776,24 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const [feverExitEffect, setFeverExitEffect] = useState<{ streak: number } | null>(null);
     const feverDroneRef = useRef<HTMLAudioElement | null>(null);
     const feverRef = useRef({ active: false, streak: 0 });
+
+    // Reset fever chain state when FEVER is turned off
+    useEffect(() => {
+        const check = () => {
+            if (!getSettings().feverEnabled) {
+                setChainState({ count: 0, mode: 'normal', key: Date.now() });
+                setKakuhenBoost(0);
+                if (feverDroneRef.current) {
+                    stopFeverBGM(feverDroneRef.current);
+                    feverDroneRef.current = null;
+                }
+                feverRef.current = { active: false, streak: 0 };
+            }
+        };
+        const interval = setInterval(check, 500);
+        return () => clearInterval(interval);
+    }, []);
+
     // Luck multiplier display
     const [luckMultiplier, setLuckMultiplier] = useState(1.0);
     const [cardRankUpEffect, setCardRankUpEffect] = useState<{ oldRank: string; newRank: string; newRankColor: string; newRankKey: CardRank; oldRankKey: CardRank; snapshotPoints: number; key: number } | null>(null);
@@ -3063,7 +3078,20 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const [savingFlavorText, setSavingFlavorText] = useState(false);
 
     // Daily review counts per month (date -> { count, xp })
-    const [monthlyReviewCounts, setMonthlyReviewCounts] = useState<Record<string, { count: number; xp: number; sparks?: number }>>({});
+    const [monthlyReviewCounts, setMonthlyReviewCounts] = useState<Record<string, { count: number; xp: number; sparks?: number }>>(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const saved = localStorage.getItem('quest-reviewCounts');
+                if (saved) return JSON.parse(saved);
+            } catch { /* */ }
+        }
+        return {};
+    });
+    useEffect(() => {
+        if (Object.keys(monthlyReviewCounts).length > 0) {
+            localStorage.setItem('quest-reviewCounts', JSON.stringify(monthlyReviewCounts));
+        }
+    }, [monthlyReviewCounts]);
 
     // YouGlish state
     const [youglishPhrase, setYouglishPhrase] = useState<Phrase | null>(null);
@@ -3164,8 +3192,12 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 : roll < 50 ? 'GREAT'
                 : roll < 85 ? 'BONUS' : 'MISS';
 
-            // XP + sparks
+            // XP + sparks + review count
             const sparksWon = tier === 'MYTHIC' ? 50 : tier === 'LEGENDARY' ? 25 : tier === 'MEGA' ? 12 : tier === 'SUPER' ? 6 : tier === 'GREAT' ? 3 : tier === 'BONUS' ? 1 : 0;
+            setMonthlyReviewCounts(prev => {
+                const existing = prev[todayKey] || { count: 0, xp: 0, sparks: 0 };
+                return { ...prev, [todayKey]: { count: existing.count + 1, xp: existing.xp + xpGained, sparks: (existing.sparks || 0) + sparksWon } };
+            });
             setPlayerSparks(prev => prev + sparksWon);
             setPlayerTotalXP(prev => {
                 const newXP = prev + xpGained;
@@ -7531,7 +7563,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             {/* Mini Runner - PC only, hidden in calendar tab (only GOD GRID) */}
             {viewMode === 'calendar' && !isMobile && calendarTab === 'puzzle' && (
                 <div style={{ position: 'relative' }}>
-                    {showRunner && <UpperScreenEffect effect={upperEffect} slotState={slotPanelState} />}
+                    {showRunner && <UpperScreenEffect effect={upperEffect} slotState={slotState} />}
                     {showRunner && (
                         <MiniRunner
                             todayXP={todayXP}
