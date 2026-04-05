@@ -3300,6 +3300,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             setTimeout(() => {
                 setTimeAttackCountdownText(text);
                 setTimeAttackCountdownColor(color);
+                if (text === 'GO!') playReachAlert();
             }, delay);
         });
 
@@ -3369,6 +3370,11 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         });
         setTimeAttackPhase('result');
         setTimeAttackUrgent(false);
+
+        // Sound effects for TA completion
+        if (completed) playGachaSound('LEGENDARY');
+        if (grade === 'S') setTimeout(() => playGachaSound('MYTHIC'), 500);
+        if (isNewRecord) setTimeout(() => playRankUpSound('GOLD'), grade === 'S' ? 1000 : 500);
 
         if (isNewRecord) {
             setTimeAttackBestRecords(prev => ({ ...prev, [preset]: session.cardsReviewed }));
@@ -3449,6 +3455,12 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         const milestone = MILESTONES.find(m => m.cards === s.cardsReviewed);
         if (milestone) {
             setTimeAttackMilestone({ title: milestone.title, color: milestone.color, key: Date.now() });
+            playGachaSound('GREAT');
+        }
+
+        // Chain hit sound during TA
+        if (s.currentChain >= 3) {
+            playFeverChainHit(s.currentChain);
         }
     }, [timeAttackPhase]);
 
@@ -3476,6 +3488,19 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         if (lastShuffle === todayStr) setShuffledToday(true);
 
         return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Auto-start Time Attack from ?ta=1 URL parameter (e.g. from kaiwa CTA)
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('ta') === '1') {
+            // Remove param from URL without reload
+            params.delete('ta');
+            const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+            window.history.replaceState({}, '', newUrl);
+            // Auto-open TA selection modal
+            setTimeAttackPhase('selecting');
+        }
     }, []);
 
     // Fetch player stats on mount (3001 only)
@@ -4182,6 +4207,28 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         }
         return map;
     }, [timeAttackHistory]);
+
+    // TA streak: set of dateKeys that are part of the current consecutive streak (counting back from today)
+    const taStreakInfo = useMemo(() => {
+        const streakSet = new Set<string>();
+        const todayKey = clientToday || new Date().toISOString().split('T')[0];
+        const sessionDates = new Set(Object.keys(taSessionsByDate));
+        const doneToday = sessionDates.has(todayKey);
+        let streakCount = 0;
+        const check = new Date();
+        // If not done today, start from yesterday
+        if (!doneToday) check.setDate(check.getDate() - 1);
+        while (true) {
+            const key = `${check.getFullYear()}-${String(check.getMonth() + 1).padStart(2, '0')}-${String(check.getDate()).padStart(2, '0')}`;
+            if (sessionDates.has(key)) {
+                streakSet.add(key);
+                streakCount++;
+                check.setDate(check.getDate() - 1);
+            } else break;
+        }
+        if (doneToday) streakSet.add(todayKey);
+        return { streakSet, streakCount, doneToday, todayGrade: doneToday ? taSessionsByDate[todayKey]?.bestGrade || '' : '' };
+    }, [taSessionsByDate, clientToday]);
 
     // Deep link support: ?date=YYYY-MM-DD and/or ?phrase=PHRASE_ID
     useEffect(() => {
@@ -8490,6 +8537,75 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                         {/* Tab Content: Calendar */}
                         {calendarTab === 'calendar' && (<>
+                        {/* Daily TA CTA Motivation Bar */}
+                        <div style={{
+                            padding: '8px 12px',
+                            background: taStreakInfo.doneToday
+                                ? 'linear-gradient(135deg, #F0FDF4, #DCFCE7)'
+                                : 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+                            borderBottom: '1px solid #E7E5E4',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            ...((!taStreakInfo.doneToday && taStreakInfo.streakCount > 0) ? {
+                                animation: 'ta-daily-pulse 2s ease-in-out infinite',
+                                border: '2px solid rgba(212,175,55,0.3)',
+                                borderRadius: 0,
+                            } : {}),
+                        }}>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                                {taStreakInfo.doneToday ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span style={{ fontSize: 11, fontWeight: 900, color: '#10B981', letterSpacing: '1px' }}>
+                                            TODAY COMPLETE
+                                        </span>
+                                        <span style={{ fontSize: 13, fontWeight: 900, color: '#D4AF37' }}>
+                                            {taStreakInfo.todayGrade}
+                                        </span>
+                                        {taStreakInfo.streakCount > 0 && (
+                                            <span style={{ fontSize: 10, fontWeight: 700, color: '#78716C' }}>
+                                                STREAK {taStreakInfo.streakCount}
+                                            </span>
+                                        )}
+                                    </div>
+                                ) : taStreakInfo.streakCount > 0 ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        <span style={{ fontSize: 18, fontWeight: 900, color: '#D4AF37', lineHeight: 1 }}>
+                                            {taStreakInfo.streakCount}
+                                        </span>
+                                        <span style={{ fontSize: 11, fontWeight: 800, color: '#B8941F' }}>
+                                            STREAK -- 今日もやろう！
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <span style={{ fontSize: 11, fontWeight: 700, color: '#78716C' }}>
+                                        1分だけ。今日から始めよう
+                                    </span>
+                                )}
+                            </div>
+                            {!taStreakInfo.doneToday && (
+                                <button
+                                    onClick={() => {
+                                        setTimeAttackPhase('selecting');
+                                    }}
+                                    style={{
+                                        background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
+                                        color: '#fff',
+                                        border: 'none',
+                                        borderRadius: 8,
+                                        padding: '7px 14px',
+                                        fontWeight: 900,
+                                        fontSize: 11,
+                                        letterSpacing: '1px',
+                                        cursor: 'pointer',
+                                        flexShrink: 0,
+                                        animation: 'ta-cta-pulse 2s ease-in-out infinite',
+                                    }}
+                                >
+                                    1分チャレンジ START
+                                </button>
+                            )}
+                        </div>
                         {/* Mobile: Today's Activity Calendar (31-day grid showing today's review touches) */}
                         {isMobile && (
                             <>
@@ -8664,15 +8780,27 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 {taSessionsByDate[dateKey] && (() => {
                                                     const ta = taSessionsByDate[dateKey];
                                                     const gradeColor: Record<string, string> = { S: '#D4AF37', A: '#ef4444', B: '#3b82f6', C: '#10B981', D: '#78716C' };
+                                                    const inStreak = taStreakInfo.streakSet.has(dateKey);
+                                                    const isToday = dateKey === (clientToday || '');
                                                     return (
                                                         <div style={{
                                                             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px',
                                                             marginTop: '1px', padding: '1px 0',
                                                             background: `${gradeColor[ta.bestGrade] || '#78716C'}12`,
                                                             borderRadius: '2px',
+                                                            ...(inStreak && taStreakInfo.streakCount >= 7 ? {
+                                                                border: '1px solid #D4AF3780',
+                                                                animation: 'ta-streak-glow 2s ease-in-out infinite',
+                                                            } : inStreak && taStreakInfo.streakCount >= 3 ? {
+                                                                animation: 'ta-streak-glow 2s ease-in-out infinite',
+                                                            } : {}),
                                                         }}>
                                                             <span style={{ fontSize: '7px', color: gradeColor[ta.bestGrade] || '#78716C', lineHeight: 1 }}>TA</span>
-                                                            <span style={{ fontSize: '8px', fontWeight: '900', color: gradeColor[ta.bestGrade] || '#78716C', lineHeight: 1 }}>{ta.bestGrade}</span>
+                                                            <span style={{
+                                                                fontSize: '8px', fontWeight: '900', lineHeight: 1,
+                                                                color: gradeColor[ta.bestGrade] || '#78716C',
+                                                                ...(isToday ? { animation: 'ta-clear-bounce 0.5s ease-out' } : {}),
+                                                            }}>{isToday ? 'CLEAR' : ta.bestGrade}</span>
                                                             {ta.count > 1 && (<span style={{ fontSize: '6px', color: '#A8A29E', lineHeight: 1 }}>x{ta.count}</span>)}
                                                         </div>
                                                     );
@@ -8981,16 +9109,28 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             {taSessionsByDate[dateKey] && (() => {
                                                 const ta = taSessionsByDate[dateKey];
                                                 const gradeColor: Record<string, string> = { S: '#D4AF37', A: '#ef4444', B: '#3b82f6', C: '#10B981', D: '#78716C' };
+                                                const inStreak = taStreakInfo.streakSet.has(dateKey);
+                                                const isToday = dateKey === (clientToday || '');
                                                 return (
                                                     <div style={{
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px',
                                                         margin: '2px 0', padding: '2px 4px',
                                                         background: `${gradeColor[ta.bestGrade] || '#78716C'}12`,
                                                         borderRadius: '3px',
-                                                        border: `1px solid ${gradeColor[ta.bestGrade] || '#78716C'}25`,
+                                                        border: inStreak && taStreakInfo.streakCount >= 7
+                                                            ? '1.5px solid #D4AF3780'
+                                                            : `1px solid ${gradeColor[ta.bestGrade] || '#78716C'}25`,
+                                                        ...(inStreak && taStreakInfo.streakCount >= 3 ? {
+                                                            animation: 'ta-streak-glow 2s ease-in-out infinite',
+                                                        } : {}),
                                                     }}>
                                                         <span style={{ fontSize: '9px', fontWeight: '600', color: '#A8A29E', lineHeight: 1 }}>TA</span>
-                                                        <span style={{ fontSize: '12px', fontWeight: '900', color: gradeColor[ta.bestGrade] || '#78716C', lineHeight: 1, textShadow: ta.bestGrade === 'S' ? '0 0 4px rgba(212,175,55,0.3)' : 'none' }}>{ta.bestGrade}</span>
+                                                        <span style={{
+                                                            fontSize: '12px', fontWeight: '900', lineHeight: 1,
+                                                            color: gradeColor[ta.bestGrade] || '#78716C',
+                                                            textShadow: ta.bestGrade === 'S' ? '0 0 4px rgba(212,175,55,0.3)' : 'none',
+                                                            ...(isToday ? { animation: 'ta-clear-bounce 0.5s ease-out' } : {}),
+                                                        }}>{isToday ? 'CLEAR' : ta.bestGrade}</span>
                                                         {ta.count > 1 && (<span style={{ fontSize: '8px', fontWeight: '700', color: '#A8A29E', lineHeight: 1 }}>x{ta.count}</span>)}
                                                         <span style={{ fontSize: '8px', color: '#A8A29E', lineHeight: 1 }}>{ta.totalCards}cards</span>
                                                     </div>

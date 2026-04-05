@@ -2309,6 +2309,107 @@ export default function EnglishMaster365Page() {
                                 </div>
                             )}
 
+                            {/* 1分チャレンジ CTA */}
+                            {(() => {
+                                let taStreak = 0;
+                                let bestGrade = '';
+                                try {
+                                    const sessions = JSON.parse(localStorage.getItem('ta-sessions') || '[]');
+                                    if (sessions.length > 0) {
+                                        // Calculate streak
+                                        const today = new Date();
+                                        const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                                        const sessionDates = new Set(sessions.map((s: any) => s.date));
+                                        let checkDate = new Date(today);
+                                        // If no session today, start checking from yesterday
+                                        if (!sessionDates.has(todayKey)) {
+                                            checkDate.setDate(checkDate.getDate() - 1);
+                                        }
+                                        while (true) {
+                                            const key = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
+                                            if (sessionDates.has(key)) {
+                                                taStreak++;
+                                                checkDate.setDate(checkDate.getDate() - 1);
+                                            } else break;
+                                        }
+                                        // Best grade
+                                        const gradeRank: Record<string, number> = { S: 5, A: 4, B: 3, C: 2, D: 1 };
+                                        let best = 0;
+                                        for (const s of sessions) {
+                                            const r = gradeRank[s.grade] || 0;
+                                            if (r > best) { best = r; bestGrade = s.grade; }
+                                        }
+                                    }
+                                } catch {}
+                                const motivationText = taStreak >= 7 ? 'もう習慣だ！' : taStreak >= 3 ? '止まるな！' : taStreak >= 1 ? 'いい調子！' : '今日から始めよう';
+                                return (
+                                    <div style={{
+                                        background: 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
+                                        borderRadius: 14,
+                                        border: '2px solid #D4AF3740',
+                                        padding: '16px 18px',
+                                        marginTop: 12,
+                                        position: 'relative',
+                                        overflow: 'hidden',
+                                    }}>
+                                        <style>{`
+                                            @keyframes kaiwa-cta-pulse {
+                                                0%, 100% { box-shadow: 0 2px 8px rgba(212,175,55,0.3); transform: scale(1); }
+                                                50% { box-shadow: 0 4px 20px rgba(212,175,55,0.6); transform: scale(1.02); }
+                                            }
+                                        `}</style>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                                            <span style={{ fontSize: 11, fontWeight: 800, color: '#D4AF37', letterSpacing: '1.5px' }}>
+                                                1分チャレンジ
+                                            </span>
+                                            {taStreak >= 3 && (
+                                                <span style={{
+                                                    fontSize: 10, fontWeight: 900, color: '#DC2626',
+                                                    letterSpacing: '1px', padding: '1px 6px',
+                                                    background: '#FEE2E2', borderRadius: 4,
+                                                }}>STREAK</span>
+                                            )}
+                                            {bestGrade && (
+                                                <span style={{
+                                                    fontSize: 10, fontWeight: 900,
+                                                    color: bestGrade === 'S' ? '#D4AF37' : bestGrade === 'A' ? '#ef4444' : '#3b82f6',
+                                                    marginLeft: 'auto', letterSpacing: '0.5px',
+                                                }}>BEST: {bestGrade}</span>
+                                            )}
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                            {taStreak > 0 && (
+                                                <div style={{ textAlign: 'center', minWidth: 50 }}>
+                                                    <div style={{ fontSize: 28, fontWeight: 900, color: '#D4AF37', lineHeight: 1 }}>{taStreak}</div>
+                                                    <div style={{ fontSize: 9, fontWeight: 700, color: '#A8A29E', letterSpacing: '1px' }}>DAYS</div>
+                                                </div>
+                                            )}
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontSize: 12, fontWeight: 600, color: '#78716C', marginBottom: 6 }}>
+                                                    {motivationText}
+                                                </div>
+                                                <Link href="/english/my-training?ta=1" style={{ textDecoration: 'none' }}>
+                                                    <div style={{
+                                                        background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
+                                                        color: '#fff',
+                                                        borderRadius: 10,
+                                                        padding: '10px 0',
+                                                        textAlign: 'center',
+                                                        fontWeight: 900,
+                                                        fontSize: 15,
+                                                        letterSpacing: '2px',
+                                                        cursor: 'pointer',
+                                                        animation: 'kaiwa-cta-pulse 2s ease-in-out infinite',
+                                                    }}>
+                                                        1分だけやる
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
                             {/* Navigation */}
                             <div style={{
                                 display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10,
