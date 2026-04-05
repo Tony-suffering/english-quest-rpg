@@ -15,8 +15,14 @@ import ReviewSlotPanel from '@/components/english/ReviewSlotPanel';
 import { TOEIC_30DAY } from '@/data/izakaya-toeic/toeic-30day-content';
 import './training-animations.css';
 
-// 公開RPG: localhost:3004 or toniolab.com。DBなし、TOEIC 30日コンテンツで動く
-const IS_PUBLIC = typeof window !== 'undefined' && (window.location.port === '3004' || window.location.hostname.includes('toniolab'));
+// 公開RPG: localhost:3004 or toniolab.com or Vercel preview or /my-training path
+const IS_PUBLIC = typeof window !== 'undefined' && (
+    window.location.port === '3004' ||
+    window.location.hostname.includes('toniolab') ||
+    window.location.hostname.includes('english-quest') ||
+    window.location.hostname.includes('vercel.app') ||
+    window.location.pathname.includes('/my-training')
+);
 
 interface VoiceRecording {
     id: number;
