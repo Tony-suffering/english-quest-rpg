@@ -1,0 +1,695 @@
+import type { YomiqueDay } from '@/types/yomique';
+
+// =====================================================================
+// YomiQue Days 25-27
+// Phase 3: Real-World Reading
+// Day 25: Job Listings / Day 26: Business Email / Day 27: Specifications
+// 30 exercises total, 10 per day
+// =====================================================================
+
+export const YOMIQUE_DAYS_25_27: YomiqueDay[] = [
+  // -------------------------------------------------------------------
+  // Day 25: Job Listings
+  // -------------------------------------------------------------------
+  {
+    day: 25,
+    phase: 3,
+    theme: '求人情報を読む',
+    themeEn: 'Job Listings',
+    hook: '求人情報は会社の本音が出る。"competitive salary"って実際いくらだと思う？',
+    rule: '求人英語では"required"は必須、"preferred"は歓迎(なくてもOK)。"up to $X"は最大額、"starting at $X"は最低額。"fast-paced environment"は「めちゃくちゃ忙しい」の婉曲表現。行間を読む力が問われる。',
+    exercises: [
+      // --- ex01: scan / beginner ---
+      {
+        id: 'y25-ex01',
+        type: 'scan',
+        passage: {
+          text: 'Project Manager -- Bangkok Office\nSalary: $65,000 - $85,000/year\nRequired: 5+ years construction management experience, PMP certification\nPreferred: Fluency in Thai, experience in Southeast Asia\nBenefits: Health insurance, 20 days PTO, relocation assistance',
+          sourceType: 'Job Listing',
+          wordCount: 36,
+        },
+        question: 'タイ語が話せない人は応募できる？',
+        options: ['応募できる', '応募できない', 'タイ語は必須ではないが有利', '記載なし'],
+        answer: '応募できる',
+        jaTranslation: 'プロジェクトマネージャー -- バンコクオフィス\n給与: 年収$65,000 - $85,000\n必須: 建設管理経験5年以上、PMP資格\n歓迎: タイ語堪能、東南アジアでの経験\n福利厚生: 健康保険、有給20日、赴任補助',
+        trap: 'Fluency in ThaiはPreferred(歓迎)の行にある。Required(必須)じゃない。日本語の求人でも「歓迎」と「必須」は違うのに、英語になると全部「必要」に見える。RequiredとPreferredの位置を確認する癖をつけろ。',
+        tip: '求人はまずRequired(必須)とPreferred(歓迎)を見分けろ。Requiredにないものは、なくても応募できる。Preferredは「あれば尚良し」。この2語が求人読解の最重要キーワード。',
+        difficulty: 'beginner',
+        characterIntro: { speaker: 'kenji', text: 'うちも海外から人を採用するかもしれねぇ。英語の求人情報、読めるようにならないと。', mood: 'motivated' },
+        reaction: { speaker: 'yuki', correct: 'RequiredとPreferredの区別、完璧。これがわかれば求人は8割読める。', wrong: 'Fluency in ThaiはPreferredの行にあるよ。Preferred=歓迎=なくてもOK。Requiredとの位置を確認して。' },
+      },
+      // --- ex02: scan / beginner ---
+      {
+        id: 'y25-ex02',
+        type: 'scan',
+        passage: {
+          text: 'Site Supervisor\nLocation: Ho Chi Minh City, Vietnam\nContract: 12-month fixed term (renewable)\nSalary: Starting at $4,500/month\nHours: Mon-Sat, occasional Sunday overtime\nApply by: April 30, 2026',
+          sourceType: 'Job Listing',
+          wordCount: 30,
+        },
+        question: 'この仕事の最低月給はいくら？',
+        options: ['$4,500', '$5,400', '$54,000', '記載なし'],
+        answer: '$4,500',
+        jaTranslation: '現場監督\n勤務地: ベトナム・ホーチミン市\n契約: 12ヶ月固定期間(更新可)\n給与: 月給$4,500から\n勤務時間: 月-土、日曜は時々残業あり\n応募締切: 2026年4月30日',
+        trap: 'Starting at $4,500は「$4,500から」=最低額。Up toだったら最大額。この2つを逆に覚えている日本人が非常に多い。Starting at=最低ライン、Up to=天井。給与交渉の出発点が変わる。',
+        tip: 'Starting at=「〜から」=最低額。Up to=「〜まで」=最大額。Competitive salary=金額非公開(大体は安い)。salary rangeの読み方は求人の基本中の基本。',
+        difficulty: 'beginner',
+        reaction: { speaker: 'master', correct: 'Starting at=最低額。これを知ってるだけで給与交渉のスタートラインが変わる。', wrong: 'Starting atは「〜から」。つまり$4,500が最低額。$5,400は12ヶ月で割った数でもない。' },
+      },
+      // --- ex03: vocabulary / beginner ---
+      {
+        id: 'y25-ex03',
+        type: 'vocabulary',
+        passage: {
+          text: 'We are seeking a self-motivated individual to join our dynamic team. The ideal candidate thrives in a fast-paced environment and can manage multiple priorities simultaneously. Competitive compensation package with performance-based bonuses.',
+          sourceType: 'Job Listing',
+          wordCount: 36,
+        },
+        question: '"fast-paced environment"の本当の意味は？',
+        options: ['めちゃくちゃ忙しい職場', 'スピード感のある成長環境', '効率的な職場', '体育会系の職場'],
+        answer: 'めちゃくちゃ忙しい職場',
+        jaTranslation: '自発的に動ける人材を求めています。理想の候補者は、変化の速い環境で力を発揮し、複数の業務を同時にこなせる方です。成果連動ボーナス付きの競争力ある報酬パッケージ。',
+        trap: 'fast-pacedは直訳すると「ペースが速い」。ポジティブに聞こえるが、求人で使われたら「めちゃくちゃ忙しい」の婉曲表現。同様にself-motivated=放置される、dynamic team=人の出入りが激しい。求人英語は美化表現のオンパレード。',
+        tip: '求人の婉曲表現リスト: fast-paced=激務、self-motivated=誰も教えてくれない、dynamic=変化が多い(=不安定)、competitive salary=金額書きたくない。裏を読め。',
+        difficulty: 'beginner',
+        reaction: { speaker: 'lisa', correct: 'Fast-pacedの裏読み、できるようになったね。アメリカ人もこの表現見たら「忙しいんだな」って思うよ。', wrong: 'fast-paced environmentは「スピード感のある」じゃない。求人で使ったら「めちゃくちゃ忙しい」って意味。美化表現だよ。' },
+      },
+      // --- ex04: truefalse / growing ---
+      {
+        id: 'y25-ex04',
+        type: 'truefalse',
+        passage: {
+          text: 'Requirements:\n- Bachelor\'s degree in Civil Engineering or related field\n- Minimum 3 years of on-site experience\n- Proficiency in AutoCAD and MS Project\n- Valid driver\'s license\n\nPreferred Qualifications:\n- Master\'s degree\n- LEED certification\n- Bilingual (English/Japanese)',
+          sourceType: 'Job Listing',
+          wordCount: 42,
+        },
+        question: 'LEED資格がないと応募できない。',
+        options: ['True', 'False'],
+        answer: 'False',
+        jaTranslation: '必須条件:\n- 土木工学または関連分野の学士号\n- 現場経験3年以上\n- AutoCADとMS Projectに精通\n- 有効な運転免許証\n\n歓迎条件:\n- 修士号\n- LEED資格\n- バイリンガル(英語/日本語)',
+        trap: 'LEED certificationはPreferred Qualifications(歓迎条件)の中にある。Requirements(必須)ではない。日本人は箇条書きを上から読んで、RequirementsとPreferredの境目を見落とす。見出しを読め。',
+        tip: '箇条書きの求人は「見出し」が命。Requirements:の下=必須。Preferred:の下=歓迎。同じ箇条書きでもセクションが違えば重みが全然違う。',
+        difficulty: 'growing',
+        reaction: { speaker: 'yuki', correct: 'セクション見出しを見て判断できた。TOEICのPart 7でも同じスキルが使えるよ。', wrong: 'LEED certificationはPreferred Qualificationsの下にある。Requirementsじゃない。見出しを確認して。' },
+      },
+      // --- ex05: inference / growing ---
+      {
+        id: 'y25-ex05',
+        type: 'inference',
+        passage: {
+          text: 'Regional Sales Director -- Asia Pacific\nBase salary: $120,000 + uncapped commission\nTravel: Up to 70% (regional)\nMust be willing to relocate to Singapore\nExperience managing teams of 20+ required\nQuarterly performance reviews with C-suite',
+          sourceType: 'Job Listing',
+          wordCount: 37,
+        },
+        question: 'この求人から推測できることは？',
+        options: [
+          '出張が非常に多いハードな仕事',
+          'シンガポールでのデスクワーク中心',
+          '少人数チームの管理職',
+          '年収は$120,000で固定',
+        ],
+        answer: '出張が非常に多いハードな仕事',
+        jaTranslation: '地域営業部長 -- アジア太平洋\n基本給: $120,000 + 上限なしコミッション\n出張: 最大70%(地域内)\nシンガポールへの転居必須\n20人以上のチーム管理経験必須\n四半期ごとに経営陣とのパフォーマンスレビュー',
+        trap: 'Travel up to 70%は「勤務時間の70%が出張」。つまり月の3週間は出張。デスクワーク中心ではない。uncapped commission=上限なし歩合=固定給ではない。teams of 20+=少人数ではない。消去法で「出張が多いハードな仕事」が正解。',
+        tip: 'Travel 70%の衝撃を知れ。5日勤務のうち3.5日が出張。ほぼ毎日どこかに飛んでる。英語の求人で%が出たら、具体的に何日か計算しろ。数字のリアリティを掴むのが推測問題のコツ。',
+        difficulty: 'growing',
+        reaction: { speaker: 'kenji', correct: '70%出張か...うちの現場監督より飛び回ってるな。英語の数字は具体的にイメージしないとダメだな。', wrong: 'Travel up to 70%だぞ。月の7割が出張。デスクワークじゃない。uncappedは「上限なし」だから固定給でもない。' },
+      },
+      // --- ex06: main_idea / growing ---
+      {
+        id: 'y25-ex06',
+        type: 'main_idea',
+        passage: {
+          text: 'About Us: Greenfield Construction is a mid-sized firm specializing in sustainable building projects across Southeast Asia. Founded in 2008, we have completed over 200 commercial and residential developments. Our commitment to green building practices has earned us ISO 14001 certification and multiple industry awards.',
+          sourceType: 'Job Listing',
+          wordCount: 46,
+        },
+        question: 'この会社紹介の要点は？',
+        options: [
+          '環境に配慮した建設を専門とする中堅企業',
+          '大企業で200以上の支社がある',
+          '2008年に設立された日本企業',
+          '住宅専門の建設会社',
+        ],
+        answer: '環境に配慮した建設を専門とする中堅企業',
+        jaTranslation: '会社概要: Greenfield Constructionは東南アジア全域でサステナブル建築プロジェクトを専門とする中堅企業です。2008年設立以来、200以上の商業・住宅開発を完了。グリーンビルディングへの取り組みによりISO 14001認証と複数の業界賞を獲得しています。',
+        trap: '200 commercial and residential developmentsを「200以上の支社」と読み間違える。developmentsは「開発案件」であって「支社」ではない。また、commercial AND residentialなので「住宅専門」でもない。mid-sizedを見落として大企業と思うのも典型的な誤読。',
+        tip: '会社紹介のAbout Usは最初の1文に全てが詰まっている。mid-sized=中堅、specializing in=専門、sustainable=環境配慮。最初の1文だけで4つの選択肢を消去できる。',
+        difficulty: 'growing',
+        reaction: { speaker: 'master', correct: '最初の1文で全部わかる。mid-sized, sustainable, Southeast Asia。会社紹介の読み方、掴んできたな。', wrong: '200は「支社」じゃない。developments=開発案件だ。最初の文を見ろ。mid-sized firm specializing in sustainable building。これが要点。' },
+      },
+      // --- ex07: vocabulary / growing ---
+      {
+        id: 'y25-ex07',
+        type: 'vocabulary',
+        passage: {
+          text: 'Compensation & Benefits:\n- Base salary commensurate with experience\n- Annual bonus up to 15% of base\n- 401(k) matching up to 6%\n- Comprehensive medical, dental, and vision\n- Tuition reimbursement program\n- Employee stock purchase plan (ESPP)',
+          sourceType: 'Job Listing',
+          wordCount: 40,
+        },
+        question: '"commensurate with experience"の意味は？',
+        options: [
+          '経験に応じて決定',
+          '経験者のみ対象',
+          '経験年数x基本給',
+          '経験不問',
+        ],
+        answer: '経験に応じて決定',
+        jaTranslation: '報酬・福利厚生:\n- 基本給は経験に応じて決定\n- 年間ボーナス基本給の最大15%\n- 401(k)マッチング最大6%\n- 医療・歯科・眼科の包括保険\n- 学費補助プログラム\n- 従業員株式購入制度(ESPP)',
+        trap: 'commensurateは日本人にはなじみの薄い単語。「〜に見合った」「〜に比例した」の意味。commensurate with experience=経験に見合った=経験が多ければ高い。具体的な金額を書きたくない時の定番表現。',
+        tip: 'commensurate with experienceは求人の超頻出フレーズ。「経験に応じる」=金額交渉の余地あり。逆に言えば金額を公開したくない。似た表現: DOE (Depends On Experience)も同じ意味。',
+        difficulty: 'growing',
+        reaction: { speaker: 'lisa', correct: 'Commensurateは求人でしか見ないレベルの単語だけど、超頻出。覚えておいて損はない。', wrong: 'commensurate with experience=経験に見合った給与。具体的な数字を出したくない時に使う定番フレーズだよ。' },
+      },
+      // --- ex08: inference / challenge ---
+      {
+        id: 'y25-ex08',
+        type: 'inference',
+        passage: {
+          text: 'Join our growing team! We are a startup disrupting the construction tech space. Seeking passionate individuals who wear multiple hats and thrive in ambiguity. Equity compensation offered in lieu of market-rate salary. Unlimited PTO policy. Must be comfortable with rapid pivots.',
+          sourceType: 'Job Listing',
+          wordCount: 42,
+        },
+        question: 'この求人から読み取れるリスクは？',
+        options: [
+          '給料が低く、業務範囲が不明確な可能性が高い',
+          '大企業で昇進が遅い',
+          '海外転勤が必須',
+          'リモートワーク不可',
+        ],
+        answer: '給料が低く、業務範囲が不明確な可能性が高い',
+        jaTranslation: '成長中のチームに参加しませんか！建設テック領域を変革するスタートアップです。複数の役割をこなし、曖昧な状況で力を発揮できる情熱的な人材を求めています。市場相場の給与の代わりに株式報酬を提供。無制限有給制度。急な方向転換に対応できること必須。',
+        trap: 'equity in lieu of market-rate salary=相場より低い現金給与を株で補填。wear multiple hats=何でもやらされる。thrive in ambiguity=やることが決まってない。Unlimited PTO=実際には誰も休めない。全部美化表現。スタートアップ求人は裏読みの総合問題。',
+        tip: 'スタートアップ求人の翻訳辞書: wear multiple hats=人手不足、equity in lieu of=現金が足りない、thrive in ambiguity=計画がない、rapid pivots=方針がコロコロ変わる、unlimited PTO=休む雰囲気じゃない。全て裏がある。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'master', correct: '裏を読めたな。求人は「書いてないこと」に本音がある。ケンジ、仕事で使える読解力だぞ。', wrong: 'equity in lieu of market-rate salary=現金が少ない。wear multiple hats=何でもやらされる。美化表現の裏を読め。' },
+      },
+      // --- ex09: order / challenge ---
+      {
+        id: 'y25-ex09',
+        type: 'order',
+        passage: {
+          text: 'Application Process:\n1. Submit resume and cover letter via our portal\n2. Initial phone screening (15 min)\n3. Technical assessment (take-home, 48-hour deadline)\n4. Panel interview with hiring manager and team leads\n5. Reference check and background verification\n6. Offer letter and negotiation',
+          sourceType: 'Job Listing',
+          wordCount: 44,
+        },
+        question: '面接(Panel interview)の前に行われるのは？',
+        options: [
+          '技術テスト(Technical assessment)',
+          'リファレンスチェック',
+          'オファーレター送付',
+          '給与交渉',
+        ],
+        answer: '技術テスト(Technical assessment)',
+        jaTranslation: '応募プロセス:\n1. ポータルから履歴書とカバーレターを提出\n2. 初回電話スクリーニング(15分)\n3. 技術テスト(持ち帰り、48時間期限)\n4. 採用マネージャーとチームリードによるパネル面接\n5. リファレンスチェックと身元確認\n6. オファーレターと交渉',
+        trap: 'Panel interviewはステップ4。その前はステップ3のTechnical assessment。番号が振ってあるから簡単に見えるが、英語の選考プロセスは日本と順番が違う。日本では面接が先で筆記が後のことも多いから、自分の常識で順番を判断すると間違える。',
+        tip: '順番問題は番号やbefore/afterを手がかりにしろ。ステップが明記されてる場合は番号通り。明記されてない場合はthen, next, followed by, prior toなどの接続詞を探せ。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'takeshi', correct: 'プロセスの順番、正確に読めてる。海外企業の選考フローは日本と全然違うから知っておくと得。', wrong: 'ステップ3がTechnical assessment、ステップ4がPanel interview。番号通り。面接の前にテストがある。' },
+      },
+      // --- ex10: main_idea / challenge ---
+      {
+        id: 'y25-ex10',
+        type: 'main_idea',
+        passage: {
+          text: 'Equal Opportunity Statement: Greenfield Construction is committed to creating a diverse environment. All qualified applicants will receive consideration for employment without regard to race, color, religion, gender, gender identity or expression, sexual orientation, national origin, disability, or veteran status.',
+          sourceType: 'Job Listing',
+          wordCount: 43,
+        },
+        question: 'この文の目的は？',
+        options: [
+          '差別なく公平に採用審査を行うと宣言する',
+          '応募者の個人情報を収集する',
+          '採用基準を具体的に示す',
+          '会社の業績を紹介する',
+        ],
+        answer: '差別なく公平に採用審査を行うと宣言する',
+        jaTranslation: '機会均等宣言: Greenfield Constructionは多様な環境の創造に取り組んでいます。適格な応募者は全員、人種、肌の色、宗教、性別、性自認・性表現、性的指向、国籍、障害、退役軍人の地位に関わらず採用審査を受けられます。',
+        trap: 'Equal Opportunity Statementは米国の求人では法的にほぼ必須の定型文。without regard to 〜 は「〜に関わらず」。長い列挙に圧倒されて内容を読み取れない日本人が多いが、要点はall qualified applicants will receive considerationの1文だけ。',
+        tip: '長い列挙文は「何を列挙しているか」ではなく「なぜ列挙しているか」を掴め。without regard to A, B, C, D... = これら全部を考慮しない = 差別しない。列挙の中身より、without regard toの構造が大事。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'yuki', correct: 'Equal Opportunity Statementは定型文だけど、構造を理解できたのは大きい。長文の「目的」を掴む力がついてきたね。', wrong: 'without regard to=「〜に関わらず」。その後に並んでるのは全部「差別しない対象」。要点は「公平に審査する」という宣言。' },
+      },
+    ],
+  },
+
+  // -------------------------------------------------------------------
+  // Day 26: Business Email Mastery
+  // -------------------------------------------------------------------
+  {
+    day: 26,
+    phase: 3,
+    theme: 'ビジネスメールの攻略',
+    themeEn: 'Business Email Mastery',
+    hook: 'ビジネスメールの "I hope this finds you well" は「調子どう？」じゃない。「本題に入るぞ」の合図だ。',
+    rule: '英語のビジネスメールには暗黙のルールがある。"Please be advised"は警告。"At your earliest convenience"は「急げ」の丁寧版。"Going forward"は「今回は許すけど次はないぞ」。直訳すると全部読み間違える。',
+    exercises: [
+      // --- ex01: main_idea / beginner ---
+      {
+        id: 'y26-ex01',
+        type: 'main_idea',
+        passage: {
+          text: 'Subject: Updated Delivery Schedule\n\nDear Mr. Tanaka,\n\nI hope this email finds you well. I am writing to inform you that the delivery of steel beams for the Riverside project has been delayed by two weeks. The revised delivery date is April 21. We sincerely apologize for any inconvenience.\n\nBest regards,\nDavid Chen',
+          sourceType: 'Business Email',
+          wordCount: 50,
+        },
+        question: 'このメールの一番大事な情報は？',
+        options: [
+          '鉄骨の納品が2週間遅れる',
+          'Davidが元気か確認している',
+          'Riversideプロジェクトが中止になった',
+          '田中さんに謝罪している',
+        ],
+        answer: '鉄骨の納品が2週間遅れる',
+        jaTranslation: '件名: 納品スケジュール変更\n\n田中様\n\nお元気のことと存じます。Riversideプロジェクト向け鉄骨の納品が2週間遅延することをお知らせいたします。改定後の納品日は4月21日です。ご不便をおかけし誠に申し訳ございません。\n\nよろしくお願いします\nDavid Chen',
+        trap: 'I hope this finds you wellは挨拶の定型文で、本題はその直後のI am writing to inform you thatから始まる。日本人は挨拶を丁寧に読みすぎて、本題にたどり着く前にエネルギーを使い果たす。',
+        tip: 'ビジネスメールの構造: 挨拶(読み飛ばしOK) → 本題(I am writing to...) → 詳細 → 結び(読み飛ばしOK)。本題は必ず「I am writing to」「I would like to」で始まる。この1文を探せ。',
+        difficulty: 'beginner',
+        characterIntro: { speaker: 'master', text: 'Day 26。ビジネスメールだ。ケンジ、取引先から英語のメールが来て固まった経験、あるだろ？構造を知れば怖くない。', mood: 'normal' },
+        reaction: { speaker: 'kenji', correct: 'I am writing to inform...ここが本題か。挨拶はお決まりのやつね。日本語のメールと同じ構造じゃん。', wrong: 'I hope this finds you wellは挨拶だ。本題はI am writing to inform you that...から。ここを見つけろ。' },
+      },
+      // --- ex02: vocabulary / beginner ---
+      {
+        id: 'y26-ex02',
+        type: 'vocabulary',
+        passage: {
+          text: 'Subject: Action Required -- Invoice #3847\n\nDear Accounts Team,\n\nPlease be advised that invoice #3847, dated March 1, remains unpaid. The payment was due 30 days ago. Kindly remit payment at your earliest convenience to avoid further action.\n\nRegards,\nSarah Kim\nAccounts Receivable',
+          sourceType: 'Business Email',
+          wordCount: 44,
+        },
+        question: '"at your earliest convenience"の本当のニュアンスは？',
+        options: [
+          '今すぐやれ(丁寧に言ってるだけ)',
+          'あなたの都合の良い時で構いません',
+          '来週までにお願いします',
+          '急がなくて大丈夫です',
+        ],
+        answer: '今すぐやれ(丁寧に言ってるだけ)',
+        jaTranslation: '件名: 要対応 -- 請求書 #3847\n\n経理チーム御中\n\n請求書#3847(3月1日付)が未払いであることをお知らせします。支払い期限は30日前に過ぎています。今後の対応を避けるため、早急にお支払いください。\n\nよろしくお願いします\nSarah Kim\n売掛金担当',
+        trap: 'at your earliest convenienceは直訳すると「あなたの最も早い都合で」。丁寧に聞こえるが、ビジネスメールでは「今すぐやれ」の意味。特にremains unpaidやto avoid further actionと組み合わさると、かなり強い催促。日本語の「お手すきの際に」とは全く違う。',
+        tip: 'ビジネスメールの丁寧表現は緊急度と反比例する。at your earliest convenience=急げ。Please be advised=警告。Kindly=やれ。丁寧であればあるほどヤバい、と覚えろ。',
+        difficulty: 'beginner',
+        reaction: { speaker: 'lisa', correct: 'At your earliest convenienceの裏の意味、わかったね。英語のビジネスメールは丁寧さ=圧力。覚えておいて。', wrong: '「都合の良い時に」なんて甘い意味じゃないよ。30日overdue+to avoid further action。これは「今すぐ払え」って言ってる。' },
+      },
+      // --- ex03: scan / beginner ---
+      {
+        id: 'y26-ex03',
+        type: 'scan',
+        passage: {
+          text: 'Subject: Meeting Rescheduled\n\nHi Team,\n\nDue to a scheduling conflict, the project kickoff meeting originally planned for Thursday, April 10 at 2:00 PM has been moved to Friday, April 11 at 10:00 AM. Same conference room (3F-B). Please update your calendars accordingly.\n\nThanks,\nMike',
+          sourceType: 'Business Email',
+          wordCount: 45,
+        },
+        question: '変更後のミーティングはいつ？',
+        options: [
+          '4月11日(金) 午前10時',
+          '4月10日(木) 午後2時',
+          '4月11日(金) 午後2時',
+          '4月10日(木) 午前10時',
+        ],
+        answer: '4月11日(金) 午前10時',
+        jaTranslation: '件名: ミーティング日程変更\n\nチームの皆さん\n\nスケジュールの都合により、4月10日(木)午後2時予定だったプロジェクトキックオフミーティングを4月11日(金)午前10時に変更します。会議室は同じ(3F-B)。カレンダーを更新してください。\n\nよろしく\nMike',
+        trap: 'originally planned for=元々の予定。has been moved to=変更後。日本人は日付が2つ出てくると混乱する。originally/previous=旧、moved to/revised/new=新。このキーワードで新旧を見分けろ。',
+        tip: '日程変更メールは「旧日程」と「新日程」が必ずある。originally/previously=旧。moved to/changed to/revised=新。2つの日付が出たら、どちらが新しいか確認するキーワードを探せ。',
+        difficulty: 'beginner',
+        reaction: { speaker: 'takeshi', correct: 'originally=元々、moved to=変更後。キーワードで新旧を見分けられたな。', wrong: '4月10日はoriginallyの方。moved toの後ろが新しい日程。April 11 at 10:00 AM。' },
+      },
+      // --- ex04: inference / growing ---
+      {
+        id: 'y26-ex04',
+        type: 'inference',
+        passage: {
+          text: 'Subject: Re: Q1 Performance Review\n\nHi James,\n\nThank you for your efforts this quarter. While your technical skills continue to impress, I\'d like to discuss some areas for growth in your client communication. Could we schedule a 30-minute chat this week? I have some suggestions that I think will be really helpful going forward.\n\nBest,\nDirector Williams',
+          sourceType: 'Business Email',
+          wordCount: 54,
+        },
+        question: 'このメールのトーンから推測できることは？',
+        options: [
+          'Jamesのクライアント対応に問題がある',
+          'Jamesが昇進する',
+          'Director WilliamsはJamesの仕事に満足している',
+          'Jamesの技術力が不足している',
+        ],
+        answer: 'Jamesのクライアント対応に問題がある',
+        jaTranslation: '件名: Re: Q1業績評価\n\nJamesさん\n\n今四半期のご尽力ありがとうございます。技術力は引き続き素晴らしいですが、クライアントとのコミュニケーションについて改善の余地をお話ししたいと思います。今週30分ほどお時間いただけますか？今後に向けて役立つ提案があります。\n\nよろしく\nDirector Williams',
+        trap: 'areas for growth=「成長の余地」=やんわりした指摘。技術力は褒めている(continue to impress)が、Whileの後にclient communicationの問題を指摘。英語のフィードバックはsandwich method: 褒め→指摘→ポジティブ締め。真ん中が本題。',
+        tip: 'ビジネスメールのフィードバックは「サンドイッチ構造」。While A is great, B needs work=Bがダメ。areas for growth=問題点の婉曲表現。Whileの後ろが本音。',
+        difficulty: 'growing',
+        reaction: { speaker: 'yuki', correct: 'Whileの後ろが本音。areas for growthは「問題あり」の丁寧な言い方。ビジネスメールの行間を読めるようになってきたね。', wrong: 'While以降を読んで。areas for growth in client communication=クライアント対応に問題あり。サンドイッチの真ん中が本題だよ。' },
+      },
+      // --- ex05: truefalse / growing ---
+      {
+        id: 'y26-ex05',
+        type: 'truefalse',
+        passage: {
+          text: 'Subject: Confidential -- Restructuring Plan\n\nDear Senior Staff,\n\nThis information is for internal use only and should not be shared outside the leadership team. Effective May 1, the Engineering and Design departments will be merged into a single unit. Current staff will be reassigned based on project needs. A town hall meeting will be held on April 15 to address questions.\n\nRegards,\nCEO Nakamura',
+          sourceType: 'Business Email',
+          wordCount: 63,
+        },
+        question: 'このメールは全社員に共有してよい。',
+        options: ['True', 'False'],
+        answer: 'False',
+        jaTranslation: '件名: 機密 -- 組織再編計画\n\n幹部各位\n\nこの情報は社内限定であり、リーダーシップチーム外への共有は禁止です。5月1日付で、エンジニアリング部とデザイン部を統合します。現スタッフはプロジェクトのニーズに基づき再配置されます。4月15日に質疑応答のためのタウンホールミーティングを開催します。\n\nよろしく\nCEO 中村',
+        trap: 'Confidential(機密)は件名にある。internal use only(社内限定)かつshould not be shared outside the leadership team(リーダーシップチーム外に共有するな)。日本人はConfidentialを「重要」程度に読み飛ばすが、これは法的にも重い言葉。',
+        tip: '件名のConfidentialは最重要の情報制限。internal use only=社内限定。should not be shared outside=外に出すな。件名にConfidentialがあったら、本文の前にまず配布範囲を確認しろ。',
+        difficulty: 'growing',
+        reaction: { speaker: 'master', correct: 'Confidential + internal use only + leadership team限定。三重のロックだ。読み落としたら大事故。', wrong: '件名にConfidential、本文にinternal use onlyとleadership teamのみ。全社員には共有できない。' },
+      },
+      // --- ex06: vocabulary / growing ---
+      {
+        id: 'y26-ex06',
+        type: 'vocabulary',
+        passage: {
+          text: 'Subject: Re: Re: Re: Site Access Issue\n\nHi Tom,\n\nI\'ve looped in Ms. Suzuki from Legal as this matter requires immediate attention. Per our previous conversation, the access permit was supposed to be finalized last week. As it stands, our crew cannot enter the site, which is costing us approximately $8,000 per day in delays. I trust this will be resolved promptly.\n\nBest,\nKenji Yamamoto',
+          sourceType: 'Business Email',
+          wordCount: 64,
+        },
+        question: '"I trust this will be resolved promptly"のニュアンスは？',
+        options: [
+          '早く解決しろ(怒りを抑えた最後通告)',
+          '解決を信頼しています(安心している)',
+          '解決してくれたら嬉しいです',
+          '解決は急がなくて良い',
+        ],
+        answer: '早く解決しろ(怒りを抑えた最後通告)',
+        jaTranslation: '件名: Re: Re: Re: 現場アクセス問題\n\nTomさん\n\n法務の鈴木さんをCCに入れました。この件は緊急対応が必要です。先日の会話の通り、アクセス許可は先週確定するはずでした。現状、作業員が現場に入れず、遅延コストが1日約$8,000発生しています。速やかな解決を期待しています。\n\nよろしく\nKENJI YAMAMOTO',
+        trap: 'I trust=「信頼する」の直訳で安心してるように見えるが、実際は「やれよな」の最後通告。Legal(法務)をCCに入れ、$8,000/dayの損害額を具体的に示し、I trustで締める。これは訴訟の予告に近い。Re:が3つ=何度もやりとりして解決しないから怒ってる。',
+        tip: 'メールの圧力レベルを読むポイント: Re:の数=やりとりの長さ(多いほど怒り蓄積)。Legal/法務のCC=法的対応の示唆。具体的な金額=損害賠償の布石。I trust=最後通告。これらが揃ったらレッドアラート。',
+        difficulty: 'growing',
+        reaction: { speaker: 'kenji', correct: '法務をCCに入れて金額まで出してる。これは相当怒ってるな。I trustは「やれよな」の意味か...俺も使うかもしれないな。', wrong: 'I trust=安心してる、じゃない。法務CC、$8,000/day、Re:が3つ。全部揃って「これが最後通告だぞ」って意味。' },
+      },
+      // --- ex07: order / growing ---
+      {
+        id: 'y26-ex07',
+        type: 'order',
+        passage: {
+          text: 'Subject: Onboarding Schedule -- New Hires April 2026\n\nDay 1: Orientation and IT setup (bring photo ID)\nDay 2: Department introductions and safety training\nDay 3: System access and software training\nDay 4: Shadow a senior team member on-site\nDay 5: Review with HR and goal setting for first month',
+          sourceType: 'Business Email',
+          wordCount: 48,
+        },
+        question: 'ITセットアップはいつ行われる？',
+        options: ['1日目', '3日目', '2日目', '5日目'],
+        answer: '1日目',
+        jaTranslation: '件名: オンボーディングスケジュール -- 2026年4月新入社員\n\n1日目: オリエンテーションとITセットアップ(写真付き身分証持参)\n2日目: 部署紹介と安全研修\n3日目: システムアクセスとソフトウェア研修\n4日目: 先輩社員の現場同行\n5日目: 人事との振り返りと初月目標設定',
+        trap: 'Day 1にIT setupとあるのに、Day 3のSystem access and software trainingと混同する人が多い。IT setup=パソコンの初期設定。software training=業務ソフトの研修。似て非なるもの。英語の単語レベルでの区別が求められる。',
+        tip: 'IT setup=物理的なセットアップ(PCを渡す等)。software training=使い方を教える。setupとtrainingは別の段階。英語の類似表現は文脈で区別する。Day 1の横にあるからDay 1。',
+        difficulty: 'growing',
+        reaction: { speaker: 'mina', correct: 'Day 1: IT setup。Day 3のsoftware trainingと混同しなかったのがえらい。', wrong: 'IT setupはDay 1だよ。Day 3はsoftware training。セットアップ(準備)とトレーニング(研修)は別物。' },
+      },
+      // --- ex08: inference / challenge ---
+      {
+        id: 'y26-ex08',
+        type: 'inference',
+        passage: {
+          text: 'Subject: Following Up -- Contract Terms\n\nDear Mr. Yamamoto,\n\nThank you for your patience. After careful consideration, we are pleased to accept most of your proposed revisions. However, Section 4.2 (liability cap) and Section 7.1 (termination clause) require further discussion. We suggest a call this week to align on these remaining points before the April 15 deadline.\n\nWarm regards,\nPriya Sharma',
+          sourceType: 'Business Email',
+          wordCount: 58,
+        },
+        question: 'このメールから推測できる状況は？',
+        options: [
+          '契約交渉が大詰めで、2つの条項でまだ合意できていない',
+          '契約が完全に合意された',
+          '山本氏の提案が全て却下された',
+          'Priyaが契約を白紙に戻したがっている',
+        ],
+        answer: '契約交渉が大詰めで、2つの条項でまだ合意できていない',
+        jaTranslation: '件名: フォローアップ -- 契約条件\n\n山本様\n\nお待ちいただきありがとうございます。慎重に検討した結果、ご提案の修正の大部分を受け入れることにいたしました。ただし、第4.2条(責任上限)と第7.1条(解約条項)についてはさらなる協議が必要です。4月15日の期限前にこれらの残存事項について擦り合わせるため、今週お電話を提案いたします。\n\nよろしく\nPriya Sharma',
+        trap: 'most of=大部分。全部ではない。Howeverの後に未合意の2セクション。further discussion=まだ決まってない。before the April 15 deadline=期限が迫ってる。most ofを「全部」と読むと「合意済み」を選んでしまう。mostは「全部じゃない」のサイン。',
+        tip: 'most of, majority of, largely=「ほぼ全部だけど全部じゃない」。Howeverの後ろに例外が来る。ビジネスメールでHoweverが出たら、その後ろが一番重要。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'master', correct: 'most of + However。大部分OK、でも残りがある。contractの交渉は最後の2条項が一番揉める。実務と同じだ。', wrong: 'pleased to accept most of=大部分は受け入れた。しかしHowever以降に未合意の2セクションがある。mostは「全部じゃない」。' },
+      },
+      // --- ex09: scan / challenge ---
+      {
+        id: 'y26-ex09',
+        type: 'scan',
+        passage: {
+          text: 'Subject: URGENT -- Safety Incident Report Required\n\nAll Site Managers,\n\nA near-miss incident occurred at Block C today at 14:30. Per company policy (Safety Manual Section 12.3), all near-miss incidents must be reported within 24 hours. Please submit your incident report forms to safety@greenfield.com by tomorrow 14:30 at the latest. Failure to comply may result in disciplinary action.\n\nChief Safety Officer\nRaj Patel',
+          sourceType: 'Business Email',
+          wordCount: 62,
+        },
+        question: 'レポートの提出期限はいつ？',
+        options: [
+          '明日の14:30まで',
+          '今日中',
+          '24時間以内(具体的な時刻なし)',
+          '来週月曜日',
+        ],
+        answer: '明日の14:30まで',
+        jaTranslation: '件名: 緊急 -- 安全インシデント報告書要提出\n\n全現場マネージャーへ\n\n本日14:30にブロックCでヒヤリハット事案が発生しました。会社規定(安全マニュアル第12.3条)により、全てのヒヤリハット事案は24時間以内に報告する必要があります。インシデント報告書をsafety@greenfield.comへ明日14:30までに提出してください。不遵守の場合、懲戒処分の対象となります。\n\nチーフセーフティオフィサー\nRaj Patel',
+        trap: '24 hoursとby tomorrow 14:30の2つの時間情報がある。ポリシーでは24時間以内だが、具体的な期限はby tomorrow 14:30 at the latest(遅くとも明日14:30)。at the latestは「最も遅くて」=これが絶対の期限。具体的な期限がポリシーの一般ルールより優先。',
+        tip: '期限が2つある場合、具体的な方が優先。by + 日時 + at the latest=これが本当の期限。within 24 hoursはポリシーの一般ルール。メールで具体的な日時が指定されたら、そちらに従え。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'kenji', correct: 'by tomorrow 14:30 at the latest。at the latestが「遅くとも」か。うちの現場でも使える表現だな。', wrong: '24 hoursは一般ルール。でもメールはby tomorrow 14:30 at the latestと具体的に書いてある。こっちが実際の期限。' },
+      },
+      // --- ex10: main_idea / challenge ---
+      {
+        id: 'y26-ex10',
+        type: 'main_idea',
+        passage: {
+          text: 'Subject: Change Order Request #047\n\nDear Project Team,\n\nDue to unforeseen soil conditions discovered during excavation, we are requesting a change order for additional foundation work. The revised scope includes 15 additional concrete piles and extended dewatering operations. Estimated cost impact: +$340,000. Schedule impact: +18 working days. Please review the attached technical report and provide approval by April 12.\n\nSincerely,\nEng. Carlos Rivera',
+          sourceType: 'Business Email',
+          wordCount: 66,
+        },
+        question: 'このメールの核心は？',
+        options: [
+          '予想外の地盤問題で追加工事と費用・工期の承認を求めている',
+          '工事が予定通りに完了した報告',
+          'プロジェクトの中止を提案している',
+          '技術レポートの感想を求めている',
+        ],
+        answer: '予想外の地盤問題で追加工事と費用・工期の承認を求めている',
+        jaTranslation: '件名: 変更指示書要求 #047\n\nプロジェクトチーム各位\n\n掘削中に想定外の地盤状況が判明したため、基礎追加工事の変更指示書を申請します。修正範囲にはコンクリート杭15本の追加と排水作業の延長が含まれます。コスト影響: +$340,000。工期影響: +18営業日。添付の技術レポートを確認し、4月12日までに承認をお願いします。\n\nよろしく\nEng. Carlos Rivera',
+        trap: 'Change Orderは建設業界の専門用語で「契約変更」。unforeseen=予見できなかった。requesting=申請している。cost impact + schedule impact=金額と工期の両方に影響。provide approval=承認を求めている。建設業界のメールは情報が凝縮されているので、1文ずつ正確に読む必要がある。',
+        tip: 'Change Orderメールの読み方: 1)理由(Due to...) 2)変更内容(revised scope) 3)コスト影響 4)工期影響 5)期限(by April 12)。この5点を拾えば全体像がわかる。建設メールは構造が決まっている。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'kenji', correct: 'Change Order...うちでもあるやつだ。英語でも構造は同じなんだな。理由→変更→金額→工期→期限。これなら読める。', wrong: 'Change Order=契約変更の申請だ。requesting + provide approval=承認を求めてる。コストと工期の数字を見ろ。+$340,000と+18日。' },
+      },
+    ],
+  },
+
+  // -------------------------------------------------------------------
+  // Day 27: Specifications
+  // -------------------------------------------------------------------
+  {
+    day: 27,
+    phase: 3,
+    theme: '仕様書を読む',
+    themeEn: 'Specifications',
+    hook: 'ケンジの得意分野。建設の仕様書は英語でも構造は同じ。でも "shall" と "should" を間違えたら現場が止まる。',
+    rule: '仕様書では"shall"=義務(やらないと契約違反)、"should"=推奨(できればやれ)、"may"=任意(やってもやらなくてもいい)。この3語の区別が仕様書読解の核心。数値の"±"(tolerance)も見逃すな。',
+    exercises: [
+      // --- ex01: vocabulary / beginner ---
+      {
+        id: 'y27-ex01',
+        type: 'vocabulary',
+        passage: {
+          text: 'Section 3.1 -- Concrete Mix Design\nThe contractor shall use a minimum compressive strength of 30 MPa at 28 days. The water-cement ratio shall not exceed 0.45. Admixtures may be used with prior written approval from the Engineer.',
+          sourceType: 'Specification',
+          wordCount: 40,
+        },
+        question: '"shall"の意味は？',
+        options: [
+          '義務(やらないと契約違反)',
+          '推奨(できればやった方がいい)',
+          '任意(やってもやらなくてもいい)',
+          '予定(将来やる予定)',
+        ],
+        answer: '義務(やらないと契約違反)',
+        jaTranslation: '第3.1条 -- コンクリート配合設計\n施工者は28日時点で最低圧縮強度30MPaのものを使用しなければならない。水セメント比は0.45を超えてはならない。混和剤はエンジニアの事前書面承認があれば使用してもよい。',
+        trap: 'shallは日常英語では「〜しましょう」程度の意味だが、仕様書・契約書では「義務」=やらないと契約違反。日本人は学校でshall=willの丁寧版と習うから、仕様書のshallの重さを理解していない。仕様書のshallは法的拘束力がある。',
+        tip: '仕様書の3大動詞: shall=義務(MUST)、should=推奨(RECOMMENDED)、may=任意(OPTIONAL)。この3つの区別が仕様書読解の生命線。shallが出たら「絶対にやれ」と読め。',
+        difficulty: 'beginner',
+        characterIntro: { speaker: 'kenji', text: '仕様書か。日本語なら毎日読んでる。英語でも構造は同じはずだ...shallとshouldの違い？正直、知らなかった。', mood: 'serious' },
+        reaction: { speaker: 'master', correct: 'shall=義務。仕様書の最重要単語だ。これを知ってるだけで読み方が変わる。', wrong: 'shallは日常会話の「〜しましょう」じゃない。仕様書ではshall=義務=やらないと契約違反。法的な重さがある。' },
+      },
+      // --- ex02: scan / beginner ---
+      {
+        id: 'y27-ex02',
+        type: 'scan',
+        passage: {
+          text: 'Section 5.4 -- Steel Reinforcement\nAll reinforcing bars shall conform to ASTM A615, Grade 60.\nMinimum concrete cover: 50mm (exterior), 30mm (interior)\nSplice length: 40 times the bar diameter\nTolerances: Placement +/- 10mm, Cover -0/+15mm',
+          sourceType: 'Specification',
+          wordCount: 38,
+        },
+        question: '外部(exterior)のコンクリートかぶり厚の最低値は？',
+        options: ['50mm', '30mm', '40mm', '60mm'],
+        answer: '50mm',
+        jaTranslation: '第5.4条 -- 鉄筋\n全ての鉄筋はASTM A615, Grade 60に準拠しなければならない。\n最低コンクリートかぶり厚: 50mm(外部)、30mm(内部)\n重ね継手長: 鉄筋径の40倍\n許容差: 配置 +/- 10mm、かぶり -0/+15mm',
+        trap: 'exterior(外部)=50mm、interior(内部)=30mm。括弧内の区別を読み飛ばすとinteriorの30mmを選んでしまう。仕様書は括弧の中に重要な条件が入っている。括弧=読み飛ばしていい補足、ではない。',
+        tip: '仕様書の括弧は「条件分け」に使われる。(exterior)と(interior)は適用箇所の違い。数値の後の括弧を飛ばすと、全く違う値を適用してしまう。仕様書の括弧は100%読め。',
+        difficulty: 'beginner',
+        reaction: { speaker: 'kenji', correct: 'exterior=外部、interior=内部。50mmと30mm。括弧の中が条件か。日本語の仕様書と同じだな。', wrong: '30mmはinterior(内部)の値。exterior(外部)は50mm。括弧の中を確認しろ。' },
+      },
+      // --- ex03: truefalse / beginner ---
+      {
+        id: 'y27-ex03',
+        type: 'truefalse',
+        passage: {
+          text: 'Section 2.3 -- Material Submittals\nThe contractor shall submit material samples for approval at least 14 days prior to installation. Shop drawings should include dimensions, material grades, and connection details. The Engineer may request additional samples at no extra cost to the Owner.',
+          sourceType: 'Specification',
+          wordCount: 42,
+        },
+        question: '施工図(shop drawings)に寸法を含めることは義務である。',
+        options: ['True', 'False'],
+        answer: 'False',
+        jaTranslation: '第2.3条 -- 材料提出\n施工者は施工開始の少なくとも14日前に承認用の材料サンプルを提出しなければならない。施工図には寸法、材料等級、接合詳細を含めるべきである。エンジニアは所有者への追加費用なしで追加サンプルを要求できる。',
+        trap: 'shop drawings shouldのshouldは「推奨」であって「義務」ではない。直前の文はshall(義務)なのに、shop drawingsの文はshould(推奨)。この1語の違いで法的な拘束力が変わる。shall=絶対やれ、should=できればやれ。shouldは義務ではない。',
+        tip: 'shallとshouldの違いは仕様書で最も重要な区別。同じ仕様書の中でもshallとshouldが混在する。1文ずつ動詞を確認しろ。shouldが使われている項目は「推奨」であって「義務」ではない。',
+        difficulty: 'beginner',
+        reaction: { speaker: 'yuki', correct: 'shouldは推奨であって義務じゃない。この1語の違いがわかるのは大きい。TOEICでも仕様書系の文章で出る。', wrong: 'shop drawings "should" include。shouldは推奨。義務ならshallになる。前の文のshall submitと比べてみて。' },
+      },
+      // --- ex04: scan / growing ---
+      {
+        id: 'y27-ex04',
+        type: 'scan',
+        passage: {
+          text: 'Section 8.2 -- HVAC Performance Requirements\nCooling capacity: Not less than 50 kW\nHeating capacity: Not less than 35 kW\nAir flow rate: 2,500 CFM +/- 5%\nNoise level: Shall not exceed 45 dB(A) at 1 meter\nEnergy efficiency: Minimum COP 3.5\nOperating temperature range: -10C to 45C',
+          sourceType: 'Specification',
+          wordCount: 48,
+        },
+        question: '許容される風量(Air flow rate)の最小値は？',
+        options: ['2,375 CFM', '2,500 CFM', '2,625 CFM', '2,400 CFM'],
+        answer: '2,375 CFM',
+        jaTranslation: '第8.2条 -- 空調性能要件\n冷房能力: 50kW以上\n暖房能力: 35kW以上\n風量: 2,500 CFM +/- 5%\n騒音レベル: 1メートル地点で45dB(A)を超えないこと\nエネルギー効率: 最低COP 3.5\n動作温度範囲: -10度〜45度',
+        trap: '+/- 5%は「プラスマイナス5%」。2,500の5%=125。つまり2,375〜2,625が許容範囲。最小値は2,500-125=2,375。+/-の計算をしないで2,500をそのまま選ぶ人が非常に多い。仕様書の数値は必ず許容差を確認しろ。',
+        tip: '+/-はtolerance(許容差)。基準値から上下にどれだけズレて良いかを示す。2,500 +/- 5%なら2,375〜2,625が合格範囲。仕様書の数値を見たら、必ず+/-がないか確認。計算してから答えろ。',
+        difficulty: 'growing',
+        reaction: { speaker: 'master', correct: '2,500の5%=125。2,500-125=2,375。tolerance計算ができるようになったな。仕様書の数字は計算込みで読め。', wrong: '2,500をそのまま選んだだろ。+/- 5%を見ろ。5%は125。2,500-125=2,375が最小値だ。toleranceの計算は仕様書の基本。' },
+      },
+      // --- ex05: vocabulary / growing ---
+      {
+        id: 'y27-ex05',
+        type: 'vocabulary',
+        passage: {
+          text: 'Section 6.1 -- Waterproofing Membrane\nThe membrane shall be applied in strict accordance with the manufacturer\'s instructions. Substrate shall be clean, dry, and free from contaminants. Any deviation from the approved method shall require prior written consent from the Project Manager.',
+          sourceType: 'Specification',
+          wordCount: 42,
+        },
+        question: '"in strict accordance with"の意味は？',
+        options: [
+          '〜に厳密に従って',
+          '〜を参考にして',
+          '〜とほぼ同じように',
+          '〜に反対して',
+        ],
+        answer: '〜に厳密に従って',
+        jaTranslation: '第6.1条 -- 防水膜\n膜はメーカーの指示書に厳密に従って施工しなければならない。下地は清潔で乾燥し、汚染物がないこと。承認された方法からの逸脱はプロジェクトマネージャーの事前書面同意を必要とする。',
+        trap: 'in accordance with=「〜に従って」。strictがつくと「厳密に」。日本人はin accordance withを「〜に沿って」程度に読むが、strictが加わると「1ミリのズレも許さない」の意味。仕様書でstrictが出たら、文字通り厳密に従う必要がある。',
+        tip: '仕様書の強度表現: in strict accordance with > in accordance with > in general accordance with > with reference to。strictが入ると最高レベルの遵守が必要。',
+        difficulty: 'growing',
+        reaction: { speaker: 'lisa', correct: 'In strict accordance with=厳密に従え。strictがあるかないかで全然違う。仕様書の温度感が読めるようになってきたね。', wrong: 'in accordance with=従って。strictが加わると「厳密に」。参考にする、とは全然違う。1ミリのズレも許さないレベル。' },
+      },
+      // --- ex06: inference / growing ---
+      {
+        id: 'y27-ex06',
+        type: 'inference',
+        passage: {
+          text: 'Section 9.3 -- Fire Safety\nAll structural steel shall be protected with intumescent coating to achieve a minimum 2-hour fire rating. The coating thickness shall be verified by an independent testing laboratory. Test reports shall be submitted prior to concealment of any coated element.',
+          sourceType: 'Specification',
+          wordCount: 42,
+        },
+        question: 'なぜ「隠す前に」テスト結果の提出が求められているのか？',
+        options: [
+          '隠した後では塗膜厚を確認できないから',
+          'テストに2時間かかるから',
+          '独立検査機関の予約が必要だから',
+          'コーティングが乾くのに時間がかかるから',
+        ],
+        answer: '隠した後では塗膜厚を確認できないから',
+        jaTranslation: '第9.3条 -- 防火安全\n全ての構造用鉄骨は膨張型塗料で保護し、最低2時間の耐火等級を達成しなければならない。塗膜厚は独立検査機関により検証されなければならない。テスト報告書は塗装された部材を隠蔽する前に提出しなければならない。',
+        trap: 'prior to concealment=隠蔽する前に。鉄骨は壁や天井で覆われると見えなくなる。覆った後では塗膜厚を確認できない=やり直しが効かない。仕様書は「なぜその順序なのか」を考えると意味が見えてくる。',
+        tip: 'prior to concealment=隠す前に。仕様書で「〜の前に」と書いてある場合、その順序には技術的な理由がある。「後からでは確認できない」「後からではやり直せない」。順序の理由を考えると、仕様書の意図が読める。',
+        difficulty: 'growing',
+        reaction: { speaker: 'kenji', correct: '隠したら見えない...当たり前だけど、仕様書にわざわざ書いてあるのは、本当にやる奴がいるからだな。現場あるあるだ。', wrong: '壁で覆ったら鉄骨が見えない。見えないと塗膜厚を確認できない。だから「隠す前に」テスト結果を出せと。順序には理由がある。' },
+      },
+      // --- ex07: truefalse / growing ---
+      {
+        id: 'y27-ex07',
+        type: 'truefalse',
+        passage: {
+          text: 'Section 4.5 -- Window Installation\nAll windows shall be installed plumb, level, and square within a tolerance of 3mm. Sealant shall be applied continuously with no gaps or voids. The contractor should provide a 10-year warranty on all window installations. Warranty documentation may be submitted in either English or Thai.',
+          sourceType: 'Specification',
+          wordCount: 48,
+        },
+        question: '10年保証の提供は契約上の義務である。',
+        options: ['True', 'False'],
+        answer: 'False',
+        jaTranslation: '第4.5条 -- 窓の設置\n全ての窓は垂直・水平・直角を許容差3mm以内で設置しなければならない。シーラントは隙間なく連続して施工しなければならない。施工者は全ての窓の設置に10年保証を提供すべきである。保証書は英語またはタイ語で提出してもよい。',
+        trap: 'should provide=推奨であって義務ではない。直前のshall be installed, shall be appliedはshall(義務)。しかし保証の文だけshouldになっている。1つの条項の中でshallとshouldが混在するパターン。これが仕様書読解の最難関。',
+        tip: '1つの条項でもshallとshouldが混在する。設置品質=shall(義務)、保証=should(推奨)。仕様書は1文ずつ動詞をチェック。「全部義務だろう」と思い込むな。',
+        difficulty: 'growing',
+        reaction: { speaker: 'yuki', correct: 'shouldはshallじゃない。この区別ができるのは仕様書読解の上級者。すごい進歩。', wrong: 'should=推奨であって義務じゃない。前の文はshall(義務)だけど、保証の文はshould(推奨)。1文ずつ動詞を確認して。' },
+      },
+      // --- ex08: main_idea / challenge ---
+      {
+        id: 'y27-ex08',
+        type: 'main_idea',
+        passage: {
+          text: 'Section 11.1 -- Quality Assurance\nThe contractor shall implement a quality management system conforming to ISO 9001. Inspection and test plans (ITP) shall be submitted for approval within 14 days of contract execution. Hold points identified in the ITP shall not be passed without written release from the Engineer. The contractor shall maintain daily quality logs accessible to the Owner at all times.',
+          sourceType: 'Specification',
+          wordCount: 62,
+        },
+        question: 'この条項の核心は？',
+        options: [
+          '施工者はISO準拠の品質管理体制を構築し、エンジニアの承認なしに進めてはならない',
+          '施工者はISO 9001の資格を取得しなければならない',
+          '品質検査は14日ごとに行う',
+          '品質ログはエンジニアだけが閲覧できる',
+        ],
+        answer: '施工者はISO準拠の品質管理体制を構築し、エンジニアの承認なしに進めてはならない',
+        jaTranslation: '第11.1条 -- 品質保証\n施工者はISO 9001に準拠した品質管理システムを導入しなければならない。検査・試験計画(ITP)は契約締結後14日以内に承認用に提出しなければならない。ITPで特定されたホールドポイントはエンジニアの書面による承認なしに通過してはならない。施工者は所有者がいつでも閲覧可能な日次品質ログを維持しなければならない。',
+        trap: 'conforming to ISO 9001は「準拠」であって「資格取得」ではない。14 days of contract executionは「契約締結後14日以内」であって「14日ごと」ではない。accessible to the Ownerは所有者がアクセス可能=エンジニアだけではない。細部の読み違いが3つの誤答を生む。',
+        tip: '仕様書の要点は「全てのshall文」を統合して掴め。この条項は全文shallだから全て義務。品質システム導入+ITP提出+ホールドポイント遵守+ログ維持。要約すると「品質管理をしっかりやれ、勝手に進めるな」。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'master', correct: 'shall文を全部拾って統合できたな。仕様書は「全てのshall」が要点。これが読めればケンジ、契約も怖くないぞ。', wrong: 'conforming to=準拠であって資格取得じゃない。14 days of contract execution=契約後14日以内。within=以内。ごと、じゃない。' },
+      },
+      // --- ex09: scan / challenge ---
+      {
+        id: 'y27-ex09',
+        type: 'scan',
+        passage: {
+          text: 'Section 7.8 -- Elevator Specifications\nCapacity: 1,600 kg (21 persons)\nSpeed: 2.5 m/s +/- 0.15 m/s\nDoor opening width: Not less than 900mm\nLeveling accuracy: +/- 5mm\nPower supply: 380V, 3-phase, 50Hz\nEmergency power: Shall automatically switch within 10 seconds\nNoise in car: Shall not exceed 50 dB(A)',
+          sourceType: 'Specification',
+          wordCount: 52,
+        },
+        question: 'エレベーターの速度が2.3 m/sだった場合、仕様を満たすか？',
+        options: [
+          '満たさない(許容範囲外)',
+          '満たす(許容範囲内)',
+          '判断できない',
+          '条件付きで満たす',
+        ],
+        answer: '満たさない(許容範囲外)',
+        jaTranslation: '第7.8条 -- エレベーター仕様\n定員: 1,600kg(21名)\n速度: 2.5 m/s +/- 0.15 m/s\nドア開口幅: 900mm以上\nレベリング精度: +/- 5mm\n電源: 380V, 3相, 50Hz\n非常電源: 10秒以内に自動切替しなければならない\n車内騒音: 50dB(A)を超えないこと',
+        trap: '2.5 +/- 0.15 = 2.35〜2.65が許容範囲。2.3は2.35を下回る。0.05だけ範囲外。日本人は+/-の計算をせず「だいたい2.5くらいならOK」と感覚で判断しがち。仕様書では0.01の差でも不合格は不合格。',
+        tip: '+/- 0.15は「0.15上下に許す」。2.5-0.15=2.35が下限。2.3<2.35だから不合格。仕様書の数値は感覚ではなく計算で判断。電卓を使え。「だいたいOK」は仕様書の世界では通用しない。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'kenji', correct: '2.35が下限で2.3は範囲外。0.05の差だけど不合格は不合格。うちの現場と同じだ。数字に妥協はない。', wrong: '2.5 +/- 0.15 = 2.35〜2.65。2.3は2.35より下。たった0.05でもアウト。仕様書の数値は計算して判断しろ。' },
+      },
+      // --- ex10: inference / challenge ---
+      {
+        id: 'y27-ex10',
+        type: 'inference',
+        passage: {
+          text: 'Section 12.4 -- Dispute Resolution\nIn the event of a dispute regarding compliance with these specifications, the Engineer\'s interpretation shall be considered final and binding. However, either party may request an independent third-party review within 14 days of the Engineer\'s decision. The cost of such review shall be borne by the losing party.',
+          sourceType: 'Specification',
+          wordCount: 52,
+        },
+        question: 'この条項が存在する理由として最も適切なのは？',
+        options: [
+          'shallとshouldの解釈で揉めた時の解決手順を定めている',
+          'エンジニアの権限を制限している',
+          '第三者機関の費用を事前に決定している',
+          '紛争が起きないことを保証している',
+        ],
+        answer: 'shallとshouldの解釈で揉めた時の解決手順を定めている',
+        jaTranslation: '第12.4条 -- 紛争解決\n本仕様書への適合に関する紛争が生じた場合、エンジニアの解釈が最終的かつ拘束力を持つものとする。ただし、いずれの当事者もエンジニアの決定から14日以内に独立した第三者機関による審査を要求できる。当該審査の費用は敗訴側が負担する。',
+        trap: 'compliance with these specifications=仕様書への適合。仕様書のshall/should/mayの解釈が現場で食い違った時の解決手順。Howeverの後に「第三者に持ち込める」とあるから、エンジニアの権限は絶対ではない(制限されているのではなく、上訴の道がある)。',
+        tip: 'Dispute Resolution条項は「揉めた時のルール」。仕様書はshall/should/mayの解釈で必ず揉める。だからこの条項がある。仕様書の最後にある紛争解決条項は、実は全体を理解する鍵。ここを読めば仕様書の「本気度」がわかる。',
+        difficulty: 'challenge',
+        reaction: { speaker: 'master', correct: 'ケンジ、25日目から始めて3日で求人、メール、仕様書を読めるようになった。明日は契約書だ。お前ならいける。', wrong: 'dispute regarding compliance with these specifications=仕様書の解釈で揉めた時。shall/shouldの読み方が違えば結論が変わる。だからこの条項がある。' },
+      },
+    ],
+  },
+];
