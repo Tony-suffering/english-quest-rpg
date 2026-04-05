@@ -8283,10 +8283,41 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             flexDirection: 'column',
                             gap: '16px',
                         }}>
-                            {renderReviewContent()}
+                            {phrases.length === 0 && timeAttackPhase === 'running' ? (
+                                <div style={{
+                                    textAlign: 'center',
+                                    padding: '60px 24px',
+                                    color: '#78716C',
+                                }}>
+                                    <div style={{ fontSize: '48px', fontWeight: '900', color: '#E7E5E4', marginBottom: '16px' }}>0</div>
+                                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#1C1917', marginBottom: '8px' }}>
+                                        まだフレーズが登録されていません
+                                    </div>
+                                    <div style={{ fontSize: '13px', lineHeight: 1.6 }}>
+                                        カレンダーの「+」ボタンか、会話ページからフレーズを登録してください。
+                                    </div>
+                                    <button
+                                        onClick={() => { stopTimeAttack(); setViewMode('calendar'); }}
+                                        style={{
+                                            marginTop: '20px',
+                                            background: '#D4AF37',
+                                            border: 'none',
+                                            borderRadius: '10px',
+                                            padding: '12px 24px',
+                                            cursor: 'pointer',
+                                            fontSize: '14px',
+                                            fontWeight: '700',
+                                            color: '#fff',
+                                        }}
+                                    >
+                                        カレンダーに戻る
+                                    </button>
+                                </div>
+                            ) : renderReviewContent()}
                         </div>
                     </div>
-                    {/* Right (desktop) / Top (mobile): Slot Machine */}
+                    {/* Right (desktop) / Top (mobile): Slot Machine — hidden during Time Attack */}
+                    {timeAttackPhase !== 'running' && timeAttackPhase !== 'countdown' && (
                     <div style={{
                         width: isMobile ? '100%' : '420px',
                         flexShrink: 0,
@@ -8310,6 +8341,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             isMobile={isMobile}
                         />
                     </div>
+                    )}
                 </div>
             ) : viewMode === 'list' ? (
                 /* List View */
@@ -11105,6 +11137,20 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     lineHeight: 1.5,
                                 }}>
                                     1分でOK。タップで覚えた表現を思い出そう
+                                </div>
+                            )}
+                            {phrases.length === 0 && (
+                                <div style={{
+                                    marginTop: '8px',
+                                    padding: '10px 16px',
+                                    background: '#FEF2F2',
+                                    borderRadius: '8px',
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    color: '#DC2626',
+                                    textAlign: 'center',
+                                }}>
+                                    まだフレーズが登録されていません。会話ページからフレーズを追加してください。
                                 </div>
                             )}
                         </div>
