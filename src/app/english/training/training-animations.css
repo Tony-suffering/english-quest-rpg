@@ -2408,3 +2408,95 @@
     0%, 100% { box-shadow: 0 0 20px rgba(212,175,55,0.4), 0 4px 12px rgba(0,0,0,0.3); transform: scale(1); }
     50% { box-shadow: 0 0 40px rgba(212,175,55,0.7), 0 4px 16px rgba(0,0,0,0.4); transform: scale(1.03); }
 }
+
+/* ══════ TIME ATTACK ANIMATIONS ══════ */
+
+/* Countdown: READY -> 3 -> 2 -> 1 -> GO! */
+@keyframes ta-number-slam {
+    0% { transform: scale(3); opacity: 0; }
+    40% { transform: scale(0.9); opacity: 1; }
+    60% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes ta-go-explode {
+    0% { transform: scale(0.3); opacity: 0; filter: blur(10px); }
+    50% { transform: scale(1.3); opacity: 1; filter: blur(0); }
+    100% { transform: scale(1); opacity: 1; filter: blur(0); }
+}
+@keyframes ta-burst {
+    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+/* Timer bar effects */
+@keyframes ta-heartbeat {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(1.02); }
+}
+@keyframes ta-edge-glow {
+    0%, 100% { box-shadow: inset 0 0 40px rgba(239,68,68,0.08); }
+    50% { box-shadow: inset 0 0 80px rgba(239,68,68,0.18); }
+}
+@keyframes ta-dot-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.4); opacity: 1; }
+}
+@keyframes ta-combo-pop {
+    0% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* Milestone popup */
+@keyframes ta-milestone-pop {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+}
+
+/* Result screen */
+@keyframes result-fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+@keyframes ta-result-card-enter {
+    0% { transform: scale(0.8) translateY(40px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+@keyframes ta-grade-zoom {
+    0% { transform: scale(0); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    70% { transform: scale(0.95); }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes ta-grade-shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+@keyframes ta-motiv-fade {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes ta-stat-enter {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes ta-result-shine {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.6; }
+}
+@keyframes ta-result-particle {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+    50% { transform: translateY(-20px) scale(1.3); opacity: 0.8; }
+}
+@keyframes ta-cta-pulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(212,175,55,0.3); transform: scale(1); }
+    50% { box-shadow: 0 4px 16px rgba(212,175,55,0.5); transform: scale(1.03); }
+}
+
+@keyframes new-record-flash {
+    0%, 100% { background: rgba(255,255,255,0.2); box-shadow: 0 0 10px rgba(255,255,255,0.1); }
+    50% { background: rgba(255,255,255,0.5); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+}
