@@ -524,10 +524,10 @@ export default function EnglishMaster365Page() {
     const [beginnerLevel, setBeginnerLevel] = useState<number | null>(null);
     const [showLevelPicker, setShowLevelPicker] = useState(false);
 
-    // Daily mini-quest
+    // Daily mini-quest — hidden on reload, only visible during active session
     const [questListenCount, setQuestListenCount] = useState(0);
     const [questRegisterCount, setQuestRegisterCount] = useState(0);
-    const [questDismissed, setQuestDismissed] = useState(false);
+    const [questDismissed, setQuestDismissed] = useState(true);
     const [questCelebration, setQuestCelebration] = useState(false);
     const questWasCompleteRef = useRef(false);
 
@@ -559,12 +559,15 @@ export default function EnglishMaster365Page() {
                 const registered = q.registered || 0;
                 setQuestListenCount(listened);
                 setQuestRegisterCount(registered);
-                setQuestDismissed(q.dismissed || false);
-                // If already complete from previous session, hide quest (show only once on completion)
+                // Already complete = stay hidden (default). Not complete = show quest
                 if (listened >= 3 && registered >= 1) {
                     questWasCompleteRef.current = true;
-                    setQuestDismissed(true);
+                } else if (!q.dismissed) {
+                    setQuestDismissed(false);
                 }
+            } else {
+                // No quest data yet today — show quest prompt
+                setQuestDismissed(false);
             }
         } catch { /* */ }
     }, []);
@@ -2348,94 +2351,50 @@ export default function EnglishMaster365Page() {
                                     }
                                 } catch {}
                                 return (
-                                    <div style={{
-                                        marginTop: 20,
-                                        background: 'linear-gradient(135deg, #FFFBEB 0%, #ECFDF5 50%, #FFFBEB 100%)',
-                                        borderRadius: 16,
-                                        border: '2px solid #D4AF3730',
-                                        overflow: 'hidden',
-                                    }}>
-                                        <style>{`
-                                            @keyframes kaiwa-cta-pulse {
-                                                0%, 100% { box-shadow: 0 2px 8px rgba(212,175,55,0.3); transform: scale(1); }
-                                                50% { box-shadow: 0 4px 20px rgba(212,175,55,0.6); transform: scale(1.02); }
-                                            }
-                                        `}</style>
-                                        {/* Header */}
+                                    <Link href="/english/my-training?ta=1" style={{ textDecoration: 'none', display: 'block', marginTop: 20 }}>
                                         <div style={{
-                                            padding: '14px 18px 10px',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                            background: '#fff',
+                                            borderRadius: 14,
+                                            border: '1px solid #E7E5E4',
+                                            padding: '16px 20px',
+                                            display: 'flex', alignItems: 'center', gap: 14,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.15s',
                                         }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                <span style={{ fontSize: 12, fontWeight: 900, color: '#1C1917' }}>
-                                                    1分で復習しよう
-                                                </span>
-                                                {taStreak >= 3 && (
-                                                    <span style={{
-                                                        fontSize: 9, fontWeight: 900, color: '#DC2626',
-                                                        background: '#FEE2E2', padding: '2px 6px', borderRadius: 4,
-                                                    }}>STREAK {taStreak}d</span>
-                                                )}
-                                            </div>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                                {registeredPhrases.size > 0 && (
-                                                    <span style={{ fontSize: 11, fontWeight: 800, color: '#10B981' }}>
-                                                        {shikomiCount} expressions
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                                                    <span style={{ fontSize: 14, fontWeight: 900, color: '#1C1917' }}>
+                                                        1分で復習
                                                     </span>
-                                                )}
-                                                {bestGrade && (
-                                                    <span style={{
-                                                        fontSize: 10, fontWeight: 900,
-                                                        color: bestGrade === 'S' ? '#D4AF37' : bestGrade === 'A' ? '#ef4444' : '#3b82f6',
-                                                    }}>BEST: {bestGrade}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        {/* Streak + CTA */}
-                                        <div style={{ padding: '0 18px 16px', display: 'flex', alignItems: 'center', gap: 14 }}>
-                                            {taStreak > 0 && (
-                                                <div style={{ textAlign: 'center', minWidth: 46 }}>
-                                                    <div style={{ fontSize: 28, fontWeight: 900, color: '#D4AF37', lineHeight: 1 }}>{taStreak}</div>
-                                                    <div style={{ fontSize: 8, fontWeight: 700, color: '#A8A29E', letterSpacing: '1px' }}>DAYS</div>
+                                                    {taStreak > 0 && (
+                                                        <span style={{
+                                                            fontSize: 10, fontWeight: 800, color: '#D4AF37',
+                                                            background: '#FEF9E7', padding: '2px 8px', borderRadius: 10,
+                                                        }}>{taStreak} day streak</span>
+                                                    )}
                                                 </div>
-                                            )}
-                                            <Link href="/english/my-training?ta=1" style={{ textDecoration: 'none', flex: 1 }}>
-                                                <div style={{
-                                                    background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
-                                                    color: '#fff',
-                                                    borderRadius: 12,
-                                                    padding: '12px 0',
-                                                    textAlign: 'center',
-                                                    fontWeight: 900,
-                                                    fontSize: 15,
-                                                    letterSpacing: '2px',
-                                                    cursor: 'pointer',
-                                                    animation: 'kaiwa-cta-pulse 2s ease-in-out infinite',
-                                                }}>
-                                                    1分だけやる
-                                                </div>
-                                            </Link>
-                                        </div>
-                                        {/* Sub link: full training */}
-                                        <Link href="/english/my-training" style={{ textDecoration: 'none' }}>
-                                            <div style={{
-                                                padding: '10px 18px',
-                                                borderTop: '1px solid #E7E5E430',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                                background: 'rgba(255,255,255,0.4)',
-                                                cursor: 'pointer',
-                                                transition: 'background 0.15s',
-                                            }}>
-                                                <span style={{ fontSize: 11, fontWeight: 600, color: '#57534E' }}>
+                                                <span style={{ fontSize: 11, color: '#78716C' }}>
                                                     {registeredPhrases.size > 0
-                                                        ? 'じっくり復習する'
-                                                        : '表現を登録してから復習しよう'
+                                                        ? `${shikomiCount} expressions${bestGrade ? ` / BEST: ${bestGrade}` : ''}`
+                                                        : '覚えた表現をタップで復習'
                                                     }
                                                 </span>
-                                                <span style={{ fontSize: 14, color: '#A8A29E' }}>{'\u203A'}</span>
                                             </div>
-                                        </Link>
-                                    </div>
+                                            <div style={{
+                                                background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
+                                                color: '#fff',
+                                                borderRadius: 10,
+                                                padding: '10px 18px',
+                                                fontWeight: 900,
+                                                fontSize: 12,
+                                                letterSpacing: '1px',
+                                                whiteSpace: 'nowrap',
+                                                flexShrink: 0,
+                                            }}>
+                                                START
+                                            </div>
+                                        </div>
+                                    </Link>
                                 );
                             })()}
 
