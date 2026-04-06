@@ -2351,47 +2351,77 @@ export default function EnglishMaster365Page() {
                                     }
                                 } catch {}
                                 return (
-                                    <Link href="/english/my-training?ta=1" style={{ textDecoration: 'none', display: 'block', marginTop: 20 }}>
+                                    <Link href="/english/my-training?ta=1" style={{ textDecoration: 'none', display: 'block', marginTop: 24 }}>
+                                        <style>{`
+                                            @keyframes kaiwa-cta-shimmer {
+                                                0% { background-position: -200% center; }
+                                                100% { background-position: 200% center; }
+                                            }
+                                            @keyframes kaiwa-cta-glow {
+                                                0%, 100% { box-shadow: 0 4px 20px rgba(212,175,55,0.3), 0 0 0 0 rgba(212,175,55,0.1); }
+                                                50% { box-shadow: 0 8px 32px rgba(212,175,55,0.5), 0 0 0 8px rgba(212,175,55,0.05); }
+                                            }
+                                        `}</style>
                                         <div style={{
-                                            background: '#fff',
-                                            borderRadius: 14,
-                                            border: '1px solid #E7E5E4',
-                                            padding: '16px 20px',
-                                            display: 'flex', alignItems: 'center', gap: 14,
+                                            background: 'linear-gradient(135deg, #D4AF37, #C9A020, #D4AF37)',
+                                            borderRadius: 16,
+                                            padding: '20px 24px',
                                             cursor: 'pointer',
-                                            transition: 'all 0.15s',
+                                            animation: 'kaiwa-cta-glow 2.5s ease-in-out infinite',
+                                            position: 'relative',
+                                            overflow: 'hidden',
                                         }}>
-                                            <div style={{ flex: 1 }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                                                    <span style={{ fontSize: 14, fontWeight: 900, color: '#1C1917' }}>
-                                                        1分で復習
-                                                    </span>
+                                            {/* Shimmer overlay */}
+                                            <div style={{
+                                                position: 'absolute', inset: 0,
+                                                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                                                backgroundSize: '200% 100%',
+                                                animation: 'kaiwa-cta-shimmer 3s ease-in-out infinite',
+                                                pointerEvents: 'none',
+                                            }} />
+                                            {/* Top row: streak + stats */}
+                                            <div style={{
+                                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                                marginBottom: 10, position: 'relative',
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                                                     {taStreak > 0 && (
                                                         <span style={{
-                                                            fontSize: 10, fontWeight: 800, color: '#D4AF37',
-                                                            background: '#FEF9E7', padding: '2px 8px', borderRadius: 10,
-                                                        }}>{taStreak} day streak</span>
+                                                            fontSize: 10, fontWeight: 900, color: '#D4AF37',
+                                                            background: 'rgba(255,255,255,0.9)', padding: '3px 10px', borderRadius: 10,
+                                                            letterSpacing: '0.5px',
+                                                        }}>{taStreak} DAY STREAK</span>
+                                                    )}
+                                                    {bestGrade && (
+                                                        <span style={{
+                                                            fontSize: 10, fontWeight: 900, color: '#fff',
+                                                            background: 'rgba(255,255,255,0.2)', padding: '3px 8px', borderRadius: 10,
+                                                        }}>BEST: {bestGrade}</span>
                                                     )}
                                                 </div>
-                                                <span style={{ fontSize: 11, color: '#78716C' }}>
-                                                    {registeredPhrases.size > 0
-                                                        ? `${shikomiCount} expressions${bestGrade ? ` / BEST: ${bestGrade}` : ''}`
-                                                        : '覚えた表現をタップで復習'
-                                                    }
-                                                </span>
+                                                {registeredPhrases.size > 0 && (
+                                                    <span style={{ fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.85)' }}>
+                                                        {shikomiCount} expressions
+                                                    </span>
+                                                )}
                                             </div>
+                                            {/* Main CTA text */}
                                             <div style={{
-                                                background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
-                                                color: '#fff',
-                                                borderRadius: 10,
-                                                padding: '10px 18px',
-                                                fontWeight: 900,
-                                                fontSize: 12,
-                                                letterSpacing: '1px',
-                                                whiteSpace: 'nowrap',
-                                                flexShrink: 0,
+                                                textAlign: 'center', position: 'relative',
                                             }}>
-                                                START
+                                                <div style={{
+                                                    fontSize: 22, fontWeight: 900, color: '#fff',
+                                                    letterSpacing: '2px', lineHeight: 1,
+                                                    textShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                                }}>
+                                                    1分で復習する
+                                                </div>
+                                                <div style={{
+                                                    fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.7)',
+                                                    marginTop: 6, letterSpacing: '3px',
+                                                }}>
+                                                    TAP TO START
+                                                </div>
                                             </div>
                                         </div>
                                     </Link>
