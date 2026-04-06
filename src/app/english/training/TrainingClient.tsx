@@ -3347,6 +3347,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             isNewRecord,
         });
         setTimeAttackPhase('result');
+        setViewMode('calendar');
         setTimeAttackUrgent(false);
 
         // Sound effects for TA completion
