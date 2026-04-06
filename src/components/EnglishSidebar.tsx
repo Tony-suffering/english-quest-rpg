@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 // ─── Color tokens ──────────────────────────────────────────
 const C = {
@@ -74,12 +74,35 @@ const PROGRAMS: Program[] = [
             { id: '/memoria', label: 'メモリア' },
         ],
     },
+    {
+        id: 'lisque',
+        label: 'リスクエ',
+        tagline: '30日リスニング特訓',
+        color: C.blue,
+        basePath: '/english/lisque',
+        items: [
+            { id: '/english/lisque', label: 'リスクエ HOME' },
+            { id: '/english/lisque/lp', label: 'リスクエとは？' },
+        ],
+    },
+    {
+        id: 'yomique',
+        label: 'ヨミクエ',
+        tagline: '30日リーディング特訓',
+        color: C.orange,
+        basePath: '/english/yomique',
+        items: [
+            { id: '/english/yomique', label: 'ヨミクエ HOME' },
+            { id: '/english/yomique/lp', label: 'ヨミクエとは？' },
+        ],
+    },
 ];
 
 // ─── Component ─────────────────────────────────────────────
 
 export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: boolean }) {
     const pathname = usePathname();
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
@@ -107,6 +130,10 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
             setExpandedProgram('izakaya');
         } else if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) {
             setExpandedProgram('tokyo52');
+        } else if (pathname.startsWith('/english/lisque')) {
+            setExpandedProgram('lisque');
+        } else if (pathname.startsWith('/english/yomique')) {
+            setExpandedProgram('yomique');
         }
         // (legacy auto-expand removed)
     }, [pathname]);
@@ -122,7 +149,17 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     };
 
     const toggleProgram = (id: string) => {
-        setExpandedProgram(prev => prev === id ? null : id);
+        const program = PROGRAMS.find(p => p.id === id);
+        if (expandedProgram === id) {
+            // Already expanded — collapse
+            setExpandedProgram(null);
+        } else {
+            // Expand + navigate to HOME (first item)
+            setExpandedProgram(id);
+            if (program) {
+                router.push(program.items[0].id);
+            }
+        }
     };
 
     // ─── Render helpers ────────────────────────────────────
