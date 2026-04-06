@@ -3151,10 +3151,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         { seconds: 180, label: '3 min', labelJa: '3分', subtitle: 'しっかり復習', color: '#D4AF37', icon: 'STANDARD' },
         { seconds: 300, label: '5 min', labelJa: '5分', subtitle: 'ガチ勢', color: '#DC2626', icon: 'FOCUS' },
     ] : [
-        { seconds: 300, label: '5 min', labelJa: '5分', subtitle: 'ウォームアップ', color: '#16A34A', icon: 'SPRINT' },
-        { seconds: 600, label: '10 min', labelJa: '10分', subtitle: 'おすすめ', color: '#D4AF37', icon: 'STANDARD', recommended: true },
-        { seconds: 1800, label: '30 min', labelJa: '30分', subtitle: 'ガチ勢', color: '#DC2626', icon: 'ENDURANCE' },
-        { seconds: 3600, label: '60 min', labelJa: '1時間', subtitle: '修行モード', color: '#7C3AED', icon: 'MARATHON' },
+        { seconds: 60, label: '1 min', labelJa: '1分', subtitle: '今日はこれだけ', color: '#16A34A', icon: 'QUICK', recommended: true },
+        { seconds: 180, label: '3 min', labelJa: '3分', subtitle: 'しっかり復習', color: '#D4AF37', icon: 'STANDARD' },
+        { seconds: 300, label: '5 min', labelJa: '5分', subtitle: 'ガチ勢', color: '#DC2626', icon: 'FOCUS' },
     ];
     const MILESTONES = IS_PUBLIC ? [
         { cards: 3, title: 'GOOD START', color: '#16A34A' },
@@ -11130,18 +11129,16 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 color: '#1C1917',
                                 letterSpacing: '-0.5px',
                             }}>
-                                {IS_PUBLIC ? '今日の復習、何分やる？' : '制限時間を選べ'}
+                                今日の復習、何分やる？
                             </div>
-                            {IS_PUBLIC && (
-                                <div style={{
-                                    fontSize: '12px',
-                                    color: '#78716C',
-                                    marginTop: '6px',
-                                    lineHeight: 1.5,
-                                }}>
-                                    1分でOK。タップで覚えた表現を思い出そう
-                                </div>
-                            )}
+                            <div style={{
+                                fontSize: '12px',
+                                color: '#78716C',
+                                marginTop: '6px',
+                                lineHeight: 1.5,
+                            }}>
+                                1分でOK。タップで覚えた表現を思い出そう
+                            </div>
                             {phrases.length === 0 && (
                                 <div style={{
                                     marginTop: '8px',
@@ -11160,7 +11157,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                         <div style={{
                             display: 'grid',
-                            gridTemplateColumns: IS_PUBLIC ? '1fr 1fr 1fr' : '1fr 1fr',
+                            gridTemplateColumns: '1fr 1fr 1fr',
                             gap: '12px',
                             marginBottom: '24px',
                         }}>
