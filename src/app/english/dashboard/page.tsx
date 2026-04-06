@@ -50,19 +50,9 @@ function loadAll() {
   const xp = stats.total_xp ?? 0;
   const level = levelFromXP(xp);
 
-  // Cards
-  const cardPts = safe<Record<string, number>>(localStorage.getItem('quest-cardPoints'), {});
-  let cardTotal = 0;
-  const ranks = { legendary: 0, holo: 0, gold: 0, silver: 0, bronze: 0 };
-  for (const p of Object.values(cardPts)) {
-    if (p < 1) continue;
-    cardTotal++;
-    if (p >= 250) ranks.legendary++;
-    else if (p >= 100) ranks.holo++;
-    else if (p >= 50) ranks.gold++;
-    else if (p >= 20) ranks.silver++;
-    else if (p >= 5) ranks.bronze++;
-  }
+  // Cards = user-registered phrases only
+  const cardTotal = phrases.length;
+  const cardMastered = mastered;
 
   // Active days
   let days = 0;
@@ -76,7 +66,7 @@ function loadAll() {
     training: { registered: phrases.length, mastered },
     streak: { current: streakData.current ?? 0, best: streakData.best ?? 0 },
     player: { level, xp, sparks: stats.sparks ?? 0, nextXP: xpForLevel(level), currentXP: xpForLevel(level - 1) },
-    cards: { total: cardTotal, ranks },
+    cards: { total: cardTotal, mastered: cardMastered },
     days,
   };
 }
@@ -352,25 +342,19 @@ export default function DashboardPage() {
               <span style={{ fontSize: 28, fontWeight: 800, color: '#D97706', fontVariantNumeric: 'tabular-nums' }}>
                 {cards.total}
               </span>
-              <span style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>枚</span>
+              <span style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>枚登録</span>
             </div>
             {cards.total > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                {[
-                  { label: 'LEGENDARY', count: cards.ranks.legendary, color: '#D97706' },
-                  { label: 'HOLO', count: cards.ranks.holo, color: '#7C3AED' },
-                  { label: 'GOLD', count: cards.ranks.gold, color: '#D4AF37' },
-                  { label: 'SILVER', count: cards.ranks.silver, color: '#78716C' },
-                  { label: 'BRONZE', count: cards.ranks.bronze, color: '#B45309' },
-                ].filter(r => r.count > 0).map(r => (
-                  <span key={r.label} style={{
-                    fontSize: 10, fontWeight: 700, color: r.color,
-                    background: r.color + '15', padding: '3px 8px', borderRadius: 6,
-                    fontVariantNumeric: 'tabular-nums',
-                  }}>
-                    {r.label} {r.count}
-                  </span>
-                ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{
+                  fontSize: 11, fontWeight: 700, color: '#10B981',
+                  fontVariantNumeric: 'tabular-nums',
+                }}>
+                  {cards.mastered} 習得済み
+                </span>
+                <span style={{ fontSize: 11, color: '#A8A29E' }}>
+                  / {cards.total - cards.mastered} 未習得
+                </span>
               </div>
             )}
           </div>
