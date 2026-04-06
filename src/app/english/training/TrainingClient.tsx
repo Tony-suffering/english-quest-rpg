@@ -4771,7 +4771,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 const current = Number(phraseMastery[currentPhrase.id] || 0);
                                 const hasRec = (voiceRecordings[currentPhrase.id] || []).length > 0;
                                 const hasLink = (phraseLinks[currentPhrase.id] || []).length > 0;
-                                const isLockedToday = current === 3 || (current !== 6 && current < 3 && phraseLastLeveled[currentPhrase.id] === clientToday);
+                                const isLockedToday = !isTimeAttackActive && (current === 3 || (current !== 6 && current < 3 && phraseLastLeveled[currentPhrase.id] === clientToday));
                                 if (isLockedToday || current === 6) {
                                     // Locked or MASTER: just advance to next card
                                     if (historyOffset > 0) setHistoryOffset(h => h - 1);
@@ -11082,7 +11082,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     zIndex: 300,
                     backdropFilter: 'blur(6px)',
                 }}
-                    onClick={() => setTimeAttackPhase('idle')}
+                    onClick={() => { setTimeAttackPhase('idle'); setViewMode('calendar'); }}
                 >
                     <div
                         style={{
