@@ -31,8 +31,9 @@ function loadAll() {
   const m365raw = safe<Record<string, number>>(localStorage.getItem('master-365-mastery'), {});
   const m365touched = Object.values(m365raw).filter(v => v >= 1).length;
 
-  // Daily Training
-  const phrases = safe<unknown[]>(localStorage.getItem('my-training-phrases'), []);
+  // Daily Training (user-registered only, exclude 365 system entries)
+  const allPhrases = safe<{ id?: string; category?: string }[]>(localStorage.getItem('my-training-phrases'), []);
+  const phrases = allPhrases.filter(p => !p.category?.startsWith('365-'));
   const mastery = safe<Record<string, number>>(
     localStorage.getItem('my-training-mastery') || localStorage.getItem('quest-mastery'), {}
   );

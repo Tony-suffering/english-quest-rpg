@@ -164,12 +164,14 @@ export function addPhrase(p: { english: string; japanese: string; category: stri
         ...(p.situation && { situation: p.situation }),
         ...(p.context && { context: p.context }),
     };
-    // Write to my-training-phrases (production Daily Training)
-    try {
-        const myPhrases = JSON.parse(localStorage.getItem('my-training-phrases') || '[]');
-        myPhrases.push(newPhrase);
-        localStorage.setItem('my-training-phrases', JSON.stringify(myPhrases));
-    } catch { /* */ }
+    // Write to my-training-phrases ONLY for user-registered phrases (not 365 system entries)
+    if (!p.category.startsWith('365-')) {
+        try {
+            const myPhrases = JSON.parse(localStorage.getItem('my-training-phrases') || '[]');
+            myPhrases.push(newPhrase);
+            localStorage.setItem('my-training-phrases', JSON.stringify(myPhrases));
+        } catch { /* */ }
+    }
     // Also keep rpg_custom_phrases for backward compat
     const custom = getJSON<TrainingPhrase[]>(K.CUSTOM_PHRASES, []);
     custom.push(newPhrase);
