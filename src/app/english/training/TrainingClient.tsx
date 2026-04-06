@@ -7830,12 +7830,13 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             display: 'flex', alignItems: 'center', gap: '2px',
                         }}
                     >
-                        ← Calendar
+                        ← カレンダー
                     </button>
                 )}
 
                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                    {/* Data Mode Toggle */}
+                    {/* Data Mode Toggle — hide on my-training (phrases only) */}
+                    {!skipDefaultData && (
                     <div style={{ display: 'flex', marginRight: '4px' }}>
                         <button
                             onClick={() => {
@@ -7855,7 +7856,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 transition: 'all 0.15s',
                             }}
                         >
-                            Phrases
+                            フレーズ
                         </button>
                         <button
                             onClick={() => {
@@ -7875,11 +7876,13 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 transition: 'all 0.15s',
                             }}
                         >
-                            Words
+                            単語
                         </button>
                     </div>
+                    )}
                     {viewMode === 'calendar' && (
                         <>
+                            {!skipDefaultData && (
                             <button
                                 onClick={() => {
                                     const target = selectedDate || (() => {
@@ -7894,8 +7897,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     fontSize: '11px', fontWeight: '600', color: '#3B82F6',
                                 }}
                             >
-                                Listen
+                                聞く
                             </button>
+                            )}
                             {!isMobile && (
                                 <button
                                     onClick={() => { setViewMode('review'); if (!shuffledToday) handleShuffle(); }}
@@ -7922,7 +7926,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     letterSpacing: '1px',
                                 }}
                             >
-                                TIME ATTACK
+                                タイムアタック
                             </button>
                             <button
                                 onClick={() => setViewMode('list')}
@@ -7932,7 +7936,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     fontSize: '11px', fontWeight: '500', color: '#78716C',
                                 }}
                             >
-                                List
+                                一覧
                             </button>
                         </>
                     )}
