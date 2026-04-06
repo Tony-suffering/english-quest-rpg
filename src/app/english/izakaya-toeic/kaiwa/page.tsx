@@ -1190,10 +1190,6 @@ export default function EnglishMaster365Page() {
 
                     {/* Dashboard banner */}
                     {(() => {
-                        const todaySlotVal = daySlotOffset + now.getDate();
-                        const todayEntries = entries.filter(e => e.day_slot === todaySlotVal);
-                        const todayMastered = todayEntries.filter(e => masteredIds.has(e.id)).length;
-                        const todayTotal = todayEntries.length;
                         const overallPct = entries.length > 0 ? Math.round((masteredIds.size / entries.length) * 100) : 0;
                         const monthLabel = monthMeta ? `${monthMeta.month}ヶ月目: ${monthMeta.title}` : '';
                         return (
@@ -1275,55 +1271,7 @@ export default function EnglishMaster365Page() {
                                 </div>
                             </div>
 
-                            {/* Today's progress */}
-                            {todayTotal > 0 && (
-                                <div style={{
-                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                    background: todayMastered >= todayTotal ? 'rgba(16,185,129,0.08)' : 'rgba(212,175,55,0.06)',
-                                    borderRadius: 8, padding: '7px 10px',
-                                    border: `1px solid ${todayMastered >= todayTotal ? 'rgba(16,185,129,0.2)' : 'rgba(212,175,55,0.15)'}`,
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <span style={{
-                                            fontSize: 9, fontWeight: 700,
-                                            color: todayMastered >= todayTotal ? '#10B981' : '#D4AF37',
-                                            letterSpacing: '0.08em',
-                                        }}>
-                                            今日
-                                        </span>
-                                        <span style={{ fontSize: 12, fontWeight: 700, color: '#D6D3D1' }}>
-                                            {todayMastered} / {todayTotal}
-                                        </span>
-                                    </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                        {todayTotal <= 10 && Array.from({ length: todayTotal }).map((_, i) => (
-                                            <div key={i} style={{
-                                                width: 5, height: 5, borderRadius: '50%',
-                                                background: i < todayMastered
-                                                    ? (todayMastered >= todayTotal ? '#10B981' : '#D4AF37')
-                                                    : '#3A3533',
-                                                transition: 'background 0.3s',
-                                            }} />
-                                        ))}
-                                        {todayTotal > 10 && (
-                                            <span style={{
-                                                fontSize: 11, fontWeight: 800,
-                                                color: todayMastered >= todayTotal ? '#10B981' : '#D4AF37',
-                                            }}>
-                                                {Math.round((todayMastered / todayTotal) * 100)}%
-                                            </span>
-                                        )}
-                                        {todayMastered >= todayTotal && todayTotal > 0 && (
-                                            <span style={{
-                                                fontSize: 9, fontWeight: 700, color: '#10B981',
-                                                letterSpacing: '0.08em', marginLeft: 2,
-                                            }}>
-                                                完了
-                                            </span>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+                            {/* Today's clear — only in-session, not on reload */}
                         </div>
                         {/* Creator voice line */}
                         <div style={{
