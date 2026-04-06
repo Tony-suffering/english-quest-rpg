@@ -555,9 +555,15 @@ export default function EnglishMaster365Page() {
             const questData = localStorage.getItem(`kaiwa-quest-${today}`);
             if (questData) {
                 const q = JSON.parse(questData);
-                setQuestListenCount(q.listened || 0);
-                setQuestRegisterCount(q.registered || 0);
+                const listened = q.listened || 0;
+                const registered = q.registered || 0;
+                setQuestListenCount(listened);
+                setQuestRegisterCount(registered);
                 setQuestDismissed(q.dismissed || false);
+                // If already complete from previous session, don't re-trigger celebration
+                if (listened >= 3 && registered >= 1) {
+                    questWasCompleteRef.current = true;
+                }
             }
         } catch { /* */ }
     }, []);
