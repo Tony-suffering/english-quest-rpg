@@ -2517,6 +2517,7 @@ export interface TrainingInitialData {
 export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData = false }: { initialData?: TrainingInitialData; onHelpClick?: () => void; skipDefaultData?: boolean }) {
     // Data mode: phrases (default) or words
     const [dataMode, setDataMode] = useState<'phrases' | 'words'>(() => {
+        if (skipDefaultData) return 'phrases'; // my-training: phrases only
         if (typeof window !== 'undefined') {
             return (localStorage.getItem('training-data-mode') as 'phrases' | 'words') || 'phrases';
         }
@@ -2788,7 +2789,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         const check = () => {
             if (!getSettings().feverEnabled) {
                 setChainState({ count: 0, mode: 'normal', key: Date.now() });
-                setKakuhenBoost(0);
                 if (feverDroneRef.current) {
                     stopFeverBGM(feverDroneRef.current);
                     feverDroneRef.current = null;
@@ -3820,36 +3820,41 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             try {
                 if (IS_PUBLIC) {
                     if (skipDefaultData) {
-                        // 本番モード: 完全に空からスタート。my-training専用のlocalStorageキーのみ使用
-                        const myPhrases: Phrase[] = [];
-                        try {
-                            const raw = localStorage.getItem('my-training-phrases');
-                            if (raw) {
-                                const saved = JSON.parse(raw);
-                                for (const p of saved) {
-                                    myPhrases.push({
-                                        id: p.id,
-                                        english: p.english || '',
-                                        japanese: p.japanese || '',
-                                        category: p.category || 'my-training',
-                                        date: p.date || new Date().toISOString(),
-                                    });
+                        // initialDataがあればそれを使う（Server Componentから渡される）
+                        // なければlocalStorageフォールバック
+                        if (!initialData?.phrases) {
+                            const myPhrases: Phrase[] = [];
+                            try {
+                                const raw = localStorage.getItem('my-training-phrases');
+                                if (raw) {
+                                    const saved = JSON.parse(raw);
+                                    for (const p of saved) {
+                                        myPhrases.push({
+                                            id: p.id,
+                                            english: p.english || '',
+                                            japanese: p.japanese || '',
+                                            category: p.category || 'my-training',
+                                            date: p.date || new Date().toISOString(),
+                                        });
+                                    }
                                 }
-                            }
-                        } catch { /* */ }
-                        setPhrases(myPhrases);
-                        try {
-                            const saved = localStorage.getItem('my-training-mastery');
-                            if (saved) setPhraseMastery(JSON.parse(saved));
-                        } catch { /* */ }
-                        try {
-                            const cp = localStorage.getItem('quest-cardPoints');
-                            if (cp) setCardPoints(JSON.parse(cp));
-                        } catch { /* */ }
-                        try {
-                            const ll = localStorage.getItem('quest-lastLeveled');
-                            if (ll) setPhraseLastLeveled(JSON.parse(ll));
-                        } catch { /* */ }
+                            } catch { /* */ }
+                            setPhrases(myPhrases);
+                            try {
+                                const saved = localStorage.getItem('my-training-mastery');
+                                if (saved) setPhraseMastery(JSON.parse(saved));
+                            } catch { /* */ }
+                            try {
+                                const cp = localStorage.getItem('quest-cardPoints');
+                                if (cp) setCardPoints(JSON.parse(cp));
+                            } catch { /* */ }
+                            try {
+                                const ll = localStorage.getItem('quest-lastLeveled');
+                                if (ll) setPhraseLastLeveled(JSON.parse(ll));
+                            } catch { /* */ }
+                        }
+                        setVoiceRecordings({});
+                        setPhraseLinks({});
                         try {
                             const ps = localStorage.getItem('quest-playerStats');
                             if (ps) {
@@ -3859,8 +3864,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 setPlayerSparks(stats.sparks || 0);
                             }
                         } catch { /* */ }
-                        setVoiceRecordings({});
-                        setPhraseLinks({});
                     } else {
                     // チュートリアル: TOEIC 30日コンテンツ + エピソードから追加した単語
                     // カレンダーの各日に20個: Day 1→1日, Day 2→2日, ...
@@ -4434,8 +4437,10 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         reviewListCacheRef.current = { filter: String(reviewFilter), shuffleKey, listRef: computedReviewList, list: computedReviewList };
     }
     // Hide phrases touched today — once you press mastery, it won't reappear until tomorrow
+    // Exception: during time attack, show all phrases (user explicitly chose to practice)
     const reviewListRaw = reviewListCacheRef.current.list;
-    const reviewList = clientToday
+    const isTimeAttackActive = timeAttackPhase === 'running' || timeAttackPhase === 'countdown';
+    const reviewList = (clientToday && !isTimeAttackActive)
         ? reviewListRaw.filter(p => phraseLastLeveled[p.id] !== clientToday)
         : reviewListRaw;
 
@@ -4482,8 +4487,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     setChainState({ count: 10, mode: 'god', key: Date.now() });
                 } else if (k === ')') { // Shift+0 = reset chain
                     setChainState({ count: 0, mode: 'normal', key: Date.now() });
-                } else if (k === 'K') { // Shift+K = kakuhen boost 10
-                    setKakuhenBoost(prev => prev > 0 ? 0 : 10);
                 }
             }
         };
@@ -8031,7 +8034,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     flex: 1,
                     overflow: 'auto',
                     display: 'flex',
-                    flexDirection: isMobile ? 'column' : 'row',
+                    flexDirection: (isMobile || timeAttackPhase === 'running' || timeAttackPhase === 'countdown') ? 'column' : 'row',
                     gap: isMobile ? '0' : '0',
                     // Raise above fever overlay (z-50) so content stays readable
                     position: 'relative',
@@ -9459,8 +9462,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         </div>
                     )}
 
-                    {/* Right Panel - Stats OR Selected Date Phrases */}
+                    {/* Right Panel - Stats OR Selected Date Phrases (hidden in review mode) */}
                     <div style={{
+                        display: viewMode === 'review' ? 'none' : 'flex',
                         flex: isMobile ? 'none' : (sidebarExpanded ? '1 1 0%' : '0.8 1 0%'),
                         minWidth: isMobile ? undefined : '320px',
                         width: isMobile ? '100%' : undefined,
@@ -9469,7 +9473,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         borderLeft: isMobile ? 'none' : '1px solid #e5e5e5',
                         borderBottom: isMobile ? '1px solid #e5e5e5' : 'none',
                         padding: '16px',
-                        display: 'flex',
                         flexDirection: 'column',
                         gap: '12px',
                         overflowY: isMobile ? 'visible' : 'auto',
@@ -11170,6 +11173,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         onClick={() => {
                                             setTimeAttackPhase('idle');
                                             setViewMode('review');
+                                            setReviewFilter('all');
+                                            setReviewIndex(0);
                                             if (!shuffledToday) handleShuffle();
                                             setTimeout(() => startTimeAttack(p.seconds), 200);
                                         }}
