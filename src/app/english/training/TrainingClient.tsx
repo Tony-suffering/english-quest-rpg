@@ -3171,7 +3171,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         { cards: 100, title: 'LEGENDARY', color: '#D4AF37' },
         { cards: 150, title: 'TRANSCENDENT', color: '#D4AF37' },
     ];
-    const [timeAttackPhase, setTimeAttackPhase] = useState<'idle' | 'selecting' | 'countdown' | 'running' | 'result'>('idle');
+    const [timeAttackPhase, setTimeAttackPhase] = useState<'idle' | 'selecting' | 'countdown' | 'running' | 'result'>(
+        typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('ta') === '1' ? 'selecting' : 'idle'
+    );
     const [timeAttackPreset, setTimeAttackPreset] = useState(600);
     const [timeAttackRemaining, setTimeAttackRemaining] = useState(0);
     const [timeAttackStartedAt, setTimeAttackStartedAt] = useState(0);
@@ -4436,12 +4438,17 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         reviewListCacheRef.current = { filter: String(reviewFilter), shuffleKey, listRef: computedReviewList, list: computedReviewList };
     }
     // Hide phrases touched today — once you press mastery, it won't reappear until tomorrow
-    // Exception: during time attack, show all phrases (user explicitly chose to practice)
+    // During time attack: show all EXCEPT already-maxed (mastery 3 or 6) cards
     const reviewListRaw = reviewListCacheRef.current.list;
     const isTimeAttackActive = timeAttackPhase === 'running' || timeAttackPhase === 'countdown';
-    const reviewList = (clientToday && !isTimeAttackActive)
-        ? reviewListRaw.filter(p => phraseLastLeveled[p.id] !== clientToday)
-        : reviewListRaw;
+    const reviewList = isTimeAttackActive
+        ? reviewListRaw.filter(p => {
+            const m = Number(phraseMastery[p.id] || 0);
+            return m !== 3 && m !== 6;
+        })
+        : clientToday
+            ? reviewListRaw.filter(p => phraseLastLeveled[p.id] !== clientToday)
+            : reviewListRaw;
 
     // History-aware displayed card: celebration > history > queue
     const displayedCard = cardCelebration
