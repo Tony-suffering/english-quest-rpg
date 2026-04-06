@@ -576,10 +576,20 @@ export default function EnglishMaster365Page() {
     useEffect(() => {
         const isComplete = questListenCount >= 3 && questRegisterCount >= 1;
         if (isComplete && !questWasCompleteRef.current) {
-            // Just completed! Trigger celebration
             setQuestCelebration(true);
             playQuestComplete();
-            setTimeout(() => setQuestCelebration(false), 4000);
+            setTimeout(() => {
+                setQuestCelebration(false);
+                setQuestDismissed(true);
+            }, 4000);
+            // Save dismissed to localStorage so reload won't show it
+            try {
+                const today = getTodayStr();
+                const raw = localStorage.getItem(`kaiwa-quest-${today}`);
+                const q = raw ? JSON.parse(raw) : {};
+                q.dismissed = true;
+                localStorage.setItem(`kaiwa-quest-${today}`, JSON.stringify(q));
+            } catch { /* */ }
         }
         questWasCompleteRef.current = isComplete;
     }, [questListenCount, questRegisterCount]);

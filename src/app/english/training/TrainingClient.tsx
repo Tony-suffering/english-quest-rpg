@@ -3279,52 +3279,30 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         }
     }, []);
 
-    // Start time attack with READY -> 3 -> 2 -> 1 -> GO! sequence
+    // Start time attack immediately (no countdown)
     const startTimeAttack = useCallback((presetSeconds: number) => {
         setTimeAttackPreset(presetSeconds);
         setTimeAttackRemaining(presetSeconds);
-        setTimeAttackStartedAt(Date.now());
         setTimeAttackUrgent(false);
         setTimeAttackMilestone(null);
         setTimeAttackLivePace(0);
         timeAttackSessionRef.current = { cardsReviewed: 0, xpEarned: 0, levelUps: 0, maxChain: 0, currentChain: 0 };
-        setTimeAttackPhase('countdown');
-
-        const sequence = [
-            { text: 'READY?', color: '#A8A29E', delay: 0 },
-            { text: '3', color: '#2563EB', delay: 800 },
-            { text: '2', color: '#EA580C', delay: 1600 },
-            { text: '1', color: '#DC2626', delay: 2400 },
-            { text: 'GO!', color: '#D4AF37', delay: 3200 },
-        ];
-        sequence.forEach(({ text, color, delay }) => {
-            setTimeout(() => {
-                setTimeAttackCountdownText(text);
-                setTimeAttackCountdownColor(color);
-                if (text === 'GO!') playReachAlert();
-            }, delay);
-        });
-
-        setTimeout(() => {
-            setTimeAttackRemaining(presetSeconds);
-            setTimeAttackPhase('running');
-            const startTime = Date.now();
-            const startedAt = Date.now();
-            setTimeAttackStartedAt(startedAt);
-            timeAttackIntervalRef.current = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = Math.max(0, presetSeconds - elapsed);
-                setTimeAttackRemaining(remaining);
-                const elapsedMin = Math.max(elapsed / 60, 0.05);
-                setTimeAttackLivePace(Math.round((timeAttackSessionRef.current.cardsReviewed / elapsedMin) * 10) / 10);
-                if (remaining <= 60 && remaining > 0) setTimeAttackUrgent(true);
-                if (remaining <= 0) {
-                    if (timeAttackIntervalRef.current) clearInterval(timeAttackIntervalRef.current);
-                    timeAttackIntervalRef.current = null;
-                    finishTimeAttack(presetSeconds, presetSeconds, true);
-                }
-            }, 250);
-        }, 4000);
+        setTimeAttackPhase('running');
+        const startTime = Date.now();
+        setTimeAttackStartedAt(startTime);
+        timeAttackIntervalRef.current = setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const remaining = Math.max(0, presetSeconds - elapsed);
+            setTimeAttackRemaining(remaining);
+            const elapsedMin = Math.max(elapsed / 60, 0.05);
+            setTimeAttackLivePace(Math.round((timeAttackSessionRef.current.cardsReviewed / elapsedMin) * 10) / 10);
+            if (remaining <= 60 && remaining > 0) setTimeAttackUrgent(true);
+            if (remaining <= 0) {
+                if (timeAttackIntervalRef.current) clearInterval(timeAttackIntervalRef.current);
+                timeAttackIntervalRef.current = null;
+                finishTimeAttack(presetSeconds, presetSeconds, true);
+            }
+        }, 250);
     }, []);
 
     // Finish time attack (either by timeout or manual stop)
