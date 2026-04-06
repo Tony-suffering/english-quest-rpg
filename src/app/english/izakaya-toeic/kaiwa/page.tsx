@@ -27,6 +27,8 @@ import { KAIWA_STORIES_3 } from '@/data/english/365/kaiwa-stories-3';
 import {
     playTapPlay, playMasteryOn, playMasteryOff, playDayComplete,
     playRegister, playDaySwitch, playStoryToggle, playLevelSwitch, playNavClick,
+    playCardExpand, playCardCollapse, playQuestStep, playQuestComplete,
+    playLevelSelect, playCalendarComplete,
 } from '@/lib/kaiwa-sounds';
 import { getStreakComment, getMissionCompleteComment, CREATOR_PROFILE } from '@/data/english/creator-voice';
 
@@ -83,6 +85,35 @@ const KAIWA_STYLES = `
 @keyframes playPulseRing {
     0% { transform: scale(1); opacity: 0.6; }
     100% { transform: scale(2); opacity: 0; }
+}
+@keyframes questCelebrate {
+    0% { opacity: 0; transform: scale(0.8); }
+    20% { opacity: 1; transform: scale(1.05); }
+    40% { transform: scale(0.98); }
+    60% { transform: scale(1.02); }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes questCelebrateOut {
+    0% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0.9); }
+}
+@keyframes confettiFloat {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(120vh) rotate(720deg); opacity: 0; }
+}
+@keyframes questStarBurst {
+    0% { transform: scale(0) rotate(0deg); opacity: 0; }
+    50% { transform: scale(1.3) rotate(180deg); opacity: 1; }
+    100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+@keyframes calendarGlow {
+    0%, 100% { box-shadow: 0 0 4px rgba(212,175,55,0.2), 0 0 0 0 rgba(212,175,55,0); }
+    50% { box-shadow: 0 0 8px rgba(212,175,55,0.3), 0 0 12px 2px rgba(212,175,55,0.1); }
+}
+@keyframes calendarStarPop {
+    0% { transform: scale(0) rotate(0deg); }
+    50% { transform: scale(1.3) rotate(180deg); }
+    100% { transform: scale(1) rotate(360deg); }
 }
 `;
 
@@ -497,6 +528,8 @@ export default function EnglishMaster365Page() {
     const [questListenCount, setQuestListenCount] = useState(0);
     const [questRegisterCount, setQuestRegisterCount] = useState(0);
     const [questDismissed, setQuestDismissed] = useState(false);
+    const [questCelebration, setQuestCelebration] = useState(false);
+    const questWasCompleteRef = useRef(false);
 
     // Load total shikomi count from localStorage
     useEffect(() => {
@@ -528,6 +561,18 @@ export default function EnglishMaster365Page() {
             }
         } catch { /* */ }
     }, []);
+
+    // Quest completion detection
+    useEffect(() => {
+        const isComplete = questListenCount >= 3 && questRegisterCount >= 1;
+        if (isComplete && !questWasCompleteRef.current) {
+            // Just completed! Trigger celebration
+            setQuestCelebration(true);
+            playQuestComplete();
+            setTimeout(() => setQuestCelebration(false), 4000);
+        }
+        questWasCompleteRef.current = isComplete;
+    }, [questListenCount, questRegisterCount]);
 
     // Streak state
     const [streak, setStreak] = useState<StreakData>({ current: 0, lastDate: '', best: 0 });
@@ -818,6 +863,7 @@ export default function EnglishMaster365Page() {
             // Update daily quest listen count
             setQuestListenCount(prev => {
                 const next = prev + 1;
+                if (next <= 3) setTimeout(() => playQuestStep(), 200);
                 try {
                     const today = getTodayStr();
                     const raw = localStorage.getItem(`kaiwa-quest-${today}`);
@@ -867,6 +913,7 @@ export default function EnglishMaster365Page() {
         // Update daily quest register count
         setQuestRegisterCount(prev => {
             const next = prev + 1;
+            if (next === 1) setTimeout(() => playQuestStep(), 300);
             try {
                 const todayStr = getTodayStr();
                 const raw = localStorage.getItem(`kaiwa-quest-${todayStr}`);
@@ -1352,6 +1399,7 @@ export default function EnglishMaster365Page() {
                         masteredIds={masteredIds}
                         isMobile={isMobile}
                         checkinDays={checkinDays}
+                        onDayComplete={playCalendarComplete}
                     />
                     {/* Calendar encouragement */}
                     <div style={{
@@ -1762,6 +1810,7 @@ export default function EnglishMaster365Page() {
                                         複数選んでOK。迷ったらまず Vibe から。
                                     </div>
                                     <button onClick={() => {
+                                        playLevelSelect();
                                         setShowLevelPicker(false);
                                         localStorage.setItem('kaiwa-beginner-level', '1');
                                         setBeginnerLevel(1);
@@ -2492,6 +2541,132 @@ export default function EnglishMaster365Page() {
                     )}
                 </div>
             </div>
+
+            {/* ═══ Quest Completion Celebration Overlay ═══ */}
+            {questCelebration && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 9999,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(0,0,0,0.5)',
+                    animation: 'questCelebrate 0.6s ease forwards',
+                }} onClick={() => setQuestCelebration(false)}>
+                    {/* Confetti particles */}
+                    {Array.from({ length: 30 }).map((_, i) => {
+                        const colors = ['#D4AF37', '#10B981', '#3B82F6', '#EC4899', '#F59E0B', '#8B5CF6'];
+                        const left = (i * 37 + 13) % 100;
+                        const size = 6 + (i % 5) * 2;
+                        const delay = (i % 8) * 0.06;
+                        const dur = 2 + (i % 4) * 0.5;
+                        return (
+                            <div key={i} style={{
+                                position: 'absolute',
+                                top: -20,
+                                left: `${left}%`,
+                                width: size, height: size,
+                                borderRadius: i % 2 === 0 ? '50%' : '2px',
+                                background: colors[i % 6],
+                                animation: `confettiFloat ${dur}s linear ${delay}s forwards`,
+                                opacity: 0.9,
+                            }} />
+                        );
+                    })}
+                    {/* Star bursts */}
+                    {Array.from({ length: 8 }).map((_, i) => {
+                        const stars = ['\u2605', '\u2726', '\u2727', '\u2736'];
+                        const stColors = ['#D4AF37', '#10B981', '#F59E0B', '#EC4899'];
+                        const top = 20 + (i * 23 + 11) % 60;
+                        const left = 10 + (i * 31 + 7) % 80;
+                        return (
+                            <div key={`star-${i}`} style={{
+                                position: 'absolute',
+                                top: `${top}%`, left: `${left}%`,
+                                fontSize: 16 + (i % 4) * 5,
+                                color: stColors[i % 4],
+                                animation: `questStarBurst ${0.8 + (i % 3) * 0.2}s ease ${0.2 + i * 0.15}s forwards`,
+                                opacity: 0,
+                                pointerEvents: 'none',
+                            }}>
+                                {stars[i % 4]}
+                            </div>
+                        );
+                    })}
+                    {/* Center card */}
+                    <div style={{
+                        background: 'linear-gradient(135deg, #FFFBEB 0%, #fff 50%, #ECFDF5 100%)',
+                        borderRadius: 24,
+                        padding: '40px 48px',
+                        textAlign: 'center',
+                        boxShadow: '0 20px 60px rgba(212,175,55,0.3), 0 0 0 2px #D4AF37',
+                        maxWidth: 340,
+                        animation: 'questCelebrate 0.5s ease',
+                        position: 'relative',
+                        overflow: 'hidden',
+                    }}>
+                        <div style={{
+                            position: 'absolute', top: 0, left: 0, right: 0, height: 4,
+                            background: 'linear-gradient(90deg, #D4AF37, #10B981, #D4AF37)',
+                        }} />
+                        <div style={{
+                            fontSize: 11, fontWeight: 800, color: '#D4AF37',
+                            letterSpacing: '0.2em', marginBottom: 12,
+                        }}>
+                            -- QUEST COMPLETE --
+                        </div>
+                        <div style={{
+                            fontSize: 48, fontWeight: 900, color: '#1C1917',
+                            lineHeight: 1, marginBottom: 8,
+                            textShadow: '0 2px 4px rgba(212,175,55,0.2)',
+                        }}>
+                            CLEAR
+                        </div>
+                        <div style={{
+                            fontSize: 14, color: '#57534E', fontWeight: 600,
+                            marginBottom: 20, lineHeight: 1.6,
+                        }}>
+                            Today&apos;s Mini Quest
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 20 }}>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{
+                                    width: 44, height: 44, borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #D4AF37, #B45309)',
+                                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: 20, fontWeight: 900, margin: '0 auto 4px',
+                                    boxShadow: '0 4px 12px rgba(212,175,55,0.3)',
+                                }}>{'\u2713'}</div>
+                                <div style={{ fontSize: 10, color: '#78716C', fontWeight: 700 }}>3 Listened</div>
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <div style={{
+                                    width: 44, height: 44, borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #10B981, #059669)',
+                                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: 20, fontWeight: 900, margin: '0 auto 4px',
+                                    boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
+                                }}>{'\u2713'}</div>
+                                <div style={{ fontSize: 10, color: '#78716C', fontWeight: 700 }}>1 Registered</div>
+                            </div>
+                        </div>
+                        <div style={{
+                            display: 'inline-block',
+                            background: 'linear-gradient(135deg, #D4AF37, #B45309)',
+                            color: '#fff',
+                            padding: '10px 32px', borderRadius: 20,
+                            fontSize: 13, fontWeight: 800,
+                            letterSpacing: '0.1em',
+                            boxShadow: '0 4px 16px rgba(212,175,55,0.35)',
+                            cursor: 'pointer',
+                        }}>
+                            NICE!
+                        </div>
+                        <div style={{
+                            fontSize: 11, color: '#A8A29E', marginTop: 14, fontStyle: 'italic',
+                        }}>
+                            三日坊主でも4日目にまたやろう
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

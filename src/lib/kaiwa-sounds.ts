@@ -237,3 +237,165 @@ export function playNavClick() {
         osc.start(now); osc.stop(now + 0.07);
     } catch { /* */ }
 }
+
+// ─── Card expand: soft open reveal ───
+export function playCardExpand() {
+    try {
+        if (!ready()) return;
+        const v = vol(), c = ctx(), now = c.currentTime;
+        const osc = c.createOscillator();
+        const g = c.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(500, now);
+        osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+        g.gain.setValueAtTime(0.08 * v, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(g); g.connect(c.destination);
+        osc.start(now); osc.stop(now + 0.15);
+    } catch { /* */ }
+}
+
+// ─── Card collapse: soft close ───
+export function playCardCollapse() {
+    try {
+        if (!ready()) return;
+        const v = vol(), c = ctx(), now = c.currentTime;
+        const osc = c.createOscillator();
+        const g = c.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(700, now);
+        osc.frequency.exponentialRampToValueAtTime(400, now + 0.08);
+        g.gain.setValueAtTime(0.06 * v, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        osc.connect(g); g.connect(c.destination);
+        osc.start(now); osc.stop(now + 0.12);
+    } catch { /* */ }
+}
+
+// ─── Quest step complete: cheerful ping ───
+export function playQuestStep() {
+    try {
+        if (!ready()) return;
+        const v = vol(), c = ctx(), now = c.currentTime;
+        [880, 1100].forEach((freq, i) => {
+            const osc = c.createOscillator();
+            const g = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const t = now + i * 0.08;
+            g.gain.setValueAtTime(0.12 * v, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+            osc.connect(g); g.connect(c.destination);
+            osc.start(t); osc.stop(t + 0.25);
+        });
+    } catch { /* */ }
+}
+
+// ─── Quest ALL complete: epic fanfare (pachinko-level celebration) ───
+export function playQuestComplete() {
+    try {
+        if (!ready()) return;
+        const v = vol(), c = ctx(), now = c.currentTime;
+
+        // Phase 1: Rising arpeggio (0-0.5s)
+        const arp = [523, 659, 784, 1047, 1319];
+        arp.forEach((freq, i) => {
+            const osc = c.createOscillator();
+            const g = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const t = now + i * 0.08;
+            g.gain.setValueAtTime(0, t);
+            g.gain.linearRampToValueAtTime(0.15 * v, t + 0.02);
+            g.gain.setValueAtTime(0.15 * v, t + 0.1);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+            osc.connect(g); g.connect(c.destination);
+            osc.start(t); osc.stop(t + 0.45);
+        });
+
+        // Phase 2: Power chord (0.5s)
+        const chord = [523, 659, 784, 1047];
+        chord.forEach(freq => {
+            const osc = c.createOscillator();
+            const g = c.createGain();
+            osc.type = 'triangle';
+            osc.frequency.value = freq;
+            g.gain.setValueAtTime(0, now + 0.5);
+            g.gain.linearRampToValueAtTime(0.12 * v, now + 0.55);
+            g.gain.setValueAtTime(0.12 * v, now + 1.0);
+            g.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
+            osc.connect(g); g.connect(c.destination);
+            osc.start(now + 0.5); osc.stop(now + 2.1);
+        });
+
+        // Phase 3: Sparkle high notes (0.8-1.5s)
+        [1568, 2093, 1760, 2349].forEach((freq, i) => {
+            const osc = c.createOscillator();
+            const g = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const t = now + 0.8 + i * 0.12;
+            g.gain.setValueAtTime(0.06 * v, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+            osc.connect(g); g.connect(c.destination);
+            osc.start(t); osc.stop(t + 0.35);
+        });
+
+        // Phase 4: Sub-bass impact
+        const bass = c.createOscillator();
+        const bg = c.createGain();
+        bass.type = 'sine';
+        bass.frequency.setValueAtTime(80, now + 0.48);
+        bass.frequency.exponentialRampToValueAtTime(40, now + 1.0);
+        bg.gain.setValueAtTime(0.2 * v, now + 0.48);
+        bg.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+        bass.connect(bg); bg.connect(c.destination);
+        bass.start(now + 0.48); bass.stop(now + 1.3);
+    } catch { /* */ }
+}
+
+// ─── Level picker select: satisfying click ───
+export function playLevelSelect() {
+    try {
+        if (!ready()) return;
+        const v = vol(), c = ctx(), now = c.currentTime;
+        const osc = c.createOscillator();
+        const g = c.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.exponentialRampToValueAtTime(900, now + 0.04);
+        g.gain.setValueAtTime(0.12 * v, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.connect(g); g.connect(c.destination);
+        osc.start(now); osc.stop(now + 0.1);
+        // Confirmation tone
+        const osc2 = c.createOscillator();
+        const g2 = c.createGain();
+        osc2.type = 'triangle';
+        osc2.frequency.value = 1200;
+        g2.gain.setValueAtTime(0.06 * v, now + 0.05);
+        g2.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc2.connect(g2); g2.connect(c.destination);
+        osc2.start(now + 0.05); osc2.stop(now + 0.18);
+    } catch { /* */ }
+}
+
+// ─── Calendar day complete sparkle ───
+export function playCalendarComplete() {
+    try {
+        if (!ready()) return;
+        const v = vol(), c = ctx(), now = c.currentTime;
+        // Gentle chime
+        [1047, 1319, 1568].forEach((freq, i) => {
+            const osc = c.createOscillator();
+            const g = c.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            const t = now + i * 0.1;
+            g.gain.setValueAtTime(0.08 * v, t);
+            g.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+            osc.connect(g); g.connect(c.destination);
+            osc.start(t); osc.stop(t + 0.45);
+        });
+    } catch { /* */ }
+}

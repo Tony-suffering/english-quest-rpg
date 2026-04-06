@@ -36,6 +36,7 @@ export interface ReviewCalendarProps {
     isMobile: boolean;
     headerRight?: React.ReactNode;
     checkinDays?: Set<number>;
+    onDayComplete?: () => void;
 }
 
 // --- Helpers ---
@@ -86,6 +87,7 @@ export default function ReviewCalendar({
     isMobile,
     headerRight,
     checkinDays,
+    onDayComplete,
 }: ReviewCalendarProps) {
     const now = new Date();
     const todayDate = now.getDate();
@@ -124,6 +126,7 @@ export default function ReviewCalendar({
             saveReviewed(reviewKey, next);
             setToastVisible(true);
             setTimeout(() => setToastVisible(false), 2500);
+            onDayComplete?.();
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playedIds, masteredIds, selectedDay]);
@@ -192,13 +195,16 @@ export default function ReviewCalendar({
                 <div style={{
                     position: 'fixed', top: '20px', left: '50%',
                     transform: 'translateX(-50%)',
-                    backgroundColor: accent, color: '#fff',
-                    padding: '10px 24px', borderRadius: '10px',
-                    fontSize: '13px', fontWeight: '700', zIndex: 1000,
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                    background: `linear-gradient(135deg, ${accent}, #B45309)`,
+                    color: '#fff',
+                    padding: '12px 32px', borderRadius: '14px',
+                    fontSize: '14px', fontWeight: '800', zIndex: 1000,
+                    boxShadow: `0 4px 20px ${accent}50, 0 8px 32px rgba(0,0,0,0.15)`,
                     animation: 'toastSlide 0.3s ease-out',
+                    letterSpacing: '0.1em',
+                    textShadow: '0 1px 2px rgba(0,0,0,0.2)',
                 }}>
-                    Complete!
+                    {'\u2605'} DAY COMPLETE! {'\u2605'}
                 </div>
             )}
 
@@ -345,10 +351,12 @@ export default function ReviewCalendar({
                                 boxShadow: isSelected
                                     ? `0 0 0 3px ${accent}20`
                                     : isComplete
-                                        ? '0 1px 4px rgba(212,175,55,0.15)'
+                                        ? '0 2px 8px rgba(212,175,55,0.25), 0 0 12px rgba(212,175,55,0.1)'
                                         : 'none',
-                                animation: isToday && !hasCheckin && count > 0
-                                    ? 'todayPulse 2.5s ease-in-out infinite' : undefined,
+                                animation: isComplete && !isSelected
+                                    ? 'calendarGlow 3s ease-in-out infinite'
+                                    : isToday && !hasCheckin && count > 0
+                                        ? 'todayPulse 2.5s ease-in-out infinite' : undefined,
                             }}
                         >
                             {/* Day number */}
@@ -378,12 +386,14 @@ export default function ReviewCalendar({
                                     height: 14,
                                 }}>
                                     {isComplete ? (
-                                        // Beautiful gold checkmark
+                                        // Gold star with glow
                                         <span style={{
-                                            fontSize: '11px', fontWeight: 900,
+                                            fontSize: '13px', fontWeight: 900,
                                             color: accent,
                                             lineHeight: 1,
-                                        }}>{'\u2713'}</span>
+                                            textShadow: `0 0 6px ${accent}60`,
+                                            animation: 'calendarStarPop 0.6s ease',
+                                        }}>{'\u2605'}</span>
                                     ) : hasProgress ? (
                                         // Soft dots showing gentle progress (not numbers)
                                         <div style={{ display: 'flex', gap: '2px', alignItems: 'center' }}>
@@ -445,6 +455,15 @@ export default function ReviewCalendar({
                 @keyframes todayPulse {
                     0%, 100% { box-shadow: 0 0 0 0 rgba(212,175,55,0.3); }
                     50% { box-shadow: 0 0 0 4px rgba(212,175,55,0.12); }
+                }
+                @keyframes calendarGlow {
+                    0%, 100% { box-shadow: 0 2px 8px rgba(212,175,55,0.2), 0 0 0 0 rgba(212,175,55,0); }
+                    50% { box-shadow: 0 2px 8px rgba(212,175,55,0.3), 0 0 16px 2px rgba(212,175,55,0.12); }
+                }
+                @keyframes calendarStarPop {
+                    0% { transform: scale(0) rotate(0deg); }
+                    50% { transform: scale(1.4) rotate(180deg); }
+                    100% { transform: scale(1) rotate(360deg); }
                 }
             `}</style>
         </div>
