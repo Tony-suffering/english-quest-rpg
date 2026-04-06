@@ -557,13 +557,16 @@ export default function EnglishMaster365Page() {
                 const q = JSON.parse(questData);
                 const listened = q.listened || 0;
                 const registered = q.registered || 0;
-                setQuestListenCount(listened);
-                setQuestRegisterCount(registered);
-                // Already complete = stay hidden (default). Not complete = show quest
                 if (listened >= 3 && registered >= 1) {
+                    // Already complete — do NOT restore counts, keep quest hidden
                     questWasCompleteRef.current = true;
-                } else if (!q.dismissed) {
-                    setQuestDismissed(false);
+                } else {
+                    // In progress — restore counts and show quest
+                    setQuestListenCount(listened);
+                    setQuestRegisterCount(registered);
+                    if (!q.dismissed) {
+                        setQuestDismissed(false);
+                    }
                 }
             } else {
                 // No quest data yet today — show quest prompt
