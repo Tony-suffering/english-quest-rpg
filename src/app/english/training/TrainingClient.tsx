@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import { getSettings } from '@/lib/settings';
@@ -3171,9 +3171,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         { cards: 100, title: 'LEGENDARY', color: '#D4AF37' },
         { cards: 150, title: 'TRANSCENDENT', color: '#D4AF37' },
     ];
-    const [timeAttackPhase, setTimeAttackPhase] = useState<'idle' | 'selecting' | 'countdown' | 'running' | 'result'>(
-        typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('ta') === '1' ? 'selecting' : 'idle'
-    );
+    const [timeAttackPhase, setTimeAttackPhase] = useState<'idle' | 'selecting' | 'countdown' | 'running' | 'result'>('idle');
+    const taAutoRef = useRef(false);
     const [timeAttackPreset, setTimeAttackPreset] = useState(600);
     const [timeAttackRemaining, setTimeAttackRemaining] = useState(0);
     const [timeAttackStartedAt, setTimeAttackStartedAt] = useState(0);
@@ -3470,14 +3469,15 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     }, []);
 
     // Auto-start Time Attack from ?ta=1 URL parameter (e.g. from kaiwa CTA)
-    useEffect(() => {
+    // useLayoutEffect to prevent idle UI flash before selecting
+    useLayoutEffect(() => {
+        if (taAutoRef.current) return;
         const params = new URLSearchParams(window.location.search);
         if (params.get('ta') === '1') {
-            // Remove param from URL without reload
+            taAutoRef.current = true;
             params.delete('ta');
             const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
             window.history.replaceState({}, '', newUrl);
-            // Auto-open TA selection modal
             setTimeAttackPhase('selecting');
         }
     }, []);
