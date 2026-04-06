@@ -33,13 +33,6 @@ export default function MyTrainingPage() {
                     borderRadius: 12,
                     marginBottom: 12,
                 }}>
-                    <span style={{
-                        fontSize: 11, fontWeight: 700, color: '#78716C',
-                        flexShrink: 0,
-                    }}>
-                        演出:
-                    </span>
-
                     {/* Slot toggle */}
                     <button
                         onClick={() => {
@@ -62,7 +55,7 @@ export default function MyTrainingPage() {
                             background: slotOn ? '#D4AF37' : '#D6D3D1',
                             transition: 'all 0.15s',
                         }} />
-                        SLOT {slotOn ? 'ON' : 'OFF'}
+                        スロット演出 {slotOn ? 'あり' : 'なし'}
                     </button>
 
                     {/* Fever toggle */}
@@ -87,7 +80,7 @@ export default function MyTrainingPage() {
                             background: feverOn ? '#EF4444' : '#D6D3D1',
                             transition: 'all 0.15s',
                         }} />
-                        FEVER {feverOn ? 'ON' : 'OFF'}
+                        確変モード {feverOn ? 'あり' : 'なし'}
                     </button>
 
                     <div style={{ flex: 1 }} />
