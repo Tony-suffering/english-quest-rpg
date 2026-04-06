@@ -560,9 +560,10 @@ export default function EnglishMaster365Page() {
                 setQuestListenCount(listened);
                 setQuestRegisterCount(registered);
                 setQuestDismissed(q.dismissed || false);
-                // If already complete from previous session, don't re-trigger celebration
+                // If already complete from previous session, hide quest (show only once on completion)
                 if (listened >= 3 && registered >= 1) {
                     questWasCompleteRef.current = true;
+                    setQuestDismissed(true);
                 }
             }
         } catch { /* */ }
