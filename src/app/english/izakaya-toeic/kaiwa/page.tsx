@@ -1189,33 +1189,141 @@ export default function EnglishMaster365Page() {
                     )}
 
                     {/* Dashboard banner */}
+                    {(() => {
+                        const todaySlotVal = daySlotOffset + now.getDate();
+                        const todayEntries = entries.filter(e => e.day_slot === todaySlotVal);
+                        const todayMastered = todayEntries.filter(e => masteredIds.has(e.id)).length;
+                        const todayTotal = todayEntries.length;
+                        const overallPct = entries.length > 0 ? Math.round((masteredIds.size / entries.length) * 100) : 0;
+                        const monthLabel = monthMeta ? `${monthMeta.month}ヶ月目: ${monthMeta.title}` : '';
+                        return (
                     <Link href="/english/dashboard" style={{ textDecoration: 'none', display: 'block', marginBottom: 14 }}>
                         <div style={{
-                            background: 'linear-gradient(135deg, #1C1917, #292524)',
-                            borderRadius: 12, padding: '14px 16px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                            background: 'linear-gradient(135deg, #1C1917 0%, #292524 60%, #1C1917 100%)',
+                            borderRadius: 14, padding: '16px 18px 14px',
                             border: '1px solid #44403C',
                             transition: 'opacity 0.15s',
+                            position: 'relative', overflow: 'hidden',
                         }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <div style={{ fontSize: 10, fontWeight: 700, color: '#D4AF37', letterSpacing: '0.1em' }}>
-                                    MY PROGRESS
-                                </div>
-                                <div style={{
-                                    height: 12, width: 1, background: '#44403C',
-                                }} />
-                                <div style={{ display: 'flex', gap: 12 }}>
+                            {/* Subtle top accent line */}
+                            <div style={{
+                                position: 'absolute', top: 0, left: 18, right: 18, height: 1,
+                                background: 'linear-gradient(90deg, transparent, #D4AF37, transparent)',
+                                opacity: 0.3,
+                            }} />
+
+                            {/* Header row */}
+                            <div style={{
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                marginBottom: 10,
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                    <span style={{
+                                        fontSize: 10, fontWeight: 700, color: '#D4AF37',
+                                        letterSpacing: '0.08em',
+                                    }}>
+                                        進捗
+                                    </span>
                                     {streak.current > 0 && (
-                                        <span style={{ fontSize: 12, fontWeight: 800, color: '#10B981' }}>
-                                            {streak.current}d streak
-                                        </span>
+                                        <>
+                                            <div style={{ height: 10, width: 1, background: '#44403C' }} />
+                                            <span style={{ fontSize: 11, fontWeight: 800, color: '#10B981' }}>
+                                                {streak.current}日連続
+                                            </span>
+                                        </>
                                     )}
-                                    <span style={{ fontSize: 12, fontWeight: 700, color: '#78716C' }}>
-                                        {masteredIds.size}/{entries.length} cleared
+                                </div>
+                                <span style={{ fontSize: 16, color: '#57534E', fontWeight: 300 }}>&rsaquo;</span>
+                            </div>
+
+                            {/* Month progress */}
+                            <div style={{ marginBottom: 10 }}>
+                                <div style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                                    marginBottom: 5,
+                                }}>
+                                    <div>
+                                        {monthLabel && (
+                                            <span style={{ fontSize: 10, fontWeight: 600, color: '#78716C', marginRight: 8 }}>
+                                                {monthLabel}
+                                            </span>
+                                        )}
+                                        <span style={{ fontSize: 11, fontWeight: 700, color: '#A8A29E' }}>
+                                            {masteredIds.size} / {entries.length} 習得
+                                        </span>
+                                    </div>
+                                    <span style={{
+                                        fontSize: 18, fontWeight: 800, color: '#D4AF37',
+                                        letterSpacing: '-0.02em', lineHeight: 1,
+                                    }}>
+                                        {overallPct}%
                                     </span>
                                 </div>
+                                <div style={{
+                                    height: 6, borderRadius: 3, background: '#292524',
+                                    border: '1px solid #3A3533', overflow: 'hidden',
+                                }}>
+                                    <div style={{
+                                        height: '100%', borderRadius: 3,
+                                        width: `${overallPct}%`,
+                                        background: overallPct === 100
+                                            ? 'linear-gradient(90deg, #10B981, #34D399)'
+                                            : 'linear-gradient(90deg, #D4AF37, #E5C76B)',
+                                        transition: 'width 0.6s ease-out',
+                                        boxShadow: overallPct > 0 ? '0 0 8px rgba(212,175,55,0.3)' : 'none',
+                                    }} />
+                                </div>
                             </div>
-                            <span style={{ fontSize: 14, color: '#57534E' }}>&rsaquo;</span>
+
+                            {/* Today's progress */}
+                            {todayTotal > 0 && (
+                                <div style={{
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    background: todayMastered >= todayTotal ? 'rgba(16,185,129,0.08)' : 'rgba(212,175,55,0.06)',
+                                    borderRadius: 8, padding: '7px 10px',
+                                    border: `1px solid ${todayMastered >= todayTotal ? 'rgba(16,185,129,0.2)' : 'rgba(212,175,55,0.15)'}`,
+                                }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span style={{
+                                            fontSize: 9, fontWeight: 700,
+                                            color: todayMastered >= todayTotal ? '#10B981' : '#D4AF37',
+                                            letterSpacing: '0.08em',
+                                        }}>
+                                            今日
+                                        </span>
+                                        <span style={{ fontSize: 12, fontWeight: 700, color: '#D6D3D1' }}>
+                                            {todayMastered} / {todayTotal}
+                                        </span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                        {todayTotal <= 10 && Array.from({ length: todayTotal }).map((_, i) => (
+                                            <div key={i} style={{
+                                                width: 5, height: 5, borderRadius: '50%',
+                                                background: i < todayMastered
+                                                    ? (todayMastered >= todayTotal ? '#10B981' : '#D4AF37')
+                                                    : '#3A3533',
+                                                transition: 'background 0.3s',
+                                            }} />
+                                        ))}
+                                        {todayTotal > 10 && (
+                                            <span style={{
+                                                fontSize: 11, fontWeight: 800,
+                                                color: todayMastered >= todayTotal ? '#10B981' : '#D4AF37',
+                                            }}>
+                                                {Math.round((todayMastered / todayTotal) * 100)}%
+                                            </span>
+                                        )}
+                                        {todayMastered >= todayTotal && todayTotal > 0 && (
+                                            <span style={{
+                                                fontSize: 9, fontWeight: 700, color: '#10B981',
+                                                letterSpacing: '0.08em', marginLeft: 2,
+                                            }}>
+                                                完了
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                         {/* Creator voice line */}
                         <div style={{
@@ -1225,6 +1333,8 @@ export default function EnglishMaster365Page() {
                             {creatorStreakLine}
                         </div>
                     </Link>
+                        );
+                    })()}
 
                     {/* 4-Level Demo */}
                     <div style={{ marginBottom: 12 }}>

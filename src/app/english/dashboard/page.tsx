@@ -90,17 +90,25 @@ export default function DashboardPage() {
 
   useEffect(() => { setD(loadAll()); }, []);
 
+  // Hooks MUST be called before any conditional return
+  const creatorComment = useMemo(() => {
+    if (!d) return '';
+    const { m365, training, cards, days, streak, player } = d;
+    const totalActions = m365.touched + training.registered + cards.total + days;
+    return getDashboardComment({
+      totalActions, streak: streak.current, level: player.level,
+      mastered: m365.touched, days,
+    });
+  }, [d]);
+  const streakComment = useMemo(() => {
+    if (!d) return '';
+    return getStreakComment(d.streak.current);
+  }, [d]);
+
   if (!d) return <div style={{ minHeight: '100vh', background: '#FAFAF9' }} />;
 
   const { m365, training, streak, player, cards, days } = d;
   const totalActions = m365.touched + training.registered + cards.total + days;
-
-  // Creator voice — stable per session (useMemo with no deps = mount only)
-  const creatorComment = useMemo(() => getDashboardComment({
-    totalActions, streak: streak.current, level: player.level,
-    mastered: m365.touched, days,
-  }), []); // eslint-disable-line react-hooks/exhaustive-deps
-  const streakComment = useMemo(() => getStreakComment(streak.current), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5F5F4' }}>
@@ -117,10 +125,10 @@ export default function DashboardPage() {
           <Link href="/english" style={{
             fontSize: 13, color: '#78716C', textDecoration: 'none', fontWeight: 600,
           }}>
-            ← Back
+            ← 戻る
           </Link>
           <span style={{ fontSize: 13, fontWeight: 800, color: '#1C1917', letterSpacing: '0.08em' }}>
-            MY PROGRESS
+            学習ダッシュボード
           </span>
           <span style={{ fontSize: 11, color: '#A8A29E', fontVariantNumeric: 'tabular-nums' }}>
             {new Date().toLocaleDateString('ja-JP')}
@@ -143,9 +151,9 @@ export default function DashboardPage() {
           }} />
           <div style={{
             fontSize: 10, fontWeight: 700, color: '#D4AF37',
-            letterSpacing: '0.15em', marginBottom: 12,
+            letterSpacing: '0.08em', marginBottom: 12,
           }}>
-            TOTAL PROGRESS
+            総合進捗
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
             <span style={{
@@ -155,7 +163,7 @@ export default function DashboardPage() {
               {totalActions.toLocaleString()}
             </span>
             <span style={{ fontSize: 13, color: '#78716C', fontWeight: 600 }}>
-              actions
+              アクション
             </span>
           </div>
           <div style={{ fontSize: 13, color: '#57534E', lineHeight: 1.6 }}>
@@ -170,7 +178,7 @@ export default function DashboardPage() {
             }}>
               <span>英会話マスター365</span>
               <span style={{ fontVariantNumeric: 'tabular-nums' }}>
-                {m365.touched} / {m365.total.toLocaleString()}
+                {m365.touched} / {m365.total.toLocaleString()} 習得
               </span>
             </div>
             <div style={{
@@ -196,8 +204,8 @@ export default function DashboardPage() {
             background: '#fff', borderRadius: 16, padding: '20px 18px',
             border: '1px solid #E7E5E4',
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#10B981', letterSpacing: '0.1em', marginBottom: 8 }}>
-              STREAK
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#10B981', letterSpacing: '0.08em', marginBottom: 8 }}>
+              連続学習
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
               <span style={{
@@ -207,11 +215,11 @@ export default function DashboardPage() {
               }}>
                 {streak.current}
               </span>
-              <span style={{ fontSize: 12, color: '#A8A29E', fontWeight: 600 }}>days</span>
+              <span style={{ fontSize: 12, color: '#A8A29E', fontWeight: 600 }}>日</span>
             </div>
             {streak.best > 0 && (
               <div style={{ fontSize: 11, color: '#A8A29E', marginTop: 6 }}>
-                best: <span style={{ fontWeight: 700, color: '#78716C' }}>{streak.best}</span>
+                最高: <span style={{ fontWeight: 700, color: '#78716C' }}>{streak.best}日</span>
               </div>
             )}
           </div>
@@ -221,8 +229,8 @@ export default function DashboardPage() {
             background: '#fff', borderRadius: 16, padding: '20px 18px',
             border: '1px solid #E7E5E4',
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', letterSpacing: '0.1em', marginBottom: 8 }}>
-              PLAYER
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#7C3AED', letterSpacing: '0.08em', marginBottom: 8 }}>
+              プレイヤー
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
               <span style={{
@@ -252,8 +260,8 @@ export default function DashboardPage() {
             background: '#fff', borderRadius: 16, padding: '20px 18px',
             border: '1px solid #E7E5E4',
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', letterSpacing: '0.1em', marginBottom: 8 }}>
-              ACTIVE DAYS
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#2563EB', letterSpacing: '0.08em', marginBottom: 8 }}>
+              学習日数
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
               <span style={{
@@ -263,7 +271,7 @@ export default function DashboardPage() {
               }}>
                 {days}
               </span>
-              <span style={{ fontSize: 12, color: '#A8A29E', fontWeight: 600 }}>days</span>
+              <span style={{ fontSize: 12, color: '#A8A29E', fontWeight: 600 }}>日</span>
             </div>
           </div>
 
@@ -272,8 +280,8 @@ export default function DashboardPage() {
             background: '#fff', borderRadius: 16, padding: '20px 18px',
             border: '1px solid #E7E5E4',
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: '#D97706', letterSpacing: '0.1em', marginBottom: 8 }}>
-              SPARKS
+            <div style={{ fontSize: 10, fontWeight: 700, color: '#D97706', letterSpacing: '0.08em', marginBottom: 8 }}>
+              スパーク
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
               <span style={{
@@ -303,7 +311,7 @@ export default function DashboardPage() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#EF4444' }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#44403C' }}>Daily Training</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#44403C' }}>デイリートレーニング</span>
               </div>
               <span style={{ fontSize: 13, color: '#D6D3D1' }}>&rsaquo;</span>
             </div>
@@ -312,13 +320,13 @@ export default function DashboardPage() {
                 <div style={{ fontSize: 28, fontWeight: 800, color: '#EF4444', fontVariantNumeric: 'tabular-nums' }}>
                   {training.registered}
                 </div>
-                <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>registered</div>
+                <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>登録フレーズ</div>
               </div>
               <div>
                 <div style={{ fontSize: 28, fontWeight: 800, color: '#44403C', fontVariantNumeric: 'tabular-nums' }}>
                   {training.mastered}
                 </div>
-                <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>mastered</div>
+                <div style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>習得済み</div>
               </div>
             </div>
           </div>
@@ -336,7 +344,7 @@ export default function DashboardPage() {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#D97706' }} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: '#44403C' }}>Card Collection</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: '#44403C' }}>カードコレクション</span>
               </div>
               <span style={{ fontSize: 13, color: '#D6D3D1' }}>&rsaquo;</span>
             </div>
@@ -344,7 +352,7 @@ export default function DashboardPage() {
               <span style={{ fontSize: 28, fontWeight: 800, color: '#D97706', fontVariantNumeric: 'tabular-nums' }}>
                 {cards.total}
               </span>
-              <span style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>cards</span>
+              <span style={{ fontSize: 11, color: '#A8A29E', fontWeight: 600 }}>枚</span>
             </div>
             {cards.total > 0 && (
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
@@ -368,16 +376,16 @@ export default function DashboardPage() {
           </div>
         </Link>
 
-        {/* Creator voice — inline, not a separate page */}
+        {/* Creator voice */}
         <div style={{
           background: '#FAFAF9', borderRadius: 16, padding: '18px 20px',
           border: '1px solid #E7E5E4', marginTop: 6,
         }}>
           <div style={{
             fontSize: 10, fontWeight: 700, color: '#A8A29E',
-            letterSpacing: '0.1em', marginBottom: 8,
+            letterSpacing: '0.08em', marginBottom: 8,
           }}>
-            FROM THE CREATOR
+            開発者より
           </div>
           <div style={{ fontSize: 13, color: '#44403C', lineHeight: 1.7, marginBottom: 10 }}>
             {streakComment}
