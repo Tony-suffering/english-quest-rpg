@@ -15,7 +15,7 @@ const day202: MasterExpression[] = [
       'Right this way',
       'Right this way, please follow me',
       'Right this way, sir, your table is all set for you',
-      'Right this way, please. We have got a nice quiet table in the back so you can talk business without all the noise. The chef already knows you are coming tonight, so expect something special.'
+      'Oh, this is perfect. Nice and quiet back here, I love it.'
     ],
     context: 'Japanese settai is all about guiding the guest. English keeps the warmth but drops the formality by a notch -- "right this way" sounds smooth without being stiff.',
     character: 'yuki',
@@ -29,7 +29,7 @@ const day202: MasterExpression[] = [
       'Thanks for tonight',
       'Really appreciate you coming out tonight',
       'I just want to say thanks for taking the time to come out tonight',
-      'I just want to say, I really appreciate you taking the time to come out tonight. I know your schedule is packed, so the fact that you made room for this means a lot to me and the whole team.'
+      'Are you kidding? I have been looking forward to this all week. Glad we could make it work.'
     ],
     context: 'In settai, the host always kicks off with gratitude. English does the same but sounds way more natural when you mention their busy schedule -- shows you actually thought about their time.',
     character: 'kenji',
@@ -43,7 +43,7 @@ const day202: MasterExpression[] = [
       'Order whatever you like',
       'Please, get whatever catches your eye',
       'Seriously, order whatever catches your eye, tonight is on us',
-      'Seriously, do not even look at the prices. Just order whatever catches your eye. The whole point of tonight is for you to enjoy yourself, so go wild. If you want the wagyu, get the wagyu.'
+      'Well, if you insist! I have had my eye on the wagyu since I walked in.'
     ],
     context: 'Japanese uses the polite "osuki na mono wo" but in English you gotta be more direct about it being your treat -- otherwise the guest might hold back out of politeness.',
     character: 'master',
@@ -57,7 +57,7 @@ const day202: MasterExpression[] = [
       'Hope you like it',
       'I hope this is to your liking',
       'I really hope the food here is to your liking, they are known for their sashimi',
-      'I really hope the food here is to your liking. This place is known for their sashimi and the chef sources everything from Tsukiji. I was a little nervous picking the spot, but I think you will be pleasantly surprised.'
+      'Are you kidding? This sashimi is incredible. Great pick, honestly.'
     ],
     context: 'This is peak Japanese humility -- you are basically apologizing in advance for the food. English flips it to confidence with a humble wrapper. You hope, but you also sell the place a little.',
     character: 'yuki',
@@ -71,7 +71,7 @@ const day202: MasterExpression[] = [
       'Let us toast',
       'How about a toast to kick things off',
       'Before we dig in, how about a toast to kick things off properly',
-      'Before we dig in, how about a toast to kick things off properly? I would like to raise my glass to our partnership. It has been a great year working together, and I am looking forward to what is next. Cheers!'
+      'Absolutely, I will raise my glass to that. Cheers!'
     ],
     context: 'Kanpai is quick and punchy in Japanese. In English business settings, a toast usually comes with a mini speech. Skipping the speech can feel abrupt, so throw in a few words about the relationship.',
     character: 'kenji',
@@ -85,7 +85,7 @@ const day202: MasterExpression[] = [
       'Another drink?',
       'Can I get you another round?',
       'How about another round? The sake here is really something',
-      'How about another round? You have barely touched that glass. The sake here is really something -- they have this junmai daiginjo that I think you would love. Or if you want to switch to whisky, they have a solid selection too.'
+      'Go on then, twist my arm. I will try whatever you are recommending.'
     ],
     context: 'In settai, refilling is an art form. English does not have the pour-for-your-senior culture, so you make up for it by offering options and showing you know the menu.',
     character: 'master',
@@ -99,7 +99,7 @@ const day202: MasterExpression[] = [
       'Great talking with you',
       'I am really glad we got to chat tonight',
       'I am really glad we got to sit down and chat like this tonight',
-      'I am really glad we got to sit down and chat like this tonight. These conversations are honestly the best part of the job. You get to know someone on a different level outside the office. I feel like I understand your vision a lot better now.'
+      'Same here. We should do this more often, it beats talking over email any day.'
     ],
     context: 'Japanese wraps up with a clean "yokatta desu." English needs more meat on the bone -- say what specifically was good about the conversation or it sounds generic.',
     character: 'lisa',
@@ -113,7 +113,7 @@ const day202: MasterExpression[] = [
       'Need a ride?',
       'Should I call you a car?',
       'Let me call you a car, you should not have to worry about getting home',
-      'Let me call you a car. After all the drinks we have had tonight, you definitely should not be driving. I will have the driver take you straight home, and do not worry about the cost. It is the least we can do.'
+      'That would be great, actually. I definitely should not be getting behind the wheel tonight.'
     ],
     context: 'Japanese goes ultra-polite with "otearai." English is more practical -- you mention why (drinking) and handle the logistics. The caring is in the action, not the words.',
     character: 'kenji',
@@ -127,7 +127,7 @@ const day202: MasterExpression[] = [
       'Let us do this again',
       'We should definitely do this again soon',
       'We should definitely do this again soon, maybe next quarter',
-      'We should definitely do this again soon. Maybe next quarter when things settle down a bit? I know a great Italian place that just opened up near the station. Same vibe as tonight but with an incredible wine list. I will send you the details.'
+      'I would love that. Send me some dates and I will make it work.'
     ],
     context: 'The Japanese is a request-style invitation. English works better as a concrete suggestion with a specific next step -- vague "let us do this again" without a plan sounds hollow.',
     character: 'yuki',
@@ -141,7 +141,7 @@ const day202: MasterExpression[] = [
       'Sorry to pull you away',
       'I know you are swamped, so thanks for making time',
       'I know how busy things are for you right now, so I really appreciate you making time for this',
-      'I know how busy things are for you right now, especially with the end of quarter coming up. So I really appreciate you carving out time for this. I promise it will be worth it -- we will keep things relaxed tonight and just enjoy some good food and drinks.'
+      'Honestly, I needed a night out. This is a nice break from staring at spreadsheets.'
     ],
     context: 'Japanese apologizes for the inconvenience. English flips it to gratitude -- apologizing for someone coming to dinner sounds weird. You thank them for their time instead.',
     character: 'kenji',
@@ -170,7 +170,7 @@ const day203: MasterExpression[] = [
       'Business trip to Osaka',
       'I am heading to Osaka on business',
       'I have got a business trip to Osaka next week for a client meeting',
-      'I have got a business trip to Osaka next week. There is a client meeting on Tuesday and a site visit on Wednesday. I am thinking about staying an extra night so I can hit up some of the local spots. You know any good places around Shinsaibashi?'
+      'Oh nice, Osaka is great. You gotta hit up Dotonbori while you are there.'
     ],
     context: 'Japanese just states the fact. English usually adds the reason and maybe a personal angle. Saying just "I am going on a business trip" without why sounds incomplete.',
     character: 'takeshi',
@@ -184,7 +184,7 @@ const day203: MasterExpression[] = [
       'Booked my flight',
       'I just booked my flight for next week',
       'I just booked my flight for next week, got a decent deal on a morning departure',
-      'I just booked my flight for next week. Managed to snag a morning departure at a decent price. I will land around noon, so I should have time to drop my bags at the hotel and grab lunch before the afternoon session. Do you need me to book anything for you too?'
+      'Smart, morning flights are way less of a headache. What time do you land?'
     ],
     context: 'In Japanese, "yoyaku shimashita" covers it. English loves the extra detail -- what time, how much, what you will do after landing. The context makes it useful information, not just a status update.',
     character: 'lisa',
@@ -198,7 +198,7 @@ const day203: MasterExpression[] = [
       'Where are you staying?',
       'Which hotel did you end up booking?',
       'Which hotel did you end up going with? Somewhere near the office?',
-      'Which hotel did you end up going with? I would recommend somewhere near the station if you can swing it. Last time I stayed at that place by the south exit and it was super convenient. Five-minute walk to the client office, and there are a ton of restaurants around there too.'
+      'Yeah, I grabbed one right by the south exit. Five minutes to the client office, can not beat that.'
     ],
     context: 'Japanese asks about location. English often turns it into a recommendation opportunity. Answering a question with just the hotel name feels short -- add something useful.',
     character: 'mina',
@@ -212,7 +212,7 @@ const day203: MasterExpression[] = [
       'Maybe I will take the bullet train',
       'I am thinking about taking the shinkansen instead',
       'I am leaning towards taking the shinkansen instead of flying, it is less hassle',
-      'I am leaning towards taking the shinkansen instead of flying. When you factor in the time getting to the airport and going through security, it is honestly about the same. Plus I can work on the train, and I do not have to deal with the whole checked bag situation.'
+      'Honestly, same. By the time you factor in airport security, the train is just as fast.'
     ],
     context: 'The Japanese "kana" shows you are thinking out loud. English captures that with "leaning towards" or "thinking about." Then you justify it, because English likes reasons.',
     character: 'takeshi',
@@ -226,7 +226,7 @@ const day203: MasterExpression[] = [
       'Expense reports are a pain',
       'Filing expense reports is such a hassle',
       'I hate filing expense reports, it takes forever to get all the receipts together',
-      'I hate filing expense reports. Every single time I end up missing a receipt and have to dig through my bag like a detective. And the system we use is so clunky -- it takes me longer to file the report than the actual trip. Someone needs to automate this already.'
+      'Tell me about it. I lost a taxi receipt last time and had to eat the cost myself.'
     ],
     context: 'Japanese "mendokusai" is one perfect word for the feeling. English needs a whole rant to capture the same energy. "Pain" and "hassle" are the closest single-word options.',
     character: 'kenji',
@@ -240,7 +240,7 @@ const day203: MasterExpression[] = [
       'Had trouble on the road',
       'Ran into some issues while I was out there',
       'Things did not go as planned while I was on site, we had a few hiccups',
-      'Things did not go as planned while I was on site. The client changed the meeting room at the last minute, and my presentation would not connect to their projector. Had to wing it with printouts. On top of that, my return train got delayed by two hours because of signal problems.'
+      'Oh no, what happened? Did you manage to sort it out in the end?'
     ],
     context: 'Japanese keeps it vague with "trouble ga atta." English usually spills the details -- vague trouble reports sound like you are hiding something in Western business culture.',
     character: 'takeshi',
@@ -254,7 +254,7 @@ const day203: MasterExpression[] = [
       'Got you some souvenirs',
       'I picked up some stuff for you guys on my trip',
       'I grabbed some local snacks for the office while I was in Osaka',
-      'I grabbed some local snacks for the office while I was in Osaka. They had this amazing takoyaki-flavored senbei at the station that I could not pass up. There is enough for everyone, so help yourselves. The green box is matcha cookies -- those are solid too.'
+      'Oh, you did not have to! Ooh, what is in the green box? Those look amazing.'
     ],
     context: 'Omiyage culture is massive in Japan but barely exists in English-speaking offices. When you do bring stuff, you describe what it is and tell people to take some -- no one will just grab it otherwise.',
     character: 'mina',
@@ -268,7 +268,7 @@ const day203: MasterExpression[] = [
       'Travel wears you out',
       'All the moving around really takes it out of you',
       'The constant travel is exhausting, especially the back-to-back trips',
-      'The constant travel is exhausting. I just got back from Osaka on Friday, and now I have to head to Fukuoka on Monday. I barely had time to do laundry. I love the change of scenery, but the actual moving from place to place? That part I could do without.'
+      'Yeah, you look wiped. When is your next one? Maybe you can squeeze in a day off before then.'
     ],
     context: 'Japanese "tsukareru" is clean and done. English needs to paint the picture -- what specifically is tiring. Just saying "travel is tiring" sounds like complaining without substance.',
     character: 'kenji',
@@ -282,7 +282,7 @@ const day203: MasterExpression[] = [
       'Meeting with the local team',
       'I have a sit-down with the folks on the ground',
       'I am meeting with the local team on-site to go over the project details',
-      'I am meeting with the local team on-site to go over the project details. It is always better to hash this stuff out face to face instead of going back and forth over email. Plus I want to see the actual workspace and get a feel for how things are running on the ground.'
+      'Good call doing it in person. Some stuff just does not translate well over Zoom.'
     ],
     context: 'Japanese uses "genchi no hito" which is neutral. English "folks on the ground" carries the same meaning but sounds warmer. "Local team" is the safe business version.',
     character: 'lisa',
@@ -296,7 +296,7 @@ const day203: MasterExpression[] = [
       'Can I head straight home?',
       'Mind if I go home directly after the trip?',
       'Would it be okay if I head straight home from the station instead of coming back to the office?',
-      'Would it be okay if I head straight home from the station instead of coming back to the office? My train gets in around seven, and by the time I get to the office it will be past eight. I can log in from home if anything urgent comes up, but honestly I am pretty beat from the trip.'
+      'Of course, go ahead. You have been on the road all day, just log in from home if anything pops up.'
     ],
     context: 'Chokki is a uniquely Japanese business concept. English has no single word for it -- you have to explain the whole situation and ask permission with reasons.',
     character: 'takeshi',
@@ -325,7 +325,7 @@ const day204: MasterExpression[] = [
       'Working from home today',
       'I am working from home today',
       'Hey, just a heads up, I am working from home today',
-      'Hey, just a heads up, I am working from home today. I will be online the whole time though, so just ping me on Slack if you need anything. My calendar is up to date, and I have got my camera ready if anything comes up that needs a quick call.'
+      'Got it, no worries. I will just ping you on Slack if anything comes up.'
     ],
     context: 'Japanese states it as a fact. English needs the reassurance -- "I am still reachable" is the unspoken thing your coworkers want to hear when you say WFH.',
     character: 'yuki',
@@ -339,7 +339,7 @@ const day204: MasterExpression[] = [
       'Can you turn your camera on?',
       'Would you mind turning your camera on for this?',
       'Hey, would you mind flipping your camera on? It helps to see faces during these discussions',
-      'Hey, would you mind flipping your camera on? I know it is a hassle, but for this kind of discussion it really helps to see everyone is faces. I find we get through things faster when we can read the room. No pressure if your background is messy though, just use a blur.'
+      'Oh, sure, hang on. Sorry, my place is a mess -- let me throw the blur on real quick.'
     ],
     context: 'This is the eternal remote work battle. Japanese asks politely. English has to justify the request because camera-off is the default for many people. Without a reason, it sounds like surveillance.',
     character: 'kenji',
@@ -353,7 +353,7 @@ const day204: MasterExpression[] = [
       'You are breaking up',
       'Your audio is cutting in and out',
       'Sorry to interrupt, but your audio keeps cutting out, can you try reconnecting?',
-      'Sorry to interrupt, but your audio has been cutting in and out for the last minute or so. We only caught about half of what you said. Could you try reconnecting? Or if that does not work, maybe switch to your phone audio. We will wait for you.'
+      'Oh, is it? Let me try reconnecting. Give me like ten seconds.'
     ],
     context: 'Japanese describes the symptom. English jumps straight to the solution -- "reconnect" or "switch to phone." Just saying "your audio is bad" without suggesting a fix leaves everyone stuck.',
     character: 'lisa',
@@ -367,7 +367,7 @@ const day204: MasterExpression[] = [
       'Let me share my screen',
       'Hold on, let me share my screen real quick',
       'Give me one second, I am going to share my screen so everyone can follow along',
-      'Give me one second, I am going to share my screen so everyone can follow along. Let me just close my email first... okay, can everyone see the spreadsheet? I am going to walk you through the numbers starting from the top left. Stop me if anything looks off.'
+      'Yep, I can see it now. Looks good, go ahead.'
     ],
     context: 'Japanese is short and sweet with "shimasu ne." English fills the dead air while you fumble with the share button. The narration of what you are doing keeps people from wondering if you froze.',
     character: 'takeshi',
@@ -381,7 +381,7 @@ const day204: MasterExpression[] = [
       'You are on mute',
       'I think you are still on mute there',
       'Hey, just so you know, you are on mute. We can see you talking but cannot hear anything',
-      'Hey, just so you know, you are on mute. We can see your lips moving but there is no audio coming through. There you go, now we can hear you. No worries, happens to everyone at least once a day. Go ahead and start over from the top.'
+      'Oh gosh, not again. Can you hear me now? Sorry about that, every single time.'
     ],
     context: 'The most universal remote work moment. Both languages handle it similarly, but English adds humor because it happens so often. Making it light prevents embarrassment.',
     character: 'mina',
@@ -395,7 +395,7 @@ const day204: MasterExpression[] = [
       'I cannot focus',
       'I am having a hard time focusing at home',
       'Honestly, working from home makes it really hard to stay focused sometimes',
-      'Honestly, working from home makes it really hard to stay focused sometimes. The couch is right there, the fridge is calling my name, and my neighbor decided today was the perfect day to mow the lawn. I end up doing my best work after nine PM when everything finally quiets down.'
+      'Same. I end up doing all my real work after nine PM when the house finally quiets down.'
     ],
     context: 'Japanese "dekinai" is a clean admission. English paints the scene with distractions -- it turns a complaint into a relatable story. Everyone has the same struggle.',
     character: 'takeshi',
@@ -409,7 +409,7 @@ const day204: MasterExpression[] = [
       'I will send it in chat',
       'Let me drop that in the chat for you',
       'I will drop the link in the chat so everyone can grab it after the meeting',
-      'I will drop the link in the chat so everyone can grab it after the meeting. Actually, let me also post it in the project channel on Slack so it does not get buried. If you have any questions after you look through it, just tag me and I will get back to you within the hour.'
+      'Perfect, thanks. Can you also post it in the Slack channel so it does not get buried?'
     ],
     context: 'Japanese treats chat as just another channel. English specifies which chat because there are usually five of them running at any given moment. Clarity prevents the "where did you send it?" loop.',
     character: 'yuki',
@@ -423,7 +423,7 @@ const day204: MasterExpression[] = [
       'Hard to switch off',
       'It is hard to draw the line between work and life',
       'The hardest part about remote work is knowing when to stop for the day',
-      'The hardest part about remote work is knowing when to stop for the day. When your office is your living room, there is no commute to signal that work is over. I have started shutting my laptop at six sharp and going for a walk. It is my fake commute home, and it actually works.'
+      'So true. I started doing a fake commute -- just a walk around the block at six. It actually helps a lot.'
     ],
     context: 'Japanese nails it with "on-off no kirikae." English has no equivalent phrase -- you have to describe the struggle. "Work-life balance" is too corporate; the real talk is about when to close the laptop.',
     character: 'lisa',
@@ -437,7 +437,7 @@ const day204: MasterExpression[] = [
       'Miss going to the office sometimes',
       'I kind of miss going into the office every now and then',
       'You know, I actually miss going into the office sometimes, just for the human interaction',
-      'You know, I actually miss going into the office sometimes. Not the commute, obviously, but just being around people. Having lunch together, overhearing random conversations, even the small talk by the coffee machine. You do not realize how much of that stuff matters until it is gone.'
+      'Right? I never thought I would say this, but I even miss the small talk by the coffee machine.'
     ],
     context: 'Japanese uses "tamani wa" for that occasional longing. English unpacks it -- you miss the office but not all of it. The specifics are what make it resonate instead of sounding contradictory.',
     character: 'mina',
@@ -451,7 +451,7 @@ const day204: MasterExpression[] = [
       'My Wi-Fi is acting up',
       'My internet connection has been super flaky today',
       'Sorry about the lag, my Wi-Fi has been really unstable all morning',
-      'Sorry about the lag, my Wi-Fi has been really unstable all morning. I have already restarted the router twice but it keeps dropping out. If I suddenly disappear from the call, that is why. I might switch to my phone hotspot as a backup. Bear with me here.'
+      'No worries, we can hear you fine now. Try your phone hotspot if it drops again.'
     ],
     context: 'Japanese reports the problem formally. English leads with an apology and what you have already tried. Jumping to "my Wi-Fi is bad" without context sounds like an excuse.',
     character: 'takeshi',
@@ -480,7 +480,7 @@ const day205: MasterExpression[] = [
       'Not going to make it',
       'I am not going to make the deadline',
       'I do not think I can make the deadline at this rate',
-      'I do not think I can make the deadline at this rate. I have been at it since seven this morning and I am still only about sixty percent done. The scope was bigger than we estimated. I need to flag this now so we can figure out a plan B before it becomes a real problem.'
+      'Okay, thanks for flagging it early. What do you need from us to get it across the line?'
     ],
     context: 'Japanese states the fact. English needs the story -- how hard you tried, where you are now, and what you want to do about it. Just saying "I cannot make it" sounds like you gave up.',
     character: 'takeshi',
@@ -494,7 +494,7 @@ const day205: MasterExpression[] = [
       'Can we push it back?',
       'Any chance we can get an extension on this?',
       'I was wondering if there is any flexibility on the deadline, even a couple of days would help',
-      'I was wondering if there is any flexibility on the deadline. Even pushing it back by two or three days would make a huge difference in the quality of the deliverable. I would rather ask now than rush it and hand in something half-baked. What do you think?'
+      'Let me check with the client. I think we can probably push it to Wednesday -- I will get back to you by noon.'
     ],
     context: 'Japanese asks directly. English wraps it in reasoning -- you need to justify the extension request or it sounds lazy. Mentioning quality as the reason is the golden move.',
     character: 'yuki',
@@ -508,7 +508,7 @@ const day205: MasterExpression[] = [
       'Just barely made it',
       'I made it by the skin of my teeth',
       'I submitted it with literally two minutes to spare, that was way too close',
-      'I submitted it with literally two minutes to spare. My hands were shaking when I hit send. I do not want to cut it that close ever again. The last hour was pure adrenaline -- I was proofreading and formatting at the same time. But hey, it is done. I need a drink.'
+      'You are giving me a heart attack. But hey, it is done -- that is what counts. You need a drink.'
     ],
     context: 'Girigiri is one of those perfect Japanese words. "By the skin of my teeth" is the closest English gets, but it is a bit old-fashioned. "Just barely" with dramatic details captures the girigiri energy better.',
     character: 'kenji',
@@ -522,7 +522,7 @@ const day205: MasterExpression[] = [
       'Let us prioritize',
       'We need to figure out what comes first',
       'Before we do anything else, let us sit down and prioritize what actually matters here',
-      'Before we do anything else, let us sit down and prioritize what actually matters here. We have got five things on the list and we can realistically finish three by Friday. So which three are the must-haves, and which two can we push to next week? I do not want us spinning our wheels on the wrong stuff.'
+      'Agreed. I think the client deck and the budget are the must-haves. Everything else can wait.'
     ],
     context: 'Japanese uses the noun "yuusen junni." English turns it into an action -- "prioritize" is both the word and the mindset. Adding specific numbers makes the conversation productive.',
     character: 'lisa',
@@ -536,7 +536,7 @@ const day205: MasterExpression[] = [
       'Overtime for sure',
       'Looks like I am pulling a late one tonight',
       'There is no way I am leaving on time tonight, I am looking at a solid three hours of overtime',
-      'There is no way I am leaving on time tonight. I am looking at a solid three hours of overtime at least. The client dropped a revision request at four PM -- who does that? I am going to need some serious coffee and probably a convenience store dinner. This is going to be a long night.'
+      'Ugh, that is rough. Want me to grab you a coffee? I am heading to the konbini anyway.'
     ],
     context: 'Japanese "kakutei" has that resigned finality. English captures the same resignation but usually with the cause -- without it, you sound like you are just complaining about your workload.',
     character: 'takeshi',
@@ -550,7 +550,7 @@ const day205: MasterExpression[] = [
       'Need more breathing room',
       'I wish we had a little more buffer built in',
       'I really wish we had more of a buffer on these deadlines, everything is always so tight',
-      'I really wish we had more of a buffer on these deadlines. Everything is always so tight that one unexpected thing throws the whole schedule off. If we could build in even a two-day cushion, we would have room to handle surprises without everyone panicking. That is not lazy, that is just smart planning.'
+      'Seriously. Even a two-day cushion would save us so much stress. I will bring it up at the next planning meeting.'
     ],
     context: 'Japanese "yoyuu" covers time, space, and mental room all in one word. English splits it -- "buffer" for time, "breathing room" for pressure, "cushion" for safety margin. Pick the right one for context.',
     character: 'mina',
@@ -564,7 +564,7 @@ const day205: MasterExpression[] = [
       'Let us cut something',
       'We need to trim the scope to hit the deadline',
       'If we want to make this deadline, we are going to have to cut some features',
-      'If we want to make this deadline, we are going to have to cut some features. I know nobody likes hearing that, but trying to do everything is how we end up with a mediocre product shipped late. Let us nail the core features first and add the nice-to-haves in phase two. Quality over quantity.'
+      'Yeah, I hate to say it, but you are right. Let us keep the core and push the rest to phase two.'
     ],
     context: 'Japanese "kezurou" (let us shave it down) is practical and clean. English needs the full pitch -- why cutting is actually the smart move. Frame it as quality, not giving up.',
     character: 'kenji',
@@ -578,7 +578,7 @@ const day205: MasterExpression[] = [
       'How is it going?',
       'Where are you at with that?',
       'Hey, just checking in, how is the progress on the report coming along?',
-      'Hey, just checking in. How is the progress on the report coming along? No pressure, I am just trying to get a sense of where things stand so I can update the client. If you are running behind, that is totally fine, just let me know and we will figure something out together.'
+      'Almost there, about eighty percent done. I should have it to you by end of day tomorrow.'
     ],
     context: 'The infamous "shinchoku dou desu ka." In English, you MUST soften it or it sounds like micromanaging. "Just checking in" and "no pressure" are essential buffers.',
     character: 'yuki',
@@ -592,7 +592,7 @@ const day205: MasterExpression[] = [
       'Do not push yourself too hard',
       'Take it easy, do not overdo it',
       'Hey, I know the deadline is tight, but do not burn yourself out over this',
-      'Hey, I know the deadline is tight, but do not burn yourself out over this. Your health matters more than any deliverable. If you need to take a break, take a break. We will figure out the rest as a team. Seriously, go home at a reasonable hour tonight. The work will still be there tomorrow.'
+      'Thanks, I appreciate that. I will try to wrap up by eight and call it a night.'
     ],
     context: 'Japanese "muri shinaide" is warm and compact. English unpacks the caring into specific advice -- "go home," "take a break." Without the specifics, "do not push yourself" can sound like empty words.',
     character: 'lisa',
@@ -606,7 +606,7 @@ const day205: MasterExpression[] = [
       'Finally done',
       'It is finally over, I am free',
       'I just hit submit and I am officially done, what a relief',
-      'I just hit submit and I am officially done. What a relief. I have been staring at that document for three days straight and I never want to see it again. Time to celebrate -- I am thinking takeout, a cold beer, and absolutely nothing productive for the rest of the night. I earned it.'
+      'Nice, you earned it! Go grab a beer and do absolutely nothing tonight.'
     ],
     context: 'Japanese "yatto" carries that exhausted relief perfectly. English "finally" gets close but needs the emotional follow-up. The celebration plan is what really sells the relief.',
     character: 'takeshi',
@@ -635,7 +635,7 @@ const day206: MasterExpression[] = [
       'The system is down',
       'Our system just crashed',
       'Hey, just a heads up, the main system went down about ten minutes ago',
-      'Hey, just a heads up, the main system went down about ten minutes ago. The engineering team is already on it, but we do not have an ETA for recovery yet. In the meantime, we cannot process any orders, so if clients call in, let them know we are aware and working on it.'
+      'Got it. Do we have an ETA on recovery, or should I start telling clients to sit tight?'
     ],
     context: 'Japanese reports it. English reports it AND tells people what to do about it. A system crash without an action plan creates chaos, so you front-load the instructions.',
     character: 'kenji',
@@ -649,7 +649,7 @@ const day206: MasterExpression[] = [
       'Looking into it',
       'We are investigating the root cause right now',
       'The team is investigating the root cause, we should have an update within the hour',
-      'The team is investigating the root cause right now. Our initial look suggests it might be a database issue, but we are not one hundred percent sure yet. We should have a clearer picture within the hour. I will send out an update as soon as we know more. Hang tight.'
+      'Okay, thanks for the heads up. I will hold off on pinging the team until we hear back.'
     ],
     context: 'Japanese "shirabete imasu" is reassuring. English needs a timeline and a promise to update -- without those, people assume you have no idea and start panicking.',
     character: 'takeshi',
@@ -663,7 +663,7 @@ const day206: MasterExpression[] = [
       'Please contact the client',
       'Can you reach out to the client about this?',
       'I need someone to reach out to the client and let them know what is going on before they hear it from someone else',
-      'I need someone to reach out to the client and let them know what is going on before they hear it from someone else. Be upfront about the situation, give them a timeline, and make sure they know we are taking it seriously. It is always better to be the one delivering the news than having them find out on their own.'
+      'I will handle it. I have got a good relationship with their PM, so I will give them a call right now.'
     ],
     context: 'Japanese frames it as instruction. English adds the "why" and the "how" -- especially the proactive angle. Getting ahead of bad news is a universal business principle.',
     character: 'lisa',
@@ -677,7 +677,7 @@ const day206: MasterExpression[] = [
       'Applied a quick fix',
       'I put a temporary fix in place for now',
       'I put a Band-Aid on it for now, but we need a proper fix soon',
-      'I put a Band-Aid on it for now so things are running again, but this is not a permanent solution. The underlying issue is still there, and if we do not address it properly, it is going to come back. I would recommend scheduling a proper fix for this weekend when traffic is low.'
+      'Good enough for now. Let us schedule the real fix for this weekend when traffic is low.'
     ],
     context: 'Japanese "oukyuu shochi" sounds professional. English "Band-Aid fix" captures the temporary nature perfectly and everyone instantly understands it is not the real solution.',
     character: 'kenji',
@@ -691,7 +691,7 @@ const day206: MasterExpression[] = [
       'Let us prevent this from happening again',
       'We need to figure out how to keep this from happening again',
       'Once we get through this, we need to sit down and figure out how to prevent it from happening again',
-      'Once we get through this, we need to sit down and figure out how to prevent it from happening again. I do not want us just putting out fires every time. Let us do a proper post-mortem, identify what went wrong, and build in safeguards. If the same issue hits us twice, that is on us.'
+      'Absolutely. I will set up a post-mortem for Thursday. Let us get everyone in the room.'
     ],
     context: 'Japanese has the clean compound "saihatsuu boushi saku." English uses "post-mortem" (yes, like an autopsy) for the analysis meeting. It sounds dramatic but it is standard business English.',
     character: 'lisa',
@@ -705,7 +705,7 @@ const day206: MasterExpression[] = [
       'I am escalating this',
       'I need to escalate this to management',
       'This is beyond what I can handle, I need to escalate this to the team lead',
-      'This is beyond what I can handle on my own. I need to escalate this to the team lead and possibly the director. I am not trying to pass the buck, but this requires a decision above my pay grade. I have documented everything so far, so whoever takes over will have full context.'
+      'Good call. I will loop in the director too, just in case. Send me what you have documented so far.'
     ],
     context: 'Escalation works in both languages but the nuance is different. In English, you have to make clear you are not ducking responsibility -- you are routing it to the right authority level.',
     character: 'takeshi',
@@ -719,7 +719,7 @@ const day206: MasterExpression[] = [
       'Do we have a backup?',
       'Please tell me we have a backup somewhere',
       'Do we have a recent backup we can restore from, or are we looking at rebuilding from scratch?',
-      'Do we have a recent backup we can restore from, or are we looking at rebuilding from scratch? I am checking the backup logs now, but I want to make sure someone else also looks. If the last backup is from more than twenty-four hours ago, we are going to have some data recovery to deal with.'
+      'I just checked -- the last backup was at two AM, so we are only missing about six hours of data. Could be worse.'
     ],
     context: 'Japanese asks a yes/no question. English immediately starts thinking about the scenario either way -- backup exists or it does not. This forward-thinking is what keeps things from spiraling.',
     character: 'kenji',
@@ -733,7 +733,7 @@ const day206: MasterExpression[] = [
       'Check how far this goes',
       'We need to assess the full impact of this',
       'Before we do anything else, I need someone to map out exactly what is affected',
-      'Before we do anything else, I need someone to map out exactly what is affected. Is it just this one module, or did it ripple out to other systems? Check the API connections, the downstream processes, and anything that touches this database. I do not want any surprises popping up tomorrow.'
+      'On it. I will check the API connections and downstream processes and report back in thirty minutes.'
     ],
     context: 'Japanese "eikyou hanni" is a compact technical term. English breaks it into specific actions -- check this, check that. The word "ripple" captures how one failure spreads through connected systems.',
     character: 'lisa',
@@ -747,7 +747,7 @@ const day206: MasterExpression[] = [
       'Here is the update',
       'Let me give you a quick status update',
       'I want to give everyone a quick status update on where we stand with the issue',
-      'I want to give everyone a quick status update on where we stand. The system has been restored and is running normally as of three PM. The root cause was a memory overflow in the batch processing module. We have applied a patch, and the engineering team will deploy a permanent fix by end of week.'
+      'Thanks for the update. So we are back to normal now? Any chance this happens again before the permanent fix?'
     ],
     context: 'Japanese "houkoku shimasu" is the start of a formal report. English "status update" signals "here comes important info, listen up." Structure it as: current state, cause, next steps.',
     character: 'takeshi',
@@ -761,7 +761,7 @@ const day206: MasterExpression[] = [
       'Sorry for the trouble',
       'I apologize for the inconvenience this caused',
       'I want to sincerely apologize for the disruption and any inconvenience it may have caused',
-      'I want to sincerely apologize for the disruption and any inconvenience it may have caused. We take this seriously, and we are putting measures in place to make sure it does not happen again. Thank you for your patience while we worked through this. If you have any lingering issues, please do not hesitate to reach out.'
+      'We appreciate you handling it so quickly. These things happen -- just keep us in the loop going forward.'
     ],
     context: 'Japanese "gomeiwaku" is a powerful apology word with no direct English match. English corporate apologies follow a formula: sorry, we take it seriously, here is what we are doing, thank you for patience.',
     character: 'yuki',
@@ -790,7 +790,7 @@ const day207: MasterExpression[] = [
       'Let us work together on this',
       'We are all in this together, let us team up',
       'This is a team effort, so let us divide it up and tackle it together',
-      'This is a team effort, so let us divide it up and tackle it together. No one should be carrying this alone. I will take the data analysis portion, and if someone can handle the client-facing slides, we will be in good shape. Who wants to take what?'
+      'I will take the client-facing slides. Yuki, you want the data analysis part? That is kind of your thing.'
     ],
     context: 'Japanese "kyouryoku" is a rallying cry. English makes it concrete -- who does what. Saying "let us cooperate" without assigning tasks is just a pep talk that leads nowhere.',
     character: 'lisa',
@@ -804,7 +804,7 @@ const day207: MasterExpression[] = [
       'You saved me',
       'That was a huge help, seriously',
       'Honestly, you really saved me back there, I owe you one',
-      'Honestly, you really saved me back there. I was completely stuck on the formatting and your suggestion fixed everything in ten minutes. That would have taken me hours to figure out on my own. I owe you one -- next time you are in a jam, I have got your back.'
+      'Ha, do not even worry about it. You would have figured it out eventually. But yeah, you owe me lunch.'
     ],
     context: 'Japanese "tasukarimashita" is warm but brief. English lands harder when you explain HOW they helped. Specific praise beats generic thanks every time.',
     character: 'mina',
@@ -818,7 +818,7 @@ const day207: MasterExpression[] = [
       'Let us split this up',
       'We should divide up the responsibilities',
       'Let us figure out who is doing what so we are not stepping on each other is toes',
-      'Let us figure out who is doing what so we are not stepping on each other is toes. I will put together a quick task list and we can each claim the parts that play to our strengths. Yuki, you are great with numbers, so maybe you take the budget section? And Takeshi, you are the presentation wizard.'
+      'Good idea. I will claim the budget section -- numbers are kind of my thing. Takeshi, you take the slides?'
     ],
     context: 'Japanese "yakuwari buntan" is organized and neutral. English makes it personal by matching tasks to strengths -- it is not just dividing work, it is optimizing the team.',
     character: 'kenji',
@@ -832,7 +832,7 @@ const day207: MasterExpression[] = [
       'Give me your feedback',
       'I would love to get your thoughts on this',
       'When you get a chance, could you take a look at this and give me your honest feedback?',
-      'When you get a chance, could you take a look at this and give me your honest feedback? I am not looking for compliments -- I need to know what is not working. If something feels off or confusing, tell me straight. I would rather fix it now than find out after the client sees it.'
+      'Sure, I will take a look after lunch. And yeah, I will be straight with you -- no sugarcoating.'
     ],
     context: 'Japanese asks for feedback politely. English has to specify what kind -- "honest" and "do not hold back" signals you actually want real input, not just a thumbs up.',
     character: 'yuki',

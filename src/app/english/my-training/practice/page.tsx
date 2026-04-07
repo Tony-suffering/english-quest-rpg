@@ -81,19 +81,107 @@ function findMaster(phrase: TrainingPhrase): MasterExpression | null {
     return MASTER_EXPRESSIONS.find(e => e.japanese === phrase.japanese) || null;
 }
 
-// ── Get distractors (wrong answers from pool) ──
+// ── Build category index for smart distractors ──
+function buildCategoryIndex(): Map<string, MasterExpression[]> {
+    const idx = new Map<string, MasterExpression[]>();
+    for (const expr of MASTER_EXPRESSIONS) {
+        const cat = expr.category || 'other';
+        if (!idx.has(cat)) idx.set(cat, []);
+        idx.get(cat)!.push(expr);
+    }
+    return idx;
+}
+
+// ── Build daySlot index for same-day distractors ──
+function buildDayIndex(): Map<number, MasterExpression[]> {
+    const idx = new Map<number, MasterExpression[]>();
+    for (const expr of MASTER_EXPRESSIONS) {
+        const day = expr.daySlot;
+        if (!idx.has(day)) idx.set(day, []);
+        idx.get(day)!.push(expr);
+    }
+    return idx;
+}
+
+const CATEGORY_INDEX = buildCategoryIndex();
+const DAY_INDEX = buildDayIndex();
+
+// ── Smart distractors: same category first, then same day, then random ──
+function getSmartDistractors(
+    correct: string,
+    master: MasterExpression | null,
+    pool: string[],
+    level: 0 | 1 | 2 | 3,
+    count: number,
+): string[] {
+    const picked: string[] = [];
+    const used = new Set([correct]);
+
+    // Priority 1: Same category expressions (most confusing = best distractors)
+    if (master) {
+        const sameCat = CATEGORY_INDEX.get(master.category) || [];
+        const catPool = shuffle(sameCat.filter(e => e.japanese !== master.japanese));
+        for (const e of catPool) {
+            if (picked.length >= count) break;
+            const val = e.english[level];
+            if (val && !used.has(val)) { picked.push(val); used.add(val); }
+        }
+    }
+
+    // Priority 2: Same daySlot (similar theme = plausible wrong answers)
+    if (picked.length < count && master) {
+        const sameDay = DAY_INDEX.get(master.daySlot) || [];
+        const dayPool = shuffle(sameDay.filter(e => e.japanese !== master.japanese));
+        for (const e of dayPool) {
+            if (picked.length >= count) break;
+            const val = e.english[level];
+            if (val && !used.has(val)) { picked.push(val); used.add(val); }
+        }
+    }
+
+    // Priority 3: Similar length strings from global pool (harder to guess by length)
+    if (picked.length < count) {
+        const lenTarget = correct.length;
+        const sorted = shuffle(pool.filter(s => !used.has(s) && s.length > 0))
+            .sort((a, b) => Math.abs(a.length - lenTarget) - Math.abs(b.length - lenTarget));
+        for (const s of sorted) {
+            if (picked.length >= count) break;
+            if (!used.has(s)) { picked.push(s); used.add(s); }
+        }
+    }
+
+    return picked.slice(0, count);
+}
+
+// ── Legacy fallback for simple pools (ja distractors) ──
 function getDistractors(
     correct: string,
     pool: string[],
     count: number,
+    master?: MasterExpression | null,
 ): string[] {
-    const filtered = pool.filter(s => s !== correct && s.length > 0);
-    const picked = shuffle(filtered).slice(0, count);
-    // Pad if not enough distractors
-    while (picked.length < count) {
-        picked.push(`(${picked.length + 1})`);
+    // For Japanese: prefer same category
+    if (master) {
+        const picked: string[] = [];
+        const used = new Set([correct]);
+        const sameCat = CATEGORY_INDEX.get(master.category) || [];
+        const catJa = shuffle(sameCat.filter(e => e.japanese !== master.japanese));
+        for (const e of catJa) {
+            if (picked.length >= count) break;
+            if (!used.has(e.japanese)) { picked.push(e.japanese); used.add(e.japanese); }
+        }
+        // Fill remainder from pool
+        if (picked.length < count) {
+            const rest = shuffle(pool.filter(s => !used.has(s)));
+            for (const s of rest) {
+                if (picked.length >= count) break;
+                picked.push(s); used.add(s);
+            }
+        }
+        return picked;
     }
-    return picked;
+    const filtered = pool.filter(s => s !== correct && s.length > 0);
+    return shuffle(filtered).slice(0, count);
 }
 
 function makeOptions(correct: string, distractors: string[]): { options: string[]; correctIdx: number } {
@@ -105,12 +193,27 @@ function makeOptions(correct: string, distractors: string[]): { options: string[
 // ── Extract a blankable word from English phrase ──
 function extractBlankWord(en: string): { blanked: string; word: string } | null {
     const words = en.replace(/[.,!?;:'"]/g, '').split(/\s+/).filter(w => w.length >= 3);
-    // Skip common words, prefer content words
-    const skip = new Set(['the', 'a', 'an', 'is', 'are', 'was', 'were', 'am', 'do', 'does', 'did', 'not', 'and', 'but', 'for', 'that', 'this', 'with', 'you', 'your', 'just']);
+    // Skip function words — we want content words (verbs, nouns, adjectives, adverbs)
+    const skip = new Set([
+        'the', 'a', 'an', 'is', 'are', 'was', 'were', 'am', 'be', 'been', 'being',
+        'do', 'does', 'did', 'has', 'have', 'had', 'will', 'would', 'could', 'should',
+        'can', 'may', 'might', 'shall', 'must',
+        'not', 'and', 'but', 'or', 'nor', 'for', 'yet', 'so',
+        'that', 'this', 'these', 'those', 'which', 'what', 'who', 'whom',
+        'with', 'from', 'into', 'onto', 'upon', 'about', 'than',
+        'you', 'your', 'his', 'her', 'its', 'our', 'their', 'my',
+        'just', 'also', 'very', 'too', 'really', 'quite', 'well',
+        'all', 'each', 'every', 'some', 'any', 'many', 'much', 'few',
+        'there', 'here', 'where', 'when', 'how', 'why',
+        'like', 'know', 'think', 'going', 'gonna', 'gotta', 'wanna',
+    ]);
     const candidates = words.filter(w => !skip.has(w.toLowerCase()));
     if (candidates.length === 0) return null;
-    const word = candidates[Math.floor(Math.random() * candidates.length)];
-    // Find in original string and blank it
+    // Prefer longer words (more meaningful) — weight by length
+    const weighted = candidates.sort((a, b) => b.length - a.length);
+    // Pick from top half (longer words) with some randomness
+    const topHalf = weighted.slice(0, Math.max(1, Math.ceil(weighted.length / 2)));
+    const word = topHalf[Math.floor(Math.random() * topHalf.length)];
     const idx = en.indexOf(word);
     if (idx === -1) return null;
     const blanked = en.substring(0, idx) + '____' + en.substring(idx + word.length);
@@ -132,7 +235,7 @@ function generateDrills(
     const allWords = MASTER_EXPRESSIONS.flatMap(e =>
         e.english.flatMap(s => s.replace(/[.,!?;:'"]/g, '').split(/\s+/).filter(w => w.length >= 3))
     );
-    const uniqueWords = [...new Set(allWords.map(w => w.toLowerCase()))];
+    const uniqueWords = Array.from(new Set(allWords.map(w => w.toLowerCase())));
 
     const drillTypes: DrillType[] = ['ja2en', 'en2ja', 'fill', 'back', 'listen'];
 
@@ -155,40 +258,43 @@ function generateDrills(
 
         const hint = phrase.situation?.split(' -- ')[0] || '';
 
+        // Determine which level the phrase is at
+        const level: 0 | 1 | 2 | 3 = master
+            ? (phrase.english === master.english[0] ? 0
+                : phrase.english === master.english[1] ? 1
+                : phrase.english === master.english[2] ? 2 : 0)
+            : 0;
+
         switch (type) {
             case 'ja2en': {
                 const correct = phrase.english;
-                const pool = master
-                    ? (phrase.english === master.english[0] ? allEnCore
-                        : phrase.english === master.english[1] ? allEnVibe
-                        : allEnScene)
-                    : allEnCore;
-                const distractors = getDistractors(correct, pool, 3);
+                const distractors = getSmartDistractors(correct, master, allEnCore, level, 3);
                 const { options, correctIdx } = makeOptions(correct, distractors);
                 return {
                     type, phrase, masterExpr: master,
-                    question: `"${phrase.japanese}" を英語で？`,
+                    question: phrase.japanese,
+                    questionSub: '英語でなんて言う？',
                     options, correctIdx, hint,
                 };
             }
             case 'en2ja': {
                 const correct = phrase.japanese;
-                const distractors = getDistractors(correct, allJa, 3);
+                const distractors = getDistractors(correct, allJa, 3, master);
                 const { options, correctIdx } = makeOptions(correct, distractors);
                 return {
                     type, phrase, masterExpr: master,
                     question: phrase.english,
-                    questionSub: 'この英語の意味は？',
+                    questionSub: 'どういう意味？',
                     options, correctIdx, hint,
                 };
             }
             case 'listen': {
                 const correct = phrase.japanese;
-                const distractors = getDistractors(correct, allJa, 3);
+                const distractors = getDistractors(correct, allJa, 3, master);
                 const { options, correctIdx } = makeOptions(correct, distractors);
                 return {
                     type, phrase, masterExpr: master,
-                    question: '(音声を聞いて選んでください)',
+                    question: '音声を聞いて選んでください',
                     options, correctIdx, hint,
                 };
             }
@@ -197,18 +303,28 @@ function generateDrills(
                 const blank = extractBlankWord(en);
                 if (!blank) {
                     const correct = phrase.english;
-                    const distractors = getDistractors(correct, allEnCore, 3);
+                    const distractors = getSmartDistractors(correct, master, allEnCore, level, 3);
                     const { options, correctIdx } = makeOptions(correct, distractors);
                     return {
                         type: 'ja2en', phrase, masterExpr: master,
-                        question: `"${phrase.japanese}" を英語で？`,
+                        question: phrase.japanese,
+                        questionSub: '英語でなんて言う？',
                         options, correctIdx, hint,
                     };
                 }
                 const correct = blank.word;
-                const wordDistractors = getDistractors(
-                    correct.toLowerCase(), uniqueWords, 3,
-                ).map(w => w.charAt(0) + w.slice(1));
+                // Smart word distractors: similar length words from same category
+                const catWords = master
+                    ? (CATEGORY_INDEX.get(master.category) || [])
+                        .flatMap(e => e.english.flatMap(s => s.replace(/[.,!?;:'"]/g, '').split(/\s+/).filter(w => w.length >= 3)))
+                    : [];
+                const wordPool = catWords.length > 10
+                    ? Array.from(new Set(catWords.map(w => w.toLowerCase())))
+                    : uniqueWords;
+                const wordDistractors = shuffle(
+                    wordPool.filter(w => w !== correct.toLowerCase())
+                        .sort((a, b) => Math.abs(a.length - correct.length) - Math.abs(b.length - correct.length))
+                ).slice(0, 3).map(w => w.charAt(0) + w.slice(1));
                 const { options, correctIdx } = makeOptions(correct, wordDistractors);
                 return {
                     type, phrase, masterExpr: master,
@@ -220,16 +336,17 @@ function generateDrills(
             case 'back': {
                 if (!master) {
                     const correct = phrase.english;
-                    const distractors = getDistractors(correct, allEnCore, 3);
+                    const distractors = getSmartDistractors(correct, master, allEnCore, level, 3);
                     const { options, correctIdx } = makeOptions(correct, distractors);
                     return {
                         type: 'ja2en', phrase, masterExpr: master,
-                        question: `"${phrase.japanese}" を英語で？`,
+                        question: phrase.japanese,
+                        questionSub: '英語でなんて言う？',
                         options, correctIdx, hint,
                     };
                 }
                 const correct = master.english[3];
-                const distractors = getDistractors(correct, allBack, 3);
+                const distractors = getSmartDistractors(correct, master, allBack, 3, 3);
                 const { options, correctIdx } = makeOptions(correct, distractors);
                 const yourPhrase = master.english[2] || master.english[1] || master.english[0];
                 return {
@@ -240,13 +357,13 @@ function generateDrills(
                 };
             }
             default: {
-                // Fallback: ja2en
                 const correct = phrase.english;
-                const distractors = getDistractors(correct, allEnCore, 3);
+                const distractors = getSmartDistractors(correct, master, allEnCore, level, 3);
                 const { options, correctIdx } = makeOptions(correct, distractors);
                 return {
                     type: 'ja2en' as DrillType, phrase, masterExpr: master,
-                    question: `"${phrase.japanese}" を英語で？`,
+                    question: phrase.japanese,
+                    questionSub: '英語でなんて言う？',
                     options, correctIdx, hint,
                 };
             }
@@ -383,23 +500,40 @@ export default function PracticePage() {
         setTotalAttempts(newAttempts);
         saveProgress(newScore, newBest, newAttempts);
 
-        // Auto-advance after delay
-        setTimeout(() => {
-            if (currentIdx + 1 >= totalRounds) {
-                setSessionComplete(true);
-                // Mark practice done for today (calendar integration)
-                try {
-                    localStorage.setItem(PRACTICE_DONE_KEY(getTodayStr()), JSON.stringify({
-                        score: newSessionScore, total: totalRounds, timestamp: Date.now(),
-                    }));
-                } catch { /* */ }
-                setTimeout(() => playLevelSound(6), 300);
-            } else {
-                setCurrentIdx(prev => prev + 1);
-                setSelected(null);
-            }
-        }, correct ? 800 : 1500);
+        // Don't auto-advance — let user read the explanation and tap "次へ"
+        // Only auto-advance on correct if streak is going (keeps momentum)
+        if (correct && newStreak >= 2) {
+            setTimeout(() => {
+                if (currentIdx + 1 >= totalRounds) {
+                    finishSession(newSessionScore, totalRounds);
+                } else {
+                    setCurrentIdx(prev => prev + 1);
+                    setSelected(null);
+                }
+            }, 1200);
+        }
     }, [selected, current, score, sessionScore, streak, bestStreak, totalAttempts, currentIdx, totalRounds, saveProgress]);
+
+    // Finish session helper
+    const finishSession = useCallback((finalScore: number, total: number) => {
+        setSessionComplete(true);
+        try {
+            localStorage.setItem(PRACTICE_DONE_KEY(getTodayStr()), JSON.stringify({
+                score: finalScore, total, timestamp: Date.now(),
+            }));
+        } catch { /* */ }
+        setTimeout(() => playLevelSound(6), 300);
+    }, []);
+
+    // Manual advance (when user taps "次へ")
+    const advanceToNext = useCallback(() => {
+        if (currentIdx + 1 >= totalRounds) {
+            finishSession(sessionScore, totalRounds);
+        } else {
+            setCurrentIdx(prev => prev + 1);
+            setSelected(null);
+        }
+    }, [currentIdx, totalRounds, sessionScore, finishSession]);
 
     // Restart
     const restart = useCallback(() => {
@@ -728,7 +862,7 @@ export default function PracticePage() {
                         fontSize: 12, fontWeight: 700, color: TEXT_FAINT,
                         letterSpacing: '0.2em', marginBottom: 8,
                     }}>
-                        SESSION COMPLETE
+                        セッション完了
                     </div>
                     <div style={{
                         fontSize: 64, fontWeight: 900,
@@ -747,9 +881,9 @@ export default function PracticePage() {
                         marginBottom: 24,
                     }}>
                         {[
-                            { val: bestStreak, label: 'BEST STREAK', c: GOLD, delay: '0.2s' },
-                            { val: totalXP, label: 'XP EARNED', c: GREEN, delay: '0.35s' },
-                            { val: totalAttempts, label: 'TODAY TOTAL', c: BLUE, delay: '0.5s' },
+                            { val: bestStreak, label: '最高連続', c: GOLD, delay: '0.2s' },
+                            { val: totalXP, label: '獲得XP', c: GREEN, delay: '0.35s' },
+                            { val: totalAttempts, label: '今日の合計', c: BLUE, delay: '0.5s' },
                         ].map(s => (
                             <div key={s.label} style={{
                                 animation: `pr-stat-in 0.4s ease-out ${s.delay} both`,
@@ -767,7 +901,7 @@ export default function PracticePage() {
                         fontSize: 12, fontWeight: 700, color: GREEN,
                         marginBottom: 20, display: 'inline-block',
                     }}>
-                        Today's Practice Complete
+                        今日の実習クリア
                     </div>
 
                     <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
@@ -776,7 +910,7 @@ export default function PracticePage() {
                             border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800,
                             cursor: 'pointer', letterSpacing: '0.05em',
                         }}>
-                            NEXT SET
+                            もう1セット
                         </button>
                         <Link href="/english/my-training" style={{
                             padding: '14px 24px', background: '#fff', color: TEXT_MUTED,
@@ -784,7 +918,7 @@ export default function PracticePage() {
                             fontSize: 14, fontWeight: 700, textDecoration: 'none',
                             display: 'inline-flex', alignItems: 'center',
                         }}>
-                            Training
+                            トレーニングへ
                         </Link>
                     </div>
                 </div>
@@ -795,7 +929,7 @@ export default function PracticePage() {
                     borderRadius: 12, padding: 16,
                 }}>
                     <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_FAINT, letterSpacing: '0.15em', marginBottom: 12 }}>
-                        TODAY'S MISSIONS
+                        今日のミッション
                     </div>
                     {missions.map(m => (
                         <div key={m.id} style={{
@@ -906,7 +1040,7 @@ export default function PracticePage() {
                 <Link href="/english/my-training" style={{
                     fontSize: 12, color: TEXT_FAINT, textDecoration: 'none',
                 }}>
-                    ← Training
+                    ← トレーニング
                 </Link>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     {streak >= 2 && (
@@ -919,7 +1053,7 @@ export default function PracticePage() {
                             border: streak >= 7 ? '1px solid #FECACA' : '1px solid #FED7AA',
                             animation: streak >= 5 ? 'pr-streak-glow 1s ease-in-out infinite' : 'none',
                         }}>
-                            {streak >= 7 ? 'FEVER ' : ''}{streak} STREAK
+                            {streak >= 7 ? 'FEVER ' : ''}{streak}連続
                         </span>
                     )}
                     <span style={{ fontSize: 14, fontWeight: 800, color: GOLD }}>
@@ -1029,7 +1163,7 @@ export default function PracticePage() {
                                     fontSize: 10, fontWeight: 700, color: '#8B5CF6',
                                     display: 'block', marginBottom: 6,
                                 }}>
-                                    YOU SAID:
+                                    あなたの発言:
                                 </span>
                             )}
                             {current.question}
@@ -1103,18 +1237,67 @@ export default function PracticePage() {
                 {/* Feedback after answer */}
                 {answered && (
                     <div style={{
-                        padding: '12px 20px 16px',
+                        padding: '14px 20px 16px',
                         borderTop: `1px solid #F5F5F4`,
                         background: isCorrect ? '#F0FDF4' : '#FFFBEB',
                     }}>
                         <div style={{
                             fontSize: 13, fontWeight: 800,
-                            color: isCorrect ? GREEN : GOLD,
-                            marginBottom: 4,
+                            color: isCorrect ? GREEN : '#B45309',
+                            marginBottom: 6,
                         }}>
-                            {isCorrect ? '正解!' : '惜しい!'}
+                            {isCorrect ? '正解!' : '不正解'}
                         </div>
-                        {current.phrase.context && (
+                        {/* Show correct answer when wrong */}
+                        {!isCorrect && (
+                            <div style={{
+                                fontSize: 13, fontWeight: 700,
+                                color: '#065F46', marginBottom: 8,
+                                padding: '6px 10px', background: '#ECFDF5',
+                                borderRadius: 6, border: `1px solid ${GREEN}30`,
+                            }}>
+                                正解: {current.options[current.correctIdx]}
+                            </div>
+                        )}
+                        {/* Show 4-level progression for context */}
+                        {current.masterExpr && (
+                            <div style={{ marginBottom: 8 }}>
+                                {MASTER_LEVELS.map((lvl, i) => (
+                                    <div key={i} style={{
+                                        display: 'flex', gap: 6, alignItems: 'baseline',
+                                        padding: '2px 0',
+                                        fontSize: 11, lineHeight: 1.5,
+                                    }}>
+                                        <span style={{
+                                            fontSize: 9, fontWeight: 800,
+                                            color: lvl.color,
+                                            minWidth: 36, flexShrink: 0,
+                                        }}>
+                                            {lvl.ja}
+                                        </span>
+                                        <span style={{
+                                            color: TEXT_SUB,
+                                            fontWeight: i <= 1 ? 400 : 500,
+                                        }}>
+                                            {current.masterExpr!.english[i]}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {/* Linguistic context from master data */}
+                        {current.masterExpr?.context && (
+                            <div style={{
+                                fontSize: 11, color: TEXT_SUB, lineHeight: 1.7,
+                                padding: '8px 10px',
+                                background: '#FAFAF9', borderRadius: 6,
+                                border: `1px solid ${BORDER}`,
+                            }}>
+                                {current.masterExpr.context}
+                            </div>
+                        )}
+                        {/* Fallback to phrase context if no master */}
+                        {!current.masterExpr?.context && current.phrase.context && (
                             <div style={{
                                 fontSize: 11, color: TEXT_SUB, lineHeight: 1.6,
                             }}>
@@ -1124,6 +1307,24 @@ export default function PracticePage() {
                     </div>
                 )}
             </div>
+
+            {/* Next button — shown when answered and not auto-advancing */}
+            {answered && (
+                <button
+                    onClick={advanceToNext}
+                    style={{
+                        width: '100%', padding: '14px',
+                        marginTop: 10,
+                        background: isCorrect ? GREEN : GOLD,
+                        color: '#fff', border: 'none',
+                        borderRadius: 12, fontSize: 15, fontWeight: 800,
+                        cursor: 'pointer',
+                        letterSpacing: '0.03em',
+                    }}
+                >
+                    {currentIdx + 1 >= totalRounds ? '結果を見る' : '次へ'}
+                </button>
+            )}
 
             {/* Compact missions */}
             <div style={{ display: 'flex', gap: 6, justifyContent: 'center', marginTop: 8 }}>
