@@ -8,6 +8,9 @@ import {
 } from '@/lib/training-sounds';
 import { MASTER_EXPRESSIONS, MASTER_LEVELS, MasterExpression } from '@/data/english/365/master-expressions';
 
+// ── Practice completion key for calendar ──
+const PRACTICE_DONE_KEY = (date: string) => `practice-done-${date}`;
+
 // ── Types ──
 interface TrainingPhrase {
     id: string;
@@ -267,6 +270,8 @@ export default function PracticePage() {
     const [drillCount, setDrillCount] = useState(10);
     const [isMobile, setIsMobile] = useState(false);
     const [ttsPlaying, setTtsPlaying] = useState(false);
+    const [correctFlash, setCorrectFlash] = useState(false);
+    const [comboText, setComboText] = useState<string | null>(null);
     const prevMissionsDone = useRef(-1);
     const synthRef = useRef<SpeechSynthesis | null>(null);
 
@@ -358,6 +363,15 @@ export default function PracticePage() {
         if (correct) {
             if (newStreak >= 3) playFeverChainHit(newStreak);
             else playLevelSound(3);
+            // Flash effect
+            setCorrectFlash(true);
+            setTimeout(() => setCorrectFlash(false), 400);
+            // Combo text
+            if (newStreak >= 3) {
+                const combos = ['NICE!', 'GREAT!', 'EXCELLENT!', 'AMAZING!', 'GODLIKE!'];
+                setComboText(combos[Math.min(Math.floor((newStreak - 3) / 2), combos.length - 1)]);
+                setTimeout(() => setComboText(null), 800);
+            }
         } else {
             if (streak >= 2) playStreakBreak();
         }
@@ -373,6 +387,12 @@ export default function PracticePage() {
         setTimeout(() => {
             if (currentIdx + 1 >= totalRounds) {
                 setSessionComplete(true);
+                // Mark practice done for today (calendar integration)
+                try {
+                    localStorage.setItem(PRACTICE_DONE_KEY(getTodayStr()), JSON.stringify({
+                        score: newSessionScore, total: totalRounds, timestamp: Date.now(),
+                    }));
+                } catch { /* */ }
                 setTimeout(() => playLevelSound(6), 300);
             } else {
                 setCurrentIdx(prev => prev + 1);
@@ -408,7 +428,7 @@ export default function PracticePage() {
 
     useEffect(() => {
         if (prevMissionsDone.current >= 0 && doneCount > prevMissionsDone.current) {
-            playRankUpSound();
+            playRankUpSound('GOLD');
         }
         prevMissionsDone.current = doneCount;
     }, [doneCount]);
@@ -458,25 +478,33 @@ export default function PracticePage() {
 
                 {/* Title */}
                 <div style={{
-                    textAlign: 'center', marginBottom: 32,
+                    textAlign: 'center', marginBottom: 28,
                 }}>
                     <div style={{
                         fontSize: 11, fontWeight: 800, color: GOLD,
                         letterSpacing: '0.3em', marginBottom: 8,
                     }}>
-                        PRACTICE DRILLS
+                        STEP 3 : PRACTICE
                     </div>
                     <div style={{
                         fontSize: 22, fontWeight: 900, color: TEXT,
                         lineHeight: 1.4, marginBottom: 8,
                     }}>
-                        登録フレーズで実戦練習
+                        実習ドリル
                     </div>
                     <div style={{
                         fontSize: 13, color: TEXT_MUTED, lineHeight: 1.6,
                     }}>
-                        覚えた {phrases.length} フレーズから出題。<br />
-                        5種類のドリルでガチで定着させる。
+                        登録した {phrases.length} フレーズから出題。<br />
+                        5種類のドリルで定着させる。
+                    </div>
+                    <div style={{
+                        display: 'inline-block', marginTop: 10,
+                        padding: '4px 14px', borderRadius: 20,
+                        background: '#ECFDF5', border: `1px solid ${GREEN}30`,
+                        fontSize: 12, fontWeight: 700, color: GREEN,
+                    }}>
+                        約5分で完了
                     </div>
                 </div>
 
@@ -650,23 +678,68 @@ export default function PracticePage() {
     if (sessionComplete) {
         const accuracy = totalRounds > 0 ? Math.round((sessionScore / totalRounds) * 100) : 0;
         const isPerfect = sessionScore === totalRounds;
+        const isGreat = accuracy >= 80;
+        const confettiColors = ['#D4AF37', '#10B981', '#3B82F6', '#F97316', '#8B5CF6', '#EC4899'];
         return (
-            <div style={{ maxWidth: 480, margin: '0 auto', padding: '40px 20px' }}>
+            <div style={{
+                maxWidth: 480, margin: '0 auto', padding: '40px 20px',
+                position: 'relative', overflow: 'hidden', minHeight: '100vh',
+            }}>
+                <style>{`
+                    @keyframes pr-confetti-fall {
+                        0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+                        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+                    }
+                    @keyframes pr-result-slam {
+                        0% { transform: scale(3); opacity: 0; }
+                        50% { transform: scale(0.9); opacity: 1; }
+                        70% { transform: scale(1.05); }
+                        100% { transform: scale(1); opacity: 1; }
+                    }
+                    @keyframes pr-shine {
+                        0% { background-position: -200% center; }
+                        100% { background-position: 200% center; }
+                    }
+                    @keyframes pr-stat-in {
+                        0% { transform: translateY(20px); opacity: 0; }
+                        100% { transform: translateY(0); opacity: 1; }
+                    }
+                `}</style>
+
+                {/* Confetti particles */}
+                {(isPerfect || isGreat) && Array.from({ length: isPerfect ? 30 : 12 }).map((_, i) => (
+                    <div key={i} style={{
+                        position: 'absolute',
+                        top: -10,
+                        left: `${Math.random() * 100}%`,
+                        width: Math.random() * 8 + 4,
+                        height: Math.random() * 8 + 4,
+                        background: confettiColors[i % confettiColors.length],
+                        borderRadius: Math.random() > 0.5 ? '50%' : 2,
+                        animation: `pr-confetti-fall ${Math.random() * 2 + 1.5}s ease-in ${Math.random() * 0.5}s forwards`,
+                        pointerEvents: 'none' as const,
+                        zIndex: 10,
+                    }} />
+                ))}
+
                 <div style={{
                     background: isPerfect
                         ? 'linear-gradient(135deg, #FEF3C7, #ECFDF5)'
-                        : accuracy >= 80 ? 'linear-gradient(135deg, #F5F5F4, #ECFDF5)' : '#fff',
+                        : isGreat ? 'linear-gradient(135deg, #F5F5F4, #ECFDF5)' : '#fff',
                     border: isPerfect ? `2px solid ${GOLD}` : `1px solid ${BORDER}`,
                     borderRadius: 16, padding: '32px 24px', textAlign: 'center',
-                    marginBottom: 20,
+                    marginBottom: 20, position: 'relative', zIndex: 20,
                 }}>
                     {isPerfect && (
                         <div style={{
-                            fontSize: 11, fontWeight: 800, color: GOLD,
+                            fontSize: 13, fontWeight: 900, color: GOLD,
                             letterSpacing: '0.3em', marginBottom: 12,
-                            padding: '4px 16px', display: 'inline-block',
-                            background: '#FFFBEB', borderRadius: 20,
-                            border: `1px solid ${GOLD}40`,
+                            padding: '6px 20px', display: 'inline-block',
+                            background: 'linear-gradient(90deg, #FFFBEB, #FEF3C7, #FFFBEB)',
+                            backgroundSize: '200% 100%',
+                            animation: 'pr-shine 2s linear infinite',
+                            borderRadius: 20,
+                            border: `1px solid ${GOLD}60`,
                         }}>
                             PERFECT
                         </div>
@@ -678,13 +751,14 @@ export default function PracticePage() {
                         SESSION COMPLETE
                     </div>
                     <div style={{
-                        fontSize: 56, fontWeight: 900,
-                        color: isPerfect ? GOLD : accuracy >= 80 ? GREEN : accuracy >= 50 ? BLUE : TEXT_MUTED,
+                        fontSize: 64, fontWeight: 900,
+                        color: isPerfect ? GOLD : isGreat ? GREEN : accuracy >= 50 ? BLUE : TEXT_MUTED,
                         lineHeight: 1, marginBottom: 4,
+                        animation: 'pr-result-slam 0.6s ease-out',
                     }}>
                         {accuracy}%
                     </div>
-                    <div style={{ fontSize: 14, color: TEXT_SUB, marginBottom: 20 }}>
+                    <div style={{ fontSize: 14, color: TEXT_SUB, marginBottom: 24 }}>
                         {sessionScore}/{totalRounds} 正解
                     </div>
 
@@ -692,27 +766,47 @@ export default function PracticePage() {
                         display: 'flex', justifyContent: 'center', gap: 32,
                         marginBottom: 24,
                     }}>
-                        <div>
-                            <div style={{ fontSize: 24, fontWeight: 900, color: GOLD }}>{bestStreak}</div>
-                            <div style={{ fontSize: 10, color: TEXT_FAINT }}>BEST STREAK</div>
-                        </div>
-                        <div>
-                            <div style={{ fontSize: 24, fontWeight: 900, color: GREEN }}>{totalXP}</div>
-                            <div style={{ fontSize: 10, color: TEXT_FAINT }}>XP EARNED</div>
-                        </div>
-                        <div>
-                            <div style={{ fontSize: 24, fontWeight: 900, color: BLUE }}>{totalAttempts}</div>
-                            <div style={{ fontSize: 10, color: TEXT_FAINT }}>TODAY TOTAL</div>
-                        </div>
+                        {[
+                            { val: bestStreak, label: 'BEST STREAK', c: GOLD, delay: '0.2s' },
+                            { val: totalXP, label: 'XP EARNED', c: GREEN, delay: '0.35s' },
+                            { val: totalAttempts, label: 'TODAY TOTAL', c: BLUE, delay: '0.5s' },
+                        ].map(s => (
+                            <div key={s.label} style={{
+                                animation: `pr-stat-in 0.4s ease-out ${s.delay} both`,
+                            }}>
+                                <div style={{ fontSize: 26, fontWeight: 900, color: s.c }}>{s.val}</div>
+                                <div style={{ fontSize: 10, color: TEXT_FAINT }}>{s.label}</div>
+                            </div>
+                        ))}
                     </div>
 
-                    <button onClick={restart} style={{
-                        padding: '14px 40px', background: GREEN, color: '#fff',
-                        border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800,
-                        cursor: 'pointer', letterSpacing: '0.05em',
+                    {/* Today's practice marked! */}
+                    <div style={{
+                        padding: '8px 16px', borderRadius: 8,
+                        background: '#ECFDF5', border: `1px solid ${GREEN}30`,
+                        fontSize: 12, fontWeight: 700, color: GREEN,
+                        marginBottom: 20, display: 'inline-block',
                     }}>
-                        NEXT SET
-                    </button>
+                        Today's Practice Complete
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+                        <button onClick={restart} style={{
+                            padding: '14px 32px', background: GREEN, color: '#fff',
+                            border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800,
+                            cursor: 'pointer', letterSpacing: '0.05em',
+                        }}>
+                            NEXT SET
+                        </button>
+                        <Link href="/english/my-training" style={{
+                            padding: '14px 24px', background: '#fff', color: TEXT_MUTED,
+                            border: `1px solid ${BORDER}`, borderRadius: 12,
+                            fontSize: 14, fontWeight: 700, textDecoration: 'none',
+                            display: 'inline-flex', alignItems: 'center',
+                        }}>
+                            Training
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Missions */}
@@ -754,13 +848,6 @@ export default function PracticePage() {
                     ))}
                 </div>
 
-                <Link href="/english/my-training" style={{
-                    display: 'block', textAlign: 'center',
-                    padding: '12px', marginTop: 16,
-                    color: TEXT_MUTED, fontSize: 13, textDecoration: 'none',
-                }}>
-                    ← Daily Training
-                </Link>
             </div>
         );
     }
@@ -777,7 +864,60 @@ export default function PracticePage() {
             maxWidth: 480, margin: '0 auto',
             padding: isMobile ? '16px' : '32px 20px',
             minHeight: '100vh',
+            position: 'relative', overflow: 'hidden',
         }}>
+            {/* Keyframes */}
+            <style>{`
+                @keyframes pr-flash { 0% { opacity: 0.6; } 100% { opacity: 0; } }
+                @keyframes pr-combo-pop {
+                    0% { transform: scale(0.3) translateY(0); opacity: 0; }
+                    30% { transform: scale(1.3) translateY(-10px); opacity: 1; }
+                    70% { transform: scale(1) translateY(-30px); opacity: 1; }
+                    100% { transform: scale(0.8) translateY(-60px); opacity: 0; }
+                }
+                @keyframes pr-streak-glow {
+                    0%, 100% { box-shadow: 0 0 8px rgba(234,88,12,0.3); }
+                    50% { box-shadow: 0 0 20px rgba(234,88,12,0.6); }
+                }
+                @keyframes pr-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+                @keyframes pr-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+                @keyframes pr-confetti-fall {
+                    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+                    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+                }
+                @keyframes pr-result-slam {
+                    0% { transform: scale(3); opacity: 0; }
+                    50% { transform: scale(0.9); opacity: 1; }
+                    70% { transform: scale(1.05); }
+                    100% { transform: scale(1); opacity: 1; }
+                }
+            `}</style>
+
+            {/* Correct flash overlay */}
+            {correctFlash && (
+                <div style={{
+                    position: 'fixed', inset: 0, zIndex: 100,
+                    background: `radial-gradient(circle, ${GREEN}30 0%, transparent 70%)`,
+                    animation: 'pr-flash 0.4s ease-out forwards',
+                    pointerEvents: 'none',
+                }} />
+            )}
+
+            {/* Combo text popup */}
+            {comboText && (
+                <div style={{
+                    position: 'fixed', top: '35%', left: '50%',
+                    transform: 'translateX(-50%)',
+                    zIndex: 101, pointerEvents: 'none',
+                    fontSize: 32, fontWeight: 900,
+                    color: streak >= 7 ? '#DC2626' : streak >= 5 ? '#EA580C' : GOLD,
+                    textShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    animation: 'pr-combo-pop 0.8s ease-out forwards',
+                    letterSpacing: '0.05em',
+                }}>
+                    {comboText}
+                </div>
+            )}
             {/* Header */}
             <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -791,12 +931,15 @@ export default function PracticePage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     {streak >= 2 && (
                         <span style={{
-                            fontSize: 11, fontWeight: 800, color: '#EA580C',
-                            padding: '2px 8px', background: '#FFF7ED',
-                            borderRadius: 6, border: '1px solid #FED7AA',
-                            animation: streak >= 5 ? 'pulse 0.5s ease-in-out infinite' : 'none',
+                            fontSize: 11, fontWeight: 800,
+                            color: streak >= 7 ? '#DC2626' : '#EA580C',
+                            padding: '2px 8px',
+                            background: streak >= 7 ? '#FEF2F2' : '#FFF7ED',
+                            borderRadius: 6,
+                            border: streak >= 7 ? '1px solid #FECACA' : '1px solid #FED7AA',
+                            animation: streak >= 5 ? 'pr-streak-glow 1s ease-in-out infinite' : 'none',
                         }}>
-                            {streak} STREAK
+                            {streak >= 7 ? 'FEVER ' : ''}{streak} STREAK
                         </span>
                     )}
                     <span style={{ fontSize: 14, fontWeight: 800, color: GOLD }}>
