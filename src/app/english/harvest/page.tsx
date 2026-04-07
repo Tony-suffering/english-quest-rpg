@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PPButton, PPPopup, usePPWordPicker } from '@/components/english/PPWordPicker';
 import { MOVIE_BY_DATE, GENRE_META, type HarvestMovie } from '@/data/english/harvest-movies';
+import { seedHarvestExpressions } from '@/data/english/harvest-expressions';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -93,6 +94,7 @@ export default function HarvestPage() {
 
     useEffect(() => {
         setMounted(true);
+        seedHarvestExpressions();
         setExpressions(loadExpressions());
         try {
             const s = localStorage.getItem('harvest-registered');
