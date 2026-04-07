@@ -461,7 +461,11 @@ export default function PracticePage() {
     // ── Intro / Welcome screen ──
     if (!started) {
         const todayProgress = totalAttempts > 0;
-        const countOptions = [5, 10, 15];
+        const countOptions: { n: number; label: string; time: string }[] = [
+            { n: 5,  label: 'サクッと5問',  time: '約30秒' },
+            { n: 10, label: 'しっかり10問', time: '約1分' },
+            { n: 15, label: 'ガッツリ15問', time: '約2分' },
+        ];
         return (
             <div style={{
                 maxWidth: 480, margin: '0 auto',
@@ -471,40 +475,21 @@ export default function PracticePage() {
                 {/* Back link */}
                 <Link href="/english/my-training" style={{
                     fontSize: 12, color: TEXT_FAINT, textDecoration: 'none',
-                    display: 'inline-block', marginBottom: 24,
+                    display: 'inline-block', marginBottom: 20,
                 }}>
-                    ← Daily Training
+                    ← トレーニングに戻る
                 </Link>
 
                 {/* Title */}
-                <div style={{
-                    textAlign: 'center', marginBottom: 28,
-                }}>
+                <div style={{ textAlign: 'center', marginBottom: 24 }}>
                     <div style={{
-                        fontSize: 11, fontWeight: 800, color: GOLD,
-                        letterSpacing: '0.3em', marginBottom: 8,
-                    }}>
-                        STEP 3 : PRACTICE
-                    </div>
-                    <div style={{
-                        fontSize: 22, fontWeight: 900, color: TEXT,
-                        lineHeight: 1.4, marginBottom: 8,
+                        fontSize: 20, fontWeight: 900, color: TEXT,
+                        lineHeight: 1.4, marginBottom: 6,
                     }}>
                         実習ドリル
                     </div>
-                    <div style={{
-                        fontSize: 13, color: TEXT_MUTED, lineHeight: 1.6,
-                    }}>
-                        登録した {phrases.length} フレーズから出題。<br />
-                        5種類のドリルで定着させる。
-                    </div>
-                    <div style={{
-                        display: 'inline-block', marginTop: 10,
-                        padding: '4px 14px', borderRadius: 20,
-                        background: '#ECFDF5', border: `1px solid ${GREEN}30`,
-                        fontSize: 12, fontWeight: 700, color: GREEN,
-                    }}>
-                        約5分で完了
+                    <div style={{ fontSize: 13, color: TEXT_MUTED, lineHeight: 1.6 }}>
+                        登録した {phrases.length} フレーズから4択で出題
                     </div>
                 </div>
 
@@ -512,101 +497,96 @@ export default function PracticePage() {
                 {todayProgress && (
                     <div style={{
                         background: '#ECFDF5', border: `1px solid ${GREEN}30`,
-                        borderRadius: 12, padding: '12px 16px',
-                        marginBottom: 24, display: 'flex',
+                        borderRadius: 12, padding: '10px 16px',
+                        marginBottom: 20, display: 'flex',
                         justifyContent: 'space-around', textAlign: 'center',
                     }}>
                         <div>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: GREEN }}>{score}</div>
-                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>TODAY CORRECT</div>
+                            <div style={{ fontSize: 18, fontWeight: 900, color: GREEN }}>{score}</div>
+                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>正解</div>
                         </div>
                         <div>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: GOLD }}>{bestStreak}</div>
-                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>BEST STREAK</div>
+                            <div style={{ fontSize: 18, fontWeight: 900, color: GOLD }}>{bestStreak}</div>
+                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>最高連続</div>
                         </div>
                         <div>
-                            <div style={{ fontSize: 20, fontWeight: 900, color: BLUE }}>{totalAttempts}</div>
-                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>TOTAL</div>
+                            <div style={{ fontSize: 18, fontWeight: 900, color: BLUE }}>{totalAttempts}</div>
+                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>今日の合計</div>
                         </div>
                     </div>
                 )}
 
-                {/* 5 Drill Types */}
+                {/* Drill types - compact */}
                 <div style={{
                     background: '#fff', border: `1px solid ${BORDER}`,
-                    borderRadius: 14, padding: '20px 16px',
-                    marginBottom: 24,
+                    borderRadius: 14, padding: '14px 16px',
+                    marginBottom: 20,
                 }}>
                     <div style={{
-                        fontSize: 10, fontWeight: 800, color: TEXT_FAINT,
-                        letterSpacing: '0.2em', marginBottom: 14,
+                        fontSize: 11, fontWeight: 700, color: TEXT_MUTED,
+                        marginBottom: 10,
                     }}>
-                        5 DRILL TYPES
+                        ランダムで5種類のドリルが出る
                     </div>
-                    {(Object.entries(DRILL_LABELS) as [DrillType, typeof DRILL_LABELS[DrillType]][]).map(([key, info]) => {
-                        const descriptions: Record<DrillType, string> = {
-                            ja2en: '日本語を見て、正しい英語を4択から選ぶ',
-                            en2ja: '英語を見て、正しい日本語を4択から選ぶ',
-                            fill: '英文の空欄に入る単語を選ぶ',
-                            back: 'あなたの発言に対する相手の返しを選ぶ',
-                            listen: '音声を聞いて、正しい日本語を選ぶ',
-                        };
-                        return (
-                            <div key={key} style={{
-                                display: 'flex', alignItems: 'center', gap: 10,
-                                padding: '8px 0',
-                                borderBottom: key !== 'listen' ? `1px solid #F5F5F4` : 'none',
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                        {(Object.entries(DRILL_LABELS) as [DrillType, typeof DRILL_LABELS[DrillType]][]).map(([key, info]) => (
+                            <span key={key} style={{
+                                fontSize: 11, fontWeight: 700, color: info.color,
+                                padding: '4px 10px', borderRadius: 6,
+                                background: `${info.color}12`,
+                                border: `1px solid ${info.color}25`,
                             }}>
-                                <span style={{
-                                    fontSize: 9, fontWeight: 900, color: '#fff',
-                                    padding: '4px 7px', borderRadius: 5,
-                                    background: info.color,
-                                    minWidth: 28, textAlign: 'center',
-                                }}>
-                                    {info.icon}
-                                </span>
-                                <div>
-                                    <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>
-                                        {info.label}
-                                    </div>
-                                    <div style={{ fontSize: 11, color: TEXT_MUTED }}>
-                                        {descriptions[key]}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
+                                {info.label}
+                            </span>
+                        ))}
+                    </div>
                 </div>
 
-                {/* Question count selector */}
-                <div style={{
-                    textAlign: 'center', marginBottom: 20,
-                }}>
+                {/* Question count selector - Japanese, clear */}
+                <div style={{ marginBottom: 20 }}>
                     <div style={{
-                        fontSize: 10, fontWeight: 700, color: TEXT_FAINT,
-                        letterSpacing: '0.15em', marginBottom: 10,
+                        fontSize: 11, fontWeight: 700, color: TEXT_MUTED,
+                        marginBottom: 8,
                     }}>
-                        QUESTION COUNT
+                        問題数をえらぶ
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
-                        {countOptions.map(n => (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {countOptions.map(({ n, label, time }) => (
                             <button
                                 key={n}
                                 onClick={() => setDrillCount(n)}
                                 style={{
-                                    width: 56, height: 56,
-                                    borderRadius: 14,
+                                    display: 'flex', alignItems: 'center',
+                                    padding: '12px 16px',
+                                    borderRadius: 12,
                                     border: drillCount === n
                                         ? `2px solid ${GOLD}`
                                         : `2px solid ${BORDER}`,
                                     background: drillCount === n ? '#FFFBEB' : '#fff',
-                                    fontSize: 18, fontWeight: 900,
-                                    color: drillCount === n ? GOLD : TEXT_MUTED,
                                     cursor: 'pointer',
                                     transition: 'all 0.15s',
                                 }}
                             >
-                                {n}
+                                <span style={{
+                                    fontSize: 15, fontWeight: 900,
+                                    color: drillCount === n ? GOLD : TEXT_MUTED,
+                                    marginRight: 12, minWidth: 24,
+                                }}>
+                                    {n}
+                                </span>
+                                <span style={{
+                                    fontSize: 14, fontWeight: 700,
+                                    color: drillCount === n ? TEXT : TEXT_MUTED,
+                                    flex: 1, textAlign: 'left',
+                                }}>
+                                    {label}
+                                </span>
+                                <span style={{
+                                    fontSize: 11, fontWeight: 600,
+                                    color: TEXT_FAINT,
+                                }}>
+                                    {time}
+                                </span>
                             </button>
                         ))}
                     </div>
@@ -616,34 +596,34 @@ export default function PracticePage() {
                 <button
                     onClick={() => startSession(drillCount)}
                     style={{
-                        width: '100%', padding: '18px',
+                        width: '100%', padding: '16px',
                         background: `linear-gradient(135deg, ${GOLD}, ${GREEN})`,
                         color: '#fff', border: 'none',
-                        borderRadius: 14, fontSize: 17, fontWeight: 900,
-                        cursor: 'pointer', letterSpacing: '0.1em',
+                        borderRadius: 14, fontSize: 16, fontWeight: 900,
+                        cursor: 'pointer',
                         transition: 'transform 0.15s',
                     }}
                     onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
                     onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
                 >
-                    START
+                    {drillCount}問スタート
                 </button>
 
-                {/* Missions preview */}
+                {/* Missions */}
                 <div style={{
                     background: '#fff', border: `1px solid ${BORDER}`,
-                    borderRadius: 12, padding: 14, marginTop: 20,
+                    borderRadius: 12, padding: 14, marginTop: 16,
                 }}>
                     <div style={{
-                        fontSize: 10, fontWeight: 700, color: TEXT_FAINT,
-                        letterSpacing: '0.15em', marginBottom: 10,
+                        fontSize: 11, fontWeight: 700, color: TEXT_MUTED,
+                        marginBottom: 8,
                     }}>
-                        TODAY'S MISSIONS
+                        今日のミッション
                     </div>
                     {missions.map(m => (
                         <div key={m.id} style={{
                             display: 'flex', alignItems: 'center', gap: 8,
-                            padding: '6px 0',
+                            padding: '5px 0',
                         }}>
                             <div style={{
                                 width: 18, height: 18, borderRadius: '50%',

@@ -18,6 +18,111 @@ function getTodayStr() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
+function MiniCalendar() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    const today = now.getDate();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDow = new Date(year, month, 1).getDay(); // 0=Sun
+
+    // Read localStorage for each day
+    const [marks, setMarks] = useState<Record<number, { training: boolean; practice: boolean }>>({});
+    useEffect(() => {
+        const m: Record<number, { training: boolean; practice: boolean }> = {};
+        const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
+        // Training marks from reviewed calendar
+        try {
+            const rev = localStorage.getItem(`master-365-reviewed-${monthStr}`);
+            if (rev) {
+                const days: number[] = JSON.parse(rev);
+                days.forEach(d => { m[d] = { ...(m[d] || { training: false, practice: false }), training: true }; });
+            }
+        } catch { /* */ }
+        // Practice marks
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const pd = localStorage.getItem(`practice-done-${dateStr}`);
+            if (pd) {
+                m[d] = { ...(m[d] || { training: false, practice: false }), practice: true };
+            }
+        }
+        setMarks(m);
+    }, [year, month, daysInMonth]);
+
+    const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+    const cells: (number | null)[] = [];
+    for (let i = 0; i < firstDow; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+    return (
+        <div style={{
+            background: '#fff', border: `1px solid ${BORDER}`,
+            borderRadius: 12, padding: '12px 14px', marginTop: 12,
+        }}>
+            <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginBottom: 8,
+            }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: '#44403C' }}>
+                    {year}年{month + 1}月
+                </div>
+                <div style={{ display: 'flex', gap: 10, fontSize: 9, color: TEXT_FAINT }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: GREEN, display: 'inline-block' }} />
+                        トレーニング
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: BLUE, display: 'inline-block' }} />
+                        実習
+                    </span>
+                </div>
+            </div>
+            {/* Day headers */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, textAlign: 'center' }}>
+                {dayNames.map(d => (
+                    <div key={d} style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT, padding: '2px 0' }}>{d}</div>
+                ))}
+                {cells.map((d, i) => {
+                    if (d === null) return <div key={`e${i}`} />;
+                    const mark = marks[d];
+                    const isToday = d === today;
+                    return (
+                        <div key={d} style={{
+                            padding: '3px 0', position: 'relative',
+                            borderRadius: 6,
+                            background: isToday ? '#FAFAF9' : 'transparent',
+                            border: isToday ? `1px solid ${BORDER}` : '1px solid transparent',
+                        }}>
+                            <div style={{
+                                fontSize: 11, fontWeight: isToday ? 800 : 500,
+                                color: isToday ? '#1C1917' : '#78716C',
+                            }}>
+                                {d}
+                            </div>
+                            {/* Dual dots */}
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: 2, marginTop: 1 }}>
+                                {mark?.training && (
+                                    <span style={{
+                                        width: 4, height: 4, borderRadius: '50%',
+                                        background: GREEN, display: 'inline-block',
+                                    }} />
+                                )}
+                                {mark?.practice && (
+                                    <span style={{
+                                        width: 4, height: 4, borderRadius: '50%',
+                                        background: BLUE, display: 'inline-block',
+                                    }} />
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 export default function MyTrainingPage() {
     const [showHelp, setShowHelp] = useState(false);
     const [slotOn, setSlotOn] = useState(true);
@@ -62,8 +167,8 @@ export default function MyTrainingPage() {
 
     const steps = [
         { num: 1, label: '仕込み', sub: 'フレーズ登録', done: phraseCount > 0, href: '/english/izakaya-toeic/kaiwa', color: GOLD },
-        { num: 2, label: 'トレーニング', sub: 'カード復習 1分', done: trainingDone, href: null, color: GREEN },
-        { num: 3, label: '実習', sub: 'ドリル 5分', done: practiceDone, href: '/english/my-training/practice', color: BLUE },
+        { num: 2, label: 'トレーニング', sub: 'カード復習', done: trainingDone, href: null, color: GREEN },
+        { num: 3, label: '実習', sub: '4択ドリル', done: practiceDone, href: '/english/my-training/practice', color: BLUE },
     ];
 
     return (
@@ -79,7 +184,7 @@ export default function MyTrainingPage() {
                         fontSize: 10, fontWeight: 800, color: TEXT_FAINT,
                         letterSpacing: '0.2em', marginBottom: 10,
                     }}>
-                        TODAY'S FLOW
+                        今日のながれ
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
                         {steps.map((step, i) => {
@@ -148,7 +253,7 @@ export default function MyTrainingPage() {
                             fontSize: 13, fontWeight: 800, textDecoration: 'none',
                             letterSpacing: '0.05em',
                         }}>
-                            STEP 3 : 実習ドリルへ (5分)
+                            実習ドリルへ
                         </Link>
                     )}
                     {/* Show practice link even if training not done, when phrases exist */}
@@ -174,6 +279,9 @@ export default function MyTrainingPage() {
                         </div>
                     )}
                 </div>
+
+                {/* Mini calendar - this month */}
+                <MiniCalendar />
             </div>
 
             {/* Collapsible settings toggle */}
