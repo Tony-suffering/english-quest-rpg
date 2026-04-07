@@ -888,7 +888,7 @@ const day297: MasterExpression[] = [
       'Kids are language geniuses.',
       'Children pick up languages so fast it is unbelievable.',
       'I am amazed at how quickly kids absorb a new language. Adults could never learn that fast.',
-      'My friend moved abroad with her five-year-old, and within like three months, the kid was chatting with the neighbors in the local language like it was nothing. Meanwhile, the mom had been taking lessons for a year and still could not order coffee without pointing at the menu. It is almost unfair how easy it is for kids. Their brains are just wired differently. They do not worry about grammar rules or making mistakes -- they just absorb everything like little sponges.'
+      "It's honestly unfair. My coworker's kid learned more in three months than I did in three years of classes."
     ],
     context: '「天才」は genius だけど大げさにならないように注意。pick up は「自然に覚える」。sponge(スポンジ)は「吸収力がすごい子供」の定番比喩。wired は「脳の配線ができている」。',
     character: 'yuki',
@@ -902,7 +902,7 @@ const day297: MasterExpression[] = [
       'Scared of losing my first language.',
       'I am starting to worry that I might forget my native language.',
       'It freaks me out when I can not remember a word in Japanese. I never thought I could forget my own language.',
-      'It started with small things. Like, I would be talking to my parents on the phone and suddenly draw a blank on a super common Japanese word. Or I would catch myself thinking in English without even trying. At first I thought it was funny, but then it started happening more and more and now it genuinely scares me. My Japanese is supposed to be the one thing I never have to worry about, and the fact that it is slipping away makes me feel like I am losing a part of who I am.'
+      "That happens to a lot of people abroad. Keep reading Japanese stuff and calling your family -- it helps a ton."
     ],
     context: '「忘れそう」は might forget だけど、slipping away(すり抜けていく)の方が徐々に失われる感覚が出る。draw a blank は「ど忘れする」。freak out は「怖くなる・パニくる」。',
     character: 'lisa',
@@ -916,7 +916,7 @@ const day297: MasterExpression[] = [
       'Interpreters are amazing.',
       'Being an interpreter is such an incredibly demanding job.',
       'Every time I watch an interpreter work in real time, I am blown away by their skill.',
-      'I tried interpreting for my friend once, just casually translating a conversation between them and a shop owner, and it completely fried my brain. And that was just a five-minute conversation about buying shoes. Professional interpreters do this for hours at international conferences about complex topics like politics and medicine. They are processing two languages simultaneously, maintaining accuracy, matching tone -- it is superhuman. I have massive respect for anyone who can do that.'
+      "I tried translating for a friend once and my brain totally fried. Those people are on another level."
     ],
     context: '「すごい」は amazing, incredible だけど、demanding(要求が厳しい)は仕事の大変さを表す。fried my brain は「脳が焼けた」= 頭がパンクした。simultaneously は「同時に」。',
     character: 'kenji',
@@ -945,7 +945,7 @@ const day298: MasterExpression[] = [
       'Do not judge by appearance.',
       'I wish people would not judge me based on how I look.',
       'It is frustrating when people make assumptions about you before they even talk to you.',
-      'I can not tell you how many times someone has looked at me and immediately decided what kind of person I am without saying a single word to me. They see my face, my clothes, maybe the color of my skin, and they think they have me all figured out. But they do not know my story, my background, what I have been through. I am so much more than what you see on the surface, and I wish people would give me a chance to show that before making up their minds.'
+      "That's so frustrating. People really need to just talk to someone before deciding who they are."
     ],
     context: '「見た目で判断」は judge by appearance が直訳。英語では do not judge a book by its cover(本を表紙で判断するな)という有名なことわざがある。make assumptions は「決めつける」。',
     character: 'kenji',
@@ -959,7 +959,7 @@ const day298: MasterExpression[] = [
       'Stereotypes never go away.',
       'Stereotypes are so deeply rooted that they probably never fully disappear.',
       'No matter how much progress we make, stereotypes seem to stick around in some form.',
-      'I think the tricky thing about stereotypes is that they are not always completely wrong. Like, sometimes there is a kernel of truth in there somewhere, and that is what makes them so hard to get rid of. People think, well, it is kind of true, so what is the big deal? But the big deal is that it flattens an entire group of people into one image. It takes away their individuality. And even positive stereotypes can be harmful because they create expectations that are impossible for everyone to meet.'
+      "Yeah, even the 'positive' ones are annoying. Like, not every Asian person is good at math -- that's still a stereotype."
     ],
     context: '「なくならない」は never go away, stick around, persist が使える。kernel of truth は「真実の核」。flatten は「平らにする」= 画一的にするイメージ。',
     character: 'master',
@@ -973,7 +973,7 @@ const day298: MasterExpression[] = [
       'I have experienced discrimination.',
       'I have been on the receiving end of discrimination before.',
       'I know what it feels like to be treated differently because of where I come from.',
-      'It happened when I was living abroad. I walked into a store and the employee followed me around the entire time like I was going to steal something. At first I thought I was imagining it, but then I noticed they were not doing that to anyone else. That sick feeling in your stomach when you realize someone has already decided you are a problem before you have even done anything -- I will never forget it. It made me realize how much privilege I had back home that I never even thought about.'
+      "I'm sorry you went through that. Experiences like that really open your eyes to things you never had to think about before."
     ],
     context: '「差別を受ける」は experience discrimination, face discrimination が一般的。on the receiving end は「受ける側にいる」。privilege は「特権」で英語圏の社会議論の核心用語。',
     character: 'takeshi',
@@ -987,7 +987,7 @@ const day298: MasterExpression[] = [
       'Ignorance creates prejudice.',
       'Most prejudice comes from simply not knowing enough about other people.',
       'I think a lot of bias comes from a lack of exposure. When you do not know anyone from a certain background, it is easy to believe the stereotypes.',
-      'The people I know who are the most open-minded are almost always the ones who have traveled or lived in diverse environments. And it is not because traveling makes you a better person automatically -- it is because it is really hard to hate or fear a group of people when you have actually spent time with them. Ignorance is where prejudice grows, and the best way to kill ignorance is just to meet people who are different from you.'
+      "That's why travel is so important. It's hard to stereotype someone once you've actually sat down and had a meal with them."
     ],
     context: '「知らない」は do not know だけど、ignorance は「無知」で少し強い。bias は prejudice より学術的。lack of exposure は「触れ合いの欠如」で原因を的確に表現。',
     character: 'lisa',
@@ -1001,7 +1001,7 @@ const day298: MasterExpression[] = [
       'Put yourself in their shoes.',
       'Try to see it from their perspective for a second.',
       'Before you judge someone, try walking a mile in their shoes. It changes everything.',
-      'I used to be pretty quick to judge people too. Then something happened that flipped my thinking completely. Someone said something ignorant about my country, and instead of getting angry, I stopped and thought about it. They had never been to Japan. Everything they knew about it came from movies and news. Of course they had a skewed view. And that made me realize how many groups of people I had a skewed view of for the exact same reason. You just can not know until you have lived it.'
+      "You're right. I catch myself making snap judgments all the time. It takes real effort to stop and think first."
     ],
     context: '「相手の立場になる」は put yourself in their shoes が定番のイディオム。walk a mile in their shoes も有名。skewed は「歪んだ」。perspective は「視点」。',
     character: 'yuki',
@@ -1015,7 +1015,7 @@ const day298: MasterExpression[] = [
       'Diversity is easy to talk about.',
       'Everyone talks about diversity, but actually living it is way harder.',
       'It is one thing to say you support diversity and another thing entirely to practice it in your daily life.',
-      'I get a little frustrated when companies and politicians throw around the word diversity like it is a magic spell. Just saying you value diversity does not mean anything if you are not actually creating spaces where different kinds of people feel welcome. Real diversity is messy and uncomfortable sometimes. It means listening to opinions that challenge yours, working with people whose approach is completely different, and being OK with not always understanding everything right away.'
+      "Preach. My company loves talking about diversity in meetings but the actual office is the least diverse place I've ever seen."
     ],
     context: '「口で言うのは簡単」は英語では it is easy to talk about, easier said than done が使える。throw around は「軽々しく使う」。magic spell は「魔法の呪文」。',
     character: 'kenji',
@@ -1029,7 +1029,7 @@ const day298: MasterExpression[] = [
       'Unconscious bias is scariest.',
       'The biases we do not even realize we have are the most dangerous ones.',
       'What scares me most is the prejudice that operates under the surface, the stuff you do not even know is there.',
-      'I took one of those unconscious bias tests online once, and the results honestly shocked me. I thought I was this totally open-minded, fair person, but the test showed that I had all these automatic associations I was not even aware of. And that is the scariest part -- you can genuinely believe you are not prejudiced and still have biases that affect how you treat people. At least with overt prejudice, you can call it out. The unconscious stuff is way harder to fight because you can not fight what you can not see.'
+      "I took one of those bias tests once and it messed me up. You think you're open-minded until the data says otherwise."
     ],
     context: '「無意識の偏見」= unconscious bias, implicit bias は英語圏の重要な社会概念。overt は「明白な」。call out は「指摘する・声を上げる」。',
     character: 'master',
@@ -1043,7 +1043,7 @@ const day298: MasterExpression[] = [
       'Accepting differences matters.',
       'We do not have to agree on everything, but we should respect our differences.',
       'I think the goal is not to eliminate our differences but to learn how to coexist with them respectfully.',
-      'I used to think that the ideal world was one where everyone thought the same way and got along perfectly. But that is not realistic and honestly, it is not even desirable. The beauty is in the differences. What matters is not that we all agree, but that we can disagree without dehumanizing each other. Accepting someone does not mean you approve of everything they do -- it means you recognize their right to exist and be who they are.'
+      "Well said. You don't have to agree on everything -- you just have to respect each other enough to listen."
     ],
     context: '「認め合う」は accept each other, acknowledge differences が使える。coexist は「共存する」。dehumanize は「人間性を奪う」で議論のキーワード。',
     character: 'mina',
@@ -1057,7 +1057,7 @@ const day298: MasterExpression[] = [
       'Start by admitting your own bias.',
       'The first step is admitting that you have biases too.',
       'I think real change starts when you are honest enough to say hey, I have prejudices too, and I need to work on them.',
-      'Nobody wants to admit they are prejudiced. We all like to think of ourselves as fair and open-minded. But the reality is, we all have biases. Every single one of us. They come from how we grew up, what we saw on TV, who we hung out with, a million different things. And pretending they do not exist does not make them go away. The bravest thing you can do is look at yourself honestly and say yeah, I have some blind spots, and I want to do better. That is where the real work starts.'
+      "That takes guts. Most people would rather pretend they don't have any blind spots at all."
     ],
     context: '「認める」は admit が最適。acknowledge は少しフォーマル。blind spots は「死角・見えていない部分」。do better は「もっと良くなる」でシンプルだけど強いフレーズ。',
     character: 'takeshi',
@@ -1071,7 +1071,7 @@ const day298: MasterExpression[] = [
       'Trying matters even if imperfect.',
       'You do not have to be perfect. The effort itself is what counts.',
       'Nobody gets it right all the time. What matters is that you keep trying and keep learning.',
-      'I mess up all the time. I say the wrong thing, I make assumptions I should not make, I catch myself thinking in stereotypes. But I do not beat myself up about it anymore. I just try to notice it, correct it, and do better next time. Progress is not a straight line, and anyone who tells you they have completely eliminated all their biases is either lying or not paying attention. The goal is not perfection -- the goal is the effort.'
+      "Exactly. Nobody's perfect at this stuff. As long as you're trying, that's what counts."
     ],
     context: '「完璧じゃなくても」は you do not have to be perfect が直球。beat yourself up は「自分を責める」。progress is not a straight line は名フレーズ。',
     character: 'yuki',
@@ -1100,7 +1100,7 @@ const day299: MasterExpression[] = [
       'I follow world news.',
       'I try to stay informed about what is happening around the world.',
       'I make it a point to read international news because what happens elsewhere affects us too.',
-      'I used to only pay attention to Japanese news, but at some point I realized that the world is way more connected than I thought. Something that happens on the other side of the planet can affect my daily life -- gas prices, food supply, job market, all of it. So now I make an effort to follow what is going on globally. It is not always pleasant, but I think it is irresponsible to just live in a bubble and pretend the rest of the world does not exist.'
+      "Same. Once you start paying attention to global news, you realize everything's connected way more than you thought."
     ],
     context: '「関心がある」は interested in だけど、stay informed(情報を得続ける)の方がアクティブ。live in a bubble は「自分だけの世界に閉じこもる」。make it a point は「意識的にする」。',
     character: 'kenji',
@@ -1114,7 +1114,7 @@ const day299: MasterExpression[] = [
       'Borders are human-made.',
       'Borders are just lines that people drew on a map.',
       'If you think about it, national borders are completely arbitrary. They were decided by humans, not by nature.',
-      'I know this sounds idealistic, but sometimes I look at a map and think about how weird it is that these invisible lines on the ground determine so much about your life. Where you can go, what language you speak, what rights you have -- all because someone a hundred or a thousand years ago decided this is my side and that is your side. The land does not know the difference. The rivers do not care. It is all just a human invention that we treat as if it is some unchangeable law of nature.'
+      "That's deep. It's wild when you think about how much of your life is decided by which side of a line you were born on."
     ],
     context: '「引いた」は drew が直訳でOK。arbitrary は「恣意的な」= 明確な理由がない。invisible lines は「見えない線」。idealistic は「理想主義的」。',
     character: 'master',
@@ -1128,7 +1128,7 @@ const day299: MasterExpression[] = [
       'Climate change is a global issue.',
       'Environmental problems do not stop at national borders.',
       'Climate change does not care about your passport. It is everyone is problem, whether they want to admit it or not.',
-      'This is the one issue where the whole global citizen thing becomes completely unavoidable. You can argue about borders and nationalism all day long, but at the end of the day, we all share the same atmosphere, the same oceans, the same planet. Pollution from one country drifts into another. A forest fire in one continent affects the air quality on the other side of the world. There is literally no way to solve this without everyone working together, and that is why it is so hard.'
+      "For real. The ocean doesn't care whose country it belongs to. This is one problem nobody can solve alone."
     ],
     context: '「地球全体の」は global, worldwide, planetary が使える。does not care about your passport は「パスポートなんて関係ない」のウィットの効いた表現。',
     character: 'lisa',
@@ -1142,7 +1142,7 @@ const day299: MasterExpression[] = [
       'I want to start with what I can do.',
       'I believe in starting small with whatever I can do right now.',
       'The world is problems feel overwhelming, but I think even small actions from individuals can add up.',
-      'It is easy to look at all the problems in the world and feel completely helpless. Like, what can one person possibly do about poverty or climate change or inequality? And the honest answer is, not much on your own. But that does not mean you should do nothing. I think the key is to stop trying to save the entire world and just focus on the piece you can actually touch. Reduce your waste, donate what you can, be kind to the people around you. If everyone did their small part, the total impact would be enormous.'
+      "I like that mindset. Don't try to fix everything at once -- just handle the piece right in front of you."
     ],
     context: '「自分にできること」は what I can do, my part が使える。overwhelming は「圧倒的で手に負えない」。add up は「積み重なる」。the piece you can touch は美しい表現。',
     character: 'yuki',
@@ -1156,7 +1156,7 @@ const day299: MasterExpression[] = [
       'I want to respect all cultures.',
       'I want to appreciate and respect cultures different from my own.',
       'Respecting other cultures does not mean you have to give up your own. You can hold onto both.',
-      'I think there is a misconception that being globally minded means you have to stop caring about your own culture. But that is not how it works at all. You can be proudly Japanese and still deeply respect and appreciate Korean, Brazilian, Nigerian, or any other culture. It is not a zero-sum game. The more cultures you understand, the richer your own perspective becomes. You do not lose anything by learning about others -- you only gain.'
+      "Couldn't agree more. Learning about other cultures actually made me appreciate my own even more."
     ],
     context: '「尊重する」は respect が定番。zero-sum game は「一方が得すると他方が損する」ゲーム理論用語で、日常会話でもよく使う。misconception は「誤解」。',
     character: 'takeshi',
@@ -1170,7 +1170,7 @@ const day299: MasterExpression[] = [
       'Globalization has pros and cons.',
       'There are upsides and downsides to globalization, and we need to face both.',
       'I think it is dishonest to say globalization is all good or all bad. The truth is somewhere in the messy middle.',
-      'Globalization gave us access to food, music, and ideas from every corner of the planet, and that is amazing. But it also meant that unique local cultures started fading, small businesses got crushed by international corporations, and wealth became even more concentrated. I think the key is to take the good parts -- the connection, the exchange, the mutual understanding -- while actively protecting the things that make each place unique. But that balance is really hard to find.'
+      "Yeah, it's a double-edged sword. Love that I can eat Thai food in Tokyo, but hate that local shops keep closing."
     ],
     context: '「いい面も悪い面も」は pros and cons, upsides and downsides が定番。the messy middle は「複雑な中間地帯」。concentrated は「集中した」。',
     character: 'kenji',
@@ -1184,7 +1184,7 @@ const day299: MasterExpression[] = [
       'Food connects you to the world.',
       'You can learn so much about a culture just through its food.',
       'One of the easiest ways to connect with another culture is to sit down and eat their food.',
-      'I started this thing a while back where I try a different country is cuisine every week. And it has taught me way more about the world than any textbook ever did. Like, you eat a dish and then you start wondering why they use those specific spices, and that leads you to the history of trade routes, colonization, migration -- all from one plate of food. Plus, food is the one cultural experience that almost never feels threatening. Nobody has ever been offended by someone trying their food and genuinely enjoying it.'
+      "That's such a good idea. Food's the easiest entry point -- no awkwardness, just good vibes and full stomachs."
     ],
     context: '「食を通じて」は through food が直訳。cuisine は「料理(体系)」でフォーマル。trade routes は「交易路」。threatening は「脅威的な」。',
     character: 'mina',
@@ -1198,7 +1198,7 @@ const day299: MasterExpression[] = [
       'The internet made the world smaller.',
       'The internet has made the world feel so much more connected.',
       'Thanks to the internet, I can talk to someone on the other side of the world as easily as I talk to my neighbor.',
-      'It is incredible when you actually stop and think about it. Twenty years ago, if you wanted to communicate with someone in another country, you had to write a letter and wait weeks for a reply. Now I can video call my friend in Brazil at midnight and we can cook dinner together in real time. The technology has completely erased the distance. The world did not get physically smaller, but it sure feels like it did. The question now is whether we are using this connection to understand each other or just to argue louder.'
+      "It's crazy, right? I video call my friend in Brazil at midnight and it feels like they're next door."
     ],
     context: '「近くなった」は smaller, more connected が自然。erased the distance は「距離を消した」。argue louder は皮肉が効いている。in real time は「リアルタイムで」。',
     character: 'master',
@@ -1212,7 +1212,7 @@ const day299: MasterExpression[] = [
       'What can I do as Japanese?',
       'I often think about what role Japan can play on the world stage.',
       'As a Japanese person, I want to think about what unique value I can bring to the global conversation.',
-      'Japan has this unique position in the world. We are an economic powerhouse with a rich cultural heritage, incredible technology, and a tradition of craftsmanship that people everywhere admire. But we also tend to keep to ourselves. I think there is so much we could contribute if we were more willing to step out and engage with the rest of the world. Not by imposing our way of doing things, but by sharing what we do well and being open to learning what others do better.'
+      "I think Japan's got so much to offer. You guys just need to put yourselves out there more."
     ],
     context: '「何ができるか」は what can I/we do が直訳。world stage は「世界の舞台」。powerhouse は「強大な国・力のある存在」。impose は「押しつける」。',
     character: 'yuki',
@@ -1226,7 +1226,7 @@ const day299: MasterExpression[] = [
       'One person can change the world.',
       'Never underestimate the power of one person is actions.',
       'History is full of examples where a single individual sparked a movement that changed everything.',
-      'People love to say that one person can not make a difference, but that is just not true. Every major movement in history started with one person who decided enough was enough. And I am not even talking about famous leaders -- I am talking about ordinary people who did one brave thing at the right moment. You never know when your small act of kindness, your decision to speak up, or your willingness to stand for something is going to be the spark that sets everything in motion. So yeah, one person absolutely matters.'
+      "You never know which small thing ends up being the thing that changes everything. So yeah, one person totally matters."
     ],
     context: '「一人の行動」は one person is actions が直訳。spark は「火花を散らす」= きっかけになる。enough was enough は「もう限界だ」。set in motion は「動き出させる」。',
     character: 'takeshi',
@@ -1255,7 +1255,7 @@ const day300: MasterExpression[] = [
       'This month broadened my view.',
       'I feel like my perspective has expanded so much this month.',
       'Looking back on this month, I can honestly say I see the world differently now.',
-      'When I started this month is theme, I thought I already had a pretty good understanding of other cultures. But every single day taught me something new -- about the world, about other people, and honestly, about myself. I realized how many assumptions I was carrying around without even knowing it. My perspective has not just broadened; it has fundamentally shifted. And I think that shift is going to stick with me for a really long time.'
+      "Same here. I didn't expect to learn this much about myself just by learning about other people."
     ],
     context: '「視野が広がった」は broadened my perspective/view/horizons が定番。fundamentally shifted は「根本的に変わった」で broaden より強い。stick with me は「自分に残り続ける」。',
     character: 'yuki',
@@ -1269,7 +1269,7 @@ const day300: MasterExpression[] = [
       'The more I learn, the more interesting it gets.',
       'Every new thing I learn about other cultures just makes me want to learn more.',
       'It is like a rabbit hole -- the more you learn about the world, the deeper you want to go.',
-      'That is the addictive part about learning about other cultures. You think you understand something, and then you dig a little deeper and discover this whole other layer you had no idea existed. And that layer leads to another layer, and suddenly you are reading about the history of spice trade at three in the morning because it somehow connects to why your Thai coworker puts lime on everything. The curiosity just feeds itself and it never gets boring.'
+      "Totally. I went down a rabbit hole about spice trade history last week and ended up staying up till 3 AM."
     ],
     context: '「知れば知るほど」は the more you learn, the more -- 英語の比較級の定番構文。rabbit hole は「深くハマる穴」(不思議の国のアリスから)。feeds itself は「自己増殖する」。',
     character: 'master',
@@ -1283,7 +1283,7 @@ const day300: MasterExpression[] = [
       'I think I understand why I study English now.',
       'I finally get why learning English matters so much to me.',
       'After this month, I have a completely new appreciation for why I started learning English in the first place.',
-      'I used to think I was learning English just to pass tests or get a better job. And yeah, those things matter. But after spending a month thinking about cross-cultural connection, I realize it is so much bigger than that. English is not just a language -- it is a key that opens doors to billions of people and their stories. Every word I learn is one more conversation I can have, one more perspective I can understand, one more human connection I can make. That is worth more than any test score.'
+      "That's a great way to look at it. Once you stop treating it as a test subject, it becomes way more fun."
     ],
     context: '「意味がわかった」は I understand why, I get why が口語的。appreciation は「真の理解・ありがたさ」。key that opens doors は比喩として自然。test score は「テストの点数」。',
     character: 'yuki',
@@ -1297,7 +1297,7 @@ const day300: MasterExpression[] = [
       'I want to enjoy differences.',
       'I want to be the kind of adult who embraces differences rather than fearing them.',
       'My goal is to become someone who genuinely enjoys the messy, complicated beauty of a diverse world.',
-      'When I was younger, anything different felt scary. Different food, different customs, different ways of thinking -- I just wanted everything to be familiar and comfortable. But I have come to realize that comfort is overrated. The most interesting people I know are the ones who actively seek out what is different and unfamiliar. They are not threatened by it; they are energized by it. That is the kind of person I want to be. Someone who walks toward the unknown instead of away from it.'
+      "You're already becoming that person, honestly. The fact that you're even thinking about it puts you way ahead."
     ],
     context: '「楽しめる」は enjoy だけど、embrace(受け入れて楽しむ)がもっと積極的。overrated は「過大評価されている」= 「そんなにいいものじゃない」。energized は「活力をもらう」。',
     character: 'mina',
@@ -1311,7 +1311,7 @@ const day300: MasterExpression[] = [
       'The world is big but hearts are close.',
       'The world might be huge, but people is emotions are surprisingly similar everywhere.',
       'No matter how far apart we live, we all laugh at the same things, cry about the same things, and want the same things.',
-      'If there is one thing this month taught me, it is that human beings are way more alike than we are different. Yeah, we eat different food, speak different languages, have different customs. But underneath all of that, everyone wants the same basic things -- to be loved, to be understood, to feel like they matter. A mother worrying about her child looks exactly the same in Tokyo as it does in Nairobi or Sao Paulo. That common humanity is the real bridge between cultures, and once you see it, you can never unsee it.'
+      "That's beautiful. At the end of the day, everybody just wants to be loved and understood. That's universal."
     ],
     context: '「心は近い」は hearts are close の直訳もOKだが、英語では common humanity(共通の人間性)という概念で語る方が深い。unsee は「見なかったことにする」= 一度気づいたら戻れない。',
     character: 'master',
@@ -1325,7 +1325,7 @@ const day300: MasterExpression[] = [
       'Imperfect English is fine.',
       'Your English does not have to be perfect. It just has to be understood.',
       'Nobody cares about your grammar as long as your message gets across. Communication is what matters.',
-      'I wasted so many years being afraid to open my mouth because I was obsessed with speaking perfectly. Perfect pronunciation, perfect grammar, perfect vocabulary. But you know what? Most of the best conversations I have had in English were full of mistakes. Broken sentences, wrong tenses, made-up words. And they were amazing because the other person could feel my sincerity. They knew I was trying my best to connect with them, and that effort mattered way more than any grammar rule.'
+      "Honestly, the messiest conversations are usually the most real. Nobody cares about grammar when the vibe is right."
     ],
     context: '「伝わればいい」は as long as it gets across, as long as you are understood が自然。sincerity は「誠実さ」。broken sentences は「つたない文章」。tenses は「時制」。',
     character: 'takeshi',
@@ -1339,7 +1339,7 @@ const day300: MasterExpression[] = [
       'Let us keep going next month.',
       'I am pumped for next month. Let us keep this momentum going.',
       'We made it through another month, and I am ready to take on whatever comes next.',
-      'I can not believe another month is already done. It feels like we just started, but when I look back at everything we covered, it is actually incredible how much ground we have covered. And the crazy thing is, I feel like I am just getting started. My curiosity is through the roof, my confidence is growing, and I genuinely look forward to studying now. So yeah, let us keep this going. Next month is going to be even better.'
+      "Let's go! I'm actually excited about next month. The momentum's definitely there."
     ],
     context: '「頑張ろう」は let us do our best の直訳は不自然。let us keep going, let us keep at it が英語的。pumped は「やる気満々」。momentum は「勢い」。through the roof は「天井を突き抜けるほど高い」。',
     character: 'yuki',
@@ -1353,7 +1353,7 @@ const day300: MasterExpression[] = [
       'What expression stuck with you most?',
       'Out of everything we learned, which expression left the biggest impression?',
       'Looking back at the whole month, is there one phrase or expression that really stuck with you?',
-      'I love asking this question because everyone picks something different, and you can tell so much about a person by what resonates with them. For me, the one that hit hardest was the idea that you do not have to be perfect to be understood. That changed something fundamental about how I approach English. It took the pressure off and let me actually enjoy the process of communicating. What about you? I am genuinely curious which one is still bouncing around in your head.'
+      "For me it was 'put yourself in their shoes.' Simple, but it really changed how I think about people."
     ],
     context: '「印象に残る」は leave an impression, stick with you が使える。resonate は「心に響く」。bouncing around は「頭の中をぐるぐる回っている」。',
     character: 'lisa',
@@ -1367,7 +1367,7 @@ const day300: MasterExpression[] = [
       'Glad I learned with everyone.',
       'I am so glad I got to go through this journey with all of you.',
       'This month would not have been the same without everyone here. I am grateful for every conversation we had.',
-      'I know this is going to sound sentimental, but I do not care. Learning alone is fine, but learning with people who challenge you, make you laugh, and push you to think differently is on a completely different level. Every one of you brought something unique to the table, and that made the whole experience richer. Even the days when I was struggling and did not feel like studying, knowing that you guys were going through the same thing kept me going. So thank you. Genuinely.'
+      "Right back at you. This group kept me going on the days I wanted to give up. Seriously, thank you."
     ],
     context: '「よかった」は I am glad, grateful が使える。bring something to the table は「貢献する・何かを持ち寄る」。kept me going は「私を前に進ませてくれた」。',
     character: 'kenji',

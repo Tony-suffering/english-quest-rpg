@@ -874,7 +874,7 @@ const day306: MasterExpression[] = [
       'Copyright laws have gotten stricter lately.',
       'Copyright stuff has been getting way more serious lately.',
       'I chat with a colleague about how copyright enforcement has become much stricter, especially online.',
-      'Have you noticed how strict they have gotten about copyright recently? A friend of mine posted a video with some background music and it got taken down within like an hour. And then there is all this stuff about AI and who owns the content it generates. It used to be way more relaxed. Now companies are suing over everything. It makes me nervous about even sharing stuff on social media.'
+      'For real. My buddy got a copyright strike on his channel over like ten seconds of a song. It\'s getting wild out there with the AI stuff too.'
     ],
     context: '「厳しくなったよね」の「よね」は共感確認。英語では"right?"を文末に付けるか、共感前提で話し始める。日本語の方が確認のバリエーションが多い。',
     character: 'master',
@@ -888,7 +888,7 @@ const day306: MasterExpression[] = [
       'Where can I get free legal advice?',
       'Do you know where they do free legal consultations?',
       'I search for places that offer free legal advice because I cannot afford a lawyer right now.',
-      'I really need legal advice but there is no way I can afford a lawyer right now. I have heard that some places offer free consultations. Do you know where I can find something like that? Is it the city that runs it, or is it a private thing? I just need someone to tell me if I even have a case before I start spending money I do not have.'
+      'The city runs free legal clinics every other Saturday. I\'ll send you the link -- you can book a 30-minute slot online.'
     ],
     context: '「どこでやってるの」のカジュアルさ。英語も"Do you know where..."と同じくらいカジュアルに聞ける。法律相談の敷居は英語圏の方が低い印象。',
     character: 'yuki',
@@ -902,7 +902,7 @@ const day306: MasterExpression[] = [
       'Never be a joint guarantor.',
       'Whatever you do, do not cosign for anyone.',
       'My dad warns me to never agree to cosign a loan or become a guarantor for someone else.',
-      'Let me give you one piece of advice my dad gave me that I have never forgotten. Never, ever cosign a loan for anyone. Not for a friend, not even for family. It sounds harsh, but the moment you put your name on that paper, you are on the hook for the full amount if they cannot pay. I have seen friendships and even families destroyed over this. Just do not do it.'
+      'Yeah, I learned that the hard way. Cosigned for a friend five years ago and guess who ended up paying the whole thing. Never again.'
     ],
     context: '「連帯保証人」は日本では賃貸契約にも出てくる身近な概念。英語の"cosigner"や"guarantor"も同じだけど、文化的に「断れない空気」は日本特有。',
     character: 'master',
@@ -916,7 +916,7 @@ const day306: MasterExpression[] = [
       'Ignorance is no excuse.',
       'You cannot just say you did not know about it.',
       'I warn my friend that not knowing about a law does not protect him from the consequences of breaking it.',
-      'Look, I get that you did not know it was illegal, but that is not going to help you if you get caught. The law does not care whether you knew about it or not. Ignorance is not a defense. You need to look into this properly before you keep doing it. I am not trying to scare you, but I would rather you hear it from me now than from a judge later.'
+      'Okay, okay, point taken. I\'ll look into it before I do anything else. Thanks for the heads up -- seriously.'
     ],
     context: '「知らなかったでは済まない」は日本語の名言的表現。英語では"Ignorance of the law is no excuse"が法格言として存在する。文化を超えた普遍的な考え方。',
     character: 'kenji',
@@ -945,7 +945,7 @@ const day307: MasterExpression[] = [
       'Can I get a quote?',
       'Could you give me an estimate for my move?',
       'I call a moving company and ask them to come to my apartment to give me a price estimate.',
-      'Hi, I am moving at the end of next month and I wanted to get a quote. I am in a two-bedroom apartment on the third floor with no elevator, if that matters. I do not have a ton of furniture, mostly just the basics plus a bunch of boxes. Could someone come take a look and give me an estimate? I am getting quotes from a few places so I can compare.'
+      'Sure thing! Third floor with no elevator does add a bit to the price, but we can send someone over this week to take a look. How\'s Thursday morning?'
     ],
     context: '「見積もり」は英語で"quote"か"estimate"。"quote"の方がカジュアルで口語的。"estimate"は少し正式。日本の引越し業者の訪問見積もりは英語圏でも一般的。',
     character: 'yuki',
@@ -959,7 +959,7 @@ const day307: MasterExpression[] = [
       'Can you provide packing materials?',
       'Do you guys supply the boxes and packing stuff?',
       'I ask the moving company whether they provide cardboard boxes, tape, and bubble wrap as part of their service.',
-      'One thing I wanted to ask about is the boxes and packing materials. Do you provide those, or do I need to get my own? Last time I moved, I spent way too long hunting for cardboard boxes at the supermarket. If you can deliver everything I need ahead of time, that would save me a huge headache. How many boxes does a two-bedroom apartment usually need?'
+      'Yep, we include boxes, tape, and bubble wrap with every package. We\'ll drop them off a week before your move so you\'ve got plenty of time to pack.'
     ],
     context: '「梱包材」は英語で"packing materials"。日本語の「梱包」は堅いけど、英語は"packing stuff"くらいカジュアルに言える。',
     character: 'lisa',
@@ -973,7 +973,7 @@ const day307: MasterExpression[] = [
       'Can you remove the air conditioner too?',
       'Do you handle air conditioner removal as well?',
       'I ask the moving company if they can disconnect and reinstall my air conditioner at the new place.',
-      'Oh, one more thing. I have an air conditioner that I bought myself, so I need to take it with me. Can you guys handle the removal and reinstallation at the new apartment? I know it requires a specialist, so is that something you arrange on your end or do I need to hire someone separately? How much extra would that be?'
+      'We work with a certified technician for that. It\'s an extra 15,000 yen for removal and reinstallation. Want me to add it to your quote?'
     ],
     context: '「取り外し」は日本語だと「取って外す」。英語は"remove"一語。日本の引越しでエアコン移設は定番オプションだけど、英語圏では備え付けが多いのでレアなリクエスト。',
     character: 'takeshi',
@@ -987,7 +987,7 @@ const day307: MasterExpression[] = [
       'I need help disposing of large furniture.',
       'Can you take away some big furniture I am not keeping?',
       'I ask the movers if they can haul away a couch and a bookshelf that I do not want to bring to my new place.',
-      'I have a big old couch and a bookshelf that are not worth bringing to the new place. They are too heavy for me to take to the dump myself. Can you guys take them away for me? How much would that cost on top of the moving fee? I would rather pay a little extra and have it all done in one go than deal with it separately.'
+      'We can handle that no problem. It\'s a flat fee per item for large furniture. I\'ll add it to the estimate so you can see the total.'
     ],
     context: '「処分」は英語で"dispose of"だけど堅い。口語では"get rid of"か"take away"。日本語の「処分」には「罰する」意味もあるけど、ここは「捨てる」。',
     character: 'kenji',
@@ -1001,7 +1001,7 @@ const day307: MasterExpression[] = [
       'I forgot to set up the utilities.',
       'Shoot, I totally forgot to arrange the utilities.',
       'I realize a few days before the move that I have not contacted the utility companies to transfer my services.',
-      'Oh no, I just realized I completely forgot to call the electric company, the gas company, and the water company to set up service at my new place. I move in three days. Am I going to show up to a dark apartment with no hot water? How quickly can they get it turned on? I should have done this weeks ago. I am such an idiot.'
+      'Relax, you can usually get electric and water turned on the same day if you call now. Gas takes a day or two since they need someone to come out. Just do it today and you\'ll be fine.'
     ],
     context: '「忘れてた」のカジュアルな後悔。英語では"totally forgot"で同じ感じ。"Shoot"は"Shit"の上品版で自分のミスに気づいた時に使う。',
     character: 'mina',
@@ -1015,7 +1015,7 @@ const day307: MasterExpression[] = [
       'I need to file a mail forwarding request.',
       'I have to set up mail forwarding before I move.',
       'I remind myself to go to the post office and submit a change of address form so my mail gets forwarded.',
-      'I keep putting this off, but I really need to go to the post office and set up mail forwarding. Last time I moved, I forgot and missed a bunch of important letters, including a bill that ended up going to collections because I never saw it. You can do it online now, right? Or do I still have to go in person? I should just do it today before I forget again.'
+      'You can totally do it online now. Takes like two minutes. I\'ll text you the link -- just do it right now before you forget again.'
     ],
     context: '「転送届」は郵便局に出す届出。英語では"mail forwarding"。日本もアメリカも郵便局で手続きする点は同じ。アメリカはUSPSのサイトでオンラインでもできる。',
     character: 'yuki',
@@ -1029,7 +1029,7 @@ const day307: MasterExpression[] = [
       'When is the key handover?',
       'When do I pick up the keys?',
       'I contact my new landlord to confirm the date and time for receiving the keys to my new apartment.',
-      'Hi, I am moving in on the first and I wanted to confirm when I can pick up the keys. Can I get them the day before so I can start bringing some small stuff over? Or does it have to be on the actual move-in date? Also, where do I pick them up? Do I go to your office or do we meet at the apartment? I want to make sure everything is set so moving day goes smoothly.'
+      'You can pick them up the day before, that\'s no problem at all. Just swing by our office anytime between 10 and 5 and we\'ll hand them over.'
     ],
     context: '「受け渡し」は「受ける」と「渡す」の両方の動作。英語では"handover"か単に"pick up"。日本語の方が双方向のニュアンスが込められている。',
     character: 'master',
@@ -1043,7 +1043,7 @@ const day307: MasterExpression[] = [
       'I need to introduce myself to the neighbors.',
       'I should go around and say hi to the neighbors.',
       'I tell my partner that we should bring small gifts and introduce ourselves to our new neighbors.',
-      'We should go around and introduce ourselves to the neighbors this weekend. I know it is kind of old-fashioned, but I think it makes a good first impression. Maybe we should bring something small, like cookies or something. Last time we moved, we did not do it and the lady next door gave us dirty looks for months. Let us just get it done early so we start off on the right foot.'
+      'Yeah, let\'s do it Saturday. Grab some cookies from that bakery down the street -- nothing fancy, just something to break the ice.'
     ],
     context: '「挨拶回り」は日本の引越し文化の象徴。英語圏では近所に挨拶に行く習慣は薄い。逆に近所の人がwelcome giftを持ってくるパターンの方が多い。',
     character: 'lisa',
@@ -1057,7 +1057,7 @@ const day307: MasterExpression[] = [
       'I feel like unpacking will never end.',
       'I do not think I will ever finish unpacking.',
       'Surrounded by boxes in my new apartment, I complain to a friend that the unpacking feels endless.',
-      'I have been unpacking for three days straight and I swear the number of boxes has not gone down at all. Every time I finish one room, I walk into another and there are ten more boxes waiting. And the worst part is I cannot find anything. My can opener is in one of these boxes somewhere and I have been eating takeout for three days because I cannot even make a simple meal. Send help.'
+      'Ha, same thing happened to me. Just focus on the kitchen first and leave the rest for later. You\'ll survive on takeout a few more days.'
     ],
     context: '「気がしない」は日本語の面白い表現。「終わる気がしない」で「終わりそうにない」を感覚で表現。英語では"I feel like...will never"で同じ絶望感。',
     character: 'takeshi',
@@ -1071,7 +1071,7 @@ const day307: MasterExpression[] = [
       'I finally feel settled in.',
       'I think I am finally starting to feel at home.',
       'After weeks of unpacking and organizing, I sit down in my new living room and feel like this place is finally mine.',
-      'You know what, I think I am finally starting to feel at home here. It took almost a month, but the last box is unpacked, everything has a place, and I actually know where the light switches are without having to fumble around in the dark. I even figured out which grocery store is closest and which coffee shop has the best stuff. It is starting to feel like my place now, not just some random apartment.'
+      'That\'s awesome, you should have us over! Nothing beats that feeling of finally being settled. Took me like two months last time.'
     ],
     context: '「落ち着いた」は物理的にも精神的にも使える万能語。英語では"settled in"が物理的、"feel at home"が精神的。"settle"はsettle a dispute(紛争解決)とも同根。',
     character: 'mina',

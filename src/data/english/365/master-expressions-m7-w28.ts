@@ -846,7 +846,7 @@ const day207: MasterExpression[] = [
       'Great team',
       'We make a pretty good team, huh?',
       'You know what, we make a really solid team when we get in a groove',
-      'You know what, we make a really solid team when we get in a groove. Everyone brought something different to the table today, and it all just clicked. That meeting could have been a disaster, but because we had each other is backs, it went smoothly. We should do team dinners more often.'
+      'For real. That meeting could have been a disaster, but we totally nailed it. Team dinner tonight?'
     ],
     context: 'Japanese keeps it simple and heartfelt. English builds the same feeling by pointing to specific moments that proved the teamwork. Abstract praise is nice; concrete examples stick.',
     character: 'takeshi',
@@ -860,7 +860,7 @@ const day207: MasterExpression[] = [
       'Can I talk to you about something?',
       'I have got something I want to run by you',
       'Hey, do you have a minute? There is something I want to run by you and get your take on',
-      'Hey, do you have a minute? There is something I want to run by you and get your take on. It is not urgent, but I have been going back and forth on the approach for the new proposal and I trust your judgment. Sometimes I just need to talk it through with someone to figure out what I actually think.'
+      'Yeah, of course. Grab a coffee and come find me. I have got like twenty minutes before my next call.'
     ],
     context: 'Japanese "soudan" covers both serious and casual consulting. English "run something by you" is the casual version; "I need your advice" is the serious one. Picking the wrong tone sets off alarm bells.',
     character: 'mina',
@@ -874,7 +874,7 @@ const day207: MasterExpression[] = [
       'We do not see eye to eye',
       'I think we are on different pages here',
       'I respect your view, but I see it differently, can we talk it through?',
-      'I respect your view, but I see it differently, and I think we should talk it through. I am not trying to shoot down your idea -- I just want to make sure we have considered all the angles before we commit. Can we lay out the pros and cons side by side and decide together?'
+      'Fair enough, let us hear it. I am open to changing my mind if the argument is solid.'
     ],
     context: 'Japanese "iken ga awanai" states disagreement neutrally. English needs careful framing -- "I disagree" can sound confrontational. "I see it differently" opens dialogue instead of closing it.',
     character: 'kenji',
@@ -888,7 +888,7 @@ const day207: MasterExpression[] = [
       'Leave it to me',
       'I have got this, do not worry about it',
       'I will take full responsibility for this part, you can count on me',
-      'I will take full responsibility for this part, you can count on me. I already have a pretty clear picture of how to approach it, and I should be able to have a draft ready by Thursday. If anything comes up that I cannot handle, I will let you know right away. But honestly, I feel good about this one.'
+      'Awesome, I trust you on this. Just ping me if you hit any roadblocks.'
     ],
     context: 'Japanese "makasete" is confident and reassuring in one word. English needs to back up the confidence with a plan -- without it, "leave it to me" can sound overconfident or dismissive.',
     character: 'takeshi',
@@ -902,7 +902,7 @@ const day207: MasterExpression[] = [
       'We are short-handed',
       'We do not have enough people for this',
       'We are stretched too thin right now, we need more hands on this project',
-      'We are stretched too thin right now. The three of us are doing the work of five, and it is starting to show in the quality. I do not want to complain, but I think we need to either bring in more people or push back on the timeline. Something has to give.'
+      'I know, I have been trying to get approval for one more person. Let me push harder on that this week.'
     ],
     context: 'Japanese "te ga tarimasen" literally means "not enough hands." English "short-handed" is nearly identical! But you still need to explain the consequence -- being short-staffed only matters because of what it affects.',
     character: 'lisa',
@@ -916,7 +916,7 @@ const day207: MasterExpression[] = [
       'Good work today',
       'Great job today, everyone',
       'Seriously, good work today everyone, we crushed it',
-      'Seriously, good work today everyone, we absolutely crushed it. That was not an easy one, and the fact that we pulled it off says a lot about this team. Take a breath tonight, you all earned it. I will bring coffee tomorrow morning as a small thank you. You guys are the best.'
+      'Thanks, boss. That means a lot coming from you. Now who is buying the first round tonight?'
     ],
     context: 'The legendary "otsukaresama" -- possibly the most untranslatable Japanese phrase. English has nothing that covers "I acknowledge your effort and fatigue." You have to build the feeling from scratch with specifics.',
     character: 'master',
@@ -945,7 +945,7 @@ const day208: MasterExpression[] = [
       'I have an update',
       'I have something to report to the team',
       'I wanted to bring everyone up to speed on the latest developments',
-      'I wanted to bring everyone up to speed on the latest developments. A few things have changed since our last meeting, and I want to make sure we are all on the same page before we move forward. I will keep this brief -- three main points, and then we can open it up for questions.'
+      'Go ahead, we are all ears. Keep it short if you can, we have got a packed agenda today.'
     ],
     context: 'Japanese "houkoku ga arimasu" signals formal reporting. English "bring up to speed" is the perfect phrase -- it means "get everyone to the same level of information." Sounds natural and professional.',
     character: 'kenji',
@@ -959,7 +959,7 @@ const day208: MasterExpression[] = [
       'Look at the numbers',
       'Take a look at these figures for me',
       'I want you to take a close look at these numbers because they tell an interesting story',
-      'I want you to take a close look at these numbers because they tell an interesting story. Revenue is up twelve percent compared to last quarter, but if you look at the breakdown by region, the growth is coming almost entirely from the Kansai area. Tokyo is actually flat. That is something we need to dig into.'
+      'Interesting. So Kansai is carrying all the growth? What is going on with Tokyo?'
     ],
     context: 'Japanese asks you to look. English tells you what to look FOR. Just saying "look at the numbers" is like handing someone a book without saying which chapter. Guide their eyes.',
     character: 'lisa',
@@ -973,7 +973,7 @@ const day208: MasterExpression[] = [
       'We improved from last time',
       'The numbers are trending up compared to the previous period',
       'Compared to last quarter, we are seeing clear improvement across the board',
-      'Compared to last quarter, we are seeing clear improvement across the board. Customer satisfaction is up by eight points, response times are down by fifteen percent, and we had zero critical incidents this month. The changes we implemented in January are clearly paying off. Here is the breakdown by category.'
+      'That is great to hear. Can you send me the breakdown by category? I want to dig into the details.'
     ],
     context: 'Japanese uses "zenkai hi" for comparison. English needs the specific numbers -- saying "we improved" without data is an opinion. With data, it is a fact. Always bring receipts.',
     character: 'yuki',
@@ -987,7 +987,7 @@ const day208: MasterExpression[] = [
       'Some issues are emerging',
       'A few challenges are starting to come into focus',
       'As we dig deeper into the data, some clear challenges are starting to emerge',
-      'As we dig deeper into the data, some clear challenges are starting to emerge. The biggest one is customer retention in the thirty to sixty day window. We are great at getting people in the door, but we are losing about forty percent of them within the second month. I have got a few ideas on how to address this.'
+      'Forty percent drop-off in the second month? That is a big number. What are your ideas for fixing it?'
     ],
     context: 'Japanese "kadai ga miete kita" is optimistic -- problems are becoming visible (so we can fix them). English "emerging" carries the same nuance. "Problems" sounds negative; "challenges" sounds fixable.',
     character: 'kenji',
@@ -1001,7 +1001,7 @@ const day208: MasterExpression[] = [
       'Bottom line',
       'To cut to the chase',
       'Let me give you the bottom line first and then walk you through the details',
-      'Let me give you the bottom line first and then walk you through the details. We hit our target. Revenue came in at a hundred and five percent of plan, and we did it while staying under budget. Now, that is the headline. There is a lot of nuance underneath, so let me break it down for you.'
+      'Love it -- hit target and under budget? That is exactly what I wanted to hear. Walk us through the details.'
     ],
     context: 'Japanese "ketsuuron kara iu to" is a classic business opening. English "bottom line" works perfectly in the same spot. "Cut to the chase" is slightly more casual but just as effective.',
     character: 'takeshi',
@@ -1015,7 +1015,7 @@ const day208: MasterExpression[] = [
       'I put it in a chart',
       'I visualized the data in a graph for easier understanding',
       'I put together some charts to make the data easier to digest at a glance',
-      'I put together some charts to make the data easier to digest at a glance. The blue bars are this year, gray is last year. You can immediately see where we are outperforming and where we are lagging. I will send the file after the meeting so you can zoom in on whichever sections are relevant to your team.'
+      'These are really clean, thanks. Can you send me the file after the meeting? I want to zoom in on a few sections.'
     ],
     context: 'Japanese states the action. English previews what the chart shows and how to read it. A chart without a guide is just a picture -- the explanation is what makes it a tool.',
     character: 'mina',
@@ -1029,7 +1029,7 @@ const day208: MasterExpression[] = [
       'Any questions?',
       'Does anyone have questions or anything they want to dig into?',
       'I will open it up for questions now, feel free to ask about anything, even if it seems small',
-      'I will open it up for questions now. Feel free to ask about anything, even if it seems small. Sometimes the small details are the ones that matter most. If you think of something later, you can always ping me on Slack. I would rather answer ten questions now than have people guessing later.'
+      'Quick question -- what is driving the dip in the third week? Is that seasonal or something else?'
     ],
     context: 'Japanese "shitsumon arimasu ka" is clean. English benefits from encouragement -- people often hold back questions in meetings. Explicitly saying "even small things" gives permission to ask.',
     character: 'kenji',
@@ -1043,7 +1043,7 @@ const day208: MasterExpression[] = [
       'Here is the outlook for next month',
       'Looking ahead to next month, here is what we are expecting',
       'Let me share the outlook for next month so everyone can plan accordingly',
-      'Let me share the outlook for next month so everyone can plan accordingly. We are expecting a fifteen percent increase in volume due to the seasonal campaign. That means all hands on deck for the first two weeks. I have already drafted a staffing plan, but I want your input before I finalize it.'
+      'Fifteen percent increase, huh? That is a lot. Send me the staffing plan, I will add my notes by Friday.'
     ],
     context: 'Japanese "mitooshi" is a forecast word. English "outlook" is the direct match, but adding "plan accordingly" turns information into action. A forecast without a response plan is just trivia.',
     character: 'lisa',
@@ -1057,7 +1057,7 @@ const day208: MasterExpression[] = [
       'That is all from me',
       'That covers everything on my end',
       'That is everything I have for now, I will hand it over to the next speaker',
-      'That is everything I have for now. If anything comes up between now and the next meeting, I will send a quick update via email. Otherwise, I will hand it over to Lisa for the marketing update. Thanks for your time and attention, everyone.'
+      'Great, thanks for the thorough update. Lisa, you are up next with marketing, right?'
     ],
     context: 'Japanese "ijou desu" is the perfect closer -- two words, done. English needs a graceful handoff. Just stopping abruptly feels awkward, so you signal the end and pass the baton.',
     character: 'takeshi',
@@ -1071,7 +1071,7 @@ const day208: MasterExpression[] = [
       'I will send the minutes',
       'I will have the meeting notes out by end of day',
       'I will type up the meeting notes and send them around by end of day so everyone has a record',
-      'I will type up the meeting notes and send them around by end of day so everyone has a record. I will highlight the action items at the top so you do not have to read through the whole thing to find your to-dos. If I missed anything or got something wrong, just reply and I will update it.'
+      'Awesome, thanks. Can you put the action items at the top? Nobody reads the whole thing anyway.'
     ],
     context: 'Japanese "gijiroku" is a standard office word. English "minutes" is the formal term, "meeting notes" is the casual version. Adding "action items at the top" shows you know what people actually read (hint: not the whole thing).',
     character: 'yuki',
@@ -1100,7 +1100,7 @@ const day209: MasterExpression[] = [
       'Here is my card',
       'Let me give you my business card',
       'Here is my card, it has got all my contact info on it',
-      'Here is my card. It has got my email, phone number, and LinkedIn on there. The best way to reach me is usually email -- I check it constantly. If something is urgent though, do not hesitate to call. I will shoot you a connection request on LinkedIn later today as well.'
+      'Thanks, here is mine. Best way to reach me is email, but feel free to connect on LinkedIn too.'
     ],
     context: 'Meishi exchange is a ritual in Japan with specific rules. English card exchange is super casual -- you basically just hand it over. The real connection happens on LinkedIn now, not with paper.',
     character: 'yuki',
@@ -1114,7 +1114,7 @@ const day209: MasterExpression[] = [
       'Nice to meet you',
       'Great to finally put a face to the name',
       'It is really great to finally meet you in person after all those emails',
-      'It is really great to finally meet you in person after all those emails. I feel like I already know you from our conversations, but it is always different face to face. You are exactly how I imagined, by the way -- I mean that as a compliment. Thanks for making the time to come in today.'
+      'Same here! You are exactly how I pictured you from your emails. This is way better than Zoom.'
     ],
     context: 'Japanese "hajimete" is clean and formal. English has layers -- "nice to meet you" for strangers, "put a face to the name" for people you have emailed. The second one builds instant rapport.',
     character: 'kenji',
@@ -1128,7 +1128,7 @@ const day209: MasterExpression[] = [
       'Am I being too formal?',
       'I wonder if I am coming across as too stiff',
       'Do you think I was too formal in that email? I do not want to seem robotic',
-      'Do you think I was too formal in that email? I do not want to seem robotic or cold. In Japanese I know exactly how to calibrate my politeness level, but in English I never know where the line is. Some people say I sound like a textbook, and others say I sound too casual. I cannot win.'
+      'A little bit, yeah. Try dropping the "Dear" and just go with "Hi." That alone makes it way more natural.'
     ],
     context: 'This is the eternal struggle for Japanese English learners. Japanese has built-in formality levels. English relies on word choice and tone instead of grammar -- way harder to get right.',
     character: 'mina',
@@ -1142,7 +1142,7 @@ const day209: MasterExpression[] = [
       'Not sure how to write this email',
       'I always struggle with the tone in business emails',
       'Every time I write a business email in English, I second-guess every sentence',
-      'Every time I write a business email in English, I second-guess every sentence. Is "Dear Mr. Tanaka" too formal? Is "Hi Ken" too casual? Do I need "I hope this email finds you well" or is that outdated? And do not even get me started on how to end it. "Best regards"? "Cheers"? "Thanks"? The options are paralyzing.'
+      'Honestly, just match whatever tone they use. If they say "Hi," you say "Hi." Do not overthink it.'
     ],
     context: 'Japanese email has a clear template everyone follows. English email is the Wild West -- every company and person has their own style. The anxiety is real and completely valid.',
     character: 'takeshi',
@@ -1156,7 +1156,7 @@ const day209: MasterExpression[] = [
       'Please be on time',
       'Let us make sure everyone is punctual for this one',
       'I want to stress that we need everyone there on time, not fashionably late',
-      'I want to stress that we need everyone there on time for this one. The client is known for starting exactly on the dot, and walking in late would not make a great impression. Plan to arrive five minutes early if possible. It is better to wait in the lobby than to rush in after things have started.'
+      'Got it, I will be there five minutes early. Do not worry, I am not going to be the one walking in late.'
     ],
     context: 'Japanese punctuality is legendary and the word "jikan genshu" captures the culture. English "punctual" is the word, but you often need to explain why this particular meeting demands it.',
     character: 'lisa',
@@ -1170,7 +1170,7 @@ const day209: MasterExpression[] = [
       'What should I wear?',
       'What is the dress code for this?',
       'Quick question -- what is the dress code for tomorrow is meeting? Business casual or full suit?',
-      'Quick question -- what is the dress code for tomorrow is meeting? I do not want to show up in a full suit if everyone else is in polo shirts, but I also do not want to be underdressed. Last time I went casual and the client was in a three-piece suit. That was awkward. Better to ask and be safe.'
+      'Go with a suit to be safe. This client is pretty traditional -- better overdressed than under.'
     ],
     context: 'Japanese dress code is usually clear -- suit is the default. English-speaking offices have a whole spectrum from "business formal" to "smart casual" to "whatever." You genuinely need to ask.',
     character: 'takeshi',
@@ -1184,7 +1184,7 @@ const day209: MasterExpression[] = [
       'I am heading out',
       'I am going to take off, see you tomorrow',
       'Hey, I am heading out for the day, have a good night everyone',
-      'Hey, I am heading out for the day. If anything comes up, I will have my phone on me for the next hour or so. Otherwise, I will tackle it first thing tomorrow morning. Have a good night everyone, and do not stay too late yourselves. See you tomorrow.'
+      'See you tomorrow! Do not worry, we will hold down the fort. Get some rest.'
     ],
     context: 'Another untranslatable Japanese classic. "Osaki ni shitsurei shimasu" apologizes for leaving before others. English has no guilt attached to leaving -- you just announce it and go. The "do not stay late" shows you care.',
     character: 'mina',
@@ -1198,7 +1198,7 @@ const day209: MasterExpression[] = [
       'CC me on that',
       'Make sure to loop me in on that email chain',
       'Could you CC me on that thread? I want to stay in the loop on how it develops',
-      'Could you CC me on that thread? I want to stay in the loop on how it develops. I do not need to be involved in every reply, but I want to have visibility in case the client asks me about it. If anything needs my direct input, just flag it in the subject line so I do not miss it.'
+      'Sure thing. I will add you now. If anything needs your direct input, I will flag it in the subject line.'
     ],
     context: 'CC works the same way, but English adds "loop me in" which means "include me in the information flow." It is warmer than "CC me" and implies you want to be aware, not necessarily involved.',
     character: 'kenji',
@@ -1212,7 +1212,7 @@ const day209: MasterExpression[] = [
       'I will lay the groundwork',
       'Let me feel things out before the meeting',
       'I am going to have some one-on-one conversations beforehand to get everyone on board',
-      'I am going to have some one-on-one conversations beforehand to get everyone on board. It is always smoother when people are not hearing the proposal for the first time in the meeting. If I can get buy-in from the key stakeholders ahead of time, the actual meeting becomes a formality.'
+      'Smart move. If you can get Tanaka-san on board first, the rest will follow. Start with him.'
     ],
     context: 'Nemawashi is a deeply Japanese concept with no single English word. "Lay the groundwork" and "get buy-in" are the closest phrases. English acknowledges the strategy but does not have a cultural name for it.',
     character: 'master',
@@ -1226,7 +1226,7 @@ const day209: MasterExpression[] = [
       'Keep me posted',
       'Communication is key -- report, inform, consult',
       'Make sure you keep the team informed at every step, no surprises',
-      'Make sure you keep the team informed at every step. No surprises. If something changes, say something. If you are stuck, ask for help. If you finished something, let people know. The worst thing you can do is go quiet for three days and then drop a bombshell on Friday. Communication is the foundation.'
+      'Got it, I will make sure to send daily updates. No going quiet, I promise.'
     ],
     context: 'Hourensou (report-inform-consult) is Japan is communication framework in one word. English has no equivalent abbreviation -- you have to spell out the philosophy. "Keep me posted" is the closest casual version.',
     character: 'master',
@@ -1255,7 +1255,7 @@ const day210: MasterExpression[] = [
       'Another month in the books',
       'Great work this month, everyone',
       'That is another month wrapped up, and what a month it was',
-      'That is another month wrapped up, and what a month it was. We dealt with system crashes, tight deadlines, business trips, and somehow came out the other side still standing. I am proud of every single one of you. Take a deep breath, because you have earned the weekend. Same time, same place next month.'
+      'What a ride. I am exhausted but honestly pretty proud of how we handled everything. Same time next month?'
     ],
     context: 'The monthly "otsukaresama" hits different at the end of a tough month. English builds the feeling by listing what happened -- the recap is what gives the words weight.',
     character: 'master',
@@ -1269,7 +1269,7 @@ const day210: MasterExpression[] = [
       'You have come so far',
       'I can really see the growth in you this month',
       'Honestly, I have seen real growth in the team this month, and it is not just me being nice',
-      'Honestly, I have seen real growth in the team this month, and I am not just saying that. The way you handled that client crisis was nothing like how it would have gone three months ago. You stayed calm, communicated clearly, and solved it. That is not luck, that is skill. You should be proud.'
+      'Thanks, that actually means a lot. I did not even realize how much I had improved until you pointed it out.'
     ],
     context: 'Japanese "seichou shita naa" is reflective and warm. English needs the evidence -- growth claims without examples sound like motivational posters. Show them the before and after.',
     character: 'master',
@@ -1283,7 +1283,7 @@ const day210: MasterExpression[] = [
       'Business English just takes practice',
       'At the end of the day, business English is all about getting reps in',
       'The secret to business English is not grammar or vocabulary, it is just putting in the reps',
-      'The secret to business English is not grammar or vocabulary. It is just putting in the reps. Every email you write, every meeting you sit through, every presentation you fumble through -- that is all practice. Nobody starts out sounding polished. The people who sound natural now were awkward once too. Keep going.'
+      'That is so true. I think I have learned more from actual meetings this month than from any textbook.'
     ],
     context: 'Japanese "kekkyoku nare" is a truth bomb in two words. English expands the philosophy -- "reps" is the gym metaphor that resonates. Language learning IS muscle memory.',
     character: 'lisa',
@@ -1297,7 +1297,7 @@ const day210: MasterExpression[] = [
       'I can speak up in meetings now',
       'I have gotten way better at chiming in during meetings',
       'A month ago I could barely open my mouth in meetings, and now I am volunteering opinions',
-      'A month ago I could barely open my mouth in meetings, and now I am volunteering opinions like it is nothing. The trick was realizing that nobody expects you to be perfect. Half the native speakers in the room say "um" and "uh" just as much as I do. Once I stopped judging myself, the words just started flowing.'
+      'I noticed that! You spoke up like three times in yesterday is meeting. Huge difference from a month ago.'
     ],
     context: 'Japanese describes the ability gained. English tells the story of the transformation -- the mental shift matters as much as the language skill. What changed was the mindset, not the vocabulary.',
     character: 'yuki',
@@ -1311,7 +1311,7 @@ const day210: MasterExpression[] = [
       'Mistakes are part of learning',
       'Every mistake is a lesson if you let it be',
       'I used to hate making mistakes, but now I see them as the fastest way to learn',
-      'I used to hate making mistakes, but now I see them as the fastest way to learn. That time I accidentally replied-all to the whole company? Painful. But I never made that mistake again. The time I used the wrong honorific in a meeting? Embarrassing. But now I know the difference. Your worst moments become your best teachers.'
+      'Ha, remember when I said "pleased to meet you" to someone I had met five times? I will never forget their face.'
     ],
     context: 'Japanese "shippai mo benkyou" is a proverb-like comfort. English makes it real with specific cringe moments. Abstract advice is forgettable; embarrassing stories are unforgettable.',
     character: 'takeshi',
@@ -1325,7 +1325,7 @@ const day210: MasterExpression[] = [
       'Let us set goals for next month',
       'Time to set some targets for the month ahead',
       'Before we wrap up, let us each pick one thing we want to nail next month',
-      'Before we wrap up, let us each pick one thing we want to nail next month. Just one -- not ten. If your goal is to lead a meeting in English, commit to that. If it is to write emails without Google Translate, go for it. Small, specific, measurable. That is how real progress happens.'
+      'I will go first. My goal is to lead at least one meeting in English without any notes. Scary, but I am going for it.'
     ],
     context: 'Japanese "mokuhyou wo tateyou" is standard goal-setting language. English adds the "just one" constraint -- it is counterintuitive but focusing on one goal beats spreading yourself across ten.',
     character: 'lisa',
@@ -1339,7 +1339,7 @@ const day210: MasterExpression[] = [
       'Your work vocabulary has grown',
       'You have picked up a ton of useful work phrases this month',
       'Think about how many new phrases you can use at work now compared to a month ago',
-      'Think about how many new phrases you can use at work now compared to a month ago. "Bring up to speed," "loop me in," "cut to the chase," "scope creep" -- these are not textbook words, they are real words that real people use in real offices. That is the kind of English that actually matters.'
+      'I actually used "scope creep" in a meeting last week and my boss looked impressed. Felt great.'
     ],
     context: 'Japanese states the observation. English proves it by listing the actual phrases -- hearing your own progress spelled out is incredibly motivating. It is not abstract growth, it is countable.',
     character: 'master',
@@ -1353,7 +1353,7 @@ const day210: MasterExpression[] = [
       'You do not have to be perfect',
       'Perfection is not the goal, communication is',
       'Stop trying to be perfect and start trying to be understood, that is all that matters',
-      'Stop trying to be perfect and start trying to be understood. That is all that matters. Your accent? Does not matter. Your grammar? Good enough. The fact that you sometimes pause to find the right word? Totally normal, even native speakers do it. Communication is about connection, not perfection.'
+      'I needed to hear that. I spend way too much time worrying about my accent when nobody else even notices.'
     ],
     context: 'Japanese "kanpeki janakute ii" is permission to be imperfect. English drives it home by listing specific insecurities and dismissing each one. It is therapy disguised as language advice.',
     character: 'mina',
@@ -1367,7 +1367,7 @@ const day210: MasterExpression[] = [
       'Be confident in yourself',
       'You have every reason to feel confident right now',
       'I want you to walk into work Monday with your head held high, because you earned it',
-      'I want you to walk into work Monday with your head held high, because you earned it. You can handle a business meeting. You can write a professional email. You can deal with a crisis in English. A month ago, those things felt impossible. Now they are just Tuesday. That is not nothing -- that is everything.'
+      'Alright, you are going to make me cry. Seriously though, thanks. I feel way more confident than I did a month ago.'
     ],
     context: 'Japanese "jishin motte ii yo" gives permission. English paints the picture of confidence -- "walk in with your head held high" is physical and visual. You can almost feel the posture change.',
     character: 'master',
@@ -1381,7 +1381,7 @@ const day210: MasterExpression[] = [
       'See you next month',
       'Same time next month, do not be a stranger until then',
       'That is a wrap for Business Month, see you all when we kick off the next chapter',
-      'That is a wrap for Business Month. It has been one of the most practical months yet, and I hope you are walking away with phrases you will actually use this week. Do not wait until next month to practice -- use what you learned starting tomorrow. See you all when we kick off the next chapter. Take care.'
+      'Can not wait to see what is next. Thanks for everything this month -- see you all soon!'
     ],
     context: 'Japanese "mata raigetsu" is a simple goodbye. English graduation moments need a final push -- remind them to use what they learned and build excitement for what is coming next.',
     character: 'master',
