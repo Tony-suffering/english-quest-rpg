@@ -6,7 +6,7 @@ import {
     getAudioCtx, playLevelSound, playGpCoin, playStreakBreak,
     playFeverChainHit, playRankUpSound,
 } from '@/lib/training-sounds';
-import { ALL_MASTER_EXPRESSIONS, MASTER_LEVELS, MasterExpression } from '@/data/english/365/master-expressions';
+import { MASTER_EXPRESSIONS, MASTER_LEVELS, MasterExpression } from '@/data/english/365/master-expressions';
 
 // ── Types ──
 interface TrainingPhrase {
@@ -75,7 +75,7 @@ function shuffle<T>(arr: T[]): T[] {
 
 // ── Find matching MasterExpression ──
 function findMaster(phrase: TrainingPhrase): MasterExpression | null {
-    return ALL_MASTER_EXPRESSIONS.find(e => e.japanese === phrase.japanese) || null;
+    return MASTER_EXPRESSIONS.find(e => e.japanese === phrase.japanese) || null;
 }
 
 // ── Get distractors (wrong answers from pool) ──
@@ -120,13 +120,13 @@ function generateDrills(
     count: number,
 ): DrillRound[] {
     const selected = shuffle(phrases).slice(0, count);
-    const allJa = ALL_MASTER_EXPRESSIONS.map(e => e.japanese);
-    const allEnCore = ALL_MASTER_EXPRESSIONS.map(e => e.english[0]);
-    const allEnVibe = ALL_MASTER_EXPRESSIONS.map(e => e.english[1]);
-    const allEnScene = ALL_MASTER_EXPRESSIONS.map(e => e.english[2]);
-    const allBack = ALL_MASTER_EXPRESSIONS.map(e => e.english[3]);
+    const allJa = MASTER_EXPRESSIONS.map(e => e.japanese);
+    const allEnCore = MASTER_EXPRESSIONS.map(e => e.english[0]);
+    const allEnVibe = MASTER_EXPRESSIONS.map(e => e.english[1]);
+    const allEnScene = MASTER_EXPRESSIONS.map(e => e.english[2]);
+    const allBack = MASTER_EXPRESSIONS.map(e => e.english[3]);
     // Collect fill-blank word pool
-    const allWords = ALL_MASTER_EXPRESSIONS.flatMap(e =>
+    const allWords = MASTER_EXPRESSIONS.flatMap(e =>
         e.english.flatMap(s => s.replace(/[.,!?;:'"]/g, '').split(/\s+/).filter(w => w.length >= 3))
     );
     const uniqueWords = [...new Set(allWords.map(w => w.toLowerCase()))];
