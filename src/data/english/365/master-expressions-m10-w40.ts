@@ -1381,7 +1381,7 @@ const day300: MasterExpression[] = [
       'Connecting with the world means connecting with people.',
       'At the end of the day, connecting with the world is really about connecting with individual people.',
       'All this talk about globalization and world citizenship comes down to one simple thing: human connection.',
-      'We spent a whole month talking about the world -- different countries, different cultures, different languages. And you know what the conclusion is? It is not about countries. It is not about cultures. It is about people. One person at a time. Every handshake, every shared meal, every awkward conversation in a language you barely speak -- that is what connecting with the world actually looks like. It is not some grand, abstract concept. It is just you, sitting across from another human being, trying to understand them and letting them understand you. That is it. And that is everything.'
+      "That's the realest thing I've heard all month. It all comes down to the person right in front of you."
     ],
     context: '「結局」は at the end of the day, when it comes down to it が英語の定番。comes down to は「結局~に行き着く」。abstract は「抽象的な」。one person at a time は美しい締めくくり。',
     character: 'master',

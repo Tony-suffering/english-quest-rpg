@@ -1052,7 +1052,7 @@ export const MONTH6_W24_EXPRESSIONS: MasterExpression[] = [
             'Master, one more drink.',
             'One more round for everyone. My treat tonight.',
             'The month is over but the night is still young. Master, keep them coming.',
-            "Nobody is going home yet. Not tonight. Tonight we celebrate everything we have accomplished and everything we are about to accomplish. Master, pour everyone whatever they want. Put it on my tab. I do not care. This is worth more than money. These people, this place, these conversations. In a world where everyone is staring at their phones and talking to nobody, we gather here and talk to each other. In English and Japanese and sometimes in a beautiful mess of both. That is rare. That is precious. And that is worth every single yen I have spent in this izakaya over the last six months. Now drink up. We have a whole second half to prepare for.",
+            "Wait, Kenji's buying? In that case, Master, I'll have whatever's most expensive. Cheers, everyone!",
         ],
         context: 'my treat は「おごり」。put it on my tab は「つけにして」。the night is still young は「夜はまだこれから」。drink up は「飲み干せ」。居酒屋の最終日にふさわしい締めの一杯。学びと友情の価値をお金に換算できない。',
         character: 'kenji', category: 'social', month: '2026-09',
