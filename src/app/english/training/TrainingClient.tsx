@@ -9200,6 +9200,18 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 );
                                             })()}
 
+                                            {/* Practice drill badge (PC) */}
+                                            {practiceDoneDates.has(dateKey) && (
+                                                <div style={{
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px',
+                                                    margin: '2px 0', padding: '2px 4px',
+                                                    background: '#3B82F612',
+                                                    borderRadius: '3px',
+                                                    border: '1px solid #3B82F630',
+                                                }}>
+                                                    <span style={{ fontSize: '9px', fontWeight: '600', color: '#3B82F6', lineHeight: 1 }}>DRILL</span>
+                                                </div>
+                                            )}
                                             {/* 7-row evolution bars (MASTER top → EGG bottom) - cumulative */}
                                             {hasAnyPhrases && (
                                                 <div style={{
