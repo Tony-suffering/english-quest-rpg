@@ -9,6 +9,7 @@ import { contestArticleMetaEntry } from './contest-article-meta-entry';
 import { harvestRewriteEntry } from './harvest-rewrite-entry';
 import { harvestEvolutionEntry } from './harvest-evolution-entry';
 import { toniolabHomepageEntry } from './toniolab-homepage-entry';
+import { timeAttackSidebarEntry } from './time-attack-sidebar-entry';
 
 export const april2026Entries: JournalEntry[] = [
     clientProfilePageEntry,
@@ -17,4 +18,5 @@ export const april2026Entries: JournalEntry[] = [
     harvestRewriteEntry,
     harvestEvolutionEntry,
     toniolabHomepageEntry,
+    timeAttackSidebarEntry,
 ];

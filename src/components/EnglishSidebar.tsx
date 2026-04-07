@@ -23,7 +23,7 @@ interface Program {
     tagline: string;
     color: string;
     basePath: string;
-    items: { id: string; label: string }[];
+    items: { id: string; label: string; featured?: boolean }[];
 }
 
 const PROGRAMS: Program[] = [
@@ -35,6 +35,8 @@ const PROGRAMS: Program[] = [
         basePath: '/english/izakaya-toeic/kaiwa',
         items: [
             { id: '/english/izakaya-toeic/kaiwa', label: 'マスター365 HOME' },
+            { id: '/english/my-training', label: 'Daily Training', featured: true },
+            { id: '/english/my-training/practice', label: 'Practice Drills', featured: true },
             { id: '/english/izakaya-toeic/kaiwa/lp', label: '英会話マスター365とは？' },
             { id: '/english/izakaya-toeic/characters', label: '常連ファイル' },
             { id: '/english/5min', label: '5分トーク' },
@@ -124,7 +126,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     useEffect(() => {
         if (!pathname) return;
         // Check kaiwa first (more specific path)
-        if (pathname.startsWith('/english/izakaya-toeic/kaiwa') || pathname.startsWith('/english/5min') || pathname.startsWith('/english/goroku')) {
+        if (pathname.startsWith('/english/izakaya-toeic/kaiwa') || pathname.startsWith('/english/my-training') || pathname.startsWith('/english/5min') || pathname.startsWith('/english/goroku')) {
             setExpandedProgram('kaiwa');
         } else if (pathname.startsWith('/english/izakaya-toeic') || pathname.startsWith('/english/tonio-words')) {
             setExpandedProgram('izakaya');
@@ -164,8 +166,35 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     // ─── Render helpers ────────────────────────────────────
 
-    const renderSubItem = (item: { id: string; label: string }, color: string) => {
+    const renderSubItem = (item: { id: string; label: string; featured?: boolean }, color: string) => {
         const active = isActive(item.id);
+        if (item.featured) {
+            return (
+                <Link key={item.id} href={item.id} style={{ textDecoration: 'none', display: 'block', margin: '3px 8px 3px 16px' }}>
+                    <div style={{
+                        padding: '8px 12px',
+                        borderRadius: 8,
+                        background: active ? `linear-gradient(135deg, ${color}18, ${color}08)` : `${color}06`,
+                        border: `1px solid ${active ? color + '40' : color + '18'}`,
+                        color: active ? '#1a1a1a' : '#555',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        letterSpacing: '0.03em',
+                        transition: 'all 0.15s ease',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                    }}>
+                        <span style={{
+                            width: 5, height: 5, borderRadius: 2,
+                            backgroundColor: active ? color : color + '80',
+                            flexShrink: 0,
+                        }} />
+                        {item.label}
+                    </div>
+                </Link>
+            );
+        }
         return (
             <Link key={item.id} href={item.id} style={{ textDecoration: 'none', display: 'block' }}>
                 <div style={{
@@ -371,39 +400,6 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     {/* ── PROGRAMS ── */}
                     <SectionLabel text="PROGRAMS" />
                     {PROGRAMS.map(p => <ProgramCard key={p.id} program={p} />)}
-
-                    {/* ── MAIN TOOL ── */}
-                    <div style={{ margin: '10px 12px 4px' }}>
-                        <Link href="/english/my-training" style={{ textDecoration: 'none', display: 'block' }}>
-                            <div style={{
-                                padding: '12px 16px',
-                                background: `linear-gradient(135deg, ${C.green}14, ${C.gold}10)`,
-                                border: `1.5px solid ${C.green}40`,
-                                borderRadius: 10,
-                                transition: 'all 0.2s ease',
-                            }}>
-                                <div style={{
-                                    fontSize: 14,
-                                    fontWeight: 800,
-                                    color: '#1a1a1a',
-                                    letterSpacing: '0.02em',
-                                    lineHeight: 1.3,
-                                }}>
-                                    Daily Training
-                                </div>
-                                <div style={{
-                                    fontSize: 10,
-                                    color: C.green,
-                                    marginTop: 2,
-                                    letterSpacing: '0.02em',
-                                }}>
-                                    登録フレーズを復習
-                                </div>
-                            </div>
-                        </Link>
-                    </div>
-
-                    {renderToolItem({ id: '/english/my-training/practice', label: '実習', color: C.green })}
 
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />
