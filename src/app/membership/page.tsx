@@ -11,8 +11,8 @@ const FEATURES = [
         href: '/journal',
         color: '#D4AF37',
         stats: [
-            { value: '--', label: 'ENTRIES' },
-            { value: '--', label: 'DAYS' },
+            { value: '135+', label: 'ENTRIES' },
+            { value: '130+', label: 'DAYS' },
         ],
     },
     {
@@ -22,8 +22,8 @@ const FEATURES = [
         href: '/journal/vibe-coding',
         color: '#10B981',
         stats: [
-            { value: '--', label: 'LESSONS' },
-            { value: '--', label: 'CHAPTERS' },
+            { value: '5', label: 'LESSONS' },
+            { value: '3', label: 'CHAPTERS' },
         ],
     },
 ];
@@ -37,15 +37,16 @@ const JOURNAL_HIGHLIGHTS = [
 ];
 
 const LATEST = [
+    { id: '135', title: '英会話マスター365 / 居酒屋TOEIC ローンチ', date: '2026-04-07' },
+    { id: '134', title: 'Movie Harvest -- 映画から表現を収穫する', date: '2026-04-01' },
     { id: '133', title: 'Vercelを捨てた日', date: '2026-03-20' },
     { id: '132', title: 'Tokyo 52 -- 居酒屋TOEICの新シリーズ', date: '2026-03-19' },
     { id: '131', title: '俺語録310個の振り返り', date: '2026-03-18' },
-    { id: '130', title: 'Memoriaの7ルール', date: '2026-03-17' },
-    { id: '129', title: 'Requiem完走 -- 7シナリオの記録', date: '2026-03-16' },
 ];
 
 const NOW_PLAYING = [
-    { status: 'LIVE', title: '居酒屋TOEIC -- 30エピソード', desc: 'Part 5/6/7対策。居酒屋の会話でTOEICを解く。', color: '#10B981' },
+    { status: 'LIVE', title: '英会話マスター365 -- 毎日10フレーズ', desc: '3650フレーズ、365日。日常会話を毎日10個ずつ身につける。', color: '#D4AF37' },
+    { status: 'LIVE', title: '居酒屋TOEIC -- 30エピソード', desc: 'Part 5/6/7対策。居酒屋の会話でTOEICを解く。6人の常連キャラ。', color: '#10B981' },
     { status: 'BUILDING', title: 'Tokyo 52 -- 52話の英語ドラマ', desc: 'エピソード1制作中。表現・単語・リスニングの3タブ構成。', color: '#D4AF37' },
     { status: 'WRITING', title: 'note連載 -- バイブコーディング塾', desc: '毎週の記事にバイブコーディングのコツを載せてる。', color: '#78716C' },
 ];
@@ -62,6 +63,7 @@ const TIMELINE = [
     { date: '2026-01', event: 'toniolab.com ローンチ' },
     { date: '2026-02', event: 'Memoria / Requiem 7シナリオ完成' },
     { date: '2026-03', event: 'メンバーシップ専用ページ開設' },
+    { date: '2026-04', event: '英会話マスター365 / 居酒屋TOEIC ローンチ' },
 ];
 
 const BENEFITS = [
@@ -69,6 +71,7 @@ const BENEFITS = [
     { title: 'バイブコーディング講座', desc: 'プログラミング経験ゼロから始めるAIコーディング。' },
     { title: '英語構造分析レポート', desc: 'ネイティブ発話の構造分解。' },
     { title: '開発の裏側', desc: 'なぜその機能を作ったか。なぜ捨てたか。判断の全記録。' },
+    { title: '英語アプリ', desc: '英会話マスター365と居酒屋TOEIC。2つの無料アプリが使い放題。' },
 ];
 
 function Divider() {
@@ -174,6 +177,51 @@ export default function MembershipPage() {
 
             <Divider />
 
+            {/* English Apps */}
+            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
+                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>ENGLISH APPS</p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+                    <Link href="/english/izakaya-toeic/kaiwa/lp" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 16, padding: '28px 24px', transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: '#D4AF37' }} />
+                            <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#D4AF37', fontWeight: 700, fontFamily: 'monospace', marginBottom: 12 }}>DAILY PHRASES</p>
+                            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#1C1917', marginBottom: 8 }}>英会話マスター365</h3>
+                            <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.8, marginBottom: 20 }}>毎日10フレーズ、365日で3650フレーズ。日常会話を完全網羅する英会話トレーニング。</p>
+                            <div style={{ display: 'flex', gap: 24 }}>
+                                <div>
+                                    <p style={{ fontSize: 24, fontWeight: 900, color: '#D4AF37' }}>3650</p>
+                                    <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>PHRASES</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: 24, fontWeight: 900, color: '#D4AF37' }}>365</p>
+                                    <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>DAYS</p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+                    <Link href="/english/izakaya-toeic/lp" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 16, padding: '28px 24px', transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: '#10B981' }} />
+                            <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#10B981', fontWeight: 700, fontFamily: 'monospace', marginBottom: 12 }}>TOEIC DRAMA</p>
+                            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#1C1917', marginBottom: 8 }}>居酒屋TOEIC</h3>
+                            <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.8, marginBottom: 20 }}>居酒屋を舞台にした30エピソードのTOEICドラマ。6人の常連キャラがTOEICを解く。</p>
+                            <div style={{ display: 'flex', gap: 24 }}>
+                                <div>
+                                    <p style={{ fontSize: 24, fontWeight: 900, color: '#10B981' }}>30</p>
+                                    <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>EPISODES</p>
+                                </div>
+                                <div>
+                                    <p style={{ fontSize: 24, fontWeight: 900, color: '#10B981' }}>6</p>
+                                    <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>CHARACTERS</p>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+                </div>
+            </section>
+
+            <Divider />
+
             {/* Reading Path */}
             <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
                 <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>READING PATH</p>
@@ -267,7 +315,7 @@ export default function MembershipPage() {
             {/* Numbers */}
             <section style={{ padding: '40px 24px', maxWidth: 800, margin: '0 auto', borderTop: '1px solid #E7E5E4' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, justifyContent: 'center' }}>
-                    {[['100', 'YEN / MONTH'], ['--', 'ENTRIES'], ['--', 'CODING LESSONS'], ['--', 'DAYS STREAK']].map(([value, label]) => (
+                    {[['100', 'YEN / MONTH'], ['135+', 'ENTRIES'], ['5', 'CODING LESSONS'], ['130+', 'DAYS STREAK']].map(([value, label]) => (
                         <div key={label} style={{ textAlign: 'center' }}>
                             <p style={{ fontSize: 28, fontWeight: 900, color: '#D4AF37' }}>{value}</p>
                             <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.2em' }}>{label}</p>
@@ -280,6 +328,8 @@ export default function MembershipPage() {
             <footer style={{ padding: '40px 24px', maxWidth: 800, margin: '0 auto', borderTop: '1px solid #E7E5E4', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 24 }}>
                 <Link href="/journal" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>Journal</Link>
                 <Link href="/journal/vibe-coding" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>Vibe Coding</Link>
+                <Link href="/english/izakaya-toeic/kaiwa/lp" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>英会話マスター365</Link>
+                <Link href="/english/izakaya-toeic/lp" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>居酒屋TOEIC</Link>
                 <a href="https://note.com/tonio_english" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>note.com</a>
                 <Link href="/" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>TONIO LAB</Link>
             </footer>

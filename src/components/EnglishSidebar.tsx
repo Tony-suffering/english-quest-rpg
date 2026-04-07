@@ -407,6 +407,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />
+                    {renderToolItem({ id: '/english/harvest', label: 'Movie Harvest', color: '#D4AF37' })}
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
                     {renderToolItem({ id: '/english/dashboard', label: 'ダッシュボード', color: '#D4AF37' })}
 
@@ -416,6 +417,21 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     <SectionLabel text="その他" />
                     {renderToolItem({ id: '/install', label: 'ホーム画面に追加', color: C.gold })}
                     {renderToolItem({ id: '/english/settings', label: '設定', color: '#78716C' })}
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('tl_chosen_app');
+                            router.push('/');
+                        }}
+                        style={{
+                            width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                            padding: '8px 20px', textAlign: 'left',
+                            fontSize: 13, fontWeight: 500, color: '#666',
+                            borderLeft: '3px solid transparent',
+                            transition: 'all 0.15s ease',
+                        }}
+                    >
+                        アプリ切り替え
+                    </button>
 
                     {/* MORE section removed -- all items in programs now */}
                 </nav>
