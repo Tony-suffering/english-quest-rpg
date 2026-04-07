@@ -12,7 +12,7 @@ const LEVELS = [
     { key: 'core',  label: 'Core',  ja: '核',   desc: '最短の型',         color: '#78716C' },
     { key: 'vibe',  label: 'Vibe',  ja: '空気', desc: '感情込み',         color: '#D4AF37' },
     { key: 'scene', label: 'Scene', ja: '場面', desc: '実際の一言',       color: '#10B981' },
-    { key: 'flow',  label: 'Flow',  ja: '流れ', desc: 'ネイティブの脳内', color: '#3B82F6' },
+    { key: 'back',  label: 'Back',  ja: '返し', desc: '相手の返答',       color: '#3B82F6' },
 ] as const;
 
 // ── Types ──

@@ -450,7 +450,7 @@ const LEVEL_JA_DESC: [string, string, string, string] = [
     '直訳・最短',
     '感情を乗せた自然な表現',
     '場面に合った実際の一言',
-    'ネイティブが頭の中で組み立てる流れ',
+    '相手からの返答・リアクション',
 ];
 
 // ── Build entries ──
@@ -1385,9 +1385,9 @@ export default function EnglishMaster365Page() {
                                 </div>
 
                                 <p style={{ fontSize: 12, color: '#78716C', margin: '0 0 8px', lineHeight: 1.6 }}>
-                                    Core → Vibe → Scene → Flow。段階を上がるごとに、
-                                    ネイティブの自然な表現に近づいていく。
-                                    このプロセスを毎日10フレーズ体験する。
+                                    Core → Vibe → Scene → Back。段階を上がるごとに、
+                                    自然な表現に近づき、最後に相手の返しが見える。
+                                    会話の往復を毎日10フレーズ体験する。
                                 </p>
                                 <Link href="/english/izakaya-toeic/kaiwa/lp" style={{
                                     fontSize: 12, fontWeight: 600, color: '#D4AF37', textDecoration: 'none',
@@ -1884,7 +1884,7 @@ export default function EnglishMaster365Page() {
                                             <strong style={{ color: '#10B981' }}>Scene</strong> -- 実際の一言
                                         </div>
                                         <div style={{ padding: '8px 10px', borderLeft: '3px solid #3B82F6', background: '#EFF6FF', borderRadius: 6 }}>
-                                            <strong style={{ color: '#3B82F6' }}>Flow</strong> -- ネイティブの脳内
+                                            <strong style={{ color: '#3B82F6' }}>Back</strong> -- 相手の返し
                                         </div>
                                     </div>
                                     <div style={{ fontSize: 11, color: '#A8A29E', lineHeight: 1.6, marginBottom: 12 }}>

@@ -4,7 +4,7 @@
  * For people who already have basic English and want to express opinions,
  * discuss culture, debate ideas, and navigate nuance.
  *
- * Format: Japanese -> 4-level English (Core / Vibe / Scene / Flow)
+ * Format: Japanese -> 4-level English (Core / Vibe / Scene / Back)
  * Each week = 1 topic, 15 expressions, 5 keywords, 1 story
  * 52 weeks = 1 year of advanced conversational mastery
  *
@@ -26,7 +26,7 @@
 export interface Tokyo52Expression {
     weekSlot: number;
     japanese: string;
-    english: [string, string, string, string]; // [Core, Vibe, Scene, Flow]
+    english: [string, string, string, string]; // [Core, Vibe, Scene, Back]
     context: string;
     character: 'yuki' | 'aya' | 'rina' | 'master' | 'client';
     category: 'opinion' | 'culture' | 'work' | 'debate' | 'emotion' | 'society' | 'travel';
@@ -72,7 +72,7 @@ export const TOKYO52_LEVELS = [
     { key: 'core',  label: 'Core',  ja: '核',   desc: '最短の型',         color: '#78716C' },
     { key: 'vibe',  label: 'Vibe',  ja: '空気', desc: '感情込み',         color: '#D4AF37' },
     { key: 'scene', label: 'Scene', ja: '場面', desc: '実際の一言',       color: '#10B981' },
-    { key: 'flow',  label: 'Flow',  ja: '流れ', desc: 'ネイティブの脳内', color: '#3B82F6' },
+    { key: 'back',  label: 'Back',  ja: '返し', desc: '相手の返答',       color: '#3B82F6' },
 ] as const;
 
 // ============================================================

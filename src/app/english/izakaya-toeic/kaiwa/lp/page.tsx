@@ -400,7 +400,7 @@ function TryItQuiz() {
             3/3 COMPLETE
           </div>
           <div style={{ fontSize: 14, color: TEXT_DARK }}>
-            Core と Flow の差、感じましたか？
+            Core と Back の差、感じましたか？
           </div>
           <div style={{ fontSize: 13, color: TEXT_MED, marginTop: 4 }}>
             この感覚を、毎日10フレーズ。
@@ -1104,10 +1104,10 @@ export default function KaiwaLandingPage() {
                 borderWidth: 5,
               },
               {
-                level: 'Flow',
+                level: 'Back',
                 color: EMERALD,
-                en: 'Beer first. I need to unwind before I can even think about food.',
-                ja: 'ネイティブの脳。',
+                en: 'Coming right up. Draft okay?',
+                ja: '相手の返し。',
                 borderWidth: 6,
               },
             ].map((item) => (
@@ -1531,7 +1531,7 @@ export default function KaiwaLandingPage() {
             />
             <FAQItem
               q="他のアプリと何が違う？"
-              a="4段階メソッド。同じ日本語をCore（骨格）→Vibe（感情）→Scene（場面）→Flow（ネイティブの脳内）の4レベルで分解します。ネイティブの思考プロセスを可視化するアプローチは他にありません。"
+              a="4段階メソッド。同じ日本語をCore（骨格）→Vibe（感情）→Scene（場面）→Back（相手の返し）の4レベルで展開します。自分の発話だけでなく会話の往復を体験するアプローチは他にありません。"
             />
             <FAQItem
               q="TOEICに効く？"
