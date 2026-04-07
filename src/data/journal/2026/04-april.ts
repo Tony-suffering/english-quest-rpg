@@ -10,6 +10,7 @@ import { harvestRewriteEntry } from './harvest-rewrite-entry';
 import { harvestEvolutionEntry } from './harvest-evolution-entry';
 import { toniolabHomepageEntry } from './toniolab-homepage-entry';
 import { timeAttackSidebarEntry } from './time-attack-sidebar-entry';
+import { englishIndustryLiesEntry } from './english-industry-lies-entry';
 
 export const april2026Entries: JournalEntry[] = [
     clientProfilePageEntry,
@@ -19,4 +20,5 @@ export const april2026Entries: JournalEntry[] = [
     harvestEvolutionEntry,
     toniolabHomepageEntry,
     timeAttackSidebarEntry,
+    englishIndustryLiesEntry,
 ];
