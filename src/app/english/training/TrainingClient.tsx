@@ -4417,13 +4417,15 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         reviewListCacheRef.current = { filter: String(reviewFilter), shuffleKey, listRef: computedReviewList, list: computedReviewList };
     }
     // Hide phrases touched today — once you press mastery, it won't reappear until tomorrow
-    // During time attack: show all EXCEPT already-maxed (mastery 3 or 6) cards
+    // During time attack: show all EXCEPT already-maxed (mastery 3 or 6) AND already-leveled-today cards
     const reviewListRaw = reviewListCacheRef.current.list;
     const isTimeAttackActive = timeAttackPhase === 'running' || timeAttackPhase === 'countdown';
     const reviewList = isTimeAttackActive
         ? reviewListRaw.filter(p => {
             const m = Number(phraseMastery[p.id] || 0);
-            return m !== 3 && m !== 6;
+            if (m === 3 || m === 6) return false;
+            if (phraseLastLeveled[p.id] === clientToday) return false;
+            return true;
         })
         : clientToday
             ? reviewListRaw.filter(p => phraseLastLeveled[p.id] !== clientToday)
@@ -4518,8 +4520,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         if (!pointEffect) return;
         const fid = Date.now();
         setXpFloats(prev => [...prev, { id: fid, value: pointEffect.points, color: pointEffect.color }]);
-        setTimeout(() => setXpFloats(prev => prev.filter(f => f.id !== fid)), 1200);
-    }, [pointEffect]);
+        const duration = isTimeAttackActive ? 700 : 1200;
+        setTimeout(() => setXpFloats(prev => prev.filter(f => f.id !== fid)), duration);
+    }, [pointEffect, isTimeAttackActive]);
 
     // Spawn touch float when monthlyReviewCounts for today changes
     const prevTouchRef = useRef(0);
@@ -4533,12 +4536,13 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         prevTouchRef.current = current;
     }, [monthlyReviewCounts, todayKey]);
 
-    // Auto-clear point effect
+    // Auto-clear point effect (shorter during time attack for rapid reviews)
     useEffect(() => {
         if (!pointEffect) return;
-        const timer = setTimeout(() => setPointEffect(null), 2000);
+        const duration = isTimeAttackActive ? 800 : 2000;
+        const timer = setTimeout(() => setPointEffect(null), duration);
         return () => clearTimeout(timer);
-    }, [pointEffect]);
+    }, [pointEffect, isTimeAttackActive]);
 
     // Auto-clear calendar pulse (particle burst + floating number)
     useEffect(() => {
@@ -4578,7 +4582,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     };
 
     // Review content: large version for PC fullscreen, compact for mobile inline
-    const isFullReview = viewMode === 'review' && !isMobile;
+    // During time attack on PC, use compact sizing for faster review flow
+    const isFullReview = viewMode === 'review' && !isMobile && !isTimeAttackActive;
 
     const renderReviewContent = () => {
         const currentPhrase = displayedCard;
@@ -5136,7 +5141,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 const hasRec = (voiceRecordings[displayedCard.id] || []).length > 0;
                                 const hasLink = (phraseLinks[displayedCard.id] || []).length > 0;
                                 const chakra = getChakraInfo(baseMastery, hasRec, hasLink);
-                                const isLockedToday = baseMastery === 3 || (baseMastery !== 6 && baseMastery < 3 && phraseLastLeveled[displayedCard.id] === clientToday);
+                                const isLockedToday = !isTimeAttackActive && (baseMastery === 3 || (baseMastery !== 6 && baseMastery < 3 && phraseLastLeveled[displayedCard.id] === clientToday));
                                 const isCrownReady = chakra.level === 5;
                                 const isMaxed = baseMastery === 3 || baseMastery === 6;
                                 return (
@@ -6199,6 +6204,10 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 if (skipDefaultData) {
                     localStorage.setItem('my-training-mastery', JSON.stringify(updated));
                 }
+                // Mark training done for today (calendar integration)
+                const td = new Date();
+                const todayKey = `training-done-${td.getFullYear()}-${String(td.getMonth() + 1).padStart(2, '0')}-${String(td.getDate()).padStart(2, '0')}`;
+                localStorage.setItem(todayKey, JSON.stringify({ count: Object.keys(updated).length, timestamp: Date.now() }));
                 // Sync back to TOEIC酒場 vocab deck if this is a toeic_ phrase
                 if (phraseId.startsWith('toeic_')) {
                     try {
@@ -6995,8 +7004,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
             {/* Old rank-up banner removed -- replaced by full-screen celebration below */}
 
-            {/* Point Effect Overlay */}
-            {pointEffect && (
+            {/* Point Effect Overlay — suppressed during time attack (small xp float is enough) */}
+            {pointEffect && !isTimeAttackActive && (
                 <div key={pointEffect.key} style={{
                     position: 'fixed', inset: 0,
                     pointerEvents: 'none', zIndex: 9999,
@@ -8270,7 +8279,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     }}>
                         <div style={{
                             width: '100%',
-                            maxWidth: '780px',
+                            maxWidth: isTimeAttackActive ? '520px' : '780px',
                             display: 'flex',
                             flexDirection: 'column',
                             gap: '16px',

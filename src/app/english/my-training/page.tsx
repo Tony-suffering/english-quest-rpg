@@ -29,25 +29,21 @@ function MiniCalendar() {
     // Read localStorage for each day
     const [marks, setMarks] = useState<Record<number, { training: boolean; practice: boolean }>>({});
     useEffect(() => {
-        const m: Record<number, { training: boolean; practice: boolean }> = {};
-        const monthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
-        // Training marks from reviewed calendar
-        try {
-            const rev = localStorage.getItem(`master-365-reviewed-${monthStr}`);
-            if (rev) {
-                const days: number[] = JSON.parse(rev);
-                days.forEach(d => { m[d] = { ...(m[d] || { training: false, practice: false }), training: true }; });
+        const loadMarks = () => {
+            const m: Record<number, { training: boolean; practice: boolean }> = {};
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const td = localStorage.getItem(`training-done-${dateStr}`);
+                const pd = localStorage.getItem(`practice-done-${dateStr}`);
+                if (td || pd) {
+                    m[d] = { training: !!td, practice: !!pd };
+                }
             }
-        } catch { /* */ }
-        // Practice marks
-        for (let d = 1; d <= daysInMonth; d++) {
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            const pd = localStorage.getItem(`practice-done-${dateStr}`);
-            if (pd) {
-                m[d] = { ...(m[d] || { training: false, practice: false }), practice: true };
-            }
-        }
-        setMarks(m);
+            setMarks(m);
+        };
+        loadMarks();
+        const interval = setInterval(loadMarks, 3000);
+        return () => clearInterval(interval);
     }, [year, month, daysInMonth]);
 
     const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
@@ -146,18 +142,19 @@ export default function MyTrainingPage() {
             const arr = raw ? JSON.parse(raw) : [];
             setPhraseCount(arr.length);
         } catch { /* */ }
-        try {
-            const today = getTodayStr();
-            // Training done = has reviewed any cards today
-            const reviewed = localStorage.getItem(`master-365-reviewed-${today.slice(0, 7)}`);
-            if (reviewed) {
-                const days = JSON.parse(reviewed);
-                if (days.includes(new Date().getDate())) setTrainingDone(true);
-            }
-            // Practice done
-            const pd = localStorage.getItem(`practice-done-${today}`);
-            if (pd) setPracticeDone(true);
-        } catch { /* */ }
+        // Check today's completion status + poll for changes (training happens on same page)
+        const today = getTodayStr();
+        const checkStatus = () => {
+            try {
+                if (localStorage.getItem(`training-done-${today}`)) setTrainingDone(true);
+            } catch { /* */ }
+            try {
+                if (localStorage.getItem(`practice-done-${today}`)) setPracticeDone(true);
+            } catch { /* */ }
+        };
+        checkStatus();
+        const interval = setInterval(checkStatus, 2000);
+        return () => clearInterval(interval);
     }, []);
 
     const dismissOnboarding = () => {
