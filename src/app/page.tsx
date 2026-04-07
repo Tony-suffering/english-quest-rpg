@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import Header from '@/components/lp/Header'
@@ -12,13 +13,19 @@ const f = {
 }
 
 export default function HomePage() {
+    const router = useRouter()
     const [mounted, setMounted] = useState(false)
     useEffect(() => {
+        // Returning user with data → skip HP, go straight to 365 home
+        if (localStorage.getItem('quest-mastery')) {
+            router.replace('/english/izakaya-toeic/kaiwa')
+            return
+        }
         setMounted(true)
         if (!localStorage.getItem('tl_welcome_seen')) {
             localStorage.setItem('tl_welcome_seen', 'true')
         }
-    }, [])
+    }, [router])
     if (!mounted) return null
 
     return (

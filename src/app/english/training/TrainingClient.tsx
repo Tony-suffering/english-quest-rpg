@@ -4191,6 +4191,24 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         return map;
     }, [timeAttackHistory]);
 
+    // Practice drill completion dates (from practice page localStorage)
+    const [practiceDoneDates, setPracticeDoneDates] = useState<Set<string>>(new Set());
+    useEffect(() => {
+        const loadPracticeDates = () => {
+            const dates = new Set<string>();
+            const now = new Date();
+            for (let d = 0; d < 31; d++) {
+                const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() - d);
+                const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+                if (localStorage.getItem(`practice-done-${key}`)) dates.add(key);
+            }
+            setPracticeDoneDates(dates);
+        };
+        loadPracticeDates();
+        const interval = setInterval(loadPracticeDates, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
     // TA streak: set of dateKeys that are part of the current consecutive streak (counting back from today)
     const taStreakInfo = useMemo(() => {
         const streakSet = new Set<string>();
@@ -8838,6 +8856,18 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                         </div>
                                                     );
                                                 })()}
+                                                {/* Practice drill badge */}
+                                                {practiceDoneDates.has(dateKey) && (
+                                                    <div style={{
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px',
+                                                        marginTop: '1px', padding: '1px 0',
+                                                        background: '#3B82F612',
+                                                        borderRadius: '2px',
+                                                        border: '1px solid #3B82F630',
+                                                    }}>
+                                                        <span style={{ fontSize: '7px', color: '#3B82F6', lineHeight: 1, fontWeight: 700 }}>DRILL</span>
+                                                    </div>
+                                                )}
                                                 {/* Chakra bars (same structure as PC) */}
                                                 {hasPhrases && (
                                                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1px', marginTop: '2px', position: 'relative' }}>
