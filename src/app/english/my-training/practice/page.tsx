@@ -85,7 +85,18 @@ function getDistractors(
     count: number,
 ): string[] {
     const filtered = pool.filter(s => s !== correct && s.length > 0);
-    return shuffle(filtered).slice(0, count);
+    const picked = shuffle(filtered).slice(0, count);
+    // Pad if not enough distractors
+    while (picked.length < count) {
+        picked.push(`(${picked.length + 1})`);
+    }
+    return picked;
+}
+
+function makeOptions(correct: string, distractors: string[]): { options: string[]; correctIdx: number } {
+    const options = shuffle([correct, ...distractors]);
+    const correctIdx = options.indexOf(correct);
+    return { options, correctIdx: correctIdx >= 0 ? correctIdx : 0 };
 }
 
 // ── Extract a blankable word from English phrase ──
@@ -122,7 +133,7 @@ function generateDrills(
 
     const drillTypes: DrillType[] = ['ja2en', 'en2ja', 'fill', 'back', 'listen'];
 
-    return selected.map((phrase) => {
+    return selected.map<DrillRound>((phrase) => {
         const master = findMaster(phrase);
 
         // Pick drill type with weights
@@ -150,102 +161,94 @@ function generateDrills(
                         : allEnScene)
                     : allEnCore;
                 const distractors = getDistractors(correct, pool, 3);
-                const options = shuffle([correct, ...distractors]);
+                const { options, correctIdx } = makeOptions(correct, distractors);
                 return {
                     type, phrase, masterExpr: master,
                     question: `"${phrase.japanese}" を英語で？`,
-                    options,
-                    correctIdx: options.indexOf(correct),
-                    hint,
+                    options, correctIdx, hint,
                 };
             }
             case 'en2ja': {
                 const correct = phrase.japanese;
                 const distractors = getDistractors(correct, allJa, 3);
-                const options = shuffle([correct, ...distractors]);
+                const { options, correctIdx } = makeOptions(correct, distractors);
                 return {
                     type, phrase, masterExpr: master,
                     question: phrase.english,
                     questionSub: 'この英語の意味は？',
-                    options,
-                    correctIdx: options.indexOf(correct),
-                    hint,
+                    options, correctIdx, hint,
                 };
             }
             case 'listen': {
                 const correct = phrase.japanese;
                 const distractors = getDistractors(correct, allJa, 3);
-                const options = shuffle([correct, ...distractors]);
+                const { options, correctIdx } = makeOptions(correct, distractors);
                 return {
                     type, phrase, masterExpr: master,
                     question: '(音声を聞いて選んでください)',
-                    options,
-                    correctIdx: options.indexOf(correct),
-                    hint,
+                    options, correctIdx, hint,
                 };
             }
             case 'fill': {
                 const en = phrase.english;
                 const blank = extractBlankWord(en);
                 if (!blank) {
-                    // Fallback to ja2en
                     const correct = phrase.english;
                     const distractors = getDistractors(correct, allEnCore, 3);
-                    const options = shuffle([correct, ...distractors]);
+                    const { options, correctIdx } = makeOptions(correct, distractors);
                     return {
                         type: 'ja2en', phrase, masterExpr: master,
                         question: `"${phrase.japanese}" を英語で？`,
-                        options,
-                        correctIdx: options.indexOf(correct),
-                        hint,
+                        options, correctIdx, hint,
                     };
                 }
                 const correct = blank.word;
                 const wordDistractors = getDistractors(
-                    correct.toLowerCase(),
-                    uniqueWords,
-                    3,
-                ).map(w => w.charAt(0) + w.slice(1)); // Keep casing natural
-                const options = shuffle([correct, ...wordDistractors]);
+                    correct.toLowerCase(), uniqueWords, 3,
+                ).map(w => w.charAt(0) + w.slice(1));
+                const { options, correctIdx } = makeOptions(correct, wordDistractors);
                 return {
                     type, phrase, masterExpr: master,
                     question: blank.blanked,
                     questionSub: phrase.japanese,
-                    options,
-                    correctIdx: options.indexOf(correct),
-                    hint,
+                    options, correctIdx, hint,
                 };
             }
             case 'back': {
                 if (!master) {
-                    // Should not happen due to fallback above, but safety
                     const correct = phrase.english;
                     const distractors = getDistractors(correct, allEnCore, 3);
-                    const options = shuffle([correct, ...distractors]);
+                    const { options, correctIdx } = makeOptions(correct, distractors);
                     return {
                         type: 'ja2en', phrase, masterExpr: master,
                         question: `"${phrase.japanese}" を英語で？`,
-                        options,
-                        correctIdx: options.indexOf(correct),
-                        hint,
+                        options, correctIdx, hint,
                     };
                 }
-                const correct = master.english[3]; // Back level
+                const correct = master.english[3];
                 const distractors = getDistractors(correct, allBack, 3);
-                const options = shuffle([correct, ...distractors]);
-                // Show Scene or Vibe level as the "your phrase"
+                const { options, correctIdx } = makeOptions(correct, distractors);
                 const yourPhrase = master.english[2] || master.english[1] || master.english[0];
                 return {
                     type, phrase, masterExpr: master,
                     question: yourPhrase,
                     questionSub: '相手はなんて返す？',
-                    options,
-                    correctIdx: options.indexOf(correct),
-                    hint,
+                    options, correctIdx, hint,
+                };
+            }
+            default: {
+                // Fallback: ja2en
+                const correct = phrase.english;
+                const distractors = getDistractors(correct, allEnCore, 3);
+                const { options, correctIdx } = makeOptions(correct, distractors);
+                return {
+                    type: 'ja2en' as DrillType, phrase, masterExpr: master,
+                    question: `"${phrase.japanese}" を英語で？`,
+                    options, correctIdx, hint,
                 };
             }
         }
-    });
+    }).filter(Boolean) as DrillRound[];
 }
 
 // ── Component ──
@@ -710,7 +713,7 @@ export default function PracticePage() {
 
                 {/* Options */}
                 <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {current.options.map((opt, i) => {
+                    {(current.options || []).map((opt, i) => {
                         const isThis = selected === i;
                         const isAnswer = i === current.correctIdx;
                         let bg = '#fff';
