@@ -281,8 +281,8 @@ export default function PracticePage() {
         window.addEventListener('resize', checkMobile);
 
         try {
-            // Only use user-registered phrases (rpg_custom_phrases), never the full tl_phrases pool
-            const raw = localStorage.getItem('rpg_custom_phrases');
+            // Only use user-registered phrases, never the full tl_phrases pool
+            const raw = localStorage.getItem('my-training-phrases');
             const registered: TrainingPhrase[] = raw ? JSON.parse(raw) : [];
             setPhrases(registered);
         } catch { /* */ }
