@@ -263,6 +263,8 @@ export default function PracticePage() {
     const [totalAttempts, setTotalAttempts] = useState(0);
     const [sessionScore, setSessionScore] = useState(0);
     const [sessionComplete, setSessionComplete] = useState(false);
+    const [started, setStarted] = useState(false);
+    const [drillCount, setDrillCount] = useState(10);
     const [isMobile, setIsMobile] = useState(false);
     const [ttsPlaying, setTtsPlaying] = useState(false);
     const prevMissionsDone = useRef(-1);
@@ -303,10 +305,16 @@ export default function PracticePage() {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Generate rounds
-    useEffect(() => {
-        if (phrases.length === 0) return;
-        setRounds(generateDrills(phrases, Math.min(10, phrases.length)));
+    // Start session
+    const startSession = useCallback((count: number) => {
+        setDrillCount(count);
+        setRounds(generateDrills(phrases, Math.min(count, phrases.length)));
+        setCurrentIdx(0);
+        setSelected(null);
+        setStreak(0);
+        setSessionScore(0);
+        setSessionComplete(false);
+        setStarted(true);
     }, [phrases]);
 
     // Save progress
@@ -380,13 +388,13 @@ export default function PracticePage() {
 
     // Restart
     const restart = useCallback(() => {
-        setRounds(generateDrills(phrases, Math.min(10, phrases.length)));
+        setRounds(generateDrills(phrases, Math.min(drillCount, phrases.length)));
         setCurrentIdx(0);
         setSelected(null);
         setStreak(0);
         setSessionScore(0);
         setSessionComplete(false);
-    }, [phrases]);
+    }, [phrases, drillCount]);
 
     // Daily missions
     const missions = useMemo(() => {
@@ -431,6 +439,214 @@ export default function PracticePage() {
                 }}>
                     マスター365へ
                 </Link>
+            </div>
+        );
+    }
+
+    // ── Intro / Welcome screen ──
+    if (!started) {
+        const todayProgress = totalAttempts > 0;
+        const countOptions = [5, 10, 15];
+        return (
+            <div style={{
+                maxWidth: 480, margin: '0 auto',
+                padding: isMobile ? '24px 16px' : '40px 20px',
+                minHeight: '100vh',
+            }}>
+                {/* Back link */}
+                <Link href="/english/my-training" style={{
+                    fontSize: 12, color: TEXT_FAINT, textDecoration: 'none',
+                    display: 'inline-block', marginBottom: 24,
+                }}>
+                    ← Daily Training
+                </Link>
+
+                {/* Title */}
+                <div style={{
+                    textAlign: 'center', marginBottom: 32,
+                }}>
+                    <div style={{
+                        fontSize: 11, fontWeight: 800, color: GOLD,
+                        letterSpacing: '0.3em', marginBottom: 8,
+                    }}>
+                        PRACTICE DRILLS
+                    </div>
+                    <div style={{
+                        fontSize: 22, fontWeight: 900, color: TEXT,
+                        lineHeight: 1.4, marginBottom: 8,
+                    }}>
+                        登録フレーズで実戦練習
+                    </div>
+                    <div style={{
+                        fontSize: 13, color: TEXT_MUTED, lineHeight: 1.6,
+                    }}>
+                        覚えた {phrases.length} フレーズから出題。<br />
+                        5種類のドリルでガチで定着させる。
+                    </div>
+                </div>
+
+                {/* Today's stats (if any) */}
+                {todayProgress && (
+                    <div style={{
+                        background: '#ECFDF5', border: `1px solid ${GREEN}30`,
+                        borderRadius: 12, padding: '12px 16px',
+                        marginBottom: 24, display: 'flex',
+                        justifyContent: 'space-around', textAlign: 'center',
+                    }}>
+                        <div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: GREEN }}>{score}</div>
+                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>TODAY CORRECT</div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: GOLD }}>{bestStreak}</div>
+                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>BEST STREAK</div>
+                        </div>
+                        <div>
+                            <div style={{ fontSize: 20, fontWeight: 900, color: BLUE }}>{totalAttempts}</div>
+                            <div style={{ fontSize: 9, fontWeight: 600, color: TEXT_FAINT }}>TOTAL</div>
+                        </div>
+                    </div>
+                )}
+
+                {/* 5 Drill Types */}
+                <div style={{
+                    background: '#fff', border: `1px solid ${BORDER}`,
+                    borderRadius: 14, padding: '20px 16px',
+                    marginBottom: 24,
+                }}>
+                    <div style={{
+                        fontSize: 10, fontWeight: 800, color: TEXT_FAINT,
+                        letterSpacing: '0.2em', marginBottom: 14,
+                    }}>
+                        5 DRILL TYPES
+                    </div>
+                    {(Object.entries(DRILL_LABELS) as [DrillType, typeof DRILL_LABELS[DrillType]][]).map(([key, info]) => {
+                        const descriptions: Record<DrillType, string> = {
+                            ja2en: '日本語を見て、正しい英語を4択から選ぶ',
+                            en2ja: '英語を見て、正しい日本語を4択から選ぶ',
+                            fill: '英文の空欄に入る単語を選ぶ',
+                            back: 'あなたの発言に対する相手の返しを選ぶ',
+                            listen: '音声を聞いて、正しい日本語を選ぶ',
+                        };
+                        return (
+                            <div key={key} style={{
+                                display: 'flex', alignItems: 'center', gap: 10,
+                                padding: '8px 0',
+                                borderBottom: key !== 'listen' ? `1px solid #F5F5F4` : 'none',
+                            }}>
+                                <span style={{
+                                    fontSize: 9, fontWeight: 900, color: '#fff',
+                                    padding: '4px 7px', borderRadius: 5,
+                                    background: info.color,
+                                    minWidth: 28, textAlign: 'center',
+                                }}>
+                                    {info.icon}
+                                </span>
+                                <div>
+                                    <div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>
+                                        {info.label}
+                                    </div>
+                                    <div style={{ fontSize: 11, color: TEXT_MUTED }}>
+                                        {descriptions[key]}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Question count selector */}
+                <div style={{
+                    textAlign: 'center', marginBottom: 20,
+                }}>
+                    <div style={{
+                        fontSize: 10, fontWeight: 700, color: TEXT_FAINT,
+                        letterSpacing: '0.15em', marginBottom: 10,
+                    }}>
+                        QUESTION COUNT
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
+                        {countOptions.map(n => (
+                            <button
+                                key={n}
+                                onClick={() => setDrillCount(n)}
+                                style={{
+                                    width: 56, height: 56,
+                                    borderRadius: 14,
+                                    border: drillCount === n
+                                        ? `2px solid ${GOLD}`
+                                        : `2px solid ${BORDER}`,
+                                    background: drillCount === n ? '#FFFBEB' : '#fff',
+                                    fontSize: 18, fontWeight: 900,
+                                    color: drillCount === n ? GOLD : TEXT_MUTED,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.15s',
+                                }}
+                            >
+                                {n}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* START button */}
+                <button
+                    onClick={() => startSession(drillCount)}
+                    style={{
+                        width: '100%', padding: '18px',
+                        background: `linear-gradient(135deg, ${GOLD}, ${GREEN})`,
+                        color: '#fff', border: 'none',
+                        borderRadius: 14, fontSize: 17, fontWeight: 900,
+                        cursor: 'pointer', letterSpacing: '0.1em',
+                        transition: 'transform 0.15s',
+                    }}
+                    onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+                    onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+                >
+                    START
+                </button>
+
+                {/* Missions preview */}
+                <div style={{
+                    background: '#fff', border: `1px solid ${BORDER}`,
+                    borderRadius: 12, padding: 14, marginTop: 20,
+                }}>
+                    <div style={{
+                        fontSize: 10, fontWeight: 700, color: TEXT_FAINT,
+                        letterSpacing: '0.15em', marginBottom: 10,
+                    }}>
+                        TODAY'S MISSIONS
+                    </div>
+                    {missions.map(m => (
+                        <div key={m.id} style={{
+                            display: 'flex', alignItems: 'center', gap: 8,
+                            padding: '6px 0',
+                        }}>
+                            <div style={{
+                                width: 18, height: 18, borderRadius: '50%',
+                                border: m.done ? `2px solid ${GREEN}` : `2px solid ${BORDER}`,
+                                background: m.done ? GREEN : '#fff',
+                                color: m.done ? '#fff' : '#D6D3D1',
+                                fontSize: 10, fontWeight: 700,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                {m.done ? '\u2713' : ''}
+                            </div>
+                            <span style={{
+                                fontSize: 12, fontWeight: 600,
+                                color: m.done ? GREEN : TEXT_SUB, flex: 1,
+                            }}>
+                                {m.label}
+                            </span>
+                            <span style={{
+                                fontSize: 10, fontWeight: 700,
+                                color: m.done ? GOLD : '#D6D3D1',
+                            }}>
+                                +{m.xp} XP
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
         );
     }
