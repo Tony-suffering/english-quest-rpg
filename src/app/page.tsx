@@ -311,9 +311,6 @@ export default function HomePage() {
                         <p>
                             TOEIC 900点は2025年11月に取った。でもネイティブと喋ると3秒で詰む。その悔しさがこのアプリの燃料になってる。
                         </p>
-                        <p>
-                            完成品じゃない。毎日何かが増える。毎日何かが壊れる。毎日何かが直る。そういうアプリ。
-                        </p>
                     </motion.div>
                     <motion.div variants={f} className="mt-8 flex flex-wrap gap-4">
                         <a href="https://note.com/tonio_english" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#DAE2E8] text-sm text-[#252423]/60 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-colors rounded">
