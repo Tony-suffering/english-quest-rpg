@@ -214,7 +214,7 @@ const PROJECTS: Project[] = [
 ];
 
 const TIMELINE: TimelineItem[] = [
-    { date: '2025-12', label: 'Site Launch', detail: 'iwasaki-naisou.com as portfolio' },
+    { date: '2025-12', label: 'Site Launch', detail: 'Portfolio site launched' },
     { date: '2026-01', label: 'English Pivot', detail: 'English learning features added' },
     { date: '2026-01', label: 'Requiem Start', detail: 'Scenario-based learning system' },
     { date: '2026-02', label: 'toniolab.com', detail: 'Domain + Cloudflare Workers deployment' },

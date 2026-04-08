@@ -1,4 +1,4 @@
-// 居酒屋TOEIC -- Shared Light Theme (matches iwasaki-naisou main site)
+// 居酒屋TOEIC -- Shared Light Theme (matches 本業サイト main site)
 
 export const T = {
   bg: '#FAFAF9',

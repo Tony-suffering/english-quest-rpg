@@ -121,7 +121,7 @@ export const skeletonTalkEntries: SkeletonTalkEntry[] = [
                 { speaker: 'male', text: "Aoki: お前やばいよ。" },
                 { speaker: 'male', text: "Tai: あとね、Cloudflareでユニークビジター700とか出てんの。すごいでしょって思うじゃん。ボットの分析見てみ。Bing Botだけで170。Google Botが60。ChatGPTのクローラーもいる。実際の人間は...12人と俺のお袋ぐらいだよ。" },
                 { speaker: 'male', text: "Aoki: それでも12人は--" },
-                { speaker: 'male', text: "Tai: でもさ、大事なのは。俺のサイト -- 英語学習アプリ -- 「岩崎内装」で検索したらトップに出るんだよ。スポンサードじゃなくて。で、中身は完全にイカれてる。呼吸法の横にウィンホフの哲学があって、その横に毎朝歌ってるOver the Rainbowの歌詞がある。誰にも頼まれてない。勝手に置いた。" },
+                { speaker: 'male', text: "Tai: でもさ、大事なのは。俺のサイト -- 英語学習アプリ -- 「内装屋」で検索したらトップに出るんだよ。スポンサードじゃなくて。で、中身は完全にイカれてる。呼吸法の横にウィンホフの哲学があって、その横に毎朝歌ってるOver the Rainbowの歌詞がある。誰にも頼まれてない。勝手に置いた。" },
                 { speaker: 'male', text: "Aoki: 誰も文句言わないの？" },
                 { speaker: 'male', text: "Tai: 誰も気づいてない。それがいいんだよ。内装会社のサイトが裏では哲学の遊び場になってて、読んでるのはボットだけっていう。正直、今まで一番正直なオーディエンスかもしれない。" },
                 { speaker: 'male', text: "Aoki: ...確かに、それはそうかもな。" },

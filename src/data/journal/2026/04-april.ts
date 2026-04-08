@@ -12,7 +12,6 @@ import { toniolabHomepageEntry } from './toniolab-homepage-entry';
 import { timeAttackSidebarEntry } from './time-attack-sidebar-entry';
 import { englishIndustryLiesEntry } from './english-industry-lies-entry';
 import { englishIndustryLightEntry } from './english-industry-light-entry';
-import { englishIndustryMiddleWayEntry } from './english-industry-middle-way-entry';
 import { aiArmyComedyEntry } from './ai-army-comedy-entry';
 
 export const april2026Entries: JournalEntry[] = [
@@ -26,5 +25,4 @@ export const april2026Entries: JournalEntry[] = [
     timeAttackSidebarEntry,
     englishIndustryLiesEntry,
     englishIndustryLightEntry,
-    englishIndustryMiddleWayEntry,
 ];
