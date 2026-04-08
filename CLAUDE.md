@@ -1,4 +1,79 @@
-# Iwasaki Naisou Website - Claude Guidelines
+# English Quest RPG - Claude Guidelines
+
+## MANDATORY: Content Quality Auto-Improvement (Every Session)
+
+**This fires EVERY conversation. No exceptions. Even if the user asks about something else.**
+
+At the START of every conversation, before doing anything else:
+
+### Step 1: Pick 5 weakest exercises and improve them
+
+1. Read a random data file from one of these (rotate each session):
+   - `src/data/english/lisque/days-01-15.ts`
+   - `src/data/english/lisque/days-16-30.ts`
+   - `src/data/english/yomique/days-01-15.ts`
+   - `src/data/english/yomique/days-16-30.ts`
+   - `src/data/izakaya-toeic/episodes/` (pick 3 random episodes)
+   - `src/data/izakaya-toeic/part2-drills.ts`
+
+2. Score exercises on these criteria:
+   - **OPTIONS**: Must have `options: string[]` with exactly 4 items. Missing = critical fix.
+   - **TRAP**: Must be 40+ chars, specific to Japanese learners, mention the cognitive/phonetic reason. Generic = rewrite.
+   - **TIP**: Must be 40+ chars, actionable (not "practice more"). Vague = rewrite.
+   - **CHARACTER**: Exercises without `characterIntro` or `reaction` are weaker. Add them.
+   - **LINGUISTICS**: IPA symbols, phonetic explanations must be accurate. Wrong = fix immediately.
+   - **DISTRACTORS**: Wrong options must be plausible but clearly wrong. Too easy or too hard = rewrite.
+
+3. Fix the 5 weakest. Actually edit the files. No reports, no JSON, no asking permission. Just fix.
+
+4. Log what you fixed in `scripts/improvement-log.md` (append, don't overwrite):
+   ```
+   ## 2026-04-02 Session
+   - d05-ex03: Added 4 options (was missing)
+   - d12-ex07: Rewrote TRAP (was generic "practice listening")
+   - d18-ex02: Fixed IPA symbol /ɪ/ description
+   - d22-ex05: Added characterIntro (Master explains linking)
+   - d25-ex09: Rewrote TIP (was "listen carefully" → specific technique)
+   ```
+
+### Step 2: Research one topic and enhance content
+
+Each session, pick ONE of these and research it properly (web search, linguistics sources):
+- A specific phonetic phenomenon (e.g., flapping, glottal stops, vowel reduction)
+- A TOEIC trap pattern (e.g., same-sound distractors, tense confusion)
+- A reading comprehension technique (e.g., skimming vs scanning, topic sentences)
+- A sound change rule (e.g., /t/ + /j/ → /tʃ/ in "don't you")
+
+Then find 3-5 exercises that relate to that topic and upgrade their TRAP/TIP with the new knowledge.
+
+### Step 3: Quick stats (silent, don't output to user unless asked)
+
+Count internally:
+- Total exercises with missing options
+- Total exercises with TRAP < 40 chars
+- Total exercises with no characterIntro
+- If any count > 0, prioritize those in Step 1 next session
+
+### Quality Standards Reference
+
+**TRAP example (GOOD)**:
+"日本語の「イ」は1種類しかない。英語のbit(/ɪ/)は口をあまり開けない短い音、beat(/iː/)は口を横に引っ張る長い音。日本語耳だと両方「ビート」に聞こえる。"
+
+**TRAP example (BAD)**:
+"リスニングは慣れが大切です。何度も聞いて練習しましょう。"
+
+**TIP example (GOOD)**:
+"口の力の入り方に注目。bitは脱力した「イ」、beatは頬が引っ張られる「イー」。力が入ってなかったらbit。"
+
+**TIP example (BAD)**:
+"注意して聞きましょう。"
+
+### Tone for all Japanese content
+- 居酒屋の友達トーン。教科書禁止。
+- 「〜しましょう」「〜です」禁止。「〜しろ」「〜だ」で書く。
+- 具体例必須。抽象的な説明禁止。
+
+---
 
 ## MANDATORY: 俺語録 Auto-Curation (Every Session)
 

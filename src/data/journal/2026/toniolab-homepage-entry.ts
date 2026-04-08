@@ -144,7 +144,7 @@ HIGHLIGHTS（機能リスト）。削除。TWO APPSとMOVIE HARVESTで実物を�
 
 ## ついでにやったこと
 
-**Harvest移植**。iwasaki-naisouからMovie Harvestを移植。API→localStorage変換。PPWordPickerコンポーネント。映画30本データ。7映画分70個のシードデータ。
+**Harvest移植**。本業サイトからMovie Harvestを移植。API→localStorage変換。PPWordPickerコンポーネント。映画30本データ。7映画分70個のシードデータ。
 
 ---
 
@@ -152,7 +152,7 @@ HIGHLIGHTS（機能リスト）。削除。TWO APPSとMOVIE HARVESTで実物を�
 
 ---
 
-**Harvest登録バグ修正**（iwasaki-naisou側）。+ Trainingボタンがuser_phrasesに書いてたけど、トレーニングはphrasesテーブルから読んでた。登録先を/api/phrasesに変更。
+**Harvest登録バグ修正**（本業サイト側）。+ Trainingボタンがuser_phrasesに書いてたけど、トレーニングはphrasesテーブルから読んでた。登録先を/api/phrasesに変更。
 
 ---
 

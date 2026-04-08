@@ -18,7 +18,7 @@ export const migrationAndHammerEntry: JournalEntry = {
 
 toniolab.comを作った。
 
-英語学習システムを別サイトに分離するプロジェクト。iwasaki-naisou-websiteから222ファイルをコピーして、新しいNext.jsプロジェクトに移した。
+英語学習システムを別サイトに分離するプロジェクト。本業サイトから222ファイルをコピーして、新しいNext.jsプロジェクトに移した。
 
 TypeScriptのビルドを通すのに3時間かかった。
 
@@ -82,7 +82,7 @@ Adyashantiの講義を聴いた。1時間。テーマは spiritual impulse。生
 
 **URLは変わった。檻は変わってない。**
 
-toniolab.comとiwasaki-naisou-website。ドメインが2つ。檻は1つ。中身は同じ。
+toniolab.comと本業サイト。ドメインが2つ。檻は1つ。中身は同じ。
 
 All separation is just literally imagination。分離はただの想像。2つのサイトも、ただの想像。
 

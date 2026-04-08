@@ -105,7 +105,7 @@ export const jjkEnglishPracticeEntry: JournalEntry = {
         ],
         japanese: [
             { speaker: 'male', text: "この会話はお前がリードしてくれ。俺が喋って、お前が直して、返事する。わかった？" },
-            { speaker: 'female', text: "わかった！じゃあ質問。岩崎内装を30年以上やってるって聞いたけど、今でも何にワクワクする？" },
+            { speaker: 'female', text: "わかった！じゃあ質問。内装の仕事を長くやってるって聞いたけど、今でも何にワクワクする？" },
             { speaker: 'male', text: "いや、30年は嘘だよ。俺まだ34歳だし。そんなに長くやってない。" },
             { speaker: 'female', text: "あ、ごめん！途中で切れたね。何を言おうとしてた？" },
             { speaker: 'male', text: "特に話したいことないんだ。だからお前がリードして、面白いこと言って笑わせてよ。" },

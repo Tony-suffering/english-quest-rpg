@@ -54,7 +54,7 @@ toniolab.comを公開した。
 
 ### Vercel -- 最も簡単
 
-iwasaki-naisou.comはVercelで動いている。
+本業サイトはVercelで動いている。
 
 Vercelの特徴:
 - GitHubにプッシュするだけで自動デプロイ
@@ -223,7 +223,7 @@ WorkerのコードからD1に直接アクセス。最速。ただしWorker内部
 **REST API（HTTP経由）:**
 どこからでもHTTPリクエストでD1にアクセス。APIトークンが必要。
 
-toniolab.comはREST APIを使っている。理由: 元々Vercel（iwasaki-naisou.com）からもアクセスする設計だったため。
+toniolab.comはREST APIを使っている。理由: 元々Vercel（本業サイト）からもアクセスする設計だったため。
 
 ### Worker Secrets -- 秘密情報の管理
 
@@ -443,7 +443,7 @@ Vercelの「何もしなくても動く」は魔法じゃない。裏で同じ�
             {
                 heading: "Vercel vs Cloudflare -- Why I Picked the Hard One",
                 paragraphs: [
-                    "So my other site, iwasaki-naisou.com, runs on Vercel. And Vercel is like... stupid easy. You push to GitHub, and boom, it's deployed. No config. No nothin'. It just works. 'Cause Vercel literally made Next.js, so they know exactly how to run it.",
+                    "So my other site, 本業サイト, runs on Vercel. And Vercel is like... stupid easy. You push to GitHub, and boom, it's deployed. No config. No nothin'. It just works. 'Cause Vercel literally made Next.js, so they know exactly how to run it.",
                     "But toniolab.com is on Cloudflare. And Cloudflare is... not easy. The thing is, Next.js was built for Node.js servers. Cloudflare Workers run on a completely different runtime called V8 isolates. So you need this translation tool called opennextjs-cloudflare to convert your Next.js app into something Cloudflare can actually run.",
                     "Why pick Cloudflare then? 'Cause it has D1 -- this edge database that sits right next to the worker. Same physical location. Super fast. And both sites share the same database, so they need to both talk to D1."
                 ]

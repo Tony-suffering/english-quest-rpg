@@ -8,8 +8,10 @@ export interface HarvestMovie {
     date: string;       // YYYY-MM-DD
     title: string;      // Movie title
     year: number;
-    genre: 'crime' | 'comedy' | 'drama' | 'romance' | 'thriller' | 'scifi' | 'action';
+    genre: 'crime' | 'comedy' | 'drama' | 'romance' | 'thriller' | 'scifi' | 'action' | 'special';
     tagline: string;    // なぜこの映画か（日本語、ユーモア込み）
+    special?: boolean;  // SPECIAL REQUEST from members
+    requestedBy?: string;
 }
 
 export const GENRE_META: Record<string, { label: string; color: string; bg: string }> = {
@@ -20,6 +22,7 @@ export const GENRE_META: Record<string, { label: string; color: string; bg: stri
     thriller: { label: 'Thriller', color: '#6B21A8', bg: '#F3E8FF' },
     scifi:    { label: 'Sci-Fi',   color: '#0E7490', bg: '#CFFAFE' },
     action:   { label: 'Action',   color: '#DC2626', bg: '#FEE2E2' },
+    special:  { label: 'SPECIAL REQUEST', color: '#D4AF37', bg: '#FEF9E7' },
 };
 
 export const APRIL_2026: HarvestMovie[] = [
@@ -235,8 +238,35 @@ export const APRIL_2026: HarvestMovie[] = [
     },
 ];
 
+// =========================================================================
+// SPECIAL REQUESTS -- メンバーからのリクエスト枠
+// =========================================================================
+export const SPECIAL_REQUESTS: HarvestMovie[] = [
+    {
+        date: '2026-04-08',
+        title: 'Blackadder (Series)',
+        year: 1983,
+        genre: 'special',
+        tagline: 'イギリス皮肉の最高峰。Baldrickの"cunning plan"は英語圏の共通言語。ごろさんリクエスト。',
+        special: true,
+        requestedBy: 'Goro Yamaguchi',
+    },
+    {
+        date: '2026-04-08',
+        title: 'Mr. Bean (Series + Movie)',
+        year: 1990,
+        genre: 'special',
+        tagline: 'セリフが少ない男の、数少ないセリフが全部名言。ローワン・アトキンソンの言語センス。ごろさんリクエスト。',
+        special: true,
+        requestedBy: 'Goro Yamaguchi',
+    },
+];
+
 // Lookup by date
 export const MOVIE_BY_DATE: Record<string, HarvestMovie> = {};
 for (const m of APRIL_2026) {
     MOVIE_BY_DATE[m.date] = m;
+}
+for (const m of SPECIAL_REQUESTS) {
+    MOVIE_BY_DATE[`special-${m.title}`] = m;
 }

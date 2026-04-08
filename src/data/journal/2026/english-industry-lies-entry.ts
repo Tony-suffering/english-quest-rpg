@@ -161,7 +161,7 @@ note #089として書いた。タイトルは「英語業界の全員が嘘を�
 
 ## 記事リンク
 
-note #089: iwasaki-naisou.com/english/note（published: falseで下書き状態）
+note #089（published: falseで下書き状態）
 
 ---
 
