@@ -1001,7 +1001,7 @@ export const HARVEST_EXPRESSIONS: HarvestExpression[] = [
     },
     {
         id: 'h-blackadder-04',
-        expression: "Baldrick, have you no idea what irony is?" "Yes, it's like goldy and bronzy, only it's made out of iron.",
+        expression: "Baldrick, have you no idea what irony is? -- Yes, it's like goldy and bronzy, only it's made out of iron.",
         context: "Blackadder asks about irony. Baldrick creates a new word by analogy. Both are technically correct.",
         note: "ironyの意味を聞いたら「鉄でできたやつ」と返された。goldy, bronzyは存在しない単語。-yをつけて形容詞にするBaldrickの造語センス。言語学的にはこれ、productive morphologyの完璧な例。バカなのに天才。",
         source_type: 'movie_script',
@@ -1014,7 +1014,7 @@ export const HARVEST_EXPRESSIONS: HarvestExpression[] = [
     },
     {
         id: 'h-blackadder-05',
-        expression: "I've been in your family since 1532." "So has syphilis.",
+        expression: "I've been in your family since 1532. -- So has syphilis.",
         context: "Baldrick claims long loyal service. Blackadder compares him to a venereal disease.",
         note: "So has X.は「Xもな」。短い返しで最大ダメージを与えるイギリス式カウンター。相手が誇らしげに何か言った直後に、同じ構文で潰す技術。syphilis（梅毒）との比較が容赦ない。タイミングと間が全て。",
         source_type: 'movie_script',
@@ -1200,7 +1200,7 @@ export const HARVEST_EXPRESSIONS: HarvestExpression[] = [
     },
     {
         id: 'h-mrbean-09',
-        expression: "Darling, the guns have stopped." "I say, do you think it's peace?" "No, I think it's lunch.",
+        expression: "Darling, the guns have stopped. -- I say, do you think it's peace? -- No, I think it's lunch.",
         context: "Blackadder Goes Forth. A brief silence on the Western Front. Hope rises. Blackadder crushes it instantly.",
         note: "Darlingは人名（ダーリング大尉）だけどダブルミーニング。peaceに対するlunchの落差。希望を一瞬で粉砕する技術。I think it's X.のシンプルな構文で最大のパンチ。喜劇と悲劇は同じ構造でできてる。",
         source_type: 'movie_script',
