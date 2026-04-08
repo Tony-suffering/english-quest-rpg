@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const harvestRewriteEntry: JournalEntry = {
     id: '147',
-    date: '2026-04-06',
+    date: '2026-04-10',
     title: 'AIに映画の台本を読ませて、使える英語だけ抜かせてる話',
     summary: '毎日自動で映画から表現を収穫する仕組みを作った。ゴミだった。全部捨てて、AIに手動で読ませて厳選させる方式に変えた。自動化の限界と、AIの正しい使い方の話。',
     featured: true,

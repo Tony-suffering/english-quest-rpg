@@ -8,7 +8,7 @@ import { JournalEntry } from '../types';
 
 export const contestArticleMetaEntry: JournalEntry = {
     id: '146',
-    date: '2026-04-05',
+    date: '2026-04-07',
     title: 'AIを3回殴って、やっと本物の記事が出た',
     summary: 'note.comのコンテスト記事をAIと書いた。1回目：しゃぶ葉に媚びた。没。2回目：サイゼリヤを褒めた。ライバル企業。没。3回目：コンビニの駐車場でカップそば。やっと本物になった。AIは3回殴らないと本気を出さない。人間も。',
     featured: true,

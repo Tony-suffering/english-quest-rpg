@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const toniolabHomepageEntry: JournalEntry = {
     id: '149',
-    date: '2026-04-07',
+    date: '2026-04-16',
     title: 'HPが消えてた。復活させたら全然ダメだった。全部書き直した。',
     summary: 'toniolab.comのトップページが2アプリ選択画面に上書きされてた。元のHPを復活→情報の羅列だったから全面リニューアル。ついでにHarvest移植、Membership改善。',
     featured: true,
