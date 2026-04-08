@@ -1,12 +1,12 @@
 /**
- * 152 - 英語業界の全員が、実はすごい（特別記事・後編）
+ * 153 - 英語業界の全員が、実はすごい（特別記事・後編）
  * 闇の記事のあとに光の記事を書いた。殺されないために。
  */
 
 import { JournalEntry } from '../types';
 
 export const englishIndustryLightEntry: JournalEntry = {
-    id: '152',
+    id: '153',
     date: '2026-04-28',
     title: '英語業界の全員が、実はすごい -- 殺されないための後編',
     summary: '前回全員をボロクソに書いた。今回は全員を褒める。PROGRITの本当の価値、NativeCampの革命、Duolingoの民主化。全部ソース付き。コインの両面を見せないとフェアじゃない。',
