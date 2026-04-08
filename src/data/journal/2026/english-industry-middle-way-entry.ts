@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const englishIndustryMiddleWayEntry: JournalEntry = {
     id: '153',
-    date: '2026-04-08',
+    date: '2026-04-20',
     title: '英語業界の中道 -- 三部作完結、弦が鳴る場所',
     summary: '闇の記事で全員殴った。光の記事で全員褒めた。3本目は仏教の中道で分析した。中道は「真ん中」じゃない。「自分の目で見ろ」だ。データ20本以上。琵琶の弦の比喩で全部つなげた。',
     featured: true,
