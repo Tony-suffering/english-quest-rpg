@@ -51,6 +51,25 @@ const NOW_PLAYING = [
     { status: 'WRITING', title: 'note連載 -- バイブコーディング塾', desc: '毎週の記事にバイブコーディングのコツを載せてる。', color: '#78716C' },
 ];
 
+const MEMBER_REQUESTS = [
+    {
+        requester: 'Goro Yamaguchi',
+        title: 'Blackadder (1983-1989)',
+        desc: 'イギリス皮肉の教科書。Rowan Atkinson主演。全4シリーズから厳選10表現。',
+        count: 10,
+        highlight: '"I have a cunning plan." -- Baldrick',
+        href: '/english/harvest',
+    },
+    {
+        requester: 'Goro Yamaguchi',
+        title: 'Mr. Bean / Rowan Atkinson (1990-2007)',
+        desc: 'セリフが少ない男の、数少ないセリフが全部名言。インタビュー含む10表現。',
+        count: 10,
+        highlight: '"Good luck, everyone." -- 最終回、最後の台詞',
+        href: '/english/harvest',
+    },
+];
+
 const READING_PATH = [
     { step: '01', label: 'START HERE', title: 'まずはここから', desc: 'TOEIC 900点なのに喋れない男の話。なぜアプリを作り始めたか。', href: '/journal/1', color: '#D4AF37' },
     { step: '02', label: 'DEEP DIVES', title: '英語構造分析シリーズ', desc: 'ネイティブの英語を構造分解。Entry #110-112で発見した7つのルール。', href: '/journal/110', color: '#10B981' },
@@ -217,6 +236,45 @@ export default function MembershipPage() {
                             </div>
                         </div>
                     </Link>
+                </div>
+            </section>
+
+            <Divider />
+
+            {/* Member Requests */}
+            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
+                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#D4AF37', fontWeight: 700, fontFamily: 'monospace', marginBottom: 20 }}>MEMBER REQUESTS</p>
+                <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.8, marginBottom: 20 }}>
+                    メンバーからのリクエストで作った表現集。「この作品やってほしい」って言ってくれたら作る。
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                    {MEMBER_REQUESTS.map((req) => (
+                        <Link key={req.title} href={req.href} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <div style={{
+                                backgroundColor: '#fff', borderRadius: 16, padding: '24px',
+                                border: '2px solid #D4AF37',
+                                background: 'linear-gradient(135deg, #FEF9E7 0%, #fff 40%)',
+                                transition: 'all 0.2s ease',
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+                                    <span style={{ fontSize: 9, fontWeight: 700, color: '#fff', backgroundColor: '#D4AF37', padding: '3px 10px', borderRadius: 100, letterSpacing: '0.1em' }}>SPECIAL</span>
+                                    <span style={{ fontSize: 11, color: '#78716C', fontStyle: 'italic' }}>Requested by {req.requester}</span>
+                                </div>
+                                <h3 style={{ fontSize: 18, fontWeight: 800, color: '#1C1917', marginBottom: 6 }}>{req.title}</h3>
+                                <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.7, marginBottom: 12 }}>{req.desc}</p>
+                                <p style={{ fontSize: 13, color: '#44403C', fontStyle: 'italic', padding: '10px 14px', backgroundColor: '#FFFBEB', borderRadius: 8, borderLeft: '3px solid #D4AF37', lineHeight: 1.6, marginBottom: 12 }}>
+                                    {req.highlight}
+                                </p>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                                    <div>
+                                        <span style={{ fontSize: 22, fontWeight: 900, color: '#D4AF37' }}>{req.count}</span>
+                                        <span style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em', marginLeft: 6 }}>EXPRESSIONS</span>
+                                    </div>
+                                    <span style={{ fontSize: 12, color: '#D4AF37', fontWeight: 600 }}>Movie Harvest で見る</span>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
                 </div>
             </section>
 

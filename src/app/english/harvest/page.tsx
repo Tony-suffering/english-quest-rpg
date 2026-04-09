@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PPButton, PPPopup, usePPWordPicker } from '@/components/english/PPWordPicker';
-import { MOVIE_BY_DATE, GENRE_META, SPECIAL_REQUESTS, type HarvestMovie } from '@/data/english/harvest-movies';
+import { MOVIE_BY_DATE, GENRE_META, type HarvestMovie } from '@/data/english/harvest-movies';
 import { seedHarvestExpressions } from '@/data/english/harvest-expressions';
 
 // ---------------------------------------------------------------------------
@@ -502,93 +502,6 @@ export default function HarvestPage() {
                         );
                     })}
                 </div>
-
-                {/* SPECIAL REQUESTS -- always visible at top */}
-                {SPECIAL_REQUESTS.length > 0 && (
-                    <div style={{ marginBottom: '24px' }}>
-                        <div style={{
-                            display: 'flex', alignItems: 'center', gap: '10px',
-                            marginBottom: '16px',
-                        }}>
-                            <div style={{
-                                width: '4px', height: '24px', borderRadius: '2px',
-                                backgroundColor: '#D4AF37',
-                            }} />
-                            <h2 style={{
-                                fontSize: '20px', fontWeight: '800', color: '#1C1917',
-                                margin: 0, letterSpacing: '-0.01em',
-                            }}>
-                                SPECIAL REQUESTS
-                            </h2>
-                            <span style={{
-                                fontSize: '11px', fontWeight: '600', color: '#D4AF37',
-                                padding: '2px 8px', borderRadius: '6px',
-                                backgroundColor: '#FEF9E7',
-                            }}>
-                                MEMBER
-                            </span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {SPECIAL_REQUESTS.map(movie => {
-                                const specialExprs = expressions.filter(
-                                    e => e.source_title === movie.title ||
-                                         e.source_title?.includes('Blackadder') && movie.title.includes('Blackadder') ||
-                                         e.source_title?.includes('Rowan Atkinson') && movie.title.includes('Mr. Bean')
-                                );
-                                return (
-                                    <div key={movie.title} style={{
-                                        backgroundColor: '#fff', borderRadius: '16px',
-                                        border: '2px solid #D4AF37', padding: '24px',
-                                        background: 'linear-gradient(135deg, #FEF9E7 0%, #fff 40%)',
-                                    }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                                            <span style={{
-                                                fontSize: '11px', fontWeight: '700', color: '#D4AF37',
-                                                padding: '3px 10px', borderRadius: '6px', backgroundColor: '#FEF9E7',
-                                                textTransform: 'uppercase', letterSpacing: '0.05em',
-                                            }}>
-                                                SPECIAL REQUEST
-                                            </span>
-                                            <span style={{ fontSize: '12px', color: '#A8A29E', fontWeight: '500' }}>
-                                                {movie.year}
-                                            </span>
-                                            {movie.requestedBy && (
-                                                <span style={{ fontSize: '11px', color: '#78716C', fontStyle: 'italic' }}>
-                                                    Requested by {movie.requestedBy}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <h3 style={{
-                                            fontSize: '22px', fontWeight: '800', color: '#1C1917',
-                                            margin: '0 0 6px', letterSpacing: '-0.02em',
-                                        }}>
-                                            {movie.title}
-                                        </h3>
-                                        <p style={{
-                                            fontSize: '14px', color: '#57534E', margin: '0 0 12px',
-                                            lineHeight: 1.6,
-                                        }}>
-                                            {movie.tagline}
-                                        </p>
-                                        <div style={{ fontSize: '12px', color: '#D4AF37', fontWeight: '600' }}>
-                                            {specialExprs.length > 0 ? `${specialExprs.length} EXPRESSIONS` : 'COMING SOON'}
-                                        </div>
-                                        {specialExprs.length > 0 && (
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px' }}>
-                                                {specialExprs
-                                                    .sort((a, b) => b.score - a.score)
-                                                    .map((expr, idx) => (
-                                                        <ExprCard key={expr.id} expr={expr} index={idx} />
-                                                    ))
-                                                }
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
 
                 {/* Genre legend */}
                 <div style={{
