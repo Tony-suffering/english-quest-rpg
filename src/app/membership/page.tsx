@@ -56,17 +56,35 @@ const MEMBER_REQUESTS = [
         requester: 'Goro Yamaguchi',
         title: 'Blackadder (1983-1989)',
         desc: 'イギリス皮肉の教科書。Rowan Atkinson主演。全4シリーズから厳選10表現。',
-        count: 10,
-        highlight: '"I have a cunning plan." -- Baldrick',
-        href: '/english/harvest',
+        expressions: [
+            { expr: 'I have a cunning plan.', note: '英語圏で最も有名なキャッチフレーズの1つ。cunningは「ずる賢い」。Baldrickのplanは毎回ゴミだけど、この一言は日常で「いい作戦がある」って言う時に使われてる。皮肉込みで。', score: 19 },
+            { expr: "Baldrick, your brain is so minute that if a hungry cannibal cracked your head open, there wouldn't be enough to cover a small water biscuit.", note: 'イギリス式insultの最高傑作。minuteは「マイニュート」と読んで「極小の」。so X that...構文のお手本。相手をバカにする時に、ここまで具体的なイメージで語るのがブリティッシュ・ウィット。', score: 16 },
+            { expr: "I've come up with a plan so cunning you could stick a tail on it and call it a weasel.", note: 'so X you could...で「Xすぎて〜できるレベル」。weaselは「イタチ」。cunningとイタチを結びつける発想がイギリス人。褒めてるようで完全にふざけてる。', score: 17 },
+            { expr: "Baldrick, have you no idea what irony is? -- Yes, it's like goldy and bronzy, only it's made out of iron.", note: 'ironyの意味を聞いたら「鉄でできたやつ」と返された。goldy, bronzyは存在しない単語。-yをつけて形容詞にするBaldrickの造語センス。バカなのに天才。', score: 18 },
+            { expr: "I've been in your family since 1532. -- So has syphilis.", note: 'So has X.は「Xもな」。短い返しで最大ダメージを与えるイギリス式カウンター。syphilis（梅毒）との比較が容赦ない。タイミングと間が全て。', score: 15 },
+            { expr: 'If you want something done properly, kill Baldrick before you start.', note: '元のことわざはIf you want something done properly, do it yourself.（自分でやれ）。これをBaldrick排除に改変。ことわざをツイストする技術。', score: 14 },
+            { expr: "The path of my life is strewn with cow pats from the devil's own satanic herd!", note: 'strewn withは「〜で散らかっている」。cow patsは「牛のフン」。悪魔の牛のフンが人生に散らばってる。日本語の「踏んだり蹴ったり」の1000倍おもしろい言い方。', score: 15 },
+            { expr: "Am I jumping the gun, Baldrick, or are the words 'I have a cunning plan' marching with ill-deserved confidence in the direction of this conversation?", note: 'jumping the gunは「先走る」。marching with ill-deserved confidenceは「身の程知らずの自信で行進してる」。相手が言いそうなことを先に潰す高等テクニック。', score: 16 },
+            { expr: 'Your services might be as useful as a barbershop on the steps of a guillotine.', note: 'as useful as Xの形で「Xくらい役に立つ（＝全く役に立たない）」。ギロチンの階段の床屋。髪を整えても首が飛ぶ。この比喩はイギリス人の十八番。', score: 14 },
+            { expr: "Who would have noticed another madman round here? Good luck, everyone.", note: 'シリーズ最終回。塹壕から飛び出す直前の台詞。Good luck, everyone.たった3語。何百もの皮肉の後で、最後だけ真っすぐ。ローワン・アトキンソンの最高傑作。', score: 20 },
+        ],
     },
     {
         requester: 'Goro Yamaguchi',
         title: 'Mr. Bean / Rowan Atkinson (1990-2007)',
         desc: 'セリフが少ない男の、数少ないセリフが全部名言。インタビュー含む10表現。',
-        count: 10,
-        highlight: '"Good luck, everyone." -- 最終回、最後の台詞',
-        href: '/english/harvest',
+        expressions: [
+            { expr: "I'm as poor as a church mouse, that's just had an enormous tax bill on the very day his wife ran off with another mouse, taking all the cheese.", note: 'as poor as a church mouseは「教会のネズミほど貧乏」。それをtax bill→wife ran off→taking all the cheeseと積み上げる。比喩を重ねて笑わせるイギリス話法。', score: 16 },
+            { expr: "I think visual comedy is a universal language. You don't need subtitles if the performance is clear enough.", note: 'universal languageは「世界共通語」。Beanがセリフなしで世界中で通じる理由。英語学習者へのメッセージでもある。', score: 14 },
+            { expr: "You're about as useful as a one-legged man at an arse-kicking contest.", note: '片足の男が尻蹴り大会に出る。arseはイギリス英語で「尻」（アメリカはass）。British vs Americanの違いが出る。', score: 15 },
+            { expr: 'I may have the body of a weak and feeble woman, but I have the heart and stomach of a concrete elephant.', note: 'エリザベス1世の実際のスピーチのパロディ。本来は「lion\'s heart」のところを象に変えてる。歴史ネタ＋誇張＝Blackadder。', score: 14 },
+            { expr: 'Leave me alone, Baldrick. If I wanted to talk to a vegetable, I would have bought one at the market.', note: 'vegetableは「野菜」だけどスラングで「無能な人」。If I wanted to X, I would have Y.は条件法の完璧な使い方。皮肉で学ぶ文法。', score: 15 },
+            { expr: 'Baldrick, get the door.', note: 'get the doorは普通「ドアを開けろ」。Baldrickはドアを外して持ってきた。英語のget+名詞は文脈で意味が変わる。直訳と意味のズレがコメディになる瞬間。', score: 17 },
+            { expr: "Not good enough. You're fired.", note: '5語。You\'re firedはトランプの決め台詞で有名だけど、Blackadderの方が先。短い文の連続で衝撃を与える技術。英語は短いほど強い。', score: 13 },
+            { expr: "Have you ever been to Wales, Baldrick? Well, don't. It's a ghastly place. Huge gangs of tough, sinewy men roam the valleys, terrorizing people with their close-harmony singing.", note: 'ghastlyは「おぞましい」。terrorizing with close-harmony singingで「合唱で恐怖に陥れる」。怖そうな描写の結末が歌。このギャップがイギリスのユーモア。', score: 16 },
+            { expr: "Darling, the guns have stopped. -- I say, do you think it's peace? -- No, I think it's lunch.", note: 'Darlingは人名だけどダブルミーニング。peaceに対するlunchの落差。希望を一瞬で粉砕する技術。喜劇と悲劇は同じ構造。', score: 17 },
+            { expr: 'Who would have noticed another madman round here? Good luck, everyone.', note: 'シリーズ最後の最後。Good luck, everyone.たった3語。それまでの何百もの皮肉の後で、最後だけ真っすぐ。この3語が一番重い。', score: 20 },
+        ],
     },
 ];
 
@@ -247,33 +265,60 @@ export default function MembershipPage() {
                 <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.8, marginBottom: 20 }}>
                     メンバーからのリクエストで作った表現集。「この作品やってほしい」って言ってくれたら作る。
                 </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                     {MEMBER_REQUESTS.map((req) => (
-                        <Link key={req.title} href={req.href} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <div style={{
-                                backgroundColor: '#fff', borderRadius: 16, padding: '24px',
-                                border: '2px solid #D4AF37',
-                                background: 'linear-gradient(135deg, #FEF9E7 0%, #fff 40%)',
-                                transition: 'all 0.2s ease',
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
-                                    <span style={{ fontSize: 9, fontWeight: 700, color: '#fff', backgroundColor: '#D4AF37', padding: '3px 10px', borderRadius: 100, letterSpacing: '0.1em' }}>SPECIAL</span>
-                                    <span style={{ fontSize: 11, color: '#78716C', fontStyle: 'italic' }}>Requested by {req.requester}</span>
-                                </div>
-                                <h3 style={{ fontSize: 18, fontWeight: 800, color: '#1C1917', marginBottom: 6 }}>{req.title}</h3>
-                                <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.7, marginBottom: 12 }}>{req.desc}</p>
-                                <p style={{ fontSize: 13, color: '#44403C', fontStyle: 'italic', padding: '10px 14px', backgroundColor: '#FFFBEB', borderRadius: 8, borderLeft: '3px solid #D4AF37', lineHeight: 1.6, marginBottom: 12 }}>
-                                    {req.highlight}
-                                </p>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                                    <div>
-                                        <span style={{ fontSize: 22, fontWeight: 900, color: '#D4AF37' }}>{req.count}</span>
-                                        <span style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em', marginLeft: 6 }}>EXPRESSIONS</span>
-                                    </div>
-                                    <span style={{ fontSize: 12, color: '#D4AF37', fontWeight: 600 }}>Movie Harvest で見る</span>
-                                </div>
+                        <div key={req.title} style={{
+                            backgroundColor: '#fff', borderRadius: 16, padding: '28px 24px',
+                            border: '2px solid #D4AF37',
+                            background: 'linear-gradient(135deg, #FEF9E7 0%, #fff 40%)',
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
+                                <span style={{ fontSize: 9, fontWeight: 700, color: '#fff', backgroundColor: '#D4AF37', padding: '3px 10px', borderRadius: 100, letterSpacing: '0.1em' }}>SPECIAL</span>
+                                <span style={{ fontSize: 11, color: '#78716C', fontStyle: 'italic' }}>Requested by {req.requester}</span>
                             </div>
-                        </Link>
+                            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#1C1917', marginBottom: 6 }}>{req.title}</h3>
+                            <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.7, marginBottom: 16 }}>{req.desc}</p>
+                            <p style={{ fontSize: 12, color: '#D4AF37', fontWeight: 700, marginBottom: 12 }}>{req.expressions.length} EXPRESSIONS</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                {req.expressions
+                                    .sort((a, b) => b.score - a.score)
+                                    .map((e, idx) => (
+                                    <div key={idx} style={{
+                                        backgroundColor: '#FAFAF9', borderRadius: 12,
+                                        border: '1px solid #E7E5E4', padding: '14px 16px',
+                                    }}>
+                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 6 }}>
+                                            <span style={{
+                                                fontSize: 10, fontWeight: 700, color: '#A8A29E',
+                                                width: 20, textAlign: 'right', flexShrink: 0, paddingTop: 3,
+                                            }}>
+                                                {String(idx + 1).padStart(2, '0')}
+                                            </span>
+                                            <span style={{
+                                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                                                width: 24, height: 24, borderRadius: 6, flexShrink: 0,
+                                                backgroundColor: e.score >= 18 ? '#FEF3C7' : e.score >= 15 ? '#D1FAE5' : '#DBEAFE',
+                                                color: e.score >= 18 ? '#92400E' : e.score >= 15 ? '#065F46' : '#1E40AF',
+                                                fontSize: 10, fontWeight: 800,
+                                            }}>
+                                                {e.score >= 18 ? 'S' : e.score >= 15 ? 'A' : 'B'}
+                                            </span>
+                                            <p style={{ fontSize: 15, fontWeight: 700, color: '#1C1917', lineHeight: 1.4, margin: 0 }}>
+                                                &ldquo;{e.expr}&rdquo;
+                                            </p>
+                                        </div>
+                                        <p style={{
+                                            fontSize: 12, color: '#44403C', lineHeight: 1.7,
+                                            margin: '0 0 0 34px', padding: '8px 12px',
+                                            backgroundColor: '#FFFBEB', borderRadius: 6,
+                                            borderLeft: '3px solid #D4AF37',
+                                        }}>
+                                            {e.note}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     ))}
                 </div>
             </section>
