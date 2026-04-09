@@ -1485,7 +1485,7 @@ const DAY_337: MasterExpression[] = [
       'お互いの言葉を仕上げ合ってて「俺ら完全に波長合うよな、最高だわ」って言ったんだ。',
       'ハハ、考えることが一緒ってやつだな！いやマジで、お前とは前世から知り合いな気がするわ。',
     ],
-    context: '「気が合う」はwe clickが一番感覚に近い。on the same pageは「意見が一致」、on the same wavelengthは「感性が合う」。使い分けると人間関係の表現が豊かになる。',
+    context: '「気が合う」は on the same wavelength が「感性・波長が合う」で一番近い。on the same page は「意見が一致」でビジネス寄り。finishing each other\'s sentences（お互いの言葉を先に言っちゃう）は仲の良さを表す定番。great minds think alike は「考えることが一緒だな」の決まり文句。',
     character: 'mina',
     category: 'social',
     month: '2027-03',

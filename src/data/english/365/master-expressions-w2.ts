@@ -1068,7 +1068,7 @@ export const WEEK2_EXPRESSIONS: MasterExpression[] = [
             '説明しにくいな。同じ方向だし、一緒に行くよ。',
             'え、いいの？めっちゃ優しいね！本当にありがとう。',
         ],
-        context: '道案内で「もう連れて行ったほうが早い」パターン。I am heading that way=同じ方向に行く。let me walk you there=連れて行く。日本人のこの親切さは海外で感動される。英語では It is easier than explaining が「説明するより早い」の自然な言い方。',
+        context: '道案内で「もう連れて行ったほうが早い」パターン。I\'m heading that way = 同じ方向に行く。let me just walk you there = 連れて行くよ。kind of hard to explain で「説明しにくいな」と自然に切り出す。日本人のこの親切さは海外で感動される。',
         character: 'lisa', category: 'request', month: '2026-04',
     },
 
@@ -1142,7 +1142,7 @@ export const WEEK2_EXPRESSIONS: MasterExpression[] = [
             '結局さ、やっぱり和食が一番だわ。他はかなわない。',
             'それは否定できないな。日本のコンビニのおにぎりですら海外のレストランより美味いもん。',
         ],
-        context: 'nothing beats=〜に勝るものはない。at the end of the day=結局のところ。on another level=レベルが違う。I am biased=偏ってる自覚あり。日本語の「やっぱり」は英語に直訳しにくい。at the end of the day か after all が一番近いけど完全一致はない。',
+        context: 'nothing beats = 〜に勝るものはない。at the end of the day = 結局のところ。nothing comes close = 他は足元にも及ばない。can\'t argue with that は「それは否定できない」の同意表現。日本語の「やっぱり」は英語に直訳しにくい。at the end of the day が一番近い。',
         character: 'master', category: 'social', month: '2026-04',
     },
     {

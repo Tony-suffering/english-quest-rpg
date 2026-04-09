@@ -890,7 +890,7 @@ export const MONTH6_W21_EXPRESSIONS: MasterExpression[] = [
             'あと30分で着陸だってアナウンスあった。やっとだ。',
             'やった。海岸線見えてきた。シート戻せ、もうすぐだぞ！',
         ],
-        context: 'descent は「降下」。coastline は「海岸線」。tray table は「テーブル」。window shade は「窓のシェード」。stretch my legs は「足を伸ばす」。killing me は「めちゃくちゃ痛い」。着陸前のアナウンスは seats in the upright position, tray tables stowed が定番。',
+        context: 'descent は「降下」で beginning our descent が機長アナウンスの定番。coastline は「海岸線」。Put your seat up は「シート戻せ」でカジュアル版。we\'re almost there は「もうすぐだ」の万能フレーズ。Finally は一言で「やっとだ」の疲労感が出る。',
         character: 'lisa', category: 'request', month: '2026-09',
     },
 

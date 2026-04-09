@@ -1094,7 +1094,7 @@ const day349: MasterExpression[] = [
       '業界の変化が速すぎて、ついていくためだけでも学び続けないとダメなんだよね。講座とか探してるところ。',
       'いい判断だな。どんな講座見てんの？今はオンラインでめちゃくちゃいいのあるし、学校戻るより全然安いよ。おすすめ知りたかったら言って。',
     ],
-    context: '「スキルアップ」は和製英語。level up, upskill, develop skills が自然。invest in yourself は自己投資の英語版。stay relevant = 時代遅れにならない。',
+    context: '「スキルアップ」は和製英語。level up my skills, learn new skills が自然。invest in yourself は「自己投資」の英語版。stay relevant は「時代遅れにならない」。looking into は「調べてる・検討してる」で、まだ決めてない段階にぴったり。',
     character: 'takeshi',
     category: 'social',
     month: '2027-03',

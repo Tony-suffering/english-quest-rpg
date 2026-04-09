@@ -690,7 +690,7 @@ export const MONTH8_W30_EXPRESSIONS: MasterExpression[] = [
       '今まで言ったこと全部一文にまとめるとさ、要は人は他に選択肢がなくなるまで変化に抵抗するってこと。',
       'うん、いいまとめだわ。反論しようがない。',
     ],
-    context: '「要するに」は basically, what it boils down to, in a nutshell が定番。日本語の「こういうことよ」の断定感は英語だと that is it で出す。',
+    context: '「要するに」は basically が一番カジュアル。what it boils down to は「突き詰めると」で少し知的な響き。distill は「蒸留する→凝縮する」で長い話を一文にまとめる時に使う。sums it up は「いいまとめだ」の返し。',
     character: 'master',
     category: 'social',
     month: '2026-11',

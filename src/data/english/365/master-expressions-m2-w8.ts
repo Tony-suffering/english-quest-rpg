@@ -419,7 +419,7 @@ export const MONTH2_W8_EXPRESSIONS: MasterExpression[] = [
             '毎回エコバッグ忘れるんだよね。家に10個くらいあるのに手元にない。',
             'またかよ！車に一個入れっぱなしにしとけよ。それで解決だろ。',
         ],
-        context: 'reusable bag は「エコバッグ」の英語。eco bag は和製英語で通じない。plastic bag は「ビニール袋」。manage to は「なんとか〜する」だが、ここでは still manage to forget で「それでも忘れる」の皮肉。',
+        context: 'reusable bag は「エコバッグ」の英語。eco bag は和製英語で通じない。I have like ten は「10個くらいある」の口語的な言い方。leave one in your car permanently は「車に入れっぱなしにしろ」の具体的アドバイス。problem solved で「それで解決」と締める。',
         character: 'takeshi', category: 'shopping', month: '2026-05',
     },
     {

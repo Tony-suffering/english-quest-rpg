@@ -788,7 +788,7 @@ const day295: MasterExpression[] = [
       'ホームステイからだいぶ経つけど、ホストファミリーとは今でも定期的にメッセージしてるよ。',
       'それがホームステイの一番いいとこだよな。泊まる場所じゃなくて、第二の家族ができるんだよ。'
     ],
-    context: '「連絡してる」は keep in touch, stay in contact が定番。a second family は「第二の家族」。way longer は「ずっと長く」の口語的な強調。',
+    context: '「連絡してる」は keep in touch が定番。still keep in touch after all these years で「何年も経つのにまだ」の感じが出る。message each other regularly は「定期的にメッセージし合う」。a second family は「第二の家族」でホームステイの良さを語る時の鉄板。',
     character: 'master',
     category: 'social',
     month: '2027-01'
@@ -963,7 +963,7 @@ const day296: MasterExpression[] = [
       '与えに行ったつもりだったのに、正直もらったもののほうがずっと多かった。',
       '不思議だよな。人を助けに行って、結局自分が助けられてるっていう。'
     ],
-    context: '「自分のためにもなった」は I got something out of it too が自然。roll my eyes は「呆れて目を回す」。therapy は「セラピー」だけど口語では「癒し」全般に使う。',
+    context: '「自分のためにもなった」は getting just as much out of it で「同じくらい得るものがあった」。I thought I was going there to give は「与えに行ったつもりだった」で期待と現実のギャップを出す。received way more than I ever gave は「もらったもののほうがずっと多かった」。ボランティアの話で定番の気づき。',
     character: 'takeshi',
     category: 'social',
     month: '2027-01'
