@@ -594,7 +594,7 @@ export default function EnglishMaster365Page() {
                 localStorage.setItem(`kaiwa-quest-${today}`, JSON.stringify(q));
             } catch { /* */ }
         }
-        questWasCompleteRef.current = isComplete;
+        if (isComplete) questWasCompleteRef.current = true;
     }, [questListenCount, questRegisterCount]);
 
     // Streak state
