@@ -503,26 +503,8 @@ export default function HarvestPage() {
                     })}
                 </div>
 
-                {/* Genre legend */}
-                <div style={{
-                    display: 'flex', gap: '12px', justifyContent: 'center',
-                    flexWrap: 'wrap', marginBottom: '24px',
-                }}>
-                    {Object.entries(GENRE_META).map(([key, meta]) => (
-                        <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <div style={{
-                                width: '6px', height: '6px', borderRadius: '50%',
-                                backgroundColor: meta.color,
-                            }} />
-                            <span style={{ fontSize: '10px', color: '#A8A29E', fontWeight: '500' }}>
-                                {meta.label}
-                            </span>
-                        </div>
-                    ))}
-                </div>
-
-                {/* SPECIAL REQUESTS */}
-                {SPECIAL_REQUESTS.length > 0 && !selectedDay && (
+                {/* SPECIAL REQUESTS -- always visible at top */}
+                {SPECIAL_REQUESTS.length > 0 && (
                     <div style={{ marginBottom: '24px' }}>
                         <div style={{
                             display: 'flex', alignItems: 'center', gap: '10px',
@@ -607,6 +589,24 @@ export default function HarvestPage() {
                         </div>
                     </div>
                 )}
+
+                {/* Genre legend */}
+                <div style={{
+                    display: 'flex', gap: '12px', justifyContent: 'center',
+                    flexWrap: 'wrap', marginBottom: '24px',
+                }}>
+                    {Object.entries(GENRE_META).map(([key, meta]) => (
+                        <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <div style={{
+                                width: '6px', height: '6px', borderRadius: '50%',
+                                backgroundColor: meta.color,
+                            }} />
+                            <span style={{ fontSize: '10px', color: '#A8A29E', fontWeight: '500' }}>
+                                {meta.label}
+                            </span>
+                        </div>
+                    ))}
+                </div>
 
                 {/* Detail panel */}
                 {selectedDay && (
