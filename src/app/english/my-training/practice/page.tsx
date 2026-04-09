@@ -500,18 +500,7 @@ export default function PracticePage() {
         setTotalAttempts(newAttempts);
         saveProgress(newScore, newBest, newAttempts);
 
-        // Don't auto-advance — let user read the explanation and tap "次へ"
-        // Only auto-advance on correct if streak is going (keeps momentum)
-        if (correct && newStreak >= 2) {
-            setTimeout(() => {
-                if (currentIdx + 1 >= totalRounds) {
-                    finishSession(newSessionScore, totalRounds);
-                } else {
-                    setCurrentIdx(prev => prev + 1);
-                    setSelected(null);
-                }
-            }, 1200);
-        }
+        // Never auto-advance — always let user read explanation and tap "次へ"
     }, [selected, current, score, sessionScore, streak, bestStreak, totalAttempts, currentIdx, totalRounds, saveProgress]);
 
     // Finish session helper

@@ -3802,7 +3802,7 @@ GWU で4年間、英語で大学教育を受けた男が、NBA で数シーズ�
 TOEIC で 900 点を取って、試合後インタビューもできて、契約交渉も自分でできる。
 
 そういう英語を目指してる。
-
+`,
         standfmScript: `あ、これ俺が考えて喋ってると思ったら大間違いで、全部AIが書いてます。俺はただの再生ボタン。人間のガワだけ提供してる感じ。Siriの逆。
 
 So yeah this ain't me talkin'. AI wrote every word. I'm just... a mouth. I'm basically Siri but worse 'cause Siri at least comes up with her own stuff.
@@ -3989,7 +3989,7 @@ Google翻訳。DeepL。スマホの翻訳アプリ。
 **完璧を待ってたら、一生喋れない。**
 
 通訳がなくなった日が、本当の練習の始まりだった。
-
+`,
         standfmScript: `ダルビッシュ、12年アメリカにいて英語できる。SNSも英語。YouTubeも英語。でも記者会見だけ通訳つけてた。なんで？ "切り取られたくない" から。わかる。俺も英語で喋ったら切り取り以前に全文が事故だけど。
 
 Darvish been in the States twelve years. His English is fine. Posts in English. YouTube in English. But press conferences? Always used an interpreter. Why? Didn't wanna get misquoted. I get it. With my English, they wouldn't even NEED to misquote me. The whole sentence is already a disaster.
@@ -4165,7 +4165,7 @@ Kuhlの研究では、大人でも集中的なトレーニングでRとLの区�
 35歳の俺は文脈で補完できる。
 
 **どっちが賢いかは、一概には言えない。**
-
+`,
         standfmScript: `赤ちゃんってさ、生後6ヶ月で地球上の全言語の音を聞き分けられるらしい。800音素。全部。世界市民。で、10ヶ月になると使わない音を脳が削除する。RとL、削除。俺に断りなく。生後10ヶ月の俺が勝手に設定を完了させてやがった。
 
 So babies, right? Six months old and they can hear EVERY sound in EVERY language on earth. Eight hundred sounds. All of 'em. World citizens. Then at ten months the brain goes "nah, don't need that" and deletes the ones you ain't usin'. R and L? Deleted. Without my permission. Ten-month-old me just went ahead and locked in the settings. Thanks, baby me. Real helpful.
@@ -4368,7 +4368,7 @@ Ramírez-Esparza の研究でバイリンガルが英語で外向的になった
 喋るたびに英語の自分が1日分だけ歳をとる。
 
 それだけ。
-
+`,
         standfmScript: `英語喋ると性格変わるの、気のせいじゃなかった。研究で証明されてる。同じ人間にアンケートを英語とスペイン語で取ったら、スコアが変わった。英語だと外向的。スペイン語だと協調的。言語が人格を起動するらしい。俺の場合、英語を喋ると "おどおどした小動物" が起動する。
 
 That thing where your personality changes when you speak English? Not in your head. It's proven. They gave the same people a personality test in English and Spanish. Different scores. English made 'em more extroverted. Spanish made 'em more agreeable. Language boots up a different personality. In my case, English boots up "nervous small animal."
@@ -4573,7 +4573,7 @@ FSIのデータは "英語ネイティブ→他言語" の難易度。
 歩き続ければ着く。
 
 それだけの話。
-
+`,
         standfmScript: `日本語が世界一難しい言語だと思ってたけど、データ見たら違った。FSIっていうアメリカの外交官訓練所のランキングで、日本語はカテゴリ5。2,200時間。確かに最難関グループだけど、バスク語とかナバホ語の方がヤバい。手がかりがゼロ。日本語はまだ漢字という手がかりがある。... いや、それ手がかりっていうか罠だけど。
 
 So I thought Japanese was the hardest language on earth. Looked at the data. It's not. FSI -- that's the American diplomat training institute -- ranks Japanese as Category Five. Twenty-two hundred hours. Hardest group, sure. But Basque? Navajo? Those got ZERO clues. Japanese at least has kanji as a clue. ...Actually kanji isn't a clue, it's a trap. Never mind.
@@ -4872,7 +4872,7 @@ TOEIC の点数でも、英検の級でも、発音の綺麗さでもない。
 もう見てる人は、今夜また見ればいい。
 
 見てない俺は、明日も練習する。
-
+`,
         standfmScript: `英語で夢を見たことある？ 俺、人生で2回ぐらいある。英語で怒鳴られて、英語で言い返した。起きたら何も覚えてない。でも夢の中で英語が出てきたってことは、脳が "こいつもう無意識で処理していいな" って判断したってこと。TOEIC 900点持ってるのに夢の言語はほぼ日本語。テストの点は意識の英語。夢は無意識の英語。俺の無意識、まだ日本語で生活してる。
 
 Ever dreamed in English? I have. Like, twice. Someone yelled at me in English, I yelled back in English. Woke up and remembered nothin'. But the fact that English showed up in a dream means my brain decided "okay, we can run this without conscious effort." I got TOEIC 900 and my dreams are still ninety-nine percent Japanese. Test scores are conscious English. Dreams are unconscious English. My unconscious is still livin' its best Japanese life.
