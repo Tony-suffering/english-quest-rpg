@@ -2001,12 +2001,6 @@ export default function EnglishMaster365Page() {
                             {/* Always BUILD-UP view — no mode toggle */}
 
                             {/* Daily Conversation Scene */}
-                            {selectedDay && getConversation(selectedDay) && (
-                                <div style={{ marginBottom: 6 }}>
-                                    <DailyConversationPlayer conversation={getConversation(selectedDay)!} />
-                                </div>
-                            )}
-
                             {/* Expression Cards */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                 {dayEntries.map((entry, idx) => {
@@ -2450,6 +2444,13 @@ export default function EnglishMaster365Page() {
                                     </Link>
                                 );
                             })()}
+
+                            {/* Bonus Conversation Listening */}
+                            {selectedDay && getConversation(selectedDay) && (
+                                <div style={{ marginTop: 16 }}>
+                                    <DailyConversationPlayer conversation={getConversation(selectedDay)!} daySlot={selectedDay} />
+                                </div>
+                            )}
 
                         </>
                     ) : (
