@@ -77,7 +77,7 @@ const CHAKRA: { name: string; ja: string; color: string }[] = [
     { name: 'OWN', ja: '得', color: '#166534' },
     { name: 'VOICE', ja: '声', color: '#1E40AF' },
     { name: 'VISION', ja: '研', color: '#3730A3' },
-    { name: 'CROWN', ja: '極', color: '#6B21A8' },
+    { name: 'START', ja: '始', color: '#6B21A8' },
 ];
 
 function getNextRankForCard(rank: CardRank): { rank: CardRank; borderColor: string; label: string; threshold: number } | null {

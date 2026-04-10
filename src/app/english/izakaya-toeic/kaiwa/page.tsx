@@ -18,6 +18,8 @@ import DailyCheckin, {
 import StreakMilestone from '@/components/english/StreakMilestone';
 import CheckinOnboarding, { isOnboardingComplete } from '@/components/english/CheckinOnboarding';
 import { addPhrase } from '@/lib/local-store';
+import DailyConversationPlayer from '@/components/english/DailyConversationPlayer';
+import { getConversation } from '@/data/english/365/daily-conversations';
 import Link from 'next/link';
 import { theJobEntries } from '@/data/english/365-the-job';
 import { charIcon } from '@/data/izakaya-toeic/characters';
@@ -789,7 +791,7 @@ export default function EnglishMaster365Page() {
             picks,
             timestamp: new Date().toISOString(),
         }));
-        // Register picked expressions to Daily Training
+        // Register picked expressions to Daily Training immediately
         const today = new Date();
         const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         const pickedEntries = entries.filter(e => picks.includes(e.id));
@@ -803,7 +805,6 @@ export default function EnglishMaster365Page() {
         });
         setShikomiCount(prev => prev + pickedEntries.length);
         setTodayPicks(picks);
-        setShowCheckin(false);
         // Update streak
         const streakData = loadCheckinStreak();
         setCheckinStreak({ current: streakData.current, best: streakData.best });
@@ -811,6 +812,8 @@ export default function EnglishMaster365Page() {
         if (milestone) {
             setTimeout(() => setShowMilestone(milestone), 500);
         }
+        // Close checkin UI after celebration animation finishes
+        setTimeout(() => setShowCheckin(false), 4000);
     }, [selectedDay, entries]);
 
     // Onboarding completion → set start date + go to checkin
@@ -1996,6 +1999,13 @@ export default function EnglishMaster365Page() {
                             )}
 
                             {/* Always BUILD-UP view — no mode toggle */}
+
+                            {/* Daily Conversation Scene */}
+                            {selectedDay && getConversation(selectedDay) && (
+                                <div style={{ marginBottom: 6 }}>
+                                    <DailyConversationPlayer conversation={getConversation(selectedDay)!} />
+                                </div>
+                            )}
 
                             {/* Expression Cards */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

@@ -40,8 +40,8 @@ const RANKS: Rank[] = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', '
 const SUIT_SYMBOLS: Record<Suit, string> = { spade: '\u2660', heart: '\u2665', diamond: '\u2666', club: '\u2663' };
 const SUIT_COLORS: Record<Suit, string> = { spade: '#1C1917', heart: '#DC2626', diamond: '#DC2626', club: '#1C1917' };
 const BET_OPTIONS = [10, 25, 50, 100];
-const CHAKRA_JA = ['種', '芽', '鍛', '得', '声', '研', '極'];
-const CHAKRA_NAMES = ['SEED', 'SPARK', 'FORGE', 'OWN', 'VOICE', 'VISION', 'CROWN'];
+const CHAKRA_JA = ['種', '芽', '鍛', '得', '声', '研', '始'];
+const CHAKRA_NAMES = ['SEED', 'SPARK', 'FORGE', 'OWN', 'VOICE', 'VISION', 'START'];
 const CHAKRA_COLORS = ['#B91C1C', '#C2410C', '#A16207', '#166534', '#1E40AF', '#3730A3', '#6B21A8'];
 
 // ── Card Rank (SP-based) ────────────────────────

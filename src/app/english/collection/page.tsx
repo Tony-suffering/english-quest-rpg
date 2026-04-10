@@ -61,7 +61,7 @@ const CHAKRA = [
     { name: 'OWN', ja: '\u5F97', color: '#EAB308' },
     { name: 'VOICE', ja: '\u58F0', color: '#10B981' },
     { name: 'VISION', ja: '\u773C', color: '#3B82F6' },
-    { name: 'CROWN', ja: '\u51A0', color: '#A855F7' },
+    { name: 'START', ja: '\u59CB', color: '#A855F7' },
 ];
 
 // ── Element Badge ────────────────────────────────────────────

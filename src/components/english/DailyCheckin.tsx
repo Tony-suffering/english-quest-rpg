@@ -161,6 +161,8 @@ export default function DailyCheckin({ day, expressions, onComplete, streak }: D
         const picks = Array.from(selected);
         saveCheckin(picks);
         streakResultRef.current = recordCheckinStreak();
+        // Register phrases immediately (don't wait for animation)
+        onComplete(picks);
         setPhase('celebrate');
         playCheckinCelebration();
         // Stagger the celebration reveal
@@ -169,7 +171,6 @@ export default function DailyCheckin({ day, expressions, onComplete, streak }: D
         setTimeout(() => setCelebrateStep(3), 1000); // picks reveal
         setTimeout(() => setCelebrateStep(4), 1800); // streak
         setTimeout(() => setCelebrateStep(5), 2800); // ready to dismiss
-        setTimeout(() => onComplete(picks), 4000);
     }, [selected, onComplete]);
 
     // ── Celebrate phase ──

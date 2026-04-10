@@ -639,7 +639,7 @@
     80% { transform: translateY(-6px) rotate(-355deg) scale(1.04); filter: brightness(1.15); }
     100% { transform: translateY(0) rotate(-360deg) scale(1); filter: brightness(1); }
 }
-/* +30 極 CROWN: mega slam + double flip + explosive absorb */
+/* +30 始 START: mega slam + double flip + explosive absorb */
 @keyframes runner-absorb-30 {
     0% { transform: translateY(0) rotate(0deg) scale(1); }
     6% { transform: translateY(7px) rotate(0deg) scale(0.75); }

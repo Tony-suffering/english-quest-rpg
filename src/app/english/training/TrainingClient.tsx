@@ -5989,7 +5989,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         );
     };
 
-    // Cycle mastery level: 0 -> 1 -> 2 -> 3 (OWN stops), CROWN(6) -> 0 with confirm
+    // Cycle mastery level: 0 -> 1 -> 2 -> 3 (OWN stops), START(6) -> 0 with confirm
     // Date gate: each level-up requires a different calendar day
     const cycleMastery = useCallback(async (phraseId: string, slamActive = false): Promise<boolean> => {
         const current = Number(phraseMastery[phraseId] || 0);
@@ -5999,9 +5999,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         // Same-day gate: block level-ups (not resets) if already leveled today
         if (next > 0 && phraseLastLeveled[phraseId] === clientToday) return false;
 
-        // CROWN reset requires confirmation
+        // START reset requires confirmation
         if (current === 6) {
-            if (!confirm('CROWN をリセットしますか?')) return false;
+            if (!confirm('リセットしますか? もう一度最初から。')) return false;
         }
 
         setPhraseMastery(prev => ({ ...prev, [phraseId]: next }));
@@ -6109,12 +6109,12 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         return true;
     }, [phraseMastery, voiceRecordings, phraseLinks, phraseLastLeveled, clientToday, phraseDateMap, dataMode]);
 
-    // Declare CROWN: VISION(5) -> CROWN(6) in DB
-    const declareCrown = useCallback(async (phraseId: string) => {
+    // Declare START: VISION(5) -> START(6) in DB
+    const declareStart = useCallback(async (phraseId: string) => {
         // Same-day gate
         if (phraseLastLeveled[phraseId] === clientToday) return;
 
-        if (!confirm('CROWN を宣言しますか? この言葉はもう自分の一部です。')) return;
+        if (!confirm('ここから始まる。この言葉を自分のものにした。次のステージへ。')) return;
 
         setPhraseMastery(prev => ({ ...prev, [phraseId]: 6 }));
         setPhraseLastLeveled(prev => ({ ...prev, [phraseId]: clientToday }));
@@ -6148,7 +6148,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             // OWN = max level XP
             postXP(clientToday, CHAKRA_CONFIG[3].lv, false, phraseId);
         } catch (err) {
-            console.error('Failed to declare CROWN:', err);
+            console.error('Failed to declare START:', err);
         }
     }, [phraseLastLeveled, clientToday, phraseDateMap]);
 
@@ -9464,7 +9464,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                     })()}
                                                 </div>
 
-                                                {/* Bottom: Mastery + CROWN + Voice + Tools */}
+                                                {/* Bottom: Mastery + START + Voice + Tools */}
                                                 <div style={{ padding: '4px 8px 6px' }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
                                                         <button
@@ -9505,7 +9505,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                         </button>
                                                         {masteryInfo.level === 5 && (
                                                             <button
-                                                                onClick={() => declareCrown(phrase.id)}
+                                                                onClick={() => declareStart(phrase.id)}
                                                                 style={{
                                                                     padding: '3px 8px', borderRadius: '4px',
                                                                     border: '1px solid #A855F7',
@@ -9515,7 +9515,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                                     opacity: isLockedToday ? 0.5 : 1,
                                                                 }}
                                                             >
-                                                                CROWN
+                                                                START
                                                             </button>
                                                         )}
                                                         <VoiceRecorder
