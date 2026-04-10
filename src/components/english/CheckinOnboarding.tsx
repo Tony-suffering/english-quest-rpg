@@ -96,7 +96,7 @@ export default function CheckinOnboarding({ onComplete }: CheckinOnboardingProps
                         <div style={{ ...fadeIn(0.3), display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
                             {[
                                 { label: '1', title: '3-Pick', desc: '毎日10表現から3つ選ぶ', color: gold },
-                                { label: '2', title: '仕込み帳に自動追加', desc: '選んだ3つがトレーニング素材になる', color: green },
+                                { label: '2', title: 'トレーニングに自動登録', desc: '選んだ3つがトレーニング素材になる', color: green },
                                 { label: '3', title: 'カレンダーが金に', desc: '毎日続けてカレンダーを埋める', color: '#3B82F6' },
                             ].map((s, i) => (
                                 <div key={i}>

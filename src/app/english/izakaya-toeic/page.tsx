@@ -795,7 +795,7 @@ export default function IzakayaToeicPage() {
             {[
               { href: '/english/izakaya-toeic/kaiwa', icon: 'K', iconColor: '#10B981', title: '英会話マスター365', sub: '毎日10フレーズ' },
               { href: '/english/izakaya-toeic/tonight', icon: '1', iconColor: T.gold, title: '今夜の1杯', sub: '毎日1問、5秒で解ける' },
-              { href: '/english/training', icon: 'V', iconColor: T.green, title: '仕込み帳', sub: '毎日20語ずつ仕込む' },
+              { href: '/english/training', icon: 'V', iconColor: T.green, title: 'Daily Training', sub: '毎日20語ずつトレーニング' },
               { href: '/english/izakaya-toeic/guide', icon: 'G', iconColor: T.blue, title: 'マスターの攻略メモ', sub: 'Part別の裏技' },
               { href: '/english/izakaya-toeic/paraphrase', icon: 'P', iconColor: T.gold, title: '言い換えお品書き', sub: '167パターン' },
               { href: '/english/izakaya-toeic/traps', icon: 'X', iconColor: T.red, title: '引っかけ毒見帳', sub: '17種の罠を見破る' },

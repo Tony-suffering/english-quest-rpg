@@ -63,7 +63,7 @@ export default function MyTrainingPage() {
     };
 
     const steps = [
-        { num: 1, label: '仕込み', sub: 'フレーズ登録', done: phraseCount > 0, href: '/english/izakaya-toeic/kaiwa', color: GOLD },
+        { num: 1, label: '登録', sub: 'フレーズ追加', done: phraseCount > 0, href: '/english/izakaya-toeic/kaiwa', color: GOLD },
         { num: 2, label: 'トレーニング', sub: 'カード復習', done: trainingDone, href: null, color: GREEN },
         { num: 3, label: '実習', sub: '4択ドリル', done: practiceDone, href: '/english/my-training/practice', color: BLUE },
     ];

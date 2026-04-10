@@ -1055,7 +1055,7 @@ export default function EpisodeDetailPage() {
                           color: savedPhrases.has(activeLine.english!) ? T.green : T.gold,
                         }}
                       >
-                        {savedPhrases.has(activeLine.english!) ? '追加済み' : '仕込み帳に追加'}
+                        {savedPhrases.has(activeLine.english!) ? '追加済み' : 'トレーニングに登録'}
                       </button>
                     )}
                   </div>
@@ -1315,7 +1315,7 @@ export default function EpisodeDetailPage() {
                           whiteSpace: 'nowrap',
                         }}
                       >
-                        {savedPhrases.has(line.english!) ? '追加済み' : '+仕込み帳'}
+                        {savedPhrases.has(line.english!) ? '追加済み' : '+トレーニング'}
                       </button>
                     )}
                     </div>
