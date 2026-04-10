@@ -18,9 +18,6 @@ const LEVELS = [
     { level: 2, name: 'SPARK', ja: '芽', meaning: '1回見た。なんとなく覚えた。', howTo: 'カードをタップしてレベルアップ。', gradFrom: '#FB923C', gradTo: '#FED7AA', color: '#C2410C' },
     { level: 3, name: 'FORGE', ja: '鍛', meaning: '繰り返し練習中。定着してきた。', howTo: 'タップでLv.3へ。復習を繰り返す。', gradFrom: '#FACC15', gradTo: '#FEF08A', color: '#A16207' },
     { level: 4, name: 'OWN', ja: '得', meaning: '自分のものにした。考えなくても出る。', howTo: 'タップでLv.4へ。ここが「使える」ライン。', gradFrom: '#4ADE80', gradTo: '#BBF7D0', color: '#166534' },
-    { level: 5, name: 'VOICE', ja: '声', meaning: '口が覚えてる。自然に出てくる。', howTo: '条件を満たすと自動昇格。', gradFrom: '#60A5FA', gradTo: '#BFDBFE', color: '#1E40AF' },
-    { level: 6, name: 'VISION', ja: '研', meaning: '使い方を理解してる。応用できる。', howTo: '条件を満たすと自動昇格。', gradFrom: '#818CF8', gradTo: '#C7D2FE', color: '#3730A3' },
-    { level: 7, name: 'CROWN', ja: '極', meaning: '完全にマスター。もう自分の言葉。', howTo: '自分で「マスターした」と宣言。', gradFrom: '#A855F7', gradTo: '#DDD6FE', color: '#6B21A8' },
 ];
 
 const cardStyle: React.CSSProperties = {

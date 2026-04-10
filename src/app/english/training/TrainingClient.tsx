@@ -62,29 +62,22 @@ interface PhraseLink {
 }
 
 type BaseMastery = 0 | 1 | 2 | 3 | 6;
-type ChakraLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+type ChakraLevel = 0 | 1 | 2 | 3;
 
-// 7 Evolution Stages — mid-tone gradients, display Lv.1-7
-// EGG(0) = untouched, no XP. 1 phrase EGG→MASTER = 100 XP total.
-// XP per step: 0, 5, 10, 15, 20, 20, 30 = 100
+// 4 Evolution Stages: 種→芽→鍛→得
+// Levels 4-6 map to 3 (得) for backwards compatibility
 const CHAKRA_CONFIG: Record<ChakraLevel, { name: string; ja: string; label: string; lv: number; color: string; bg: string; border: string; gradFrom: string; gradTo: string }> = {
-    0: { name: 'EGG', ja: 'タマゴ', label: 'Lv.1 タマゴ', lv: 0, color: '#B91C1C', bg: '#FEF2F2', border: '#F87171', gradFrom: '#F87171', gradTo: '#FECACA' },
-    1: { name: 'HATCH', ja: '孵化', label: 'Lv.2 孵化', lv: 5, color: '#C2410C', bg: '#FFF7ED', border: '#FB923C', gradFrom: '#FB923C', gradTo: '#FED7AA' },
-    2: { name: 'ROOKIE', ja: 'ルーキー', label: 'Lv.3 ルーキー', lv: 10, color: '#A16207', bg: '#FEFCE8', border: '#FACC15', gradFrom: '#FACC15', gradTo: '#FEF08A' },
-    3: { name: 'FIGHTER', ja: 'ファイター', label: 'Lv.4 ファイター', lv: 15, color: '#166534', bg: '#F0FDF4', border: '#4ADE80', gradFrom: '#4ADE80', gradTo: '#BBF7D0' },
-    4: { name: 'CHAMPION', ja: 'チャンピオン', label: 'Lv.5 チャンピオン', lv: 20, color: '#1E40AF', bg: '#EFF6FF', border: '#60A5FA', gradFrom: '#60A5FA', gradTo: '#BFDBFE' },
-    5: { name: 'ELITE', ja: 'エリート', label: 'Lv.6 エリート', lv: 20, color: '#3730A3', bg: '#EEF2FF', border: '#818CF8', gradFrom: '#818CF8', gradTo: '#C7D2FE' },
-    6: { name: 'MASTER', ja: 'マスター', label: 'Lv.7 マスター', lv: 30, color: '#6B21A8', bg: '#FAF5FF', border: '#A855F7', gradFrom: '#A855F7', gradTo: '#DDD6FE' },
+    0: { name: 'SEED', ja: '種', label: '種', lv: 0, color: '#B91C1C', bg: '#FEF2F2', border: '#F87171', gradFrom: '#F87171', gradTo: '#FECACA' },
+    1: { name: 'SPARK', ja: '芽', label: '芽', lv: 5, color: '#C2410C', bg: '#FFF7ED', border: '#FB923C', gradFrom: '#FB923C', gradTo: '#FED7AA' },
+    2: { name: 'FORGE', ja: '鍛', label: '鍛', lv: 10, color: '#A16207', bg: '#FEFCE8', border: '#FACC15', gradFrom: '#FACC15', gradTo: '#FEF08A' },
+    3: { name: 'OWN', ja: '得', label: '得', lv: 15, color: '#166534', bg: '#F0FDF4', border: '#4ADE80', gradFrom: '#4ADE80', gradTo: '#BBF7D0' },
 };
 
-function getChakraLevel(baseMastery: number, hasRecording: boolean, hasLink: boolean): ChakraLevel {
-    if (baseMastery === 6) return 6;  // CROWN (DB stored)
-    if (baseMastery >= 3 && hasRecording && hasLink) return 5;  // VISION
-    if (baseMastery >= 3 && hasRecording) return 4;  // VOICE
+function getChakraLevel(baseMastery: number, _hasRecording?: boolean, _hasLink?: boolean): ChakraLevel {
     return Math.min(baseMastery, 3) as ChakraLevel;
 }
 
-function getChakraInfo(baseMastery: number, hasRecording: boolean, hasLink: boolean) {
+function getChakraInfo(baseMastery: number, hasRecording?: boolean, hasLink?: boolean) {
     const level = getChakraLevel(baseMastery, hasRecording, hasLink);
     return { ...CHAKRA_CONFIG[level], level };
 }
@@ -4283,7 +4276,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     // Each level is independently shuffled on every reload / tab switch / shuffleKey change
     const thisMonthReviewPhrases = useMemo(() => {
         void shuffleKey; // dependency trigger — forces full re-shuffle
-        if (!currentMonth) return { level0: [], level1: [], level2: [], level3: [], level4: [], level5: [], level6: [], all: [], total: [] };
+        if (!currentMonth) return { level0: [], level1: [], level2: [], level3: [], all: [], total: [] };
         // Use string comparison to avoid UTC vs local timezone mismatch
         const y = currentMonth.getFullYear();
         const m = String(currentMonth.getMonth() + 1).padStart(2, '0');
@@ -4306,9 +4299,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             level1: fisherYates(withChakra.filter(x => x.chakra === 1).map(x => x.phrase)),
             level2: fisherYates(withChakra.filter(x => x.chakra === 2).map(x => x.phrase)),
             level3: fisherYates(withChakra.filter(x => x.chakra === 3).map(x => x.phrase)),
-            level4: fisherYates(withChakra.filter(x => x.chakra === 4).map(x => x.phrase)),
-            level5: fisherYates(withChakra.filter(x => x.chakra === 5).map(x => x.phrase)),
-            level6: fisherYates(withChakra.filter(x => x.chakra === 6).map(x => x.phrase)),
             all: fisherYates(withChakra.filter(x => x.chakra < 3).map(x => x.phrase)),
             total: fisherYates(monthPhrases),
         };
@@ -5162,157 +5152,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 const isMaxed = baseMastery === 3 || baseMastery === 6;
                                 return (
                                     <div style={{ marginTop: isFullReview ? '8px' : '4px' }}>
-                                        {isCrownReady ? (
-                                            <button
-                                                onClick={() => {
-                                                    if (cardCelebration) return;
-                                                    if (displayedCard) {
-                                                        setCardCelebration({ phrase: displayedCard, key: Date.now() });
-                                                    }
-                                                    declareCrown(displayedCard.id);
-                                                }}
-                                                style={{
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                                                    width: '100%',
-                                                    padding: isFullReview ? '18px 0' : '14px 0',
-                                                    borderRadius: '14px',
-                                                    border: 'none',
-                                                    background: 'linear-gradient(135deg, #7E22CE, #A855F7)',
-                                                    color: '#fff',
-                                                    fontSize: isFullReview ? '17px' : '15px',
-                                                    fontWeight: '800',
-                                                    cursor: 'pointer',
-                                                    letterSpacing: '2px',
-                                                    boxShadow: '0 4px 16px #A855F740',
-                                                    transition: 'transform 0.12s, box-shadow 0.12s',
-                                                }}
-                                                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
-                                                onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                                                onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                                            >
-                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                                                </svg>
-                                                CROWN
-                                            </button>
-                                        ) : isMaxed && !hasRec ? (
-                                            /* Lv.4 needs recording: Big REC + small NEXT */
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
-                                                {(() => {
-                                                    const recState = recordingStateForCard;
-                                                    return (
-                                                        <button
-                                                            onClick={() => {
-                                                                if (recState === 'uploading') return;
-                                                                if (recState === 'recording') {
-                                                                    if (inlineMediaRecorderRef.current) { inlineMediaRecorderRef.current.stop(); setRecordingStateForCard('uploading'); }
-                                                                } else {
-                                                                    (async () => {
-                                                                        try {
-                                                                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                                                                            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
-                                                                            const mr = new MediaRecorder(stream, { mimeType });
-                                                                            const chunks: Blob[] = [];
-                                                                            mr.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-                                                                            mr.onstop = async () => {
-                                                                                stream.getTracks().forEach(t => t.stop());
-                                                                                const blob = new Blob(chunks, { type: mimeType });
-                                                                                const pid = displayedCard.id;
-                                                                                const fd = new FormData();
-                                                                                fd.append('audio', blob, 'recording.webm');
-                                                                                fd.append('phraseId', pid);
-                                                                                try {
-                                                                                    const res = await fetch('/api/voice-recordings', { method: 'POST', body: fd });
-                                                                                    const data = await res.json();
-                                                                                    if (data.success && data.recording) {
-                                                                                        const prevRecs = voiceRecordings[pid] || [];
-                                                                                        const wasFirst = prevRecs.length === 0;
-                                                                                        setVoiceRecordings(prev => ({ ...prev, [pid]: [data.recording, ...(prev[pid] || [])] }));
-                                                                                        const bm = Number(phraseMastery[pid] || 0);
-                                                                                        const hl = (phraseLinks[pid] || []).length > 0;
-                                                                                        const lvB = getChakraLevel(bm, !wasFirst, hl);
-                                                                                        const lvA = getChakraLevel(bm, true, hl);
-                                                                                        const xp = lvA > lvB ? CHAKRA_CONFIG[lvA].lv : 0;
-                                                                                        if (xp > 0) {
-                                                                                            postXP(new Date().toISOString().split('T')[0], xp, false, pid);
-                                                                                            // Full level-up effects (same as normal level-up)
-                                                                                            const nc = CHAKRA_CONFIG[lvA];
-                                                                                            const k = Date.now();
-                                                                                            playLevelSound(lvA);
-                                                                                            setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
-                                                                                            setCalendarPulse({ dateKey: displayedCard.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: lvA, key: k });
-                                                                                            setCardCelebration({ phrase: displayedCard, key: k });
-                                                                                            // Register card to GOD GRID
-                                                                                            const pts = cardPoints[pid] || 0;
-                                                                                            const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
-                                                                                            setPuzzleDropCard({ phraseId: pid, english: displayedCard.english, japanese: displayedCard.japanese, element: displayedCard.category, rank, points: pts, bstTotal: calcBstTotal(pid), key: k });
-                                                                                        }
-                                                                                        if (data.recording.url) {
-                                                                                            setRecordAutoPlayId(null);
-                                                                                        }
-                                                                                    }
-                                                                                } catch (err) { console.error('Upload failed:', err); }
-                                                                                setRecordingStateForCard('idle');
-                                                                            };
-                                                                            inlineMediaRecorderRef.current = mr; mr.start(); setRecordingStateForCard('recording');
-                                                                        } catch (err) { console.error('Mic denied:', err); alert('マイクへのアクセスが許可されていません'); }
-                                                                    })();
-                                                                }
-                                                            }}
-                                                            style={{
-                                                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                                                flex: 1, padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px',
-                                                                border: recState === 'recording' ? '2px solid #dc2626' : 'none',
-                                                                background: recState === 'recording' ? '#fef2f2' : recState === 'uploading' ? '#E7E5E4' : 'linear-gradient(135deg, #fbbf24, #d97706)',
-                                                                color: recState === 'recording' ? '#dc2626' : recState === 'uploading' ? '#A8A29E' : '#fff',
-                                                                fontSize: isFullReview ? '15px' : '13px', fontWeight: '800',
-                                                                cursor: recState === 'uploading' ? 'not-allowed' : 'pointer', letterSpacing: '2px',
-                                                                boxShadow: recState === 'recording' ? '0 0 0 4px rgba(220,38,38,0.15)' : recState === 'uploading' ? 'none' : '0 4px 16px #d9770640',
-                                                                transition: 'transform 0.12s, box-shadow 0.12s',
-                                                            }}
-                                                            className={recState === 'recording' ? 'recording-pulse' : undefined}
-                                                            onMouseDown={e => { if (recState !== 'uploading') e.currentTarget.style.transform = 'scale(0.97)'; }}
-                                                            onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                                                            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                                                        >
-                                                            {recState === 'recording' ? (<><svg width="16" height="16" viewBox="0 0 24 24" fill="#dc2626"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>STOP</>)
-                                                            : recState === 'uploading' ? (<><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>...</>)
-                                                            : (<><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>REC</>)}
-                                                        </button>
-                                                    );
-                                                })()}
-                                                <button onClick={() => { if (cardCelebration) { setReviewHistory(prev => [...prev, cardCelebration.phrase]); setHistoryOffset(0); setCardCelebration(null); return; } if (historyOffset > 0) setHistoryOffset(h => h - 1); else if (reviewList.length > 0) setReviewIndex(i => (i + 1) % reviewList.length); }}
-                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: isFullReview ? '52px' : '44px', padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none', background: 'linear-gradient(135deg, #D4AF37, #B8941E)', color: '#fff', cursor: 'pointer', boxShadow: '0 2px 8px #D4AF3730', transition: 'transform 0.12s', flexShrink: 0 }}
-                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.95)'; }} onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }} title="次のカード"
-                                                ><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg></button>
-                                            </div>
-                                        ) : isMaxed && hasRec && !hasLink ? (
-                                            /* Lv.5 has recording, needs link: Big 研究 + small NEXT */
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
-                                                <button
-                                                    onClick={() => setShowQuickAdd(!showQuickAdd)}
-                                                    style={{
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
-                                                        flex: 1, padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none',
-                                                        background: showQuickAdd ? 'linear-gradient(135deg, #92400E, #78350F)' : 'linear-gradient(135deg, #D4AF37, #B8941E)',
-                                                        color: '#fff', fontSize: isFullReview ? '15px' : '13px', fontWeight: '800',
-                                                        cursor: 'pointer', letterSpacing: '2px',
-                                                        boxShadow: '0 4px 16px #D4AF3740', transition: 'transform 0.12s, box-shadow 0.12s',
-                                                    }}
-                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
-                                                    onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                                                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                                                >
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                                                    {showQuickAdd ? 'CLOSE' : '研究'}
-                                                </button>
-                                                <button onClick={() => { if (cardCelebration) { setReviewHistory(prev => [...prev, cardCelebration.phrase]); setHistoryOffset(0); setCardCelebration(null); return; } if (historyOffset > 0) setHistoryOffset(h => h - 1); else if (reviewList.length > 0) setReviewIndex(i => (i + 1) % reviewList.length); }}
-                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: isFullReview ? '52px' : '44px', padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none', background: 'linear-gradient(135deg, #D4AF37, #B8941E)', color: '#fff', cursor: 'pointer', boxShadow: '0 2px 8px #D4AF3730', transition: 'transform 0.12s', flexShrink: 0 }}
-                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.95)'; }} onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }} title="次のカード"
-                                                ><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg></button>
-                                            </div>
-                                        ) : isMaxed ? (
-                                            /* Lv.7 MASTER — fully complete */
+                                        {isMaxed ? (
+                                            /* 得 — fully complete */
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%', padding: isFullReview ? '12px 0' : '10px 0', borderRadius: '14px', backgroundColor: '#F5F5F4', color: '#A8A29E', fontSize: isFullReview ? '13px' : '11px', fontWeight: '700', letterSpacing: '2px' }}>
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                                                 COMPLETE
@@ -6074,7 +5915,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     {[
                         { key: 'all' as const, label: 'ALL', count: thisMonthReviewPhrases.total.length, color: '#78716C', accent: '#78716C' },
                         { key: 'random' as const, label: 'SHUFFLE', count: thisMonthReviewPhrases.all.length, color: '#D4AF37', accent: '#D4AF37' },
-                        ...([0, 1, 2, 3, 4, 5, 6] as const).map(k => ({
+                        ...([0, 1, 2, 3] as const).map(k => ({
                             key: k,
                             label: `${CHAKRA_CONFIG[k].ja} ${CHAKRA_CONFIG[k].name}`,
                             count: thisMonthReviewPhrases[`level${k}` as keyof typeof thisMonthReviewPhrases].length,
@@ -6304,8 +6145,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 setPhraseMastery(prev => ({ ...prev, [phraseId]: 5 }));
                 return;
             }
-            // CROWN = lv 7 XP
-            postXP(clientToday, CHAKRA_CONFIG[6].lv, false, phraseId);
+            // OWN = max level XP
+            postXP(clientToday, CHAKRA_CONFIG[3].lv, false, phraseId);
         } catch (err) {
             console.error('Failed to declare CROWN:', err);
         }
@@ -8609,7 +8450,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                                         // Chakra computation (same as PC)
                                         const total = allDayPhrases.length;
-                                        const mChakraCounts: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+                                        const mChakraCounts: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
                                         for (const p of allDayPhrases) {
                                             const m = Number(phraseMastery[p.id] || 0);
                                             const hasRec = (voiceRecordings[p.id] || []).length > 0;
@@ -8617,9 +8458,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             mChakraCounts[getChakraLevel(m, hasRec, hasLink)]++;
                                         }
                                         const dailyPts = Object.entries(mChakraCounts).reduce((s, [lv, cnt]) => s + (Number(lv) > 0 ? CHAKRA_CONFIG[Number(lv) as ChakraLevel].lv * cnt : 0), 0);
-                                        const mCum: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+                                        const mCum: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
                                         let mSum = 0;
-                                        for (let lv = 6; lv >= 1; lv--) { mSum += mChakraCounts[lv as ChakraLevel]; mCum[lv as ChakraLevel] = mSum; }
+                                        for (let lv = 3; lv >= 1; lv--) { mSum += mChakraCounts[lv as ChakraLevel]; mCum[lv as ChakraLevel] = mSum; }
 
                                         return (
                                             <div
@@ -8791,7 +8632,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        {([6, 5, 4, 3, 2, 1] as ChakraLevel[]).map(lv => {
+                                                        {([3, 2, 1, 0] as ChakraLevel[]).map(lv => {
                                                             const pct = total > 0 ? (mCum[lv] / total) * 100 : 0;
                                                             const isFlashLv = isPulsing && calendarPulse!.level === lv;
                                                             const isActiveBar = isActiveReview && activeReviewLevel === lv && !isPulsing;
@@ -8900,7 +8741,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                                     // Count phrases at each chakra level for this day
                                     const total = allDayPhrases.length;
-                                    const chakraCounts: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+                                    const chakraCounts: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
                                     for (const p of allDayPhrases) {
                                         const m = Number(phraseMastery[p.id] || 0);
                                         const hasRec = (voiceRecordings[p.id] || []).length > 0;
@@ -8914,14 +8755,14 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                                     // Cumulative: each level = "phrases that reached at least this level"
                                     // EGG(0) = untouched, always 0%. Bars start from HATCH(1).
-                                    const cumulative: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+                                    const cumulative: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
                                     let runningSum = 0;
-                                    for (let lv = 6; lv >= 1; lv--) {
+                                    for (let lv = 3; lv >= 1; lv--) {
                                         runningSum += chakraCounts[lv as ChakraLevel];
                                         cumulative[lv as ChakraLevel] = runningSum;
                                     }
                                     // SEED stays 0 — never fills the bar
-                                    const barSegments = ([0, 1, 2, 3, 4, 5, 6] as ChakraLevel[]).map(lv => ({
+                                    const barSegments = ([0, 1, 2, 3] as ChakraLevel[]).map(lv => ({
                                         reached: cumulative[lv],
                                         pct: total > 0 ? (cumulative[lv] / total) * 100 : 0,
                                         exactCount: chakraCounts[lv],
@@ -9123,7 +8964,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                     <span style={{ fontSize: '9px', fontWeight: '600', color: '#3B82F6', lineHeight: 1 }}>DRILL</span>
                                                 </div>
                                             )}
-                                            {/* 7-row evolution bars (MASTER top → EGG bottom) - cumulative */}
+                                            {/* 4-row evolution bars (得 top → 種 bottom) - cumulative */}
                                             {hasAnyPhrases && (
                                                 <div style={{
                                                     flex: 1,
@@ -9165,7 +9006,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                             </span>
                                                         )}
                                                     </div>
-                                                    {([6, 5, 4, 3, 2, 1] as ChakraLevel[]).map(lv => {
+                                                    {([3, 2, 1, 0] as ChakraLevel[]).map(lv => {
                                                         const seg = barSegments[lv];
                                                         const isFlashingLevel = isPulsing && calendarPulse.level === lv;
                                                         const isActiveBar = isActiveReview && activeReviewLevel === lv && !isPulsing;
@@ -9857,18 +9698,18 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             <div style={{ fontSize: '10px', fontWeight: '700', color: '#666', letterSpacing: '0.5px', marginBottom: '8px' }}>LEVEL DISTRIBUTION</div>
                                             {thisMonthReviewPhrases.total.length > 0 && (() => {
                                                 const t = thisMonthReviewPhrases.total.length;
-                                                const exactCounts = [0, 1, 2, 3, 4, 5, 6].map(lv =>
+                                                const exactCounts = [0, 1, 2, 3].map(lv =>
                                                     (thisMonthReviewPhrases[`level${lv}` as keyof typeof thisMonthReviewPhrases] as Phrase[]).length
                                                 );
-                                                const monthCumulative: number[] = [0, 0, 0, 0, 0, 0, 0];
+                                                const monthCumulative: number[] = [0, 0, 0, 0];
                                                 let sum = 0;
-                                                for (let lv = 6; lv >= 0; lv--) {
+                                                for (let lv = 3; lv >= 0; lv--) {
                                                     sum += exactCounts[lv];
                                                     monthCumulative[lv] = sum;
                                                 }
                                                 return (
                                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                                        {([6, 5, 4, 3, 2, 1] as ChakraLevel[]).map(lv => {
+                                                        {([3, 2, 1, 0] as ChakraLevel[]).map(lv => {
                                                             const cfg = CHAKRA_CONFIG[lv];
                                                             const reached = monthCumulative[lv];
                                                             const pct = (reached / t) * 100;
