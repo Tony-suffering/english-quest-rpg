@@ -10,8 +10,6 @@ import {
     startFeverBGM, stopFeverBGM, playCardRankSound, playRankUpSound, playFeverChainHit,
     playImpactHit, playKakuhenEntry, playGpCoin, playStreakBreak,
 } from '@/lib/training-sounds';
-import PuzzleBoard, { type GridMilestoneData } from '@/components/english/PuzzleBoard';
-import ReviewSlotPanel from '@/components/english/ReviewSlotPanel';
 import { TOEIC_30DAY } from '@/data/izakaya-toeic/toeic-30day-content';
 import './training-animations.css';
 
@@ -2548,9 +2546,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const [copiedId, setCopiedId] = useState('');
 
     // Puzzle board — tab inside calendar view, card drop triggered after each review COMPLETE
-    const [calendarTab, setCalendarTab] = useState<'calendar' | 'puzzle'>('calendar');
+    const [calendarTab, setCalendarTab] = useState<'calendar'>('calendar');
     const [puzzleDropCard, setPuzzleDropCard] = useState<{ phraseId: string; english: string; japanese: string; element: string; rank: string; points: number; bstTotal: number; key: number } | null>(null);
-    const [milestoneData, setMilestoneData] = useState<GridMilestoneData | null>(null);
+    const [milestoneData, setMilestoneData] = useState<{ grade?: string } | null>(null);
 
     const [gridInfo, setGridInfo] = useState<{ filled: number; total: number }>({ filled: 0, total: 9 });
 
@@ -7181,7 +7179,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             )}
 
             {/* Gacha Overlay — Nintendo-level (hidden in GOD GRID — ReviewSlotPanel handles it) */}
-            {gachaEffect && calendarTab !== 'puzzle' && (() => {
+            {gachaEffect && (() => {
                 const cfg = GACHA_TIER_CONFIG[gachaEffect.tier] || GACHA_TIER_CONFIG.MISS;
                 const isReveal = gachaEffect.phase === 'reveal';
                 const tier = gachaEffect.tier;
@@ -7993,55 +7991,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 </div>
             </div>
 
-            {/* Mini Runner - PC only, hidden in calendar tab (only GOD GRID) */}
-            {viewMode === 'calendar' && !isMobile && calendarTab === 'puzzle' && (
-                <div style={{ position: 'relative' }}>
-                    {showRunner && <UpperScreenEffect effect={upperEffect} slotState={slotState} />}
-                    {showRunner && (
-                        <MiniRunner
-                            todayXP={todayXP}
-                            goalXP={goalXP}
-                            onGoalChange={handleGoalChange}
-                            lastReviewedWord={lastReviewedWord}
-                            dropCard={puzzleDropCard as any}
-                            gridInfo={gridInfo}
-                            sessionGP={playerSparks}
-                            slotMode="effects"
-                            gridCompleteGrade={milestoneData?.grade || null}
-                            onSpecialSlotTrigger={handleSpecialSlotTrigger}
-                        />
-                    )}
-                    <button
-                        onClick={() => {
-                            setShowRunner(prev => {
-                                const next = !prev;
-                                localStorage.setItem('training-show-runner', String(next));
-                                return next;
-                            });
-                        }}
-                        style={{
-                            position: showRunner ? 'absolute' : 'relative',
-                            right: showRunner ? '8px' : undefined,
-                            bottom: showRunner ? '4px' : undefined,
-                            marginLeft: showRunner ? undefined : 'auto',
-                            display: 'block',
-                            background: 'rgba(255,255,255,0.7)',
-                            border: '1px solid #E7E5E4',
-                            borderRadius: '4px',
-                            padding: '2px 8px',
-                            fontSize: '10px',
-                            fontWeight: '600',
-                            color: '#A8A29E',
-                            cursor: 'pointer',
-                            zIndex: 40,
-                            letterSpacing: '0.5px',
-                            backdropFilter: 'blur(4px)',
-                        }}
-                    >
-                        {showRunner ? 'HIDE' : 'SHOW RUNNER'}
-                    </button>
-                </div>
-            )}
 
             {/* Main Content */}
             {viewMode === 'review' ? (
@@ -8335,32 +8284,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             ) : renderReviewContent()}
                         </div>
                     </div>
-                    {/* Right (desktop) / Top (mobile): Slot Machine — hidden during Time Attack */}
-                    {timeAttackPhase !== 'running' && timeAttackPhase !== 'countdown' && (
-                    <div style={{
-                        width: isMobile ? '100%' : '420px',
-                        flexShrink: 0,
-                        order: isMobile ? 1 : 2,
-                        borderLeft: isMobile ? 'none' : '1px solid #222',
-                        borderBottom: isMobile ? '1px solid #222' : 'none',
-                        overflow: isMobile ? 'visible' : 'auto',
-                        maxHeight: isMobile ? '380px' : '100%',
-                    }}>
-                        <ReviewSlotPanel
-                            dropCard={puzzleDropCard}
-                            cardPool={slotCardPool}
-                            specialMode={specialSlotMode}
-                            onSpecialSpinDone={handleSpecialSpinDone}
-                            onSpinComplete={handleSlotSpinComplete}
-                            onBigWin={handleSlotResult}
-                            gridInfo={gridInfo}
-                            gridCompleteGrade={milestoneData?.grade || null}
-                            onBonusSlotPress={() => handleSpecialSlotTrigger(milestoneData?.grade || 'B')}
-                            sessionGP={playerSparks}
-                            isMobile={isMobile}
-                        />
-                    </div>
-                    )}
                 </div>
             ) : viewMode === 'list' ? (
                 /* List View */
@@ -8544,7 +8467,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 }}>
                     {/* Calendar Section */}
                     <div style={{
-                        flex: isMobile ? 'none' : (calendarTab === 'puzzle' ? '0 0 auto' : '1 1 0%'),
+                        flex: isMobile ? 'none' : '1 1 0%',
                         minWidth: 0,
                         display: 'flex',
                         flexDirection: 'column',
@@ -8571,18 +8494,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 }}
                             >
                                 CALENDAR
-                            </button>
-                            <button
-                                onClick={() => setCalendarTab('puzzle')}
-                                style={{
-                                    flex: 1, padding: '7px 0', border: 'none', cursor: 'pointer',
-                                    fontSize: '10px', fontWeight: calendarTab === 'puzzle' ? '800' : '500',
-                                    letterSpacing: '1.5px', color: calendarTab === 'puzzle' ? '#D4AF37' : '#A8A29E',
-                                    background: '#fff',
-                                    borderBottom: calendarTab === 'puzzle' ? '2px solid #D4AF37' : '2px solid transparent',
-                                }}
-                            >
-                                GOD GRID
                             </button>
                         </div>
 
@@ -9381,126 +9292,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         )}
                         </>)}
 
-                        {/* Tab Content: GOD GRID + Slot Machine — side by side on PC */}
-                        {calendarTab === 'puzzle' && (
-                            <div style={{
-                                flex: 1,
-                                display: 'flex',
-                                flexDirection: isMobile ? 'column' : 'row',
-                                backgroundColor: '#FAFAF9',
-                                overflow: 'hidden',
-                                // Raise above fever overlay (z-50) so content stays readable
-                                position: 'relative',
-                                zIndex: feverMode.active ? 51 : undefined,
-                            }}>
-                                {/* Left: GOD GRID */}
-                                <div style={{
-                                    flex: '0 0 auto',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'flex-start',
-                                    padding: isMobile ? '4px 2px' : '8px',
-                                    overflowY: 'auto',
-                                }}>
-                                    <PuzzleBoard
-                                        dropCard={puzzleDropCard as any}
-                                        chainMode={chainState.mode}
-                                        isMobile={isMobile}
-                                        cardPoints={cardPoints}
-                                        mastery={phraseMastery}
-                                        hideSidePanel={!isMobile}
-                                        onChainResult={(result) => {
-                                            if (result.gpEarned > 0) {
-                                                setPlayerSparks(prev => prev + result.gpEarned);
-                                            }
-                                        }}
-                                        onGridMilestone={(data) => setMilestoneData(data)}
-                                        onGridUpdate={setGridInfo}
-                                        onCardClick={(phraseId) => {
-                                            const phrase = phrases.find(p => p.id === phraseId);
-                                            if (phrase) {
-                                                const dateKey = phrase.date.split('T')[0];
-                                                setSelectedDate(dateKey);
-                                            }
-                                        }}
-                                    />
-                                </div>
-                                {/* Center: Card Slot Machine */}
-                                <div style={{
-                                    flex: isMobile ? undefined : 1,
-                                    minWidth: isMobile ? undefined : '420px',
-                                    borderLeft: isMobile ? 'none' : '1px solid #292524',
-                                    borderTop: isMobile ? '1px solid #292524' : 'none',
-                                    backgroundColor: '#0A0A0A',
-                                    display: 'flex',
-                                    alignItems: 'flex-start',
-                                    justifyContent: 'center',
-                                    padding: isMobile ? '8px 0' : '16px 0',
-                                    overflowY: 'auto',
-                                }}>
-                                    <ReviewSlotPanel
-                                        dropCard={puzzleDropCard}
-                                        cardPool={slotCardPool}
-                                        specialMode={specialSlotMode}
-                                        onSpecialSpinDone={handleSpecialSpinDone}
-                                        onSpinComplete={handleSlotSpinComplete}
-                                        onBigWin={handleSlotResult}
-                                        gridInfo={gridInfo}
-                                        gridCompleteGrade={milestoneData?.grade || null}
-                                        onBonusSlotPress={() => handleSpecialSlotTrigger(milestoneData?.grade || 'B')}
-                                        sessionGP={playerSparks}
-                                        isMobile={isMobile}
-                                    />
-                                </div>
-                            </div>
-                        )}
                     </div>
 
-                    {/* Mini Runner - Mobile only, hidden in calendar tab */}
-                    {isMobile && calendarTab === 'puzzle' && (
-                        <div style={{ position: 'relative' }}>
-                            {showRunner && (
-                                <MiniRunner
-                                    todayXP={todayXP}
-                                    goalXP={goalXP}
-                                    onGoalChange={handleGoalChange}
-                                    lastReviewedWord={lastReviewedWord}
-                                    dropCard={puzzleDropCard as any}
-                                    gridInfo={gridInfo}
-                                    sessionGP={playerSparks}
-                                    slotMode="minimal"
-                                />
-                            )}
-                            <button
-                                onClick={() => {
-                                    setShowRunner(prev => {
-                                        const next = !prev;
-                                        localStorage.setItem('training-show-runner', String(next));
-                                        return next;
-                                    });
-                                }}
-                                style={{
-                                    position: showRunner ? 'absolute' : 'relative',
-                                    right: showRunner ? '6px' : undefined,
-                                    bottom: showRunner ? '4px' : undefined,
-                                    marginLeft: showRunner ? undefined : 'auto',
-                                    display: 'block',
-                                    background: 'rgba(255,255,255,0.7)',
-                                    border: '1px solid #E7E5E4',
-                                    borderRadius: '4px',
-                                    padding: '2px 6px',
-                                    fontSize: '9px',
-                                    fontWeight: '600',
-                                    color: '#A8A29E',
-                                    cursor: 'pointer',
-                                    zIndex: 40,
-                                    backdropFilter: 'blur(4px)',
-                                }}
-                            >
-                                {showRunner ? 'HIDE' : 'SHOW RUNNER'}
-                            </button>
-                        </div>
-                    )}
 
                     {/* Right Panel - Stats OR Selected Date Phrases (hidden in review mode) */}
                     <div style={{
