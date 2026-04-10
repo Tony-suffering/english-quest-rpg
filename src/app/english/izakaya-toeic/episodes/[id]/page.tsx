@@ -10,7 +10,6 @@ import { recordEpisodeResult, getEpisodeResult, addVocabToDeck, getVocabDeck, Vo
 import { T, parseConversation, isConversation } from '@/data/izakaya-toeic/theme';
 import { THIRTY_DAY_PLAN, getCompletedDays, markDayComplete } from '@/data/izakaya-toeic/thirty-day-plan';
 import EpisodeTutorial from '../EpisodeTutorial';
-import BookRecommendation from '../../BookRecommendation';
 
 type Phase = 'story' | 'quiz' | 'results';
 
@@ -289,13 +288,45 @@ function QuizQuestion({
           <ConversationPlayer script={question.audioScript} />
         </div>
       ) : question.audioScript ? (
-        <button onClick={() => playQuizAudio(episodeId, qIndex, question.audioScript!)} style={{
-          width: '100%', padding: '12px 16px', background: T.surface, borderRadius: 10,
-          marginBottom: 16, textAlign: 'left', cursor: 'pointer',
-          border: `1px solid ${T.border}`, borderLeftWidth: 3, borderLeftColor: T.gold,
-        }}>
-          <div style={{ fontSize: 10, color: T.gold, fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>YOU HEAR (tap to replay)</div>
-          <div style={{ fontSize: 15, color: T.text, fontWeight: 500, lineHeight: 1.6 }}>{question.audioScript}</div>
+        <button
+          onClick={() => playQuizAudio(episodeId, qIndex, question.audioScript!)}
+          aria-label="音声を再生"
+          style={{
+            width: '100%', padding: '18px 18px',
+            background: T.surface,
+            borderRadius: 14,
+            marginBottom: 16, textAlign: 'left' as const, cursor: 'pointer',
+            border: `2px solid ${T.goldBorder}`,
+            display: 'flex', alignItems: 'center', gap: 14,
+            boxShadow: T.shadow,
+            transition: 'all 0.2s',
+          }}
+        >
+          <div style={{
+            width: 54, height: 54, borderRadius: '50%',
+            background: `linear-gradient(135deg, ${T.gold}, #C9A227)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+            boxShadow: `0 5px 14px ${T.gold}55`,
+            animation: 'izk-breathe 2.4s ease-in-out infinite',
+          }}>
+            <span style={{
+              width: 0, height: 0,
+              borderLeft: '16px solid #fff',
+              borderTop: '10px solid transparent',
+              borderBottom: '10px solid transparent',
+              marginLeft: 4,
+            }} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{
+              fontSize: 11, color: T.gold, fontWeight: 800,
+              letterSpacing: 1.2, marginBottom: 4,
+            }}>タップで音声を再生</div>
+            <div style={{ fontSize: 13, color: T.textSub, fontWeight: 500, lineHeight: 1.5 }}>
+              聞いて、答えを選べ
+            </div>
+          </div>
         </button>
       ) : null}
 
@@ -1478,9 +1509,6 @@ export default function EpisodeDetailPage() {
               </div>
             )}
 
-            {/* Book recommendations */}
-            <BookRecommendation skill={episode.targetSkill} limit={2} context="episode" />
-
             {/* Action buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
               <div style={{ display: 'flex', gap: 8 }}>
@@ -1623,6 +1651,10 @@ export default function EpisodeDetailPage() {
         @keyframes izk-fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes izk-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
         @keyframes izk-shake { 0% { transform: translateX(-1px); } 50% { transform: translateX(1px); } 100% { transform: translateX(-1px); } }
+        @keyframes izk-breathe {
+          0%, 100% { box-shadow: 0 5px 14px ${T.gold}55, 0 0 0 0 ${T.gold}30; }
+          50% { box-shadow: 0 5px 14px ${T.gold}55, 0 0 0 8px ${T.gold}15; }
+        }
       `}</style>
       <EpisodeTutorial />
     </div>

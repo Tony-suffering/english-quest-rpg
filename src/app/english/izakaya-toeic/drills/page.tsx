@@ -32,7 +32,7 @@ function playSound(type: 'correct' | 'wrong' | 'tap' | 'complete') {
   } catch { /* */ }
 }
 
-function speakText(text: string, rate = 0.9) {
+function speakText(text: string, rate = 0.9, onStart?: () => void, onEnd?: () => void) {
   if (typeof window === 'undefined' || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
@@ -40,6 +40,9 @@ function speakText(text: string, rate = 0.9) {
   const voices = window.speechSynthesis.getVoices();
   const en = voices.find(v => /google us|david|daniel/i.test(v.name) && v.lang.startsWith('en'));
   if (en) utter.voice = en;
+  utter.onstart = () => onStart?.();
+  utter.onend = () => onEnd?.();
+  utter.onerror = () => onEnd?.();
   window.speechSynthesis.speak(utter);
 }
 
@@ -77,6 +80,10 @@ export default function Part2DrillPage() {
   const [revealed, setRevealed] = useState(false);
   const [results, setResults] = useState<boolean[]>([]);
   const [expandedQ, setExpandedQ] = useState<number | null>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [audioRate, setAudioRate] = useState(0.9);
+  const [showScript, setShowScript] = useState(false);
+  const [playCount, setPlayCount] = useState(0);
 
   const stats = useMemo(() => getPart2Stats(), []);
 
@@ -97,13 +104,35 @@ export default function Part2DrillPage() {
 
   const current = drillSet[currentIdx];
 
-  // Auto-play audio
+  const playAudio = useCallback(() => {
+    if (!current) return;
+    setPlayCount(c => c + 1);
+    speakText(
+      current.audioScript,
+      audioRate,
+      () => setIsSpeaking(true),
+      () => setIsSpeaking(false),
+    );
+  }, [current, audioRate]);
+
+  // Auto-play audio + reset script visibility per question
   useEffect(() => {
     if (mode === 'drill' && current) {
-      const t = setTimeout(() => speakText(current.audioScript), 400);
+      setShowScript(false);
+      setPlayCount(0);
+      const t = setTimeout(() => {
+        setPlayCount(1);
+        speakText(
+          current.audioScript,
+          audioRate,
+          () => setIsSpeaking(true),
+          () => setIsSpeaking(false),
+        );
+      }, 400);
       return () => clearTimeout(t);
     }
-  }, [mode, currentIdx, current]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, currentIdx]);
 
   const handleSelect = useCallback((idx: number) => {
     if (revealed) return;
@@ -312,18 +341,124 @@ export default function Part2DrillPage() {
               }} />
             </div>
 
-            {/* Audio script */}
-            <button
-              onClick={() => speakText(current.audioScript)}
-              style={{
-                width: '100%', padding: '14px 16px', background: T.surface, borderRadius: 10,
-                marginBottom: 14, textAlign: 'left', cursor: 'pointer',
-                border: `1px solid ${T.border}`, borderLeftWidth: 3, borderLeftColor: T.gold,
-              }}
-            >
-              <div style={{ fontSize: 10, color: T.gold, fontWeight: 700, letterSpacing: 1, marginBottom: 4 }}>YOU HEAR (tap to replay)</div>
-              <div style={{ fontSize: 16, color: T.text, fontWeight: 600, lineHeight: 1.6 }}>{current.audioScript}</div>
-            </button>
+            {/* Audio player -- large, obvious, with speed control */}
+            <div style={{ marginBottom: 14 }}>
+              <button
+                onClick={playAudio}
+                aria-label="音声を再生"
+                style={{
+                  width: '100%',
+                  padding: '20px 18px',
+                  background: isSpeaking
+                    ? `linear-gradient(135deg, ${T.goldBg}, rgba(253,230,138,0.25))`
+                    : T.surface,
+                  border: `2px solid ${isSpeaking ? T.gold : T.goldBorder}`,
+                  borderRadius: 14,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 16,
+                  textAlign: 'left' as const,
+                  boxShadow: isSpeaking ? T.goldGlow : T.shadow,
+                  transition: 'all 0.25s ease',
+                  position: 'relative' as const,
+                }}
+              >
+                {/* Big circular play button */}
+                <div style={{
+                  width: 60, height: 60, borderRadius: '50%',
+                  background: `linear-gradient(135deg, ${T.gold}, #C9A227)`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', flexShrink: 0,
+                  boxShadow: `0 6px 16px ${T.gold}55`,
+                  animation: isSpeaking ? 'izk-pulse 1.2s ease-in-out infinite' : 'izk-breathe 2.4s ease-in-out infinite',
+                  position: 'relative' as const,
+                }}>
+                  {isSpeaking ? (
+                    <div style={{ display: 'flex', gap: 3, alignItems: 'center', height: 18 }}>
+                      <span style={{ width: 3, background: '#fff', borderRadius: 2, animation: 'izk-bar 0.9s ease-in-out infinite', animationDelay: '0s' }} />
+                      <span style={{ width: 3, background: '#fff', borderRadius: 2, animation: 'izk-bar 0.9s ease-in-out infinite', animationDelay: '0.15s' }} />
+                      <span style={{ width: 3, background: '#fff', borderRadius: 2, animation: 'izk-bar 0.9s ease-in-out infinite', animationDelay: '0.3s' }} />
+                      <span style={{ width: 3, background: '#fff', borderRadius: 2, animation: 'izk-bar 0.9s ease-in-out infinite', animationDelay: '0.45s' }} />
+                    </div>
+                  ) : (
+                    <span style={{
+                      width: 0, height: 0,
+                      borderLeft: '18px solid #fff',
+                      borderTop: '11px solid transparent',
+                      borderBottom: '11px solid transparent',
+                      marginLeft: 5,
+                    }} />
+                  )}
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: 11, color: T.gold, fontWeight: 800,
+                    letterSpacing: 1.2, marginBottom: 4,
+                    display: 'flex', alignItems: 'center', gap: 6,
+                  }}>
+                    {isSpeaking ? '再生中...' : playCount === 0 ? 'タップで音声を再生' : 'もう一度再生'}
+                    {playCount > 0 && !isSpeaking && (
+                      <span style={{
+                        fontSize: 9, color: T.textMuted, fontWeight: 600,
+                        background: T.bgSecondary, padding: '1px 5px', borderRadius: 8,
+                      }}>×{playCount}</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 13, color: T.textSub, fontWeight: 500, lineHeight: 1.5 }}>
+                    問題文を聞いて、下から答えを選べ
+                  </div>
+                </div>
+              </button>
+
+              {/* Speed + reveal script row */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                marginTop: 8, padding: '0 4px',
+              }}>
+                <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                  <span style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, marginRight: 4 }}>速度</span>
+                  {([['slow', 0.7, 'ゆっくり'], ['normal', 0.9, '標準'], ['fast', 1.05, '速い']] as const).map(([key, r, label]) => (
+                    <button
+                      key={key}
+                      onClick={() => setAudioRate(r)}
+                      style={{
+                        padding: '4px 10px',
+                        background: audioRate === r ? T.gold : 'transparent',
+                        color: audioRate === r ? '#fff' : T.textMuted,
+                        border: `1px solid ${audioRate === r ? T.gold : T.border}`,
+                        borderRadius: 14, fontSize: 10, fontWeight: 700, cursor: 'pointer',
+                        transition: 'all 0.15s',
+                      }}
+                    >{label}</button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setShowScript(s => !s)}
+                  style={{
+                    padding: '4px 10px',
+                    background: 'transparent',
+                    color: showScript ? T.gold : T.textMuted,
+                    border: `1px solid ${showScript ? T.gold : T.border}`,
+                    borderRadius: 14, fontSize: 10, fontWeight: 700, cursor: 'pointer',
+                  }}
+                >{showScript ? '字幕OFF' : '字幕表示'}</button>
+              </div>
+
+              {/* Script reveal */}
+              {showScript && (
+                <div style={{
+                  marginTop: 8, padding: '10px 14px',
+                  background: T.bgSecondary, borderRadius: 8,
+                  border: `1px dashed ${T.border}`,
+                  fontSize: 14, color: T.text, fontWeight: 600, lineHeight: 1.6,
+                  animation: 'izk-fadein 0.2s ease',
+                }}>
+                  {current.audioScript}
+                </div>
+              )}
+            </div>
 
             {/* Choices */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 5, marginBottom: 14 }}>
@@ -512,6 +647,18 @@ export default function Part2DrillPage() {
 
       <style>{`
         @keyframes izk-fadein { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes izk-pulse {
+          0%, 100% { box-shadow: 0 6px 16px ${T.gold}55, 0 0 0 0 ${T.gold}60; transform: scale(1); }
+          50% { box-shadow: 0 6px 16px ${T.gold}55, 0 0 0 12px ${T.gold}00; transform: scale(1.04); }
+        }
+        @keyframes izk-breathe {
+          0%, 100% { box-shadow: 0 6px 16px ${T.gold}55, 0 0 0 0 ${T.gold}30; }
+          50% { box-shadow: 0 6px 16px ${T.gold}55, 0 0 0 6px ${T.gold}15; }
+        }
+        @keyframes izk-bar {
+          0%, 100% { height: 6px; }
+          50% { height: 18px; }
+        }
       `}</style>
     </div>
   );

@@ -257,13 +257,25 @@ export default function SoundChangesPage() {
                   {/* Play button */}
                   <button
                     onClick={e => { e.stopPropagation(); speakText(entry.written, ttsRate); }}
+                    aria-label="音声を再生"
+                    title="タップで再生"
                     style={{
-                      width: 32, height: 32, borderRadius: '50%', background: c + '10',
-                      border: `1.5px solid ${c}30`, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      cursor: 'pointer', flexShrink: 0, fontSize: 12, color: c, fontWeight: 900,
+                      width: 42, height: 42, borderRadius: '50%',
+                      background: `linear-gradient(135deg, ${c}, ${c}DD)`,
+                      border: 'none',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', flexShrink: 0,
+                      boxShadow: `0 4px 10px ${c}40`,
+                      transition: 'all 0.15s',
                     }}
                   >
-                    P
+                    <span style={{
+                      width: 0, height: 0,
+                      borderLeft: '11px solid #fff',
+                      borderTop: '7px solid transparent',
+                      borderBottom: '7px solid transparent',
+                      marginLeft: 3,
+                    }} />
                   </button>
                   <span style={{ fontSize: 10, color: T.textMuted, flexShrink: 0 }}>{isOpen ? 'v' : '>'}</span>
                 </button>
@@ -300,12 +312,23 @@ export default function SoundChangesPage() {
                           <div style={{ display: 'flex', gap: 6, alignItems: 'flex-start', marginBottom: 4 }}>
                             <button
                               onClick={() => speakText(ex.sentence, ttsRate)}
+                              aria-label="例文を再生"
+                              title="タップで再生"
                               style={{
-                                padding: '2px 6px', background: c + '10', border: `1px solid ${c}30`,
-                                borderRadius: 4, fontSize: 9, fontWeight: 700, color: c, cursor: 'pointer', flexShrink: 0,
+                                width: 26, height: 26, borderRadius: '50%',
+                                background: c, border: 'none',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                cursor: 'pointer', flexShrink: 0,
+                                boxShadow: `0 2px 6px ${c}50`,
                               }}
                             >
-                              PLAY
+                              <span style={{
+                                width: 0, height: 0,
+                                borderLeft: '7px solid #fff',
+                                borderTop: '4px solid transparent',
+                                borderBottom: '4px solid transparent',
+                                marginLeft: 2,
+                              }} />
                             </button>
                             <span style={{
                               padding: '2px 5px', background: T.bgSecondary, borderRadius: 3,
