@@ -28,3 +28,20 @@ Each session audits and improves the 5 weakest exercises.
 
 ---
 
+## 2026-04-11 Session -- Options + Character Enrichment (Days 13, 15)
+
+### Critical Fixes (2 options -> 4 options)
+- **d13-ex01**: Expanded from 2 to 4 options (added 'could' and '聞き取れない'). Added characterIntro (Master) + reaction (Takeshi). Rewrote trap with /ə/ schwa detail.
+- **d13-ex02**: Expanded from 2 to 4 options (added 'could', 'couldn\'t'). Added characterIntro (Lisa) + reaction (Yuki). Rewrote trap to explain /t/ elision trap more specifically.
+- **d13-ex03**: Expanded from 2 to 4 options (added '疑問', '過去進行'). Added characterIntro (Kenji) + reaction (Mina). Enhanced trap with /n/ nasal explanation.
+- **d13-ex04**: Expanded from 2 to 4 options (added 'would', 'might'). Added characterIntro (Master) + reaction (Lisa). Rewrote trap explaining will weak form invisibility.
+- **d15-ex01**: Expanded from 2 to 4 options (added 'まっすぐ前', '後ろ側'). Added characterIntro (Kenji) + reaction (Takeshi). Rewrote trap with /l/ vs /r/ articulation detail (tongue position).
+
+### Quality Stats (days-01-15.ts)
+- Exercises with <4 options remaining: ~60 (many 2-3 option exercises in Days 1-5, 8, 10)
+- Exercises without characterIntro: ~145/150
+- Exercises without reaction: ~135/150
+- Priority next session: Day 1 exercises (ex02-ex05 missing characterIntro)
+
+---
+

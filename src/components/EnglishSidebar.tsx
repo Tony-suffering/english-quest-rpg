@@ -403,6 +403,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />
+                    {renderToolItem({ id: '/english/noren', label: 'のれん', color: C.green })}
                     {renderToolItem({ id: '/english/harvest', label: 'Movie Harvest', color: '#D4AF37' })}
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
                     {renderToolItem({ id: '/english/dashboard', label: 'ダッシュボード', color: '#D4AF37' })}
