@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Footprints, ChevronRight, ArrowUp, ArrowDown, Clock, Compass, Heart } from 'lucide-react';
+import { Footprints, ChevronRight, ArrowUp, ArrowDown, Clock, Compass, Heart, Target } from 'lucide-react';
 import {
   SAMPLE_NORENS,
   BADGE_CONFIG,
@@ -526,6 +526,48 @@ function FootprintPreview({
 }
 
 /* ================================================================
+   Path Relevance Scoring
+   ================================================================ */
+
+function scorePathRelevance(noren: Noren, goal: string): number {
+  const g = goal.toLowerCase();
+  const fields = [noren.goal, noren.name, noren.subtitle, noren.description].join(' ').toLowerCase();
+
+  const goalWords = g.split(/[\s、。,.]/).filter((w) => w.length >= 2);
+  let score = 0;
+  for (const word of goalWords) {
+    if (fields.includes(word)) score += 10;
+  }
+
+  if (g.includes('toeic') || g.includes('トイック')) {
+    if (noren.id === 'toeic-800') score += 20;
+  }
+  if (g.includes('コーチ') || g.includes('教え') || g.includes('先生')) {
+    if (noren.drive === 'teaching') score += 15;
+  }
+  if (g.includes('映画') || g.includes('字幕')) {
+    if (noren.id === 'movie-english') score += 20;
+  }
+  if (g.includes('発音') || g.includes('pronunciation')) {
+    if (noren.id === 'hatsuon-gachi') score += 20;
+  }
+  if (g.includes('会議') || g.includes('ビジネス') || g.includes('仕事')) {
+    if (noren.id === 'eigode-kaigi') score += 20;
+  }
+  if (g.includes('英会話') || g.includes('オンライン')) {
+    if (noren.id === 'eikaiwa-debut') score += 20;
+  }
+  if (g.includes('note') || g.includes('発信') || g.includes('ブログ')) {
+    if (noren.id === 'note-eigo-start') score += 20;
+  }
+  if (g.includes('独立') || g.includes('フリーランス') || g.includes('月収')) {
+    if (noren.id === 'coach-30man') score += 20;
+  }
+
+  return score;
+}
+
+/* ================================================================
    Path Card
    ================================================================ */
 
@@ -794,7 +836,7 @@ function DriveSection({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
           gap: 20,
         }}
       >
@@ -808,6 +850,283 @@ function DriveSection({
         ))}
       </div>
     </section>
+  );
+}
+
+/* ================================================================
+   Recommended Section
+   ================================================================ */
+
+function RecommendedSection({
+  goal,
+  walkingIds,
+}: {
+  goal: string;
+  walkingIds: string[];
+}) {
+  const scored = SAMPLE_NORENS.map((n) => ({
+    noren: n,
+    score: scorePathRelevance(n, goal),
+  }))
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+
+  if (scored.length === 0) return null;
+
+  return (
+    <section style={{ marginBottom: 56 }}>
+      {/* Section header */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          marginBottom: 8,
+          animation: 'norenFadeUp 0.5s ease both',
+        }}
+      >
+        <Target size={16} color={C.gold} strokeWidth={2.2} />
+        <span
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: C.gold,
+            fontFamily: FONT,
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+          }}
+        >
+          YOUR PATH
+        </span>
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 600,
+            color: C.s500,
+            fontFamily: FONT,
+          }}
+        >
+          -- おすすめ
+        </span>
+      </div>
+
+      {/* Tagline */}
+      <p
+        style={{
+          fontSize: 13,
+          color: C.s400,
+          fontFamily: FONT,
+          margin: '0 0 20px',
+          letterSpacing: '0.02em',
+          animation: 'norenFadeUp 0.5s ease 0.05s both',
+        }}
+      >
+        「{goal}」に近い道
+      </p>
+
+      {/* Cards */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
+          gap: 20,
+        }}
+      >
+        {scored.map(({ noren }, i) => (
+          <RecommendedPathCard
+            key={noren.id}
+            noren={noren}
+            isWalking={walkingIds.includes(noren.id)}
+            index={i}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RecommendedPathCard({
+  noren,
+  isWalking,
+  index,
+}: {
+  noren: Noren;
+  isWalking: boolean;
+  index: number;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Link
+      href={`/english/noren/${noren.id}`}
+      style={{ textDecoration: 'none', color: 'inherit' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div
+        style={{
+          position: 'relative',
+          background: C.white,
+          borderRadius: 16,
+          padding: '28px 24px 22px',
+          border: `1px solid ${C.gold}33`,
+          borderLeft: `4px solid ${C.gold}`,
+          boxShadow: hovered ? SHADOW_LG : SHADOW_SM,
+          transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
+          transition: 'all 0.25s ease',
+          cursor: 'pointer',
+          animation: `norenFadeIn 0.5s ease ${index * 0.08}s both`,
+        }}
+      >
+        {/* Top row */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 14,
+          }}
+        >
+          {isWalking ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <Footprints size={12} color={C.gold} strokeWidth={2} />
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: C.gold,
+                  fontFamily: FONT,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                歩いてる
+              </span>
+            </div>
+          ) : (
+            <div style={{ height: 18 }} />
+          )}
+        </div>
+
+        {/* Goal name */}
+        <h3
+          style={{
+            fontSize: 20,
+            fontWeight: 800,
+            color: C.s900,
+            fontFamily: FONT,
+            margin: '0 0 6px',
+            lineHeight: 1.3,
+            letterSpacing: '-0.015em',
+          }}
+        >
+          {noren.name}
+        </h3>
+
+        {/* Subtitle */}
+        <p
+          style={{
+            fontSize: 13,
+            color: C.s500,
+            fontFamily: FONT,
+            margin: '0 0 18px',
+            lineHeight: 1.5,
+          }}
+        >
+          {noren.subtitle}
+        </p>
+
+        {/* Stats row */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 14,
+            marginBottom: 16,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Footprints size={12} color={C.s400} strokeWidth={1.8} />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: C.s600,
+                fontFamily: FONT,
+              }}
+            >
+              {noren.memberCount}人
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <ActivityDot />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: C.emerald,
+                fontFamily: FONT,
+              }}
+            >
+              今日{noren.activeToday}
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span
+              style={{
+                fontSize: 11,
+                color: C.s400,
+                fontFamily: FONT,
+              }}
+            >
+              {noren.milestones.length}ステップ
+            </span>
+          </div>
+        </div>
+
+        {/* Milestones preview */}
+        {noren.milestones.length > 0 && (
+          <div style={{ marginBottom: 14 }}>
+            <MilestonePreview milestones={noren.milestones} />
+          </div>
+        )}
+
+        {/* Latest footprint */}
+        {noren.latestFootprint && (
+          <div style={{ marginBottom: 12 }}>
+            <FootprintPreview footprint={noren.latestFootprint} />
+          </div>
+        )}
+
+        {/* Enter hint */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+            gap: 4,
+            marginTop: 6,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: hovered ? C.gold : C.s400,
+              fontFamily: FONT,
+              transition: 'color 0.2s',
+            }}
+          >
+            この道を見る
+          </span>
+          <ChevronRight
+            size={14}
+            color={hovered ? C.gold : C.s400}
+            style={{ transition: 'color 0.2s' }}
+          />
+        </div>
+      </div>
+    </Link>
   );
 }
 
@@ -916,6 +1235,24 @@ export default function NorenPage() {
           >
             去る者追わず、来る者拒まず
           </p>
+
+          {/* My Journey link - only if walking at least one path */}
+          {walkingIds.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <Link
+                href="/english/noren/me"
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: C.gold,
+                  textDecoration: 'none',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                俺の旅を見る →
+              </Link>
+            </div>
+          )}
         </header>
 
         {/* ── Content ── */}
@@ -926,6 +1263,11 @@ export default function NorenPage() {
             padding: '40px 24px 48px',
           }}
         >
+          {/* Recommended section - based on user's declared goal */}
+          {myGoal && (
+            <RecommendedSection goal={myGoal} walkingIds={walkingIds} />
+          )}
+
           {/* Necessity section first - urgent things on top */}
           {necessityNorens.length > 0 && (
             <DriveSection

@@ -54,7 +54,7 @@ const whoQuestions: Part2Drill[] = [
     explanation: 'Who → 人を答える。B・Cは「キャンペーンの日程/結果」を答えてて完全にズレ。',
     difficulty: 'easy',
     scoreLevel: 400,
-    tip: 'Whoには必ず人名・部署・役職で返す。',
+    tip: 'Who疑問文は「人」で返す鉄則。選択肢に人名・役職・部署名があったらそれが正解候補。逆に場所・時間・金額で返してる選択肢は全部ハズレだ。居酒屋で「誰が払った？」って聞かれて「昨日だよ」って返す奴いないだろ。同じこと。',
   },
   {
     id: 'p2-who-002',
@@ -69,6 +69,7 @@ const whoQuestions: Part2Drill[] = [
     explanation: '予算を承認したのは誰？→ 人名＋部署で答えるAが正解。Cは金額を答えてて完全にズレ。',
     difficulty: 'easy',
     scoreLevel: 400,
+    tip: '「budget」「approved」が聞こえた瞬間に金額や日付で答えたくなる。でもWho質問だから人を答えろ。TOEICはこの「聞こえた単語に引っ張られて質問タイプを忘れる」罠を毎回仕掛けてくる。Whoと聞いた瞬間「人!」と頭に刻め。',
   },
   {
     id: 'p2-who-003',
@@ -83,6 +84,7 @@ const whoQuestions: Part2Drill[] = [
     explanation: '「誰が発表するか」→ 間接的でもDr. Williamsという人名が入ってるAが正解。YesはWho質問に使えない。',
     difficulty: 'easy',
     scoreLevel: 400,
+    tip: '「I\'m not sure, but I think it\'s...」は超頻出の間接回答パターン。断言しないで「たぶん〇〇」と答える形。日本語でも「わかんないけど、たしかウィリアムズ先生じゃない？」って言うだろ。TOEICはこの曖昧回答を正解にするのが大好き。',
   },
   {
     id: 'p2-who-004',
@@ -97,7 +99,7 @@ const whoQuestions: Part2Drill[] = [
     explanation: '「誰に連絡すべきか」→ facilitiesマネージャーに電話してという提案が正解。Aはequipmentを繰り返す音罠。',
     difficulty: 'medium',
     scoreLevel: 500,
-    tip: '問題文の単語を繰り返す選択肢はほぼ罠。',
+    tip: '問題文に出た単語がそのまま選択肢に入ってたら警戒しろ。TOEICは「equipment」「malfunction」みたいなキーワードを選択肢にわざと混ぜて、音で釣る。本物の正解はたいてい問題文の単語を避けて、別の言い方で答える。繰り返し=罠、言い換え=正解。この法則を叩き込め。',
   },
   {
     id: 'p2-who-005',
@@ -112,6 +114,7 @@ const whoQuestions: Part2Drill[] = [
     explanation: '担当者を問う→ Ms. Parkまたはアシスタントという人名回答が正解。Bは場所を答えててズレ。',
     difficulty: 'medium',
     scoreLevel: 500,
+    tip: '「complaints」が聞こえると「苦情の話だ!」と脳が反応して、Aの「We receive a lot of complaints」に飛びつきやすい。これが音の罠(verbatim trap)。日本語で「苦情担当は誰？」に「苦情めっちゃ来ますよ」って返したら会話成立しないだろ。質問の核心は「誰が」であって「苦情」じゃない。',
   },
   {
     id: 'p2-who-006',

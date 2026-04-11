@@ -404,6 +404,35 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />
                     {renderToolItem({ id: '/english/noren', label: 'のれん', color: C.green })}
+                    {/* Sub-item: 俺の旅 — personal journey under のれん */}
+                    {(() => {
+                        const active = isActive('/english/noren/me');
+                        return (
+                            <Link href="/english/noren/me" style={{ textDecoration: 'none', display: 'block' }}>
+                                <div style={{
+                                    padding: '6px 20px 6px 36px',
+                                    color: active ? '#1a1a1a' : '#888',
+                                    backgroundColor: active ? (C.green + '10') : 'transparent',
+                                    borderLeft: active ? `2px solid ${C.green}` : '2px solid transparent',
+                                    fontSize: 12,
+                                    fontWeight: active ? 600 : 400,
+                                    transition: 'all 0.15s ease',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 6,
+                                }}>
+                                    <span style={{
+                                        width: 4,
+                                        height: 4,
+                                        borderRadius: '50%',
+                                        backgroundColor: active ? C.green : '#bbb',
+                                        flexShrink: 0,
+                                    }} />
+                                    俺の旅
+                                </div>
+                            </Link>
+                        );
+                    })()}
                     {renderToolItem({ id: '/english/harvest', label: 'Movie Harvest', color: '#D4AF37' })}
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
                     {renderToolItem({ id: '/english/dashboard', label: 'ダッシュボード', color: '#D4AF37' })}

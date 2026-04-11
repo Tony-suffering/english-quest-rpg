@@ -392,7 +392,7 @@ export default function NorenGoalPathPage() {
   const [nickname, setNickname] = useState('');
   const [nicknameInput, setNicknameInput] = useState('');
   const [showNicknamePrompt, setShowNicknamePrompt] = useState(false);
-  const [toast, setToast] = useState('');
+  const [toast, setToast] = useState<{ text: string; type: Footprint['type'] } | null>(null);
 
   // Footprint form state
   const [fpText, setFpText] = useState('');
@@ -429,8 +429,8 @@ export default function NorenGoalPathPage() {
     if (!id) return;
     startWalking(id);
     setWalking(true);
-    setToast(`${displayName}、この道を歩き始めた。`);
-    setTimeout(() => setToast(''), 3000);
+    setToast({ text: `${displayName}、この道を歩き始めた。`, type: 'breakthrough' });
+    setTimeout(() => setToast(null), 3000);
   };
 
   // ── 404 ─────────────────────────────────────────────────
@@ -486,11 +486,18 @@ export default function NorenGoalPathPage() {
       type: fpType,
       noteUrl: fpNoteUrl.trim() || undefined,
     });
-    setUserFootprints(getUserFootprints(id));
+    const updatedFps = getUserFootprints(id);
+    setUserFootprints(updatedFps);
     setFpText('');
     setFpNoteUrl('');
-    setToast('足跡を残した。');
-    setTimeout(() => setToast(''), 3000);
+    const count = updatedFps.length;
+    const msgs: Record<Footprint['type'], string> = {
+      breakthrough: `突破だ。${count}個目の足跡。`,
+      struggle: `苦戦も立派な足跡だ。${count}個目。`,
+      tip: `コツを共有した。${count}個目の足跡。`,
+    };
+    setToast({ text: msgs[fpType], type: fpType });
+    setTimeout(() => setToast(null), 3500);
   };
 
   const handleAdvanceMilestone = (step: number) => {
@@ -662,16 +669,28 @@ export default function NorenGoalPathPage() {
 
         {/* ── Toast ─────────────────────────────────── */}
 
-        {toast && (
-          <div style={{
-            position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)',
-            padding: '14px 28px', borderRadius: '12px', background: C.s900, color: C.white,
-            fontSize: '15px', fontWeight: 600, boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
-            zIndex: 1000, animation: 'fadeInDown 0.3s ease',
-          }}>
-            {toast}
-          </div>
-        )}
+        {toast && (() => {
+          const ts = FP_STYLE[toast.type];
+          return (
+            <div style={{
+              position: 'fixed', top: '24px', left: '50%', transform: 'translateX(-50%)',
+              padding: '14px 28px', borderRadius: '12px',
+              background: C.s900, color: C.white,
+              borderLeft: `4px solid ${ts.color}`,
+              fontSize: '15px', fontWeight: 600, boxShadow: '0 8px 30px rgba(0,0,0,0.25)',
+              zIndex: 1000, animation: 'fadeInDown 0.35s ease',
+              display: 'flex', alignItems: 'center', gap: '10px',
+            }}>
+              <span style={{
+                fontSize: '10px', fontWeight: 800, color: ts.color,
+                letterSpacing: '0.06em', textTransform: 'uppercase',
+              }}>
+                {ts.label}
+              </span>
+              <span>{toast.text}</span>
+            </div>
+          );
+        })()}
 
         {/* ── Footprint Form (only when walking) ────── */}
 

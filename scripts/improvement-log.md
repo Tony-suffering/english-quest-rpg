@@ -45,3 +45,28 @@ Each session audits and improves the 5 weakest exercises.
 
 ---
 
+## 2026-04-11 Session -- Part 2 Drills TIP Enrichment
+
+### Weak TIPs Fixed (5 exercises)
+- **p2-who-001**: Rewrote tip (was 18 chars, generic "Whoには必ず人名・部署・役職で返す" -- now 100+ chars with concrete izakaya example explaining why time/place answers never work for Who questions)
+- **p2-who-002**: Added tip (was missing entirely -- now explains the verbatim trap where "budget/approved" keywords lure you into picking date/amount answers instead of person answers)
+- **p2-who-003**: Added tip (was missing entirely -- now explains "I'm not sure, but I think it's..." indirect answer pattern, a TOEIC favorite for Who questions)
+- **p2-who-004**: Rewrote tip (was 20 chars, generic "問題文の単語を繰り返す選択肢はほぼ罠" -- now 100+ chars with specific explanation of verbatim trap law: repetition=trap, paraphrase=correct)
+- **p2-who-005**: Added tip (was missing entirely -- now explains why "complaints" triggers a verbatim trap response and how to catch it by staying focused on the question type "Who")
+
+### Tone Compliance
+- All tips written in izakaya-friend tone
+- No です/ます/しましょう used
+- Concrete examples in every tip
+
+### Files Reviewed (No Changes Needed)
+- ep-007.ts: All 5 questions have detailed explanations, paraphraseMaps, proper difficulty levels. Strong content.
+- ep-019.ts: All 8 questions excellent quality with multi-layer paraphrasing and inference patterns. Top-tier.
+- ep-025.ts: All 6 questions well-structured with Part 4 pre-reading strategy integration. Solid.
+
+### Quality Stats (part2-drills.ts)
+- Exercises with tip: ~22/120+ (most WH questions still missing tips)
+- Priority next session: Add tips to p2-who-006 through p2-who-008 and p2-what series
+
+---
+
