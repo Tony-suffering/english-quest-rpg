@@ -200,7 +200,7 @@ function FirstVisitScreen({
 
           <div
             style={{
-              maxWidth: 420,
+              maxWidth: 'min(420px, 100%)',
               width: '100%',
               animation: `norenFadeUp 0.8s ease 0.6s both${shaking ? ', norenShake 0.4s ease' : ''}`,
             }}
@@ -298,7 +298,7 @@ function FirstVisitScreen({
 
           <div
             style={{
-              maxWidth: 380,
+              maxWidth: 'min(380px, 100%)',
               width: '100%',
               animation: `norenFadeUp 0.6s ease 0.2s both${shaking ? ', norenShake 0.4s ease' : ''}`,
             }}

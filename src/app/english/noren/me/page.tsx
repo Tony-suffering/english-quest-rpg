@@ -829,7 +829,7 @@ export default function MyJourneyPage() {
           style={{
             maxWidth: 760,
             margin: '0 auto',
-            padding: 'clamp(32px, 5vw, 56px) 24px 72px',
+            padding: 'clamp(32px, 5vw, 56px) 24px clamp(48px, 8vw, 72px)',
           }}
         >
           {/* ── Empty: no walking paths ── */}

@@ -515,7 +515,7 @@ export default function NorenGoalPathPage() {
       background: `linear-gradient(180deg, ${C.s50} 0%, ${C.white} 50%)`,
       fontFamily: "'Noto Sans JP', sans-serif",
     }}>
-      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div style={{ maxWidth: '720px', margin: '0 auto', padding: 'clamp(24px, 4vw, 40px) 24px clamp(48px, 8vw, 80px)' }}>
 
         {/* ── Header ──────────────────────────────────── */}
 
@@ -601,7 +601,7 @@ export default function NorenGoalPathPage() {
             <div style={{ fontSize: '13px', color: C.s500, marginBottom: '16px' }}>
               ニックネームを決めてから歩き出す
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <input
                 type="text"
                 value={nicknameInput}
@@ -610,7 +610,7 @@ export default function NorenGoalPathPage() {
                 placeholder="ニックネーム"
                 maxLength={12}
                 style={{
-                  flex: 1, padding: '12px 16px', border: `1px solid ${C.s300}`,
+                  flex: '1 1 200px', minWidth: 0, padding: '12px 16px', border: `1px solid ${C.s300}`,
                   borderRadius: '10px', fontSize: '14px', outline: 'none', background: C.white,
                 }}
               />
@@ -762,10 +762,10 @@ export default function NorenGoalPathPage() {
                       title={ms.title}
                       onClick={() => setFpMilestone(ms.step)}
                       style={{
-                        width: '32px', height: '32px', borderRadius: '50%', border: 'none',
+                        width: '40px', height: '40px', borderRadius: '50%', border: 'none',
                         background: fpMilestone === ms.step ? C.gold : C.s100,
                         color: fpMilestone === ms.step ? C.white : C.s600,
-                        fontSize: '12px', fontWeight: 700, cursor: 'pointer',
+                        fontSize: '13px', fontWeight: 700, cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         transition: 'background 0.15s',
                       }}
