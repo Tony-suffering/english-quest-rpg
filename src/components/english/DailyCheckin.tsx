@@ -178,248 +178,265 @@ export default function DailyCheckin({ day, expressions, onComplete, streak }: D
         const streakResult = streakResultRef.current || { current: 1, best: 1, isNew: true };
         const pickedExpressions = expressions.filter(e => selected.has(e.id));
         const isFirstEver = streakResult.current === 1 && streakResult.isNew;
+        const easing = 'cubic-bezier(0.2, 0.65, 0.3, 0.9)';
+
+        // Deterministic dust particles (no random, SSR-safe, consistent)
+        const dust = Array.from({ length: 16 }, (_, i) => ({
+            left: (i * 41 + 7) % 100,
+            delay: (i * 0.37) % 5,
+            duration: 9 + ((i * 1.3) % 5),
+            size: 1.5 + ((i * 0.7) % 2.5),
+            drift: ((i * 13) % 30) - 15,
+        }));
 
         return (
             <div style={{
                 position: 'fixed', inset: 0, zIndex: 9999,
-                backgroundColor: 'rgba(0,0,0,0.92)',
+                background: 'radial-gradient(ellipse at center, #1a1917 0%, #050403 75%)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                flexDirection: 'column', padding: 24,
-                animation: 'celFadeIn 0.4s ease-out',
+                flexDirection: 'column', padding: '40px 24px',
+                animation: 'celFadeIn 0.6s ease-out',
                 overflow: 'hidden',
             }}>
                 <style>{`
                     @keyframes celFadeIn { from { opacity: 0; } to { opacity: 1; } }
-                    @keyframes celRingBurst {
-                        0% { transform: scale(0); opacity: 1; }
-                        60% { transform: scale(1); opacity: 1; }
-                        100% { transform: scale(1.8); opacity: 0; }
+                    @keyframes celRise {
+                        from { opacity: 0; transform: translateY(14px); }
+                        to   { opacity: 1; transform: translateY(0); }
                     }
-                    @keyframes celCheckPop {
-                        0% { transform: scale(0) rotate(-45deg); opacity: 0; }
-                        60% { transform: scale(1.15) rotate(0deg); opacity: 1; }
-                        100% { transform: scale(1) rotate(0deg); opacity: 1; }
+                    @keyframes celRingExpand {
+                        0%   { transform: scale(0.6); opacity: 0; }
+                        40%  { opacity: 0.5; }
+                        100% { transform: scale(1.15); opacity: 0; }
                     }
-                    @keyframes celGlow {
-                        0%, 100% { box-shadow: 0 0 30px rgba(212,175,55,0.3), 0 0 60px rgba(212,175,55,0.1); }
-                        50% { box-shadow: 0 0 50px rgba(212,175,55,0.6), 0 0 100px rgba(212,175,55,0.2); }
+                    @keyframes celOrbPulse {
+                        0%, 100% { transform: scale(1);    opacity: 0.75; }
+                        50%      { transform: scale(1.06); opacity: 1; }
                     }
-                    @keyframes celRays {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
+                    @keyframes celDust {
+                        0%   { transform: translateY(0) translateX(0); opacity: 0; }
+                        10%  { opacity: 0.7; }
+                        90%  { opacity: 0.5; }
+                        100% { transform: translateY(-110vh) translateX(var(--drift, 0px)); opacity: 0; }
                     }
-                    @keyframes celTextUp {
-                        from { opacity: 0; transform: translateY(20px); }
-                        to { opacity: 1; transform: translateY(0); }
+                    @keyframes celShimmer {
+                        0%   { background-position: -200% 0; }
+                        100% { background-position:  200% 0; }
                     }
-                    @keyframes celPickSlide {
-                        from { opacity: 0; transform: translateX(-24px); }
-                        to { opacity: 1; transform: translateX(0); }
+                    .cel-shimmer {
+                        background: linear-gradient(
+                            90deg,
+                            #ffffff 0%,
+                            #ffffff 35%,
+                            ${gold} 50%,
+                            #ffffff 65%,
+                            #ffffff 100%
+                        );
+                        background-size: 200% 100%;
+                        -webkit-background-clip: text;
+                        background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        color: transparent;
+                        animation: celShimmer 5s linear infinite;
                     }
-                    @keyframes celParticle {
-                        0% { opacity: 1; transform: translate(0, 0) scale(1); }
-                        100% { opacity: 0; transform: translate(var(--px), var(--py)) scale(0); }
-                    }
-                    @keyframes celStreakCount {
-                        from { opacity: 0; transform: scale(0.5); }
-                        to { opacity: 1; transform: scale(1); }
-                    }
-                    @keyframes celShine {
-                        0% { left: -100%; }
-                        100% { left: 200%; }
+                    .cel-dust {
+                        position: absolute;
+                        bottom: -10px;
+                        width: var(--s);
+                        height: var(--s);
+                        border-radius: 50%;
+                        background: ${gold};
+                        box-shadow: 0 0 6px ${gold}aa, 0 0 12px ${gold}55;
+                        animation: celDust var(--d) linear infinite;
+                        animation-delay: var(--dl);
+                        pointer-events: none;
                     }
                 `}</style>
 
-                {/* Rotating light rays behind the icon */}
+                {/* Ambient gold orb */}
+                <div style={{
+                    position: 'absolute',
+                    width: 560, height: 560, borderRadius: '50%',
+                    background: `radial-gradient(circle, ${gold}20 0%, ${gold}06 40%, transparent 70%)`,
+                    filter: 'blur(60px)',
+                    opacity: celebrateStep >= 1 ? 1 : 0,
+                    transition: 'opacity 1.2s ease-out',
+                    animation: celebrateStep >= 2 ? 'celOrbPulse 5s ease-in-out infinite' : 'none',
+                    pointerEvents: 'none',
+                }} />
+
+                {/* Rising dust particles */}
+                {celebrateStep >= 1 && dust.map((p, i) => (
+                    <div
+                        key={i}
+                        className="cel-dust"
+                        style={{
+                            left: `${p.left}%`,
+                            ['--s' as string]: `${p.size}px`,
+                            ['--d' as string]: `${p.duration}s`,
+                            ['--dl' as string]: `${p.delay}s`,
+                            ['--drift' as string]: `${p.drift}px`,
+                        } as React.CSSProperties}
+                    />
+                ))}
+
+                {/* Thin gold ring — single graceful expansion */}
                 {celebrateStep >= 1 && (
                     <div style={{
                         position: 'absolute',
-                        width: 300, height: 300,
-                        animation: 'celRays 20s linear infinite',
-                        opacity: 0.15,
-                    }}>
-                        {Array.from({ length: 12 }, (_, i) => (
-                            <div key={i} style={{
-                                position: 'absolute',
-                                left: '50%', top: '50%',
-                                width: 2, height: 150,
-                                background: `linear-gradient(to top, transparent, ${gold})`,
-                                transformOrigin: 'bottom center',
-                                transform: `translateX(-50%) rotate(${i * 30}deg)`,
-                            }} />
-                        ))}
-                    </div>
-                )}
-
-                {/* Particle burst */}
-                {celebrateStep >= 1 && (
-                    <div style={{ position: 'absolute', width: 0, height: 0 }}>
-                        {Array.from({ length: 20 }, (_, i) => {
-                            const angle = (i / 20) * Math.PI * 2;
-                            const dist = 80 + Math.random() * 100;
-                            const px = Math.cos(angle) * dist;
-                            const py = Math.sin(angle) * dist;
-                            const size = 3 + Math.random() * 5;
-                            const colors = [gold, '#F5D76E', '#FFE4A0', '#10B981', '#fff'];
-                            return (
-                                <div key={i} style={{
-                                    position: 'absolute',
-                                    width: size, height: size,
-                                    borderRadius: '50%',
-                                    backgroundColor: colors[i % colors.length],
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    ['--px' as any]: `${px}px`,
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    ['--py' as any]: `${py}px`,
-                                    animation: `celParticle ${0.8 + Math.random() * 0.6}s ease-out ${Math.random() * 0.3}s forwards`,
-                                }} />
-                            );
-                        })}
-                    </div>
-                )}
-
-                {/* Expanding ring burst */}
-                {celebrateStep >= 1 && (
-                    <>
-                        <div style={{
-                            position: 'absolute',
-                            width: 100, height: 100, borderRadius: '50%',
-                            border: `3px solid ${gold}`,
-                            animation: 'celRingBurst 0.8s ease-out forwards',
-                        }} />
-                        <div style={{
-                            position: 'absolute',
-                            width: 100, height: 100, borderRadius: '50%',
-                            border: `2px solid ${green}`,
-                            animation: 'celRingBurst 0.8s ease-out 0.15s forwards',
-                            opacity: 0,
-                        }} />
-                    </>
-                )}
-
-                {/* Main check icon */}
-                <div style={{
-                    width: 88, height: 88, borderRadius: '50%',
-                    background: `linear-gradient(135deg, ${gold}, #F5D76E, ${gold})`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    animation: celebrateStep >= 1
-                        ? 'celCheckPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards, celGlow 2s ease-in-out 0.5s infinite'
-                        : 'none',
-                    opacity: celebrateStep >= 1 ? undefined : 0,
-                    marginBottom: 20,
-                    position: 'relative',
-                    overflow: 'hidden',
-                }}>
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    {/* Shine sweep */}
-                    <div style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
-                        animation: 'celShine 1.5s ease-in-out 0.6s',
+                        width: 340, height: 340, borderRadius: '50%',
+                        border: `1px solid ${gold}50`,
+                        animation: `celRingExpand 2.4s ${easing} forwards`,
+                        pointerEvents: 'none',
                     }} />
-                </div>
+                )}
 
-                {/* Text content */}
-                {celebrateStep >= 2 && (
-                    <div style={{ textAlign: 'center', animation: 'celTextUp 0.5s ease-out' }}>
+                {/* Content */}
+                <div style={{
+                    position: 'relative', zIndex: 1,
+                    maxWidth: 520, width: '100%', textAlign: 'center',
+                }}>
+                    {/* Label */}
+                    <div style={{
+                        opacity: celebrateStep >= 1 ? 1 : 0,
+                        transform: celebrateStep >= 1 ? 'translateY(0)' : 'translateY(-8px)',
+                        transition: `all 1s ${easing}`,
+                        marginBottom: 18,
+                    }}>
                         <div style={{
-                            fontSize: 10, letterSpacing: '0.35em', color: gold,
-                            fontWeight: 700, marginBottom: 10,
+                            fontSize: 10, letterSpacing: '0.45em', color: gold,
+                            fontWeight: 700,
+                            textShadow: `0 0 20px ${gold}80`,
                         }}>
-                            {isFirstEver ? 'FIRST CHECK IN' : 'CHECK IN COMPLETE'}
+                            {isFirstEver ? 'FIRST CHECK IN' : 'CHECK IN'}
                         </div>
-                        <div style={{
-                            fontSize: 28, fontWeight: 900, color: '#fff', marginBottom: 4,
-                            textShadow: `0 0 30px rgba(212,175,55,0.3)`,
-                        }}>
+                    </div>
+
+                    {/* Day number — star */}
+                    <div style={{
+                        opacity: celebrateStep >= 2 ? 1 : 0,
+                        transform: celebrateStep >= 2 ? 'translateY(0) scale(1)' : 'translateY(14px) scale(0.96)',
+                        transition: `all 1.2s ${easing}`,
+                        marginBottom: 14,
+                    }}>
+                        <div
+                            className={celebrateStep >= 3 ? 'cel-shimmer' : ''}
+                            style={{
+                                fontSize: 72,
+                                fontWeight: 200,
+                                color: celebrateStep >= 3 ? undefined : '#fff',
+                                lineHeight: 1,
+                                fontFamily: 'Georgia, serif',
+                                letterSpacing: '-0.01em',
+                                textShadow: celebrateStep >= 3 ? 'none' : `0 0 40px ${gold}50`,
+                            }}
+                        >
                             Day {day}
                         </div>
-                        {isFirstEver && (
-                            <div style={{
-                                fontSize: 12, color: '#888', fontWeight: 300, marginTop: 4,
-                                animation: 'celTextUp 0.5s ease-out 0.2s both',
-                            }}>
-                                365日の旅が始まった
-                            </div>
-                        )}
                     </div>
-                )}
 
-                {/* Selected 3 picks reveal */}
-                {celebrateStep >= 3 && (
+                    {/* Gold divider */}
                     <div style={{
-                        marginTop: 24, width: '100%', maxWidth: 320,
-                        display: 'flex', flexDirection: 'column', gap: 6,
-                    }}>
+                        width: celebrateStep >= 3 ? 60 : 0,
+                        height: 1,
+                        background: `linear-gradient(90deg, transparent, ${gold}, transparent)`,
+                        margin: '0 auto 24px',
+                        transition: `width 1s ${easing}`,
+                        boxShadow: celebrateStep >= 3 ? `0 0 12px ${gold}80` : 'none',
+                    }} />
+
+                    {/* Subtitle */}
+                    {isFirstEver && (
                         <div style={{
-                            fontSize: 9, letterSpacing: '0.25em', color: '#555',
-                            fontWeight: 700, textAlign: 'center', marginBottom: 4,
-                            animation: 'celTextUp 0.3s ease-out both',
+                            opacity: celebrateStep >= 3 ? 0.6 : 0,
+                            transform: celebrateStep >= 3 ? 'translateY(0)' : 'translateY(6px)',
+                            transition: `all 0.9s ${easing} 0.2s`,
+                            marginBottom: 28,
+                            fontSize: 12, color: '#b8b8b8', fontStyle: 'italic',
+                            fontWeight: 300, letterSpacing: '0.04em',
                         }}>
-                            TODAY&apos;S PICKS
+                            365日の旅が、今日始まる
                         </div>
-                        {pickedExpressions.map((expr, i) => {
-                            const charColor = CHARACTER_COLORS[expr.character] || '#78716C';
-                            return (
+                    )}
+
+                    {/* Selected 3 picks — minimal list */}
+                    {celebrateStep >= 3 && (
+                        <div style={{
+                            width: '100%', maxWidth: 420, margin: '0 auto',
+                            display: 'flex', flexDirection: 'column', gap: 10,
+                            marginTop: isFirstEver ? 0 : 8,
+                        }}>
+                            <div style={{
+                                fontSize: 9, letterSpacing: '0.35em', color: `${gold}aa`,
+                                fontWeight: 700, marginBottom: 6,
+                                animation: `celRise 0.8s ${easing} both`,
+                            }}>
+                                TODAY&apos;S THREE
+                            </div>
+                            {pickedExpressions.map((expr, i) => (
                                 <div key={expr.id} style={{
-                                    display: 'flex', alignItems: 'center', gap: 10,
-                                    padding: '10px 14px',
-                                    backgroundColor: 'rgba(212,175,55,0.06)',
-                                    border: `1px solid rgba(212,175,55,0.15)`,
-                                    borderRadius: 8,
-                                    animation: `celPickSlide 0.4s ease-out ${i * 0.12}s both`,
+                                    padding: '14px 18px',
+                                    background: `linear-gradient(135deg, ${gold}0c, transparent)`,
+                                    border: `1px solid ${gold}22`,
+                                    borderLeft: `2px solid ${gold}`,
+                                    textAlign: 'left',
+                                    animation: `celRise 0.9s ${easing} ${0.15 + i * 0.18}s both`,
                                 }}>
                                     <div style={{
-                                        width: 6, height: 6, borderRadius: '50%',
-                                        backgroundColor: charColor, flexShrink: 0,
-                                    }} />
-                                    <div style={{ flex: 1, minWidth: 0 }}>
-                                        <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', lineHeight: 1.3 }}>
-                                            {expr.japanese}
-                                        </div>
-                                        <div style={{ fontSize: 11, color: gold, lineHeight: 1.4, opacity: 0.8 }}>
-                                            {expr.english}
-                                        </div>
+                                        fontSize: 14, fontWeight: 400, color: '#f0f0f0',
+                                        lineHeight: 1.5, marginBottom: 4,
+                                    }}>
+                                        {expr.japanese}
                                     </div>
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={green} strokeWidth="2.5" strokeLinecap="round">
-                                        <polyline points="20 6 9 17 4 12" />
-                                    </svg>
+                                    <div style={{
+                                        fontSize: 11, color: `${gold}cc`,
+                                        lineHeight: 1.4, fontStyle: 'italic',
+                                        letterSpacing: '0.01em',
+                                    }}>
+                                        {expr.english}
+                                    </div>
                                 </div>
-                            );
-                        })}
-                        <div style={{
-                            fontSize: 10, color: '#444', textAlign: 'center', marginTop: 4,
-                            animation: `celTextUp 0.3s ease-out ${pickedExpressions.length * 0.12 + 0.2}s both`,
-                        }}>
-                            <span style={{ color: green }}>トレーニング</span>に登録済み
+                            ))}
+                            <div style={{
+                                fontSize: 10, color: '#666', marginTop: 8,
+                                letterSpacing: '0.15em', textAlign: 'center',
+                                animation: `celRise 0.8s ${easing} ${0.15 + pickedExpressions.length * 0.18 + 0.1}s both`,
+                            }}>
+                                トレーニングに登録完了
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Streak display */}
-                {celebrateStep >= 4 && streakResult.current >= 2 && (
-                    <div style={{
-                        marginTop: 20, textAlign: 'center',
-                        animation: 'celStreakCount 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    }}>
+                    {/* Streak — quiet pill */}
+                    {celebrateStep >= 4 && streakResult.current >= 2 && (
                         <div style={{
-                            display: 'inline-flex', alignItems: 'baseline', gap: 6,
-                            padding: '8px 20px',
-                            background: 'linear-gradient(135deg, rgba(212,175,55,0.1), rgba(16,185,129,0.08))',
-                            border: '1px solid rgba(212,175,55,0.2)',
-                            borderRadius: 20,
+                            marginTop: 28,
+                            animation: `celRise 1s ${easing}`,
                         }}>
-                            <span style={{ fontSize: 24, fontWeight: 900, color: gold }}>
-                                {streakResult.current}
-                            </span>
-                            <span style={{ fontSize: 11, color: '#888', fontWeight: 500, letterSpacing: '0.05em' }}>
-                                day streak
-                            </span>
+                            <div style={{
+                                display: 'inline-flex', alignItems: 'baseline', gap: 8,
+                                padding: '10px 22px',
+                                border: `1px solid ${gold}40`,
+                                background: `${gold}08`,
+                                boxShadow: `0 0 24px ${gold}20`,
+                            }}>
+                                <span style={{
+                                    fontSize: 22, fontWeight: 200, color: gold,
+                                    fontFamily: 'Georgia, serif',
+                                    textShadow: `0 0 16px ${gold}80`,
+                                }}>
+                                    {streakResult.current}
+                                </span>
+                                <span style={{
+                                    fontSize: 10, color: `${gold}cc`, fontWeight: 600,
+                                    letterSpacing: '0.2em',
+                                }}>
+                                    DAY STREAK
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         );
     }

@@ -807,13 +807,22 @@ export default function EnglishMaster365Page() {
         const today = new Date();
         const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         const pickedEntries = entries.filter(e => picks.includes(e.id));
+        const newlyRegistered: string[] = [];
         pickedEntries.forEach(entry => {
+            const english = entry.english[1]; // Vibe level
             addPhrase({
-                english: entry.english[1], // Vibe level
+                english,
                 japanese: entry.japanese,
                 category: '365-master',
                 date: dateStr,
             });
+            newlyRegistered.push(english.toLowerCase());
+        });
+        // Sync React state so the checkmark shows immediately and prevents re-registration
+        setRegisteredPhrases(prev => {
+            const next = new Set(prev);
+            newlyRegistered.forEach(e => next.add(e));
+            return next;
         });
         setShikomiCount(prev => prev + pickedEntries.length);
         setTodayPicks(picks);
