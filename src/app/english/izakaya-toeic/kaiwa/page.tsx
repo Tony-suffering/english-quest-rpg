@@ -18,6 +18,8 @@ import DailyCheckin, {
 import StreakMilestone from '@/components/english/StreakMilestone';
 import CheckinOnboarding, { isOnboardingComplete } from '@/components/english/CheckinOnboarding';
 import DailyQuote, { isQuoteShownToday } from '@/components/english/DailyQuote';
+import DailyQuests, { type QuestTier } from '@/components/english/DailyQuests';
+import QuestCelebration from '@/components/english/QuestCelebration';
 import { addPhrase } from '@/lib/local-store';
 import DailyConversationPlayer from '@/components/english/DailyConversationPlayer';
 import { getConversation } from '@/data/english/365/daily-conversations';
@@ -527,12 +529,12 @@ export default function EnglishMaster365Page() {
     const [beginnerLevel, setBeginnerLevel] = useState<number | null>(null);
     const [showLevelPicker, setShowLevelPicker] = useState(false);
 
-    // Daily mini-quest — hidden on reload, only visible during active session
+    // Daily quests — 3 tiers: must (3聴+1登録) / normal (5聴+3登録) / final (all mastered)
     const [questListenCount, setQuestListenCount] = useState(0);
     const [questRegisterCount, setQuestRegisterCount] = useState(0);
     const [questDismissed, setQuestDismissed] = useState(true);
-    const [questCelebration, setQuestCelebration] = useState(false);
-    const questWasCompleteRef = useRef(false);
+    const [completedTiers, setCompletedTiers] = useState<Set<QuestTier>>(new Set());
+    const [activeCelebration, setActiveCelebration] = useState<QuestTier | null>(null);
 
     // Load total shikomi count from localStorage
     useEffect(() => {
@@ -552,53 +554,55 @@ export default function EnglishMaster365Page() {
                 setShowLevelPicker(true); // First time: show picker
             }
         } catch { /* */ }
-        // Load daily quest progress
+        // Load daily quest progress (listen/register counts + tier completion flags)
         try {
             const today = getTodayStr();
             const questData = localStorage.getItem(`kaiwa-quest-${today}`);
             if (questData) {
                 const q = JSON.parse(questData);
-                const listened = q.listened || 0;
-                const registered = q.registered || 0;
-                if (listened >= 3 && registered >= 1) {
-                    // Already complete — do NOT restore counts, keep quest hidden
-                    questWasCompleteRef.current = true;
-                } else {
-                    // In progress — restore counts and show quest
-                    setQuestListenCount(listened);
-                    setQuestRegisterCount(registered);
-                    if (!q.dismissed) {
-                        setQuestDismissed(false);
-                    }
+                setQuestListenCount(q.listened || 0);
+                setQuestRegisterCount(q.registered || 0);
+                const tiers = new Set<QuestTier>();
+                if (Array.isArray(q.completedTiers)) {
+                    q.completedTiers.forEach((t: string) => {
+                        if (t === 'must' || t === 'normal' || t === 'final') tiers.add(t);
+                    });
                 }
+                setCompletedTiers(tiers);
+                if (!q.dismissed) setQuestDismissed(false);
             } else {
-                // No quest data yet today — show quest prompt
                 setQuestDismissed(false);
             }
         } catch { /* */ }
     }, []);
 
-    // Quest completion detection
+    // Persist completed tiers when they change
     useEffect(() => {
-        const isComplete = questListenCount >= 3 && questRegisterCount >= 1;
-        if (isComplete && !questWasCompleteRef.current) {
-            setQuestCelebration(true);
+        try {
+            const today = getTodayStr();
+            const raw = localStorage.getItem(`kaiwa-quest-${today}`);
+            const q = raw ? JSON.parse(raw) : {};
+            q.completedTiers = Array.from(completedTiers);
+            localStorage.setItem(`kaiwa-quest-${today}`, JSON.stringify(q));
+        } catch { /* */ }
+    }, [completedTiers]);
+
+    // Quest tier completion detection — MUST / NORMAL
+    useEffect(() => {
+        const mustHit = questListenCount >= 3 && questRegisterCount >= 1;
+        const normalHit = questListenCount >= 5 && questRegisterCount >= 3;
+        if (mustHit && !completedTiers.has('must')) {
             playQuestComplete();
-            setTimeout(() => {
-                setQuestCelebration(false);
-                setQuestDismissed(true);
-            }, 4000);
-            // Save dismissed to localStorage so reload won't show it
-            try {
-                const today = getTodayStr();
-                const raw = localStorage.getItem(`kaiwa-quest-${today}`);
-                const q = raw ? JSON.parse(raw) : {};
-                q.dismissed = true;
-                localStorage.setItem(`kaiwa-quest-${today}`, JSON.stringify(q));
-            } catch { /* */ }
+            setCompletedTiers(prev => new Set(prev).add('must'));
+            setActiveCelebration('must');
         }
-        if (isComplete) questWasCompleteRef.current = true;
-    }, [questListenCount, questRegisterCount]);
+        if (normalHit && !completedTiers.has('normal')) {
+            playQuestComplete();
+            setCompletedTiers(prev => new Set(prev).add('normal'));
+            // If MUST just fired, delay NORMAL celebration
+            setTimeout(() => setActiveCelebration('normal'), 100);
+        }
+    }, [questListenCount, questRegisterCount, completedTiers]);
 
     // Streak state
     const [streak, setStreak] = useState<StreakData>({ current: 0, lastDate: '', best: 0 });
@@ -867,10 +871,18 @@ export default function EnglishMaster365Page() {
             const mSet = new Set<string>();
             updated.forEach(e => { if (e.mastery === 3) mSet.add(e.id); });
             setMasteredIds(mSet);
-            // Check if all entries for this day are now mastered
+            // Check if all entries for this day are now mastered → FINAL quest
             const dayEntries = updated.filter(e => e.day_slot === updated.find(x => x.id === id)?.day_slot);
             if (dayEntries.length > 0 && dayEntries.every(e => e.mastery === 3)) {
                 setTimeout(() => playDayComplete(), 300);
+                // Trigger FINAL quest celebration (once per day via completedTiers guard)
+                setCompletedTiers(prev => {
+                    if (prev.has('final')) return prev;
+                    const next = new Set(prev);
+                    next.add('final');
+                    setTimeout(() => setActiveCelebration('final'), 600);
+                    return next;
+                });
             }
             return updated;
         });
@@ -1934,92 +1946,26 @@ export default function EnglishMaster365Page() {
                                 </div>
                             )}
 
-                            {/* Daily Mini Quest */}
-                            {!questDismissed && selectedDay && (
-                                <div style={{
-                                    marginBottom: 16, padding: '14px 18px',
-                                    background: questListenCount >= 3 && questRegisterCount >= 1
-                                        ? 'linear-gradient(135deg, #FEF3C7, #ECFDF5, #FEF3C7)'
-                                        : '#fff',
-                                    backgroundSize: questListenCount >= 3 && questRegisterCount >= 1 ? '200% 200%' : 'auto',
-                                    animation: questListenCount >= 3 && questRegisterCount >= 1 ? 'questComplete 3s ease infinite' : 'none',
-                                    border: questListenCount >= 3 && questRegisterCount >= 1
-                                        ? '2px solid #D4AF37'
-                                        : '1px solid #E7E5E4',
-                                    borderRadius: 12,
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                            <span style={{
-                                                fontSize: 10, fontWeight: 800, color: '#D4AF37',
-                                                background: '#FEF3C7', padding: '2px 8px', borderRadius: 4,
-                                            }}>TODAY</span>
-                                            <span style={{ fontSize: 12, fontWeight: 700, color: '#44403C' }}>
-                                                {questListenCount >= 3 && questRegisterCount >= 1 ? 'Quest Complete!' : "Today's Mini Quest"}
-                                            </span>
-                                        </div>
-                                        <button onClick={() => {
-                                            setQuestDismissed(true);
-                                            try {
-                                                const today = getTodayStr();
-                                                const raw = localStorage.getItem(`kaiwa-quest-${today}`);
-                                                const q = raw ? JSON.parse(raw) : {};
-                                                q.dismissed = true;
-                                                localStorage.setItem(`kaiwa-quest-${today}`, JSON.stringify(q));
-                                            } catch { /* */ }
-                                        }} style={{
-                                            background: 'none', border: 'none', color: '#D6D3D1',
-                                            fontSize: 16, cursor: 'pointer', padding: '0 4px',
-                                        }}>
-                                            x
-                                        </button>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: 12 }}>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontSize: 11, color: '#78716C', marginBottom: 4 }}>
-                                                3つ聴く
-                                            </div>
-                                            <div style={{ display: 'flex', gap: 4 }}>
-                                                {[0, 1, 2].map(i => (
-                                                    <div key={i} style={{
-                                                        width: 24, height: 24, borderRadius: '50%',
-                                                        background: i < questListenCount ? '#D4AF37' : '#F5F5F4',
-                                                        color: i < questListenCount ? '#fff' : '#D6D3D1',
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        fontSize: 12, fontWeight: 700,
-                                                        transition: 'all 0.3s',
-                                                        animation: i < questListenCount ? 'checkFade 0.4s ease' : 'none',
-                                                    }}>
-                                                        {i < questListenCount ? '\u2713' : ''}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontSize: 11, color: '#78716C', marginBottom: 4 }}>
-                                                1つ登録
-                                            </div>
-                                            <div style={{ display: 'flex', gap: 4 }}>
-                                                <div style={{
-                                                    width: 24, height: 24, borderRadius: '50%',
-                                                    background: questRegisterCount >= 1 ? '#10B981' : '#F5F5F4',
-                                                    color: questRegisterCount >= 1 ? '#fff' : '#D6D3D1',
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 12, fontWeight: 700,
-                                                    transition: 'all 0.3s',
-                                                    animation: questRegisterCount >= 1 ? 'checkFade 0.4s ease' : 'none',
-                                                }}>
-                                                    {questRegisterCount >= 1 ? '\u2713' : ''}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div style={{ fontSize: 10, color: '#A8A29E', marginTop: 8 }}>
-                                        {questListenCount >= 3 && questRegisterCount >= 1
-                                            ? 'Nice! 今日もやったね'
-                                            : 'Skip OK -- 三日坊主でも4日目にまたやろう'}
-                                    </div>
-                                </div>
+                            {/* Daily 3-Tier Quest Panel */}
+                            {selectedDay && (
+                                <DailyQuests
+                                    listenCount={questListenCount}
+                                    registerCount={questRegisterCount}
+                                    mastered={dayEntries.filter(e => e.mastery === 3).length}
+                                    totalForDay={dayEntries.length}
+                                    completedTiers={completedTiers}
+                                    dismissed={questDismissed}
+                                    onDismiss={() => {
+                                        setQuestDismissed(true);
+                                        try {
+                                            const today = getTodayStr();
+                                            const raw = localStorage.getItem(`kaiwa-quest-${today}`);
+                                            const q = raw ? JSON.parse(raw) : {};
+                                            q.dismissed = true;
+                                            localStorage.setItem(`kaiwa-quest-${today}`, JSON.stringify(q));
+                                        } catch { /* */ }
+                                    }}
+                                />
                             )}
 
                             {/* Always BUILD-UP view — no mode toggle */}
@@ -2492,129 +2438,11 @@ export default function EnglishMaster365Page() {
             </div>
 
             {/* ═══ Quest Completion Celebration Overlay ═══ */}
-            {questCelebration && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 9999,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    background: 'rgba(0,0,0,0.5)',
-                    animation: 'questCelebrate 0.6s ease forwards',
-                }} onClick={() => setQuestCelebration(false)}>
-                    {/* Confetti particles */}
-                    {Array.from({ length: 30 }).map((_, i) => {
-                        const colors = ['#D4AF37', '#10B981', '#3B82F6', '#EC4899', '#F59E0B', '#8B5CF6'];
-                        const left = (i * 37 + 13) % 100;
-                        const size = 6 + (i % 5) * 2;
-                        const delay = (i % 8) * 0.06;
-                        const dur = 2 + (i % 4) * 0.5;
-                        return (
-                            <div key={i} style={{
-                                position: 'absolute',
-                                top: -20,
-                                left: `${left}%`,
-                                width: size, height: size,
-                                borderRadius: i % 2 === 0 ? '50%' : '2px',
-                                background: colors[i % 6],
-                                animation: `confettiFloat ${dur}s linear ${delay}s forwards`,
-                                opacity: 0.9,
-                            }} />
-                        );
-                    })}
-                    {/* Star bursts */}
-                    {Array.from({ length: 8 }).map((_, i) => {
-                        const stars = ['\u2605', '\u2726', '\u2727', '\u2736'];
-                        const stColors = ['#D4AF37', '#10B981', '#F59E0B', '#EC4899'];
-                        const top = 20 + (i * 23 + 11) % 60;
-                        const left = 10 + (i * 31 + 7) % 80;
-                        return (
-                            <div key={`star-${i}`} style={{
-                                position: 'absolute',
-                                top: `${top}%`, left: `${left}%`,
-                                fontSize: 16 + (i % 4) * 5,
-                                color: stColors[i % 4],
-                                animation: `questStarBurst ${0.8 + (i % 3) * 0.2}s ease ${0.2 + i * 0.15}s forwards`,
-                                opacity: 0,
-                                pointerEvents: 'none',
-                            }}>
-                                {stars[i % 4]}
-                            </div>
-                        );
-                    })}
-                    {/* Center card */}
-                    <div style={{
-                        background: 'linear-gradient(135deg, #FFFBEB 0%, #fff 50%, #ECFDF5 100%)',
-                        borderRadius: 24,
-                        padding: '40px 48px',
-                        textAlign: 'center',
-                        boxShadow: '0 20px 60px rgba(212,175,55,0.3), 0 0 0 2px #D4AF37',
-                        maxWidth: 340,
-                        animation: 'questCelebrate 0.5s ease',
-                        position: 'relative',
-                        overflow: 'hidden',
-                    }}>
-                        <div style={{
-                            position: 'absolute', top: 0, left: 0, right: 0, height: 4,
-                            background: 'linear-gradient(90deg, #D4AF37, #10B981, #D4AF37)',
-                        }} />
-                        <div style={{
-                            fontSize: 11, fontWeight: 800, color: '#D4AF37',
-                            letterSpacing: '0.2em', marginBottom: 12,
-                        }}>
-                            -- QUEST COMPLETE --
-                        </div>
-                        <div style={{
-                            fontSize: 48, fontWeight: 900, color: '#1C1917',
-                            lineHeight: 1, marginBottom: 8,
-                            textShadow: '0 2px 4px rgba(212,175,55,0.2)',
-                        }}>
-                            CLEAR
-                        </div>
-                        <div style={{
-                            fontSize: 14, color: '#57534E', fontWeight: 600,
-                            marginBottom: 20, lineHeight: 1.6,
-                        }}>
-                            Today&apos;s Mini Quest
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginBottom: 20 }}>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                    width: 44, height: 44, borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #D4AF37, #B45309)',
-                                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 20, fontWeight: 900, margin: '0 auto 4px',
-                                    boxShadow: '0 4px 12px rgba(212,175,55,0.3)',
-                                }}>{'\u2713'}</div>
-                                <div style={{ fontSize: 10, color: '#78716C', fontWeight: 700 }}>3 Listened</div>
-                            </div>
-                            <div style={{ textAlign: 'center' }}>
-                                <div style={{
-                                    width: 44, height: 44, borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #10B981, #059669)',
-                                    color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 20, fontWeight: 900, margin: '0 auto 4px',
-                                    boxShadow: '0 4px 12px rgba(16,185,129,0.3)',
-                                }}>{'\u2713'}</div>
-                                <div style={{ fontSize: 10, color: '#78716C', fontWeight: 700 }}>1 Registered</div>
-                            </div>
-                        </div>
-                        <div style={{
-                            display: 'inline-block',
-                            background: 'linear-gradient(135deg, #D4AF37, #B45309)',
-                            color: '#fff',
-                            padding: '10px 32px', borderRadius: 20,
-                            fontSize: 13, fontWeight: 800,
-                            letterSpacing: '0.1em',
-                            boxShadow: '0 4px 16px rgba(212,175,55,0.35)',
-                            cursor: 'pointer',
-                        }}>
-                            NICE!
-                        </div>
-                        <div style={{
-                            fontSize: 11, color: '#A8A29E', marginTop: 14, fontStyle: 'italic',
-                        }}>
-                            三日坊主でも4日目にまたやろう
-                        </div>
-                    </div>
-                </div>
+            {activeCelebration && (
+                <QuestCelebration
+                    tier={activeCelebration}
+                    onDismiss={() => setActiveCelebration(null)}
+                />
             )}
         </div>
     );
