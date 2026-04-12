@@ -7,6 +7,7 @@ import {
     playFeverChainHit, playRankUpSound,
 } from '@/lib/training-sounds';
 import { MASTER_EXPRESSIONS, MASTER_LEVELS, MasterExpression } from '@/data/english/365/master-expressions';
+import { HANDCRAFTED_DRILLS, HandcraftedDrill } from '@/data/english/365/practice-drills';
 
 // ── Practice completion key for calendar ──
 const PRACTICE_DONE_KEY = (date: string) => `practice-done-${date}`;
@@ -22,7 +23,7 @@ interface TrainingPhrase {
     context?: string;
 }
 
-type DrillType = 'ja2en' | 'en2ja' | 'fill' | 'back' | 'listen';
+type DrillType = 'ja2en' | 'en2ja' | 'fill' | 'back' | 'listen' | 'custom';
 
 interface DrillRound {
     type: DrillType;
@@ -33,6 +34,8 @@ interface DrillRound {
     options: string[];
     correctIdx: number;
     hint: string;
+    explanation?: string;
+    customLabel?: string;
 }
 
 // ── Constants ──
@@ -53,7 +56,27 @@ const DRILL_LABELS: Record<DrillType, { label: string; color: string; icon: stri
     fill:   { label: '穴埋め',   color: BLUE,  icon: '--' },
     back:   { label: '返し',     color: '#8B5CF6', icon: '<>' },
     listen: { label: 'リスニング', color: '#F97316', icon: '))'  },
+    custom: { label: '応用',     color: '#DC2626', icon: '*'  },
 };
+
+const HAND_DRILL_LABELS: Record<string, string> = {
+    'pick-native': 'ネイティブ度',
+    'meaning':     '意味',
+    'trap':        'ワナ',
+    'word-choice': '単語選び',
+    'register':    '丁寧度',
+    'response':    '返し方',
+};
+
+// Index hand-crafted drills by japanese key
+const HAND_INDEX: Map<string, HandcraftedDrill[]> = (() => {
+    const m = new Map<string, HandcraftedDrill[]>();
+    for (const d of HANDCRAFTED_DRILLS) {
+        if (!m.has(d.japaneseKey)) m.set(d.japaneseKey, []);
+        m.get(d.japaneseKey)!.push(d);
+    }
+    return m;
+})();
 
 const DAILY_MISSIONS = [
     { id: 'practice_5', label: '5問クリア', target: 5, xp: 10 },
@@ -241,6 +264,25 @@ function generateDrills(
 
     return selected.map<DrillRound>((phrase) => {
         const master = findMaster(phrase);
+        const hint = phrase.situation?.split(' -- ')[0] || '';
+
+        // ── Priority 1: Hand-crafted drill for this phrase ──
+        const handDrills = HAND_INDEX.get(phrase.japanese);
+        if (handDrills && handDrills.length > 0) {
+            const d = handDrills[Math.floor(Math.random() * handDrills.length)];
+            return {
+                type: 'custom',
+                phrase,
+                masterExpr: master,
+                question: d.question,
+                questionSub: d.questionSub,
+                options: [...d.options],
+                correctIdx: d.correctIdx,
+                hint,
+                explanation: d.explanation,
+                customLabel: HAND_DRILL_LABELS[d.type] || '応用',
+            };
+        }
 
         // Pick drill type with weights
         let type: DrillType;
@@ -255,8 +297,6 @@ function generateDrills(
         if (!master && (type === 'fill' || type === 'back')) {
             type = Math.random() < 0.5 ? 'ja2en' : 'en2ja';
         }
-
-        const hint = phrase.situation?.split(' -- ')[0] || '';
 
         // Determine which level the phrase is at
         const level: 0 | 1 | 2 | 3 = master
@@ -782,176 +822,23 @@ export default function PracticePage() {
         const accuracy = totalRounds > 0 ? Math.round((sessionScore / totalRounds) * 100) : 0;
         const isPerfect = sessionScore === totalRounds;
         const isGreat = accuracy >= 80;
-        const confettiColors = ['#D4AF37', '#10B981', '#3B82F6', '#F97316', '#8B5CF6', '#EC4899'];
+        const isPassing = accuracy >= 50;
+        const accentColor = isPerfect ? '#D4AF37' : isGreat ? '#10B981' : isPassing ? '#3B82F6' : '#78716C';
         return (
-            <div style={{
-                maxWidth: 480, margin: '0 auto', padding: '40px 20px',
-                position: 'relative', overflow: 'hidden', minHeight: '100vh',
-            }}>
-                <style>{`
-                    @keyframes pr-confetti-fall {
-                        0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-                        100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-                    }
-                    @keyframes pr-result-slam {
-                        0% { transform: scale(3); opacity: 0; }
-                        50% { transform: scale(0.9); opacity: 1; }
-                        70% { transform: scale(1.05); }
-                        100% { transform: scale(1); opacity: 1; }
-                    }
-                    @keyframes pr-shine {
-                        0% { background-position: -200% center; }
-                        100% { background-position: 200% center; }
-                    }
-                    @keyframes pr-stat-in {
-                        0% { transform: translateY(20px); opacity: 0; }
-                        100% { transform: translateY(0); opacity: 1; }
-                    }
-                `}</style>
-
-                {/* Confetti particles */}
-                {(isPerfect || isGreat) && Array.from({ length: isPerfect ? 30 : 12 }).map((_, i) => (
-                    <div key={i} style={{
-                        position: 'absolute',
-                        top: -10,
-                        left: `${Math.random() * 100}%`,
-                        width: Math.random() * 8 + 4,
-                        height: Math.random() * 8 + 4,
-                        background: confettiColors[i % confettiColors.length],
-                        borderRadius: Math.random() > 0.5 ? '50%' : 2,
-                        animation: `pr-confetti-fall ${Math.random() * 2 + 1.5}s ease-in ${Math.random() * 0.5}s forwards`,
-                        pointerEvents: 'none' as const,
-                        zIndex: 10,
-                    }} />
-                ))}
-
-                <div style={{
-                    background: isPerfect
-                        ? 'linear-gradient(135deg, #FEF3C7, #ECFDF5)'
-                        : isGreat ? 'linear-gradient(135deg, #F5F5F4, #ECFDF5)' : '#fff',
-                    border: isPerfect ? `2px solid ${GOLD}` : `1px solid ${BORDER}`,
-                    borderRadius: 16, padding: '32px 24px', textAlign: 'center',
-                    marginBottom: 20, position: 'relative', zIndex: 20,
-                }}>
-                    {isPerfect && (
-                        <div style={{
-                            fontSize: 13, fontWeight: 900, color: GOLD,
-                            letterSpacing: '0.3em', marginBottom: 12,
-                            padding: '6px 20px', display: 'inline-block',
-                            background: 'linear-gradient(90deg, #FFFBEB, #FEF3C7, #FFFBEB)',
-                            backgroundSize: '200% 100%',
-                            animation: 'pr-shine 2s linear infinite',
-                            borderRadius: 20,
-                            border: `1px solid ${GOLD}60`,
-                        }}>
-                            PERFECT
-                        </div>
-                    )}
-                    <div style={{
-                        fontSize: 12, fontWeight: 700, color: TEXT_FAINT,
-                        letterSpacing: '0.2em', marginBottom: 8,
-                    }}>
-                        セッション完了
-                    </div>
-                    <div style={{
-                        fontSize: 64, fontWeight: 900,
-                        color: isPerfect ? GOLD : isGreat ? GREEN : accuracy >= 50 ? BLUE : TEXT_MUTED,
-                        lineHeight: 1, marginBottom: 4,
-                        animation: 'pr-result-slam 0.6s ease-out',
-                    }}>
-                        {accuracy}%
-                    </div>
-                    <div style={{ fontSize: 14, color: TEXT_SUB, marginBottom: 24 }}>
-                        {sessionScore}/{totalRounds} 正解
-                    </div>
-
-                    <div style={{
-                        display: 'flex', justifyContent: 'center', gap: 32,
-                        marginBottom: 24,
-                    }}>
-                        {[
-                            { val: bestStreak, label: '最高連続', c: GOLD, delay: '0.2s' },
-                            { val: totalXP, label: '獲得XP', c: GREEN, delay: '0.35s' },
-                            { val: totalAttempts, label: '今日の合計', c: BLUE, delay: '0.5s' },
-                        ].map(s => (
-                            <div key={s.label} style={{
-                                animation: `pr-stat-in 0.4s ease-out ${s.delay} both`,
-                            }}>
-                                <div style={{ fontSize: 26, fontWeight: 900, color: s.c }}>{s.val}</div>
-                                <div style={{ fontSize: 10, color: TEXT_FAINT }}>{s.label}</div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Today's practice marked! */}
-                    <div style={{
-                        padding: '8px 16px', borderRadius: 8,
-                        background: '#ECFDF5', border: `1px solid ${GREEN}30`,
-                        fontSize: 12, fontWeight: 700, color: GREEN,
-                        marginBottom: 20, display: 'inline-block',
-                    }}>
-                        今日の実習クリア
-                    </div>
-
-                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-                        <button onClick={restart} style={{
-                            padding: '14px 32px', background: GREEN, color: '#fff',
-                            border: 'none', borderRadius: 12, fontSize: 15, fontWeight: 800,
-                            cursor: 'pointer', letterSpacing: '0.05em',
-                        }}>
-                            もう1セット
-                        </button>
-                        <Link href="/english/my-training" style={{
-                            padding: '14px 24px', background: '#fff', color: TEXT_MUTED,
-                            border: `1px solid ${BORDER}`, borderRadius: 12,
-                            fontSize: 14, fontWeight: 700, textDecoration: 'none',
-                            display: 'inline-flex', alignItems: 'center',
-                        }}>
-                            トレーニングへ
-                        </Link>
-                    </div>
-                </div>
-
-                {/* Missions */}
-                <div style={{
-                    background: '#fff', border: `1px solid ${BORDER}`,
-                    borderRadius: 12, padding: 16,
-                }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: TEXT_FAINT, letterSpacing: '0.15em', marginBottom: 12 }}>
-                        今日のミッション
-                    </div>
-                    {missions.map(m => (
-                        <div key={m.id} style={{
-                            display: 'flex', alignItems: 'center', gap: 10,
-                            padding: '8px 0', borderBottom: `1px solid #F5F5F4`,
-                        }}>
-                            <div style={{
-                                width: 22, height: 22, borderRadius: '50%',
-                                border: m.done ? `2px solid ${GREEN}` : `2px solid ${BORDER}`,
-                                background: m.done ? GREEN : '#fff',
-                                color: m.done ? '#fff' : '#D6D3D1',
-                                fontSize: 12, fontWeight: 700,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
-                                {m.done ? '\u2713' : ''}
-                            </div>
-                            <div style={{ flex: 1 }}>
-                                <span style={{
-                                    fontSize: 13, fontWeight: 600,
-                                    color: m.done ? GREEN : '#44403C',
-                                }}>{m.label}</span>
-                            </div>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: m.done ? GREEN : TEXT_FAINT }}>
-                                {m.current}/{m.target}
-                            </div>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: m.done ? GOLD : '#D6D3D1' }}>
-                                +{m.xp} XP
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-            </div>
+            <PracticeCelebration
+                accuracy={accuracy}
+                sessionScore={sessionScore}
+                totalRounds={totalRounds}
+                isPerfect={isPerfect}
+                isGreat={isGreat}
+                isPassing={isPassing}
+                accentColor={accentColor}
+                bestStreak={bestStreak}
+                totalXP={totalXP}
+                totalAttempts={totalAttempts}
+                missions={missions}
+                onRestart={restart}
+            />
         );
     }
 
@@ -1084,7 +971,9 @@ export default function PracticePage() {
                     <span style={{
                         fontSize: 11, fontWeight: 700, color: drillInfo.color,
                     }}>
-                        {drillInfo.label}
+                        {current.type === 'custom' && current.customLabel
+                            ? `${drillInfo.label} / ${current.customLabel}`
+                            : drillInfo.label}
                     </span>
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 700, color: TEXT_FAINT }}>
@@ -1248,8 +1137,22 @@ export default function PracticePage() {
                                 正解: {current.options[current.correctIdx]}
                             </div>
                         )}
+                        {/* Hand-crafted drill explanation (takes priority) */}
+                        {current.explanation && (
+                            <div style={{
+                                fontSize: 12, color: '#1C1917', lineHeight: 1.75,
+                                padding: '12px 14px',
+                                background: '#FEF2F2',
+                                borderLeft: `3px solid #DC2626`,
+                                borderRadius: 6,
+                                marginBottom: 10,
+                                fontWeight: 500,
+                            }}>
+                                {current.explanation}
+                            </div>
+                        )}
                         {/* Show 4-level progression for context */}
-                        {current.masterExpr && (
+                        {!current.explanation && current.masterExpr && (
                             <div style={{ marginBottom: 8 }}>
                                 {MASTER_LEVELS.map((lvl, i) => (
                                     <div key={i} style={{
@@ -1275,7 +1178,7 @@ export default function PracticePage() {
                             </div>
                         )}
                         {/* Linguistic context from master data */}
-                        {current.masterExpr?.context && (
+                        {!current.explanation && current.masterExpr?.context && (
                             <div style={{
                                 fontSize: 11, color: TEXT_SUB, lineHeight: 1.7,
                                 padding: '8px 10px',
@@ -1329,6 +1232,378 @@ export default function PracticePage() {
                     </div>
                 ))}
             </div>
+        </div>
+    );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Session Complete Celebration — DailyQuote-style lavish overlay
+// ═══════════════════════════════════════════════════════════════
+
+interface MissionView {
+    id: string;
+    label: string;
+    target: number;
+    xp: number;
+    current: number;
+    done: boolean;
+}
+
+interface PracticeCelebrationProps {
+    accuracy: number;
+    sessionScore: number;
+    totalRounds: number;
+    isPerfect: boolean;
+    isGreat: boolean;
+    isPassing: boolean;
+    accentColor: string;
+    bestStreak: number;
+    totalXP: number;
+    totalAttempts: number;
+    missions: MissionView[];
+    onRestart: () => void;
+}
+
+const PERFECT_PRAISE: Array<{ big: string; sub: string }> = [
+    { big: 'FLAWLESS',  sub: '一問も落とさなかった。その集中力、本物だ。' },
+    { big: 'LEGEND',    sub: '全部正解。言い訳の余地なし、完璧。' },
+    { big: 'GODLIKE',   sub: '全問撃ち抜き。今日の俺、神じゃん。' },
+    { big: 'IMMORTAL',  sub: '1ミリの揺らぎもなく全問正解。やばい。' },
+    { big: 'MASTER',    sub: 'マスター級。この問題もう敵じゃない。' },
+    { big: 'SUPREME',   sub: '頂点。全問正解の重み、覚えとけ。' },
+    { big: 'TRANSCEND', sub: '超越。普通の努力じゃ出ない結果だ。' },
+    { big: 'DIVINE',    sub: '神業。今日の脳、フル回転だったな。' },
+    { big: 'CLUTCH',    sub: '詰め寄られても全部捌いた。本物。' },
+    { big: 'PEERLESS',  sub: '無敵。比べる相手がいない仕上がり。' },
+];
+
+const GREAT_PRAISE: Array<{ big: string; sub: string }> = [
+    { big: 'SOLID',    sub: '安定感ハンパない。この調子キープ。' },
+    { big: 'SHARP',    sub: '頭キレッキレ。今日の読み、鋭い。' },
+    { big: 'STRONG',   sub: '地力ついてる。ミスも含めて前進。' },
+    { big: 'ELITE',    sub: 'エリート圏内。上位の実力、見せつけた。' },
+    { big: 'CRISP',    sub: 'キレのある仕上がり。完璧じゃなくても強い。' },
+    { big: 'DIALED',   sub: '調子に乗ってる。この流れ、掴んどけ。' },
+    { big: 'LOCKED',   sub: 'ロックオン。集中切れてないのが伝わる。' },
+    { big: 'FIRED UP', sub: '熱い。このテンションで毎日やれたら最強。' },
+    { big: 'RISING',   sub: '上り調子。確実にレベル上がってる。' },
+    { big: 'HEATED',   sub: '波に乗ってる。この勢いで明日もな。' },
+];
+
+const PASSING_PRAISE: Array<{ big: string; sub: string }> = [
+    { big: 'NICE',    sub: '及第点クリア。続けてることが一番偉い。' },
+    { big: 'STEADY',  sub: '着実。爆発しないけど崩れない、それが強い。' },
+    { big: 'BUILDING',sub: '積み上げ中。明日の自分が今日に感謝する。' },
+    { big: 'ROLLING', sub: '流れは悪くない。ミスは次の燃料にしろ。' },
+    { big: 'KEEPING', sub: '継続が効いてる。やめないやつだけが勝つ。' },
+    { big: 'STACKING',sub: '経験値スタック中。1回1回が無駄じゃない。' },
+    { big: 'WORKING', sub: '仕事してる。派手じゃないけど前進してる。' },
+    { big: 'ALIVE',   sub: '生き残った。合格点、ちゃんと取ったな。' },
+];
+
+const LOW_PRAISE: Array<{ big: string; sub: string }> = [
+    { big: 'TRYING',  sub: '結果より、やった事実。明日またやれ。' },
+    { big: 'SHOWING', sub: '出てきたのが一番大事。続けろ、必ず変わる。' },
+    { big: 'GRINDING',sub: '泥臭くていい。積み上げは嘘つかない。' },
+    { big: 'LIVING',  sub: '諦めずに最後までやった。それが全てだ。' },
+    { big: 'FIGHTING',sub: 'ミス多くても最後まで戦った。次回倍返し。' },
+    { big: 'LEARNING',sub: '失敗した問題ほど覚える。今日は仕込み日。' },
+];
+
+function pickPraise(pool: Array<{ big: string; sub: string }>) {
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function PracticeCelebration(props: PracticeCelebrationProps) {
+    const {
+        accuracy, sessionScore, totalRounds,
+        isPerfect, isGreat, isPassing, accentColor,
+        bestStreak, totalXP, totalAttempts, missions, onRestart,
+    } = props;
+
+    const [praise] = useState(() => {
+        if (isPerfect) return pickPraise(PERFECT_PRAISE);
+        if (isGreat)   return pickPraise(GREAT_PRAISE);
+        if (isPassing) return pickPraise(PASSING_PRAISE);
+        return pickPraise(LOW_PRAISE);
+    });
+
+    // Deterministic dust particles (server-safe)
+    const dustParticles = useMemo(() => Array.from({ length: 32 }, (_, i) => ({
+        left: (i * 37 + 13) % 100,
+        delay: (i * 0.17) % 4,
+        duration: 5 + ((i * 0.31) % 3),
+        size: 2 + ((i * 0.7) % 3),
+    })), []);
+
+    return (
+        <div style={{
+            position: 'fixed', inset: 0, zIndex: 10001,
+            background: 'radial-gradient(ellipse at center, #1a1917 0%, #050403 75%)',
+            overflow: 'hidden',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            padding: '24px 20px',
+            animation: 'pc-fade-in 0.8s ease-out',
+        }}>
+            <style>{`
+                @keyframes pc-fade-in {
+                    0% { opacity: 0; }
+                    100% { opacity: 1; }
+                }
+                @keyframes pc-ray-rotate {
+                    0% { transform: translate(-50%, -50%) rotate(0deg); }
+                    100% { transform: translate(-50%, -50%) rotate(360deg); }
+                }
+                @keyframes pc-orb-pulse {
+                    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+                    50%     { opacity: 0.75; transform: translate(-50%, -50%) scale(1.08); }
+                }
+                @keyframes pc-dust-rise {
+                    0% { transform: translateY(0) scale(1); opacity: 0; }
+                    15% { opacity: 0.7; }
+                    85% { opacity: 0.5; }
+                    100% { transform: translateY(-100vh) scale(0.4); opacity: 0; }
+                }
+                @keyframes pc-ring-expand {
+                    0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0.9; }
+                    100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+                }
+                @keyframes pc-shimmer-sweep {
+                    0%   { background-position: -150% center; }
+                    100% { background-position: 250% center; }
+                }
+                @keyframes pc-slide-up {
+                    0% { transform: translateY(30px); opacity: 0; }
+                    100% { transform: translateY(0); opacity: 1; }
+                }
+                .pc-shimmer-text {
+                    background: linear-gradient(100deg,
+                        ${accentColor} 0%,
+                        #FFFFFF 20%,
+                        #FFF8DC 40%,
+                        ${accentColor} 60%,
+                        #FFFFFF 80%,
+                        ${accentColor} 100%);
+                    background-size: 200% auto;
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    animation: pc-shimmer-sweep 4s linear infinite;
+                }
+            `}</style>
+
+            {/* Rotating conic light rays */}
+            <div style={{
+                position: 'absolute', top: '50%', left: '50%',
+                width: 900, height: 900,
+                background: `conic-gradient(from 0deg, transparent 0deg, ${accentColor}18 10deg, transparent 30deg, ${accentColor}0c 50deg, transparent 80deg, ${accentColor}15 120deg, transparent 150deg, ${accentColor}08 200deg, transparent 240deg, ${accentColor}18 280deg, transparent 320deg, transparent 360deg)`,
+                animation: 'pc-ray-rotate 42s linear infinite',
+                filter: 'blur(8px)',
+                pointerEvents: 'none',
+            }} />
+
+            {/* Gold orb */}
+            <div style={{
+                position: 'absolute', top: '50%', left: '50%',
+                width: 620, height: 620, borderRadius: '50%',
+                background: `radial-gradient(circle, ${accentColor}40 0%, ${accentColor}15 35%, transparent 70%)`,
+                filter: 'blur(40px)',
+                animation: 'pc-orb-pulse 5s ease-in-out infinite',
+                pointerEvents: 'none',
+            }} />
+
+            {/* Rising dust */}
+            {dustParticles.map((p, i) => (
+                <div key={i} style={{
+                    position: 'absolute',
+                    bottom: -20,
+                    left: `${p.left}%`,
+                    width: p.size, height: p.size,
+                    borderRadius: '50%',
+                    background: accentColor,
+                    boxShadow: `0 0 ${p.size * 3}px ${accentColor}`,
+                    animation: `pc-dust-rise ${p.duration}s linear ${p.delay}s infinite`,
+                    pointerEvents: 'none',
+                }} />
+            ))}
+
+            {/* Expanding rings */}
+            <div style={{
+                position: 'absolute', top: '50%', left: '50%',
+                width: 340, height: 340, borderRadius: '50%',
+                border: `1px solid ${accentColor}60`,
+                animation: 'pc-ring-expand 3.5s ease-out infinite',
+                pointerEvents: 'none',
+            }} />
+            <div style={{
+                position: 'absolute', top: '50%', left: '50%',
+                width: 460, height: 460, borderRadius: '50%',
+                border: `1px solid ${accentColor}30`,
+                animation: 'pc-ring-expand 3.5s ease-out 1.2s infinite',
+                pointerEvents: 'none',
+            }} />
+
+            {/* Top accent line */}
+            <div style={{
+                position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: 120, height: 2,
+                background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+                boxShadow: `0 0 16px ${accentColor}`,
+            }} />
+
+            {/* Content */}
+            <div style={{
+                position: 'relative', zIndex: 2,
+                textAlign: 'center',
+                maxWidth: 520, width: '100%',
+                animation: 'pc-slide-up 0.7s cubic-bezier(0.2, 0.65, 0.3, 0.9) 0.2s both',
+            }}>
+                {/* Label */}
+                <div style={{
+                    fontSize: 10, fontWeight: 800, color: `${accentColor}cc`,
+                    letterSpacing: '0.4em', marginBottom: 16,
+                    textTransform: 'uppercase',
+                }}>
+                    {isPerfect ? 'PERFECT CLEAR' : 'SESSION CLEAR'}
+                </div>
+
+                {/* Big shimmer praise text */}
+                <div className="pc-shimmer-text" style={{
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    fontSize: 'clamp(48px, 12vw, 84px)',
+                    fontWeight: 900,
+                    letterSpacing: '0.05em',
+                    lineHeight: 1,
+                    marginBottom: 16,
+                    textShadow: `0 0 40px ${accentColor}80`,
+                }}>
+                    {praise.big}
+                </div>
+
+                {/* Gold divider */}
+                <div style={{
+                    width: 80, height: 1, margin: '20px auto',
+                    background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+                    boxShadow: `0 0 12px ${accentColor}`,
+                }} />
+
+                {/* Accuracy big */}
+                <div style={{
+                    fontFamily: 'Georgia, serif',
+                    fontSize: 72, fontWeight: 900, color: accentColor,
+                    lineHeight: 1, marginBottom: 4,
+                    textShadow: `0 0 24px ${accentColor}60`,
+                }}>
+                    {accuracy}%
+                </div>
+                <div style={{
+                    fontSize: 13, color: '#a8a29e', marginBottom: 20,
+                    letterSpacing: '0.15em',
+                }}>
+                    {sessionScore} / {totalRounds} 正解
+                </div>
+
+                {/* Sub praise message */}
+                <div style={{
+                    fontSize: 14, color: '#e7e5e4',
+                    lineHeight: 1.7, marginBottom: 28,
+                    maxWidth: 380, margin: '0 auto 28px',
+                    fontWeight: 500,
+                }}>
+                    {praise.sub}
+                </div>
+
+                {/* Stats row */}
+                <div style={{
+                    display: 'flex', justifyContent: 'center', gap: 32,
+                    marginBottom: 32,
+                }}>
+                    {[
+                        { val: bestStreak, label: '最高連続', c: '#D4AF37' },
+                        { val: totalXP, label: '獲得XP', c: '#10B981' },
+                        { val: totalAttempts, label: '今日の合計', c: '#60A5FA' },
+                    ].map(s => (
+                        <div key={s.label}>
+                            <div style={{
+                                fontSize: 28, fontWeight: 900, color: s.c,
+                                fontFamily: 'Georgia, serif',
+                                textShadow: `0 0 16px ${s.c}50`,
+                            }}>
+                                {s.val}
+                            </div>
+                            <div style={{
+                                fontSize: 9, color: '#78716c',
+                                letterSpacing: '0.2em', marginTop: 4,
+                            }}>
+                                {s.label}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Missions compact */}
+                <div style={{
+                    display: 'flex', gap: 6, justifyContent: 'center',
+                    flexWrap: 'wrap', marginBottom: 28,
+                }}>
+                    {missions.map(m => (
+                        <div key={m.id} style={{
+                            padding: '5px 12px', borderRadius: 20,
+                            background: m.done ? `${accentColor}25` : 'rgba(255,255,255,0.04)',
+                            border: m.done ? `1px solid ${accentColor}` : '1px solid rgba(255,255,255,0.1)',
+                            fontSize: 10, fontWeight: 700,
+                            color: m.done ? accentColor : '#78716c',
+                            letterSpacing: '0.05em',
+                        }}>
+                            {m.done ? '\u2713 ' : ''}{m.label}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Actions */}
+                <div style={{
+                    display: 'flex', gap: 12, justifyContent: 'center',
+                    flexWrap: 'wrap',
+                }}>
+                    <button onClick={onRestart} style={{
+                        padding: '14px 36px',
+                        background: `linear-gradient(135deg, ${accentColor}, ${accentColor}dd)`,
+                        color: '#0a0908',
+                        border: `1px solid ${accentColor}`,
+                        borderRadius: 2,
+                        fontSize: 12, fontWeight: 900,
+                        letterSpacing: '0.2em',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                        boxShadow: `0 0 24px ${accentColor}80`,
+                    }}>
+                        もう1セット
+                    </button>
+                    <Link href="/english/my-training" style={{
+                        padding: '14px 28px',
+                        background: 'transparent',
+                        color: '#d6d3d1',
+                        border: '1px solid rgba(255,255,255,0.2)',
+                        borderRadius: 2,
+                        fontSize: 12, fontWeight: 700,
+                        letterSpacing: '0.2em',
+                        textDecoration: 'none',
+                        textTransform: 'uppercase',
+                        display: 'inline-flex', alignItems: 'center',
+                    }}>
+                        トレーニングへ
+                    </Link>
+                </div>
+            </div>
+
+            {/* Bottom accent */}
+            <div style={{
+                position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+                width: 120, height: 2,
+                background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+                boxShadow: `0 0 16px ${accentColor}`,
+            }} />
         </div>
     );
 }
