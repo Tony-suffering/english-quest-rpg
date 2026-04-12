@@ -1,6 +1,6 @@
 const CACHE_NAME = 'izakaya-toeic-v2';
 const STATIC_ASSETS = [
-  '/english/izakaya-toeic',
+  '/english/toeic',
   '/english-icon.svg',
   '/manifest.json'
 ];

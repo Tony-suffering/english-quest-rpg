@@ -38,7 +38,7 @@ const PROGRAMS: Program[] = [
             { id: '/english/my-training', label: 'Daily Training', featured: true },
             { id: '/english/my-training/practice', label: 'Practice Drills', featured: true },
             { id: '/english/izakaya-toeic/kaiwa/lp', label: '英会話マスター365とは？' },
-            { id: '/english/izakaya-toeic/characters', label: '常連ファイル' },
+            { id: '/english/toeic/characters', label: '常連ファイル' },
             { id: '/english/5min', label: '5分トーク' },
             { id: '/english/goroku', label: 'ひとこと英語帳' },
         ],
@@ -48,19 +48,19 @@ const PROGRAMS: Program[] = [
         label: '居酒屋TOEIC',
         tagline: '30日でスコアUP',
         color: C.gold,
-        basePath: '/english/izakaya-toeic',
+        basePath: '/english/toeic',
         items: [
-            { id: '/english/izakaya-toeic', label: 'のれん30夜' },
-            { id: '/english/izakaya-toeic/episodes', label: 'エピソード一覧' },
-            { id: '/english/izakaya-toeic/characters', label: '常連ファイル' },
-            { id: '/english/izakaya-toeic/guide', label: '攻略メモ' },
-            { id: '/english/izakaya-toeic/paraphrase', label: '言い換えお品書き' },
-            { id: '/english/izakaya-toeic/sounds', label: '聞き酒ノート' },
-            { id: '/english/izakaya-toeic/traps', label: '引っかけ毒見帳' },
-            { id: '/english/izakaya-toeic/score', label: 'スコア通知表' },
-            { id: '/english/izakaya-toeic/mistakes', label: '反省ノート' },
-            { id: '/english/izakaya-toeic/achievements', label: 'のれんの勲章' },
-            { id: '/english/izakaya-toeic/words', label: 'TOEIC頻出310語' },
+            { id: '/english/toeic', label: 'のれん30夜' },
+            { id: '/english/toeic/episodes', label: 'エピソード一覧' },
+            { id: '/english/toeic/characters', label: '常連ファイル' },
+            { id: '/english/toeic/guide', label: '攻略メモ' },
+            { id: '/english/toeic/paraphrase', label: '言い換えお品書き' },
+            { id: '/english/toeic/sounds', label: '聞き酒ノート' },
+            { id: '/english/toeic/traps', label: '引っかけ毒見帳' },
+            { id: '/english/toeic/score', label: 'スコア通知表' },
+            { id: '/english/toeic/mistakes', label: '反省ノート' },
+            { id: '/english/toeic/achievements', label: 'のれんの勲章' },
+            { id: '/english/toeic/words', label: 'TOEIC頻出310語' },
             { id: '/english/tonio-words', label: 'TOEIC英単語' },
         ],
     },
@@ -128,7 +128,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         // Check kaiwa first (more specific path)
         if (pathname.startsWith('/english/izakaya-toeic/kaiwa') || pathname.startsWith('/english/my-training') || pathname.startsWith('/english/5min') || pathname.startsWith('/english/goroku')) {
             setExpandedProgram('kaiwa');
-        } else if (pathname.startsWith('/english/izakaya-toeic') || pathname.startsWith('/english/tonio-words')) {
+        } else if (pathname.startsWith('/english/toeic') || pathname.startsWith('/english/tonio-words')) {
             setExpandedProgram('izakaya');
         } else if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) {
             setExpandedProgram('tokyo52');
@@ -140,9 +140,33 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         // (legacy auto-expand removed)
     }, [pathname]);
 
+    // ─── Determine which app the user is currently inside ─────
+    // Returns null when on shared/root pages → show all programs.
+    const currentAppId: string | null = (() => {
+        if (!pathname) return null;
+        if (
+            pathname.startsWith('/english/izakaya-toeic/kaiwa') ||
+            pathname.startsWith('/english/my-training') ||
+            pathname.startsWith('/english/5min') ||
+            pathname.startsWith('/english/goroku')
+        ) return 'kaiwa';
+        if (
+            pathname.startsWith('/english/toeic') ||
+            pathname.startsWith('/english/tonio-words')
+        ) return 'izakaya';
+        if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) return 'tokyo52';
+        if (pathname.startsWith('/english/lisque')) return 'lisque';
+        if (pathname.startsWith('/english/yomique')) return 'yomique';
+        return null;
+    })();
+
+    const visiblePrograms = currentAppId
+        ? PROGRAMS.filter(p => p.id === currentAppId)
+        : PROGRAMS;
+
     const isActive = (path: string) => {
         if (!pathname) return false;
-        if (path === '/english/izakaya-toeic') return pathname === '/english/izakaya-toeic' || pathname === '/english/izakaya-toeic/program';
+        if (path === '/english/toeic') return pathname === '/english/toeic' || pathname === '/english/toeic/program';
         if (path === '/english/izakaya-toeic/kaiwa') return pathname === '/english/izakaya-toeic/kaiwa';
         if (path === '/english/training/card-preview') return pathname === '/english/training/card-preview';
         if (path === '/english/training') return pathname === '/english/training' || pathname.startsWith('/english/training/card-slot');
@@ -398,8 +422,24 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
                 <nav style={{ flex: 1, paddingTop: isMobile ? 0 : 8 }}>
                     {/* ── PROGRAMS ── */}
-                    <SectionLabel text="PROGRAMS" />
-                    {PROGRAMS.map(p => <ProgramCard key={p.id} program={p} />)}
+                    <SectionLabel text={currentAppId ? 'CURRENT APP' : 'PROGRAMS'} />
+                    {visiblePrograms.map(p => <ProgramCard key={p.id} program={p} />)}
+                    {currentAppId && (
+                        <Link href="/english" style={{ textDecoration: 'none', display: 'block', margin: '4px 16px 8px' }}>
+                            <div style={{
+                                padding: '6px 12px',
+                                fontSize: 11,
+                                color: '#888',
+                                border: '1px dashed #d5d5d5',
+                                borderRadius: 6,
+                                textAlign: 'center',
+                                fontWeight: 500,
+                                letterSpacing: '0.05em',
+                            }}>
+                                ← 他のアプリを見る
+                            </div>
+                        </Link>
+                    )}
 
                     {/* ── TOOLS ── */}
                     <SectionLabel text="TOOLS" />

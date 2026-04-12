@@ -149,7 +149,7 @@ const PROJECTS: Project[] = [
         nameJa: '居酒屋TOEIC -- 物語で学ぶ英語',
         status: 'live',
         description: '6人のキャラが居酒屋「のれん」に集まる。マスター権藤、ユキ、タケシ、リサ、ケンジ、ミナ。30日 × 20フレーズ = 600。パチンコ式学習。',
-        url: 'https://www.toniolab.com/english/izakaya-toeic',
+        url: 'https://www.toniolab.com/english/toeic',
         tech: ['Gamification', 'TTS', 'Character-driven'],
     },
     {

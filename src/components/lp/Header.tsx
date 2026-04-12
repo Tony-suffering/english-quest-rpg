@@ -66,7 +66,7 @@ const navigation: NavItem[] = [
         href: '/english/izakaya-toeic/kaiwa/lp',
         submenu: [
             { name: '英会話マスター365', href: '/english/izakaya-toeic/kaiwa/lp' },
-            { name: '居酒屋TOEIC', href: '/english/izakaya-toeic/lp' },
+            { name: '居酒屋TOEIC', href: '/english/toeic/lp' },
             { name: 'Movie Harvest', href: '/english/harvest' },
             { name: 'Training (RPG)', href: '/english/training' },
         ],

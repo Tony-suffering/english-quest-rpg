@@ -153,7 +153,7 @@ export default function HomePage() {
 
                         {/* 居酒屋TOEIC */}
                         <motion.div variants={f}>
-                            <Link href="/english/izakaya-toeic/lp" className="block group">
+                            <Link href="/english/toeic/lp" className="block group">
                                 <div className="rounded-2xl border border-[#E7E5E4] bg-white overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-[#10B981]/30">
                                     <div className="h-1.5 bg-gradient-to-r from-[#10B981] to-[#10B981]/40" />
                                     <div className="p-8">
@@ -337,7 +337,7 @@ export default function HomePage() {
                         <Link href="/english/izakaya-toeic/kaiwa/lp" className="inline-flex items-center gap-3 px-8 py-4 bg-[#D4AF37] text-white text-sm font-bold tracking-wide hover:bg-[#252423] transition-colors">
                             英会話マスター365 を始める <span className="text-xs opacity-50">→</span>
                         </Link>
-                        <Link href="/english/izakaya-toeic/lp" className="inline-flex items-center gap-3 px-8 py-4 bg-[#10B981] text-white text-sm font-bold tracking-wide hover:bg-[#252423] transition-colors">
+                        <Link href="/english/toeic/lp" className="inline-flex items-center gap-3 px-8 py-4 bg-[#10B981] text-white text-sm font-bold tracking-wide hover:bg-[#252423] transition-colors">
                             居酒屋TOEIC を始める <span className="text-xs opacity-50">→</span>
                         </Link>
                     </motion.div>

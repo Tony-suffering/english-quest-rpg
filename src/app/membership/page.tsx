@@ -236,7 +236,7 @@ export default function MembershipPage() {
                             </div>
                         </div>
                     </Link>
-                    <Link href="/english/izakaya-toeic/lp" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Link href="/english/toeic/lp" style={{ textDecoration: 'none', color: 'inherit' }}>
                         <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 16, padding: '28px 24px', transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden' }}>
                             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: '#10B981' }} />
                             <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#10B981', fontWeight: 700, fontFamily: 'monospace', marginBottom: 12 }}>TOEIC DRAMA</p>
@@ -432,7 +432,7 @@ export default function MembershipPage() {
                 <Link href="/journal" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>Journal</Link>
                 <Link href="/journal/vibe-coding" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>Vibe Coding</Link>
                 <Link href="/english/izakaya-toeic/kaiwa/lp" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>英会話マスター365</Link>
-                <Link href="/english/izakaya-toeic/lp" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>居酒屋TOEIC</Link>
+                <Link href="/english/toeic/lp" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>居酒屋TOEIC</Link>
                 <a href="https://note.com/tonio_english" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>note.com</a>
                 <Link href="/" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>TONIO LAB</Link>
             </footer>

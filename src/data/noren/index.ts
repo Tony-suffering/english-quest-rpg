@@ -241,7 +241,7 @@ export const SAMPLE_NORENS: Noren[] = [
         memberCount: 23,
         activeToday: 8,
         createdAt: '2026-03-15',
-        linkedContent: '/english/izakaya-toeic',
+        linkedContent: '/english/toeic',
         milestones: [
             { step: 1, label: '基礎文法を固める' },
             { step: 2, label: 'Part 5を攻略する' },
