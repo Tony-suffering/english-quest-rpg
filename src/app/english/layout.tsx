@@ -135,9 +135,9 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
                 <div style={{ textAlign: 'center', maxWidth: 400, marginTop: 32, ...fadeIn(0.8) }}>
                     <div style={{ fontSize: 14, color: '#ccc', lineHeight: 2, fontWeight: 300, opacity: phase >= 2 ? 1 : 0, transition: 'opacity 1s ease' }}>
                         教科書の英語じゃない。<br />
-                        ネイティブが実際に喋ってる構造を分析して、<br />
-                        <span style={{ color: gold, fontWeight: 700 }}>15,000フレーズ</span>に落とし込んだ。<br />
-                        毎日タップして、スロット回して、<br />
+                        ネイティブが実際に喋ってる構造を分解して、<br />
+                        <span style={{ color: gold, fontWeight: 700 }}>3,650フレーズ</span>と<span style={{ color: gold, fontWeight: 700 }}>30話のドラマ</span>に落とし込んだ。<br />
+                        毎日10フレーズ、30日で1話読破。<br />
                         気づいたら英語が頭に残ってる。
                     </div>
                 </div>
@@ -146,33 +146,40 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
         </>
     );
 
-    // ── Step 1: What's inside ──
+    // ── Step 1: Two main apps ──
     if (step === 1) return (
         <>
             <Screen>
-                <Label>WHAT YOU GET</Label>
+                <Label>TWO APPS</Label>
                 <Title>
-                    これが全部、<span style={{ fontWeight: 700 }}>無料</span>で入ってる。
+                    メインは<span style={{ fontWeight: 700 }}>2つ</span>。<br />
+                    どっちも無料。登録不要。
                 </Title>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, ...fadeIn(0.3) }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, ...fadeIn(0.3) }}>
                     {[
-                        { icon: 'K', label: '英会話マスター365', desc: '毎日更新の英会話レッスン。5分トーク+ひとこと英語帳', c: gold },
-                        { icon: 'D', label: 'Daily Training', desc: '自分のフレーズを登録して覚える。スロット+カード育成つき', c: '#EF4444' },
-                        { icon: 'T', label: '居酒屋TOEIC', desc: '居酒屋トークで学ぶTOEIC対策。Part 1-7完全対応', c: '#10B981' },
-                        { icon: 'M', label: 'メモリア(会話リスニング)', desc: '7つのシナリオ、40人以上のキャラ。ネイティブの会話を聴く', c: '#3B82F6' },
-                        { icon: 'L', label: 'リスクエ(リスニング特訓)', desc: '30日で英語が聞こえる耳を作る。1日10問、聞こえない原因を潰す', c: '#2563EB' },
-                        { icon: 'R', label: 'ヨミクエ(リーディング特訓)', desc: '30日で英語が読める脳を作る。看板からニュースまで読む力', c: '#F59E0B' },
-                        { icon: 'G', label: '積み上げ(成長記録)', desc: '自分がどれだけ英語に触れたか、全部の記録が見える', c: '#7C3AED' },
-                        { icon: 'N', label: '作ってる人の話', desc: 'TOEIC 900で喋れない男の開発日記。毎日note.comで更新中', c: '#78716C' },
+                        {
+                            label: '英会話マスター365',
+                            tagline: 'DAILY PHRASES',
+                            desc: '日本語1つに英語4つ (CORE / NATURAL / FLOW / EXPRESS)。毎日10フレーズ、365日で3,650フレーズ。口から出す「在庫」を物理的に増やす。',
+                            c: gold,
+                        },
+                        {
+                            label: '居酒屋TOEIC',
+                            tagline: 'TOEIC DRAMA',
+                            desc: '全30話の連続ドラマ。6人のキャラクター、伏線、涙。物語を読んでたらTOEICのスコアが上がってる設計。',
+                            c: green,
+                        },
                     ].map((f, i) => (
-                        <div key={f.label} style={{ display: 'flex', gap: 12, padding: '12px 14px', backgroundColor: '#111', borderRadius: 12, border: '1px solid #222', ...slideIn(i) }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: f.c, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, flexShrink: 0 }}>{f.icon}</div>
-                            <div>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{f.label}</div>
-                                <div style={{ fontSize: 11, color: '#666', lineHeight: 1.5 }}>{f.desc}</div>
-                            </div>
+                        <div key={f.label} style={{ padding: '18px 18px', backgroundColor: '#111', borderRadius: 14, border: `1px solid ${f.c}30`, ...slideIn(i) }}>
+                            <div style={{ fontSize: 9, letterSpacing: '0.2em', color: f.c, fontWeight: 700, marginBottom: 6 }}>{f.tagline}</div>
+                            <div style={{ fontSize: 16, fontWeight: 800, color: '#fff', marginBottom: 8 }}>{f.label}</div>
+                            <div style={{ fontSize: 12, color: '#888', lineHeight: 1.8 }}>{f.desc}</div>
                         </div>
                     ))}
+                </div>
+                <div style={{ fontSize: 11, color: '#555', lineHeight: 1.8, marginTop: 18, textAlign: 'center', ...fadeIn(0.7) }}>
+                    他にも Movie Harvest、のれん、ひとこと英語帳など<br />
+                    サイドバーから色々触れる。
                 </div>
             </Screen>
             <Nav />
@@ -290,48 +297,62 @@ function WelcomeFlow({ onDone }: { onDone: () => void }) {
         </>
     );
 
-    // ── Step 4: Let's go ──
+    // ── Step 4: Choose your app (direct entry, no HP hop) ──
     return (
         <>
             <Screen>
-                <Label color={green}>READY?</Label>
+                <Label color={green}>START</Label>
                 <Title>
-                    あとは<span style={{ fontWeight: 700 }}>触るだけ</span>。
+                    どっちから<span style={{ fontWeight: 700 }}>始める</span>？
                 </Title>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28, ...fadeIn(0.3) }}>
-                    {[
-                        { text: '1日3回までレベルアップ可能。毎日来る理由がある', color: gold },
-                        { text: '左のサイドバーから全機能にアクセスできる', color: '#3B82F6' },
-                        { text: 'スマホでもPCでも使える。データはブラウザに保存', color: '#8B5CF6' },
-                    ].map((tip, i) => (
-                        <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 14px', backgroundColor: '#111', borderRadius: 10, border: '1px solid #222', ...slideIn(i) }}>
-                            <div style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: tip.color, marginTop: 7, flexShrink: 0 }} />
-                            <div style={{ fontSize: 13, color: '#ccc', lineHeight: 1.7 }}>{tip.text}</div>
-                        </div>
-                    ))}
+                <div style={{ fontSize: 12, color: '#888', lineHeight: 1.8, textAlign: 'center', marginBottom: 24, ...fadeIn(0.2) }}>
+                    あとでサイドバーから両方切り替えられる。<br />
+                    今すぐ好きな方に飛んでOK。
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', ...fadeIn(0.5) }}>
-                    <button onClick={() => finish('/english')} style={{
-                        padding: '16px 48px', borderRadius: 0, backgroundColor: gold,
-                        border: 'none', color: '#000', fontSize: 16, fontWeight: 800,
-                        cursor: 'pointer', letterSpacing: '0.1em', width: '100%', maxWidth: 320,
-                        boxShadow: '0 4px 24px rgba(212,175,55,0.5)',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, ...fadeIn(0.4) }}>
+                    <button
+                        onClick={() => finish('/english/izakaya-toeic/kaiwa')}
+                        style={{
+                            padding: '20px 24px', borderRadius: 14, backgroundColor: gold,
+                            border: 'none', color: '#000', cursor: 'pointer', textAlign: 'left',
+                            boxShadow: '0 6px 20px rgba(212,175,55,0.4)',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
                     >
-                        HOME
+                        <div style={{ fontSize: 9, letterSpacing: '0.2em', fontWeight: 700, marginBottom: 6, opacity: 0.7 }}>DAILY PHRASES</div>
+                        <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 4 }}>英会話マスター365 を始める →</div>
+                        <div style={{ fontSize: 11, fontWeight: 500, opacity: 0.75 }}>毎日10フレーズ、口から出す在庫を増やす</div>
                     </button>
-                    <button onClick={() => finish('/english/training')} style={{
-                        padding: '10px 24px', backgroundColor: 'transparent',
-                        border: '1px solid #333', borderRadius: 0, color: '#666',
-                        fontSize: 13, cursor: 'pointer',
-                    }}>
-                        すぐトレーニングを始める
+                    <button
+                        onClick={() => finish('/english/toeic')}
+                        style={{
+                            padding: '20px 24px', borderRadius: 14, backgroundColor: green,
+                            border: 'none', color: '#fff', cursor: 'pointer', textAlign: 'left',
+                            boxShadow: '0 6px 20px rgba(16,185,129,0.4)',
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.02)'}
+                        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                        <div style={{ fontSize: 9, letterSpacing: '0.2em', fontWeight: 700, marginBottom: 6, opacity: 0.8 }}>TOEIC DRAMA</div>
+                        <div style={{ fontSize: 18, fontWeight: 900, marginBottom: 4 }}>居酒屋TOEIC を始める →</div>
+                        <div style={{ fontSize: 11, fontWeight: 500, opacity: 0.8 }}>全30話の連続ドラマで物語ごとスコアUP</div>
                     </button>
                 </div>
             </Screen>
-            <Nav nextLabel="HOME" onNext={() => finish('/english')} />
+            <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 10000, padding: '20px 24px 32px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, background: 'linear-gradient(transparent, rgba(0,0,0,0.95) 40%)' }}>
+                <div style={{ display: 'flex', gap: 6 }}>
+                    {Array.from({ length: totalSteps }, (_, i) => (
+                        <div key={i} style={{ width: i === step ? 20 : 6, height: 6, borderRadius: 3, backgroundColor: i === step ? gold : i < step ? green : '#333', transition: 'all 0.3s ease' }} />
+                    ))}
+                </div>
+                <button onClick={prev} style={{
+                    padding: '8px 18px', borderRadius: 8, backgroundColor: 'transparent',
+                    border: '1px solid #333', color: '#666', fontSize: 12, cursor: 'pointer',
+                }}>
+                    戻る
+                </button>
+            </div>
         </>
     );
 }
