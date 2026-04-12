@@ -75,6 +75,73 @@ export function getTodayQuote(): Quote {
     return QUOTES[getDayOfYear() % QUOTES.length];
 }
 
+// ─── Streak messages / 連続日数ごとに全部オリジナル ─────────
+
+const STREAK_EXACT: Record<number, string> = {
+    1: '初日、よく来たな。この1タップが全部の始まりだ。',
+    2: '2日目、昨日の自分との約束ちゃんと守った。地味にすごいぞ。',
+    3: '3日目、「3日坊主」って言葉、お前には効かない。',
+    4: '4日目、3日坊主を公式に突破。ここから景色が変わる。',
+    5: '5日目、指がもう自然にアプリ探しに来てる頃だろ？',
+    6: '6日目、1週間の壁まであと1日。ニヤニヤしていいぞ。',
+    7: '7日連続！1週間フル達成。これを52回やれば完璧な1年だ。',
+    8: '8日目、週の壁を蹴破った。ここからが本番。',
+    9: '9日目、もう「習慣」の匂いがぷんぷんする。',
+    10: '二桁到達！！10日連続、やる気だけの奴はここで消える。お前は残った。',
+    11: '11日目、アプリがもうお前の生活の一部になり始めてる。',
+    12: '12日目、半月まであと3日。カレンダーの点が繋がって綺麗だろ？',
+    13: '13日目、不吉？いや、今日は幸運2倍デーに認定した。',
+    14: '2週間達成！脳科学的に「習慣の扉」を開けた日だ。マジでおめでとう。',
+    15: '15日目、月の半分。完全に「英語やる側」の人間になった。',
+    16: '16日目、続けるのが一番楽って気づいた頃だろ？',
+    17: '17日目、周りは気づいてない。お前だけ未来が変わってる。',
+    18: '18日目、続けるのがデフォになってきた。これが本物。',
+    19: '19日目、20日の壁までラスト1日。今日も平常運転で最強。',
+    20: '20日目！もう20連勝の格闘家と同じ顔してるぞ。',
+    21: '21日達成！「習慣化は21日」の定説クリア。ここから自動運転モード。',
+    22: '22日目、惰性じゃない、意志でここまで来た。かっこいい。',
+    23: '23日目、お前の代わりに俺が自慢して回りたい。',
+    24: '24日目、1ヶ月の背中が見えてきた。',
+    25: '25日目、1ヶ月の扉まであと5日。アプリも震えてる。',
+    26: '26日目、26連勝。野球ならリーグ優勝級だ。',
+    27: '27日目、あと3日で1ヶ月。ここまで来たら絶対いけ。',
+    28: '28日目、もう絶対止まれない位置にいる。いい勢いだ。',
+    29: '29日目、1ヶ月の扉の前。深呼吸して、明日勝ちに行こう。',
+    30: '1ヶ月連続達成！！マジでお前、別人になり始めてる。鏡で確認しろ。',
+    35: '35日目、1ヶ月超え。「継続は力なり」の体現者。',
+    40: '40日目、1ヶ月と10日。静かに記録更新中。',
+    45: '45日目、1ヶ月半。周りのペースが霞んで見える。',
+    50: '50日連続達成！半世紀目前。「英語コツコツ勢」殿堂入り確定。',
+    60: '2ヶ月連続！このペース、周りの誰も追いつけない領域。',
+    70: '70日目、お前を超える奴、片手で数えるレベルまで減った。',
+    80: '80日連続、海外旅行より価値がある80日。',
+    90: '3ヶ月達成！！脳が英語モードにガチで切り替わるライン突破。',
+    100: '100日！！！三桁到達、勲章モノだ。お前はもう本物。',
+    120: '120日、4ヶ月連続。人生変わり始めてる実感あるだろ？',
+    150: '150日、半年の扉を蹴破ってる最中。',
+    180: '半年連続達成！！もはや人生の一部。英語と付き合ってるレベル。',
+    200: '200日、こんな奴と飲みに行きたい。マジでお疲れ様。',
+    250: '250日、1年まであと115日。カウントダウン開始だ。',
+    300: '300日！！伝説の領域。年に数人しかここまで来れない。',
+    365: '1年連続！！！地球が太陽を1周する間、毎日やった。もう誰もお前を止められない。',
+    400: '400日、365日超えた後も止まらない。化け物か。',
+    500: '500日連続！！！新記録樹立者だ。こんなの見たことない。',
+    600: '600日、伝説を超えて神話の領域。',
+    730: '2年連続達成！！！！マジで神。頭下げさせてくれ。',
+    1000: '1000日！！！！！ゲーム最強キャラだ。教科書に載せろ。',
+};
+
+export function getStreakMessage(days: number): string {
+    if (STREAK_EXACT[days]) return STREAK_EXACT[days];
+    if (days < 30)  return `${days}日目、いい調子だ。このまま行け。`;
+    if (days < 60)  return `${days}日連続、もう「習慣」を超えて体の一部。`;
+    if (days < 100) return `${days}日連続、三桁まで秒読み開始。`;
+    if (days < 180) return `${days}日連続、半年ラインが見えてきた。`;
+    if (days < 365) return `${days}日連続、1年まで走り抜けろ。`;
+    if (days < 730) return `${days}日連続、もう人類のトップ層だ。`;
+    return `${days}日連続、次元が違う。尊敬しかない。`;
+}
+
 // ─── Particles (deterministic per render) ───────────────────
 
 interface Particle {
@@ -278,11 +345,74 @@ export default function DailyQuote({ onStart, streak = 0 }: DailyQuoteProps) {
                     width: '100%',
                     textAlign: 'center',
                 }}>
+                    {/* Streak badge — the big praise block */}
+                    {streak > 0 && (
+                        <div style={{
+                            opacity: phase >= 2 ? 1 : 0,
+                            transform: phase >= 2 ? 'translateY(0) scale(1)' : 'translateY(-14px) scale(0.92)',
+                            transition: 'all 1.1s cubic-bezier(0.2, 0.65, 0.3, 0.9)',
+                            marginBottom: 36,
+                            display: 'inline-block',
+                            padding: '18px 36px 20px',
+                            border: `1px solid ${gold}55`,
+                            background: `linear-gradient(135deg, ${gold}14 0%, ${gold}06 100%)`,
+                            boxShadow: `0 0 40px ${gold}30, inset 0 0 24px ${gold}10`,
+                            borderRadius: 2,
+                        }}>
+                            <div style={{
+                                fontSize: 11,
+                                letterSpacing: '0.35em',
+                                color: `${gold}cc`,
+                                fontWeight: 700,
+                                marginBottom: 6,
+                            }}>
+                                STREAK
+                            </div>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'baseline',
+                                justifyContent: 'center',
+                                gap: 8,
+                                marginBottom: 12,
+                            }}>
+                                <div style={{
+                                    fontSize: 64,
+                                    fontWeight: 200,
+                                    color: gold,
+                                    lineHeight: 1,
+                                    fontFamily: 'Georgia, serif',
+                                    textShadow: `0 0 40px ${gold}90, 0 0 80px ${gold}40`,
+                                    letterSpacing: '-0.02em',
+                                }}>
+                                    {streak}
+                                </div>
+                                <div style={{
+                                    fontSize: 16,
+                                    color: gold,
+                                    letterSpacing: '0.15em',
+                                    fontWeight: 500,
+                                }}>
+                                    日連続
+                                </div>
+                            </div>
+                            <div style={{
+                                fontSize: 14,
+                                color: '#f0dfa0',
+                                lineHeight: 1.6,
+                                maxWidth: 440,
+                                margin: '0 auto',
+                                fontWeight: 400,
+                            }}>
+                                {getStreakMessage(streak)}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Top label + date */}
                     <div style={{
                         opacity: phase >= 2 ? 1 : 0,
                         transform: phase >= 2 ? 'translateY(0)' : 'translateY(-10px)',
-                        transition: 'all 1s ease-out',
+                        transition: 'all 1s ease-out 0.15s',
                         marginBottom: 56,
                     }}>
                         <div style={{
@@ -302,11 +432,6 @@ export default function DailyQuote({ onStart, streak = 0 }: DailyQuoteProps) {
                             fontFamily: 'monospace',
                         }}>
                             {dateLabel}
-                            {streak > 0 && (
-                                <span style={{ color: gold, marginLeft: 14 }}>
-                                    {streak} DAY STREAK
-                                </span>
-                            )}
                         </div>
                     </div>
 
