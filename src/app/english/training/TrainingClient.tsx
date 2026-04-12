@@ -3340,6 +3340,10 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         setTimeAttackPhase('result');
         setViewMode('calendar');
         setTimeAttackUrgent(false);
+        // Restore SHUFFLE as default after TimeAttack so unmastered cards
+        // are the first thing the user sees on next review session.
+        setReviewFilter('random');
+        setReviewIndex(0);
 
         // Sound effects for TA completion
         if (completed) playGachaSound('LEGENDARY');

@@ -17,6 +17,7 @@ import DailyCheckin, {
 } from '@/components/english/DailyCheckin';
 import StreakMilestone from '@/components/english/StreakMilestone';
 import CheckinOnboarding, { isOnboardingComplete } from '@/components/english/CheckinOnboarding';
+import DailyQuote, { isQuoteShownToday } from '@/components/english/DailyQuote';
 import { addPhrase } from '@/lib/local-store';
 import DailyConversationPlayer from '@/components/english/DailyConversationPlayer';
 import { getConversation } from '@/data/english/365/daily-conversations';
@@ -604,6 +605,7 @@ export default function EnglishMaster365Page() {
 
     // Daily check-in state
     const [showOnboarding, setShowOnboarding] = useState(false);
+    const [showQuote, setShowQuote] = useState(false);
     const [showCheckin, setShowCheckin] = useState(false);
     const [showMilestone, setShowMilestone] = useState<{ days: number; title: string; message: string } | null>(null);
     const [todayPicks, setTodayPicks] = useState<string[]>([]);
@@ -695,17 +697,27 @@ export default function EnglishMaster365Page() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [viewYear, viewMonth, daySlotOffset]);
 
-    // Trigger checkin overlay when selectedDay is set (first load)
+    // Trigger daily-quote + checkin overlays when selectedDay is set (first load)
     const checkinTriggered = useRef(false);
     useEffect(() => {
         if (!selectedDay || checkinTriggered.current) return;
         checkinTriggered.current = true;
         const alreadyCheckedIn = typeof window !== 'undefined' && localStorage.getItem(`365-checkin-${selectedDay}`) !== null;
-        if (!showOnboarding && !alreadyCheckedIn) {
+        if (showOnboarding || alreadyCheckedIn) return;
+        // DailyQuote runs once per calendar day as the intro before the 3-pick.
+        // After the user taps 今日も始めよう, handleQuoteStart flips to showCheckin.
+        if (!isQuoteShownToday()) {
+            setShowQuote(true);
+        } else {
             setShowCheckin(true);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedDay, showOnboarding]);
+
+    const handleQuoteStart = useCallback(() => {
+        setShowQuote(false);
+        setShowCheckin(true);
+    }, []);
 
     // Load registered phrases from localStorage
     useEffect(() => {
@@ -1067,6 +1079,9 @@ export default function EnglishMaster365Page() {
             {/* ── Check-in Overlays ── */}
             {showOnboarding && (
                 <CheckinOnboarding onComplete={handleOnboardingComplete} />
+            )}
+            {showQuote && !showOnboarding && (
+                <DailyQuote onStart={handleQuoteStart} streak={checkinStreak.current} />
             )}
             {showCheckin && checkinExpressions.length > 0 && (
                 <DailyCheckin
