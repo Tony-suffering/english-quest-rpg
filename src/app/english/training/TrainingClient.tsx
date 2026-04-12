@@ -3465,7 +3465,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     }, []);
 
     // Auto-start Time Attack from ?ta=1 URL parameter (e.g. from kaiwa CTA)
-    // useLayoutEffect to prevent idle UI flash before selecting
+    // useLayoutEffect to prevent idle UI flash + pre-empt any auto-play TTS
     useLayoutEffect(() => {
         if (taAutoRef.current) return;
         const params = new URLSearchParams(window.location.search);
@@ -3474,6 +3474,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             params.delete('ta');
             const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
             window.history.replaceState({}, '', newUrl);
+            // Kill any queued/playing speech before the preset modal shows
+            try { window.speechSynthesis.cancel(); } catch { /* */ }
             setTimeAttackPhase('selecting');
         }
     }, []);
@@ -6175,12 +6177,18 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     }, [voices]);
 
     // Auto-play TTS when displayed card changes
+    // Suppress while Time Attack preset picker is up (user hasn't chosen duration yet)
     useEffect(() => {
         if (!displayedCard || cardCelebration) return;
+        if (timeAttackPhase === 'selecting' || timeAttackPhase === 'countdown') {
+            try { window.speechSynthesis.cancel(); } catch { /* */ }
+            setPlayingPhraseId(null);
+            return;
+        }
         if (displayedCard.id === prevAutoPlayIdRef.current) return;
         prevAutoPlayIdRef.current = displayedCard.id;
         playPhrase(displayedCard);
-    }, [displayedCard, cardCelebration, playPhrase]);
+    }, [displayedCard, cardCelebration, playPhrase, timeAttackPhase]);
 
     const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
     const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
