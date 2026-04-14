@@ -114,8 +114,23 @@ export default function GrindPage() {
         [monthEntries]
     );
 
-    // Played = has entry (gold dot)
-    const playedIds = useMemo(() => new Set(monthEntries.map(e => e.id)), [monthEntries]);
+    // Checked = user explicitly marked "確認済み" on this entry
+    const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
+    useEffect(() => {
+        try {
+            const raw = localStorage.getItem('grind-checked-ids');
+            if (raw) setCheckedIds(new Set(JSON.parse(raw)));
+        } catch {}
+    }, []);
+    const toggleChecked = (id: string) => {
+        setCheckedIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id); else next.add(id);
+            try { localStorage.setItem('grind-checked-ids', JSON.stringify([...next])); } catch {}
+            return next;
+        });
+    };
+    const playedIds = checkedIds;
 
     // By day map
     const byDay = useMemo(() => {
@@ -558,6 +573,8 @@ export default function GrindPage() {
                                     entry={entry}
                                     isMobile={isMobile}
                                     isToday={isToday}
+                                    isChecked={checkedIds.has(entry.id)}
+                                    onToggleChecked={() => toggleChecked(entry.id)}
                                 />
                             );
                         })
@@ -715,8 +732,8 @@ function EmptyState({ label, sub }: { label: string; sub?: string }) {
 }
 
 function EntryCard({
-    entry, isMobile, isToday,
-}: { entry: GrindEntry; isMobile: boolean; isToday?: boolean }) {
+    entry, isMobile, isToday, isChecked, onToggleChecked,
+}: { entry: GrindEntry; isMobile: boolean; isToday?: boolean; isChecked: boolean; onToggleChecked: () => void }) {
     const tags = entry.tags ? entry.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
     const [copied, setCopied] = useState(false);
     const handleShare = async () => {
@@ -802,8 +819,23 @@ function EntryCard({
                 </p>
             )}
 
-            {/* Share button */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
+            {/* Share + Check buttons */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+                <button
+                    onClick={onToggleChecked}
+                    style={{
+                        fontSize: 11, fontWeight: 800, letterSpacing: '0.06em',
+                        color: isChecked ? '#92400E' : '#78716C',
+                        background: isChecked ? '#FEF3C7' : '#F5F5F4',
+                        border: `1px solid ${isChecked ? '#D4AF3760' : '#E7E5E4'}`,
+                        padding: '7px 14px', borderRadius: 6,
+                        cursor: 'pointer', transition: 'all 0.2s',
+                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                    }}
+                >
+                    <span style={{ fontSize: 13, lineHeight: 1 }}>{isChecked ? '★' : '☆'}</span>
+                    {isChecked ? '確認済み' : '確認した？'}
+                </button>
                 <button
                     onClick={handleShare}
                     style={{
