@@ -13,8 +13,10 @@ import { timeAttackSidebarEntry } from './time-attack-sidebar-entry';
 import { englishIndustryLiesEntry } from './english-industry-lies-entry';
 import { englishIndustryLightEntry } from './english-industry-light-entry';
 import { aiArmyComedyEntry } from './ai-army-comedy-entry';
+import { grindCalendarLaunchEntry } from './grind-calendar-launch-entry';
 
 export const april2026Entries: JournalEntry[] = [
+    grindCalendarLaunchEntry,
     aiArmyComedyEntry,
     clientProfilePageEntry,
     aiGotItWrongEntry,
