@@ -696,6 +696,21 @@ export default function GrindPage() {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-50%); }
                 }
+                @keyframes grindBurstRing {
+                    0%   { transform: scale(0.4); opacity: 0.9; }
+                    70%  { transform: scale(6);   opacity: 0.15; }
+                    100% { transform: scale(7);   opacity: 0; }
+                }
+                @keyframes grindBurstSpark {
+                    0%   { opacity: 1; transform: rotate(var(--a,0deg)) translateY(-8px) scale(1); }
+                    100% { opacity: 0; transform: rotate(var(--a,0deg)) translateY(-70px) scale(0.4); }
+                }
+                @keyframes grindBurstText {
+                    0%   { opacity: 0; transform: translateY(8px) scale(0.7); }
+                    20%  { opacity: 1; transform: translateY(0) scale(1.1); }
+                    40%  { transform: translateY(-2px) scale(1); }
+                    100% { opacity: 0; transform: translateY(-18px) scale(1); }
+                }
             `}</style>
         </div>
     );
@@ -736,6 +751,8 @@ function EntryCard({
 }: { entry: GrindEntry; isMobile: boolean; isToday?: boolean; isChecked: boolean; onToggleChecked: () => void }) {
     const tags = entry.tags ? entry.tags.split(',').map(t => t.trim()).filter(Boolean) : [];
     const [copied, setCopied] = useState(false);
+    const [showBurst, setShowBurst] = useState(false);
+    const [burstKey, setBurstKey] = useState(0);
     const handleShare = async () => {
         const url = `${window.location.origin}/english/grind?date=${entry.date}`;
         try {
@@ -819,35 +836,118 @@ function EntryCard({
                 </p>
             )}
 
-            {/* Share + Check buttons */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
+            {/* Check button (hero) + Share */}
+            <div style={{ display: 'flex', gap: 10, marginBottom: 14, flexWrap: 'wrap', alignItems: 'stretch' }}>
                 <button
-                    onClick={onToggleChecked}
+                    onClick={() => {
+                        if (!isChecked) {
+                            setBurstKey(k => k + 1);
+                            setShowBurst(true);
+                            window.setTimeout(() => setShowBurst(false), 1400);
+                        }
+                        onToggleChecked();
+                    }}
                     style={{
-                        fontSize: 11, fontWeight: 800, letterSpacing: '0.06em',
-                        color: isChecked ? '#92400E' : '#78716C',
-                        background: isChecked ? '#FEF3C7' : '#F5F5F4',
-                        border: `1px solid ${isChecked ? '#D4AF3760' : '#E7E5E4'}`,
-                        padding: '7px 14px', borderRadius: 6,
-                        cursor: 'pointer', transition: 'all 0.2s',
-                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                        position: 'relative',
+                        flex: '1 1 auto',
+                        minWidth: isMobile ? '100%' : 240,
+                        fontSize: isMobile ? 15 : 16,
+                        fontWeight: 900,
+                        letterSpacing: '0.08em',
+                        color: isChecked ? '#FFFFFF' : '#1C1917',
+                        background: isChecked
+                            ? 'linear-gradient(135deg, #D4AF37 0%, #F59E0B 50%, #D4AF37 100%)'
+                            : 'linear-gradient(135deg, #FAFAF9 0%, #F5F5F4 100%)',
+                        backgroundSize: isChecked ? '200% 200%' : '100% 100%',
+                        border: `2px solid ${isChecked ? '#D4AF37' : '#1C1917'}`,
+                        padding: isMobile ? '16px 20px' : '18px 24px',
+                        borderRadius: 12,
+                        cursor: 'pointer',
+                        transition: 'all 0.25s ease',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 10,
+                        boxShadow: isChecked
+                            ? '0 6px 22px rgba(212,175,55,0.45), inset 0 1px 0 rgba(255,255,255,0.4)'
+                            : '0 2px 8px rgba(28,25,23,0.08)',
+                        animation: isChecked ? 'grindGradient 3.5s ease infinite' : 'none',
+                        overflow: 'visible',
                     }}
                 >
-                    <span style={{ fontSize: 13, lineHeight: 1 }}>{isChecked ? '★' : '☆'}</span>
-                    {isChecked ? '確認済み' : '確認した？'}
+                    <span style={{ fontSize: isMobile ? 22 : 24, lineHeight: 1 }}>
+                        {isChecked ? '★' : '☆'}
+                    </span>
+                    <span>{isChecked ? '確認済み' : '確認した？'}</span>
+
+                    {/* Achievement burst */}
+                    {showBurst && (
+                        <span
+                            key={burstKey}
+                            aria-hidden
+                            style={{
+                                position: 'absolute',
+                                inset: 0,
+                                pointerEvents: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <span style={{
+                                position: 'absolute',
+                                width: 24, height: 24, borderRadius: '50%',
+                                border: '3px solid #D4AF37',
+                                animation: 'grindBurstRing 1.2s ease-out forwards',
+                            }} />
+                            <span style={{
+                                position: 'absolute',
+                                width: 24, height: 24, borderRadius: '50%',
+                                border: '2px solid #FDE68A',
+                                animation: 'grindBurstRing 1.2s 0.15s ease-out forwards',
+                            }} />
+                            {[0, 1, 2, 3, 4, 5, 6, 7].map(i => (
+                                <span
+                                    key={i}
+                                    style={{
+                                        position: 'absolute',
+                                        width: 6, height: 6, borderRadius: '50%',
+                                        background: i % 2 === 0 ? '#D4AF37' : '#FDE68A',
+                                        boxShadow: '0 0 6px rgba(212,175,55,0.8)',
+                                        animation: 'grindBurstSpark 1s ease-out forwards',
+                                        ['--a' as never]: `${i * 45}deg`,
+                                    }}
+                                />
+                            ))}
+                            <span style={{
+                                position: 'absolute',
+                                top: -28,
+                                fontSize: 13,
+                                fontWeight: 900,
+                                letterSpacing: '0.12em',
+                                color: '#D4AF37',
+                                textShadow: '0 2px 8px rgba(212,175,55,0.4)',
+                                whiteSpace: 'nowrap',
+                                animation: 'grindBurstText 1.3s ease-out forwards',
+                            }}>
+                                +1 GRIND DAY
+                            </span>
+                        </span>
+                    )}
                 </button>
                 <button
                     onClick={handleShare}
                     style={{
-                        fontSize: 10, fontWeight: 700, letterSpacing: '0.06em',
+                        fontSize: 11, fontWeight: 800, letterSpacing: '0.06em',
                         color: copied ? '#065F46' : '#78716C',
                         background: copied ? '#D1FAE5' : '#F5F5F4',
                         border: `1px solid ${copied ? '#10B98140' : '#E7E5E4'}`,
-                        padding: '6px 12px', borderRadius: 6,
+                        padding: '10px 14px', borderRadius: 10,
                         cursor: 'pointer', transition: 'all 0.2s',
+                        flex: '0 0 auto',
                     }}
                 >
-                    {copied ? 'COPIED!' : 'SHARE LINK'}
+                    {copied ? 'COPIED!' : 'SHARE'}
                 </button>
             </div>
 
