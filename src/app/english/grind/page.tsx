@@ -223,15 +223,23 @@ export default function GrindPage() {
 
     // --- RENDER ---
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#FAFAF9' }}>
+        <div style={{
+            display: 'flex',
+            minHeight: '100vh',
+            background: '#FAFAF9',
+            overflowX: 'hidden',
+            maxWidth: '100vw',
+        }}>
             <EnglishSidebar />
             <div style={{
                 flex: 1,
                 display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
                 overflow: isMobile ? 'visible' : 'hidden',
+                overflowX: 'hidden',
                 height: isMobile ? 'auto' : '100vh',
                 minWidth: 0,
+                maxWidth: '100%',
             }}>
                 {/* LEFT: Calendar + Stats */}
                 <div style={{
@@ -381,8 +389,10 @@ export default function GrindPage() {
                             {/* Header row */}
                             <div style={{
                                 position: 'relative',
-                                display: 'flex', alignItems: 'center', gap: 12,
-                                padding: isMobile ? '14px 16px 10px' : '16px 20px 12px',
+                                display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 12,
+                                padding: isMobile ? '14px 14px 10px' : '16px 20px 12px',
+                                flexWrap: 'nowrap',
+                                minWidth: 0,
                             }}>
                                 <div style={{
                                     width: 10, height: 10, borderRadius: '50%',
@@ -557,11 +567,13 @@ export default function GrindPage() {
                     {entries.length > 0 && (
                         <div style={{
                             marginTop: 40,
-                            padding: isMobile ? '18px 14px' : '22px 24px',
+                            padding: isMobile ? '18px 12px' : '22px 24px',
                             background: 'linear-gradient(135deg, #1C1917, #292524)',
                             borderRadius: 14,
                             border: '1px solid #D4AF3730',
                             boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+                            minWidth: 0,
+                            overflow: 'hidden',
                         }}>
                             <div style={{
                                 display: 'flex', alignItems: 'baseline', gap: 12,
@@ -584,10 +596,11 @@ export default function GrindPage() {
                             }}>
                                 {yearGrid.months.map((mRow, mi) => (
                                     <div key={mi} style={{
-                                        display: 'flex', alignItems: 'center', gap: 8,
+                                        display: 'flex', alignItems: 'center', gap: isMobile ? 6 : 8,
+                                        minWidth: 0,
                                     }}>
                                         <div style={{
-                                            width: 28, flexShrink: 0,
+                                            width: isMobile ? 22 : 28, flexShrink: 0,
                                             fontSize: 9, fontWeight: 800,
                                             color: '#D4AF37', letterSpacing: '0.05em',
                                         }}>
@@ -596,7 +609,7 @@ export default function GrindPage() {
                                         <div style={{
                                             display: 'grid',
                                             gridTemplateColumns: 'repeat(31, 1fr)',
-                                            gap: 2,
+                                            gap: isMobile ? 1 : 2,
                                             flex: 1,
                                             minWidth: 0,
                                         }}>
@@ -720,10 +733,12 @@ function EntryCard({
             {isToday && (
                 <div style={{
                     display: 'flex', alignItems: 'center', gap: 10,
-                    marginBottom: 14, padding: '10px 16px',
+                    marginBottom: 14, padding: isMobile ? '10px 12px' : '10px 16px',
                     background: 'linear-gradient(135deg, #D4AF37, #F59E0B)',
                     borderRadius: 10,
                     boxShadow: '0 6px 20px rgba(212,175,55,0.35)',
+                    flexWrap: 'wrap',
+                    minWidth: 0,
                 }}>
                     <span style={{
                         display: 'inline-block', width: 8, height: 8, borderRadius: '50%',
@@ -768,9 +783,11 @@ function EntryCard({
 
             {/* Title */}
             <h1 style={{
-                fontSize: isMobile ? (isToday ? 22 : 18) : (isToday ? 28 : 22),
+                fontSize: isMobile ? (isToday ? 20 : 17) : (isToday ? 28 : 22),
                 fontWeight: 800, color: '#1C1917',
                 margin: '0 0 4px 0', lineHeight: 1.25,
+                overflowWrap: 'break-word',
+                wordBreak: 'break-word',
             }}>
                 {entry.title}
             </h1>
@@ -778,6 +795,8 @@ function EntryCard({
                 <p style={{
                     fontSize: isToday ? 14 : 13, color: '#78716C',
                     margin: '0 0 10px 0', fontWeight: 500,
+                    overflowWrap: 'break-word',
+                    wordBreak: 'break-word',
                 }}>
                     {entry.title_ja}
                 </p>
