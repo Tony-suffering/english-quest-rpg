@@ -1,21 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import EnglishSidebar from '@/components/EnglishSidebar';
 import ReviewCalendar from '@/components/english/ReviewCalendar';
-
-// --- Types ---
-interface GrindEntry {
-    id: string;
-    date: string;          // YYYY-MM-DD
-    youtube_id: string;
-    title: string;
-    title_ja: string;
-    note: string;
-    tags: string;          // comma-separated
-    duration: number;      // seconds
-    created_at: string;
-}
+import { grindEntries, type GrindEntry } from '@/data/grind-log';
 
 const CATEGORY_COLORS: Record<string, { fg: string; bg: string }> = {
     log: { fg: '#92400E', bg: '#FEF3C7' },
@@ -35,8 +23,7 @@ export default function GrindPage() {
     const [viewYear, setViewYear] = useState(now.getFullYear());
     const [viewMonth, setViewMonth] = useState(now.getMonth());
     const [selectedDay, setSelectedDay] = useState<number | null>(null);
-    const [entries, setEntries] = useState<GrindEntry[]>([]);
-    const [loading, setLoading] = useState(true);
+    const entries = grindEntries;
     const [isMobile, setIsMobile] = useState(false);
     const detailRef = useRef<HTMLDivElement>(null);
 
@@ -78,21 +65,6 @@ export default function GrindPage() {
         }
     }, [urlDateApplied, selectedDay, viewYear, viewMonth]);
 
-    // Load entries
-    const loadEntries = useCallback(async () => {
-        try {
-            const res = await fetch('/api/study-log', { cache: 'no-store' });
-            const data = await res.json();
-            setEntries(data.entries || []);
-        } catch {
-            setEntries([]);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => { loadEntries(); }, [loadEntries]);
-
     // Scroll top on day change
     useEffect(() => { detailRef.current?.scrollTo(0, 0); }, [selectedDay]);
 
@@ -124,10 +96,10 @@ export default function GrindPage() {
     // Auto-select today when entries loaded (only if URL didn't specify a date)
     useEffect(() => {
         if (!urlDateApplied) return;
-        if (!loading && selectedDay === null && viewYear === todayYear && viewMonth === todayMonth) {
+        if (selectedDay === null && viewYear === todayYear && viewMonth === todayMonth) {
             setSelectedDay(todayDate);
         }
-    }, [urlDateApplied, loading, selectedDay, viewYear, viewMonth, todayYear, todayMonth, todayDate]);
+    }, [urlDateApplied, selectedDay, viewYear, viewMonth, todayYear, todayMonth, todayDate]);
 
     // Calendar entries format
     const calendarEntries = useMemo(
@@ -383,7 +355,7 @@ export default function GrindPage() {
                     }}
                 >
                     {/* Flashy marquee hero */}
-                    {!loading && entries.length > 0 && (
+                    {entries.length > 0 && (
                         <div style={{
                             position: 'relative',
                             marginBottom: 18,
@@ -494,7 +466,7 @@ export default function GrindPage() {
                     )}
 
                     {/* Prev/Next day nav */}
-                    {!loading && selectedEntries.length > 0 && (prevDateStr || nextDateStr) && (
+                    {selectedEntries.length > 0 && (prevDateStr || nextDateStr) && (
                         <div style={{
                             display: 'flex', alignItems: 'center', gap: 8,
                             marginBottom: 16,
@@ -554,9 +526,7 @@ export default function GrindPage() {
                         </div>
                     )}
 
-                    {loading ? (
-                        <EmptyState label="Loading..." />
-                    ) : selectedEntries.length === 0 ? (
+                    {selectedEntries.length === 0 ? (
                         <EmptyState
                             label={selectedDay ? 'この日の動画はまだ公開されてない' : '日付を選んで'}
                             sub={selectedDay ? '明日以降にまた覗きに来て' : 'カレンダーから日付を選択'}
@@ -579,7 +549,7 @@ export default function GrindPage() {
                     )}
 
                     {/* Year mosaic: 365 thumbnails */}
-                    {!loading && (
+                    {entries.length > 0 && (
                         <div style={{
                             marginTop: 40,
                             padding: isMobile ? '18px 14px' : '22px 24px',

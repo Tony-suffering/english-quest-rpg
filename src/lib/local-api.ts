@@ -619,11 +619,6 @@ export function installLocalApi() {
             return originalFetch(input, init)
         }
 
-        // Pass-through: real server-backed APIs (D1-backed, not localStorage mocks)
-        if (pathname.startsWith('/api/study-log')) {
-            return originalFetch(input, init)
-        }
-
         const method = (init?.method || 'GET').toUpperCase()
         let body: Record<string, unknown> | null = null
         if (init?.body) {
