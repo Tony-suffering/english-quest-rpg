@@ -31,9 +31,11 @@ export default function GrindPage() {
     const todayMonth = now.getMonth();
     const todayYear = now.getFullYear();
 
-    // Responsive
+    // Responsive -- stacked layout kicks in for 13" laptops and smaller,
+    // not just phones. 3-column (sidebar + calendar + detail) is too cramped
+    // below ~1100px effective width.
     useEffect(() => {
-        const check = () => setIsMobile(window.innerWidth < 768);
+        const check = () => setIsMobile(window.innerWidth < 1100);
         check();
         window.addEventListener('resize', check);
         return () => window.removeEventListener('resize', check);
@@ -227,8 +229,9 @@ export default function GrindPage() {
                 flex: 1,
                 display: 'flex',
                 flexDirection: isMobile ? 'column' : 'row',
-                overflow: 'hidden',
-                height: '100vh',
+                overflow: isMobile ? 'visible' : 'hidden',
+                height: isMobile ? 'auto' : '100vh',
+                minWidth: 0,
             }}>
                 {/* LEFT: Calendar + Stats */}
                 <div style={{
@@ -238,7 +241,7 @@ export default function GrindPage() {
                     borderBottom: isMobile ? '1px solid #E7E5E4' : 'none',
                     background: '#FFF',
                     display: 'flex', flexDirection: 'column',
-                    maxHeight: isMobile ? 420 : '100vh',
+                    maxHeight: isMobile ? 'none' : '100vh',
                     overflow: 'auto',
                 }}>
                     <ReviewCalendar
@@ -350,8 +353,10 @@ export default function GrindPage() {
                 <div
                     ref={detailRef}
                     style={{
-                        flex: 1, overflow: 'auto',
+                        flex: 1,
+                        overflow: isMobile ? 'visible' : 'auto',
                         padding: isMobile ? '16px 14px' : '24px 32px',
+                        minWidth: 0,
                     }}
                 >
                     {/* Flashy marquee hero */}
