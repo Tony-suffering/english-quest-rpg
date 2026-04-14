@@ -35,6 +35,7 @@ const PROGRAMS: Program[] = [
         basePath: '/english/izakaya-toeic/kaiwa',
         items: [
             { id: '/english/izakaya-toeic/kaiwa', label: 'マスター365 HOME' },
+            { id: '/english/grind', label: '毎日GRIND動画', featured: true },
             { id: '/english/my-training', label: 'Daily Training', featured: true },
             { id: '/english/my-training/practice', label: 'Practice Drills', featured: true },
             { id: '/english/izakaya-toeic/kaiwa/lp', label: '英会話マスター365とは？' },
@@ -126,7 +127,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
     useEffect(() => {
         if (!pathname) return;
         // Check kaiwa first (more specific path)
-        if (pathname.startsWith('/english/izakaya-toeic/kaiwa') || pathname.startsWith('/english/my-training') || pathname.startsWith('/english/5min') || pathname.startsWith('/english/goroku')) {
+        if (pathname.startsWith('/english/izakaya-toeic/kaiwa') || pathname.startsWith('/english/my-training') || pathname.startsWith('/english/5min') || pathname.startsWith('/english/goroku') || pathname.startsWith('/english/grind')) {
             setExpandedProgram('kaiwa');
         } else if (pathname.startsWith('/english/toeic') || pathname.startsWith('/english/tonio-words')) {
             setExpandedProgram('izakaya');
