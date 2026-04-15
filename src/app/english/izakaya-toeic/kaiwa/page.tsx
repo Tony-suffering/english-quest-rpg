@@ -529,6 +529,24 @@ export default function EnglishMaster365Page() {
     const [beginnerLevel, setBeginnerLevel] = useState<number | null>(null);
     const [showLevelPicker, setShowLevelPicker] = useState(false);
 
+    // Flow reveal (old monologue level 4, kept as hidden bonus for "極めたい人")
+    const [flowMap, setFlowMap] = useState<Record<string, string> | null>(null);
+    const [revealedFlowIds, setRevealedFlowIds] = useState<Set<string>>(new Set());
+    const revealFlow = useCallback(async (daySlot: number, japanese: string) => {
+        const id = `${daySlot}-${japanese}`;
+        setRevealedFlowIds((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+        try { playLevelSwitch(); } catch { /* */ }
+        if (!flowMap) {
+            const mod = await import('@/data/english/365/master-flow-archive');
+            setFlowMap(mod.MASTER_FLOW_ARCHIVE);
+        }
+    }, [flowMap]);
+
     // Daily quests — 3 tiers: must (3聴+1登録) / normal (5聴+3登録) / final (all mastered)
     const [questListenCount, setQuestListenCount] = useState(0);
     const [questRegisterCount, setQuestRegisterCount] = useState(0);
@@ -2115,6 +2133,9 @@ export default function EnglishMaster365Page() {
                                                     const text = entry.english[i];
                                                     const isLast = i === 3;
                                                     const isLvlRegistered = registeredPhrases.has(text.toLowerCase());
+                                                    const flowId = `${entry.day_slot}-${entry.japanese}`;
+                                                    const flowRevealed = revealedFlowIds.has(flowId);
+                                                    const flowText = flowMap ? flowMap[`${entry.day_slot}::${entry.japanese}`] : undefined;
                                                     return (
                                                         <div
                                                             key={lvl.key}
@@ -2191,10 +2212,87 @@ export default function EnglishMaster365Page() {
                                                             >
                                                                 {isLvlRegistered ? '\u2713' : '+'}
                                                             </button>
+                                                            {isLast && (
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        revealFlow(entry.day_slot, entry.japanese);
+                                                                    }}
+                                                                    title={flowRevealed ? 'Flowを隠す' : 'Flow（ネイティブの脳内モノローグ）を見る'}
+                                                                    style={{
+                                                                        flexShrink: 0,
+                                                                        marginLeft: 6,
+                                                                        border: flowRevealed ? '2px solid #B45309' : '2px solid #D4AF37',
+                                                                        borderRadius: 8,
+                                                                        background: flowRevealed ? '#B45309' : 'linear-gradient(135deg, #FEF3C7, #FFFBEB)',
+                                                                        color: flowRevealed ? '#fff' : '#B45309',
+                                                                        padding: '6px 12px', fontSize: 13, fontWeight: 900,
+                                                                        cursor: 'pointer',
+                                                                        transition: 'all 0.2s',
+                                                                        whiteSpace: 'nowrap',
+                                                                        boxShadow: '0 2px 6px rgba(212,175,55,0.3)',
+                                                                    }}
+                                                                >
+                                                                    極
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     );
                                                 })}
                                             </div>
+
+                                            {/* Flow reveal: old monologue level for "極めたい人" */}
+                                            {revealedFlowIds.has(`${entry.day_slot}-${entry.japanese}`) && (() => {
+                                                const flow = flowMap?.[`${entry.day_slot}::${entry.japanese}`];
+                                                if (!flow) {
+                                                    return (
+                                                        <div style={{
+                                                            marginTop: 4, marginBottom: 8,
+                                                            padding: '8px 12px',
+                                                            background: '#FAFAF9',
+                                                            border: '1px dashed #E7E5E4',
+                                                            borderRadius: 8,
+                                                            fontSize: 11, color: '#A8A29E',
+                                                        }}>
+                                                            この表現にはFlow（モノローグ）がありません。
+                                                        </div>
+                                                    );
+                                                }
+                                                return (
+                                                    <div
+                                                        onClick={() => {
+                                                            if (!synthRef.current) return;
+                                                            synthRef.current.cancel();
+                                                            const u = new SpeechSynthesisUtterance(flow);
+                                                            u.lang = 'en-US';
+                                                            u.rate = 0.95;
+                                                            synthRef.current.speak(u);
+                                                        }}
+                                                        style={{
+                                                            marginTop: 4, marginBottom: 8,
+                                                            padding: '10px 14px',
+                                                            background: '#FFFBEB',
+                                                            border: '1px solid #FDE68A',
+                                                            borderLeft: '3px solid #D4AF37',
+                                                            borderRadius: 8,
+                                                            cursor: 'pointer',
+                                                        }}
+                                                    >
+                                                        <div style={{
+                                                            fontSize: 9, fontWeight: 800, color: '#B45309',
+                                                            letterSpacing: '0.15em', marginBottom: 4,
+                                                        }}>
+                                                            FLOW -- ネイティブの脳内モノローグ
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: 13, color: '#1C1917',
+                                                            lineHeight: 1.6, fontStyle: 'italic',
+                                                        }}>
+                                                            {flow}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })()}
 
                                             {/* Context -- always visible */}
                                             {entry.context && (
