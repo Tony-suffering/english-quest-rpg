@@ -68,6 +68,184 @@ function useMembersPWA() {
   }, []);
 }
 
+type Platform = {
+  isIOS: boolean;
+  isAndroid: boolean;
+  isInApp: boolean;
+  inAppName: string | null;
+  isStandalone: boolean;
+  ready: boolean;
+};
+
+function usePlatform(): Platform {
+  const [state, setState] = useState<Platform>({
+    isIOS: false, isAndroid: false, isInApp: false, inAppName: null, isStandalone: false, ready: false,
+  });
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const ua = navigator.userAgent || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+    const isAndroid = /Android/.test(ua);
+    let inAppName: string | null = null;
+    if (/Line\//i.test(ua)) inAppName = 'LINE';
+    else if (/FBAN|FBAV/.test(ua)) inAppName = 'Facebook';
+    else if (/Instagram/.test(ua)) inAppName = 'Instagram';
+    else if (/Twitter/.test(ua)) inAppName = 'X (Twitter)';
+    const isInApp = inAppName !== null;
+    const isStandalone =
+      window.matchMedia?.('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
+    setState({ isIOS, isAndroid, isInApp, inAppName, isStandalone, ready: true });
+  }, []);
+  return state;
+}
+
+function useInstallPrompt() {
+  const [deferred, setDeferred] = useState<any>(null);
+  const [installed, setInstalled] = useState(false);
+  useEffect(() => {
+    const onPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferred(e);
+    };
+    const onInstalled = () => {
+      setDeferred(null);
+      setInstalled(true);
+    };
+    window.addEventListener('beforeinstallprompt', onPrompt as any);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onPrompt as any);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
+  }, []);
+  const trigger = useCallback(async () => {
+    if (!deferred) return false;
+    try {
+      deferred.prompt();
+      const choice = await deferred.userChoice;
+      setDeferred(null);
+      return choice?.outcome === 'accepted';
+    } catch {
+      return false;
+    }
+  }, [deferred]);
+  return { canPrompt: !!deferred, installed, trigger };
+}
+
+function InstallBanner() {
+  const platform = usePlatform();
+  const { canPrompt, trigger } = useInstallPrompt();
+  const [dismissed, setDismissed] = useState(false);
+
+  if (!platform.ready) return null;
+  if (platform.isStandalone) return null;
+  if (dismissed) return null;
+
+  const BoxBase: React.CSSProperties = {
+    marginBottom: 24,
+    padding: 20,
+    background: '#FFFBEB',
+    border: `1px solid ${GOLD}`,
+    borderRadius: 4,
+    position: 'relative',
+  };
+  const Heading: React.CSSProperties = {
+    fontFamily: SERIF, fontSize: 17, color: INK, marginBottom: 8, fontWeight: 500,
+  };
+  const Body: React.CSSProperties = {
+    fontSize: 14, lineHeight: 1.8, color: TEXT, margin: 0,
+  };
+  const Step: React.CSSProperties = {
+    fontSize: 13, lineHeight: 1.8, color: TEXT, padding: '6px 0',
+    borderBottom: `1px dashed ${LINE}`,
+  };
+  const CloseBtn = (
+    <button
+      onClick={() => setDismissed(true)}
+      aria-label="閉じる"
+      style={{ position: 'absolute', top: 8, right: 12, background: 'none', border: 'none', color: MUTE, fontSize: 18, cursor: 'pointer', lineHeight: 1 }}
+    >
+      ×
+    </button>
+  );
+
+  if (platform.isInApp) {
+    return (
+      <div style={BoxBase}>
+        {CloseBtn}
+        <div style={Heading}>
+          {platform.inAppName}の中では使えません
+        </div>
+        <p style={Body}>
+          右上のメニューから「{platform.isIOS ? 'Safari' : '他のブラウザ'}で開く」を選んでください。そこからホーム画面にインストールできます。
+        </p>
+      </div>
+    );
+  }
+
+  if (platform.isIOS) {
+    return (
+      <div style={BoxBase}>
+        {CloseBtn}
+        <div style={Heading}>
+          ホーム画面に追加してアプリっぽく使う
+        </div>
+        <div style={{ ...Body, marginBottom: 12 }}>
+          毎回URLを踏まなくて済みます。3秒で終わります。
+        </div>
+        <div>
+          <div style={Step}>
+            1. 画面下の <span style={{ fontWeight: 600 }}>共有ボタン</span>（□に↑のアイコン）をタップ
+          </div>
+          <div style={Step}>
+            2. メニューを下にスクロールして <span style={{ fontWeight: 600 }}>「ホーム画面に追加」</span> をタップ
+          </div>
+          <div style={{ ...Step, borderBottom: 'none' }}>
+            3. 右上の <span style={{ fontWeight: 600 }}>「追加」</span> をタップ
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (platform.isAndroid && canPrompt) {
+    return (
+      <div style={BoxBase}>
+        {CloseBtn}
+        <div style={Heading}>
+          ホーム画面に追加してアプリっぽく使う
+        </div>
+        <p style={{ ...Body, marginBottom: 14 }}>
+          毎回URLを踏まなくて済みます。一発で終わります。
+        </p>
+        <button
+          onClick={async () => { const ok = await trigger(); if (ok) setDismissed(true); }}
+          style={{ padding: '10px 20px', background: INK, color: '#fff', border: 'none', borderRadius: 4, fontSize: 14, cursor: 'pointer', letterSpacing: '0.05em' }}
+        >
+          ホーム画面に追加
+        </button>
+      </div>
+    );
+  }
+
+  if (platform.isAndroid) {
+    return (
+      <div style={BoxBase}>
+        {CloseBtn}
+        <div style={Heading}>
+          ホーム画面に追加してアプリっぽく使う
+        </div>
+        <p style={Body}>
+          ブラウザ右上のメニュー（︙）から <span style={{ fontWeight: 600 }}>「アプリをインストール」</span> または <span style={{ fontWeight: 600 }}>「ホーム画面に追加」</span> をタップしてください。
+        </p>
+      </div>
+    );
+  }
+
+  return null;
+}
+
 function LifeMemberInner() {
   const searchParams = useSearchParams();
   const [slug, setSlug] = useState<string | null>(null);
@@ -282,6 +460,8 @@ function LifeMemberInner() {
             </div>
           </div>
         )}
+
+        <InstallBanner />
 
         {/* Hero */}
         <div style={{ marginBottom: 40 }}>
