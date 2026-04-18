@@ -59,10 +59,10 @@ function useMembersPWA() {
     if (existing) existing.remove();
     const link = document.createElement('link');
     link.rel = 'manifest';
-    link.href = '/members-app.json';
+    link.href = '/membership-life-app.json';
     document.head.appendChild(link);
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/members-sw.js', { scope: '/members' }).catch(() => {});
+      navigator.serviceWorker.register('/membership-life-sw.js', { scope: '/membership/life' }).catch(() => {});
     }
     return () => { link.remove(); };
   }, []);
@@ -225,7 +225,7 @@ function LifeMemberInner() {
       <div style={{ minHeight: '100vh', background: BG, fontFamily: SANS, color: TEXT, padding: '80px 24px', display: 'flex', justifyContent: 'center' }}>
         <div style={{ maxWidth: 520, width: '100%' }}>
           <div style={{ fontSize: 11, letterSpacing: '0.3em', color: FAINT, fontWeight: 500, marginBottom: 32 }}>
-            TONIO LAB / MEMBERS / LIFE
+            TONIO LAB / MEMBERSHIP / LIFE
           </div>
           <h1 style={{ fontFamily: SERIF, fontSize: 32, lineHeight: 1.3, color: INK, margin: 0, marginBottom: 16, fontWeight: 400 }}>
             メンバー用のリンクから入ってください

@@ -1,8 +1,8 @@
-const CACHE_NAME = 'tonio-members-v1';
+const CACHE_NAME = 'tonio-membership-life-v1';
 const STATIC_ASSETS = [
-  '/members/life',
+  '/membership/life',
   '/english-icon.svg',
-  '/members-app.json',
+  '/membership-life-app.json',
 ];
 
 self.addEventListener('install', event => {
@@ -16,7 +16,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME && k.startsWith('tonio-members-')).map(k => caches.delete(k)))
+      Promise.all(keys.filter(k => k !== CACHE_NAME && (k.startsWith('tonio-members-') || k.startsWith('tonio-membership-life-'))).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
