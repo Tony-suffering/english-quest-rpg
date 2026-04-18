@@ -19,7 +19,6 @@ interface Recording {
   member_name: string | null;
 }
 
-const AUTH_KEY = 'tonio-life-admin-authed';
 const SERIF = "'Noto Serif JP', 'Source Serif Pro', Georgia, 'Times New Roman', serif";
 const SANS = "'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 const GOLD = '#D4AF37';
@@ -33,40 +32,11 @@ const BG = '#FAFAF9';
 type DraftMap = Record<string, Partial<Recording>>;
 
 export default function LifeAdminPage() {
-  const [authed, setAuthed] = useState(false);
-  const [pass, setPass] = useState('');
-  const [authError, setAuthError] = useState('');
   const [recordings, setRecordings] = useState<Recording[]>([]);
   const [loading, setLoading] = useState(false);
   const [drafts, setDrafts] = useState<DraftMap>({});
   const [saving, setSaving] = useState<string | null>(null);
   const [filter, setFilter] = useState<'pending' | 'all'>('pending');
-
-  useEffect(() => {
-    try {
-      if (sessionStorage.getItem(AUTH_KEY) === '1') setAuthed(true);
-    } catch { /* */ }
-  }, []);
-
-  const verify = async () => {
-    setAuthError('');
-    try {
-      const res = await fetch('/api/life-admin-verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pass }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        setAuthed(true);
-        try { sessionStorage.setItem(AUTH_KEY, '1'); } catch { /* */ }
-      } else {
-        setAuthError('パスが違います');
-      }
-    } catch {
-      setAuthError('サーバーエラー');
-    }
-  };
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -79,7 +49,7 @@ export default function LifeAdminPage() {
     setLoading(false);
   }, [filter]);
 
-  useEffect(() => { if (authed) fetchAll(); }, [authed, fetchAll]);
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const grouped = useMemo(() => {
     const map: Record<string, Recording[]> = {};
@@ -142,36 +112,6 @@ export default function LifeAdminPage() {
       if (data.success) setRecordings(prev => prev.filter(x => x.id !== r.id));
     } catch { /* */ }
   };
-
-  if (!authed) {
-    return (
-      <div style={{ minHeight: '100vh', background: BG, fontFamily: SANS, color: TEXT, padding: '80px 24px', display: 'flex', justifyContent: 'center' }}>
-        <div style={{ maxWidth: 420, width: '100%' }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.3em', color: FAINT, fontWeight: 500, marginBottom: 24 }}>
-            TONIO LAB / ADMIN
-          </div>
-          <h1 style={{ fontFamily: SERIF, fontSize: 28, color: INK, margin: 0, marginBottom: 24, fontWeight: 400 }}>
-            Admin
-          </h1>
-          <input
-            type="password"
-            value={pass}
-            onChange={e => setPass(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter') verify(); }}
-            placeholder="password"
-            style={{ width: '100%', padding: '12px 16px', border: `1px solid ${LINE}`, borderRadius: 4, fontSize: 15, fontFamily: SANS, marginBottom: 12 }}
-          />
-          <button
-            onClick={verify}
-            style={{ width: '100%', padding: '12px 20px', background: INK, color: '#fff', border: 'none', borderRadius: 4, fontSize: 14, cursor: 'pointer' }}
-          >
-            Enter
-          </button>
-          {authError && <div style={{ color: '#DC2626', fontSize: 13, marginTop: 12 }}>{authError}</div>}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: SANS, color: TEXT }}>
