@@ -3,37 +3,52 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-const FEATURES = [
+const NOW_BUILDING = [
     {
-        label: 'JOURNAL',
-        title: 'とにおのジャーナル',
-        desc: '開発と英語学習の全記録。カレンダーUIで日付ごとに読める。',
-        href: '/journal',
-        color: '#D4AF37',
-        stats: [
-            { value: '135+', label: 'ENTRIES' },
-            { value: '130+', label: 'DAYS' },
-        ],
+        status: 'LIVE',
+        title: '英会話マスター365',
+        desc: '毎日10フレーズ、365日で3650。日常会話を身体に叩き込む。',
+        href: '/english/izakaya-toeic/kaiwa/lp',
     },
     {
-        label: 'VIBE CODING',
-        title: 'バイブコーディング講座',
-        desc: 'プログラミング知識ゼロからアプリを作る。Claude Codeの使い方を大工の例えで教える。',
+        status: 'LIVE',
+        title: '居酒屋TOEIC',
+        desc: '6人の常連キャラがPart 5/6/7を解く。30エピソードのドラマ形式。',
+        href: '/english/toeic/lp',
+    },
+    {
+        status: 'BUILDING',
+        title: 'Tokyo 52',
+        desc: '52話の英語ドラマ。エピソード1を制作中。表現・単語・リスニングの3タブ構成。',
+        href: '/journal',
+    },
+    {
+        status: 'WRITING',
+        title: 'バイブコーディング塾',
+        desc: '毎週のnote記事にプログラミング経験ゼロでアプリを作るコツを載せる連載。',
         href: '/journal/vibe-coding',
-        color: '#10B981',
-        stats: [
-            { value: '5', label: 'LESSONS' },
-            { value: '3', label: 'CHAPTERS' },
-        ],
     },
 ];
 
-const JOURNAL_HIGHLIGHTS = [
-    { id: '133', title: 'Vercelを捨てた日', tag: '開発' },
-    { id: '115', title: '会話の骨格 -- 10の会話パターン', tag: '英語分析' },
-    { id: '112', title: 'Miguel Rojasの英語を解剖する', tag: '英語分析' },
-    { id: '111', title: '6ステップ流暢性メソッド', tag: '英語分析' },
-    { id: '110', title: 'ネイティブの英語を構造分解する', tag: '英語分析' },
+const WHAT_YOU_GET = [
+    {
+        title: '毎日のジャーナル',
+        body: '今日作った機能、壊れた場所、諦めた案。開発と英語学習の全記録。フィルターはかけてない。カレンダーUIで日付ごとに読める。',
+        href: '/journal',
+        cta: 'ジャーナルへ',
+    },
+    {
+        title: '英語構造分析シリーズ',
+        body: 'ネイティブとノンネイティブの英語を秒速39bitsレベルまで分解する。#110-112で発見した7つのルールから、Miguel Rojasのスペイン語話者としての強みまで。',
+        href: '/journal/110',
+        cta: 'Entry #110を読む',
+    },
+    {
+        title: 'バイブコーディング講座',
+        body: 'プログラミング経験ゼロからAIと一緒にアプリを作る全過程。大工の例えで教えるClaude Codeの使い方。毎週のnoteで連載中。',
+        href: '/journal/vibe-coding',
+        cta: '講座を読む',
+    },
 ];
 
 const LATEST = [
@@ -44,400 +59,663 @@ const LATEST = [
     { id: '131', title: '俺語録310個の振り返り', date: '2026-03-18' },
 ];
 
-const NOW_PLAYING = [
-    { status: 'LIVE', title: '英会話マスター365 -- 毎日10フレーズ', desc: '3650フレーズ、365日。日常会話を毎日10個ずつ身につける。', color: '#D4AF37' },
-    { status: 'LIVE', title: '居酒屋TOEIC -- 30エピソード', desc: 'Part 5/6/7対策。居酒屋の会話でTOEICを解く。6人の常連キャラ。', color: '#10B981' },
-    { status: 'BUILDING', title: 'Tokyo 52 -- 52話の英語ドラマ', desc: 'エピソード1制作中。表現・単語・リスニングの3タブ構成。', color: '#D4AF37' },
-    { status: 'WRITING', title: 'note連載 -- バイブコーディング塾', desc: '毎週の記事にバイブコーディングのコツを載せてる。', color: '#78716C' },
+const HIGHLIGHTS = [
+    { id: '115', title: '会話の骨格 -- 10の会話パターン' },
+    { id: '112', title: 'Miguel Rojasの英語を解剖する' },
+    { id: '111', title: '6ステップ流暢性メソッド' },
+    { id: '110', title: 'ネイティブの英語を構造分解する' },
+    { id: '114', title: 'Goro Yamaguchiのリクエスト' },
 ];
 
-const MEMBER_REQUESTS = [
+const HAQ = [
     {
-        requester: 'Goro Yamaguchi',
-        title: 'Blackadder (1983-1989)',
-        desc: 'イギリス皮肉の教科書。Rowan Atkinson主演。全4シリーズから厳選10表現。',
-        expressions: [
-            { expr: 'I have a cunning plan.', note: '英語圏で最も有名なキャッチフレーズの1つ。cunningは「ずる賢い」。Baldrickのplanは毎回ゴミだけど、この一言は日常で「いい作戦がある」って言う時に使われてる。皮肉込みで。', score: 19 },
-            { expr: "Baldrick, your brain is so minute that if a hungry cannibal cracked your head open, there wouldn't be enough to cover a small water biscuit.", note: 'イギリス式insultの最高傑作。minuteは「マイニュート」と読んで「極小の」。so X that...構文のお手本。相手をバカにする時に、ここまで具体的なイメージで語るのがブリティッシュ・ウィット。', score: 16 },
-            { expr: "I've come up with a plan so cunning you could stick a tail on it and call it a weasel.", note: 'so X you could...で「Xすぎて〜できるレベル」。weaselは「イタチ」。cunningとイタチを結びつける発想がイギリス人。褒めてるようで完全にふざけてる。', score: 17 },
-            { expr: "Baldrick, have you no idea what irony is? -- Yes, it's like goldy and bronzy, only it's made out of iron.", note: 'ironyの意味を聞いたら「鉄でできたやつ」と返された。goldy, bronzyは存在しない単語。-yをつけて形容詞にするBaldrickの造語センス。バカなのに天才。', score: 18 },
-            { expr: "I've been in your family since 1532. -- So has syphilis.", note: 'So has X.は「Xもな」。短い返しで最大ダメージを与えるイギリス式カウンター。syphilis（梅毒）との比較が容赦ない。タイミングと間が全て。', score: 15 },
-            { expr: 'If you want something done properly, kill Baldrick before you start.', note: '元のことわざはIf you want something done properly, do it yourself.（自分でやれ）。これをBaldrick排除に改変。ことわざをツイストする技術。', score: 14 },
-            { expr: "The path of my life is strewn with cow pats from the devil's own satanic herd!", note: 'strewn withは「〜で散らかっている」。cow patsは「牛のフン」。悪魔の牛のフンが人生に散らばってる。日本語の「踏んだり蹴ったり」の1000倍おもしろい言い方。', score: 15 },
-            { expr: "Am I jumping the gun, Baldrick, or are the words 'I have a cunning plan' marching with ill-deserved confidence in the direction of this conversation?", note: 'jumping the gunは「先走る」。marching with ill-deserved confidenceは「身の程知らずの自信で行進してる」。相手が言いそうなことを先に潰す高等テクニック。', score: 16 },
-            { expr: 'Your services might be as useful as a barbershop on the steps of a guillotine.', note: 'as useful as Xの形で「Xくらい役に立つ（＝全く役に立たない）」。ギロチンの階段の床屋。髪を整えても首が飛ぶ。この比喩はイギリス人の十八番。', score: 14 },
-            { expr: "Who would have noticed another madman round here? Good luck, everyone.", note: 'シリーズ最終回。塹壕から飛び出す直前の台詞。Good luck, everyone.たった3語。何百もの皮肉の後で、最後だけ真っすぐ。ローワン・アトキンソンの最高傑作。', score: 20 },
-        ],
+        q: 'なんで毎日書けるの？',
+        a: '書かないと死ぬから。英語を話せないまま終わりたくないという単純な恐怖で続いてる。',
     },
     {
-        requester: 'Goro Yamaguchi',
-        title: 'Mr. Bean / Rowan Atkinson (1990-2007)',
-        desc: 'セリフが少ない男の、数少ないセリフが全部名言。インタビュー含む10表現。',
-        expressions: [
-            { expr: "I'm as poor as a church mouse, that's just had an enormous tax bill on the very day his wife ran off with another mouse, taking all the cheese.", note: 'as poor as a church mouseは「教会のネズミほど貧乏」。それをtax bill→wife ran off→taking all the cheeseと積み上げる。比喩を重ねて笑わせるイギリス話法。', score: 16 },
-            { expr: "I think visual comedy is a universal language. You don't need subtitles if the performance is clear enough.", note: 'universal languageは「世界共通語」。Beanがセリフなしで世界中で通じる理由。英語学習者へのメッセージでもある。', score: 14 },
-            { expr: "You're about as useful as a one-legged man at an arse-kicking contest.", note: '片足の男が尻蹴り大会に出る。arseはイギリス英語で「尻」（アメリカはass）。British vs Americanの違いが出る。', score: 15 },
-            { expr: 'I may have the body of a weak and feeble woman, but I have the heart and stomach of a concrete elephant.', note: 'エリザベス1世の実際のスピーチのパロディ。本来は「lion\'s heart」のところを象に変えてる。歴史ネタ＋誇張＝Blackadder。', score: 14 },
-            { expr: 'Leave me alone, Baldrick. If I wanted to talk to a vegetable, I would have bought one at the market.', note: 'vegetableは「野菜」だけどスラングで「無能な人」。If I wanted to X, I would have Y.は条件法の完璧な使い方。皮肉で学ぶ文法。', score: 15 },
-            { expr: 'Baldrick, get the door.', note: 'get the doorは普通「ドアを開けろ」。Baldrickはドアを外して持ってきた。英語のget+名詞は文脈で意味が変わる。直訳と意味のズレがコメディになる瞬間。', score: 17 },
-            { expr: "Not good enough. You're fired.", note: '5語。You\'re firedはトランプの決め台詞で有名だけど、Blackadderの方が先。短い文の連続で衝撃を与える技術。英語は短いほど強い。', score: 13 },
-            { expr: "Have you ever been to Wales, Baldrick? Well, don't. It's a ghastly place. Huge gangs of tough, sinewy men roam the valleys, terrorizing people with their close-harmony singing.", note: 'ghastlyは「おぞましい」。terrorizing with close-harmony singingで「合唱で恐怖に陥れる」。怖そうな描写の結末が歌。このギャップがイギリスのユーモア。', score: 16 },
-            { expr: "Darling, the guns have stopped. -- I say, do you think it's peace? -- No, I think it's lunch.", note: 'Darlingは人名だけどダブルミーニング。peaceに対するlunchの落差。希望を一瞬で粉砕する技術。喜劇と悲劇は同じ構造。', score: 17 },
-            { expr: 'Who would have noticed another madman round here? Good luck, everyone.', note: 'シリーズ最後の最後。Good luck, everyone.たった3語。それまでの何百もの皮肉の後で、最後だけ真っすぐ。この3語が一番重い。', score: 20 },
-        ],
+        q: '月100円って安すぎない？',
+        a: '缶コーヒー1本分。傍聴席料金。1000人集まっても10万円。副業にもなってない。',
+    },
+    {
+        q: 'メンバー何人？',
+        a: '5人くらい。全員の名前と、何をリクエストしてくれたか覚えてる。人数を伸ばす気はあまりない。',
+    },
+    {
+        q: '英語話せるようになった？',
+        a: 'なってない。だから毎日作ってる。会話練習アプリを自分で使って自分で直してる。',
+    },
+    {
+        q: 'Discord/Slack使わないの？',
+        a: '1人運営が死ぬから使わない。リクエストはnoteのコメントかメンバー記事のコメントで全部回す。',
     },
 ];
 
-const READING_PATH = [
-    { step: '01', label: 'START HERE', title: 'まずはここから', desc: 'TOEIC 900点なのに喋れない男の話。なぜアプリを作り始めたか。', href: '/journal/1', color: '#D4AF37' },
-    { step: '02', label: 'DEEP DIVES', title: '英語構造分析シリーズ', desc: 'ネイティブの英語を構造分解。Entry #110-112で発見した7つのルール。', href: '/journal/110', color: '#10B981' },
-    { step: '03', label: 'DAILY READING', title: '今日のジャーナル', desc: '毎日更新される開発ログ。最新のエントリから読む。', href: '/journal', color: '#D4AF37' },
-];
+// Typography -- editorial system
+const SERIF = "'Noto Serif JP', 'Source Serif Pro', Georgia, 'Times New Roman', serif";
+const SANS = "'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
-const TIMELINE = [
-    { date: '2025-11', event: 'TOEIC 900点取得' },
-    { date: '2025-12', event: 'アプリ開発開始（プログラミング経験ゼロ）' },
-    { date: '2026-01', event: 'toniolab.com ローンチ' },
-    { date: '2026-02', event: 'Memoria / Requiem 7シナリオ完成' },
-    { date: '2026-03', event: 'メンバーシップ専用ページ開設' },
-    { date: '2026-04', event: '英会話マスター365 / 居酒屋TOEIC ローンチ' },
-];
+// Colors -- gold 1% rule
+const GOLD = '#D4AF37';
+const INK = '#1C1917';
+const TEXT = '#44403C';
+const MUTE = '#78716C';
+const FAINT = '#A8A29E';
+const LINE = '#E7E5E4';
+const BG = '#FAFAF9';
 
-const BENEFITS = [
-    { title: 'ジャーナル', desc: '開発ログ、英語分析、没ネタ、反省文。フィルターなし。' },
-    { title: 'バイブコーディング講座', desc: 'プログラミング経験ゼロから始めるAIコーディング。' },
-    { title: '英語構造分析レポート', desc: 'ネイティブ発話の構造分解。' },
-    { title: '開発の裏側', desc: 'なぜその機能を作ったか。なぜ捨てたか。判断の全記録。' },
-    { title: '英語アプリ', desc: '英会話マスター365と居酒屋TOEIC。2つの無料アプリが使い放題。' },
-];
-
-function Divider() {
+function Asterism() {
     return (
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: '0 24px' }}>
-            <div style={{ height: 1, background: 'linear-gradient(90deg, transparent 0%, #D4AF3730 20%, #D4AF3760 50%, #D4AF3730 80%, transparent 100%)' }} />
+        <div style={{
+            textAlign: 'center',
+            fontFamily: SERIF,
+            fontSize: 14,
+            color: FAINT,
+            letterSpacing: '1em',
+            padding: '0 0 0 1em',
+            margin: '72px 0',
+            userSelect: 'none' as const,
+        }}>
+            * * *
         </div>
+    );
+}
+
+function Eyebrow({ children, color = GOLD }: { children: React.ReactNode; color?: string }) {
+    return (
+        <p style={{
+            fontSize: 10,
+            letterSpacing: '0.35em',
+            textTransform: 'uppercase' as const,
+            color,
+            fontFamily: SANS,
+            fontWeight: 700,
+            marginBottom: 20,
+            margin: 0,
+        }}>
+            {children}
+        </p>
     );
 }
 
 export default function MembershipPage() {
     const [mounted, setMounted] = useState(false);
+    const [openHaqIndex, setOpenHaqIndex] = useState<number | null>(null);
     useEffect(() => setMounted(true), []);
     if (!mounted) return null;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#FAFAF9' }}>
-            {/* Top accent line */}
-            <div style={{ height: 3, background: 'linear-gradient(90deg, #D4AF37, #10B981)' }} />
-
+        <div style={{ minHeight: '100vh', backgroundColor: BG, fontFamily: SANS }}>
             {/* Header */}
-            <div style={{ position: 'sticky', top: 0, zIndex: 100, backgroundColor: 'rgba(250,250,249,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #E7E5E4', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <header style={{
+                position: 'sticky',
+                top: 0,
+                zIndex: 100,
+                backgroundColor: 'rgba(250,250,249,0.95)',
+                backdropFilter: 'blur(12px)',
+                borderBottom: `1px solid ${LINE}`,
+                padding: '14px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+            }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                    <Link href="/" style={{ fontSize: 11, color: '#A8A29E', textDecoration: 'none', letterSpacing: '0.05em' }}>TONIO LAB</Link>
-                    <span style={{ color: '#D6D3D1', fontSize: 11 }}>/</span>
-                    <span style={{ fontSize: 11, color: '#D4AF37', fontWeight: 700, letterSpacing: '0.1em' }}>MEMBERS</span>
+                    <Link href="/" style={{ fontSize: 11, color: FAINT, textDecoration: 'none', letterSpacing: '0.12em', fontWeight: 600 }}>TONIO LAB</Link>
+                    <span style={{ color: LINE, fontSize: 11 }}>/</span>
+                    <span style={{ fontSize: 11, color: GOLD, fontWeight: 700, letterSpacing: '0.14em' }}>MEMBERS</span>
                 </div>
-                <Link href="/" style={{ fontSize: 11, color: '#A8A29E', textDecoration: 'none', letterSpacing: '0.05em' }}>TOP</Link>
-            </div>
+                <Link href="/" style={{ fontSize: 11, color: FAINT, textDecoration: 'none', letterSpacing: '0.08em' }}>← TOP</Link>
+            </header>
 
-            {/* Journal Hero -- メインコンテンツ */}
-            <section style={{ padding: '60px 24px 0', maxWidth: 800, margin: '0 auto' }}>
-                <Link href="/journal" style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+            {/* HERO */}
+            <section style={{
+                maxWidth: 720,
+                margin: '0 auto',
+                padding: '80px 24px 40px',
+            }}>
+                <Eyebrow>Membership · ¥100 / Month</Eyebrow>
+
+                <h1 style={{
+                    fontFamily: SERIF,
+                    fontSize: 44,
+                    fontWeight: 700,
+                    color: INK,
+                    lineHeight: 1.25,
+                    letterSpacing: '-0.01em',
+                    margin: '28px 0 28px',
+                    maxWidth: 620,
+                }}>
+                    TOEIC 900点、<br />しゃべれない男のクラブ。
+                </h1>
+
+                <div style={{
+                    fontSize: 16,
+                    color: TEXT,
+                    lineHeight: 1.95,
+                    maxWidth: 560,
+                    marginBottom: 36,
+                }}>
+                    <p style={{ margin: '0 0 16px' }}>
+                        4技能のうち3つクリアして、最後の1つで永遠に死んでる男が、自分の英語を救うために毎日アプリを作ってます。
+                    </p>
+                    <p style={{ margin: 0 }}>
+                        完成したから売ってるんじゃない。作ってる最中を見せるために売ってる。
+                    </p>
+                </div>
+
+                {/* Stats inline */}
+                <div style={{
+                    display: 'flex',
+                    gap: 40,
+                    padding: '20px 0',
+                    borderTop: `1px solid ${LINE}`,
+                    borderBottom: `1px solid ${LINE}`,
+                    flexWrap: 'wrap',
+                }}>
+                    {[
+                        ['135+', 'Journal Entries'],
+                        ['130+', 'Days Streak'],
+                        ['2', 'Live Apps'],
+                        ['¥100', 'Per Month'],
+                    ].map(([value, label]) => (
+                        <div key={label}>
+                            <p style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: INK, margin: 0, lineHeight: 1 }}>{value}</p>
+                            <p style={{ fontSize: 10, color: FAINT, letterSpacing: '0.12em', textTransform: 'uppercase' as const, margin: '6px 0 0' }}>{label}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Journal CTA */}
+                <Link href="/journal" style={{ textDecoration: 'none' }}>
                     <div style={{
-                        background: 'linear-gradient(135deg, #1C1917 0%, #292524 100%)',
-                        borderRadius: 20,
-                        padding: '56px 40px',
+                        background: `linear-gradient(135deg, ${INK} 0%, #292524 100%)`,
+                        borderRadius: 16,
+                        padding: '44px 36px',
+                        marginTop: 40,
                         position: 'relative',
                         overflow: 'hidden',
                     }}>
-                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: 'linear-gradient(90deg, #D4AF37, #10B981)' }} />
-                        <p style={{ fontSize: 10, letterSpacing: '0.4em', color: '#D4AF37', fontWeight: 700, fontFamily: 'monospace', marginBottom: 20 }}>MAIN CONTENT</p>
-                        <h2 style={{ fontSize: 36, fontWeight: 900, color: '#fff', lineHeight: 1.2, marginBottom: 12 }}>とにおのジャーナル</h2>
-                        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.9, maxWidth: 500, marginBottom: 32 }}>
-                            開発と英語学習の全記録。カレンダーUIで日付ごとに読める。没ネタ、反省文、未公開コンテンツ。フィルターなし。
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: GOLD }} />
+                        <p style={{
+                            fontSize: 10,
+                            letterSpacing: '0.4em',
+                            color: GOLD,
+                            fontWeight: 700,
+                            margin: '0 0 16px',
+                            textTransform: 'uppercase' as const,
+                        }}>
+                            Main Content
                         </p>
-                        <div style={{ display: 'block', padding: '20px 0', backgroundColor: '#D4AF37', color: '#000', borderRadius: 12, fontSize: 18, fontWeight: 900, letterSpacing: '0.05em', textAlign: 'center', marginTop: 8 }}>ジャーナルを開く</div>
+                        <h2 style={{
+                            fontFamily: SERIF,
+                            fontSize: 32,
+                            fontWeight: 700,
+                            color: '#fff',
+                            lineHeight: 1.25,
+                            margin: '0 0 14px',
+                        }}>
+                            とにおのジャーナル
+                        </h2>
+                        <p style={{
+                            fontSize: 14,
+                            color: 'rgba(255,255,255,0.65)',
+                            lineHeight: 1.8,
+                            margin: '0 0 28px',
+                            maxWidth: 480,
+                        }}>
+                            開発と英語学習の全記録。没ネタ、反省文、未公開コンテンツ。カレンダーUIで日付ごとに読める。
+                        </p>
+                        <div style={{
+                            display: 'inline-block',
+                            padding: '14px 28px',
+                            background: GOLD,
+                            color: INK,
+                            borderRadius: 8,
+                            fontSize: 14,
+                            fontWeight: 700,
+                            letterSpacing: '0.04em',
+                        }}>
+                            ジャーナルを開く →
+                        </div>
                     </div>
                 </Link>
             </section>
 
-            {/* Sub hero text */}
-            <section style={{ padding: '40px 24px 48px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.4em', color: '#D4AF37', fontWeight: 700, marginBottom: 16, fontFamily: 'monospace' }}>MEMBERS ONLY</p>
-                <p style={{ fontSize: 15, color: '#78716C', lineHeight: 1.9, maxWidth: 600 }}>
-                    TOEIC 900点なのに喋れない男が、自分で英語アプリを作ってる。武器はAIと根性だけ。かっこいい部分だけ見たい人は、たぶん間違えて入ってきた。
-                </p>
-            </section>
+            <Asterism />
 
-            <Divider />
-
-            {/* Now Playing */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>NOW PLAYING</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                    {NOW_PLAYING.map((item) => (
-                        <div key={item.title} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px', backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 12 }}>
-                            <span style={{ fontSize: 9, fontWeight: 700, color: '#fff', backgroundColor: item.color, padding: '3px 10px', borderRadius: 100, letterSpacing: '0.1em', flexShrink: 0 }}>{item.status}</span>
-                            <div>
-                                <p style={{ fontSize: 14, fontWeight: 700, color: '#1C1917', marginBottom: 4 }}>{item.title}</p>
-                                <p style={{ fontSize: 12, color: '#78716C', lineHeight: 1.6 }}>{item.desc}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            <Divider />
-
-            {/* Feature Cards */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>EXCLUSIVE CONTENT</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
-                    {FEATURES.map((f) => (
-                        <Link key={f.label} href={f.href} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 16, padding: '28px 24px', transition: 'all 0.2s ease' }}>
-                                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: f.color, fontWeight: 700, fontFamily: 'monospace', marginBottom: 12 }}>{f.label}</p>
-                                <h3 style={{ fontSize: 20, fontWeight: 900, color: '#1C1917', marginBottom: 8 }}>{f.title}</h3>
-                                <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.8, marginBottom: 20 }}>{f.desc}</p>
-                                <div style={{ display: 'flex', gap: 24 }}>
-                                    {f.stats.map(s => (
-                                        <div key={s.label}>
-                                            <p style={{ fontSize: 24, fontWeight: 900, color: f.color }}>{s.value}</p>
-                                            <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>{s.label}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            </section>
-
-            <Divider />
-
-            {/* English Apps */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>ENGLISH APPS</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
-                    <Link href="/english/izakaya-toeic/kaiwa/lp" style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 16, padding: '28px 24px', transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden' }}>
-                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: '#D4AF37' }} />
-                            <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#D4AF37', fontWeight: 700, fontFamily: 'monospace', marginBottom: 12 }}>DAILY PHRASES</p>
-                            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#1C1917', marginBottom: 8 }}>英会話マスター365</h3>
-                            <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.8, marginBottom: 20 }}>毎日10フレーズ、365日で3650フレーズ。日常会話を完全網羅する英会話トレーニング。</p>
-                            <div style={{ display: 'flex', gap: 24 }}>
-                                <div>
-                                    <p style={{ fontSize: 24, fontWeight: 900, color: '#D4AF37' }}>3650</p>
-                                    <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>PHRASES</p>
-                                </div>
-                                <div>
-                                    <p style={{ fontSize: 24, fontWeight: 900, color: '#D4AF37' }}>365</p>
-                                    <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>DAYS</p>
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-                    <Link href="/english/toeic/lp" style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 16, padding: '28px 24px', transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden' }}>
-                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, backgroundColor: '#10B981' }} />
-                            <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#10B981', fontWeight: 700, fontFamily: 'monospace', marginBottom: 12 }}>TOEIC DRAMA</p>
-                            <h3 style={{ fontSize: 20, fontWeight: 900, color: '#1C1917', marginBottom: 8 }}>居酒屋TOEIC</h3>
-                            <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.8, marginBottom: 20 }}>居酒屋を舞台にした30エピソードのTOEICドラマ。6人の常連キャラがTOEICを解く。</p>
-                            <div style={{ display: 'flex', gap: 24 }}>
-                                <div>
-                                    <p style={{ fontSize: 24, fontWeight: 900, color: '#10B981' }}>30</p>
-                                    <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>EPISODES</p>
-                                </div>
-                                <div>
-                                    <p style={{ fontSize: 24, fontWeight: 900, color: '#10B981' }}>6</p>
-                                    <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.15em' }}>CHARACTERS</p>
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-                </div>
-            </section>
-
-            <Divider />
-
-            {/* Member Requests */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#D4AF37', fontWeight: 700, fontFamily: 'monospace', marginBottom: 20 }}>MEMBER REQUESTS</p>
-                <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.8, marginBottom: 20 }}>
-                    メンバーからのリクエストで作った表現集。「この作品やってほしい」って言ってくれたら作る。
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                    {MEMBER_REQUESTS.map((req) => (
-                        <div key={req.title} style={{
-                            backgroundColor: '#fff', borderRadius: 16, padding: '28px 24px',
-                            border: '2px solid #D4AF37',
-                            background: 'linear-gradient(135deg, #FEF9E7 0%, #fff 40%)',
-                        }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 10 }}>
-                                <span style={{ fontSize: 9, fontWeight: 700, color: '#fff', backgroundColor: '#D4AF37', padding: '3px 10px', borderRadius: 100, letterSpacing: '0.1em' }}>SPECIAL</span>
-                                <span style={{ fontSize: 11, color: '#78716C', fontStyle: 'italic' }}>Requested by {req.requester}</span>
-                            </div>
-                            <h3 style={{ fontSize: 20, fontWeight: 800, color: '#1C1917', marginBottom: 6 }}>{req.title}</h3>
-                            <p style={{ fontSize: 13, color: '#78716C', lineHeight: 1.7, marginBottom: 16 }}>{req.desc}</p>
-                            <p style={{ fontSize: 12, color: '#D4AF37', fontWeight: 700, marginBottom: 12 }}>{req.expressions.length} EXPRESSIONS</p>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                                {req.expressions
-                                    .sort((a, b) => b.score - a.score)
-                                    .map((e, idx) => (
-                                    <div key={idx} style={{
-                                        backgroundColor: '#FAFAF9', borderRadius: 12,
-                                        border: '1px solid #E7E5E4', padding: '14px 16px',
+            {/* NOW BUILDING */}
+            <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px' }}>
+                <Eyebrow color={FAINT}>Now Building</Eyebrow>
+                <h2 style={{
+                    fontFamily: SERIF,
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: INK,
+                    margin: '20px 0 32px',
+                    letterSpacing: '-0.005em',
+                }}>
+                    いま走ってる4本。
+                </h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                    {NOW_BUILDING.map((item, i) => (
+                        <Link key={item.title} href={item.href} style={{ textDecoration: 'none' }}>
+                            <div style={{
+                                padding: '24px 0',
+                                borderTop: `1px solid ${LINE}`,
+                                borderBottom: i === NOW_BUILDING.length - 1 ? `1px solid ${LINE}` : 'none',
+                                display: 'flex',
+                                gap: 24,
+                                alignItems: 'flex-start',
+                            }}>
+                                <span style={{
+                                    fontSize: 9,
+                                    fontWeight: 700,
+                                    color: item.status === 'LIVE' ? GOLD : item.status === 'BUILDING' ? INK : MUTE,
+                                    letterSpacing: '0.18em',
+                                    flexShrink: 0,
+                                    width: 80,
+                                    paddingTop: 4,
+                                }}>
+                                    {item.status}
+                                </span>
+                                <div style={{ flex: 1 }}>
+                                    <h3 style={{
+                                        fontFamily: SERIF,
+                                        fontSize: 19,
+                                        fontWeight: 700,
+                                        color: INK,
+                                        margin: '0 0 6px',
+                                        lineHeight: 1.4,
                                     }}>
-                                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 6 }}>
-                                            <span style={{
-                                                fontSize: 10, fontWeight: 700, color: '#A8A29E',
-                                                width: 20, textAlign: 'right', flexShrink: 0, paddingTop: 3,
-                                            }}>
-                                                {String(idx + 1).padStart(2, '0')}
-                                            </span>
-                                            <span style={{
-                                                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                                                width: 24, height: 24, borderRadius: 6, flexShrink: 0,
-                                                backgroundColor: e.score >= 18 ? '#FEF3C7' : e.score >= 15 ? '#D1FAE5' : '#DBEAFE',
-                                                color: e.score >= 18 ? '#92400E' : e.score >= 15 ? '#065F46' : '#1E40AF',
-                                                fontSize: 10, fontWeight: 800,
-                                            }}>
-                                                {e.score >= 18 ? 'S' : e.score >= 15 ? 'A' : 'B'}
-                                            </span>
-                                            <p style={{ fontSize: 15, fontWeight: 700, color: '#1C1917', lineHeight: 1.4, margin: 0 }}>
-                                                &ldquo;{e.expr}&rdquo;
-                                            </p>
-                                        </div>
-                                        <p style={{
-                                            fontSize: 12, color: '#44403C', lineHeight: 1.7,
-                                            margin: '0 0 0 34px', padding: '8px 12px',
-                                            backgroundColor: '#FFFBEB', borderRadius: 6,
-                                            borderLeft: '3px solid #D4AF37',
-                                        }}>
-                                            {e.note}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            <Divider />
-
-            {/* Reading Path */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>READING PATH</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
-                    {READING_PATH.map((p) => (
-                        <Link key={p.step} href={p.href} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 14, padding: '24px 20px', position: 'relative', transition: 'all 0.2s ease' }}>
-                                <span style={{ position: 'absolute', top: -10, left: 20, fontSize: 10, fontWeight: 700, color: '#fff', backgroundColor: p.color, padding: '3px 12px', borderRadius: 100, letterSpacing: '0.1em' }}>STEP {p.step}</span>
-                                <p style={{ fontSize: 10, color: p.color, fontWeight: 700, letterSpacing: '0.2em', marginBottom: 8, marginTop: 8 }}>{p.label}</p>
-                                <p style={{ fontSize: 16, fontWeight: 800, color: '#1C1917', marginBottom: 6 }}>{p.title}</p>
-                                <p style={{ fontSize: 12, color: '#78716C', lineHeight: 1.7 }}>{p.desc}</p>
+                                        {item.title}
+                                    </h3>
+                                    <p style={{
+                                        fontSize: 14,
+                                        color: TEXT,
+                                        lineHeight: 1.75,
+                                        margin: 0,
+                                    }}>
+                                        {item.desc}
+                                    </p>
+                                </div>
                             </div>
                         </Link>
                     ))}
                 </div>
             </section>
 
-            <Divider />
+            <Asterism />
 
-            {/* Latest Entries */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>LATEST ENTRIES</p>
-                <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 16, overflow: 'hidden' }}>
+            {/* WHAT YOU GET */}
+            <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px' }}>
+                <Eyebrow color={FAINT}>What You Get</Eyebrow>
+                <h2 style={{
+                    fontFamily: SERIF,
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: INK,
+                    margin: '20px 0 40px',
+                    letterSpacing: '-0.005em',
+                }}>
+                    月100円で届くもの。
+                </h2>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 48 }}>
+                    {WHAT_YOU_GET.map((item, i) => (
+                        <article key={item.title}>
+                            <p style={{
+                                fontFamily: SERIF,
+                                fontSize: 13,
+                                color: GOLD,
+                                margin: '0 0 8px',
+                                fontStyle: 'italic' as const,
+                            }}>
+                                {String(i + 1).padStart(2, '0')}.
+                            </p>
+                            <h3 style={{
+                                fontFamily: SERIF,
+                                fontSize: 22,
+                                fontWeight: 700,
+                                color: INK,
+                                margin: '0 0 14px',
+                                lineHeight: 1.35,
+                            }}>
+                                {item.title}
+                            </h3>
+                            <p style={{
+                                fontSize: 15,
+                                color: TEXT,
+                                lineHeight: 1.9,
+                                margin: '0 0 16px',
+                            }}>
+                                {item.body}
+                            </p>
+                            <Link href={item.href} style={{
+                                fontSize: 13,
+                                color: INK,
+                                textDecoration: 'underline',
+                                textDecorationColor: GOLD,
+                                textUnderlineOffset: 4,
+                                fontWeight: 600,
+                                letterSpacing: '0.02em',
+                            }}>
+                                {item.cta} →
+                            </Link>
+                        </article>
+                    ))}
+                </div>
+            </section>
+
+            <Asterism />
+
+            {/* CO-BUILT */}
+            <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px' }}>
+                <Eyebrow>Co-Built with Members</Eyebrow>
+                <h2 style={{
+                    fontFamily: SERIF,
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: INK,
+                    margin: '20px 0 28px',
+                    letterSpacing: '-0.005em',
+                }}>
+                    5人の開発委員会。
+                </h2>
+                <div style={{
+                    fontSize: 15,
+                    color: TEXT,
+                    lineHeight: 1.95,
+                    marginBottom: 24,
+                }}>
+                    <p style={{ margin: '0 0 16px' }}>
+                        メンバー5人くらいで回してる小さい委員会です。「これ作ってほしい」「この作品やってほしい」があったら送ってください。
+                    </p>
+                    <p style={{ margin: 0 }}>
+                        実際に動いてる例があります。Goro YamaguchiさんからBlackadderとMr. Beanのリクエストをもらって、合計20表現の教材を組みました。皮肉の教科書です。
+                    </p>
+                </div>
+
+                <Link href="/membership/requests" style={{ textDecoration: 'none' }}>
+                    <div style={{
+                        padding: '20px 24px',
+                        border: `1px solid ${LINE}`,
+                        borderLeft: `3px solid ${GOLD}`,
+                        background: '#fff',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: 16,
+                    }}>
+                        <div>
+                            <p style={{ fontSize: 10, letterSpacing: '0.25em', color: GOLD, fontWeight: 700, margin: '0 0 6px', textTransform: 'uppercase' as const }}>
+                                Member Request #001
+                            </p>
+                            <p style={{ fontSize: 15, color: INK, fontFamily: SERIF, fontWeight: 700, margin: 0 }}>
+                                Blackadder / Mr. Bean -- 20 expressions
+                            </p>
+                            <p style={{ fontSize: 12, color: MUTE, margin: '4px 0 0', fontStyle: 'italic' as const }}>
+                                Requested by Goro Yamaguchi
+                            </p>
+                        </div>
+                        <span style={{ fontSize: 18, color: INK }}>→</span>
+                    </div>
+                </Link>
+
+                <p style={{
+                    fontSize: 12,
+                    color: MUTE,
+                    lineHeight: 1.8,
+                    margin: '20px 0 0',
+                }}>
+                    送り先: <a href="https://note.com/tonio_english" target="_blank" rel="noopener noreferrer" style={{ color: INK, textDecoration: 'underline', textDecorationColor: GOLD, textUnderlineOffset: 3 }}>note.com/tonio_english</a> のコメント、またはメンバー記事のコメント欄。Discord・Slackは使いません。
+                </p>
+            </section>
+
+            <Asterism />
+
+            {/* LATEST */}
+            <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px' }}>
+                <Eyebrow color={FAINT}>Latest</Eyebrow>
+                <h2 style={{
+                    fontFamily: SERIF,
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: INK,
+                    margin: '20px 0 32px',
+                    letterSpacing: '-0.005em',
+                }}>
+                    直近のジャーナル。
+                </h2>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {LATEST.map((entry, i) => (
-                        <Link key={entry.id} href={`/journal/${entry.id}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', borderBottom: i < LATEST.length - 1 ? '1px solid #F5F5F4' : 'none', textDecoration: 'none', color: 'inherit' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                <span style={{ fontSize: 11, color: '#D4AF37', fontWeight: 700, fontFamily: 'monospace', minWidth: 36 }}>#{entry.id}</span>
-                                <span style={{ fontSize: 14, color: '#44403C', fontWeight: 600 }}>{entry.title}</span>
+                        <Link key={entry.id} href={`/journal/${entry.id}`} style={{
+                            textDecoration: 'none',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'baseline',
+                            gap: 16,
+                            padding: '14px 0',
+                            borderTop: `1px solid ${LINE}`,
+                            borderBottom: i === LATEST.length - 1 ? `1px solid ${LINE}` : 'none',
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, flex: 1, minWidth: 0 }}>
+                                <span style={{ fontSize: 11, color: GOLD, fontWeight: 700, fontFamily: SANS, letterSpacing: '0.08em', flexShrink: 0 }}>
+                                    #{entry.id}
+                                </span>
+                                <span style={{ fontSize: 14, color: INK, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' as const }}>
+                                    {entry.title}
+                                </span>
                             </div>
-                            <span style={{ fontSize: 11, color: '#A8A29E', fontFamily: 'monospace', flexShrink: 0 }}>{entry.date}</span>
+                            <span style={{ fontSize: 11, color: FAINT, fontFamily: SANS, letterSpacing: '0.04em', flexShrink: 0 }}>
+                                {entry.date}
+                            </span>
                         </Link>
                     ))}
                 </div>
-                <div style={{ textAlign: 'center', marginTop: 16 }}>
-                    <Link href="/journal" style={{ fontSize: 12, color: '#D4AF37', textDecoration: 'none', fontWeight: 600, letterSpacing: '0.05em' }}>全エントリを見る</Link>
-                </div>
-            </section>
 
-            <Divider />
-
-            {/* Recommended */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>RECOMMENDED READING</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {JOURNAL_HIGHLIGHTS.map((h) => (
-                        <Link key={h.id} href={`/journal/${h.id}`} style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 20px', backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 12, textDecoration: 'none', color: 'inherit' }}>
-                            <span style={{ fontSize: 11, color: '#D4AF37', fontWeight: 700, fontFamily: 'monospace', flexShrink: 0 }}>#{h.id}</span>
-                            <span style={{ fontSize: 14, color: '#44403C', fontWeight: 600, flex: 1 }}>{h.title}</span>
-                            <span style={{ fontSize: 10, color: '#fff', fontWeight: 600, backgroundColor: h.tag === '英語分析' ? '#D4AF37' : '#10B981', padding: '3px 10px', borderRadius: 100, letterSpacing: '0.05em', flexShrink: 0 }}>{h.tag}</span>
+                <p style={{
+                    fontSize: 11,
+                    color: MUTE,
+                    letterSpacing: '0.25em',
+                    textTransform: 'uppercase' as const,
+                    margin: '48px 0 20px',
+                    fontWeight: 600,
+                }}>
+                    Highlights
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {HIGHLIGHTS.map((entry, i) => (
+                        <Link key={entry.id} href={`/journal/${entry.id}`} style={{
+                            textDecoration: 'none',
+                            display: 'flex',
+                            alignItems: 'baseline',
+                            gap: 16,
+                            padding: '12px 0',
+                            borderTop: i === 0 ? `1px solid ${LINE}` : 'none',
+                            borderBottom: `1px solid ${LINE}`,
+                        }}>
+                            <span style={{ fontSize: 11, color: GOLD, fontWeight: 700, letterSpacing: '0.08em', flexShrink: 0 }}>
+                                #{entry.id}
+                            </span>
+                            <span style={{ fontSize: 14, color: INK, fontWeight: 500 }}>
+                                {entry.title}
+                            </span>
                         </Link>
                     ))}
                 </div>
+
+                <div style={{ textAlign: 'center' as const, marginTop: 32 }}>
+                    <Link href="/journal" style={{
+                        fontSize: 12,
+                        color: INK,
+                        textDecoration: 'underline',
+                        textDecorationColor: GOLD,
+                        textUnderlineOffset: 4,
+                        fontWeight: 600,
+                        letterSpacing: '0.04em',
+                    }}>
+                        全エントリを見る →
+                    </Link>
+                </div>
             </section>
 
-            <Divider />
+            <Asterism />
 
-            {/* Timeline */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>TIMELINE</p>
-                <div style={{ backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 16, padding: 24 }}>
-                    {TIMELINE.map((t, i) => (
-                        <div key={t.date} style={{ display: 'flex', gap: 20, paddingBottom: i < TIMELINE.length - 1 ? 20 : 0 }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, width: 12 }}>
-                                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: i === TIMELINE.length - 1 ? '#D4AF37' : '#E7E5E4', border: i === TIMELINE.length - 1 ? '2px solid #D4AF3740' : 'none', flexShrink: 0 }} />
-                                {i < TIMELINE.length - 1 && <div style={{ width: 1, flex: 1, backgroundColor: '#E7E5E4', marginTop: 4 }} />}
+            {/* HAQ */}
+            <section style={{ maxWidth: 720, margin: '0 auto', padding: '0 24px' }}>
+                <Eyebrow color={FAINT}>Hypothetically Asked Questions</Eyebrow>
+                <h2 style={{
+                    fontFamily: SERIF,
+                    fontSize: 28,
+                    fontWeight: 700,
+                    color: INK,
+                    margin: '20px 0 8px',
+                    letterSpacing: '-0.005em',
+                }}>
+                    聞かれてないけど答えます。
+                </h2>
+                <p style={{
+                    fontSize: 13,
+                    color: MUTE,
+                    fontStyle: 'italic' as const,
+                    margin: '0 0 32px',
+                }}>
+                    FAQではない。誰も聞いてない。でも書いておく。
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    {HAQ.map((item, i) => {
+                        const isOpen = openHaqIndex === i;
+                        return (
+                            <div key={i} style={{
+                                borderTop: `1px solid ${LINE}`,
+                                borderBottom: i === HAQ.length - 1 ? `1px solid ${LINE}` : 'none',
+                            }}>
+                                <button
+                                    onClick={() => setOpenHaqIndex(isOpen ? null : i)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '20px 0',
+                                        background: 'transparent',
+                                        border: 'none',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        gap: 16,
+                                        textAlign: 'left' as const,
+                                        fontFamily: SANS,
+                                    }}
+                                >
+                                    <span style={{
+                                        fontFamily: SERIF,
+                                        fontSize: 17,
+                                        fontWeight: 600,
+                                        color: INK,
+                                        lineHeight: 1.4,
+                                    }}>
+                                        {item.q}
+                                    </span>
+                                    <span style={{
+                                        fontSize: 14,
+                                        color: GOLD,
+                                        flexShrink: 0,
+                                        transform: isOpen ? 'rotate(45deg)' : 'rotate(0)',
+                                        transition: 'transform 0.2s ease',
+                                        fontWeight: 700,
+                                    }}>
+                                        +
+                                    </span>
+                                </button>
+                                {isOpen && (
+                                    <p style={{
+                                        fontSize: 14,
+                                        color: TEXT,
+                                        lineHeight: 1.9,
+                                        margin: '0 0 24px',
+                                        paddingRight: 40,
+                                    }}>
+                                        {item.a}
+                                    </p>
+                                )}
                             </div>
-                            <div style={{ paddingBottom: 4 }}>
-                                <p style={{ fontSize: 11, color: '#A8A29E', fontFamily: 'monospace', marginBottom: 4 }}>{t.date}</p>
-                                <p style={{ fontSize: 14, color: '#44403C', fontWeight: 600 }}>{t.event}</p>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </section>
 
-            <Divider />
+            <Asterism />
 
-            {/* Benefits */}
-            <section style={{ padding: '56px 24px 60px', maxWidth: 800, margin: '0 auto' }}>
-                <p style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontFamily: 'monospace', marginBottom: 20 }}>MEMBERSHIP INCLUDES</p>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16 }}>
-                    {BENEFITS.map((b) => (
-                        <div key={b.title} style={{ padding: 20, backgroundColor: '#fff', border: '1px solid #E7E5E4', borderRadius: 12 }}>
-                            <p style={{ fontSize: 14, fontWeight: 700, color: '#1C1917', marginBottom: 8 }}>{b.title}</p>
-                            <p style={{ fontSize: 12, color: '#78716C', lineHeight: 1.7 }}>{b.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
-            {/* Numbers */}
-            <section style={{ padding: '40px 24px', maxWidth: 800, margin: '0 auto', borderTop: '1px solid #E7E5E4' }}>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 32, justifyContent: 'center' }}>
-                    {[['100', 'YEN / MONTH'], ['135+', 'ENTRIES'], ['5', 'CODING LESSONS'], ['130+', 'DAYS STREAK']].map(([value, label]) => (
-                        <div key={label} style={{ textAlign: 'center' }}>
-                            <p style={{ fontSize: 28, fontWeight: 900, color: '#D4AF37' }}>{value}</p>
-                            <p style={{ fontSize: 9, color: '#A8A29E', letterSpacing: '0.2em' }}>{label}</p>
-                        </div>
-                    ))}
-                </div>
+            {/* Final CTA */}
+            <section style={{
+                maxWidth: 720,
+                margin: '0 auto',
+                padding: '0 24px 80px',
+                textAlign: 'center' as const,
+            }}>
+                <h2 style={{
+                    fontFamily: SERIF,
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: INK,
+                    margin: '0 0 20px',
+                    lineHeight: 1.5,
+                    fontStyle: 'italic' as const,
+                }}>
+                    完成したから売ってるんじゃない。<br />作ってる最中を見せるために売ってる。
+                </h2>
+                <p style={{
+                    fontSize: 13,
+                    color: MUTE,
+                    margin: '0 0 28px',
+                }}>
+                    -- とにお
+                </p>
+                <Link href="/journal" style={{
+                    display: 'inline-block',
+                    padding: '16px 40px',
+                    background: INK,
+                    color: '#fff',
+                    borderRadius: 6,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textDecoration: 'none',
+                }}>
+                    ジャーナルを開く
+                </Link>
             </section>
 
             {/* Footer */}
-            <footer style={{ padding: '40px 24px', maxWidth: 800, margin: '0 auto', borderTop: '1px solid #E7E5E4', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 24 }}>
-                <Link href="/journal" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>Journal</Link>
-                <Link href="/journal/vibe-coding" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>Vibe Coding</Link>
-                <Link href="/english/izakaya-toeic/kaiwa/lp" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>英会話マスター365</Link>
-                <Link href="/english/toeic/lp" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>居酒屋TOEIC</Link>
-                <a href="https://note.com/tonio_english" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>note.com</a>
-                <Link href="/" style={{ fontSize: 12, color: '#78716C', textDecoration: 'none' }}>TONIO LAB</Link>
+            <footer style={{
+                borderTop: `1px solid ${LINE}`,
+                padding: '40px 24px 32px',
+                maxWidth: 720,
+                margin: '0 auto',
+            }}>
+                <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    gap: 24,
+                    marginBottom: 24,
+                }}>
+                    <Link href="/journal" style={{ fontSize: 12, color: MUTE, textDecoration: 'none', letterSpacing: '0.04em' }}>Journal</Link>
+                    <Link href="/journal/vibe-coding" style={{ fontSize: 12, color: MUTE, textDecoration: 'none', letterSpacing: '0.04em' }}>Vibe Coding</Link>
+                    <Link href="/english/izakaya-toeic/kaiwa/lp" style={{ fontSize: 12, color: MUTE, textDecoration: 'none', letterSpacing: '0.04em' }}>365</Link>
+                    <Link href="/english/toeic/lp" style={{ fontSize: 12, color: MUTE, textDecoration: 'none', letterSpacing: '0.04em' }}>居酒屋TOEIC</Link>
+                    <a href="https://note.com/tonio_english" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: MUTE, textDecoration: 'none', letterSpacing: '0.04em' }}>note.com</a>
+                    <Link href="/" style={{ fontSize: 12, color: MUTE, textDecoration: 'none', letterSpacing: '0.04em' }}>TONIO LAB</Link>
+                </div>
+                <p style={{
+                    textAlign: 'center' as const,
+                    fontSize: 10,
+                    color: FAINT,
+                    letterSpacing: '0.25em',
+                    textTransform: 'uppercase' as const,
+                    margin: 0,
+                }}>
+                    Tonio Lab Membership
+                </p>
             </footer>
-
-            <div style={{ textAlign: 'center', padding: '16px 24px 40px', fontSize: 10, color: '#D6D3D1', letterSpacing: '0.1em' }}>TONIO LAB MEMBERSHIP</div>
         </div>
     );
 }
