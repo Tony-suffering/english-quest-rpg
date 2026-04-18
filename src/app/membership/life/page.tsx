@@ -464,17 +464,54 @@ function LifeMemberInner() {
         <InstallBanner />
 
         {/* Hero */}
-        <div style={{ marginBottom: 40 }}>
-          <h1 style={{ fontFamily: SERIF, fontSize: 36, lineHeight: 1.3, color: INK, margin: 0, marginBottom: 12, fontWeight: 400 }}>
-            今日の一言を録音する
+        <div style={{ marginBottom: 32 }}>
+          <h1 style={{ fontFamily: SERIF, fontSize: 30, lineHeight: 1.4, color: INK, margin: 0, marginBottom: 16, fontWeight: 400 }}>
+            日本語で残した一言が、<br />翌朝、英語になって戻ってくる。
           </h1>
           <p style={{ fontSize: 15, lineHeight: 1.9, color: TEXT, margin: 0 }}>
-            日本語で喋ってください。とにおが翌日までに英語化して、<a href="/membership" style={{ color: INK, textDecoration: 'underline' }}>メンバーシップ</a>の語録に載せます。
+            街で「これ、英語でなんて言うんだろう」と思った瞬間を、音声で残す。とにおが翌朝までに英語化する。DeepLでもChatGPTでもなく、ネイティブが同じ場面で実際に使う一言に。
           </p>
         </div>
 
+        {/* Example showcase */}
+        <div style={{ marginBottom: 32, padding: 24, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.2em', color: FAINT, fontWeight: 500, marginBottom: 14 }}>
+            例えば、こう
+          </div>
+          <div style={{ fontFamily: SERIF, fontSize: 22, color: INK, marginBottom: 14 }}>
+            「小春日和」
+          </div>
+          <div style={{ paddingLeft: 14, borderLeft: `2px solid ${GOLD}`, fontSize: 16, color: TEXT, lineHeight: 1.7, marginBottom: 14 }}>
+            One of those warm days that sneak in when it should be cold.
+          </div>
+          <div style={{ fontSize: 13, color: MUTE, lineHeight: 1.8 }}>
+            季節がズレた温かさ。直訳はムリ。こういう"感覚の日本語"は、辞書にも翻訳ツールにもない。
+          </div>
+        </div>
+
+        {/* How it works */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ fontSize: 11, letterSpacing: '0.2em', color: MUTE, fontWeight: 500, marginBottom: 12 }}>
+            HOW IT WORKS
+          </div>
+          {[
+            { n: '01', t: '今日、日本語で録音する' },
+            { n: '02', t: '翌朝までに、金色の英語が付く' },
+            { n: '03', t: '自分の言葉が、英語の語録として残る' },
+          ].map((s, i, arr) => (
+            <div key={s.n} style={{ padding: '14px 0', borderBottom: i === arr.length - 1 ? 'none' : `1px solid ${LINE}`, display: 'flex', gap: 16, alignItems: 'baseline' }}>
+              <div style={{ fontSize: 11, color: GOLD, letterSpacing: '0.2em', fontWeight: 500, flexShrink: 0 }}>
+                {s.n}
+              </div>
+              <div style={{ fontSize: 15, color: INK, lineHeight: 1.6 }}>
+                {s.t}
+              </div>
+            </div>
+          ))}
+        </div>
+
         {/* Record button */}
-        <div style={{ marginBottom: 40, padding: 32, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, textAlign: 'center' }}>
+        <div style={{ marginBottom: 16, padding: 32, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, textAlign: 'center' }}>
           <button
             onClick={isRecording ? stopRecording : startRecording}
             disabled={submitting}
@@ -491,10 +528,25 @@ function LifeMemberInner() {
           >
             {isRecording ? 'STOP' : submitting ? '...' : 'REC'}
           </button>
-          <div style={{ marginTop: 20, fontSize: 13, color: MUTE, minHeight: 40 }}>
-            {isRecording ? (interim || '聞いてます...') : submitting ? '送信中...' : 'ボタンを押して話してください'}
+          <div style={{ marginTop: 20, fontSize: 13, color: MUTE, minHeight: 40, lineHeight: 1.6 }}>
+            {isRecording
+              ? (interim || '聞いてます...')
+              : submitting
+                ? '送信中...'
+                : '1単語でも、1フレーズでも、1シーンでもいい'}
           </div>
         </div>
+
+        {/* Prompt hints */}
+        {!isRecording && !submitting && (
+          <div style={{ marginBottom: 40, display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
+            {['月極駐車場', 'ピンキリ', 'ないがしろにする', '自転車は降りてください', '車のドア少し開けて涼しい風'].map(s => (
+              <span key={s} style={{ fontSize: 11, padding: '5px 11px', background: '#fff', border: `1px solid ${LINE}`, borderRadius: 999, color: MUTE }}>
+                {s}
+              </span>
+            ))}
+          </div>
+        )}
 
         {/* Today's recordings */}
         <div style={{ marginBottom: 40 }}>
@@ -504,8 +556,9 @@ function LifeMemberInner() {
           {loading ? (
             <div style={{ fontSize: 14, color: FAINT }}>読み込み中...</div>
           ) : todayRecordings.length === 0 ? (
-            <div style={{ fontSize: 14, color: FAINT, padding: '20px 0' }}>
-              まだ今日の録音はありません。
+            <div style={{ padding: '16px 0', fontSize: 13, color: MUTE, lineHeight: 1.9 }}>
+              今日はまだ録音なし。浮かんだ瞬間にボタン押せばOK。<br />
+              感覚語（小春日和）も、シーン（車のドア開けて涼しい風）も、動詞（ないがしろにする）も、なんでも。
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -519,8 +572,11 @@ function LifeMemberInner() {
                       {r.english_attitude}
                     </div>
                   ) : (
-                    <div style={{ fontSize: 11, color: FAINT, letterSpacing: '0.15em', marginTop: 6 }}>
-                      PENDING — 英語化待ち
+                    <div style={{ marginTop: 10, fontSize: 12, color: MUTE, lineHeight: 1.6 }}>
+                      <span style={{ color: FAINT, letterSpacing: '0.15em', fontSize: 11, marginRight: 10 }}>
+                        PENDING
+                      </span>
+                      とにおが明日の朝までに英語化します
                     </div>
                   )}
                 </div>
@@ -549,6 +605,32 @@ function LifeMemberInner() {
             </div>
           </div>
         )}
+
+        {/* Why this exists */}
+        <details style={{ marginTop: 64, padding: '20px 24px', background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
+          <summary style={{ fontFamily: SERIF, fontSize: 16, color: INK, cursor: 'pointer', outline: 'none' }}>
+            なぜこれを作ったのか
+          </summary>
+          <div style={{ marginTop: 18, fontSize: 14, lineHeight: 1.95, color: TEXT }}>
+            <p style={{ margin: '0 0 14px' }}>
+              英語学習アプリの例文は、全部他人の人生。「She went to the market」を何回読んでも、自分が言いたい場面がこない。
+            </p>
+            <p style={{ margin: '0 0 14px' }}>
+              自分の日本語から始めれば、英語を見た瞬間「あ、これ俺が言いたかったやつだ」になる。身体に入る順番が逆だから。
+            </p>
+            <p style={{ margin: '0 0 14px' }}>
+              翻訳ツールは単語を正確に変換するけど、ネイティブが同じ場面で実際に使う一言は出してこない。「小春日和」を「Indian summer」と直訳するだけじゃ、あの感覚は伝わらない。
+            </p>
+            <p style={{ margin: 0 }}>
+              だから、人力で、とにおが、一つ一つ考える。5人分なら回せる。だからメンバー限定。
+            </p>
+          </div>
+        </details>
+
+        {/* Footer */}
+        <div style={{ marginTop: 48, fontSize: 12, color: FAINT, textAlign: 'center', lineHeight: 1.8 }}>
+          詰まったら、とにおにLINEで。スクショあるとベスト。
+        </div>
       </div>
     </div>
   );
