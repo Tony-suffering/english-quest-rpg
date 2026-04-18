@@ -49,6 +49,12 @@ const WHAT_YOU_GET = [
         href: '/journal/vibe-coding',
         cta: '講座を読む',
     },
+    {
+        title: 'Life -- 1日1録音',
+        body: 'あなたの今日の一言を日本語で録音。とにおが翌日までに英語化して、あなたの名前クレジット付きで語録に載せる。参加するメンバーシップ。',
+        href: '/members/life',
+        cta: '録音する',
+    },
 ];
 
 const LATEST = [
