@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { LIFE_ROSTER } from '@/data/life-members';
 
 interface Recording {
   id: string;
@@ -32,6 +33,7 @@ const MUTE = '#78716C';
 const FAINT = '#A8A29E';
 const LINE = '#E7E5E4';
 const BG = '#FAFAF9';
+const SELF_BG = '#FFFBEB';
 
 function dedupAdjacentRepeats(text: string): string {
   if (!text || text.length < 6) return text;
@@ -51,6 +53,31 @@ function dedupAdjacentRepeats(text: string): string {
     }
   }
   return result;
+}
+
+function getJSTDateString(d: Date = new Date()): string {
+  const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+  return jst.toISOString().slice(0, 10);
+}
+
+function getTodayJST(): string {
+  return getJSTDateString();
+}
+
+function getYesterdayJST(): string {
+  const now = new Date();
+  now.setUTCDate(now.getUTCDate() - 1);
+  return getJSTDateString(now);
+}
+
+function formatJSTDateJP(dateStr: string): string {
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length < 3) return dateStr;
+  const [y, m, d] = parts;
+  const date = new Date(Date.UTC(y, m - 1, d));
+  const days = ['日', '月', '火', '水', '木', '金', '土'];
+  const dow = days[date.getUTCDay()];
+  return `${m}月${d}日（${dow}）`;
 }
 
 function useMembersPWA() {
@@ -145,7 +172,7 @@ function InstallBanner() {
   const BoxBase: React.CSSProperties = {
     marginBottom: 24,
     padding: 20,
-    background: '#FFFBEB',
+    background: SELF_BG,
     border: `1px solid ${GOLD}`,
     borderRadius: 4,
     position: 'relative',
@@ -246,6 +273,14 @@ function InstallBanner() {
   return null;
 }
 
+type RosterRow = {
+  slug: string | null;
+  displayName: string;
+  isAuthor: boolean;
+  isSelf: boolean;
+  todayRec?: Recording;
+};
+
 function LifeMemberInner() {
   const searchParams = useSearchParams();
   const [slug, setSlug] = useState<string | null>(null);
@@ -256,6 +291,8 @@ function LifeMemberInner() {
   const [isRecording, setIsRecording] = useState(false);
   const [interim, setInterim] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [justSubmitted, setJustSubmitted] = useState(false);
+  const [showMyPage, setShowMyPage] = useState(false);
 
   const recognitionRef = useRef<any>(null);
   const sessionFinalsRef = useRef<string[]>([]);
@@ -278,18 +315,18 @@ function LifeMemberInner() {
     } catch { /* */ }
   }, [searchParams]);
 
-  const fetchMine = useCallback(async () => {
+  const fetchAll = useCallback(async () => {
     if (!slug) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/life-recordings?member=${encodeURIComponent(slug)}`);
+      const res = await fetch('/api/life-recordings');
       const data = await res.json();
       if (data.success) setRecordings(data.recordings || []);
     } catch { /* */ }
     setLoading(false);
   }, [slug]);
 
-  useEffect(() => { fetchMine(); }, [fetchMine]);
+  useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const saveName = () => {
     const trimmed = nameInput.trim();
@@ -314,6 +351,8 @@ function LifeMemberInner() {
       const data = await res.json();
       if (data.success && data.recording) {
         setRecordings(prev => [data.recording, ...prev]);
+        setJustSubmitted(true);
+        setTimeout(() => setJustSubmitted(false), 4000);
       }
     } catch { /* */ }
     setSubmitting(false);
@@ -388,14 +427,65 @@ function LifeMemberInner() {
     }
   };
 
-  const today = new Date().toISOString().slice(0, 10);
-  const todayRecordings = useMemo(
+  const today = getTodayJST();
+  const yesterday = getYesterdayJST();
+  const todayJP = formatJSTDateJP(today);
+  const yesterdayJP = formatJSTDateJP(yesterday);
+
+  const myRecordings = useMemo(
+    () => recordings.filter(r => r.member_slug === slug),
+    [recordings, slug]
+  );
+
+  const todayRecs = useMemo(
     () => recordings.filter(r => r.created_at.startsWith(today)),
     [recordings, today]
   );
-  const convertedRecordings = useMemo(
-    () => recordings.filter(r => r.status === 'converted'),
+
+  const yesterdayConverted = useMemo(
+    () => recordings
+      .filter(r => r.created_at.startsWith(yesterday) && r.status === 'converted')
+      .sort((a, b) => a.created_at.localeCompare(b.created_at)),
+    [recordings, yesterday]
+  );
+
+  const rosterRows = useMemo<RosterRow[]>(() => {
+    return LIFE_ROSTER.map(m => {
+      const namedRec = recordings.find(r => r.member_slug === m.slug && r.member_name);
+      let displayName = namedRec?.member_name || m.defaultName;
+      if (m.slug === slug && name) displayName = name;
+      const todayRec = todayRecs.find(r => r.member_slug === m.slug);
+      return {
+        slug: m.slug,
+        displayName,
+        isAuthor: m.isAuthor,
+        isSelf: m.slug === slug,
+        todayRec,
+      };
+    });
+  }, [recordings, todayRecs, slug, name]);
+
+  const orderedRoster = useMemo(() => {
+    const self = rosterRows.filter(r => r.isSelf);
+    const others = rosterRows.filter(r => !r.isSelf);
+    return [...self, ...others];
+  }, [rosterRows]);
+
+  const filledToday = todayRecs.length;
+  const isNewcomer = !loading && myRecordings.length === 0;
+  const hasRecordedToday = rosterRows.some(r => r.isSelf && r.todayRec);
+
+  const bookPageCount = recordings.length;
+  const sortedByDate = useMemo(
+    () => [...recordings].sort((a, b) => a.created_at.localeCompare(b.created_at)),
     [recordings]
+  );
+  const firstEntry = sortedByDate[0];
+  const latestEntry = sortedByDate[sortedByDate.length - 1];
+
+  const mySorted = useMemo(
+    () => [...myRecordings].sort((a, b) => b.created_at.localeCompare(a.created_at)),
+    [myRecordings]
   );
 
   if (!slug) {
@@ -419,21 +509,26 @@ function LifeMemberInner() {
     );
   }
 
+  const selfDisplayName = rosterRows.find(r => r.isSelf)?.displayName || name || '—';
+
   return (
     <div style={{ minHeight: '100vh', background: BG, fontFamily: SANS, color: TEXT }}>
-      {/* Header */}
-      <div style={{ borderBottom: `1px solid ${LINE}`, padding: '20px 24px', background: '#fff' }}>
-        <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.3em', color: FAINT, fontWeight: 500 }}>
+      {/* Book header */}
+      <div style={{ borderBottom: `1px solid ${LINE}`, padding: '16px 24px', background: '#fff' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.3em', color: FAINT, fontWeight: 500, flexShrink: 0 }}>
             LIFE
           </div>
-          <div style={{ fontSize: 12, color: MUTE }}>
-            {name ? `${name} — ` : ''}@{slug}
+          <div style={{ fontFamily: SERIF, fontSize: 12, color: MUTE, letterSpacing: '0.15em', textAlign: 'center', flex: 1 }}>
+            VOL.1 · 2026
+          </div>
+          <div style={{ fontSize: 11, color: MUTE, flexShrink: 0, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {selfDisplayName} · @{slug}
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px 120px' }}>
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '28px 24px 120px' }}>
         {/* Name prompt (first visit) */}
         {!name && (
           <div style={{ marginBottom: 32, padding: 20, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
@@ -441,7 +536,7 @@ function LifeMemberInner() {
               はじめまして。お名前を教えてください
             </div>
             <div style={{ fontSize: 13, color: MUTE, marginBottom: 16 }}>
-              記事で紹介するとき、この名前でクレジットします。
+              この本に著者として載るときの名前。後で変えられる。
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
               <input
@@ -463,54 +558,115 @@ function LifeMemberInner() {
 
         <InstallBanner />
 
-        {/* Hero */}
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontFamily: SERIF, fontSize: 30, lineHeight: 1.4, color: INK, margin: 0, marginBottom: 16, fontWeight: 400 }}>
-            日本語で残した一言が、<br />翌朝、英語になって戻ってくる。
-          </h1>
-          <p style={{ fontSize: 15, lineHeight: 1.9, color: TEXT, margin: 0 }}>
-            街で「これ、英語でなんて言うんだろう」と思った瞬間を、音声で残す。とにおが翌朝までに英語化する。DeepLでもChatGPTでもなく、ネイティブが同じ場面で実際に使う一言に。
-          </p>
-        </div>
+        {/* Hero — adaptive */}
+        {isNewcomer ? (
+          <div style={{ marginBottom: 40 }}>
+            <h1 style={{ fontFamily: SERIF, fontSize: 30, lineHeight: 1.4, color: INK, margin: 0, marginBottom: 18, fontWeight: 400 }}>
+              6人で、<br />1冊の本を書いている。
+            </h1>
+            <p style={{ fontSize: 15, lineHeight: 1.95, color: TEXT, margin: 0, marginBottom: 16 }}>
+              1人1日1行。日本語で残した一言を、とにおが翌朝までに英語化する。5人 + とにお = 6人。この本の著者は、この6人だけ。
+            </p>
+            <p style={{ fontSize: 14, lineHeight: 1.9, color: MUTE, margin: 0 }}>
+              DeepLでもChatGPTでもない。ネイティブが同じ場面で実際に使う一言に、人力で変える。100人には配れない。5人だから回る。
+            </p>
 
-        {/* Example showcase */}
-        <div style={{ marginBottom: 32, padding: 24, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.2em', color: FAINT, fontWeight: 500, marginBottom: 14 }}>
-            例えば、こう
-          </div>
-          <div style={{ fontFamily: SERIF, fontSize: 22, color: INK, marginBottom: 14 }}>
-            「小春日和」
-          </div>
-          <div style={{ paddingLeft: 14, borderLeft: `2px solid ${GOLD}`, fontSize: 16, color: TEXT, lineHeight: 1.7, marginBottom: 14 }}>
-            One of those warm days that sneak in when it should be cold.
-          </div>
-          <div style={{ fontSize: 13, color: MUTE, lineHeight: 1.8 }}>
-            季節がズレた温かさ。直訳はムリ。こういう"感覚の日本語"は、辞書にも翻訳ツールにもない。
-          </div>
-        </div>
-
-        {/* How it works */}
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.2em', color: MUTE, fontWeight: 500, marginBottom: 12 }}>
-            HOW IT WORKS
-          </div>
-          {[
-            { n: '01', t: '今日、日本語で録音する' },
-            { n: '02', t: '翌朝までに、金色の英語が付く' },
-            { n: '03', t: '自分の言葉が、英語の語録として残る' },
-          ].map((s, i, arr) => (
-            <div key={s.n} style={{ padding: '14px 0', borderBottom: i === arr.length - 1 ? 'none' : `1px solid ${LINE}`, display: 'flex', gap: 16, alignItems: 'baseline' }}>
-              <div style={{ fontSize: 11, color: GOLD, letterSpacing: '0.2em', fontWeight: 500, flexShrink: 0 }}>
-                {s.n}
+            {/* Example showcase (newcomer only) */}
+            <div style={{ marginTop: 28, padding: 24, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
+              <div style={{ fontSize: 10, letterSpacing: '0.25em', color: FAINT, fontWeight: 500, marginBottom: 14 }}>
+                例えば
               </div>
-              <div style={{ fontSize: 15, color: INK, lineHeight: 1.6 }}>
-                {s.t}
+              <div style={{ fontFamily: SERIF, fontSize: 22, color: INK, marginBottom: 14 }}>
+                小春日和
+              </div>
+              <div style={{ paddingLeft: 14, borderLeft: `2px solid ${GOLD}`, fontSize: 16, color: TEXT, lineHeight: 1.7, marginBottom: 14 }}>
+                One of those warm days that sneak in when it should be cold.
+              </div>
+              <div style={{ fontSize: 13, color: MUTE, lineHeight: 1.8 }}>
+                季節がズレた温かさ。直訳はムリ。こういう感覚の日本語は、辞書にも翻訳ツールにもない。人力だけが出せる。
               </div>
             </div>
-          ))}
+          </div>
+        ) : (
+          <div style={{ marginBottom: 32 }}>
+            <h1 style={{ fontFamily: SERIF, fontSize: 24, lineHeight: 1.45, color: INK, margin: 0, fontWeight: 400 }}>
+              {hasRecordedToday
+                ? '書いた。明朝、金色がつく。'
+                : '今日、6人で1ページ書こう。'}
+            </h1>
+          </div>
+        )}
+
+        {/* Today's Page — shared 6-row view */}
+        <div style={{ marginBottom: 40 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 18 }}>
+            <div style={{ fontFamily: SERIF, fontSize: 16, color: INK }}>
+              {todayJP}のページ
+            </div>
+            <div style={{ fontSize: 11, color: MUTE, letterSpacing: '0.15em', fontWeight: 500 }}>
+              {filledToday} / 6
+            </div>
+          </div>
+          {loading ? (
+            <div style={{ fontSize: 13, color: FAINT, padding: '16px 0' }}>読み込み中...</div>
+          ) : (
+            <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, overflow: 'hidden' }}>
+              {orderedRoster.map((row, i) => {
+                const rec = row.todayRec;
+                const rowBg = row.isSelf ? SELF_BG : '#fff';
+                const rowBorder = i === orderedRoster.length - 1 ? 'none' : `1px solid ${LINE}`;
+                const leftAccent = row.isSelf ? `3px solid ${GOLD}` : '3px solid transparent';
+                return (
+                  <div
+                    key={(row.slug || 'author') + '-' + i}
+                    style={{
+                      padding: '14px 16px 14px 13px',
+                      borderBottom: rowBorder,
+                      borderLeft: leftAccent,
+                      background: rowBg,
+                      display: 'flex',
+                      gap: 12,
+                      alignItems: 'flex-start',
+                    }}
+                  >
+                    <div style={{ flexShrink: 0, width: 14, marginTop: 3, textAlign: 'center' }}>
+                      {rec
+                        ? <span style={{ color: GOLD, fontSize: 12 }}>●</span>
+                        : <span style={{ color: FAINT, fontSize: 12 }}>○</span>}
+                    </div>
+                    <div style={{ flexShrink: 0, minWidth: 72, fontSize: 12, color: row.isSelf ? INK : TEXT, fontWeight: row.isSelf ? 500 : 400, marginTop: 2 }}>
+                      {row.displayName}{row.isAuthor ? <span style={{ color: GOLD, marginLeft: 4, fontSize: 10 }}>·編</span> : null}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      {rec ? (
+                        <>
+                          <div style={{ fontSize: 14, color: INK, lineHeight: 1.6, marginBottom: rec.status === 'converted' && rec.english_attitude ? 6 : 0, overflowWrap: 'anywhere' }}>
+                            {rec.japanese}
+                          </div>
+                          {rec.status === 'converted' && rec.english_attitude ? (
+                            <div style={{ fontSize: 13, color: TEXT, lineHeight: 1.65, paddingLeft: 10, borderLeft: `2px solid ${GOLD}`, marginTop: 6 }}>
+                              {rec.english_attitude}
+                            </div>
+                          ) : (
+                            <div style={{ fontSize: 11, color: FAINT, letterSpacing: '0.15em', marginTop: 4 }}>
+                              PENDING
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <div style={{ fontSize: 13, color: FAINT, lineHeight: 1.6 }}>
+                          {row.isSelf ? 'まだ書いてない' : '—'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Record button */}
+        {/* REC */}
         <div style={{ marginBottom: 16, padding: 32, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, textAlign: 'center' }}>
           <button
             onClick={isRecording ? stopRecording : startRecording}
@@ -528,17 +684,21 @@ function LifeMemberInner() {
           >
             {isRecording ? 'STOP' : submitting ? '...' : 'REC'}
           </button>
-          <div style={{ marginTop: 20, fontSize: 13, color: MUTE, minHeight: 40, lineHeight: 1.6 }}>
+          <div style={{ marginTop: 20, fontSize: 13, color: justSubmitted ? GOLD : MUTE, minHeight: 40, lineHeight: 1.6, transition: 'color 0.3s' }}>
             {isRecording
               ? (interim || '聞いてます...')
               : submitting
-                ? '送信中...'
-                : '1単語でも、1フレーズでも、1シーンでもいい'}
+                ? '書いてる...'
+                : justSubmitted
+                  ? '書いた。明朝、金色がつく。'
+                  : hasRecordedToday
+                    ? '今日の1行、もう1つ足してもいい'
+                    : '今日のあんたの1行を書く'}
           </div>
         </div>
 
-        {/* Prompt hints */}
-        {!isRecording && !submitting && (
+        {/* Prompt hints — only when idle and haven't recorded today */}
+        {!isRecording && !submitting && !hasRecordedToday && !justSubmitted && (
           <div style={{ marginBottom: 40, display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
             {['月極駐車場', 'ピンキリ', 'ないがしろにする', '自転車は降りてください', '車のドア少し開けて涼しい風'].map(s => (
               <span key={s} style={{ fontSize: 11, padding: '5px 11px', background: '#fff', border: `1px solid ${LINE}`, borderRadius: 999, color: MUTE }}>
@@ -547,88 +707,145 @@ function LifeMemberInner() {
             ))}
           </div>
         )}
+        {(hasRecordedToday || justSubmitted) && <div style={{ marginBottom: 40 }} />}
 
-        {/* Today's recordings */}
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.2em', color: MUTE, fontWeight: 500, marginBottom: 16 }}>
-            TODAY — {today}
-          </div>
-          {loading ? (
-            <div style={{ fontSize: 14, color: FAINT }}>読み込み中...</div>
-          ) : todayRecordings.length === 0 ? (
-            <div style={{ padding: '16px 0', fontSize: 13, color: MUTE, lineHeight: 1.9 }}>
-              今日はまだ録音なし。浮かんだ瞬間にボタン押せばOK。<br />
-              感覚語（小春日和）も、シーン（車のドア開けて涼しい風）も、動詞（ないがしろにする）も、なんでも。
+        {/* Yesterday's Harvest — unified card */}
+        {yesterdayConverted.length > 0 && (
+          <div style={{ marginBottom: 40 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
+              <div style={{ fontFamily: SERIF, fontSize: 15, color: INK }}>
+                {yesterdayJP}のページ
+              </div>
+              <div style={{ fontSize: 10, letterSpacing: '0.25em', color: GOLD, fontWeight: 500 }}>
+                YESTERDAY
+              </div>
             </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {todayRecordings.map(r => (
-                <div key={r.id} style={{ padding: 16, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
-                  <div style={{ fontSize: 15, lineHeight: 1.7, color: INK, marginBottom: 8 }}>
-                    {r.japanese}
-                  </div>
-                  {r.status === 'converted' && r.english_attitude ? (
-                    <div style={{ fontSize: 14, lineHeight: 1.7, color: TEXT, paddingLeft: 12, borderLeft: `2px solid ${GOLD}`, marginTop: 12 }}>
+            <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, padding: '4px 20px' }}>
+              {yesterdayConverted.map((r, i) => {
+                const row = rosterRows.find(x => x.slug === r.member_slug);
+                const who = row?.displayName || r.member_name || '—';
+                const convertedAt = r.converted_at ? r.converted_at.slice(11, 16) : null;
+                return (
+                  <div key={r.id} style={{ padding: '18px 0', borderTop: i === 0 ? 'none' : `1px dashed ${LINE}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
+                      <div style={{ fontSize: 12, color: TEXT, fontWeight: 500 }}>
+                        {who}
+                      </div>
+                      {convertedAt && (
+                        <div style={{ fontSize: 10, color: FAINT, letterSpacing: '0.1em' }}>
+                          converted · {convertedAt}
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ fontSize: 15, color: INK, lineHeight: 1.65, marginBottom: 8, overflowWrap: 'anywhere' }}>
+                      {r.japanese}
+                    </div>
+                    <div style={{ fontSize: 14, color: TEXT, lineHeight: 1.7, paddingLeft: 12, borderLeft: `2px solid ${GOLD}` }}>
                       {r.english_attitude}
                     </div>
-                  ) : (
-                    <div style={{ marginTop: 10, fontSize: 12, color: MUTE, lineHeight: 1.6 }}>
-                      <span style={{ color: FAINT, letterSpacing: '0.15em', fontSize: 11, marginRight: 10 }}>
-                        PENDING
-                      </span>
-                      とにおが明日の朝までに英語化します
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Converted archive */}
-        {convertedRecordings.length > 0 && (
-          <div>
-            <div style={{ fontSize: 11, letterSpacing: '0.2em', color: MUTE, fontWeight: 500, marginBottom: 16 }}>
-              YOUR CONVERTED — {convertedRecordings.length}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {convertedRecordings.slice(0, 10).map(r => (
-                <div key={r.id} style={{ padding: '12px 0', borderBottom: `1px solid ${LINE}` }}>
-                  <div style={{ fontSize: 13, color: MUTE, marginBottom: 4 }}>
-                    {r.created_at.slice(0, 10)} · {r.japanese}
                   </div>
-                  <div style={{ fontSize: 14, color: INK }}>
-                    {r.english_attitude}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
 
+        {/* Story So Far */}
+        {bookPageCount > 0 && !isNewcomer && (
+          <div style={{ marginBottom: 40 }}>
+            <div style={{ fontSize: 10, letterSpacing: '0.25em', color: MUTE, fontWeight: 500, marginBottom: 14 }}>
+              STORY SO FAR
+            </div>
+            <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, padding: 20 }}>
+              <div style={{ fontFamily: SERIF, fontSize: 15, color: INK, lineHeight: 1.8, marginBottom: 14 }}>
+                この本は今、<span style={{ color: GOLD, fontWeight: 500 }}>{bookPageCount}</span> 行目。
+              </div>
+              {firstEntry && (
+                <div style={{ fontSize: 12, color: MUTE, lineHeight: 1.8, marginBottom: 6 }}>
+                  最初の1行 · {firstEntry.created_at.slice(0, 10)} · {firstEntry.member_name || '—'} 「{firstEntry.japanese.slice(0, 30)}{firstEntry.japanese.length > 30 ? '…' : ''}」
+                </div>
+              )}
+              {latestEntry && latestEntry.id !== firstEntry?.id && (
+                <div style={{ fontSize: 12, color: MUTE, lineHeight: 1.8 }}>
+                  最新の1行 · {latestEntry.created_at.slice(0, 10)} · {latestEntry.member_name || '—'} 「{latestEntry.japanese.slice(0, 30)}{latestEntry.japanese.length > 30 ? '…' : ''}」
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Your Page — collapsed */}
+        {myRecordings.length > 0 && (
+          <div style={{ marginBottom: 40 }}>
+            <button
+              onClick={() => setShowMyPage(v => !v)}
+              style={{
+                width: '100%', textAlign: 'left',
+                padding: '14px 16px',
+                background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4,
+                fontFamily: SANS, fontSize: 13, color: INK,
+                cursor: 'pointer',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              }}
+            >
+              <span>
+                <span style={{ fontFamily: SERIF, fontSize: 15, marginRight: 10 }}>自分のページ</span>
+                <span style={{ color: MUTE, fontSize: 12 }}>{myRecordings.length} 行</span>
+              </span>
+              <span style={{ color: FAINT, fontSize: 14 }}>{showMyPage ? '閉じる' : '開く'}</span>
+            </button>
+            {showMyPage && (
+              <div style={{ marginTop: 2, background: '#fff', border: `1px solid ${LINE}`, borderTop: 'none', borderRadius: '0 0 4px 4px', padding: '4px 16px' }}>
+                {mySorted.slice(0, 30).map((r, i) => (
+                  <div key={r.id} style={{ padding: '12px 0', borderTop: i === 0 ? 'none' : `1px dashed ${LINE}` }}>
+                    <div style={{ fontSize: 11, color: FAINT, marginBottom: 4, letterSpacing: '0.05em' }}>
+                      {r.created_at.slice(0, 10)}
+                    </div>
+                    <div style={{ fontSize: 14, color: INK, lineHeight: 1.6, marginBottom: 6, overflowWrap: 'anywhere' }}>
+                      {r.japanese}
+                    </div>
+                    {r.status === 'converted' && r.english_attitude ? (
+                      <div style={{ fontSize: 13, color: TEXT, lineHeight: 1.65, paddingLeft: 10, borderLeft: `2px solid ${GOLD}` }}>
+                        {r.english_attitude}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: 11, color: FAINT, letterSpacing: '0.15em' }}>
+                        PENDING · 明朝までに金色がつく
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Why this exists */}
-        <details style={{ marginTop: 64, padding: '20px 24px', background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
+        <details style={{ marginTop: 40, padding: '20px 24px', background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
           <summary style={{ fontFamily: SERIF, fontSize: 16, color: INK, cursor: 'pointer', outline: 'none' }}>
             なぜこれを作ったのか
           </summary>
           <div style={{ marginTop: 18, fontSize: 14, lineHeight: 1.95, color: TEXT }}>
             <p style={{ margin: '0 0 14px' }}>
-              英語学習アプリの例文は、全部他人の人生。「She went to the market」を何回読んでも、自分が言いたい場面がこない。
+              英語学習アプリの例文は、全部他人の人生。She went to the market を何回読んでも、自分が言いたい場面がこない。
             </p>
             <p style={{ margin: '0 0 14px' }}>
-              自分の日本語から始めれば、英語を見た瞬間「あ、これ俺が言いたかったやつだ」になる。身体に入る順番が逆だから。
+              自分の日本語から始めれば、英語を見た瞬間、あ、これ俺が言いたかったやつだ、になる。身体に入る順番が逆だから。
             </p>
             <p style={{ margin: '0 0 14px' }}>
-              翻訳ツールは単語を正確に変換するけど、ネイティブが同じ場面で実際に使う一言は出してこない。「小春日和」を「Indian summer」と直訳するだけじゃ、あの感覚は伝わらない。
+              翻訳ツールは単語を正確に変換するけど、ネイティブが同じ場面で実際に使う一言は出してこない。小春日和を Indian summer と直訳するだけじゃ、あの感覚は伝わらない。
             </p>
-            <p style={{ margin: 0 }}>
-              だから、人力で、とにおが、一つ一つ考える。5人分なら回せる。だからメンバー限定。
+            <p style={{ margin: '0 0 14px' }}>
+              だから、人力で、とにおが、一つ一つ考える。1人なら続かない。100人なら回せない。5人なら回せる。6人目は俺。
+            </p>
+            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 15, color: INK }}>
+              これはお前らに作ってあげる本じゃない。お前らと俺で書く本。
             </p>
           </div>
         </details>
 
         {/* Footer */}
-        <div style={{ marginTop: 48, fontSize: 12, color: FAINT, textAlign: 'center', lineHeight: 1.8 }}>
+        <div style={{ marginTop: 40, fontSize: 12, color: FAINT, textAlign: 'center', lineHeight: 1.8 }}>
           詰まったら、とにおにLINEで。スクショあるとベスト。
         </div>
       </div>
