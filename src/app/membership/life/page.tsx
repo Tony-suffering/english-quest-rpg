@@ -34,6 +34,10 @@ const FAINT = '#A8A29E';
 const LINE = '#E7E5E4';
 const BG = '#FAFAF9';
 const SELF_BG = '#FFFBEB';
+const GOLD_DIM = '#B8971F';
+const GOLD_BG = '#FFFBEB';
+const GOLD_BORDER = '#FDE68A';
+const GHOST = '#D6D3D1';
 
 function dedupAdjacentRepeats(text: string): string {
   if (!text || text.length < 6) return text;
@@ -709,40 +713,129 @@ function LifeMemberInner() {
         )}
         {(hasRecordedToday || justSubmitted) && <div style={{ marginBottom: 40 }} />}
 
-        {/* Yesterday's Harvest — unified card */}
+        {/* Yesterday's Harvest — show-style reveal cards */}
         {yesterdayConverted.length > 0 && (
           <div style={{ marginBottom: 40 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
               <div style={{ fontFamily: SERIF, fontSize: 15, color: INK }}>
-                {yesterdayJP}のページ
+                {yesterdayJP}、こうなった
               </div>
               <div style={{ fontSize: 10, letterSpacing: '0.25em', color: GOLD, fontWeight: 500 }}>
                 YESTERDAY
               </div>
             </div>
-            <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, padding: '4px 20px' }}>
-              {yesterdayConverted.map((r, i) => {
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {yesterdayConverted.map((r) => {
                 const row = rosterRows.find(x => x.slug === r.member_slug);
                 const who = row?.displayName || r.member_name || '—';
-                const convertedAt = r.converted_at ? r.converted_at.slice(11, 16) : null;
+                const isAuthor = !r.member_slug;
+                const isMine = slug ? r.member_slug === slug : isAuthor;
+
                 return (
-                  <div key={r.id} style={{ padding: '18px 0', borderTop: i === 0 ? 'none' : `1px dashed ${LINE}` }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
-                      <div style={{ fontSize: 12, color: TEXT, fontWeight: 500 }}>
+                  <div key={r.id} style={{
+                    background: '#fff',
+                    borderRadius: 14,
+                    overflow: 'hidden',
+                    border: `1px solid ${isMine ? GOLD_BORDER : LINE}`,
+                    boxShadow: isMine ? '0 2px 12px rgba(212, 175, 55, 0.12)' : '0 1px 4px rgba(0,0,0,0.04)',
+                  }}>
+                    {/* HERO STRIP — whose voice */}
+                    <div style={{
+                      background: isMine
+                        ? 'linear-gradient(90deg, #FFFBEB 0%, #FEF3C7 100%)'
+                        : 'linear-gradient(90deg, #FAFAF9 0%, #F5F5F4 100%)',
+                      padding: '11px 16px 9px',
+                      borderBottom: `1px solid ${isMine ? GOLD_BORDER : LINE}`,
+                      display: 'flex', alignItems: 'baseline', gap: 10,
+                    }}>
+                      <span style={{
+                        fontSize: 9, letterSpacing: 3, fontWeight: 800,
+                        color: isMine ? GOLD_DIM : MUTE,
+                      }}>
+                        {isMine ? 'あんたの1行は' : '今回の1行は'}
+                      </span>
+                      <span style={{
+                        fontSize: 20, fontWeight: 900, lineHeight: 1,
+                        color: isMine ? GOLD_DIM : INK, letterSpacing: 0.5,
+                      }}>
                         {who}
-                      </div>
-                      {convertedAt && (
-                        <div style={{ fontSize: 10, color: FAINT, letterSpacing: '0.1em' }}>
-                          converted · {convertedAt}
-                        </div>
+                      </span>
+                      {isAuthor && (
+                        <span style={{ fontSize: 10, fontWeight: 700, color: GOLD_DIM }}>著者</span>
                       )}
                     </div>
-                    <div style={{ fontSize: 15, color: INK, lineHeight: 1.65, marginBottom: 8, overflowWrap: 'anywhere' }}>
-                      {r.japanese}
+
+                    {/* JAPANESE — the quote */}
+                    <div style={{ padding: '18px 18px 4px', textAlign: 'center' }}>
+                      <div style={{
+                        fontSize: 10, color: FAINT, letterSpacing: 2.5,
+                        fontWeight: 700, marginBottom: 8,
+                      }}>
+                        こう言った
+                      </div>
+                      <div style={{
+                        fontFamily: SERIF, fontSize: 20, fontWeight: 700,
+                        color: INK, lineHeight: 1.5, letterSpacing: 0.3,
+                        overflowWrap: 'anywhere',
+                      }}>
+                        〝{r.japanese}〞
+                      </div>
                     </div>
-                    <div style={{ fontSize: 14, color: TEXT, lineHeight: 1.7, paddingLeft: 12, borderLeft: `2px solid ${GOLD}` }}>
-                      {r.english_attitude}
+
+                    {/* DRAMATIC ARROW */}
+                    <div style={{
+                      textAlign: 'center', padding: '12px 0 6px',
+                      position: 'relative',
+                    }}>
+                      <div style={{
+                        position: 'absolute', top: '50%', left: '14%', right: '14%',
+                        height: 1,
+                        background: `linear-gradient(90deg, transparent, ${GOLD_BORDER} 50%, transparent)`,
+                      }} />
+                      <span style={{
+                        position: 'relative', background: '#fff',
+                        padding: '4px 14px',
+                        fontSize: 10, letterSpacing: 3, fontWeight: 800,
+                        color: GOLD_DIM,
+                      }}>
+                        ▼ 英語にしたら ▼
+                      </span>
                     </div>
+
+                    {/* ENGLISH — the reveal */}
+                    <div style={{
+                      margin: '0 14px 12px',
+                      padding: '16px 16px',
+                      background: `linear-gradient(135deg, ${GOLD_BG} 0%, #FEF9E7 100%)`,
+                      border: `1px solid ${GOLD_BORDER}`,
+                      borderRadius: 12,
+                      textAlign: 'center',
+                    }}>
+                      <div style={{
+                        fontSize: 18, fontWeight: 800, color: GOLD_DIM,
+                        lineHeight: 1.5, letterSpacing: 0.3,
+                      }}>
+                        {r.english_attitude}
+                      </div>
+                    </div>
+
+                    {/* WHY */}
+                    {r.context && (
+                      <div style={{
+                        margin: '0 14px 14px',
+                        background: BG, borderRadius: 10,
+                        padding: '11px 14px',
+                        borderLeft: `3px solid ${GOLD}`,
+                      }}>
+                        <div style={{
+                          fontSize: 9, letterSpacing: 2.5, color: GOLD_DIM,
+                          fontWeight: 800, marginBottom: 5,
+                        }}>
+                          なぜそうなるのか
+                        </div>
+                        <div style={{ fontSize: 12, color: TEXT, lineHeight: 1.8 }}>{r.context}</div>
+                      </div>
+                    )}
                   </div>
                 );
               })}
