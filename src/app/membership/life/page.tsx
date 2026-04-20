@@ -262,6 +262,32 @@ function LifeMemberInner() {
 
   const [activeExpr, setActiveExpr] = useState<Record<string, number>>({});
 
+  // ─── Diary state ───
+  const [diaryContent, setDiaryContent] = useState<string>('');
+  const [diaryNews, setDiaryNews] = useState<string>('');
+  const [diaryLoaded, setDiaryLoaded] = useState(false);
+  const [diaryDates, setDiaryDates] = useState<Set<string>>(new Set());
+
+  // ─── Reply state ───
+  interface Reply {
+    id: number;
+    diary_date: string;
+    content: string;
+    member_slug: string | null;
+    member_name: string | null;
+    created_at: string;
+  }
+  const [replies, setReplies] = useState<Reply[]>([]);
+  const [replyInput, setReplyInput] = useState<string>('');
+  const [replySubmitting, setReplySubmitting] = useState(false);
+  const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
+  const [isReplyRecording, setIsReplyRecording] = useState(false);
+  const [replyInterim, setReplyInterim] = useState('');
+  const replyRecognitionRef = useRef<any>(null);
+  const replyFinalsRef = useRef<string[]>([]);
+  const replyPriorRef = useRef<string>('');
+  const replyUserStoppedRef = useRef<boolean>(false);
+
   useMembersPWA();
 
   // Identity bootstrap
@@ -302,6 +328,170 @@ function LifeMemberInner() {
 
   // Derived
   const selectedDateStr = toDateStr(selectedDate);
+
+  // ─── Diary fetch ───
+  const fetchDiaryDates = useCallback(async () => {
+    try {
+      const res = await fetch('/api/life-diary?list=true');
+      const data = await res.json();
+      if (data.success) setDiaryDates(new Set(data.dates || []));
+    } catch { /* */ }
+  }, []);
+  useEffect(() => { fetchDiaryDates(); }, [fetchDiaryDates]);
+
+  const fetchDiaryForDate = useCallback(async (date: string) => {
+    setDiaryLoaded(false);
+    try {
+      const res = await fetch(`/api/life-diary?date=${encodeURIComponent(date)}`);
+      const data = await res.json();
+      if (data.success) {
+        setDiaryContent(data.diary?.content || '');
+        setDiaryNews(data.diary?.news || '');
+      } else {
+        setDiaryContent(''); setDiaryNews('');
+      }
+    } catch {
+      setDiaryContent(''); setDiaryNews('');
+    } finally {
+      setDiaryLoaded(true);
+    }
+  }, []);
+  useEffect(() => { fetchDiaryForDate(selectedDateStr); }, [fetchDiaryForDate, selectedDateStr]);
+
+  // ─── Replies fetch ───
+  const fetchReplyCounts = useCallback(async () => {
+    try {
+      const res = await fetch('/api/life-diary-replies?counts=true');
+      const data = await res.json();
+      if (data.success) setReplyCounts(data.counts || {});
+    } catch { /* */ }
+  }, []);
+  useEffect(() => { fetchReplyCounts(); }, [fetchReplyCounts]);
+
+  const fetchReplies = useCallback(async (date: string) => {
+    try {
+      const res = await fetch(`/api/life-diary-replies?date=${encodeURIComponent(date)}`);
+      const data = await res.json();
+      if (data.success) setReplies(data.replies || []);
+      else setReplies([]);
+    } catch {
+      setReplies([]);
+    }
+  }, []);
+  useEffect(() => { fetchReplies(selectedDateStr); setReplyInput(''); setReplyInterim(''); }, [fetchReplies, selectedDateStr]);
+
+  const submitReply = useCallback(async (content: string) => {
+    const trimmed = content.trim();
+    if (!trimmed || replySubmitting) return;
+    setReplySubmitting(true);
+    try {
+      const res = await fetch('/api/life-diary-replies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          date: selectedDateStr,
+          content: trimmed,
+          member_slug: slug,
+          member_name: name || null,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.reply) {
+        setReplies(prev => [...prev, data.reply]);
+        setReplyInput('');
+        setReplyCounts(prev => ({ ...prev, [selectedDateStr]: (prev[selectedDateStr] || 0) + 1 }));
+      }
+    } catch { /* */ }
+    finally {
+      setReplySubmitting(false);
+    }
+  }, [selectedDateStr, slug, name, replySubmitting]);
+
+  const deleteReply = useCallback(async (id: number) => {
+    try {
+      const res = await fetch('/api/life-diary-replies', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, member_slug: slug }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReplies(prev => prev.filter(r => r.id !== id));
+        setReplyCounts(prev => {
+          const next = { ...prev };
+          if (next[selectedDateStr]) next[selectedDateStr] = Math.max(0, next[selectedDateStr] - 1);
+          return next;
+        });
+      }
+    } catch { /* */ }
+  }, [slug, selectedDateStr]);
+
+  // ─── Reply voice ───
+  const startReplyRecording = () => {
+    if (typeof window === 'undefined') return;
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { alert('このブラウザは音声認識に対応していません'); return; }
+    replyFinalsRef.current = [];
+    replyPriorRef.current = '';
+    replyUserStoppedRef.current = false;
+
+    const startSession = () => {
+      const recognition = new SR();
+      recognition.lang = 'ja-JP';
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+      recognition.continuous = true;
+      recognition.onresult = (event: any) => {
+        let interimText = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) replyFinalsRef.current[i] = result[0].transcript;
+          else interimText += result[0].transcript;
+        }
+        setReplyInterim(interimText);
+      };
+      recognition.onerror = (e: any) => {
+        const fatal = e?.error === 'not-allowed' || e?.error === 'service-not-allowed' || e?.error === 'audio-capture';
+        if (fatal) {
+          replyUserStoppedRef.current = true;
+          setIsReplyRecording(false);
+          setReplyInterim('');
+        }
+      };
+      recognition.onend = () => {
+        const sessionText = replyFinalsRef.current.join('');
+        if (!replyUserStoppedRef.current) {
+          try {
+            replyFinalsRef.current = [];
+            startSession();
+            replyPriorRef.current += sessionText;
+            return;
+          } catch { /* */ }
+        }
+        const raw = (replyPriorRef.current + sessionText).trim();
+        const fullText = dedupAdjacentRepeats(raw);
+        replyPriorRef.current = '';
+        replyFinalsRef.current = [];
+        if (fullText) {
+          setReplyInput(prev => prev ? `${prev} ${fullText}` : fullText);
+        }
+        setIsReplyRecording(false);
+        setReplyInterim('');
+      };
+      replyRecognitionRef.current = recognition;
+      recognition.start();
+    };
+
+    startSession();
+    setIsReplyRecording(true);
+  };
+  const stopReplyRecording = () => {
+    replyUserStoppedRef.current = true;
+    if (replyRecognitionRef.current) {
+      try { replyRecognitionRef.current.stop(); } catch { /* */ }
+    }
+  };
+
   const dayRecordings = useMemo(() =>
     recordings.filter(r => r.created_at.startsWith(selectedDateStr)),
     [recordings, selectedDateStr]
@@ -587,6 +777,8 @@ function LifeMemberInner() {
             const dayData = recordingDates[cellKey];
             const hasPending = dayData && dayData.total > dayData.converted;
             const hasConverted = dayData && dayData.converted > 0;
+            const hasDiary = diaryDates.has(cellKey);
+            const rCount = replyCounts[cellKey] || 0;
             return (
               <button key={day} onClick={() => goToDate(cellDate)} style={{
                 width: '100%', aspectRatio: '1', border: isTodayCell && !isSelected ? `2px solid ${C.gold}` : `1px solid ${C.borderLight}`,
@@ -601,6 +793,22 @@ function LifeMemberInner() {
                 padding: 0,
                 gap: 2,
               }}>
+                {hasDiary && (
+                  <span style={{
+                    position: 'absolute', top: 3, right: 4,
+                    fontSize: 9, fontWeight: 900,
+                    color: isSelected ? C.card : C.goldDim,
+                    letterSpacing: 0.5,
+                  }}>日</span>
+                )}
+                {rCount > 0 && (
+                  <span style={{
+                    position: 'absolute', top: 3, left: 4,
+                    fontSize: 8, fontWeight: 900,
+                    color: isSelected ? C.card : C.textDim,
+                    letterSpacing: 0,
+                  }}>{rCount}</span>
+                )}
                 <span>{day}</span>
                 {dayData && (
                   <div style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
@@ -632,8 +840,198 @@ function LifeMemberInner() {
             <div style={{ width: 10, height: 10, borderRadius: 3, border: `2px solid ${C.gold}` }} />
             <span style={{ fontSize: 10, fontWeight: 700, color: C.textDim, letterSpacing: 1 }}>今日</span>
           </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <span style={{ fontSize: 11, fontWeight: 900, color: C.goldDim }}>日</span>
+            <span style={{ fontSize: 10, fontWeight: 700, color: C.textDim, letterSpacing: 1 }}>日記</span>
+          </div>
         </div>
       </div>
+
+      {/* ─── Daily Diary (read-only) ─── */}
+      {diaryLoaded && diaryContent && (
+        <div style={{
+          background: C.card, padding: '14px 14px 16px',
+          borderBottom: `1px solid ${C.border}`,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <span style={{
+              fontSize: 9, letterSpacing: 3, fontWeight: 800, color: C.goldDim,
+            }}>DAILY JOURNAL</span>
+            <span style={{
+              fontSize: 11, fontWeight: 800, color: C.text,
+            }}>{selectedDate.getMonth() + 1}/{selectedDate.getDate()}の日記</span>
+            <span style={{ flex: 1 }} />
+            <span style={{
+              fontSize: 9, fontWeight: 700, color: C.textFaint, letterSpacing: 1,
+            }}>とにお</span>
+          </div>
+
+          <div style={{
+            background: `linear-gradient(135deg, ${C.goldBg} 0%, #FEF9E7 100%)`,
+            border: `1px solid ${C.goldBorder}`,
+            borderRadius: 14, padding: '14px 16px',
+          }}>
+            <div style={{
+              fontSize: 13, lineHeight: 1.9, color: C.textSub,
+              whiteSpace: 'pre-wrap',
+              fontFamily: "'Noto Serif JP', Georgia, serif",
+            }}>
+              {diaryContent}
+            </div>
+            {diaryNews && (
+              <div style={{
+                marginTop: 12, paddingTop: 10,
+                borderTop: `1px dashed ${C.goldBorder}`,
+                display: 'flex', alignItems: 'flex-start', gap: 8,
+              }}>
+                <span style={{
+                  fontSize: 8, letterSpacing: 2, fontWeight: 800, color: C.goldDim,
+                  padding: '3px 6px', background: C.card, borderRadius: 4,
+                  marginTop: 1, flexShrink: 0,
+                }}>NEWS</span>
+                <span style={{
+                  fontSize: 11, color: C.textDim, lineHeight: 1.6,
+                }}>{diaryNews}</span>
+              </div>
+            )}
+          </div>
+
+          {/* ─── Replies (みなさんはどう？) ─── */}
+          <div style={{ marginTop: 18 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10,
+            }}>
+              <span style={{
+                fontSize: 9, letterSpacing: 3, fontWeight: 800, color: C.goldDim,
+              }}>REPLIES</span>
+              <span style={{
+                fontSize: 11, fontWeight: 800, color: C.text,
+              }}>みなさんはどう？</span>
+              {replies.length > 0 && (
+                <span style={{
+                  fontSize: 10, fontWeight: 700,
+                  background: C.borderLight, color: C.textDim,
+                  padding: '2px 8px', borderRadius: 999,
+                }}>{replies.length}</span>
+              )}
+            </div>
+
+            {/* Existing replies */}
+            {replies.length > 0 && (
+              <div style={{
+                display: 'flex', flexDirection: 'column', gap: 8,
+                marginBottom: 12,
+              }}>
+                {replies.map(r => {
+                  const isAdmin = !r.member_slug;
+                  const isMine = !isAdmin && r.member_slug === slug;
+                  const displayedName = isAdmin ? 'とにお' : (isMine ? (name || 'あなた') : (r.member_name || '匿名'));
+                  const highlight = isAdmin;
+                  return (
+                    <div key={r.id} style={{
+                      background: highlight ? C.goldBg : C.bg,
+                      border: `1px solid ${highlight ? C.goldBorder : C.border}`,
+                      borderRadius: 10,
+                      padding: '10px 12px',
+                      display: 'flex', flexDirection: 'column', gap: 4,
+                    }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'baseline', gap: 8,
+                      }}>
+                        <span style={{
+                          fontSize: 11, fontWeight: 800,
+                          color: highlight ? C.goldDim : C.text,
+                        }}>{displayedName}</span>
+                        <span style={{
+                          fontSize: 9, fontWeight: 600, color: C.textFaint,
+                        }}>
+                          {r.created_at.slice(5, 16).replace('T', ' ')}
+                        </span>
+                        <span style={{ flex: 1 }} />
+                        {isMine && (
+                          <button
+                            onClick={() => deleteReply(r.id)}
+                            style={{
+                              background: 'none', border: 'none', cursor: 'pointer',
+                              fontSize: 11, color: C.textGhost, padding: 0,
+                            }}
+                          >x</button>
+                        )}
+                      </div>
+                      <div style={{
+                        fontSize: 13, lineHeight: 1.7, color: C.textSub,
+                        whiteSpace: 'pre-wrap',
+                      }}>{r.content}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Input */}
+            <div style={{
+              background: C.bg, border: `1px solid ${C.border}`,
+              borderRadius: 12, padding: 10,
+            }}>
+              <textarea
+                value={isReplyRecording && replyInterim ? `${replyInput}${replyInput ? ' ' : ''}${replyInterim}` : replyInput}
+                onChange={e => { if (!isReplyRecording) setReplyInput(e.target.value); }}
+                placeholder="この日の感想、気づいたこと、なんでも。"
+                rows={3}
+                readOnly={isReplyRecording}
+                style={{
+                  width: '100%', padding: 10, borderRadius: 8,
+                  border: `1px solid ${C.borderLight}`, background: C.card,
+                  fontSize: 13, fontFamily: 'inherit', color: C.text,
+                  resize: 'vertical', lineHeight: 1.7, boxSizing: 'border-box',
+                }}
+              />
+              <div style={{
+                display: 'flex', gap: 8, marginTop: 8, alignItems: 'center',
+              }}>
+                <button
+                  onClick={isReplyRecording ? stopReplyRecording : startReplyRecording}
+                  style={{
+                    width: 40, height: 40, borderRadius: '50%',
+                    border: 'none', cursor: 'pointer',
+                    background: isReplyRecording
+                      ? `linear-gradient(135deg, ${C.red}, #EF4444)`
+                      : `linear-gradient(135deg, ${C.gold}, #F59E0B)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                    animation: isReplyRecording ? 'micPulse 1s infinite' : 'none',
+                  }}
+                  title={isReplyRecording ? '録音停止' : '音声で入力'}
+                >
+                  {isReplyRecording ? (
+                    <div style={{ width: 10, height: 10, borderRadius: 2, background: 'white' }} />
+                  ) : (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="white">
+                      <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                      <line x1="12" y1="19" x2="12" y2="23" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  )}
+                </button>
+                <span style={{ flex: 1 }} />
+                <button
+                  onClick={() => submitReply(replyInput)}
+                  disabled={!replyInput.trim() || replySubmitting || isReplyRecording}
+                  style={{
+                    padding: '10px 18px', borderRadius: 10, border: 'none',
+                    background: !replyInput.trim() || replySubmitting || isReplyRecording ? C.borderLight : C.text,
+                    color: !replyInput.trim() || replySubmitting || isReplyRecording ? C.textFaint : C.card,
+                    fontSize: 12, fontWeight: 800, letterSpacing: 1,
+                    cursor: !replyInput.trim() || replySubmitting || isReplyRecording ? 'default' : 'pointer',
+                  }}
+                >
+                  {replySubmitting ? '...' : '送信'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ─── Recordings for selected day ─── */}
       <div style={{ padding: '8px 12px' }}>
