@@ -75,7 +75,7 @@ function dedupAdjacentRepeats(text: string): string {
   return result;
 }
 
-// ─── Colors (match iwasaki /life) ───
+// ─── Colors ───
 const C = {
   bg: '#FAFAF9',
   card: '#FFFFFF',
