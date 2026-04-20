@@ -230,13 +230,85 @@ export default function MembershipPage() {
                     ))}
                 </div>
 
+                {/* LIFE CTA -- primary call to action */}
+                <Link href="/membership/life" style={{ textDecoration: 'none' }}>
+                    <div style={{
+                        background: `linear-gradient(135deg, #fff 0%, #FAF7EF 100%)`,
+                        border: `2px solid ${GOLD}`,
+                        borderRadius: 16,
+                        padding: '48px 36px',
+                        marginTop: 40,
+                        position: 'relative',
+                        overflow: 'hidden',
+                        boxShadow: '0 24px 60px -20px rgba(212,175,55,0.35)',
+                    }}>
+                        <div style={{
+                            position: 'absolute',
+                            top: 16,
+                            right: 20,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            color: GOLD,
+                            letterSpacing: '0.3em',
+                            textTransform: 'uppercase' as const,
+                        }}>
+                            App · Install
+                        </div>
+                        <p style={{
+                            fontSize: 10,
+                            letterSpacing: '0.4em',
+                            color: GOLD,
+                            fontWeight: 700,
+                            margin: '0 0 18px',
+                            textTransform: 'uppercase' as const,
+                        }}>
+                            Life -- 1日1録音
+                        </p>
+                        <h2 style={{
+                            fontFamily: SERIF,
+                            fontSize: 38,
+                            fontWeight: 700,
+                            color: INK,
+                            lineHeight: 1.2,
+                            margin: '0 0 18px',
+                            letterSpacing: '-0.01em',
+                        }}>
+                            今日の一言を、<br />録音する。
+                        </h2>
+                        <p style={{
+                            fontSize: 15,
+                            color: TEXT,
+                            lineHeight: 1.85,
+                            margin: '0 0 28px',
+                            maxWidth: 500,
+                        }}>
+                            日本語で一言録音。あとでとにおが英語にして、あなたの名前クレジット付きで語録に載せます。ホーム画面に追加してアプリとして使えます。
+                        </p>
+                        <div style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            padding: '16px 32px',
+                            background: INK,
+                            color: '#fff',
+                            borderRadius: 8,
+                            fontSize: 14,
+                            fontWeight: 700,
+                            letterSpacing: '0.04em',
+                        }}>
+                            録音ページを開く
+                            <span style={{ fontSize: 16 }}>→</span>
+                        </div>
+                    </div>
+                </Link>
+
                 {/* Journal CTA */}
                 <Link href="/journal" style={{ textDecoration: 'none' }}>
                     <div style={{
                         background: `linear-gradient(135deg, ${INK} 0%, #292524 100%)`,
                         borderRadius: 16,
-                        padding: '44px 36px',
-                        marginTop: 40,
+                        padding: '36px 32px',
+                        marginTop: 20,
                         position: 'relative',
                         overflow: 'hidden',
                     }}>
@@ -246,18 +318,18 @@ export default function MembershipPage() {
                             letterSpacing: '0.4em',
                             color: GOLD,
                             fontWeight: 700,
-                            margin: '0 0 16px',
+                            margin: '0 0 14px',
                             textTransform: 'uppercase' as const,
                         }}>
                             Main Content
                         </p>
                         <h2 style={{
                             fontFamily: SERIF,
-                            fontSize: 32,
+                            fontSize: 28,
                             fontWeight: 700,
                             color: '#fff',
                             lineHeight: 1.25,
-                            margin: '0 0 14px',
+                            margin: '0 0 12px',
                         }}>
                             とにおのジャーナル
                         </h2>
@@ -265,18 +337,18 @@ export default function MembershipPage() {
                             fontSize: 14,
                             color: 'rgba(255,255,255,0.65)',
                             lineHeight: 1.8,
-                            margin: '0 0 28px',
+                            margin: '0 0 22px',
                             maxWidth: 480,
                         }}>
                             開発と英語学習の全記録。没ネタ、反省文、未公開コンテンツ。カレンダーUIで日付ごとに読める。
                         </p>
                         <div style={{
                             display: 'inline-block',
-                            padding: '14px 28px',
+                            padding: '12px 24px',
                             background: GOLD,
                             color: INK,
                             borderRadius: 8,
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: 700,
                             letterSpacing: '0.04em',
                         }}>
