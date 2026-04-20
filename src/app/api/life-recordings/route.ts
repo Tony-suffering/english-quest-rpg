@@ -19,6 +19,7 @@ interface LifeRecording {
     converted_at: string | null;
     member_slug: string | null;
     member_name: string | null;
+    is_public: number | null;
 }
 
 async function queryD1<T = unknown>(sql: string, params: (string | number | null)[] = []): Promise<{ results: T[] }> {
@@ -54,10 +55,14 @@ export async function GET(request: Request) {
         const url = new URL(request.url);
         const pending = url.searchParams.get('pending') === 'true';
         const member = url.searchParams.get('member');
+        // Admin view (?all=true) sees everything including private author recordings.
+        // Default view hides author's private recordings (is_public=0). Member recordings always visible.
+        const all = url.searchParams.get('all') === 'true';
         const where: string[] = [];
         const params: (string | number | null)[] = [];
         if (pending) where.push("status = 'pending'");
         if (member) { where.push('member_slug = ?'); params.push(member); }
+        if (!all) where.push('(member_slug IS NOT NULL OR is_public = 1)');
         const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
         const order = pending ? 'created_at ASC' : 'created_at DESC';
         const result = await queryD1<LifeRecording>(
@@ -89,6 +94,7 @@ export async function POST(request: Request) {
             context: null, literal: null, category: null,
             status: 'pending', created_at: now, converted_at: null,
             member_slug: member_slug || null, member_name: member_name || null,
+            is_public: 0,
         };
         return NextResponse.json({ success: true, recording }, { status: 201 });
     } catch (err) {

@@ -81,7 +81,7 @@ export default function LifeAdminPage() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/life-recordings');
+      const res = await fetch('/api/life-recordings?all=true');
       const data = await res.json();
       if (data.success) setRecordings(data.recordings || []);
     } catch { /* */ }

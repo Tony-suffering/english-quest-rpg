@@ -2,8 +2,24 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { LIFE_ROSTER } from '@/data/life-members';
 
+// ─── PWA ───
+function useMembersPWA() {
+  useEffect(() => {
+    const existing = document.querySelector('link[rel="manifest"]');
+    if (existing) existing.remove();
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = '/membership-life-app.json';
+    document.head.appendChild(link);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/membership-life-sw.js', { scope: '/membership/life' }).catch(() => {});
+    }
+    return () => { link.remove(); };
+  }, []);
+}
+
+// ─── Types ───
 interface Recording {
   id: string;
   japanese: string;
@@ -19,25 +35,24 @@ interface Recording {
   converted_at: string | null;
   member_slug: string | null;
   member_name: string | null;
+  is_public: number | null;
 }
+
+// ─── Helpers ───
+const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+function getDaysInMonth(y: number, m: number) { return new Date(y, m + 1, 0).getDate(); }
+function getFirstDayOfWeek(y: number, m: number) { return new Date(y, m, 1).getDay(); }
+function toDateStr(d: Date) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 
 const SLUG_KEY = 'tonio-life-member-slug';
 const NAME_KEY = 'tonio-life-member-name';
 
-const SERIF = "'Noto Serif JP', 'Source Serif Pro', Georgia, 'Times New Roman', serif";
-const SANS = "'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-const GOLD = '#D4AF37';
-const INK = '#1C1917';
-const TEXT = '#44403C';
-const MUTE = '#78716C';
-const FAINT = '#A8A29E';
-const LINE = '#E7E5E4';
-const BG = '#FAFAF9';
-const SELF_BG = '#FFFBEB';
-const GOLD_DIM = '#B8971F';
-const GOLD_BG = '#FFFBEB';
-const GOLD_BORDER = '#FDE68A';
-const GHOST = '#D6D3D1';
+function randomSlug(len = 10): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let id = '';
+  for (let i = 0; i < len; i++) id += chars[Math.floor(Math.random() * chars.length)];
+  return id;
+}
 
 function dedupAdjacentRepeats(text: string): string {
   if (!text || text.length < 6) return text;
@@ -59,46 +74,28 @@ function dedupAdjacentRepeats(text: string): string {
   return result;
 }
 
-function getJSTDateString(d: Date = new Date()): string {
-  const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-  return jst.toISOString().slice(0, 10);
-}
+// ─── Colors (match iwasaki /life) ───
+const C = {
+  bg: '#FAFAF9',
+  card: '#FFFFFF',
+  border: '#E7E5E4',
+  borderLight: '#F5F5F4',
+  gold: '#D4AF37',
+  goldDim: '#B8971F',
+  goldBg: '#FFFBEB',
+  goldBorder: '#FDE68A',
+  green: '#10B981',
+  greenBg: '#ECFDF5',
+  red: '#DC2626',
+  blue: '#2563EB',
+  text: '#1C1917',
+  textSub: '#44403C',
+  textDim: '#78716C',
+  textFaint: '#A8A29E',
+  textGhost: '#D6D3D1',
+};
 
-function getTodayJST(): string {
-  return getJSTDateString();
-}
-
-function getYesterdayJST(): string {
-  const now = new Date();
-  now.setUTCDate(now.getUTCDate() - 1);
-  return getJSTDateString(now);
-}
-
-function formatJSTDateJP(dateStr: string): string {
-  const parts = dateStr.split('-').map(Number);
-  if (parts.length < 3) return dateStr;
-  const [y, m, d] = parts;
-  const date = new Date(Date.UTC(y, m - 1, d));
-  const days = ['日', '月', '火', '水', '木', '金', '土'];
-  const dow = days[date.getUTCDay()];
-  return `${m}月${d}日（${dow}）`;
-}
-
-function useMembersPWA() {
-  useEffect(() => {
-    const existing = document.querySelector('link[rel="manifest"]');
-    if (existing) existing.remove();
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = '/membership-life-app.json';
-    document.head.appendChild(link);
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/membership-life-sw.js', { scope: '/membership/life' }).catch(() => {});
-    }
-    return () => { link.remove(); };
-  }, []);
-}
-
+// ─── Install Banner ───
 type Platform = {
   isIOS: boolean;
   isAndroid: boolean;
@@ -135,14 +132,8 @@ function useInstallPrompt() {
   const [deferred, setDeferred] = useState<any>(null);
   const [installed, setInstalled] = useState(false);
   useEffect(() => {
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setDeferred(e);
-    };
-    const onInstalled = () => {
-      setDeferred(null);
-      setInstalled(true);
-    };
+    const onPrompt = (e: Event) => { e.preventDefault(); setDeferred(e); };
+    const onInstalled = () => { setDeferred(null); setInstalled(true); };
     window.addEventListener('beforeinstallprompt', onPrompt as any);
     window.addEventListener('appinstalled', onInstalled);
     return () => {
@@ -157,9 +148,7 @@ function useInstallPrompt() {
       const choice = await deferred.userChoice;
       setDeferred(null);
       return choice?.outcome === 'accepted';
-    } catch {
-      return false;
-    }
+    } catch { return false; }
   }, [deferred]);
   return { canPrompt: !!deferred, installed, trigger };
 }
@@ -173,195 +162,179 @@ function InstallBanner() {
   if (platform.isStandalone) return null;
   if (dismissed) return null;
 
-  const BoxBase: React.CSSProperties = {
-    marginBottom: 24,
-    padding: 20,
-    background: SELF_BG,
-    border: `1px solid ${GOLD}`,
-    borderRadius: 4,
+  const box: React.CSSProperties = {
+    margin: '12px 12px 0',
+    padding: '14px 16px',
+    background: C.goldBg,
+    border: `1px solid ${C.goldBorder}`,
+    borderRadius: 12,
     position: 'relative',
   };
-  const Heading: React.CSSProperties = {
-    fontFamily: SERIF, fontSize: 17, color: INK, marginBottom: 8, fontWeight: 500,
-  };
-  const Body: React.CSSProperties = {
-    fontSize: 14, lineHeight: 1.8, color: TEXT, margin: 0,
-  };
-  const Step: React.CSSProperties = {
-    fontSize: 13, lineHeight: 1.8, color: TEXT, padding: '6px 0',
-    borderBottom: `1px dashed ${LINE}`,
-  };
-  const CloseBtn = (
+  const close = (
     <button
       onClick={() => setDismissed(true)}
       aria-label="閉じる"
-      style={{ position: 'absolute', top: 8, right: 12, background: 'none', border: 'none', color: MUTE, fontSize: 18, cursor: 'pointer', lineHeight: 1 }}
-    >
-      ×
-    </button>
+      style={{
+        position: 'absolute', top: 6, right: 10,
+        background: 'none', border: 'none', cursor: 'pointer',
+        color: C.goldDim, fontSize: 16, lineHeight: 1, padding: 2,
+      }}
+    >×</button>
   );
 
   if (platform.isInApp) {
     return (
-      <div style={BoxBase}>
-        {CloseBtn}
-        <div style={Heading}>
-          {platform.inAppName}の中では使えません
+      <div style={box}>{close}
+        <div style={{ fontSize: 10, letterSpacing: 2, color: C.goldDim, fontWeight: 700, marginBottom: 6 }}>
+          ブラウザで開いてください
         </div>
-        <p style={Body}>
-          右上のメニューから「{platform.isIOS ? 'Safari' : '他のブラウザ'}で開く」を選んでください。そこからホーム画面にインストールできます。
-        </p>
+        <div style={{ fontSize: 13, lineHeight: 1.7, color: C.textSub }}>
+          {platform.inAppName}の中では使えません。右上のメニューから「{platform.isIOS ? 'Safari' : '他のブラウザ'}で開く」を選んでください。
+        </div>
       </div>
     );
   }
-
   if (platform.isIOS) {
     return (
-      <div style={BoxBase}>
-        {CloseBtn}
-        <div style={Heading}>
+      <div style={box}>{close}
+        <div style={{ fontSize: 10, letterSpacing: 2, color: C.goldDim, fontWeight: 700, marginBottom: 6 }}>
           ホーム画面に追加してアプリっぽく使う
         </div>
-        <div style={{ ...Body, marginBottom: 12 }}>
-          毎回URLを踏まなくて済みます。3秒で終わります。
-        </div>
-        <div>
-          <div style={Step}>
-            1. 画面下の <span style={{ fontWeight: 600 }}>共有ボタン</span>（□に↑のアイコン）をタップ
-          </div>
-          <div style={Step}>
-            2. メニューを下にスクロールして <span style={{ fontWeight: 600 }}>「ホーム画面に追加」</span> をタップ
-          </div>
-          <div style={{ ...Step, borderBottom: 'none' }}>
-            3. 右上の <span style={{ fontWeight: 600 }}>「追加」</span> をタップ
-          </div>
+        <div style={{ fontSize: 13, lineHeight: 1.7, color: C.textSub }}>
+          画面下の共有ボタン → 「ホーム画面に追加」→ 「追加」
         </div>
       </div>
     );
   }
-
   if (platform.isAndroid && canPrompt) {
     return (
-      <div style={BoxBase}>
-        {CloseBtn}
-        <div style={Heading}>
+      <div style={box}>{close}
+        <div style={{ fontSize: 10, letterSpacing: 2, color: C.goldDim, fontWeight: 700, marginBottom: 6 }}>
           ホーム画面に追加してアプリっぽく使う
         </div>
-        <p style={{ ...Body, marginBottom: 14 }}>
-          毎回URLを踏まなくて済みます。一発で終わります。
-        </p>
         <button
           onClick={async () => { const ok = await trigger(); if (ok) setDismissed(true); }}
-          style={{ padding: '10px 20px', background: INK, color: '#fff', border: 'none', borderRadius: 4, fontSize: 14, cursor: 'pointer', letterSpacing: '0.05em' }}
+          style={{ marginTop: 6, padding: '8px 16px', background: C.text, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, cursor: 'pointer' }}
         >
           ホーム画面に追加
         </button>
       </div>
     );
   }
-
   if (platform.isAndroid) {
     return (
-      <div style={BoxBase}>
-        {CloseBtn}
-        <div style={Heading}>
+      <div style={box}>{close}
+        <div style={{ fontSize: 10, letterSpacing: 2, color: C.goldDim, fontWeight: 700, marginBottom: 6 }}>
           ホーム画面に追加してアプリっぽく使う
         </div>
-        <p style={Body}>
-          ブラウザ右上のメニュー（︙）から <span style={{ fontWeight: 600 }}>「アプリをインストール」</span> または <span style={{ fontWeight: 600 }}>「ホーム画面に追加」</span> をタップしてください。
-        </p>
+        <div style={{ fontSize: 13, lineHeight: 1.7, color: C.textSub }}>
+          ブラウザ右上のメニュー（︙） → 「アプリをインストール」または「ホーム画面に追加」
+        </div>
       </div>
     );
   }
-
   return null;
 }
 
-type RosterRow = {
-  slug: string | null;
-  displayName: string;
-  isAuthor: boolean;
-  isSelf: boolean;
-  todayRec?: Recording;
-};
-
+// ─── Main ───
 function LifeMemberInner() {
   const searchParams = useSearchParams();
+  const now = new Date();
+
   const [slug, setSlug] = useState<string | null>(null);
   const [name, setName] = useState<string>('');
   const [nameInput, setNameInput] = useState<string>('');
+  const [showNameEdit, setShowNameEdit] = useState(false);
+
+  const [viewYear, setViewYear] = useState(now.getFullYear());
+  const [viewMonth, setViewMonth] = useState(now.getMonth());
+  const [selectedDate, setSelectedDate] = useState<Date>(now);
   const [recordings, setRecordings] = useState<Recording[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   const [isRecording, setIsRecording] = useState(false);
   const [interim, setInterim] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [justSubmitted, setJustSubmitted] = useState(false);
-  const [showMyPage, setShowMyPage] = useState(false);
-
   const recognitionRef = useRef<any>(null);
   const sessionFinalsRef = useRef<string[]>([]);
   const priorSessionsTextRef = useRef<string>('');
   const userStoppedRef = useRef<boolean>(false);
 
+  const [activeExpr, setActiveExpr] = useState<Record<string, number>>({});
+
   useMembersPWA();
 
+  // Identity bootstrap
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const urlSlug = searchParams?.get('m');
-    const saved = typeof window !== 'undefined' ? localStorage.getItem(SLUG_KEY) : null;
-    const resolved = urlSlug || saved;
-    if (resolved) {
-      setSlug(resolved);
-      try { localStorage.setItem(SLUG_KEY, resolved); } catch { /* */ }
-    }
+    const saved = localStorage.getItem(SLUG_KEY);
+    let resolved = urlSlug || saved;
+    if (!resolved) resolved = randomSlug();
+    setSlug(resolved);
+    try { localStorage.setItem(SLUG_KEY, resolved); } catch { /* */ }
     try {
       const savedName = localStorage.getItem(NAME_KEY);
       if (savedName) setName(savedName);
     } catch { /* */ }
   }, [searchParams]);
 
-  const fetchAll = useCallback(async () => {
-    if (!slug) return;
-    setLoading(true);
+  // Fetch
+  const fetchRecordings = useCallback(async () => {
     try {
       const res = await fetch('/api/life-recordings');
       const data = await res.json();
       if (data.success) setRecordings(data.recordings || []);
     } catch { /* */ }
     setLoading(false);
-  }, [slug]);
-
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  }, []);
+  useEffect(() => { fetchRecordings(); }, [fetchRecordings]);
 
   const saveName = () => {
     const trimmed = nameInput.trim();
-    if (!trimmed) return;
     setName(trimmed);
-    try { localStorage.setItem(NAME_KEY, trimmed); } catch { /* */ }
-  };
-
-  const submitRecording = async (text: string) => {
-    if (!text.trim() || !slug) return;
-    setSubmitting(true);
     try {
-      const res = await fetch('/api/life-recordings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          japanese: text.trim(),
-          member_slug: slug,
-          member_name: name || null,
-        }),
-      });
-      const data = await res.json();
-      if (data.success && data.recording) {
-        setRecordings(prev => [data.recording, ...prev]);
-        setJustSubmitted(true);
-        setTimeout(() => setJustSubmitted(false), 4000);
-      }
+      if (trimmed) localStorage.setItem(NAME_KEY, trimmed);
+      else localStorage.removeItem(NAME_KEY);
     } catch { /* */ }
-    setSubmitting(false);
+    setShowNameEdit(false);
   };
 
+  // Derived
+  const selectedDateStr = toDateStr(selectedDate);
+  const dayRecordings = useMemo(() =>
+    recordings.filter(r => r.created_at.startsWith(selectedDateStr)),
+    [recordings, selectedDateStr]
+  );
+  const myRecordings = useMemo(
+    () => recordings.filter(r => r.member_slug === slug),
+    [recordings, slug]
+  );
+  const pendingCount = myRecordings.filter(r => r.status === 'pending').length;
+  const convertedCount = myRecordings.filter(r => r.status === 'converted').length;
+  const isToday = (d: Date) => toDateStr(d) === toDateStr(now);
+
+  const daysInMonth = getDaysInMonth(viewYear, viewMonth);
+  const firstDay = getFirstDayOfWeek(viewYear, viewMonth);
+  const recordingDates = useMemo(() => {
+    const map: Record<string, { total: number; converted: number }> = {};
+    recordings.forEach(r => {
+      const d = r.created_at.split('T')[0];
+      if (!map[d]) map[d] = { total: 0, converted: 0 };
+      map[d].total++;
+      if (r.status === 'converted') map[d].converted++;
+    });
+    return map;
+  }, [recordings]);
+
+  // Navigation
+  const goToDate = (d: Date) => setSelectedDate(d);
+  const prevDay = () => { const d = new Date(selectedDate); d.setDate(d.getDate() - 1); goToDate(d); };
+  const nextDay = () => { const d = new Date(selectedDate); d.setDate(d.getDate() + 1); goToDate(d); };
+  const goToday = () => { goToDate(new Date()); setViewYear(now.getFullYear()); setViewMonth(now.getMonth()); };
+  const prevMonth = () => { if (viewMonth === 0) { setViewYear(viewYear - 1); setViewMonth(11); } else setViewMonth(viewMonth - 1); };
+  const nextMonth = () => { if (viewMonth === 11) { setViewYear(viewYear + 1); setViewMonth(0); } else setViewMonth(viewMonth + 1); };
+
+  // Voice
   const startRecording = () => {
     if (typeof window === 'undefined') return;
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -406,7 +379,7 @@ function LifeMemberInner() {
             startSession();
             priorSessionsTextRef.current += sessionText;
             return;
-          } catch { /* fallthrough */ }
+          } catch { /* */ }
         }
         const raw = (priorSessionsTextRef.current + sessionText).trim();
         const fullText = dedupAdjacentRepeats(raw);
@@ -423,7 +396,6 @@ function LifeMemberInner() {
     startSession();
     setIsRecording(true);
   };
-
   const stopRecording = () => {
     userStoppedRef.current = true;
     if (recognitionRef.current) {
@@ -431,524 +403,521 @@ function LifeMemberInner() {
     }
   };
 
-  const today = getTodayJST();
-  const yesterday = getYesterdayJST();
-  const todayJP = formatJSTDateJP(today);
-  const yesterdayJP = formatJSTDateJP(yesterday);
+  // Submit
+  const submitRecording = async (text: string) => {
+    if (!text.trim() || !slug) return;
+    try {
+      const res = await fetch('/api/life-recordings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          japanese: text.trim(),
+          member_slug: slug,
+          member_name: name || null,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.recording) setRecordings(prev => [data.recording, ...prev]);
+    } catch { /* */ }
+  };
 
-  const myRecordings = useMemo(
-    () => recordings.filter(r => r.member_slug === slug),
-    [recordings, slug]
-  );
+  // Delete (own only)
+  const deleteRecording = async (id: string) => {
+    try {
+      await fetch('/api/life-recordings', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      setRecordings(prev => prev.filter(r => r.id !== id));
+    } catch { /* */ }
+  };
 
-  const todayRecs = useMemo(
-    () => recordings.filter(r => r.created_at.startsWith(today)),
-    [recordings, today]
-  );
+  // TTS
+  const speak = (text: string) => {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  };
 
-  const yesterdayConverted = useMemo(
-    () => recordings
-      .filter(r => r.created_at.startsWith(yesterday) && r.status === 'converted')
-      .sort((a, b) => a.created_at.localeCompare(b.created_at)),
-    [recordings, yesterday]
-  );
-
-  const rosterRows = useMemo<RosterRow[]>(() => {
-    return LIFE_ROSTER.map(m => {
-      const namedRec = recordings.find(r => r.member_slug === m.slug && r.member_name);
-      let displayName = namedRec?.member_name || m.defaultName;
-      if (m.slug === slug && name) displayName = name;
-      const todayRec = todayRecs.find(r => r.member_slug === m.slug);
-      return {
-        slug: m.slug,
-        displayName,
-        isAuthor: m.isAuthor,
-        isSelf: m.slug === slug,
-        todayRec,
-      };
-    });
-  }, [recordings, todayRecs, slug, name]);
-
-  const orderedRoster = useMemo(() => {
-    const self = rosterRows.filter(r => r.isSelf);
-    const others = rosterRows.filter(r => !r.isSelf);
-    return [...self, ...others];
-  }, [rosterRows]);
-
-  const filledToday = todayRecs.length;
-  const isNewcomer = !loading && myRecordings.length === 0;
-  const hasRecordedToday = rosterRows.some(r => r.isSelf && r.todayRec);
-
-  const bookPageCount = recordings.length;
-  const sortedByDate = useMemo(
-    () => [...recordings].sort((a, b) => a.created_at.localeCompare(b.created_at)),
-    [recordings]
-  );
-  const firstEntry = sortedByDate[0];
-  const latestEntry = sortedByDate[sortedByDate.length - 1];
-
-  const mySorted = useMemo(
-    () => [...myRecordings].sort((a, b) => b.created_at.localeCompare(a.created_at)),
-    [myRecordings]
-  );
+  const displayName = name || '匿名';
 
   if (!slug) {
-    return (
-      <div style={{ minHeight: '100vh', background: BG, fontFamily: SANS, color: TEXT, padding: '80px 24px', display: 'flex', justifyContent: 'center' }}>
-        <div style={{ maxWidth: 520, width: '100%' }}>
-          <div style={{ fontSize: 11, letterSpacing: '0.3em', color: FAINT, fontWeight: 500, marginBottom: 32 }}>
-            TONIO LAB / MEMBERSHIP / LIFE
-          </div>
-          <h1 style={{ fontFamily: SERIF, fontSize: 32, lineHeight: 1.3, color: INK, margin: 0, marginBottom: 16, fontWeight: 400 }}>
-            メンバー用のリンクから入ってください
-          </h1>
-          <p style={{ fontSize: 15, lineHeight: 1.9, color: TEXT, margin: 0, marginBottom: 24 }}>
-            このページは、とにおからLINEで配られた専用URL（<code style={{ fontFamily: 'monospace', fontSize: 13, color: INK }}>?m=あなたの名前</code>付き）から開いてください。
-          </p>
-          <p style={{ fontSize: 14, lineHeight: 1.9, color: MUTE, margin: 0 }}>
-            URL が分からない場合はとにおに聞いてください。
-          </p>
-        </div>
-      </div>
-    );
+    return <div style={{ minHeight: '100vh', background: C.bg }} />;
   }
 
-  const selfDisplayName = rosterRows.find(r => r.isSelf)?.displayName || name || '—';
-
   return (
-    <div style={{ minHeight: '100vh', background: BG, fontFamily: SANS, color: TEXT }}>
-      {/* Book header */}
-      <div style={{ borderBottom: `1px solid ${LINE}`, padding: '16px 24px', background: '#fff' }}>
-        <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <div style={{ fontSize: 10, letterSpacing: '0.3em', color: FAINT, fontWeight: 500, flexShrink: 0 }}>
-            LIFE
-          </div>
-          <div style={{ fontFamily: SERIF, fontSize: 12, color: MUTE, letterSpacing: '0.15em', textAlign: 'center', flex: 1 }}>
-            VOL.1 · 2026
-          </div>
-          <div style={{ fontSize: 11, color: MUTE, flexShrink: 0, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {selfDisplayName} · @{slug}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: 720, margin: '0 auto', padding: '28px 24px 120px' }}>
-        {/* Name prompt (first visit) */}
-        {!name && (
-          <div style={{ marginBottom: 32, padding: 20, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
-            <div style={{ fontFamily: SERIF, fontSize: 16, color: INK, marginBottom: 8 }}>
-              はじめまして。お名前を教えてください
-            </div>
-            <div style={{ fontSize: 13, color: MUTE, marginBottom: 16 }}>
-              この本に著者として載るときの名前。後で変えられる。
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <input
-                value={nameInput}
-                onChange={e => setNameInput(e.target.value)}
-                placeholder="例: 中田"
-                style={{ flex: 1, padding: '10px 14px', border: `1px solid ${LINE}`, borderRadius: 4, fontSize: 15, fontFamily: SANS }}
-              />
-              <button
-                onClick={saveName}
-                disabled={!nameInput.trim()}
-                style={{ padding: '10px 20px', background: INK, color: '#fff', border: 'none', borderRadius: 4, fontSize: 14, cursor: nameInput.trim() ? 'pointer' : 'not-allowed', opacity: nameInput.trim() ? 1 : 0.4 }}
-              >
-                決定
-              </button>
-            </div>
-          </div>
-        )}
-
-        <InstallBanner />
-
-        {/* Hero — adaptive */}
-        {isNewcomer ? (
-          <div style={{ marginBottom: 40 }}>
-            <h1 style={{ fontFamily: SERIF, fontSize: 30, lineHeight: 1.4, color: INK, margin: 0, marginBottom: 18, fontWeight: 400 }}>
-              6人で、<br />1冊の本を書いている。
-            </h1>
-            <p style={{ fontSize: 15, lineHeight: 1.95, color: TEXT, margin: 0, marginBottom: 16 }}>
-              1人1日1行。日本語で残した一言を、とにおが翌朝までに英語化する。5人 + とにお = 6人。この本の著者は、この6人だけ。
-            </p>
-            <p style={{ fontSize: 14, lineHeight: 1.9, color: MUTE, margin: 0 }}>
-              DeepLでもChatGPTでもない。ネイティブが同じ場面で実際に使う一言に、人力で変える。100人には配れない。5人だから回る。
-            </p>
-
-            {/* Example showcase (newcomer only) */}
-            <div style={{ marginTop: 28, padding: 24, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
-              <div style={{ fontSize: 10, letterSpacing: '0.25em', color: FAINT, fontWeight: 500, marginBottom: 14 }}>
-                例えば
-              </div>
-              <div style={{ fontFamily: SERIF, fontSize: 22, color: INK, marginBottom: 14 }}>
-                小春日和
-              </div>
-              <div style={{ paddingLeft: 14, borderLeft: `2px solid ${GOLD}`, fontSize: 16, color: TEXT, lineHeight: 1.7, marginBottom: 14 }}>
-                One of those warm days that sneak in when it should be cold.
-              </div>
-              <div style={{ fontSize: 13, color: MUTE, lineHeight: 1.8 }}>
-                季節がズレた温かさ。直訳はムリ。こういう感覚の日本語は、辞書にも翻訳ツールにもない。人力だけが出せる。
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div style={{ marginBottom: 32 }}>
-            <h1 style={{ fontFamily: SERIF, fontSize: 24, lineHeight: 1.45, color: INK, margin: 0, fontWeight: 400 }}>
-              {hasRecordedToday
-                ? '書いた。明朝、金色がつく。'
-                : '今日、6人で1ページ書こう。'}
-            </h1>
-          </div>
-        )}
-
-        {/* Today's Page — shared 6-row view */}
-        <div style={{ marginBottom: 40 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 18 }}>
-            <div style={{ fontFamily: SERIF, fontSize: 16, color: INK }}>
-              {todayJP}のページ
-            </div>
-            <div style={{ fontSize: 11, color: MUTE, letterSpacing: '0.15em', fontWeight: 500 }}>
-              {filledToday} / 6
-            </div>
-          </div>
-          {loading ? (
-            <div style={{ fontSize: 13, color: FAINT, padding: '16px 0' }}>読み込み中...</div>
-          ) : (
-            <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, overflow: 'hidden' }}>
-              {orderedRoster.map((row, i) => {
-                const rec = row.todayRec;
-                const rowBg = row.isSelf ? SELF_BG : '#fff';
-                const rowBorder = i === orderedRoster.length - 1 ? 'none' : `1px solid ${LINE}`;
-                const leftAccent = row.isSelf ? `3px solid ${GOLD}` : '3px solid transparent';
-                return (
-                  <div
-                    key={(row.slug || 'author') + '-' + i}
-                    style={{
-                      padding: '14px 16px 14px 13px',
-                      borderBottom: rowBorder,
-                      borderLeft: leftAccent,
-                      background: rowBg,
-                      display: 'flex',
-                      gap: 12,
-                      alignItems: 'flex-start',
-                    }}
-                  >
-                    <div style={{ flexShrink: 0, width: 14, marginTop: 3, textAlign: 'center' }}>
-                      {rec
-                        ? <span style={{ color: GOLD, fontSize: 12 }}>●</span>
-                        : <span style={{ color: FAINT, fontSize: 12 }}>○</span>}
-                    </div>
-                    <div style={{ flexShrink: 0, minWidth: 72, fontSize: 12, color: row.isSelf ? INK : TEXT, fontWeight: row.isSelf ? 500 : 400, marginTop: 2 }}>
-                      {row.displayName}{row.isAuthor ? <span style={{ color: GOLD, marginLeft: 4, fontSize: 10 }}>·編</span> : null}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      {rec ? (
-                        <>
-                          <div style={{ fontSize: 14, color: INK, lineHeight: 1.6, marginBottom: rec.status === 'converted' && rec.english_attitude ? 6 : 0, overflowWrap: 'anywhere' }}>
-                            {rec.japanese}
-                          </div>
-                          {rec.status === 'converted' && rec.english_attitude ? (
-                            <div style={{ fontSize: 13, color: TEXT, lineHeight: 1.65, paddingLeft: 10, borderLeft: `2px solid ${GOLD}`, marginTop: 6 }}>
-                              {rec.english_attitude}
-                            </div>
-                          ) : (
-                            <div style={{ fontSize: 11, color: FAINT, letterSpacing: '0.15em', marginTop: 4 }}>
-                              PENDING
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <div style={{ fontSize: 13, color: FAINT, lineHeight: 1.6 }}>
-                          {row.isSelf ? 'まだ書いてない' : '—'}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* REC */}
-        <div style={{ marginBottom: 16, padding: 32, background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, textAlign: 'center' }}>
+    <div style={{
+      minHeight: '100vh',
+      background: C.bg,
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+      maxWidth: 480, margin: '0 auto',
+      paddingBottom: 100,
+      color: C.text,
+    }}>
+      {/* ─── Header ─── */}
+      <div style={{
+        padding: '16px 16px 14px',
+        borderBottom: `1px solid ${C.border}`,
+        background: C.card,
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
+      }}>
+        <div>
+          <div style={{ fontSize: 9, letterSpacing: 3, color: C.textFaint, fontWeight: 600 }}>TONIO LAB</div>
           <button
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={submitting}
+            onClick={() => { setNameInput(name); setShowNameEdit(true); }}
             style={{
-              width: 140, height: 140, borderRadius: '50%',
-              background: isRecording ? '#DC2626' : INK,
-              color: '#fff', border: 'none',
-              fontSize: 15, fontWeight: 500, letterSpacing: '0.1em',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-              boxShadow: isRecording ? '0 0 0 8px rgba(220, 38, 38, 0.15)' : '0 2px 8px rgba(0,0,0,0.08)',
-              transition: 'all 0.2s',
-              opacity: submitting ? 0.5 : 1,
+              fontSize: 17, fontWeight: 800, marginTop: 2,
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: C.text,
+              fontFamily: 'inherit',
             }}
           >
-            {isRecording ? 'STOP' : submitting ? '...' : 'REC'}
+            <span style={{ color: C.gold }}>{displayName}</span>
+            <span style={{ fontSize: 10, marginLeft: 6, color: C.textFaint, fontWeight: 500 }}>編集</span>
           </button>
-          <div style={{ marginTop: 20, fontSize: 13, color: justSubmitted ? GOLD : MUTE, minHeight: 40, lineHeight: 1.6, transition: 'color 0.3s' }}>
-            {isRecording
-              ? (interim || '聞いてます...')
-              : submitting
-                ? '書いてる...'
-                : justSubmitted
-                  ? '書いた。明朝、金色がつく。'
-                  : hasRecordedToday
-                    ? '今日の1行、もう1つ足してもいい'
-                    : '今日のあんたの1行を書く'}
-          </div>
         </div>
-
-        {/* Prompt hints — only when idle and haven't recorded today */}
-        {!isRecording && !submitting && !hasRecordedToday && !justSubmitted && (
-          <div style={{ marginBottom: 40, display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'center' }}>
-            {['月極駐車場', 'ピンキリ', 'ないがしろにする', '自転車は降りてください', '車のドア少し開けて涼しい風'].map(s => (
-              <span key={s} style={{ fontSize: 11, padding: '5px 11px', background: '#fff', border: `1px solid ${LINE}`, borderRadius: 999, color: MUTE }}>
-                {s}
-              </span>
-            ))}
+        <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end' }}>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 9, letterSpacing: 1.5, color: C.textFaint, fontWeight: 700, marginBottom: 2 }}>録音</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: C.text, lineHeight: 1 }}>{myRecordings.length}</div>
           </div>
-        )}
-        {(hasRecordedToday || justSubmitted) && <div style={{ marginBottom: 40 }} />}
-
-        {/* Yesterday's Harvest — show-style reveal cards */}
-        {yesterdayConverted.length > 0 && (
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 14 }}>
-              <div style={{ fontFamily: SERIF, fontSize: 15, color: INK }}>
-                {yesterdayJP}、こうなった
-              </div>
-              <div style={{ fontSize: 10, letterSpacing: '0.25em', color: GOLD, fontWeight: 500 }}>
-                YESTERDAY
-              </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {yesterdayConverted.map((r) => {
-                const row = rosterRows.find(x => x.slug === r.member_slug);
-                const who = row?.displayName || r.member_name || '—';
-                const isAuthor = !r.member_slug;
-                const isMine = slug ? r.member_slug === slug : isAuthor;
-
-                return (
-                  <div key={r.id} style={{
-                    background: '#fff',
-                    borderRadius: 14,
-                    overflow: 'hidden',
-                    border: `1px solid ${isMine ? GOLD_BORDER : LINE}`,
-                    boxShadow: isMine ? '0 2px 12px rgba(212, 175, 55, 0.12)' : '0 1px 4px rgba(0,0,0,0.04)',
-                  }}>
-                    {/* HERO STRIP — whose voice */}
-                    <div style={{
-                      background: isMine
-                        ? 'linear-gradient(90deg, #FFFBEB 0%, #FEF3C7 100%)'
-                        : 'linear-gradient(90deg, #FAFAF9 0%, #F5F5F4 100%)',
-                      padding: '11px 16px 9px',
-                      borderBottom: `1px solid ${isMine ? GOLD_BORDER : LINE}`,
-                      display: 'flex', alignItems: 'baseline', gap: 10,
-                    }}>
-                      <span style={{
-                        fontSize: 9, letterSpacing: 3, fontWeight: 800,
-                        color: isMine ? GOLD_DIM : MUTE,
-                      }}>
-                        {isMine ? 'あんたの1行は' : '今回の1行は'}
-                      </span>
-                      <span style={{
-                        fontSize: 20, fontWeight: 900, lineHeight: 1,
-                        color: isMine ? GOLD_DIM : INK, letterSpacing: 0.5,
-                      }}>
-                        {who}
-                      </span>
-                      {isAuthor && (
-                        <span style={{ fontSize: 10, fontWeight: 700, color: GOLD_DIM }}>著者</span>
-                      )}
-                    </div>
-
-                    {/* JAPANESE — the quote */}
-                    <div style={{ padding: '18px 18px 4px', textAlign: 'center' }}>
-                      <div style={{
-                        fontSize: 10, color: FAINT, letterSpacing: 2.5,
-                        fontWeight: 700, marginBottom: 8,
-                      }}>
-                        こう言った
-                      </div>
-                      <div style={{
-                        fontFamily: SERIF, fontSize: 20, fontWeight: 700,
-                        color: INK, lineHeight: 1.5, letterSpacing: 0.3,
-                        overflowWrap: 'anywhere',
-                      }}>
-                        〝{r.japanese}〞
-                      </div>
-                    </div>
-
-                    {/* DRAMATIC ARROW */}
-                    <div style={{
-                      textAlign: 'center', padding: '12px 0 6px',
-                      position: 'relative',
-                    }}>
-                      <div style={{
-                        position: 'absolute', top: '50%', left: '14%', right: '14%',
-                        height: 1,
-                        background: `linear-gradient(90deg, transparent, ${GOLD_BORDER} 50%, transparent)`,
-                      }} />
-                      <span style={{
-                        position: 'relative', background: '#fff',
-                        padding: '4px 14px',
-                        fontSize: 10, letterSpacing: 3, fontWeight: 800,
-                        color: GOLD_DIM,
-                      }}>
-                        ▼ 英語にしたら ▼
-                      </span>
-                    </div>
-
-                    {/* ENGLISH — the reveal */}
-                    <div style={{
-                      margin: '0 14px 12px',
-                      padding: '16px 16px',
-                      background: `linear-gradient(135deg, ${GOLD_BG} 0%, #FEF9E7 100%)`,
-                      border: `1px solid ${GOLD_BORDER}`,
-                      borderRadius: 12,
-                      textAlign: 'center',
-                    }}>
-                      <div style={{
-                        fontSize: 18, fontWeight: 800, color: GOLD_DIM,
-                        lineHeight: 1.5, letterSpacing: 0.3,
-                      }}>
-                        {r.english_attitude}
-                      </div>
-                    </div>
-
-                    {/* WHY */}
-                    {r.context && (
-                      <div style={{
-                        margin: '0 14px 14px',
-                        background: BG, borderRadius: 10,
-                        padding: '11px 14px',
-                        borderLeft: `3px solid ${GOLD}`,
-                      }}>
-                        <div style={{
-                          fontSize: 9, letterSpacing: 2.5, color: GOLD_DIM,
-                          fontWeight: 800, marginBottom: 5,
-                        }}>
-                          なぜそうなるのか
-                        </div>
-                        <div style={{ fontSize: 12, color: TEXT, lineHeight: 1.8 }}>{r.context}</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 9, letterSpacing: 1.5, color: C.goldDim, fontWeight: 700, marginBottom: 2 }}>英語待ち</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: C.goldDim, lineHeight: 1 }}>{pendingCount}</div>
           </div>
-        )}
-
-        {/* Story So Far */}
-        {bookPageCount > 0 && !isNewcomer && (
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ fontSize: 10, letterSpacing: '0.25em', color: MUTE, fontWeight: 500, marginBottom: 14 }}>
-              STORY SO FAR
-            </div>
-            <div style={{ background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4, padding: 20 }}>
-              <div style={{ fontFamily: SERIF, fontSize: 15, color: INK, lineHeight: 1.8, marginBottom: 14 }}>
-                この本は今、<span style={{ color: GOLD, fontWeight: 500 }}>{bookPageCount}</span> 行目。
-              </div>
-              {firstEntry && (
-                <div style={{ fontSize: 12, color: MUTE, lineHeight: 1.8, marginBottom: 6 }}>
-                  最初の1行 · {firstEntry.created_at.slice(0, 10)} · {firstEntry.member_name || '—'} 「{firstEntry.japanese.slice(0, 30)}{firstEntry.japanese.length > 30 ? '…' : ''}」
-                </div>
-              )}
-              {latestEntry && latestEntry.id !== firstEntry?.id && (
-                <div style={{ fontSize: 12, color: MUTE, lineHeight: 1.8 }}>
-                  最新の1行 · {latestEntry.created_at.slice(0, 10)} · {latestEntry.member_name || '—'} 「{latestEntry.japanese.slice(0, 30)}{latestEntry.japanese.length > 30 ? '…' : ''}」
-                </div>
-              )}
-            </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 9, letterSpacing: 1.5, color: C.green, fontWeight: 700, marginBottom: 2 }}>完了</div>
+            <div style={{ fontSize: 22, fontWeight: 900, color: C.green, lineHeight: 1 }}>{convertedCount}</div>
           </div>
-        )}
-
-        {/* Your Page — collapsed */}
-        {myRecordings.length > 0 && (
-          <div style={{ marginBottom: 40 }}>
-            <button
-              onClick={() => setShowMyPage(v => !v)}
-              style={{
-                width: '100%', textAlign: 'left',
-                padding: '14px 16px',
-                background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4,
-                fontFamily: SANS, fontSize: 13, color: INK,
-                cursor: 'pointer',
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              }}
-            >
-              <span>
-                <span style={{ fontFamily: SERIF, fontSize: 15, marginRight: 10 }}>自分のページ</span>
-                <span style={{ color: MUTE, fontSize: 12 }}>{myRecordings.length} 行</span>
-              </span>
-              <span style={{ color: FAINT, fontSize: 14 }}>{showMyPage ? '閉じる' : '開く'}</span>
-            </button>
-            {showMyPage && (
-              <div style={{ marginTop: 2, background: '#fff', border: `1px solid ${LINE}`, borderTop: 'none', borderRadius: '0 0 4px 4px', padding: '4px 16px' }}>
-                {mySorted.slice(0, 30).map((r, i) => (
-                  <div key={r.id} style={{ padding: '12px 0', borderTop: i === 0 ? 'none' : `1px dashed ${LINE}` }}>
-                    <div style={{ fontSize: 11, color: FAINT, marginBottom: 4, letterSpacing: '0.05em' }}>
-                      {r.created_at.slice(0, 10)}
-                    </div>
-                    <div style={{ fontSize: 14, color: INK, lineHeight: 1.6, marginBottom: 6, overflowWrap: 'anywhere' }}>
-                      {r.japanese}
-                    </div>
-                    {r.status === 'converted' && r.english_attitude ? (
-                      <div style={{ fontSize: 13, color: TEXT, lineHeight: 1.65, paddingLeft: 10, borderLeft: `2px solid ${GOLD}` }}>
-                        {r.english_attitude}
-                      </div>
-                    ) : (
-                      <div style={{ fontSize: 11, color: FAINT, letterSpacing: '0.15em' }}>
-                        PENDING · 明朝までに金色がつく
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Why this exists */}
-        <details style={{ marginTop: 40, padding: '20px 24px', background: '#fff', border: `1px solid ${LINE}`, borderRadius: 4 }}>
-          <summary style={{ fontFamily: SERIF, fontSize: 16, color: INK, cursor: 'pointer', outline: 'none' }}>
-            なぜこれを作ったのか
-          </summary>
-          <div style={{ marginTop: 18, fontSize: 14, lineHeight: 1.95, color: TEXT }}>
-            <p style={{ margin: '0 0 14px' }}>
-              英語学習アプリの例文は、全部他人の人生。She went to the market を何回読んでも、自分が言いたい場面がこない。
-            </p>
-            <p style={{ margin: '0 0 14px' }}>
-              自分の日本語から始めれば、英語を見た瞬間、あ、これ俺が言いたかったやつだ、になる。身体に入る順番が逆だから。
-            </p>
-            <p style={{ margin: '0 0 14px' }}>
-              翻訳ツールは単語を正確に変換するけど、ネイティブが同じ場面で実際に使う一言は出してこない。小春日和を Indian summer と直訳するだけじゃ、あの感覚は伝わらない。
-            </p>
-            <p style={{ margin: '0 0 14px' }}>
-              だから、人力で、とにおが、一つ一つ考える。1人なら続かない。100人なら回せない。5人なら回せる。6人目は俺。
-            </p>
-            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 15, color: INK }}>
-              これはお前らに作ってあげる本じゃない。お前らと俺で書く本。
-            </p>
-          </div>
-        </details>
-
-        {/* Footer */}
-        <div style={{ marginTop: 40, fontSize: 12, color: FAINT, textAlign: 'center', lineHeight: 1.8 }}>
-          詰まったら、とにおにLINEで。スクショあるとベスト。
         </div>
       </div>
+
+      {/* ─── Name editor ─── */}
+      {showNameEdit && (
+        <div style={{ margin: '12px 12px 0', padding: 14, background: C.card, border: `1px solid ${C.border}`, borderRadius: 12 }}>
+          <div style={{ fontSize: 12, color: C.textDim, marginBottom: 10, lineHeight: 1.6 }}>
+            表示名を入力してください。空欄のままでも問題ありません。
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              value={nameInput}
+              onChange={e => setNameInput(e.target.value)}
+              placeholder="例: 中田 / 空欄で匿名"
+              style={{ flex: 1, padding: '10px 14px', border: `1px solid ${C.border}`, borderRadius: 8, fontSize: 14, fontFamily: 'inherit' }}
+            />
+            <button
+              onClick={saveName}
+              style={{ padding: '10px 18px', background: C.text, color: C.card, border: 'none', borderRadius: 8, fontSize: 13, cursor: 'pointer', fontWeight: 700 }}
+            >
+              決定
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Install banner ─── */}
+      <InstallBanner />
+
+      {/* ─── Day navigator ─── */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '6px 12px', background: C.card,
+        borderBottom: `1px solid ${C.borderLight}`,
+        marginTop: 12,
+      }}>
+        <button onClick={prevDay} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: C.textFaint, padding: '4px 12px' }}>&#8249;</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button onClick={goToday} style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontSize: 16, fontWeight: 800, color: C.text,
+          }}>
+            {selectedDate.getMonth() + 1}/{selectedDate.getDate()}
+          </button>
+          {isToday(selectedDate) && (
+            <span style={{
+              color: C.card, background: C.gold,
+              fontSize: 8, fontWeight: 800, letterSpacing: 1,
+              padding: '2px 6px', borderRadius: 4,
+            }}>TODAY</span>
+          )}
+          {dayRecordings.length > 0 && (
+            <span style={{
+              background: C.borderLight, padding: '2px 7px', borderRadius: 8,
+              fontSize: 10, color: C.textDim, fontWeight: 600,
+            }}>
+              {dayRecordings.length}
+            </span>
+          )}
+        </div>
+        <button onClick={nextDay} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: C.textFaint, padding: '4px 12px' }}>&#8250;</button>
+      </div>
+
+      {/* ─── Calendar ─── */}
+      <div style={{ background: C.card, padding: '14px 12px 14px', borderBottom: `1px solid ${C.border}` }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, padding: '0 4px' }}>
+          <button onClick={prevMonth} style={{ background: C.borderLight, border: 'none', cursor: 'pointer', fontSize: 18, color: C.textDim, padding: '4px 14px', borderRadius: 8, fontWeight: 700 }}>&#8249;</button>
+          <div style={{ fontSize: 17, fontWeight: 900, color: C.text, letterSpacing: 1 }}>
+            {viewYear}.{String(viewMonth + 1).padStart(2, '0')}
+          </div>
+          <button onClick={nextMonth} style={{ background: C.borderLight, border: 'none', cursor: 'pointer', fontSize: 18, color: C.textDim, padding: '4px 14px', borderRadius: 8, fontWeight: 700 }}>&#8250;</button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: 4 }}>
+          {WEEKDAYS.map((d, i) => (
+            <div key={i} style={{
+              fontSize: 11, color: i === 0 ? '#EF4444' : i === 6 ? '#3B82F6' : C.textFaint,
+              fontWeight: 700, letterSpacing: 1, padding: '4px 0',
+            }}>{d}</div>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3 }}>
+          {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} />)}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const cellDate = new Date(viewYear, viewMonth, day);
+            const cellKey = toDateStr(cellDate);
+            const isSelected = cellKey === toDateStr(selectedDate);
+            const isTodayCell = cellKey === toDateStr(now);
+            const dayData = recordingDates[cellKey];
+            const hasPending = dayData && dayData.total > dayData.converted;
+            const hasConverted = dayData && dayData.converted > 0;
+            return (
+              <button key={day} onClick={() => goToDate(cellDate)} style={{
+                width: '100%', aspectRatio: '1', border: isTodayCell && !isSelected ? `2px solid ${C.gold}` : `1px solid ${C.borderLight}`,
+                cursor: 'pointer',
+                borderRadius: 10,
+                background: isSelected ? C.text : C.card,
+                color: isSelected ? C.card : C.text,
+                fontSize: 16, fontWeight: isSelected || isTodayCell ? 900 : 600,
+                position: 'relative',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                padding: 0,
+                gap: 2,
+              }}>
+                <span>{day}</span>
+                {dayData && (
+                  <div style={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+                    {hasConverted && (
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: isSelected ? C.card : C.green }} />
+                    )}
+                    {hasPending && (
+                      <div style={{ width: 6, height: 6, borderRadius: '50%', background: isSelected ? C.card : C.gold }} />
+                    )}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <div style={{
+          display: 'flex', justifyContent: 'center', gap: 16,
+          marginTop: 12, paddingTop: 10, borderTop: `1px solid ${C.borderLight}`,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: C.gold }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: C.textDim, letterSpacing: 1 }}>英語待ち</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: C.green }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: C.textDim, letterSpacing: 1 }}>完了</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{ width: 10, height: 10, borderRadius: 3, border: `2px solid ${C.gold}` }} />
+            <span style={{ fontSize: 10, fontWeight: 700, color: C.textDim, letterSpacing: 1 }}>今日</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Recordings for selected day ─── */}
+      <div style={{ padding: '8px 12px' }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 40, color: C.textFaint, fontSize: 13 }}>...</div>
+        ) : dayRecordings.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ fontSize: 13, color: C.textDim, marginBottom: 4 }}>録音はありません</div>
+            <div style={{ fontSize: 11, color: C.textGhost }}>下のマイクから録音できます</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {dayRecordings.map(rec => {
+              const isConverted = rec.status === 'converted';
+              const active = activeExpr[rec.id] ?? 0;
+              const exprs = isConverted ? [rec.english_short, rec.english_attitude, rec.english_full].filter(Boolean) as string[] : [];
+              const exprColors = [C.text, C.gold, C.blue];
+
+              const isAuthor = !rec.member_slug;
+              const isMine = !isAuthor && rec.member_slug === slug;
+              const displayedName = isAuthor ? 'とにお' : (isMine ? (name || 'あなた') : (rec.member_name || '匿名'));
+              const roleLabel = isAuthor ? 'とにお' : (isMine ? 'あなた' : 'メンバー');
+              const highlight = isAuthor || isMine;
+
+              return (
+                <div key={rec.id} style={{
+                  background: C.card, borderRadius: 18, overflow: 'hidden',
+                  border: `1px solid ${highlight ? C.goldBorder : C.border}`,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                }}>
+                  {/* Hero strip */}
+                  <div style={{
+                    background: highlight
+                      ? 'linear-gradient(90deg, #FFFBEB 0%, #FEF3C7 100%)'
+                      : 'linear-gradient(90deg, #FAFAF9 0%, #F5F5F4 100%)',
+                    padding: '12px 16px 10px',
+                    borderBottom: `1px solid ${highlight ? C.goldBorder : C.border}`,
+                    display: 'flex', alignItems: 'baseline', gap: 10,
+                  }}>
+                    <span style={{
+                      fontSize: 9, letterSpacing: 3, fontWeight: 800,
+                      color: highlight ? C.goldDim : C.textDim,
+                    }}>
+                      今回の1行は
+                    </span>
+                    <span style={{
+                      fontSize: 22, fontWeight: 900, lineHeight: 1,
+                      color: highlight ? C.goldDim : C.text,
+                      letterSpacing: 0.5,
+                    }}>
+                      {displayedName}
+                    </span>
+                    <span style={{
+                      fontSize: 10, fontWeight: 700,
+                      color: highlight ? C.goldDim : C.textFaint,
+                    }}>
+                      {roleLabel}
+                    </span>
+                    <span style={{ flex: 1 }} />
+                    {isMine && (
+                      <button onClick={() => deleteRecording(rec.id)} style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        fontSize: 12, color: C.textGhost, padding: 0,
+                      }}>x</button>
+                    )}
+                  </div>
+
+                  {/* Japanese */}
+                  <div style={{ padding: '20px 18px 6px', textAlign: 'center' }}>
+                    <div style={{
+                      fontSize: 11, color: C.textFaint,
+                      letterSpacing: 2, fontWeight: 700, marginBottom: 8,
+                    }}>
+                      こう言った
+                    </div>
+                    <div style={{
+                      fontSize: 22, fontWeight: 800, color: C.text,
+                      lineHeight: 1.5, letterSpacing: 0.5,
+                      fontFamily: "'Noto Serif JP', 'Source Serif Pro', Georgia, serif",
+                    }}>
+                      〝{rec.japanese}〞
+                    </div>
+                  </div>
+
+                  {isConverted && exprs.length > 0 ? (
+                    <>
+                      {/* Arrow */}
+                      <div style={{
+                        textAlign: 'center', padding: '12px 0 6px',
+                        position: 'relative',
+                      }}>
+                        <div style={{
+                          position: 'absolute', top: '50%', left: '14%', right: '14%',
+                          height: 1, background: `linear-gradient(90deg, transparent, ${C.goldBorder} 50%, transparent)`,
+                        }} />
+                        <span style={{
+                          position: 'relative',
+                          background: C.card,
+                          padding: '4px 14px',
+                          fontSize: 10, letterSpacing: 3, fontWeight: 800,
+                          color: C.goldDim,
+                        }}>
+                          ▼ 英語にしたら ▼
+                        </span>
+                      </div>
+
+                      {/* English reveal */}
+                      <div
+                        onClick={() => speak(exprs[active])}
+                        style={{
+                          margin: '0 14px 12px',
+                          padding: '16px 16px',
+                          background: `linear-gradient(135deg, ${C.goldBg} 0%, #FEF9E7 100%)`,
+                          border: `1px solid ${C.goldBorder}`,
+                          borderRadius: 14,
+                          cursor: 'pointer',
+                          textAlign: 'center',
+                        }}
+                      >
+                        <div style={{
+                          fontSize: 20, fontWeight: 800,
+                          color: exprColors[active],
+                          lineHeight: 1.5, letterSpacing: 0.3,
+                        }}>
+                          {exprs[active]}
+                        </div>
+                        <div style={{
+                          fontSize: 9, color: C.textFaint, marginTop: 6,
+                          letterSpacing: 2, fontWeight: 600,
+                        }}>
+                          TAP TO HEAR
+                        </div>
+                      </div>
+
+                      {/* Level switcher */}
+                      <div style={{
+                        display: 'flex', gap: 4, justifyContent: 'center',
+                        padding: '0 14px 10px',
+                      }}>
+                        {exprs.map((_, i) => (
+                          <button key={i} onClick={() => setActiveExpr(prev => ({ ...prev, [rec.id]: i }))} style={{
+                            padding: '4px 10px', borderRadius: 999,
+                            border: i === active ? `1.5px solid ${exprColors[i]}` : `1px solid ${C.border}`,
+                            background: i === active ? exprColors[i] : 'transparent',
+                            color: i === active ? 'white' : C.textFaint,
+                            fontSize: 10, fontWeight: 700, letterSpacing: 1,
+                            cursor: 'pointer',
+                          }}>{['軽め', 'ふつう', 'ちゃんと'][i] || `L${i + 1}`}</button>
+                        ))}
+                      </div>
+
+                      {/* Why */}
+                      {rec.context && (
+                        <div style={{
+                          margin: '0 14px 14px',
+                          background: C.bg, borderRadius: 12,
+                          padding: '12px 14px',
+                          borderLeft: `3px solid ${C.gold}`,
+                        }}>
+                          <div style={{
+                            fontSize: 9, letterSpacing: 2.5, color: C.goldDim,
+                            fontWeight: 800, marginBottom: 5,
+                          }}>
+                            なぜそうなるのか
+                          </div>
+                          <div style={{ fontSize: 12, color: C.textSub, lineHeight: 1.8 }}>{rec.context}</div>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div style={{ padding: '6px 14px 16px', textAlign: 'center' }}>
+                      <div style={{
+                        fontSize: 11, color: C.goldDim, fontWeight: 700,
+                        background: C.goldBg, padding: '6px 14px', borderRadius: 999,
+                        border: `1px solid ${C.goldBorder}`,
+                        display: 'inline-block',
+                        letterSpacing: 1.5,
+                      }}>
+                        あとでとにおが英語にします
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ─── Fixed mic button ─── */}
+      <div style={{
+        position: 'fixed',
+        bottom: 'max(28px, env(safe-area-inset-bottom, 28px))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1000,
+      }}>
+        <button onClick={isRecording ? stopRecording : startRecording} style={{
+          width: 88, height: 88, borderRadius: '50%',
+          border: 'none', cursor: 'pointer',
+          background: isRecording
+            ? `linear-gradient(135deg, ${C.red}, #EF4444)`
+            : `linear-gradient(135deg, ${C.gold}, #F59E0B)`,
+          color: 'white',
+          boxShadow: isRecording
+            ? '0 6px 32px rgba(220,38,38,0.45)'
+            : '0 6px 32px rgba(212,175,55,0.4)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.2s ease',
+          animation: isRecording ? 'micPulse 1s infinite' : 'none',
+        }}>
+          {isRecording ? (
+            <div style={{ width: 24, height: 24, borderRadius: 5, background: 'white' }} />
+          ) : (
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="white" stroke="none">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="12" y1="19" x2="12" y2="23" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          )}
+        </button>
+        {pendingCount > 0 && !isRecording && (
+          <div style={{
+            position: 'absolute', top: -2, right: -2,
+            background: C.red, color: 'white',
+            width: 24, height: 24, borderRadius: '50%',
+            fontSize: 11, fontWeight: 700,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            border: `2px solid ${C.bg}`,
+          }}>
+            {pendingCount}
+          </div>
+        )}
+      </div>
+
+      {/* ─── Recording overlay ─── */}
+      {isRecording && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 999,
+          background: 'rgba(250,250,249,0.97)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          padding: 32,
+        }}
+          onClick={stopRecording}
+        >
+          <div style={{ display: 'flex', gap: 5, marginBottom: 40 }}>
+            {[0, 1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} style={{
+                width: 4, borderRadius: 2, background: C.gold,
+                animation: `waveBar 0.8s ease-in-out ${i * 0.1}s infinite alternate`,
+              }} />
+            ))}
+          </div>
+
+          <div style={{
+            color: C.text, fontSize: 24, fontWeight: 800,
+            textAlign: 'center', lineHeight: 1.5,
+            minHeight: 60, maxWidth: '85vw',
+          }}>
+            {interim || '...'}
+          </div>
+
+          <div style={{
+            color: C.textFaint, fontSize: 11, marginTop: 32,
+            letterSpacing: 2, fontWeight: 600,
+          }}>
+            TAP TO STOP
+          </div>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes micPulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.08); }
+        }
+        @keyframes waveBar {
+          0% { height: 8px; }
+          100% { height: 44px; }
+        }
+      `}</style>
     </div>
   );
 }
 
 export default function LifeMemberPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: BG }} />}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: C.bg }} />}>
       <LifeMemberInner />
     </Suspense>
   );
