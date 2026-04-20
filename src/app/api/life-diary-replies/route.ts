@@ -42,12 +42,18 @@ export async function GET(request: Request) {
         const url = new URL(request.url);
 
         if (url.searchParams.get('counts') === 'true') {
-            const result = await queryD1<{ diary_date: string; n: number }>(
-                'SELECT diary_date, COUNT(*) as n FROM life_diary_replies GROUP BY diary_date'
+            const result = await queryD1<{ diary_date: string; n: number; latest_admin: string | null }>(
+                `SELECT diary_date, COUNT(*) as n,
+                        MAX(CASE WHEN member_slug IS NULL THEN created_at END) as latest_admin
+                 FROM life_diary_replies GROUP BY diary_date`
             );
             const counts: Record<string, number> = {};
-            result.results.forEach(r => { counts[r.diary_date] = r.n; });
-            return NextResponse.json({ success: true, counts });
+            const adminLatest: Record<string, string> = {};
+            result.results.forEach(r => {
+                counts[r.diary_date] = r.n;
+                if (r.latest_admin) adminLatest[r.diary_date] = r.latest_admin;
+            });
+            return NextResponse.json({ success: true, counts, adminLatest });
         }
 
         const date = url.searchParams.get('date');

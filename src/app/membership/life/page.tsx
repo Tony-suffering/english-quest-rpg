@@ -281,6 +281,8 @@ function LifeMemberInner() {
   const [replyInput, setReplyInput] = useState<string>('');
   const [replySubmitting, setReplySubmitting] = useState(false);
   const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
+  const [adminLatest, setAdminLatest] = useState<Record<string, string>>({});
+  const [readMap, setReadMap] = useState<Record<string, string>>({});
   const [isReplyRecording, setIsReplyRecording] = useState(false);
   const [replyInterim, setReplyInterim] = useState('');
   const replyRecognitionRef = useRef<any>(null);
@@ -363,10 +365,31 @@ function LifeMemberInner() {
     try {
       const res = await fetch('/api/life-diary-replies?counts=true');
       const data = await res.json();
-      if (data.success) setReplyCounts(data.counts || {});
+      if (data.success) {
+        setReplyCounts(data.counts || {});
+        setAdminLatest(data.adminLatest || {});
+      }
     } catch { /* */ }
   }, []);
   useEffect(() => { fetchReplyCounts(); }, [fetchReplyCounts]);
+
+  const READ_MAP_KEY = 'tonio-life-reply-read-map';
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(READ_MAP_KEY);
+      if (raw) setReadMap(JSON.parse(raw));
+    } catch { /* */ }
+  }, []);
+  const markDateRead = useCallback((date: string) => {
+    setReadMap(prev => {
+      const next = { ...prev, [date]: new Date().toISOString() };
+      try { localStorage.setItem(READ_MAP_KEY, JSON.stringify(next)); } catch { /* */ }
+      return next;
+    });
+  }, []);
+  useEffect(() => {
+    if (adminLatest[selectedDateStr]) markDateRead(selectedDateStr);
+  }, [selectedDateStr, adminLatest, markDateRead]);
 
   const fetchReplies = useCallback(async (date: string) => {
     try {
@@ -779,6 +802,9 @@ function LifeMemberInner() {
             const hasConverted = dayData && dayData.converted > 0;
             const hasDiary = diaryDates.has(cellKey);
             const rCount = replyCounts[cellKey] || 0;
+            const adminAt = adminLatest[cellKey];
+            const readAt = readMap[cellKey];
+            const hasUnreadAdmin = !!adminAt && (!readAt || adminAt > readAt);
             return (
               <button key={day} onClick={() => goToDate(cellDate)} style={{
                 width: '100%', aspectRatio: '1', border: isTodayCell && !isSelected ? `2px solid ${C.gold}` : `1px solid ${C.borderLight}`,
@@ -808,6 +834,14 @@ function LifeMemberInner() {
                     color: isSelected ? C.card : C.textDim,
                     letterSpacing: 0,
                   }}>{rCount}</span>
+                )}
+                {hasUnreadAdmin && (
+                  <span style={{
+                    position: 'absolute', bottom: 2, right: 2,
+                    width: 7, height: 7, borderRadius: '50%',
+                    background: '#EF4444',
+                    boxShadow: '0 0 0 1.5px ' + (isSelected ? C.text : C.card),
+                  }} />
                 )}
                 <span>{day}</span>
                 {dayData && (
