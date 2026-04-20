@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 // ─── PWA ───
 function useMembersPWA() {
@@ -465,6 +466,10 @@ function LifeMemberInner() {
         display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
       }}>
         <div>
+          <Link href="/membership" style={{
+            fontSize: 10, letterSpacing: 1.5, color: C.textFaint, textDecoration: 'none',
+            fontWeight: 600, display: 'inline-block', marginBottom: 4,
+          }}>&#8592; MEMBERSHIP</Link>
           <div style={{ fontSize: 9, letterSpacing: 3, color: C.textFaint, fontWeight: 600 }}>TONIO LAB</div>
           <button
             onClick={() => { setNameInput(name); setShowNameEdit(true); }}
