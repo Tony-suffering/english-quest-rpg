@@ -485,9 +485,20 @@ export default function LifeAdminPage() {
                         {/* Form */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                           <div>
-                            <label style={fieldLabel}>ENGLISH — ネイティブが実際に言うやつ</label>
+                            <label style={fieldLabel}>① ストレート — 直球の訳</label>
                             <input
-                              placeholder="how a native would actually say it"
+                              placeholder="単語・構造対応の素直な訳"
+                              value={d.english_short ?? ''}
+                              onChange={e => updateDraft(r.id, { english_short: e.target.value })}
+                              onKeyDown={handleKey(r)}
+                              style={inputStyle()}
+                            />
+                          </div>
+
+                          <div>
+                            <label style={fieldLabel}>② ネイティブ口癖 — 実生活で出るやつ (必須)</label>
+                            <input
+                              placeholder="映画・ドラマで拾えるようなネイティブの決まり文句"
                               value={d.english_attitude ?? ''}
                               onChange={e => updateDraft(r.id, { english_attitude: e.target.value })}
                               onKeyDown={handleKey(r)}
@@ -497,9 +508,20 @@ export default function LifeAdminPage() {
                           </div>
 
                           <div>
+                            <label style={fieldLabel}>③ クセ強 — とにお流 (皮肉・大げさ・メタ・文学)</label>
+                            <input
+                              placeholder="俺の個性で味つけした一言"
+                              value={d.english_full ?? ''}
+                              onChange={e => updateDraft(r.id, { english_full: e.target.value })}
+                              onKeyDown={handleKey(r)}
+                              style={inputStyle()}
+                            />
+                          </div>
+
+                          <div>
                             <label style={fieldLabel}>CONTEXT — なぜそうなるのか、文脈、ニュアンス</label>
                             <textarea
-                              placeholder="文脈、ニュアンス、使える場面、他の言い方との違い"
+                              placeholder="文脈、ニュアンス、使える場面、3パターンの使い分け"
                               value={d.context ?? ''}
                               onChange={e => updateDraft(r.id, { context: e.target.value })}
                               onKeyDown={handleKey(r)}
@@ -510,20 +532,6 @@ export default function LifeAdminPage() {
 
                           {showOpt && (
                             <div style={{ display: 'flex', gap: 8 }}>
-                              <input
-                                placeholder="short (optional)"
-                                value={d.english_short ?? ''}
-                                onChange={e => updateDraft(r.id, { english_short: e.target.value })}
-                                onKeyDown={handleKey(r)}
-                                style={{ ...inputStyle(), flex: 1, fontSize: 13 }}
-                              />
-                              <input
-                                placeholder="full (optional)"
-                                value={d.english_full ?? ''}
-                                onChange={e => updateDraft(r.id, { english_full: e.target.value })}
-                                onKeyDown={handleKey(r)}
-                                style={{ ...inputStyle(), flex: 1, fontSize: 13 }}
-                              />
                               <input
                                 placeholder="category (optional)"
                                 value={d.category ?? ''}

@@ -722,7 +722,7 @@ function LifeMemberInner() {
                     <>
                       {/* Arrow */}
                       <div style={{
-                        textAlign: 'center', padding: '12px 0 6px',
+                        textAlign: 'center', padding: '12px 0 10px',
                         position: 'relative',
                       }}>
                         <div style={{
@@ -736,9 +736,54 @@ function LifeMemberInner() {
                           fontSize: 10, letterSpacing: 3, fontWeight: 800,
                           color: C.goldDim,
                         }}>
-                          ▼ 英語にしたら ▼
+                          ▼ 3パターンで英語化 ▼
                         </span>
                       </div>
+
+                      {/* Segmented control — pick the angle */}
+                      {(() => {
+                        const styleLabels = ['ストレート', 'ネイティブ', 'クセ強'];
+                        const styleSubs = ['直球の訳', '実生活の口癖', 'とにお流'];
+                        return (
+                          <div style={{
+                            display: 'flex', margin: '0 14px 10px',
+                            borderRadius: 12, overflow: 'hidden',
+                            border: `1px solid ${C.border}`,
+                          }}>
+                            {exprs.map((_, i) => {
+                              const isActive = i === active;
+                              return (
+                                <button
+                                  key={i}
+                                  onClick={() => setActiveExpr(prev => ({ ...prev, [rec.id]: i }))}
+                                  style={{
+                                    flex: 1,
+                                    padding: '10px 4px',
+                                    border: 'none',
+                                    borderLeft: i > 0 ? `1px solid ${C.border}` : 'none',
+                                    background: isActive ? exprColors[i] : C.card,
+                                    color: isActive ? 'white' : C.textDim,
+                                    cursor: 'pointer',
+                                    transition: 'background 0.15s, color 0.15s',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                                  }}
+                                >
+                                  <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5 }}>
+                                    {styleLabels[i] || `L${i + 1}`}
+                                  </span>
+                                  <span style={{
+                                    fontSize: 9, fontWeight: 600,
+                                    color: isActive ? 'rgba(255,255,255,0.85)' : C.textFaint,
+                                    letterSpacing: 0.5,
+                                  }}>
+                                    {styleSubs[i] || ''}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        );
+                      })()}
 
                       {/* English reveal */}
                       <div
@@ -766,23 +811,6 @@ function LifeMemberInner() {
                         }}>
                           TAP TO HEAR
                         </div>
-                      </div>
-
-                      {/* Level switcher */}
-                      <div style={{
-                        display: 'flex', gap: 4, justifyContent: 'center',
-                        padding: '0 14px 10px',
-                      }}>
-                        {exprs.map((_, i) => (
-                          <button key={i} onClick={() => setActiveExpr(prev => ({ ...prev, [rec.id]: i }))} style={{
-                            padding: '4px 10px', borderRadius: 999,
-                            border: i === active ? `1.5px solid ${exprColors[i]}` : `1px solid ${C.border}`,
-                            background: i === active ? exprColors[i] : 'transparent',
-                            color: i === active ? 'white' : C.textFaint,
-                            fontSize: 10, fontWeight: 700, letterSpacing: 1,
-                            cursor: 'pointer',
-                          }}>{['軽め', 'ふつう', 'ちゃんと'][i] || `L${i + 1}`}</button>
-                        ))}
                       </div>
 
                       {/* Why */}
