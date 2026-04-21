@@ -14,8 +14,12 @@ import { englishIndustryLiesEntry } from './english-industry-lies-entry';
 import { englishIndustryLightEntry } from './english-industry-light-entry';
 import { aiArmyComedyEntry } from './ai-army-comedy-entry';
 import { grindCalendarLaunchEntry } from './grind-calendar-launch-entry';
+import { lifeGodToolEntry } from './life-god-tool-entry';
+import { lifeSixCharactersEntry } from './life-six-characters-entry';
 
 export const april2026Entries: JournalEntry[] = [
+    lifeSixCharactersEntry,
+    lifeGodToolEntry,
     grindCalendarLaunchEntry,
     aiArmyComedyEntry,
     clientProfilePageEntry,

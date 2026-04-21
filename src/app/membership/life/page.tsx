@@ -96,6 +96,95 @@ const C = {
   textGhost: '#D6D3D1',
 };
 
+// ─── 3パターンのキャラクター (居酒屋TOEIC) ───
+// A=権藤マスター(TOEIC990/元講師→直球), B=リサ(帰国子女→実生活口癖), C=タケシ(日英混ぜ→クセ強)
+const PATTERN_CHARS = [
+  {
+    name: '権藤マスター',
+    role: 'ストレート',
+    sub: '直球の訳',
+    color: '#78716C',
+    colorDim: '#44403C',
+    bg: '#F5F5F4',
+    border: '#D6D3D1',
+    reaction: '構文通り、正確に訳した。会議でもメールでも、これで減点はない。',
+    initial: '権',
+    avatar: '/characters/master.webp',
+  },
+  {
+    name: 'リサ',
+    role: 'ネイティブ',
+    sub: '実生活の口癖',
+    color: '#EC4899',
+    colorDim: '#BE185D',
+    bg: '#FDF2F8',
+    border: '#FBCFE8',
+    reaction: "That's how we'd actually say it -- 友達に話す時、普通にこう出る。",
+    initial: 'リ',
+    avatar: '/characters/lisa.webp',
+  },
+  {
+    name: 'タケシ',
+    role: 'クセ強',
+    sub: 'とにお流',
+    color: '#3B82F6',
+    colorDim: '#1D4ED8',
+    bg: '#EFF6FF',
+    border: '#BFDBFE',
+    reaction: 'うん、これはもう日本語の匂いを残したまま英語にブチ込んだやつ。俺好き。',
+    initial: 'タ',
+    avatar: '/characters/takeshi.webp',
+  },
+] as const;
+
+// ─── 見守る3人(主人公・現場・Z世代) ───
+// A/B/C に対して、学習者/現場/SNS の角度でコメントする
+// reactions[0] = A, [1] = B, [2] = C に対する反応
+const SECONDARY_CHARS = [
+  {
+    name: 'ユキ',
+    role: '学習者',
+    color: '#D4AF37',
+    colorDim: '#B8971F',
+    bg: '#FFFBEB',
+    border: '#FDE68A',
+    avatar: '/characters/yuki.webp',
+    reactions: [
+      'こう正確に言えたら、会議で恥かかんのに…メモしとこ。',
+      'わ、ネイティブってこう言うんや!口に出して練習したい。',
+      'こんな言い回し、私には思いつかへん。面白い!',
+    ],
+  },
+  {
+    name: '健二',
+    role: '現場',
+    color: '#92400E',
+    colorDim: '#78350F',
+    bg: '#FEF3C7',
+    border: '#FCD34D',
+    avatar: '/characters/kenji.webp',
+    reactions: [
+      '文法的には完璧や。でも現場じゃ少し硬いかもな。',
+      'おお、これは伝わる。現場の外人にも使えそうや。',
+      '俺には分からんが、こっちの方が人間臭くてええな。',
+    ],
+  },
+  {
+    name: 'ミナ',
+    role: 'Z世代',
+    color: '#8B5CF6',
+    colorDim: '#6D28D9',
+    bg: '#F5F3FF',
+    border: '#DDD6FE',
+    avatar: '/characters/mina.webp',
+    reactions: [
+      'これ、ビジネスSlackでそのまま使うやつ〜',
+      'これSNSのDMで普通に投げれる!',
+      'えっ、これちょっと詩的でエモない?投稿したい。',
+    ],
+  },
+] as const;
+
 // ─── Install Banner ───
 type Platform = {
   isIOS: boolean;
@@ -683,16 +772,23 @@ function LifeMemberInner() {
             fontSize: 10, letterSpacing: 1.5, color: C.textFaint, textDecoration: 'none',
             fontWeight: 600, display: 'inline-block', marginBottom: 4,
           }}>&#8592; MEMBERSHIP</Link>
-          <div style={{ fontSize: 9, letterSpacing: 3, color: C.textFaint, fontWeight: 600 }}>TONIO LAB</div>
+          <div style={{ fontSize: 9, letterSpacing: 3, color: C.textFaint, fontWeight: 600 }}>YOUR LIFE IN ENGLISH</div>
+          <div style={{
+            fontSize: 20, fontWeight: 900, marginTop: 2, letterSpacing: 0.5,
+            fontFamily: "'Noto Serif JP', 'Source Serif Pro', Georgia, serif",
+            color: C.text,
+          }}>
+            <span style={{ color: C.gold }}>あなたの</span>人生
+          </div>
           <button
             onClick={() => { setNameInput(name); setShowNameEdit(true); }}
             style={{
-              fontSize: 17, fontWeight: 800, marginTop: 2,
-              background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: C.text,
+              fontSize: 13, fontWeight: 700, marginTop: 4,
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: C.textDim,
               fontFamily: 'inherit',
             }}
           >
-            <span style={{ color: C.gold }}>{displayName}</span>
+            <span style={{ color: C.goldDim }}>{displayName}</span>
             <span style={{ fontSize: 10, marginLeft: 6, color: C.textFaint, fontWeight: 500 }}>編集</span>
           </button>
         </div>
@@ -1082,7 +1178,7 @@ function LifeMemberInner() {
               const isConverted = rec.status === 'converted';
               const active = activeExpr[rec.id] ?? 0;
               const exprs = isConverted ? [rec.english_short, rec.english_attitude, rec.english_full].filter(Boolean) as string[] : [];
-              const exprColors = [C.text, C.gold, C.blue];
+              const activeChar = PATTERN_CHARS[Math.min(active, PATTERN_CHARS.length - 1)];
 
               const isAuthor = !rec.member_slug;
               const isMine = !isAuthor && rec.member_slug === slug;
@@ -1172,59 +1268,68 @@ function LifeMemberInner() {
                         </span>
                       </div>
 
-                      {/* Segmented control — pick the angle */}
-                      {(() => {
-                        const styleLabels = ['ストレート', 'ネイティブ', 'クセ強'];
-                        const styleSubs = ['直球の訳', '実生活の口癖', 'とにお流'];
-                        return (
-                          <div style={{
-                            display: 'flex', margin: '0 14px 10px',
-                            borderRadius: 12, overflow: 'hidden',
-                            border: `1px solid ${C.border}`,
-                          }}>
-                            {exprs.map((_, i) => {
-                              const isActive = i === active;
-                              return (
-                                <button
-                                  key={i}
-                                  onClick={() => setActiveExpr(prev => ({ ...prev, [rec.id]: i }))}
-                                  style={{
-                                    flex: 1,
-                                    padding: '10px 4px',
-                                    border: 'none',
-                                    borderLeft: i > 0 ? `1px solid ${C.border}` : 'none',
-                                    background: isActive ? exprColors[i] : C.card,
-                                    color: isActive ? 'white' : C.textDim,
-                                    cursor: 'pointer',
-                                    transition: 'background 0.15s, color 0.15s',
-                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                                  }}
-                                >
-                                  <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5 }}>
-                                    {styleLabels[i] || `L${i + 1}`}
-                                  </span>
-                                  <span style={{
-                                    fontSize: 9, fontWeight: 600,
-                                    color: isActive ? 'rgba(255,255,255,0.85)' : C.textFaint,
-                                    letterSpacing: 0.5,
-                                  }}>
-                                    {styleSubs[i] || ''}
-                                  </span>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        );
-                      })()}
+                      {/* Segmented control -- pick the character */}
+                      <div style={{
+                        display: 'flex', margin: '0 14px 10px',
+                        borderRadius: 12, overflow: 'hidden',
+                        border: `1px solid ${C.border}`,
+                      }}>
+                        {exprs.map((_, i) => {
+                          const ch = PATTERN_CHARS[Math.min(i, PATTERN_CHARS.length - 1)];
+                          const isActive = i === active;
+                          return (
+                            <button
+                              key={i}
+                              onClick={() => setActiveExpr(prev => ({ ...prev, [rec.id]: i }))}
+                              style={{
+                                flex: 1,
+                                padding: '10px 4px',
+                                border: 'none',
+                                borderLeft: i > 0 ? `1px solid ${C.border}` : 'none',
+                                background: isActive ? ch.color : C.card,
+                                color: isActive ? 'white' : C.textDim,
+                                cursor: 'pointer',
+                                transition: 'background 0.15s, color 0.15s',
+                                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+                              }}
+                            >
+                              <img
+                                src={ch.avatar}
+                                alt={ch.name}
+                                width={26}
+                                height={26}
+                                style={{
+                                  width: 26, height: 26, borderRadius: '50%',
+                                  objectFit: 'cover',
+                                  border: isActive
+                                    ? '2px solid rgba(255,255,255,0.9)'
+                                    : `2px solid ${ch.color}`,
+                                  background: C.card,
+                                }}
+                              />
+                              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.5 }}>
+                                {ch.role}
+                              </span>
+                              <span style={{
+                                fontSize: 9, fontWeight: 600,
+                                color: isActive ? 'rgba(255,255,255,0.85)' : C.textFaint,
+                                letterSpacing: 0.5,
+                              }}>
+                                {ch.sub}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
 
-                      {/* English reveal */}
+                      {/* English reveal -- character-colored */}
                       <div
                         onClick={() => speak(exprs[active])}
                         style={{
-                          margin: '0 14px 12px',
+                          margin: '0 14px 10px',
                           padding: '16px 16px',
-                          background: `linear-gradient(135deg, ${C.goldBg} 0%, #FEF9E7 100%)`,
-                          border: `1px solid ${C.goldBorder}`,
+                          background: `linear-gradient(135deg, ${activeChar.bg} 0%, #FFFFFF 100%)`,
+                          border: `1px solid ${activeChar.border}`,
                           borderRadius: 14,
                           cursor: 'pointer',
                           textAlign: 'center',
@@ -1232,7 +1337,7 @@ function LifeMemberInner() {
                       >
                         <div style={{
                           fontSize: 20, fontWeight: 800,
-                          color: exprColors[active],
+                          color: activeChar.colorDim,
                           lineHeight: 1.5, letterSpacing: 0.3,
                         }}>
                           {exprs[active]}
@@ -1242,6 +1347,87 @@ function LifeMemberInner() {
                           letterSpacing: 2, fontWeight: 600,
                         }}>
                           TAP TO HEAR
+                        </div>
+                      </div>
+
+                      {/* Character reaction banner */}
+                      <div style={{
+                        margin: '0 14px 12px',
+                        padding: '10px 12px',
+                        background: activeChar.bg,
+                        border: `1px dashed ${activeChar.border}`,
+                        borderRadius: 10,
+                        display: 'flex', alignItems: 'flex-start', gap: 10,
+                      }}>
+                        <img
+                          src={activeChar.avatar}
+                          alt={activeChar.name}
+                          width={30}
+                          height={30}
+                          style={{
+                            flexShrink: 0,
+                            width: 30, height: 30, borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: `2px solid ${activeChar.color}`,
+                            background: C.card,
+                          }}
+                        />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{
+                            fontSize: 9, letterSpacing: 2, fontWeight: 800,
+                            color: activeChar.colorDim, marginBottom: 3,
+                          }}>{activeChar.name} — {activeChar.role}</div>
+                          <div style={{
+                            fontSize: 12, color: C.textSub, lineHeight: 1.6,
+                          }}>{activeChar.reaction}</div>
+                        </div>
+                      </div>
+
+                      {/* 居酒屋の反応 — 残り3人の視点 */}
+                      <div style={{ margin: '0 14px 14px' }}>
+                        <div style={{
+                          fontSize: 9, letterSpacing: 2.5, color: C.textFaint,
+                          fontWeight: 800, marginBottom: 8, textAlign: 'center',
+                        }}>
+                          — 居酒屋の反応 —
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                          {SECONDARY_CHARS.map(sc => (
+                            <div key={sc.name} style={{
+                              display: 'flex', alignItems: 'flex-start', gap: 10,
+                              padding: '8px 10px',
+                              background: sc.bg,
+                              border: `1px solid ${sc.border}`,
+                              borderRadius: 10,
+                            }}>
+                              <img
+                                src={sc.avatar}
+                                alt={sc.name}
+                                width={26}
+                                height={26}
+                                style={{
+                                  flexShrink: 0,
+                                  width: 26, height: 26, borderRadius: '50%',
+                                  objectFit: 'cover',
+                                  border: `2px solid ${sc.color}`,
+                                  background: C.card,
+                                }}
+                              />
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{
+                                  fontSize: 9, fontWeight: 800, letterSpacing: 1,
+                                  color: sc.colorDim, marginBottom: 2,
+                                }}>
+                                  {sc.name} ({sc.role})
+                                </div>
+                                <div style={{
+                                  fontSize: 11, color: C.textSub, lineHeight: 1.55,
+                                }}>
+                                  {sc.reactions[active] ?? sc.reactions[0]}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
