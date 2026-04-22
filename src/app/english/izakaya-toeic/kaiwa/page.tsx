@@ -22,6 +22,7 @@ import DailyQuests, { type QuestTier } from '@/components/english/DailyQuests';
 import QuestCelebration from '@/components/english/QuestCelebration';
 import { addPhrase } from '@/lib/local-store';
 import DailyConversationPlayer from '@/components/english/DailyConversationPlayer';
+import TodayOthersStrip from '@/components/english/TodayOthersStrip';
 import { getConversation } from '@/data/english/365/daily-conversations';
 import Link from 'next/link';
 import { theJobEntries } from '@/data/english/365-the-job';
@@ -1357,6 +1358,9 @@ export default function EnglishMaster365Page() {
                     </Link>
                         );
                     })()}
+
+                    {/* Cross-surface: ヨミクエ / リスクエ / Harvest */}
+                    <TodayOthersStrip />
 
                     {/* 4-Level Demo */}
                     <div style={{ marginBottom: 12 }}>

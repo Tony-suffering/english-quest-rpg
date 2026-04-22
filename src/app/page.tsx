@@ -16,9 +16,9 @@ export default function HomePage() {
     const router = useRouter()
     const [mounted, setMounted] = useState(false)
     useEffect(() => {
-        // Returning user with data → skip HP, go straight to 365 home
+        // Returning user with data -> skip HP, land on the cross-app hub
         if (localStorage.getItem('quest-mastery')) {
-            router.replace('/english/izakaya-toeic/kaiwa')
+            router.replace('/english/home')
             return
         }
         setMounted(true)
