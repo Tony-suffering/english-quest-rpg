@@ -100,6 +100,17 @@ const PROGRAMS: Program[] = [
             { id: '/english/yomique/lp', label: 'ヨミクエとは？' },
         ],
     },
+    {
+        id: 'native365',
+        label: 'ネイティブ365',
+        tagline: '英語の最後の1マイル',
+        color: C.purple,
+        basePath: '/english/native365',
+        items: [
+            { id: '/english/native365', label: 'ネイティブ365 HOME' },
+            { id: '/english/native365/lp', label: 'ネイティブ365とは？' },
+        ],
+    },
 ];
 
 // ─── Component ─────────────────────────────────────────────
@@ -138,6 +149,8 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
             setExpandedProgram('lisque');
         } else if (pathname.startsWith('/english/yomique')) {
             setExpandedProgram('yomique');
+        } else if (pathname.startsWith('/english/native365')) {
+            setExpandedProgram('native365');
         }
         // (legacy auto-expand removed)
     }, [pathname]);
@@ -159,6 +172,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) return 'tokyo52';
         if (pathname.startsWith('/english/lisque')) return 'lisque';
         if (pathname.startsWith('/english/yomique')) return 'yomique';
+        if (pathname.startsWith('/english/native365')) return 'native365';
         return null;
     })();
 

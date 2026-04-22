@@ -102,6 +102,13 @@ export default function EnglishHomeHub() {
                     marginBottom: 14,
                 }}>
                     <HubCard
+                        href="/english/native365"
+                        tagline="ADVANCED / 発音+文法"
+                        title="ネイティブ365"
+                        desc="英語の最後の1マイル。発音と文法を毎日1つずつ"
+                        color="#8B5CF6"
+                    />
+                    <HubCard
                         href="/english/yomique"
                         tagline="READING / 30日"
                         title="ヨミクエ"
