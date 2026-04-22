@@ -185,6 +185,24 @@ const SECONDARY_CHARS = [
   },
 ] as const;
 
+// ─── Per-recording character monologue (JSON in english_monologue) ───
+type CharMonologue = {
+  master?: string; lisa?: string; takeshi?: string;
+  yuki?: string; kenji?: string; mina?: string;
+};
+function parseCharMono(raw: string | null | undefined): CharMonologue | null {
+  if (!raw || typeof raw !== 'string') return null;
+  const trimmed = raw.trim();
+  if (!trimmed.startsWith('{')) return null;
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (parsed && typeof parsed === 'object') return parsed as CharMonologue;
+  } catch { /* ignore malformed monologue */ }
+  return null;
+}
+const PATTERN_KEYS = ['master', 'lisa', 'takeshi'] as const;
+const SECONDARY_KEYS = ['yuki', 'kenji', 'mina'] as const;
+
 // ─── Install Banner ───
 type Platform = {
   isIOS: boolean;
@@ -1379,7 +1397,12 @@ function LifeMemberInner() {
                           }}>{activeChar.name} — {activeChar.role}</div>
                           <div style={{
                             fontSize: 12, color: C.textSub, lineHeight: 1.6,
-                          }}>{activeChar.reaction}</div>
+                          }}>{(() => {
+                            const mono = parseCharMono(rec.english_monologue);
+                            const idx = Math.min(active, PATTERN_KEYS.length - 1);
+                            const perEntry = mono?.[PATTERN_KEYS[idx] ?? 'master'];
+                            return (perEntry && perEntry.trim()) || activeChar.reaction;
+                          })()}</div>
                         </div>
                       </div>
 
@@ -1392,42 +1415,47 @@ function LifeMemberInner() {
                           — 居酒屋の反応 —
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                          {SECONDARY_CHARS.map(sc => (
-                            <div key={sc.name} style={{
-                              display: 'flex', alignItems: 'flex-start', gap: 10,
-                              padding: '8px 10px',
-                              background: sc.bg,
-                              border: `1px solid ${sc.border}`,
-                              borderRadius: 10,
-                            }}>
-                              <img
-                                src={sc.avatar}
-                                alt={sc.name}
-                                width={26}
-                                height={26}
-                                style={{
-                                  flexShrink: 0,
-                                  width: 26, height: 26, borderRadius: '50%',
-                                  objectFit: 'cover',
-                                  border: `2px solid ${sc.color}`,
-                                  background: C.card,
-                                }}
-                              />
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{
-                                  fontSize: 9, fontWeight: 800, letterSpacing: 1,
-                                  color: sc.colorDim, marginBottom: 2,
-                                }}>
-                                  {sc.name} ({sc.role})
-                                </div>
-                                <div style={{
-                                  fontSize: 11, color: C.textSub, lineHeight: 1.55,
-                                }}>
-                                  {sc.reactions[active] ?? sc.reactions[0]}
+                          {SECONDARY_CHARS.map((sc, si) => {
+                            const mono = parseCharMono(rec.english_monologue);
+                            const perEntry = mono?.[SECONDARY_KEYS[si] ?? 'yuki'];
+                            const line = (perEntry && perEntry.trim()) || (sc.reactions[active] ?? sc.reactions[0]);
+                            return (
+                              <div key={sc.name} style={{
+                                display: 'flex', alignItems: 'flex-start', gap: 10,
+                                padding: '8px 10px',
+                                background: sc.bg,
+                                border: `1px solid ${sc.border}`,
+                                borderRadius: 10,
+                              }}>
+                                <img
+                                  src={sc.avatar}
+                                  alt={sc.name}
+                                  width={26}
+                                  height={26}
+                                  style={{
+                                    flexShrink: 0,
+                                    width: 26, height: 26, borderRadius: '50%',
+                                    objectFit: 'cover',
+                                    border: `2px solid ${sc.color}`,
+                                    background: C.card,
+                                  }}
+                                />
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{
+                                    fontSize: 9, fontWeight: 800, letterSpacing: 1,
+                                    color: sc.colorDim, marginBottom: 2,
+                                  }}>
+                                    {sc.name} ({sc.role})
+                                  </div>
+                                  <div style={{
+                                    fontSize: 11, color: C.textSub, lineHeight: 1.55,
+                                  }}>
+                                    {line}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
 
