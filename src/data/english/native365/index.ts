@@ -1,5 +1,14 @@
 import type { Native365Day } from '@/types/native365';
 import { DAY_01 } from './day-01';
+import { DAY_02 } from './day-02';
+import { DAY_03 } from './day-03';
+import { DAY_04 } from './day-04';
+import { DAY_11 } from './day-11';
+import { DAY_12 } from './day-12';
+import { DAY_13 } from './day-13';
+import { DAY_21 } from './day-21';
+import { DAY_22 } from './day-22';
+import { DAY_23 } from './day-23';
 
 /**
  * ネイティブ365 -- Month 1 index
@@ -51,6 +60,15 @@ export const NATIVE365_MONTH1_PLAN: Native365DayPlan[] = [
 // ─── Actual data (populated days) ───────────────────
 export const NATIVE365_DAYS: Record<number, Native365Day> = {
     1: DAY_01,
+    2: DAY_02,
+    3: DAY_03,
+    4: DAY_04,
+    11: DAY_11,
+    12: DAY_12,
+    13: DAY_13,
+    21: DAY_21,
+    22: DAY_22,
+    23: DAY_23,
 };
 
 export function getNative365Day(dayNum: number): Native365Day | null {
