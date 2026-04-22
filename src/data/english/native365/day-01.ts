@@ -3,8 +3,8 @@ import type { Native365Day } from '@/types/native365';
 /**
  * Day 1
  *
- * 発音: schwa /ə/  -- 英語で一番よく出る母音
- * 文法: 現在完了 vs 過去形 -- 学校で習った「完了・経験・継続」で止まるな
+ * 発音: schwa /ə/        -- 映画の英語が砂嵐に聞こえる理由
+ * 文法: 現在完了 vs 過去形 -- 日本語脳が時制で詰まる理由
  */
 
 export const DAY_01: Native365Day = {
@@ -13,12 +13,28 @@ export const DAY_01: Native365Day = {
     month: 1,
 
     // ══════════════════════════════════════════════════
+    // 扉絵: 夜の居酒屋
+    // ══════════════════════════════════════════════════
+    opening: {
+        scene: '夜の居酒屋。カウンター。TOEIC 900 を取った翌週、ネイティブとの会話で3秒で詰んだ男の相談から始まった。',
+        lines: [
+            { char: 'lisa',    text: "お前、about の「ア」に力入れすぎ。英語はあそこ、消す音なんだよ。" },
+            { char: 'master',  text: "それが schwa だ。英語の母音の40%が消える。これが分かれば、映画が聞き取れない理由の半分は解ける。" },
+            { char: 'takeshi', text: "あと過去形と現在完了もな。「なくした」を日本語の一択で処理してる限り、英語の時間軸が見えねえ。" },
+        ],
+    },
+
+    // ══════════════════════════════════════════════════
     // 発音: schwa /ə/
     // ══════════════════════════════════════════════════
     pronunciation: {
-        title: 'schwa /ə/ -- 英語で一番よく出る母音',
-        subtitle: '強勢のない母音は全部「脱力」に化ける。',
-        tldr: '強勢のない音節は原則 /ə/(schwa) になる。5単語で「弱化」の感覚を体に入れる。about, today, banana, of, to。',
+        title: 'schwa /ə/ -- 映画の英語が砂嵐に聞こえる正体',
+        subtitle: '母音の40%が消えてる。全部拾おうとする限り、耳は追いつかない。',
+        intro: {
+            question: 'なぜネイティブの英語はこんなに速く聞こえるのか?',
+            insight: '日本語はモーラ拍(mora-timed)。「あ・り・が・と・う」5拍すべてが等しい時間を取る。英語は強勢拍(stress-timed)。強勢のある音節だけが拍を刻み、他は時間的に圧縮される。\n\n結果、ネイティブの会話で母音の40%は /ə/(schwa) に化けてる。「about」は「u-BOUT」、「today」は「t-DAY」、「of」は「uhv」。あなたが全音節を均等に聴こうとする限り、リズムの骨格が掴めず、耳がパンクする。\n\n今日の5単語で、「弱化」という英語の核の動作を体に入れる。これが掴めれば、映画の1割が聞き取れるようになる。',
+        },
+        tldr: 'about / today / banana / of / to の5語で schwa の感覚を体に入れる。',
         items: [
             {
                 id: 'd1-p-01-about',
@@ -26,18 +42,18 @@ export const DAY_01: Native365Day = {
                 trigger: "'about' を声に出して3回。",
                 points: {
                     core: { en: '/əˈbaʊt/', ja: 'a- は schwa、-BOUT に強勢。' },
-                    nuance: { en: "It's u-BOUT, not A-bout.", ja: '最初の a に力を入れない。-BOUT だけ立てる。' },
-                    shift: { en: "Casual: 'bout time you showed up.", ja: "会話では a- が完全に消えて 'bout になる。" },
-                    native: { en: "It's u-BOUT five minutes away.", ja: '道案内の定型句。a を抜くだけで一気にネイティブ度が上がる。' },
+                    nuance: { en: "It's u-BOUT, not A-bout. Energy lives on BOUT.", ja: '最初の a に力を入れない。-BOUT だけ立てる。「アバウト」とは別物。' },
+                    shift: { en: "Fast speech collapses to 'bout: 'Bout time you showed up.", ja: "カジュアル会話では a- が完全に消えて 'bout になる。頻出。" },
+                    native: { en: "It's u-BOUT five minutes away.", ja: '道案内の定型。a を抜けるだけで一気にネイティブ度が上がる。' },
                 },
-                trap: 'カタカナ「アバウト」で2拍均等。英語は1拍 (BOUT) + 脱力 (u) の波。',
-                tip: 'a を「うぁ」の弱い最短版と思ってそっと流す。ほぼ b から始まる気持ち。',
+                trap: 'カタカナ「アバウト」で2拍均等。英語は1拍 (BOUT) +脱力 (u) の波。',
+                tip: 'a を「うぁ」の弱い最短版、と思ってそっと流す。ほぼ b から始まる気持ち。',
                 reactions: {
-                    master: 'schwa は英語最頻出の母音。これを制すのが発音の入口。機能語・接頭辞は原則ここに落ちる。',
+                    master: 'schwa は英語最頻出の母音。機能語と接頭辞は原則ここに落ちる。これを制すのが発音の入口。',
                     lisa: "When I hear 'A-BOUT' with energy on the A, I know it's a Japanese speaker. Just drop it.",
                     takeshi: '「アバウト」の「ア」に力入れてる限り、ネイティブの波に乗れねえ。入口でつまずくな。',
                     yuki: 'え、今までずっと「アバウト」って均等に読んでた…今日から直す。',
-                    kenji: '現場で about five minutes って言う機会、1日何度も出る。u-BOUT でいきたい。',
+                    kenji: '現場で about five minutes と言う機会、1日何度も出る。u-BOUT でいきたい。',
                     mina: "TikTok の字幕で \"'bout\" ってよく見る。あれ schwa が完全に落ちた表記やったんや。",
                 },
             },
@@ -132,14 +148,18 @@ export const DAY_01: Native365Day = {
     // 文法: 現在完了 vs 過去形
     // ══════════════════════════════════════════════════
     grammar: {
-        title: '現在完了 vs 過去形 -- 「完了・経験・継続」で止まるな',
-        subtitle: '過去形=終わった出来事。現在完了=今に影響してる出来事。',
-        tldr: '日本語に現在完了はない。だから文法書の分類で覚えても使えない。「今に繋がってるか」の感覚1つで I did vs I have done を切り分ける。',
+        title: '現在完了 vs 過去形 -- 日本語脳が詰まる時間軸のズレ',
+        subtitle: '「なくした」を日本語の一択で処理してる限り、I did と I\'ve done は選べない。',
+        intro: {
+            question: 'なぜ日本人は現在完了を使えないのか?',
+            insight: '日本語には「過去」「現在」「未来」の3つの時間しかない。「〜した」で過去、「〜する」で現在と未来。完了形は存在しない。\n\n英語の現在完了 (have + 過去分詞) は時制ではなく「視点の置き方」。「今から振り返って過去の出来事を見る」という特殊な視線を動詞で表現する。この視線は日本語脳にない。だから I lost と I\'ve lost が同じ「なくした」に見えて、選べない。\n\n解決策は1つ。ルールの分類 (完了・経験・継続) を暗記しない。「今に影響が残ってるか?」この1軸だけで切り分ける。鍵を今も探してるなら現在完了、もう見つかって話題が終わってるなら過去形。それだけ。',
+        },
+        tldr: '「今に影響が残ってるか?」の1軸で I did / I\'ve done を切る。',
         items: [
             {
                 id: 'd1-g-01-keys',
-                label: 'I lost vs I\'ve lost -- 鍵の話',
-                trigger: '「鍵なくした」を言え。',
+                label: "I lost vs I've lost -- 鍵の話",
+                trigger: '「鍵なくした」を英語で。',
                 points: {
                     core: { en: 'I lost my keys.', ja: '過去の出来事としての事実。今は見つかってるかもしれない。' },
                     nuance: { en: "I've lost my keys.", ja: '今も無い。今まさに困ってる。現在に影響を残している。' },
@@ -153,14 +173,14 @@ export const DAY_01: Native365Day = {
                     lisa: "If you tell me 'I lost my keys' I assume the story's over. 'I've lost my keys' means you're still looking.",
                     takeshi: '日本語は「なくした」の一択だから、英語で選べずに止まる。「今も困ってる?」で切れ。',
                     yuki: '学校で完了・経験・継続って習ったけど、この「今への影響」一本のほうがしっくりくる。',
-                    kenji: '現場で部品なくした時は I\'ve lost the part、now の含みで助け呼べる。',
-                    mina: 'DM で \"I lost my phone\" より \"I\'ve lost my phone\" の方が緊急感出て返信早いやん。',
+                    kenji: "現場で部品なくした時は I've lost the part、now の含みで助け呼べる。",
+                    mina: 'DM で "I lost my phone" より "I\'ve lost my phone" の方が緊急感出て返信早いやん。',
                 },
             },
             {
                 id: 'd1-g-02-lived',
-                label: 'I lived in Tokyo vs I\'ve lived in Tokyo',
-                trigger: '「東京に住んでた/住んでる」を言え。',
+                label: "I lived in Tokyo vs I've lived in Tokyo",
+                trigger: '「東京に住んでた/住んでる」を英語で。',
                 points: {
                     core: { en: 'I lived in Tokyo for 5 years.', ja: '過去に住んでた。今はもう住んでいない。' },
                     nuance: { en: "I've lived in Tokyo for 5 years.", ja: '今も住んでる。5年間継続中。' },
@@ -174,14 +194,14 @@ export const DAY_01: Native365Day = {
                     lisa: "If you say 'I lived in Tokyo for 5 years' I'll ask 'Where are you now?' -- I know you left.",
                     takeshi: '英語は「今住んでる」と「住んでた」を動詞1文字で区別する。日本語より正確で冷たい。',
                     yuki: '「住んでる」の英訳で動詞の時制で迷うの、ここでスッキリした。',
-                    kenji: '自己紹介で I\'ve lived in Tokyo for 10 years って言えれば、説明不要で状況伝わる。',
+                    kenji: "自己紹介で I've lived in Tokyo for 10 years って言えれば、説明不要で状況伝わる。",
                     mina: 'Bio に "Tokyo-based" って書くのは便利やけど、会話では I\'ve lived 構文が王道やね。',
                 },
             },
             {
                 id: 'd1-g-03-news',
                 label: 'Did you see the news? vs Have you seen the news?',
-                trigger: '「あのニュース見た?」を言え。',
+                trigger: '「あのニュース見た?」を英語で。',
                 points: {
                     core: { en: 'Did you see the news?', ja: 'いつ？の感覚で、特定の時間枠 (今朝・昨日) を想定。' },
                     nuance: { en: 'Have you seen the news?', ja: 'いつでもいいから見た? の感覚。経験を聞いてる。' },
@@ -202,7 +222,7 @@ export const DAY_01: Native365Day = {
             {
                 id: 'd1-g-04-when',
                 label: 'When + 現在完了は原則 NG',
-                trigger: '「いつ彼に会ったの?」を言え。',
+                trigger: '「いつ彼に会ったの?」を英語で。',
                 points: {
                     core: { en: 'When did you meet him?', ja: 'when は特定の時点を聞く語。過去形と組む。' },
                     nuance: { en: "When have you met him? -- unnatural.", ja: 'when + 現在完了は「時点が不定」と「時点を特定」が矛盾するのでネイティブには違和感。' },
@@ -223,7 +243,7 @@ export const DAY_01: Native365Day = {
             {
                 id: 'd1-g-05-just',
                 label: "just now vs I've just -- 直前の話",
-                trigger: '「今ちょうど終わった」を言え。',
+                trigger: '「今ちょうど終わった」を英語で。',
                 points: {
                     core: { en: 'I finished it just now.', ja: '過去形+just now は米英どちらも OK。米語ではこちらが主流。' },
                     nuance: { en: "I've just finished it.", ja: '現在完了+just は英国英語で主流。米語でもフォーマル文脈ならOK。' },
@@ -237,7 +257,7 @@ export const DAY_01: Native365Day = {
                     lisa: "I'm American and I'd say 'I just finished it' 90% of the time. Brits go with 'I've just finished'.",
                     takeshi: '米か英か選べ、と言われたら米寄りの方が世界的に通じる場面多い。迷ったら米。',
                     yuki: '英文法で現在完了が正解って習ったけど、米では過去形も自然って初めて知った。',
-                    kenji: '現場でアメリカ人相手なら I just finished。イギリス人相手なら I\'ve just finished。使い分け可。',
+                    kenji: "現場でアメリカ人相手なら I just finished。イギリス人相手なら I've just finished。使い分け可。",
                     mina: 'SNSで "just dropped!" って見るの、あれ米語の主語省略+過去形の流れやん。',
                 },
             },

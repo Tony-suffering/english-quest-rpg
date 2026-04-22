@@ -48,11 +48,27 @@ export interface Native365Item {
   reactions: Native365Reactions;
 }
 
+export interface Native365Intro {
+  question: string;  // "なぜ映画の英語が砂嵐に聞こえるのか?"
+  insight: string;   // 2-4 行の深い回答 (母音の40%が schwa に化ける…)
+}
+
 export interface Native365Section {
   title: string;     // "schwa /ə/" etc
   subtitle: string;  // 1行キャッチ
-  tldr: string;      // 今日終わる頃に何ができる
+  intro: Native365Intro;   // "なぜ" と 深い理由
+  tldr: string;      // 今日終わる頃に何ができる (tactical 1行)
   items: Native365Item[];  // 4-6 items per section
+}
+
+export interface Native365OpeningLine {
+  char: Native365CharKey;
+  text: string;
+}
+
+export interface Native365Opening {
+  scene: string;                    // "夜の居酒屋。いつものカウンター"
+  lines: Native365OpeningLine[];    // 2-3 行の短いやり取り
 }
 
 export interface Native365Day {
@@ -60,6 +76,7 @@ export interface Native365Day {
   week: number;                    // 1-52
   month: number;                   // 1-12
   date?: string;                   // 表示用 (optional)
+  opening: Native365Opening;       // 扉絵ストーリー
   pronunciation: Native365Section; // 発音テーマ
   grammar: Native365Section;       // 文法テーマ
 }
