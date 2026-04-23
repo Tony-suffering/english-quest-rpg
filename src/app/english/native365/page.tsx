@@ -823,8 +823,37 @@ export default function Native365Page() {
                 </div>
             </div>
 
-            {/* Phrase Bank shortcut */}
+            {/* Trigger training shortcut */}
             <div style={{ maxWidth: 760, margin: '14px auto 0', padding: '0 16px' }}>
+                <Link href="/english/native365/training" style={{ textDecoration: 'none', display: 'block' }}>
+                    <div style={{
+                        background: `linear-gradient(135deg, ${C.gold}18, #fff)`,
+                        border: `1.5px solid ${C.gold}60`,
+                        borderLeft: `5px solid ${C.gold}`,
+                        borderRadius: 12, padding: '14px 18px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                        boxShadow: `0 2px 12px ${C.gold}20`,
+                    }}>
+                        <div>
+                            <div style={{ fontSize: 9, letterSpacing: 2.5, color: C.goldDim, fontWeight: 800 }}>
+                                TRIGGER TRAINING
+                            </div>
+                            <div style={{ fontSize: 14, fontWeight: 800, color: C.textPrimary, marginTop: 2 }}>
+                                状況 → 英語、日本語を経由しない反射
+                            </div>
+                            <div style={{ fontSize: 11, color: C.textSub, lineHeight: 1.5, marginTop: 3 }}>
+                                + TRAINING で追加した文を場面カード + 3秒タイマー + SRS で反射化。
+                            </div>
+                        </div>
+                        <div style={{
+                            fontSize: 22, color: C.goldDim, fontWeight: 900,
+                        }}>→</div>
+                    </div>
+                </Link>
+            </div>
+
+            {/* Phrase Bank shortcut */}
+            <div style={{ maxWidth: 760, margin: '10px auto 0', padding: '0 16px' }}>
                 <Link href="/english/native365/phrases" style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{
                         background: `linear-gradient(135deg, ${C.blue}08, #fff)`,
