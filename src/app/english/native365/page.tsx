@@ -11,6 +11,7 @@ import type {
 } from '@/types/native365';
 import { NATIVE365_CHARS, NATIVE365_CHAR_ORDER } from '@/types/native365';
 import { NATIVE365_MONTH1_PLAN, getNative365Day, isNative365DayReady } from '@/data/english/native365';
+import { addPhrase } from '@/lib/local-store';
 
 // ─── Global animations (365 の演出を踏襲) ──────────────────
 const NATIVE365_STYLES = `
@@ -39,38 +40,107 @@ const NATIVE365_STYLES = `
 
 // ─── Storage ────────────────────────────────────────────────
 const STORAGE_KEY = 'native365_stats';
+const REPS_PER_MASTER = 5; // 1 項目をマスター扱いにする最小シャドー回数
 
 type Stats = {
     currentDay: number;
     totalCompleted: number;
     streakDays: number;
     lastVisit: string;
+    totalReps: number;  // 全期間の累計シャドー回数
+    startDate: string;  // YYYY-MM-DD -- Day 1 に対応する実カレンダー日付
     dayProgress: Record<number, { completed: boolean; completedAt?: string }>;
+    itemReps: Record<string, number>; // itemId -> reps
+    registeredItems: Record<string, string>; // itemId -> ISO datetime (training送り済みフラグ)
 };
+
+function todayYMD(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
 function loadStats(): Stats {
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            // 既存ユーザーに startDate が無ければ、最初の完了日、無ければ今日を採用
+            let startDate = parsed.startDate as string | undefined;
+            if (!startDate) {
+                const earliest = Object.values(parsed.dayProgress ?? {})
+                    .map((p: unknown) => (p as { completedAt?: string })?.completedAt)
+                    .filter((s): s is string => !!s)
+                    .sort()[0];
+                startDate = earliest ? earliest.slice(0, 10) : todayYMD();
+            }
+            return {
+                currentDay: parsed.currentDay ?? 1,
+                totalCompleted: parsed.totalCompleted ?? 0,
+                streakDays: parsed.streakDays ?? 0,
+                lastVisit: parsed.lastVisit ?? '',
+                totalReps: parsed.totalReps ?? 0,
+                startDate,
+                dayProgress: parsed.dayProgress ?? {},
+                itemReps: parsed.itemReps ?? {},
+                registeredItems: parsed.registeredItems ?? {},
+            };
+        }
     } catch { /* ignore */ }
-    return { currentDay: 1, totalCompleted: 0, streakDays: 0, lastVisit: '', dayProgress: {} };
+    return {
+        currentDay: 1, totalCompleted: 0, streakDays: 0, lastVisit: '',
+        totalReps: 0, startDate: todayYMD(),
+        dayProgress: {}, itemReps: {}, registeredItems: {},
+    };
 }
 function saveStats(s: Stats) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
 
+// dayNum (1..30) を実カレンダー日付に変換
+function dayToDate(startDate: string, dayNum: number): Date {
+    const [y, m, d] = startDate.split('-').map(n => parseInt(n, 10));
+    const base = new Date(y, (m || 1) - 1, d || 1);
+    base.setDate(base.getDate() + (dayNum - 1));
+    return base;
+}
+function formatMD(d: Date): string { return `${d.getMonth() + 1}/${d.getDate()}`; }
+function sameDate(a: Date, b: Date): boolean {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
 // ─── Audio (Web Speech API) ─────────────────────────────────
-function speakEN(text: string) {
-    if (typeof window === 'undefined' || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    // Strip annotation brackets from pronunciation guides (e.g. u-BOUT -> about)
-    const cleaned = text
+function cleanForTTS(text: string): string {
+    return text
         .replace(/\/[^\/]+\//g, '')      // drop /IPA/
         .replace(/[()[\]{}]/g, '')
         .trim();
-    const u = new SpeechSynthesisUtterance(cleaned);
+}
+function speakEN(text: string, rate = 0.95) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(cleanForTTS(text));
     u.lang = 'en-US';
-    u.rate = 0.95;
+    u.rate = rate;
     u.pitch = 1.0;
     window.speechSynthesis.speak(u);
+}
+function speakENLoop(text: string, times: number, onEach?: () => void) {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const cleaned = cleanForTTS(text);
+    let i = 0;
+    const playOne = () => {
+        if (i >= times) return;
+        const u = new SpeechSynthesisUtterance(cleaned);
+        u.lang = 'en-US';
+        u.rate = 0.95;
+        u.pitch = 1.0;
+        u.onend = () => {
+            i++;
+            onEach?.();
+            if (i < times) setTimeout(playOne, 700); // 700ms gap to let user shadow
+        };
+        window.speechSynthesis.speak(u);
+    };
+    playOne();
 }
 
 // ─── Colors (light theme only) ──────────────────────────────
@@ -176,18 +246,115 @@ function SpeakText({ text, size = 16, weight = 700 }: { text: string; size?: num
     );
 }
 
-// ─── Item viewer ────────────────────────────────────────────
-function ItemCard({ item }: { item: Native365Item }) {
-    const [level, setLevel] = useState<Native365Level>('core');
-    const lm = LEVEL_META[level];
-    const point = item.points[level];
+// ─── Shadow Bar (NATIVE tab only) ──────────────────────────
+// ネイティブの音を「同じスピードで口に出す」訓練の核。
+// normal / slow / loop5 の3ボタン + 回数カウンタ。
+function ShadowBar({
+    text, reps, onRep,
+}: { text: string; reps: number; onRep: () => void }) {
+    const [looping, setLooping] = useState(false);
+    const mastered = reps >= REPS_PER_MASTER;
+
+    const onNormal = () => { speakEN(text, 0.95); onRep(); };
+    const onSlow   = () => { speakEN(text, 0.70); onRep(); };
+    const onLoop   = () => {
+        if (looping) return;
+        setLooping(true);
+        speakENLoop(text, REPS_PER_MASTER, onRep);
+        // Release lock after estimated total time (REPS_PER_MASTER * ~3.5s each)
+        setTimeout(() => setLooping(false), REPS_PER_MASTER * 3500);
+    };
+
+    const btnStyle = (color: string, filled = false): React.CSSProperties => ({
+        flex: 1, padding: '8px 6px',
+        background: filled ? color : '#fff',
+        color: filled ? '#fff' : color,
+        border: `1.5px solid ${color}`,
+        borderRadius: 8,
+        fontSize: 10, fontWeight: 800, letterSpacing: 1,
+        cursor: looping ? 'wait' : 'pointer',
+        opacity: looping ? 0.6 : 1,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+    });
 
     return (
         <div style={{
-            background: C.card, border: `1px solid ${C.border}`,
-            borderRadius: 14, padding: 16, marginBottom: 14,
+            marginTop: 10, padding: '10px 12px',
+            background: `linear-gradient(135deg, ${C.blue}08, ${C.blue}03)`,
+            border: `1px solid ${C.blue}30`,
+            borderRadius: 10,
         }}>
-            <div style={{ fontSize: 12, fontWeight: 800, color: C.textPrimary, marginBottom: 4 }}>
+            <div style={{
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                marginBottom: 8,
+            }}>
+                <div style={{ fontSize: 9, letterSpacing: 1.8, color: C.blueDim, fontWeight: 800 }}>
+                    SHADOW / 声に出して同じ速度で
+                </div>
+                <div style={{
+                    fontSize: 10, fontWeight: 800,
+                    color: mastered ? C.green : C.textDim,
+                    background: mastered ? `${C.green}15` : C.bg,
+                    padding: '3px 8px', borderRadius: 999,
+                    border: `1px solid ${mastered ? C.green + '40' : C.border}`,
+                }}>
+                    {mastered ? `★ ${reps}` : `× ${reps} / ${REPS_PER_MASTER}`}
+                </div>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+                <button onClick={onNormal} disabled={looping} style={btnStyle(C.blue, true)}>
+                    {'▶'} PLAY
+                </button>
+                <button onClick={onSlow} disabled={looping} style={btnStyle(C.blueDim)}>
+                    {'▶▶'} SLOW
+                </button>
+                <button onClick={onLoop} disabled={looping} style={btnStyle(C.gold, looping)}>
+                    {looping ? '…' : `${'↻'} LOOP×${REPS_PER_MASTER}`}
+                </button>
+            </div>
+            {mastered && (
+                <div style={{
+                    marginTop: 8, fontSize: 10, color: C.greenDim,
+                    fontWeight: 700, textAlign: 'center',
+                }}>
+                    この文、体が覚えた。次の項目へ。
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Item viewer ────────────────────────────────────────────
+function ItemCard({
+    item, reps, onRep, registered, onRegister,
+}: {
+    item: Native365Item;
+    reps: number;
+    onRep: () => void;
+    registered: boolean;
+    onRegister: () => void;
+}) {
+    const [level, setLevel] = useState<Native365Level>('core');
+    const lm = LEVEL_META[level];
+    const point = item.points[level];
+    const mastered = reps >= REPS_PER_MASTER;
+
+    return (
+        <div style={{
+            background: C.card,
+            border: `1px solid ${mastered ? C.green + '50' : C.border}`,
+            borderRadius: 14, padding: 16, marginBottom: 14,
+            position: 'relative',
+            boxShadow: mastered ? `0 2px 10px ${C.green}18` : 'none',
+        }}>
+            {mastered && (
+                <span style={{
+                    position: 'absolute', top: 10, right: 12,
+                    fontSize: 13, color: C.green,
+                    animation: 'native365StarPop 0.4s ease-out',
+                }}>★</span>
+            )}
+            <div style={{ fontSize: 12, fontWeight: 800, color: C.textPrimary, marginBottom: 4, paddingRight: 20 }}>
                 {item.label}
             </div>
             <div style={{ fontSize: 12, color: C.textDim, marginBottom: 12, fontStyle: 'italic' }}>
@@ -230,6 +397,33 @@ function ItemCard({ item }: { item: Native365Item }) {
                 <div style={{ fontSize: 12, color: C.textSub, lineHeight: 1.7, marginTop: 8 }}>
                     {point.ja}
                 </div>
+                {/* Shadow bar -- NATIVE tab だけ本格的なシャドー練習 */}
+                {level === 'native' && (
+                    <>
+                        <ShadowBar text={point.en} reps={reps} onRep={onRep} />
+                        {/* +TRAINING: native の文を 365 training に送る */}
+                        <button
+                            onClick={onRegister}
+                            disabled={registered}
+                            style={{
+                                marginTop: 8, width: '100%',
+                                padding: '10px 14px',
+                                background: registered
+                                    ? `linear-gradient(135deg, ${C.green}12, #fff)`
+                                    : `linear-gradient(135deg, ${C.gold}, ${C.goldDim})`,
+                                color: registered ? C.greenDim : '#fff',
+                                border: registered ? `1.5px solid ${C.green}60` : 'none',
+                                borderRadius: 10,
+                                fontSize: 11, fontWeight: 800, letterSpacing: 1.5,
+                                cursor: registered ? 'default' : 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                boxShadow: registered ? 'none' : `0 2px 8px ${C.gold}40`,
+                            }}
+                        >
+                            {registered ? '✓ TRAINING 登録済み' : '+ TRAINING に追加（この文を毎日練習）'}
+                        </button>
+                    </>
+                )}
             </div>
 
             {item.trap && (
@@ -300,7 +494,18 @@ function ItemCard({ item }: { item: Native365Item }) {
 }
 
 // ─── Section (発音 or 文法) ──────────────────────────────────
-function SectionBlock({ section, color, tag }: { section: Native365Section; color: string; tag: string }) {
+function SectionBlock({
+    section, color, tag, itemReps, onRep,
+    registeredItems, onRegister,
+}: {
+    section: Native365Section;
+    color: string;
+    tag: string;
+    itemReps: Record<string, number>;
+    onRep: (itemId: string) => void;
+    registeredItems: Record<string, string>;
+    onRegister: (item: Native365Item) => void;
+}) {
     return (
         <div style={{ marginBottom: 28 }}>
             <div style={{ marginBottom: 16 }}>
@@ -354,7 +559,16 @@ function SectionBlock({ section, color, tag }: { section: Native365Section; colo
                     {section.tldr}
                 </div>
             </div>
-            {section.items.map(item => <ItemCard key={item.id} item={item} />)}
+            {section.items.map(item => (
+                <ItemCard
+                    key={item.id}
+                    item={item}
+                    reps={itemReps[item.id] ?? 0}
+                    onRep={() => onRep(item.id)}
+                    registered={!!registeredItems[item.id]}
+                    onRegister={() => onRegister(item)}
+                />
+            ))}
         </div>
     );
 }
@@ -462,10 +676,58 @@ export default function Native365Page() {
         setTimeout(() => setToastOn(false), 2200);
     }, [selectedDay]);
 
+    const bumpRep = useCallback((itemId: string) => {
+        setStats(prev => {
+            if (!prev) return prev;
+            const current = prev.itemReps[itemId] ?? 0;
+            const next: Stats = {
+                ...prev,
+                totalReps: prev.totalReps + 1,
+                itemReps: { ...prev.itemReps, [itemId]: current + 1 },
+            };
+            saveStats(next);
+            return next;
+        });
+    }, []);
+
+    const [registerToast, setRegisterToast] = useState<string | null>(null);
+    const registerToTraining = useCallback((item: Native365Item) => {
+        setStats(prev => {
+            if (!prev) return prev;
+            if (prev.registeredItems[item.id]) return prev; // 二重登録防止
+            try {
+                addPhrase({
+                    english: item.points.native.en,
+                    japanese: item.points.native.ja,
+                    category: 'native365',
+                    date: todayYMD(),
+                    situation: `Native365 Day ${selectedDay} -- ${item.label}`,
+                    context: item.tip ?? item.trigger,
+                });
+            } catch (e) {
+                console.warn('[native365] addPhrase failed:', e);
+                return prev;
+            }
+            const next: Stats = {
+                ...prev,
+                registeredItems: { ...prev.registeredItems, [item.id]: new Date().toISOString() },
+            };
+            saveStats(next);
+            return next;
+        });
+        setRegisterToast(item.points.native.en);
+        setTimeout(() => setRegisterToast(null), 2200);
+    }, [selectedDay]);
+
     if (!stats) return null;
 
     const completedCount = Object.values(stats.dayProgress).filter(p => p.completed).length;
     const progressPct = Math.round((completedCount / 30) * 100);
+
+    // Mastery: items whose reps >= REPS_PER_MASTER. Auto-marks day complete when all mastered.
+    const dayItems = day ? [...day.pronunciation.items, ...day.grammar.items] : [];
+    const masteredCount = dayItems.filter(it => (stats.itemReps[it.id] ?? 0) >= REPS_PER_MASTER).length;
+    const allMastered = dayItems.length > 0 && masteredCount === dayItems.length;
 
     return (
         <div style={{ minHeight: '100vh', background: C.bg, paddingBottom: 60 }}>
@@ -485,6 +747,28 @@ export default function Native365Page() {
                     animation: 'native365ToastSlide 0.3s ease-out',
                 }}>
                     ★ DAY {selectedDay} COMPLETE ★
+                </div>
+            )}
+
+            {/* Training register toast */}
+            {registerToast && (
+                <div style={{
+                    position: 'fixed', bottom: 24, left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#fff',
+                    border: `2px solid ${C.green}`,
+                    color: C.greenDim,
+                    padding: '10px 18px', borderRadius: 12,
+                    fontSize: 12, fontWeight: 800, letterSpacing: 0.5,
+                    zIndex: 1000, maxWidth: 520,
+                    boxShadow: `0 6px 24px ${C.green}30`,
+                    animation: 'native365ToastSlide 0.3s ease-out',
+                    textAlign: 'center', lineHeight: 1.5,
+                }}>
+                    ✓ TRAINING に追加<br />
+                    <span style={{ color: C.textPrimary, fontSize: 11, fontWeight: 700 }}>
+                        「{registerToast}」
+                    </span>
                 </div>
             )}
 
@@ -509,19 +793,62 @@ export default function Native365Page() {
                                 TOEIC 900・英検準1級の壁の先。発音 + 文法を毎日1テーマずつ。
                             </p>
                         </div>
-                        <div style={{
-                            padding: '6px 12px', background: C.goldBg,
-                            border: `1px solid ${C.gold}40`, borderRadius: 10, textAlign: 'center',
-                        }}>
-                            <div style={{ fontSize: 18, fontWeight: 900, color: C.goldDim, lineHeight: 1 }}>
-                                {completedCount}
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <div style={{
+                                padding: '6px 12px', background: C.goldBg,
+                                border: `1px solid ${C.gold}40`, borderRadius: 10, textAlign: 'center',
+                                minWidth: 62,
+                            }}>
+                                <div style={{ fontSize: 18, fontWeight: 900, color: C.goldDim, lineHeight: 1 }}>
+                                    {completedCount}
+                                </div>
+                                <div style={{ fontSize: 8, letterSpacing: 1.5, color: C.goldDim, fontWeight: 700, marginTop: 2 }}>
+                                    / 30 DAYS
+                                </div>
                             </div>
-                            <div style={{ fontSize: 8, letterSpacing: 1.5, color: C.goldDim, fontWeight: 700, marginTop: 2 }}>
-                                / 30 DONE
+                            <div style={{
+                                padding: '6px 12px', background: `${C.blue}10`,
+                                border: `1px solid ${C.blue}40`, borderRadius: 10, textAlign: 'center',
+                                minWidth: 62,
+                            }}>
+                                <div style={{ fontSize: 18, fontWeight: 900, color: C.blueDim, lineHeight: 1 }}>
+                                    {stats.totalReps}
+                                </div>
+                                <div style={{ fontSize: 8, letterSpacing: 1.5, color: C.blueDim, fontWeight: 700, marginTop: 2 }}>
+                                    SHADOW
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Phrase Bank shortcut */}
+            <div style={{ maxWidth: 760, margin: '14px auto 0', padding: '0 16px' }}>
+                <Link href="/english/native365/phrases" style={{ textDecoration: 'none', display: 'block' }}>
+                    <div style={{
+                        background: `linear-gradient(135deg, ${C.blue}08, #fff)`,
+                        border: `1px solid ${C.blue}40`,
+                        borderLeft: `4px solid ${C.blue}`,
+                        borderRadius: 12, padding: '12px 16px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                    }}>
+                        <div>
+                            <div style={{ fontSize: 9, letterSpacing: 2, color: C.blueDim, fontWeight: 800 }}>
+                                PHRASE BANK
+                            </div>
+                            <div style={{ fontSize: 13, fontWeight: 800, color: C.textPrimary, marginTop: 2 }}>
+                                ネイティブの生音声 68 本
+                            </div>
+                            <div style={{ fontSize: 11, color: C.textSub, lineHeight: 1.5, marginTop: 2 }}>
+                                PlayPhrase 由来の実写クリップ。タグで絞り込んでシャドー練習。
+                            </div>
+                        </div>
+                        <div style={{
+                            fontSize: 20, color: C.blue, fontWeight: 900,
+                        }}>→</div>
+                    </div>
+                </Link>
             </div>
 
             {/* Month 1 calendar -- week x 6day grid (365 風) */}
@@ -586,12 +913,16 @@ export default function Native365Page() {
                                     const ready = isNative365DayReady(dayNum);
                                     const active = selectedDay === dayNum;
                                     const done = !!stats.dayProgress[dayNum]?.completed;
+                                    const cellDate = dayToDate(stats.startDate, dayNum);
+                                    const isToday = sameDate(cellDate, new Date());
 
                                     const bg = active
                                         ? `linear-gradient(135deg, ${C.gold}, ${C.goldDim})`
                                         : done
                                             ? 'linear-gradient(135deg, #FEF3C7, #ECFDF5)'
-                                            : ready ? C.card : C.bg;
+                                            : isToday
+                                                ? `linear-gradient(135deg, ${C.blue}15, #fff)`
+                                                : ready ? C.card : C.bg;
 
                                     return (
                                         <button
@@ -603,14 +934,17 @@ export default function Native365Page() {
                                                     ? `2px solid ${C.goldDim}`
                                                     : done
                                                         ? `1.5px solid ${C.gold}50`
-                                                        : `1px solid ${ready ? C.border : '#F5F5F4'}`,
+                                                        : isToday
+                                                            ? `2px solid ${C.blue}`
+                                                            : `1px solid ${ready ? C.border : '#F5F5F4'}`,
                                                 background: bg,
-                                                color: active ? '#fff' : (done ? '#92400E' : (ready ? C.textPrimary : C.textFaint)),
-                                                fontSize: 13, fontWeight: 800,
+                                                color: active ? '#fff' : (done ? '#92400E' : (isToday ? C.blueDim : (ready ? C.textPrimary : C.textFaint))),
+                                                fontSize: 12, fontWeight: 800,
                                                 borderRadius: 10, cursor: 'pointer',
                                                 transition: 'all 0.2s ease',
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                position: 'relative', padding: 0,
+                                                display: 'flex', flexDirection: 'column',
+                                                alignItems: 'center', justifyContent: 'center',
+                                                position: 'relative', padding: '2px 0',
                                                 animation: done && !active
                                                     ? 'native365CellGlow 3s ease-in-out infinite'
                                                     : (active ? 'native365TodayPulse 2s ease-in-out infinite' : undefined),
@@ -618,17 +952,32 @@ export default function Native365Page() {
                                                     ? `0 4px 16px ${C.gold}40`
                                                     : done
                                                         ? `0 2px 8px ${C.gold}25`
-                                                        : 'none',
+                                                        : isToday
+                                                            ? `0 2px 10px ${C.blue}30`
+                                                            : 'none',
                                             }}
-                                            title={p ? `${p.pronunciation} / ${p.grammar}` : ''}
+                                            title={p ? `${formatMD(cellDate)} -- ${p.pronunciation} / ${p.grammar}` : formatMD(cellDate)}
                                         >
-                                            {dayNum}
+                                            <span style={{ fontSize: 13, lineHeight: 1 }}>{formatMD(cellDate)}</span>
+                                            <span style={{
+                                                fontSize: 8, lineHeight: 1, marginTop: 2,
+                                                opacity: active ? 0.9 : 0.55, letterSpacing: 0.5,
+                                            }}>
+                                                Day {dayNum}
+                                            </span>
                                             {done && !active && (
                                                 <span style={{
                                                     position: 'absolute', top: 2, right: 4,
                                                     fontSize: 10, color: C.goldDim,
                                                     animation: 'native365StarPop 0.5s ease-out',
                                                 }}>★</span>
+                                            )}
+                                            {isToday && !active && !done && (
+                                                <span style={{
+                                                    position: 'absolute', top: 2, right: 4,
+                                                    fontSize: 7, fontWeight: 900, color: C.blueDim,
+                                                    letterSpacing: 0.5,
+                                                }}>今日</span>
                                             )}
                                         </button>
                                     );
@@ -639,13 +988,17 @@ export default function Native365Page() {
 
                     {/* Legend */}
                     <div style={{
-                        display: 'flex', gap: 14, justifyContent: 'center',
+                        display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap',
                         marginTop: 12, paddingTop: 10, borderTop: `1px solid ${C.bg}`,
                         fontSize: 10, color: C.textFaint, fontWeight: 600,
                     }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <span style={{ width: 10, height: 10, borderRadius: 3, background: `linear-gradient(135deg, ${C.gold}, ${C.goldDim})` }} />
                             選択中
+                        </span>
+                        <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                            <span style={{ width: 10, height: 10, borderRadius: 3, background: `linear-gradient(135deg, ${C.blue}15, #fff)`, border: `2px solid ${C.blue}` }} />
+                            今日
                         </span>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                             <span style={{ width: 10, height: 10, borderRadius: 3, background: 'linear-gradient(135deg, #FEF3C7, #ECFDF5)', border: `1px solid ${C.gold}50` }} />
@@ -665,8 +1018,25 @@ export default function Native365Page() {
                     background: '#fff', border: `1px solid ${C.border}`,
                     borderRadius: 14, padding: '16px 18px',
                 }}>
-                    <div style={{ fontSize: 10, letterSpacing: 2, color: C.gold, fontWeight: 800, marginBottom: 4 }}>
-                        DAY {selectedDay} / 30
+                    <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        gap: 10, marginBottom: 4,
+                    }}>
+                        <div style={{ fontSize: 10, letterSpacing: 2, color: C.gold, fontWeight: 800 }}>
+                            DAY {selectedDay} / 30
+                        </div>
+                        <div style={{
+                            fontSize: 10, letterSpacing: 1, color: C.textDim, fontWeight: 700,
+                        }}>
+                            {formatMD(dayToDate(stats.startDate, selectedDay))}
+                            {sameDate(dayToDate(stats.startDate, selectedDay), new Date()) && (
+                                <span style={{
+                                    marginLeft: 6, padding: '1px 6px',
+                                    background: C.blue, color: '#fff',
+                                    borderRadius: 999, fontSize: 9, fontWeight: 800,
+                                }}>TODAY</span>
+                            )}
+                        </div>
                     </div>
                     {plan && (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, fontSize: 12, color: C.textSub }}>
@@ -688,8 +1058,51 @@ export default function Native365Page() {
                 {day ? (
                     <>
                         <OpeningScene opening={day.opening} day={day.day} />
-                        <SectionBlock section={day.pronunciation} color={C.gold} tag="発音" />
-                        <SectionBlock section={day.grammar} color={C.green} tag="文法" />
+
+                        {/* Shadow master bar */}
+                        <div style={{
+                            background: '#fff', border: `1px solid ${C.border}`,
+                            borderLeft: `4px solid ${allMastered ? C.green : C.blue}`,
+                            borderRadius: 10, padding: '10px 14px', marginBottom: 16,
+                            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+                        }}>
+                            <div>
+                                <div style={{ fontSize: 9, letterSpacing: 1.5, color: allMastered ? C.green : C.blue, fontWeight: 800 }}>
+                                    SHADOW MASTER
+                                </div>
+                                <div style={{ fontSize: 12, color: C.textSub, marginTop: 2 }}>
+                                    {allMastered
+                                        ? 'この日の全項目を体に入れた。完了マークできる。'
+                                        : `NATIVE タブでシャドー練習。各項目 ${REPS_PER_MASTER} 回ずつ声に出す。`}
+                                </div>
+                            </div>
+                            <div style={{
+                                fontSize: 16, fontWeight: 900,
+                                color: allMastered ? C.green : C.textPrimary,
+                                whiteSpace: 'nowrap',
+                            }}>
+                                {masteredCount} / {dayItems.length}
+                            </div>
+                        </div>
+
+                        <SectionBlock
+                            section={day.pronunciation}
+                            color={C.gold}
+                            tag="発音"
+                            itemReps={stats.itemReps}
+                            onRep={bumpRep}
+                            registeredItems={stats.registeredItems}
+                            onRegister={registerToTraining}
+                        />
+                        <SectionBlock
+                            section={day.grammar}
+                            color={C.green}
+                            tag="文法"
+                            itemReps={stats.itemReps}
+                            onRep={bumpRep}
+                            registeredItems={stats.registeredItems}
+                            onRegister={registerToTraining}
+                        />
                         <DayComplete
                             day={selectedDay}
                             isDone={isDone}

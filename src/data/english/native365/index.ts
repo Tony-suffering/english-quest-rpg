@@ -3,12 +3,32 @@ import { DAY_01 } from './day-01';
 import { DAY_02 } from './day-02';
 import { DAY_03 } from './day-03';
 import { DAY_04 } from './day-04';
+import { DAY_05 } from './day-05';
+import { DAY_06 } from './day-06';
+import { DAY_07 } from './day-07';
+import { DAY_08 } from './day-08';
+import { DAY_09 } from './day-09';
+import { DAY_10 } from './day-10';
 import { DAY_11 } from './day-11';
 import { DAY_12 } from './day-12';
 import { DAY_13 } from './day-13';
+import { DAY_14 } from './day-14';
+import { DAY_15 } from './day-15';
+import { DAY_16 } from './day-16';
+import { DAY_17 } from './day-17';
+import { DAY_18 } from './day-18';
+import { DAY_19 } from './day-19';
+import { DAY_20 } from './day-20';
 import { DAY_21 } from './day-21';
 import { DAY_22 } from './day-22';
 import { DAY_23 } from './day-23';
+import { DAY_24 } from './day-24';
+import { DAY_25 } from './day-25';
+import { DAY_26 } from './day-26';
+import { DAY_27 } from './day-27';
+import { DAY_28 } from './day-28';
+import { DAY_29 } from './day-29';
+import { DAY_30 } from './day-30';
 
 /**
  * ネイティブ365 -- Month 1 index
@@ -63,12 +83,32 @@ export const NATIVE365_DAYS: Record<number, Native365Day> = {
     2: DAY_02,
     3: DAY_03,
     4: DAY_04,
+    5: DAY_05,
+    6: DAY_06,
+    7: DAY_07,
+    8: DAY_08,
+    9: DAY_09,
+    10: DAY_10,
     11: DAY_11,
     12: DAY_12,
     13: DAY_13,
+    14: DAY_14,
+    15: DAY_15,
+    16: DAY_16,
+    17: DAY_17,
+    18: DAY_18,
+    19: DAY_19,
+    20: DAY_20,
     21: DAY_21,
     22: DAY_22,
     23: DAY_23,
+    24: DAY_24,
+    25: DAY_25,
+    26: DAY_26,
+    27: DAY_27,
+    28: DAY_28,
+    29: DAY_29,
+    30: DAY_30,
 };
 
 export function getNative365Day(dayNum: number): Native365Day | null {
