@@ -1761,7 +1761,6 @@ export default function EnglishMaster365Page() {
                                                 border: `1px dashed ${tc.border}`,
                                                 borderRadius: 8,
                                                 padding: '8px 10px',
-                                                marginBottom: 8,
                                             }}>
                                                 <div style={{
                                                     fontSize: 9, letterSpacing: 2, fontWeight: 800,
@@ -1773,20 +1772,6 @@ export default function EnglishMaster365Page() {
                                                     {todayTheme.catch}
                                                 </div>
                                             </div>
-
-                                            {/* CTA to /life */}
-                                            <Link
-                                                href="/membership/life"
-                                                style={{
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                                                    background: tc.accent, color: '#fff',
-                                                    padding: '8px 12px', borderRadius: 8,
-                                                    fontSize: 11, fontWeight: 800, letterSpacing: 1,
-                                                    textDecoration: 'none',
-                                                }}
-                                            >
-                                                拾えた瞬間を /life で録音する →
-                                            </Link>
                                         </div>
                                     );
                                 })()}
