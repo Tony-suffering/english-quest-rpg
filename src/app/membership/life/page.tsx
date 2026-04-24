@@ -48,11 +48,71 @@ function toDateStr(d: Date) { return `${d.getFullYear()}-${String(d.getMonth() +
 const SLUG_KEY = 'tonio-life-member-slug';
 const NAME_KEY = 'tonio-life-member-name';
 
-// ─── Daily challenge (today's お題) ───
+// ─── Daily theme (today's お題) ───
+// お題 = 観察レンズ。一日の過ごし方をチューニングする指示。
+// "今日は『怒り』に注目する" というテーマを朝に受け取り、日中気づいた瞬間を録音で拾う。
 // Day 1 = 2026-04-24 (the ritual start date).
-// dayNumber = days since epoch + 1. Content picks loop modulo converted-recordings.length.
 const CHALLENGE_EPOCH = '2026-04-24';
-const CHALLENGE_DATES_KEY = 'tonio-life-challenge-completed-dates';
+
+interface DailyTheme {
+  title: string;      // 短いタイトル
+  prompt: string;     // 「今日はこう過ごす」の一行指示
+  catch: string;      // 「拾うもの」=録音すべき瞬間の描写
+  tone: 'heavy' | 'turn' | 'body' | 'light';
+}
+
+// 7本のアーク: 暗→転→身体→軽
+const DAILY_THEMES: DailyTheme[] = [
+  {
+    title: '死を背景に置く',
+    prompt: '「もし今日で終わるなら、これをやるか?」を意識的に通す',
+    catch: 'この問いで手が止まった瞬間、または逆に「これだけはやる」と腹が据わった瞬間',
+    tone: 'heavy',
+  },
+  {
+    title: '怒りの一閃を捕まえる',
+    prompt: 'カチッと来た0.5秒を流さない。怒りは速い',
+    catch: 'イラっとした具体的な場面と、自分が「何を侵害された」と感じたか',
+    tone: 'heavy',
+  },
+  {
+    title: '退屈を紛らわせずに味わう',
+    prompt: 'スマホ・作業・会話で退屈を消さない。来たら5秒留まる',
+    catch: '退屈の"肌触り"を言葉にする。ネバっこい／ぼんやり／穴／薄い膜',
+    tone: 'heavy',
+  },
+  {
+    title: '妬みは羅針盤',
+    prompt: '誰かの投稿・話・存在で「ザラッ」と来た瞬間。目を逸らさない',
+    catch: '誰の何に妬んだか。その妬みは、自分が本当に欲しいものを教えている',
+    tone: 'heavy',
+  },
+  {
+    title: '無意味に没頭する',
+    prompt: '意味・効率・成果から離れた瞬間を探す',
+    catch: '「何の役にも立たないな」とやりながら、なぜかやめられなかった1つ',
+    tone: 'turn',
+  },
+  {
+    title: '体が先に言ったこと',
+    prompt: '頭が追いつく前に、肩が上がった／息が止まった／顔が笑った',
+    catch: 'その瞬間の直前に何が起きていたか。感情は体に来てから脳に届く',
+    tone: 'body',
+  },
+  {
+    title: '愛おしさの源泉',
+    prompt: '理由がつかめないのに、なぜか「いいな」と思う小さい物事',
+    catch: '意味が言えない愛着を1つ。暗いテーマの1週間の最後の受け皿',
+    tone: 'light',
+  },
+];
+
+const THEME_TONE_COLORS: Record<DailyTheme['tone'], { accent: string; accentDim: string; bg: string; border: string }> = {
+  heavy: { accent: '#44403C', accentDim: '#1C1917', bg: '#F5F5F4', border: '#D6D3D1' },
+  turn:  { accent: '#8B5CF6', accentDim: '#6D28D9', bg: '#F5F3FF', border: '#DDD6FE' },
+  body:  { accent: '#2563EB', accentDim: '#1D4ED8', bg: '#EFF6FF', border: '#BFDBFE' },
+  light: { accent: '#D4AF37', accentDim: '#B8971F', bg: '#FFFBEB', border: '#FDE68A' },
+};
 
 function jstTodayKey(): string {
   const now = new Date();
@@ -67,6 +127,13 @@ function challengeDaysSince(from: string, to: string): number {
 function prevDateKey(key: string): string {
   const d = new Date(new Date(key + 'T00:00:00+09:00').getTime() - 24 * 3600 * 1000);
   return d.toISOString().slice(0, 10);
+}
+function iso2JstDate(iso: string | null | undefined): string {
+  if (!iso) return '';
+  try {
+    // ISO timestamp (UTC) → JST date string. Assumes created_at already in JST+9 format (from jstNowIso).
+    return iso.slice(0, 10);
+  } catch { return ''; }
 }
 
 function randomSlug(len = 10): string {
@@ -412,8 +479,7 @@ function LifeMemberInner() {
   const [editSaving, setEditSaving] = useState(false);
 
   // ─── Daily challenge state ───
-  const [challengePlayed, setChallengePlayed] = useState<Set<number>>(new Set());
-  const [challengeDates, setChallengeDates] = useState<string[]>([]);
+  // (streak と完了判定は自分の録音から算出するので state 不要)
 
   // ─── Reply state ───
   interface Reply {
@@ -465,19 +531,6 @@ function LifeMemberInner() {
     } catch { /* */ }
   }, [searchParams]);
 
-  // ─── Load challenge state from localStorage ───
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const today = jstTodayKey();
-    try {
-      const raw = localStorage.getItem(`tonio-life-challenge-${today}-played`);
-      if (raw) setChallengePlayed(new Set(JSON.parse(raw)));
-    } catch { /* */ }
-    try {
-      const raw = localStorage.getItem(CHALLENGE_DATES_KEY);
-      if (raw) setChallengeDates(JSON.parse(raw));
-    } catch { /* */ }
-  }, []);
 
   // Fetch
   const fetchRecordings = useCallback(async () => {
@@ -917,62 +970,39 @@ function LifeMemberInner() {
     window.speechSynthesis.speak(u);
   };
 
-  // ─── Today's challenge: pick globally, track completion per-member ───
+  // ─── Today's theme: 観察レンズを配信、完了は自分の録音で判定 ───
   const challengeTodayKey = jstTodayKey();
   const dayNumber = challengeDaysSince(CHALLENGE_EPOCH, challengeTodayKey) + 1;
-  const convertedRecordings = useMemo(() =>
-    [...recordings]
-      .filter(r => r.status === 'converted' && r.japanese)
-      .sort((a, b) => (a.created_at || '').localeCompare(b.created_at || '')),
-    [recordings]
-  );
-  const challenge = convertedRecordings.length > 0
-    ? convertedRecordings[(dayNumber - 1) % convertedRecordings.length]
-    : null;
-  const challengeExprs: string[] = challenge
-    ? [challenge.english_short, challenge.english_attitude, challenge.english_full]
-        .filter((x): x is string => !!x)
-    : [];
-  const allChallengePlayed = challengeExprs.length > 0
-    && challengeExprs.every((_, i) => challengePlayed.has(i));
+  const todayTheme = DAILY_THEMES[(dayNumber - 1) % DAILY_THEMES.length];
+  const todayToneColors = THEME_TONE_COLORS[todayTheme.tone];
 
-  // Personal streak: consecutive days ending on today (or yesterday) in challengeDates
+  // 自分の録音の JST 日付セット ＝ 完了した日
+  const myRecordingDatesSet = useMemo(() => {
+    const s = new Set<string>();
+    for (const r of myRecordings) {
+      const d = iso2JstDate(r.created_at);
+      if (d) s.add(d);
+    }
+    return s;
+  }, [myRecordings]);
+
+  const todayRecordingCount = useMemo(
+    () => myRecordings.filter(r => iso2JstDate(r.created_at) === challengeTodayKey).length,
+    [myRecordings, challengeTodayKey]
+  );
+  const hasRecordedToday = todayRecordingCount > 0;
+
+  // Streak = 連続して録音した日数。今日未録音なら昨日起点で数える
   const streak = useMemo(() => {
-    const set = new Set(challengeDates);
     let d = challengeTodayKey;
-    if (!set.has(d)) d = prevDateKey(d);
+    if (!myRecordingDatesSet.has(d)) d = prevDateKey(d);
     let count = 0;
-    while (set.has(d) && count < 9999) {
+    while (myRecordingDatesSet.has(d) && count < 9999) {
       count++;
       d = prevDateKey(d);
     }
     return count;
-  }, [challengeDates, challengeTodayKey]);
-
-  const playChallengePattern = (idx: number) => {
-    if (!challenge) return;
-    const text = challengeExprs[idx];
-    if (!text) return;
-    speak(text);
-    setChallengePlayed(prev => {
-      if (prev.has(idx)) return prev;
-      const next = new Set(prev);
-      next.add(idx);
-      try {
-        localStorage.setItem(`tonio-life-challenge-${challengeTodayKey}-played`, JSON.stringify([...next]));
-      } catch { /* */ }
-      // Mark today as completed if all patterns played
-      if (challengeExprs.every((_, i) => next.has(i))) {
-        setChallengeDates(prevDates => {
-          if (prevDates.includes(challengeTodayKey)) return prevDates;
-          const arr = [...prevDates, challengeTodayKey].sort();
-          try { localStorage.setItem(CHALLENGE_DATES_KEY, JSON.stringify(arr)); } catch { /* */ }
-          return arr;
-        });
-      }
-      return next;
-    });
-  };
+  }, [myRecordingDatesSet, challengeTodayKey]);
 
   const displayName = name || '匿名';
 
@@ -1063,126 +1093,102 @@ function LifeMemberInner() {
       {/* ─── Install banner ─── */}
       <InstallBanner />
 
-      {/* ─── Today's Challenge ─── */}
-      {challenge && (
-        <div style={{
-          margin: '12px 12px 0',
-          background: `linear-gradient(135deg, ${C.goldBg} 0%, #FEF9E7 100%)`,
-          border: `1px solid ${C.goldBorder}`,
-          borderRadius: 14,
-          padding: '14px 14px 12px',
-          position: 'relative',
-        }}>
-          {/* Header row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 10, letterSpacing: 3, fontWeight: 800, color: C.goldDim }}>
-              今日のお題
-            </span>
-            <span style={{ flex: 1 }} />
+      {/* ─── Today's theme (観察レンズ) ─── */}
+      <div style={{
+        margin: '12px 12px 0',
+        background: `linear-gradient(135deg, ${todayToneColors.bg} 0%, #FFFFFF 100%)`,
+        border: `1px solid ${todayToneColors.border}`,
+        borderRadius: 16,
+        padding: '16px 16px 14px',
+        position: 'relative',
+      }}>
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+          <span style={{
+            fontSize: 10, letterSpacing: 3, fontWeight: 800,
+            color: todayToneColors.accentDim,
+          }}>
+            今日のお題
+          </span>
+          <span style={{ flex: 1 }} />
+          <span style={{
+            fontSize: 11, fontWeight: 900, color: C.text,
+            background: C.card, padding: '3px 10px', borderRadius: 999,
+            border: `1px solid ${todayToneColors.border}`, letterSpacing: 1,
+          }}>Day {dayNumber}</span>
+          {streak > 0 && (
             <span style={{
-              fontSize: 11, fontWeight: 900, color: C.text,
-              background: C.card, padding: '3px 10px', borderRadius: 999,
-              border: `1px solid ${C.goldBorder}`, letterSpacing: 1,
-            }}>Day {dayNumber}</span>
-            {streak > 0 && (
-              <span style={{
-                fontSize: 10, fontWeight: 800, color: C.goldDim,
-                padding: '3px 10px', borderRadius: 999,
-                background: C.card, border: `1px solid ${C.goldBorder}`,
-                letterSpacing: 1,
-              }}>連続 {streak} 日</span>
-            )}
-          </div>
-
-          {/* Japanese quote */}
-          <div style={{
-            fontSize: 18, fontWeight: 800, color: C.text,
-            lineHeight: 1.55, letterSpacing: 0.5,
-            fontFamily: "'Noto Serif JP', 'Source Serif Pro', Georgia, serif",
-            padding: '2px 0 12px',
-          }}>
-            〝{challenge.japanese}〞
-          </div>
-
-          {/* 3 patterns */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {challengeExprs.map((text, i) => {
-              const ch = PATTERN_CHARS[Math.min(i, PATTERN_CHARS.length - 1)];
-              const played = challengePlayed.has(i);
-              return (
-                <button
-                  key={i}
-                  onClick={() => playChallengePattern(i)}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    background: played ? ch.bg : C.card,
-                    border: `1.5px solid ${played ? ch.color : C.border}`,
-                    borderRadius: 12, padding: '10px 12px',
-                    textAlign: 'left', cursor: 'pointer',
-                    transition: 'background 0.15s, border 0.15s',
-                    fontFamily: 'inherit',
-                  }}
-                >
-                  <img src={ch.avatar} alt={ch.name} width={32} height={32} style={{
-                    width: 32, height: 32, borderRadius: '50%',
-                    border: `2px solid ${ch.color}`, background: C.card,
-                    objectFit: 'cover', flexShrink: 0,
-                  }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 9, fontWeight: 800, color: ch.color, letterSpacing: 1.2 }}>
-                      {ch.role}  {ch.sub}
-                    </div>
-                    <div style={{
-                      fontSize: 13, fontWeight: 600, color: C.text,
-                      lineHeight: 1.5, marginTop: 2,
-                    }}>
-                      {text}
-                    </div>
-                  </div>
-                  <span style={{
-                    fontSize: 10, fontWeight: 800, letterSpacing: 1,
-                    color: played ? ch.color : C.textFaint,
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {played ? '再生済' : '▶ 再生'}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Progress */}
-          <div style={{
-            marginTop: 12, display: 'flex', alignItems: 'center', gap: 8,
-            fontSize: 10, fontWeight: 800, letterSpacing: 1,
-          }}>
-            <div style={{
-              flex: 1, height: 5, background: C.card, borderRadius: 3,
-              border: `1px solid ${C.goldBorder}`, overflow: 'hidden',
-            }}>
-              <div style={{
-                width: `${(challengePlayed.size / Math.max(1, challengeExprs.length)) * 100}%`,
-                height: '100%', background: allChallengePlayed ? C.green : C.gold,
-                transition: 'width 0.3s, background 0.3s',
-              }} />
-            </div>
-            <span style={{ color: allChallengePlayed ? C.green : C.textDim }}>
-              {challengePlayed.size}/{challengeExprs.length}
-            </span>
-          </div>
-
-          {allChallengePlayed && (
-            <div style={{
-              marginTop: 10, padding: '8px 12px', borderRadius: 8,
-              background: C.green, color: 'white',
-              fontSize: 11, fontWeight: 800, letterSpacing: 1.5,
-              textAlign: 'center',
-            }}>
-              今日のお題 完了 --- また明日
-            </div>
+              fontSize: 10, fontWeight: 800,
+              color: hasRecordedToday ? C.green : todayToneColors.accentDim,
+              padding: '3px 10px', borderRadius: 999,
+              background: C.card,
+              border: `1px solid ${hasRecordedToday ? C.green : todayToneColors.border}`,
+              letterSpacing: 1,
+            }}>連続 {streak} 日</span>
           )}
         </div>
-      )}
+
+        {/* Theme title */}
+        <div style={{
+          fontSize: 20, fontWeight: 900, color: todayToneColors.accentDim,
+          lineHeight: 1.4, letterSpacing: 0.5,
+          fontFamily: "'Noto Serif JP', 'Source Serif Pro', Georgia, serif",
+          padding: '2px 0 8px',
+        }}>
+          {todayTheme.title}
+        </div>
+
+        {/* Prompt */}
+        <div style={{
+          fontSize: 13, fontWeight: 600, color: C.textSub,
+          lineHeight: 1.7, padding: '2px 0 10px',
+        }}>
+          {todayTheme.prompt}
+        </div>
+
+        {/* Catch hint */}
+        <div style={{
+          background: C.card,
+          border: `1px dashed ${todayToneColors.border}`,
+          borderRadius: 10,
+          padding: '10px 12px',
+          marginBottom: 12,
+        }}>
+          <div style={{
+            fontSize: 9, letterSpacing: 2, fontWeight: 800,
+            color: todayToneColors.accent, marginBottom: 4,
+          }}>
+            拾うもの
+          </div>
+          <div style={{ fontSize: 12, color: C.textSub, lineHeight: 1.7 }}>
+            {todayTheme.catch}
+          </div>
+        </div>
+
+        {/* CTA + completion */}
+        {hasRecordedToday ? (
+          <div style={{
+            background: C.green, color: 'white',
+            borderRadius: 10, padding: '10px 14px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            fontSize: 12, fontWeight: 800, letterSpacing: 1.2,
+          }}>
+            今日 {todayRecordingCount} 件 拾った --- また明日
+          </div>
+        ) : (
+          <div style={{
+            background: C.card,
+            border: `1.5px solid ${todayToneColors.accent}`,
+            borderRadius: 10, padding: '10px 14px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            fontSize: 12, fontWeight: 700,
+            color: todayToneColors.accentDim,
+          }}>
+            <span>拾えた瞬間は下のマイクから録音する</span>
+            <span style={{ fontSize: 14 }}>↓</span>
+          </div>
+        )}
+      </div>
 
       {/* ─── Day navigator ─── */}
       <div style={{
