@@ -378,6 +378,18 @@ function LifeMemberInner() {
   const [diarySaving, setDiarySaving] = useState(false);
   const [isLifeAdmin, setIsLifeAdmin] = useState(false);
 
+  // ─── Recording edit state ───
+  interface EditDraft {
+    japanese: string;
+    english_short: string;
+    english_attitude: string;
+    english_full: string;
+    context: string;
+  }
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<EditDraft | null>(null);
+  const [editSaving, setEditSaving] = useState(false);
+
   // ─── Reply state ───
   interface Reply {
     id: number;
@@ -801,6 +813,60 @@ function LifeMemberInner() {
       });
       setRecordings(prev => prev.filter(r => r.id !== id));
     } catch { /* */ }
+  };
+
+  // ─── Edit recording (own or admin) ───
+  const startEdit = (rec: Recording) => {
+    setEditingId(rec.id);
+    setEditDraft({
+      japanese: rec.japanese || '',
+      english_short: rec.english_short || '',
+      english_attitude: rec.english_attitude || '',
+      english_full: rec.english_full || '',
+      context: rec.context || '',
+    });
+  };
+  const cancelEdit = () => { setEditingId(null); setEditDraft(null); };
+  const saveEdit = async () => {
+    if (!editingId || !editDraft || editSaving) return;
+    const ja = editDraft.japanese.trim();
+    if (!ja) return;
+    setEditSaving(true);
+    const rec = recordings.find(r => r.id === editingId);
+    const isConverted = rec?.status === 'converted';
+    const body: Record<string, unknown> = { id: editingId, edit: true, japanese: ja };
+    if (isConverted) {
+      body.english_short = editDraft.english_short.trim();
+      body.english_attitude = editDraft.english_attitude.trim();
+      body.english_full = editDraft.english_full.trim();
+      body.context = editDraft.context.trim();
+    }
+    try {
+      const res = await fetch('/api/life-recordings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setRecordings(prev => prev.map(r => {
+          if (r.id !== editingId) return r;
+          const next: Recording = { ...r, japanese: ja };
+          if (isConverted) {
+            next.english_short = editDraft.english_short.trim();
+            next.english_attitude = editDraft.english_attitude.trim();
+            next.english_full = editDraft.english_full.trim();
+            next.context = editDraft.context.trim();
+          }
+          return next;
+        }));
+        setEditingId(null);
+        setEditDraft(null);
+      }
+    } catch { /* */ }
+    finally {
+      setEditSaving(false);
+    }
   };
 
   // TTS
@@ -1376,13 +1442,127 @@ function LifeMemberInner() {
                       {roleLabel}
                     </span>
                     <span style={{ flex: 1 }} />
-                    {isMine && (
-                      <button onClick={() => deleteRecording(rec.id)} style={{
-                        background: 'none', border: 'none', cursor: 'pointer',
-                        fontSize: 12, color: C.textGhost, padding: 0,
-                      }}>x</button>
-                    )}
+                    {(isMine || (isAuthor && isLifeAdmin)) && editingId === rec.id ? (
+                      <span style={{
+                        fontSize: 9, letterSpacing: 2, fontWeight: 800,
+                        color: C.goldDim, background: C.card,
+                        padding: '3px 8px', borderRadius: 999,
+                        border: `1px solid ${C.goldBorder}`,
+                      }}>編集中</span>
+                    ) : (isMine || (isAuthor && isLifeAdmin)) ? (
+                      <>
+                        <button
+                          onClick={() => startEdit(rec)}
+                          title="この録音を編集"
+                          style={{
+                            border: `1px solid ${C.border}`, background: C.card,
+                            color: C.textDim, cursor: 'pointer',
+                            padding: '3px 8px', borderRadius: 999,
+                            fontSize: 9, fontWeight: 800, letterSpacing: 1,
+                          }}
+                        >編集</button>
+                        <button onClick={() => deleteRecording(rec.id)} style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          fontSize: 12, color: C.textGhost, padding: 0,
+                        }}>x</button>
+                      </>
+                    ) : null}
                   </div>
+
+                  {editingId === rec.id && editDraft ? (() => {
+                    const fieldLabel: React.CSSProperties = {
+                      fontSize: 9, letterSpacing: 2, color: C.goldDim,
+                      fontWeight: 800, marginBottom: 4, display: 'block',
+                    };
+                    const ta: React.CSSProperties = {
+                      width: '100%', boxSizing: 'border-box',
+                      padding: '10px 12px', borderRadius: 10,
+                      border: `1px solid ${C.border}`, background: C.card,
+                      color: C.text, fontSize: 14, lineHeight: 1.6,
+                      fontFamily: 'inherit', resize: 'vertical',
+                      outline: 'none',
+                    };
+                    const jaEmpty = !editDraft.japanese.trim();
+                    return (
+                      <div style={{ padding: '16px 16px 14px' }}>
+                        <div style={{ marginBottom: 12 }}>
+                          <label style={fieldLabel}>日本語 (原文)</label>
+                          <textarea
+                            value={editDraft.japanese}
+                            onChange={e => setEditDraft(d => d ? { ...d, japanese: e.target.value } : d)}
+                            rows={2}
+                            style={{ ...ta, fontFamily: "'Noto Serif JP', 'Source Serif Pro', Georgia, serif", fontWeight: 700 }}
+                          />
+                        </div>
+                        {isConverted && (
+                          <>
+                            <div style={{ marginBottom: 10 }}>
+                              <label style={{ ...fieldLabel, color: C.text }}>A ストレート (直球の訳)</label>
+                              <textarea
+                                value={editDraft.english_short}
+                                onChange={e => setEditDraft(d => d ? { ...d, english_short: e.target.value } : d)}
+                                rows={2}
+                                style={ta}
+                              />
+                            </div>
+                            <div style={{ marginBottom: 10 }}>
+                              <label style={{ ...fieldLabel, color: C.goldDim }}>B ネイティブ (実生活の口癖)</label>
+                              <textarea
+                                value={editDraft.english_attitude}
+                                onChange={e => setEditDraft(d => d ? { ...d, english_attitude: e.target.value } : d)}
+                                rows={2}
+                                style={ta}
+                              />
+                            </div>
+                            <div style={{ marginBottom: 10 }}>
+                              <label style={{ ...fieldLabel, color: C.blue }}>C クセ強 (とにお流)</label>
+                              <textarea
+                                value={editDraft.english_full}
+                                onChange={e => setEditDraft(d => d ? { ...d, english_full: e.target.value } : d)}
+                                rows={2}
+                                style={ta}
+                              />
+                            </div>
+                            <div style={{ marginBottom: 14 }}>
+                              <label style={fieldLabel}>なぜそうなるのか</label>
+                              <textarea
+                                value={editDraft.context}
+                                onChange={e => setEditDraft(d => d ? { ...d, context: e.target.value } : d)}
+                                rows={4}
+                                style={ta}
+                              />
+                            </div>
+                          </>
+                        )}
+                        <div style={{ display: 'flex', gap: 8 }}>
+                          <button
+                            onClick={cancelEdit}
+                            disabled={editSaving}
+                            style={{
+                              flex: 1, padding: 12, borderRadius: 12,
+                              border: `1px solid ${C.border}`,
+                              background: C.card, color: C.textDim,
+                              fontSize: 12, fontWeight: 800, letterSpacing: 1,
+                              cursor: editSaving ? 'default' : 'pointer',
+                              opacity: editSaving ? 0.5 : 1,
+                            }}
+                          >キャンセル</button>
+                          <button
+                            onClick={saveEdit}
+                            disabled={editSaving || jaEmpty}
+                            style={{
+                              flex: 2, padding: 12, borderRadius: 12, border: 'none',
+                              background: jaEmpty ? C.border : C.text,
+                              color: jaEmpty ? C.textFaint : 'white',
+                              fontSize: 12, fontWeight: 800, letterSpacing: 1,
+                              cursor: (editSaving || jaEmpty) ? 'default' : 'pointer',
+                              opacity: editSaving ? 0.5 : 1,
+                            }}
+                          >{editSaving ? '保存中...' : '保存'}</button>
+                        </div>
+                      </div>
+                    );
+                  })() : (<>
 
                   {/* Japanese */}
                   <div style={{ padding: '20px 18px 6px', textAlign: 'center' }}>
@@ -1627,6 +1807,7 @@ function LifeMemberInner() {
                       </div>
                     </div>
                   )}
+                  </>)}
                 </div>
               );
             })}
