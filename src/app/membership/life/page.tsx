@@ -374,6 +374,9 @@ function LifeMemberInner() {
   const [diaryNews, setDiaryNews] = useState<string>('');
   const [diaryLoaded, setDiaryLoaded] = useState(false);
   const [diaryDates, setDiaryDates] = useState<Set<string>>(new Set());
+  const [diaryEditorOpen, setDiaryEditorOpen] = useState(false);
+  const [diarySaving, setDiarySaving] = useState(false);
+  const [isLifeAdmin, setIsLifeAdmin] = useState(false);
 
   // ─── Reply state ───
   interface Reply {
@@ -411,6 +414,17 @@ function LifeMemberInner() {
     try {
       const savedName = localStorage.getItem(NAME_KEY);
       if (savedName) setName(savedName);
+    } catch { /* */ }
+  }, [searchParams]);
+
+  // ─── Admin gate: ?admin=1 → localStorage flag. obscurity only. ───
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      if (searchParams?.get('admin') === '1') {
+        localStorage.setItem('tonio-life-admin', 'true');
+      }
+      setIsLifeAdmin(localStorage.getItem('tonio-life-admin') === 'true');
     } catch { /* */ }
   }, [searchParams]);
 
@@ -465,7 +479,42 @@ function LifeMemberInner() {
       setDiaryLoaded(true);
     }
   }, []);
-  useEffect(() => { fetchDiaryForDate(selectedDateStr); }, [fetchDiaryForDate, selectedDateStr]);
+  useEffect(() => { fetchDiaryForDate(selectedDateStr); setDiaryEditorOpen(false); }, [fetchDiaryForDate, selectedDateStr]);
+
+  // ─── Diary admin write ───
+  const saveDiary = async () => {
+    if (diarySaving) return;
+    setDiarySaving(true);
+    try {
+      const res = await fetch('/api/life-diary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date: selectedDateStr, content: diaryContent.trim(), news: diaryNews.trim() || null }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDiaryDates(prev => new Set([...prev, selectedDateStr]));
+        setDiaryEditorOpen(false);
+      }
+    } catch { /* */ }
+    finally {
+      setDiarySaving(false);
+    }
+  };
+
+  const deleteDiary = async () => {
+    if (!confirm('この日の日記を削除する？')) return;
+    try {
+      const res = await fetch(`/api/life-diary?date=${encodeURIComponent(selectedDateStr)}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        setDiaryContent('');
+        setDiaryNews('');
+        setDiaryDates(prev => { const next = new Set(prev); next.delete(selectedDateStr); return next; });
+        setDiaryEditorOpen(false);
+      }
+    } catch { /* */ }
+  };
 
   // ─── Replies fetch ───
   const fetchReplyCounts = useCallback(async () => {
@@ -995,8 +1044,8 @@ function LifeMemberInner() {
         </div>
       </div>
 
-      {/* ─── Daily Diary (read-only) ─── */}
-      {diaryLoaded && diaryContent && (
+      {/* ─── Daily Diary (read-only for members, editable for admin) ─── */}
+      {diaryLoaded && (diaryContent || isLifeAdmin) && (
         <div style={{
           background: C.card, padding: '14px 14px 16px',
           borderBottom: `1px solid ${C.border}`,
@@ -1012,8 +1061,87 @@ function LifeMemberInner() {
             <span style={{
               fontSize: 9, fontWeight: 700, color: C.textFaint, letterSpacing: 1,
             }}>とにお</span>
+            {isLifeAdmin && !diaryEditorOpen && (
+              <button
+                onClick={() => setDiaryEditorOpen(true)}
+                style={{
+                  background: 'none', border: `1px solid ${C.border}`,
+                  padding: '4px 10px', borderRadius: 999, cursor: 'pointer',
+                  fontSize: 10, fontWeight: 700, color: C.textDim, letterSpacing: 1,
+                }}
+              >
+                {diaryContent ? '編集' : '書く'}
+              </button>
+            )}
           </div>
 
+          {diaryEditorOpen && isLifeAdmin ? (
+            <div>
+              <textarea
+                value={diaryContent}
+                onChange={e => setDiaryContent(e.target.value)}
+                placeholder="今日の日記。とにお目線で短く、おもしろく。"
+                rows={6}
+                style={{
+                  width: '100%', padding: 12, borderRadius: 10,
+                  border: `1px solid ${C.border}`, background: C.bg,
+                  fontSize: 13, fontFamily: 'inherit', color: C.text,
+                  resize: 'vertical', lineHeight: 1.7, boxSizing: 'border-box',
+                }}
+              />
+              <div style={{ height: 8 }} />
+              <input
+                value={diaryNews}
+                onChange={e => setDiaryNews(e.target.value)}
+                placeholder="外の世界のニュース(1行)"
+                style={{
+                  width: '100%', padding: '10px 12px', borderRadius: 10,
+                  border: `1px solid ${C.border}`, background: C.bg,
+                  fontSize: 12, fontFamily: 'inherit', color: C.text,
+                  boxSizing: 'border-box',
+                }}
+              />
+              <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                <button
+                  onClick={saveDiary}
+                  disabled={diarySaving || !diaryContent.trim()}
+                  style={{
+                    flex: 1, padding: 10, borderRadius: 10, border: 'none',
+                    background: diarySaving || !diaryContent.trim() ? C.border : C.text,
+                    color: diarySaving || !diaryContent.trim() ? C.textFaint : C.card,
+                    fontSize: 12, fontWeight: 800, letterSpacing: 1,
+                    cursor: diarySaving || !diaryContent.trim() ? 'default' : 'pointer',
+                  }}
+                >
+                  {diarySaving ? '...' : '保存'}
+                </button>
+                <button
+                  onClick={() => { setDiaryEditorOpen(false); fetchDiaryForDate(selectedDateStr); }}
+                  style={{
+                    padding: '10px 14px', borderRadius: 10,
+                    border: `1px solid ${C.border}`, background: C.card,
+                    color: C.textDim, fontSize: 12, fontWeight: 700,
+                    cursor: 'pointer', letterSpacing: 1,
+                  }}
+                >
+                  キャンセル
+                </button>
+                {diaryDates.has(selectedDateStr) && (
+                  <button
+                    onClick={deleteDiary}
+                    style={{
+                      padding: '10px 12px', borderRadius: 10,
+                      border: `1px solid ${C.border}`, background: C.card,
+                      color: '#EF4444', fontSize: 11, fontWeight: 700,
+                      cursor: 'pointer', letterSpacing: 1,
+                    }}
+                  >
+                    削除
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : diaryContent ? (
           <div style={{
             background: `linear-gradient(135deg, ${C.goldBg} 0%, #FEF9E7 100%)`,
             border: `1px solid ${C.goldBorder}`,
@@ -1043,6 +1171,15 @@ function LifeMemberInner() {
               </div>
             )}
           </div>
+          ) : (
+            <div style={{
+              padding: '12px 14px', borderRadius: 10,
+              border: `1px dashed ${C.border}`, background: C.bg,
+              fontSize: 12, color: C.textDim, fontStyle: 'italic',
+            }}>
+              この日の日記はまだありません。「書く」から追加できます。
+            </div>
+          )}
 
           {/* ─── Replies (みなさんはどう？) ─── */}
           <div style={{ marginTop: 18 }}>

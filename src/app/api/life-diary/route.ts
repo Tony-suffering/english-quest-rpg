@@ -28,6 +28,12 @@ async function queryD1<T = unknown>(sql: string, params: (string | number | null
     return data.result[0];
 }
 
+function jstNowIso(): string {
+    const now = new Date();
+    const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+    return jst.toISOString().replace('Z', '+09:00');
+}
+
 // GET /api/life-diary?date=YYYY-MM-DD -- single diary
 // GET /api/life-diary?list=true -- list of dates with diaries
 export async function GET(request: Request) {
@@ -50,6 +56,64 @@ export async function GET(request: Request) {
             [date]
         );
         return NextResponse.json({ success: true, diary: result.results[0] || null });
+    } catch (err) {
+        return NextResponse.json({ success: false, error: String(err) }, { status: 500 });
+    }
+}
+
+// POST /api/life-diary
+// body: { date: 'YYYY-MM-DD', content: string, news?: string | null }
+// upsert: updates if exists, inserts if not
+export async function POST(request: Request) {
+    try {
+        const body = await request.json();
+        const { date, content, news } = body;
+        if (!date || !content || !String(content).trim()) {
+            return NextResponse.json({ success: false, error: 'date and content required' }, { status: 400 });
+        }
+        const now = jstNowIso();
+        const trimmedContent = String(content).trim();
+        const trimmedNews = news ? String(news).trim() : null;
+
+        const existing = await queryD1<LifeDiary>(
+            'SELECT * FROM life_diaries WHERE date = ?',
+            [date]
+        );
+
+        if (existing.results.length > 0) {
+            await queryD1(
+                'UPDATE life_diaries SET content = ?, news = ?, updated_at = ? WHERE date = ?',
+                [trimmedContent, trimmedNews, now, date]
+            );
+            return NextResponse.json({
+                success: true,
+                diary: { date, content: trimmedContent, news: trimmedNews, created_at: existing.results[0].created_at, updated_at: now },
+            });
+        }
+
+        await queryD1(
+            'INSERT INTO life_diaries (date, content, news, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
+            [date, trimmedContent, trimmedNews, now, now]
+        );
+        return NextResponse.json({
+            success: true,
+            diary: { date, content: trimmedContent, news: trimmedNews, created_at: now, updated_at: now },
+        });
+    } catch (err) {
+        return NextResponse.json({ success: false, error: String(err) }, { status: 500 });
+    }
+}
+
+// DELETE /api/life-diary?date=YYYY-MM-DD
+export async function DELETE(request: Request) {
+    try {
+        const url = new URL(request.url);
+        const date = url.searchParams.get('date');
+        if (!date) {
+            return NextResponse.json({ success: false, error: 'date required' }, { status: 400 });
+        }
+        await queryD1('DELETE FROM life_diaries WHERE date = ?', [date]);
+        return NextResponse.json({ success: true });
     } catch (err) {
         return NextResponse.json({ success: false, error: String(err) }, { status: 500 });
     }
