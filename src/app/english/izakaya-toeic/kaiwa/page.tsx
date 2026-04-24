@@ -30,6 +30,7 @@ import { charIcon } from '@/data/izakaya-toeic/characters';
 import { KAIWA_STORIES, type KaiwaStory } from '@/data/english/365/kaiwa-stories';
 import { KAIWA_STORIES_2 } from '@/data/english/365/kaiwa-stories-2';
 import { KAIWA_STORIES_3 } from '@/data/english/365/kaiwa-stories-3';
+import { getDailyTheme, THEME_TONE_COLORS } from '@/data/english/365/daily-themes';
 import {
     playTapPlay, playMasteryOn, playMasteryOff, playDayComplete,
     playRegister, playDaySwitch, playStoryToggle, playLevelSwitch, playNavClick,
@@ -1706,6 +1707,89 @@ export default function EnglishMaster365Page() {
                                 <p style={{ fontSize: 13, color: '#78716C', margin: 0 }}>
                                     {dayTheme.scene}
                                 </p>
+
+                                {/* Today's Theme -- 下層パターン抽出 + 日常レンズ */}
+                                {selectedDay && (() => {
+                                    const todayTheme = getDailyTheme(selectedDay);
+                                    if (!todayTheme) return null;
+                                    const tc = THEME_TONE_COLORS[todayTheme.tone];
+                                    return (
+                                        <div style={{
+                                            marginTop: 14,
+                                            background: `linear-gradient(135deg, ${tc.bg} 0%, #FFFFFF 100%)`,
+                                            border: `1px solid ${tc.border}`,
+                                            borderRadius: 12,
+                                            padding: '12px 14px',
+                                        }}>
+                                            {/* Header label */}
+                                            <div style={{
+                                                display: 'flex', alignItems: 'center', gap: 8,
+                                                marginBottom: 8, flexWrap: 'wrap',
+                                            }}>
+                                                <span style={{
+                                                    fontSize: 9, letterSpacing: 3, fontWeight: 800,
+                                                    color: tc.accentDim,
+                                                }}>
+                                                    今日のお題 --- 日常にどう効かせるか
+                                                </span>
+                                            </div>
+
+                                            {/* Pattern (下層) */}
+                                            <div style={{
+                                                fontSize: 12, fontWeight: 700,
+                                                color: tc.accentDim,
+                                                padding: '2px 0 8px',
+                                                lineHeight: 1.6,
+                                            }}>
+                                                {todayTheme.surface} の下層 = <span style={{ color: tc.accent }}>{todayTheme.pattern}</span>
+                                            </div>
+
+                                            {/* Prompt */}
+                                            <div style={{
+                                                fontSize: 14, fontWeight: 700,
+                                                color: '#1C1917',
+                                                lineHeight: 1.65, letterSpacing: 0.3,
+                                                padding: '6px 0 10px',
+                                                borderTop: `1px dashed ${tc.border}`,
+                                            }}>
+                                                {todayTheme.prompt}
+                                            </div>
+
+                                            {/* Catch hint */}
+                                            <div style={{
+                                                background: '#FFFFFF',
+                                                border: `1px dashed ${tc.border}`,
+                                                borderRadius: 8,
+                                                padding: '8px 10px',
+                                                marginBottom: 8,
+                                            }}>
+                                                <div style={{
+                                                    fontSize: 9, letterSpacing: 2, fontWeight: 800,
+                                                    color: tc.accent, marginBottom: 3,
+                                                }}>
+                                                    拾うもの
+                                                </div>
+                                                <div style={{ fontSize: 11, color: '#44403C', lineHeight: 1.6 }}>
+                                                    {todayTheme.catch}
+                                                </div>
+                                            </div>
+
+                                            {/* CTA to /life */}
+                                            <Link
+                                                href="/membership/life"
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                                    background: tc.accent, color: '#fff',
+                                                    padding: '8px 12px', borderRadius: 8,
+                                                    fontSize: 11, fontWeight: 800, letterSpacing: 1,
+                                                    textDecoration: 'none',
+                                                }}
+                                            >
+                                                拾えた瞬間を /life で録音する →
+                                            </Link>
+                                        </div>
+                                    );
+                                })()}
 
                                 {/* Story Intro */}
                                 {(() => {
