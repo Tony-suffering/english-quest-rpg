@@ -324,6 +324,27 @@ export default function HomePage() {
             </section>
 
 
+            {/* ━━━ LINE ━━━ */}
+            <section className="px-6 sm:px-12 lg:px-24 py-20 bg-white border-t border-[#E7E5E4]">
+                <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} transition={{ staggerChildren: 0.1 }} className="max-w-2xl mx-auto">
+                    <motion.p variants={f} className="text-[10px] tracking-[0.3em] text-[#06C755] font-mono mb-4">LINE</motion.p>
+                    <motion.h2 variants={f} className="text-2xl sm:text-3xl font-black leading-[1.4] mb-3">
+                        毎朝7時、居酒屋から声が届く。
+                    </motion.h2>
+                    <motion.p variants={f} className="text-sm text-[#252423]/50 mb-8 leading-[1.9]">
+                        権藤マスター、ユキ、タケシ、リサ、健二、ミナ。<br />
+                        6人の常連が毎朝1分の馬鹿話を LINE に送ってくる。<br />
+                        返信すると、居酒屋の誰かが何かを喋り出す。
+                    </motion.p>
+                    <motion.div variants={f}>
+                        <a href="https://lin.ee/s1rp3w0" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-8 py-4 bg-[#06C755] text-white text-sm font-bold tracking-wide hover:bg-[#252423] transition-colors">
+                            LINE で友だち追加 <span className="text-xs opacity-50">→</span>
+                        </a>
+                    </motion.div>
+                </motion.div>
+            </section>
+
+
             {/* ━━━ FINAL CTA ━━━ */}
             <section className="px-6 sm:px-12 lg:px-24 py-20 bg-[#FAFAF9]">
                 <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }} transition={{ staggerChildren: 0.1 }} className="max-w-3xl mx-auto text-center">
