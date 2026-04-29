@@ -1,5 +1,6 @@
 {
     "crons": [
-        { "path": "/api/line-cron", "schedule": "0 22 * * *" }
+        { "path": "/api/line-cron", "schedule": "0 22 * * *" },
+        { "path": "/api/line-cron-skit", "schedule": "0 11 * * *" }
     ]
 }

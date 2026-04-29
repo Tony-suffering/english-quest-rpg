@@ -1,4 +1,6 @@
 import { MASTER_EXPRESSIONS, type MasterExpression } from '@/data/english/365/master-expressions';
+import { SKIT_NODES, ENTRY_NODE_IDS, SKIT_NODE_MAP } from '@/data/bot/skits';
+import { CHARACTER_LABEL, type BotNode, type BotCharacter } from '@/data/bot/types';
 
 const CHARACTER_LABELS: Record<MasterExpression['character'], string> = {
     yuki: 'ユキ',
@@ -7,6 +9,17 @@ const CHARACTER_LABELS: Record<MasterExpression['character'], string> = {
     lisa: 'リサ',
     kenji: '健二',
     mina: 'ミナ',
+};
+
+const SKIT_AVATAR_BASE = 'https://www.toniolab.com/characters';
+const AVATAR_FILE: Record<BotCharacter, string> = {
+    gondo: 'master.webp',
+    yuki: 'yuki.webp',
+    takeshi: 'takeshi.webp',
+    lisa: 'lisa.webp',
+    kenji: 'kenji.webp',
+    mina: 'mina.webp',
+    system: 'master.webp',
 };
 
 const MORNING_OPENERS = [
@@ -57,4 +70,57 @@ export function buildDailyMessage(dateStr: string, friendKaiwaUrl: string): stri
 export function todayJstString(now: Date = new Date()): string {
     const jst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
     return jst.toISOString().slice(0, 10);
+}
+
+// === Evening skit (Flex Message with character avatar) ===
+
+export function pickSkitForDate(dateStr: string): BotNode {
+    const seed = dateSeed(dateStr);
+    const id = ENTRY_NODE_IDS[seed % ENTRY_NODE_IDS.length];
+    return SKIT_NODE_MAP.get(id)!;
+}
+
+export function buildSkitFlexMessage(node: BotNode): object {
+    const charLabel = CHARACTER_LABEL[node.character] || '';
+    const avatarFile = AVATAR_FILE[node.character];
+    const avatarUrl = `${SKIT_AVATAR_BASE}/${avatarFile}`;
+    const body = node.lines.join('\n');
+    const altText = `${charLabel}「${node.lines[0].slice(0, 40)}…」`;
+
+    return {
+        type: 'flex',
+        altText,
+        contents: {
+            type: 'bubble',
+            size: 'kilo',
+            hero: {
+                type: 'image',
+                url: avatarUrl,
+                size: 'full',
+                aspectRatio: '1:1',
+                aspectMode: 'cover',
+            },
+            body: {
+                type: 'box',
+                layout: 'vertical',
+                spacing: 'md',
+                contents: [
+                    {
+                        type: 'text',
+                        text: charLabel,
+                        weight: 'bold',
+                        size: 'md',
+                        color: '#252423',
+                    },
+                    {
+                        type: 'text',
+                        text: body,
+                        wrap: true,
+                        size: 'sm',
+                        color: '#444444',
+                    },
+                ],
+            },
+        },
+    };
 }
