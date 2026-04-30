@@ -99,7 +99,21 @@ export async function POST(request: Request) {
 
             // テキスト: キーワード→entry。マッチしなかったら fallback
             if (ev.type === 'message' && ev.message?.type === 'text' && ev.message.text) {
-                const node = pickEntryFromText(ev.message.text);
+                const text = ev.message.text.trim();
+                // userId 取得用コマンド (admin テスト送信先設定)
+                if (text === 'whoami' || text === '/whoami') {
+                    const uid = ev.source?.userId ?? '(unknown)';
+                    await reply(
+                        ev.replyToken,
+                        [{
+                            type: 'text',
+                            text: `あなたの LINE userId:\n${uid}\n\nコピーして .env.local の LINE_TEST_USER_ID に貼ってくれ`,
+                        }],
+                        token,
+                    );
+                    return;
+                }
+                const node = pickEntryFromText(text);
                 await reply(ev.replyToken, [nodeToLineMessage(node)], token);
                 return;
             }
