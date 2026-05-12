@@ -30,6 +30,9 @@ import { charIcon } from '@/data/izakaya-toeic/characters';
 import { KAIWA_STORIES, type KaiwaStory } from '@/data/english/365/kaiwa-stories';
 import { KAIWA_STORIES_2 } from '@/data/english/365/kaiwa-stories-2';
 import { KAIWA_STORIES_3 } from '@/data/english/365/kaiwa-stories-3';
+import { KAIWA_STORIES_4 } from '@/data/english/365/kaiwa-stories-4';
+import { KAIWA_STORIES_5 } from '@/data/english/365/kaiwa-stories-5';
+import { KAIWA_STORIES_6 } from '@/data/english/365/kaiwa-stories-6';
 import { getDailyTheme, THEME_TONE_COLORS } from '@/data/english/365/daily-themes';
 import {
     playTapPlay, playMasteryOn, playMasteryOff, playDayComplete,
@@ -39,7 +42,7 @@ import {
 } from '@/lib/kaiwa-sounds';
 import { getStreakComment, getMissionCompleteComment, CREATOR_PROFILE } from '@/data/english/creator-voice';
 
-const ALL_KAIWA_STORIES = [...KAIWA_STORIES, ...KAIWA_STORIES_2, ...KAIWA_STORIES_3];
+const ALL_KAIWA_STORIES = [...KAIWA_STORIES, ...KAIWA_STORIES_2, ...KAIWA_STORIES_3, ...KAIWA_STORIES_4, ...KAIWA_STORIES_5, ...KAIWA_STORIES_6];
 
 // Inject keyframe animation for play button pulse
 const KAIWA_STYLES = `
