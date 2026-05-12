@@ -1004,6 +1004,49 @@ export default function EnglishMaster365Page() {
         });
     }, [selectedDay]);
 
+    // Register FLOW (native's internal monologue) -- same pipeline as registerPhrase
+    const registerFlow = useCallback((entry: KaiwaEntry, flowText: string) => {
+        setRegisteringId(entry.id);
+        playRegister();
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const theme = selectedDay ? MASTER_DAY_THEMES[selectedDay] : null;
+        const situation = theme
+            ? `${theme.title} -- ${theme.scene} (FLOW)`
+            : 'FLOW';
+        addPhrase({
+            english: flowText,
+            japanese: entry.japanese,
+            category: '365-master-flow',
+            date: dateStr,
+            situation,
+            context: entry.context,
+        });
+        setRegisteredPhrases(prev => {
+            const next = new Set(prev);
+            next.add(flowText.toLowerCase());
+            return next;
+        });
+        setShikomiCount(prev => prev + 1);
+        setCelebrateId(entry.id);
+        setTimeout(() => setCelebrateId(null), 1200);
+        setShikomiToast(flowText.length > 40 ? flowText.slice(0, 37) + '...' : flowText);
+        setTimeout(() => setShikomiToast(null), 3000);
+        setRegisteringId(null);
+        setQuestRegisterCount(prev => {
+            const next = prev + 1;
+            if (next === 1) setTimeout(() => playQuestStep(), 300);
+            try {
+                const todayStr = getTodayStr();
+                const raw = localStorage.getItem(`kaiwa-quest-${todayStr}`);
+                const q = raw ? JSON.parse(raw) : {};
+                q.registered = next;
+                localStorage.setItem(`kaiwa-quest-${todayStr}`, JSON.stringify(q));
+            } catch { /* */ }
+            return next;
+        });
+    }, [selectedDay]);
+
     // ── Month Nav (constrained to start date through +12 months) ──
 
     const prevMonth = useCallback(() => {
@@ -2331,6 +2374,7 @@ export default function EnglishMaster365Page() {
                                                         </div>
                                                     );
                                                 }
+                                                const isFlowRegistered = registeredPhrases.has(flow.toLowerCase());
                                                 return (
                                                     <div
                                                         onClick={() => {
@@ -2352,10 +2396,38 @@ export default function EnglishMaster365Page() {
                                                         }}
                                                     >
                                                         <div style={{
-                                                            fontSize: 9, fontWeight: 800, color: '#B45309',
-                                                            letterSpacing: '0.15em', marginBottom: 4,
+                                                            display: 'flex', alignItems: 'center', gap: 8,
+                                                            marginBottom: 4,
                                                         }}>
-                                                            FLOW -- ネイティブの脳内モノローグ
+                                                            <div style={{
+                                                                fontSize: 9, fontWeight: 800, color: '#B45309',
+                                                                letterSpacing: '0.15em', flex: 1,
+                                                            }}>
+                                                                FLOW -- ネイティブの脳内モノローグ
+                                                            </div>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    if (!isFlowRegistered) registerFlow(entry, flow);
+                                                                }}
+                                                                disabled={isFlowRegistered}
+                                                                title={isFlowRegistered ? 'Daily Trainingに登録済み' : 'FLOWをDaily Trainingに追加'}
+                                                                style={{
+                                                                    flexShrink: 0,
+                                                                    border: isFlowRegistered ? '1.5px solid #B45309' : '1.5px solid #D4AF37',
+                                                                    borderRadius: 6,
+                                                                    background: isFlowRegistered ? '#FEF3C7' : '#fff',
+                                                                    color: '#B45309',
+                                                                    padding: '4px 10px', fontSize: 10, fontWeight: 800,
+                                                                    cursor: isFlowRegistered ? 'default' : 'pointer',
+                                                                    transition: 'all 0.2s',
+                                                                    opacity: isFlowRegistered ? 0.7 : 1,
+                                                                    whiteSpace: 'nowrap',
+                                                                    letterSpacing: '0.05em',
+                                                                }}
+                                                            >
+                                                                {isFlowRegistered ? '✓ 極' : '+ 極'}
+                                                            </button>
                                                         </div>
                                                         <div style={{
                                                             fontSize: 13, color: '#1C1917',
