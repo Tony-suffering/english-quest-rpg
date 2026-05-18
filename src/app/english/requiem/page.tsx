@@ -32,17 +32,6 @@ interface ScenarioConfig {
 
 const SCENARIOS: ScenarioConfig[] = [
     {
-        key: 'homeinspection',
-        scenarioNum: '9',
-        prologueDate: '2026-03-22',
-        memoriaId: 'homeinspection-day1',
-        dayLabels: ['The Basement', 'The Roof & HVAC', 'The Negotiation', 'The Termite Twist', 'Closing Day'],
-        speakerColors: {
-            Marcus: '#2563EB', Jenna: '#EC4899', Bob: '#78350F',
-            'Mrs. Patterson': '#7C3AED', Karen: '#10B981',
-        },
-    },
-    {
         key: 'bucketlist',
         scenarioNum: '7',
         prologueDate: '2026-03-07',
