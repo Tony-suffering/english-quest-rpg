@@ -15,6 +15,7 @@ import { gameNightEntries } from '@/data/english/game-night-chaos';
 import { antiquesHouseEntries } from '@/data/english/antiques-house';
 import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
 import { bbqNeighborhoodEntries } from '@/data/english/bbq-neighborhood';
+import { homeInspectionEntries } from '@/data/english/home-inspection';
 import { theJobEntries } from '@/data/english/365-the-job';
 import { tokyo52Ep01Entries } from '@/data/english/tokyo52/ep01';
 import { tokyo52Ep02Entries } from '@/data/english/tokyo52/ep02';
@@ -211,6 +212,20 @@ export default function MemoriaPage() {
             }));
 
             const bbqMemoriaEntries: MemoriaEntry[] = bbqNeighborhoodEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const homeInspectionMemoriaEntries: MemoriaEntry[] = homeInspectionEntries.map(e => ({
                 id: e.id,
                 date: e.date,
                 title: e.title,

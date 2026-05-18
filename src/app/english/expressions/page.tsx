@@ -65,10 +65,19 @@ import {
     findBucketListExpressionLineIndex,
     BucketListExpression,
 } from '@/data/english/bucket-list-expressions';
+import { homeInspectionEntries } from '@/data/english/home-inspection';
+import {
+    HOME_INSPECTION_EXPRESSIONS,
+    TOTAL_HOME_INSPECTION_EXPRESSIONS,
+    HOME_INSPECTION_EXPRESSIONS_PER_DAY,
+    HOME_INSPECTION_DAY_IDS,
+    findHomeInspectionExpressionLineIndex,
+    HomeInspectionExpression,
+} from '@/data/english/home-inspection-expressions';
 
-type SeriesKey = 'party' | 'monster' | 'mariners' | 'movie' | 'gamenight' | 'antiques' | 'bucketlist';
+type SeriesKey = 'party' | 'monster' | 'mariners' | 'movie' | 'gamenight' | 'antiques' | 'bucketlist' | 'homeinspection';
 
-type AnyExpression = PartyExpression | MonsterExpression | MarinersExpression | MovieExpression | GameNightExpression | AntiquesExpression | BucketListExpression;
+type AnyExpression = PartyExpression | MonsterExpression | MarinersExpression | MovieExpression | GameNightExpression | AntiquesExpression | BucketListExpression | HomeInspectionExpression;
 
 const SERIES_CONFIG: Record<SeriesKey, {
     label: string;
@@ -260,6 +269,30 @@ const SERIES_CONFIG: Record<SeriesKey, {
         source: 'Bucket List Trip',
         findLineIndex: findBucketListExpressionLineIndex,
         getEntries: () => bucketListTripEntries,
+    },
+    homeinspection: {
+        label: 'Home Inspection',
+        expressions: HOME_INSPECTION_EXPRESSIONS,
+        total: TOTAL_HOME_INSPECTION_EXPRESSIONS,
+        perDay: HOME_INSPECTION_EXPRESSIONS_PER_DAY,
+        dayIds: HOME_INSPECTION_DAY_IDS,
+        dayLabels: {
+            1: 'The Basement',
+            2: 'The Roof & HVAC',
+            3: 'The Negotiation',
+            4: 'The Termite Twist',
+            5: 'Closing Day',
+        },
+        speakerColors: {
+            Marcus: '#2563EB',
+            Jenna: '#EC4899',
+            Bob: '#78350F',
+            'Mrs. Patterson': '#7C3AED',
+            Karen: '#10B981',
+        },
+        source: 'Home Inspection',
+        findLineIndex: findHomeInspectionExpressionLineIndex,
+        getEntries: () => homeInspectionEntries,
     },
 };
 

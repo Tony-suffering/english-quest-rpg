@@ -208,6 +208,19 @@ export const DAY_PROLOGUES: Record<string, DayPrologue> = {
             { name: 'Megan (28F)', desc: "Gary & Linda's daughter, FaceTimes every hour, recently engaged, wants them to 'be careful' but also 'take more photos'" },
         ],
     },
+    '2026-03-22': {
+        title: 'Home Inspection',
+        titleJa: 'ホームインスペクション -- 初めての家購入（30代、夫婦）',
+        setting: "A 40-year-old colonial in the Portland suburbs. Marcus (34) and Jenna (32) made an offer two weeks ago and are walking through the home inspection with Bob -- a 58-year-old inspector who has done this thirty years and is allergic to drywall and small talk. The seller, Mrs. Patterson, raised her family in this house and is taking the whole process personally. Karen, the buyer's agent, runs damage control. The basement has water history Mrs. Patterson would rather forget, the roof is on borrowed time, and there's something in the crawl space photos that Bob wants to revisit.",
+        settingJa: 'ポートランド郊外の築40年コロニアル住宅。マーカス(34)とジェナ(32)が2週間前に申し込みをして、いまホームインスペクション中。インスペクターのボブ(58)は30年このバイトをやっていて、ドライウォールと世間話にアレルギー持ち。売主のパターソン夫人は子供を育てた家で、全部を個人的に受け取っている。バイヤーズエージェントのカレンは火消しに走り回る。地下室には夫人が忘れたい水の履歴。屋根は残り少ない命。床下の写真にはボブがもう一度見たい何かがある。',
+        characters: [
+            { name: 'Marcus (34M)', desc: 'first-time buyer, software engineer, does mental math on every disaster, ready to walk' },
+            { name: 'Jenna (32F)', desc: "Marcus's wife, project manager, calm under pressure, the one who keeps the deal alive" },
+            { name: 'Bob (58M)', desc: '30 years inspecting, allergic to small talk, takes a hundred photos and reviews them later, deadpan honest' },
+            { name: 'Mrs. Patterson (72F)', desc: 'seller, lived here 41 years, raised her kids in this house, takes everything personally, secretly knows about the water' },
+            { name: 'Karen (45F)', desc: "buyer's agent, professional damage control, friends with Mrs. Patterson (calls her Patty), runs five closings a week" },
+        ],
+    },
     '2026-03-17': {
         title: 'Tokyo 52 -- Episode 1: It Starts Here',
         titleJa: 'Tokyo 52 Ep1 -- ここから始まる（27歳、商社OL）',
