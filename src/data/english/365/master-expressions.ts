@@ -74,8 +74,16 @@ export interface MasterExpression {
     jaTranslations?: [string, string, string, string]; // Japanese translation for each English level
     context: string;
     character: 'yuki' | 'master' | 'takeshi' | 'lisa' | 'kenji' | 'mina';
-    category: 'greeting' | 'order' | 'shopping' | 'travel' | 'feeling' | 'request' | 'social';
+    category: 'greeting' | 'order' | 'shopping' | 'travel' | 'feeling' | 'request' | 'social' | 'work';
     month: string;
+    // --- 300 product extensions (optional, backward-compatible) ---
+    // Exam relevance. Delivered in-fiction via Yuki's "それ、テストに出るやつ？".
+    exam?: {
+        toeic?: string;  // e.g. 'Part 3' / 'Part 2' / '頻出'
+        eiken?: string;  // e.g. '2級' / '準2級' / '準1級'
+    };
+    // Phrase to query on YouGlish for abundant REAL native audio (vs robotic TTS).
+    youglish?: string;
 }
 
 // ============================================================
@@ -90,6 +98,7 @@ export const MASTER_CATEGORY_META: Record<string, { label: string; color: string
     feeling:   { label: '気持ち', color: '#D97706', bg: '#FFF7ED' },
     request:   { label: 'お願い', color: '#DB2777', bg: '#FDF2F8' },
     social:    { label: '雑談',   color: '#0891B2', bg: '#ECFEFF' },
+    work:      { label: '仕事',   color: '#475569', bg: '#F1F5F9' },
 };
 
 // ============================================================
