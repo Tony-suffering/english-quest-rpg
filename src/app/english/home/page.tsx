@@ -82,13 +82,13 @@ export default function EnglishHomeHub() {
                     好きなアプリから始める。あとでサイドバーから切り替えられる。
                 </p>
 
-                {/* Primary: 365 */}
+                {/* Primary: 居酒屋TOEIC */}
                 <div style={{ marginBottom: 14 }}>
                     <HubCard
-                        href="/english/izakaya-toeic/kaiwa"
-                        tagline="DAILY PHRASES"
-                        title="英会話マスター365"
-                        desc="毎日10フレーズ。今日も続ける。"
+                        href="/english/toeic"
+                        tagline="TOEIC / 30日でスコアUP"
+                        title="居酒屋TOEIC"
+                        desc="DUO式300例文 + 金フレ式310単語。居酒屋の6人と、30日。"
                         color="#D4AF37"
                         primary
                     />
@@ -132,10 +132,10 @@ export default function EnglishHomeHub() {
                         color="#92400E"
                     />
                     <HubCard
-                        href="/english/toeic"
-                        tagline="TOEIC DRAMA / 30話"
-                        title="居酒屋TOEIC"
-                        desc="連続ドラマでスコアUP"
+                        href="/english/izakaya-toeic/kaiwa"
+                        tagline="DAILY PHRASES"
+                        title="英会話マスター365"
+                        desc="毎日10フレーズ。今日も続ける。"
                         color="#10B981"
                     />
                 </div>
