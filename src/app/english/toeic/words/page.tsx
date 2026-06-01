@@ -7,12 +7,14 @@ import { ToeicWordEntry, WORD_CATEGORY_META, WORD_LEVEL_META, WordCategory, Word
 import { TOEIC_WORD_ENTRIES } from '@/data/izakaya-toeic/toeic-words';
 import { T } from '@/data/izakaya-toeic/theme';
 import { IZAKAYA_CHARACTERS } from '@/data/izakaya-toeic/characters';
+import { addPhrase } from '@/lib/local-store';
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 const LS_KEY = 'toeic-words-learned';
+const REG_KEY = 'toeic-words-registered';
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const WEEKDAY_LABELS_JA = ['日', '月', '火', '水', '木', '金', '土'];
 const ALL_LEVELS: WordLevel[] = [500, 600, 700, 800, 900];
@@ -36,6 +38,20 @@ function getFirstDayOfWeek(year: number, month: number): number {
 
 function wordKey(entry: ToeicWordEntry): string {
   return `${entry.daySlot}-${entry.word}`;
+}
+
+function cleanQ(q: string): string {
+  return q.replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim();
+}
+function youglishUrl(q: string): string {
+  return `https://youglish.com/pronounce/${encodeURIComponent(cleanQ(q))}/english`;
+}
+function playphraseUrl(q: string): string {
+  return `https://www.playphrase.me/#/search?q=${encodeURIComponent(cleanQ(q))}`;
+}
+function todayStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function speakWord(word: string, meaning: string, onStart: () => void, onEnd: () => void) {
@@ -124,14 +140,18 @@ function CategoryPill({ category, active, onClick }: { category: WordCategory | 
 function WordCard({
   entry,
   learned,
+  registered,
   playing,
   onToggleLearned,
+  onRegister,
   onPlay,
 }: {
   entry: ToeicWordEntry;
   learned: boolean;
+  registered: boolean;
   playing: boolean;
   onToggleLearned: () => void;
+  onRegister: () => void;
   onPlay: () => void;
 }) {
   const catMeta = WORD_CATEGORY_META[entry.category];
@@ -239,8 +259,19 @@ function WordCard({
         </div>
       )}
 
+      {/* 実音声 (YouGlish / PlayPhrase) + トレーニング登録 */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12, alignItems: 'center' }}>
+        <a href={youglishUrl(entry.word)} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, fontWeight: 600, color: T.blue, textDecoration: 'none', border: `1px solid ${T.blue}40`, borderRadius: 6, padding: '4px 10px' }}>YouGlish</a>
+        <a href={playphraseUrl(entry.word)} target="_blank" rel="noopener noreferrer" style={{ fontSize: 11, fontWeight: 600, color: T.purple, textDecoration: 'none', border: `1px solid ${T.purple}40`, borderRadius: 6, padding: '4px 10px' }}>PlayPhrase</a>
+        <button onClick={onRegister} disabled={registered} style={{
+          marginLeft: 'auto', fontSize: 12, fontWeight: 700, cursor: registered ? 'default' : 'pointer',
+          border: `1px solid ${registered ? T.green : T.gold}`, borderRadius: 8, padding: '5px 12px',
+          background: registered ? T.greenBg : T.goldBg, color: registered ? T.green : '#92400E',
+        }}>{registered ? '登録済' : '+ トレーニング登録'}</button>
+      </div>
+
       {/* Bottom row: play + learned */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
         <button
           onClick={onPlay}
           disabled={playing}
@@ -315,6 +346,7 @@ export default function ToeicWordsPage() {
   const [viewMonth, setViewMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
   const [learnedWords, setLearnedWords] = useState<Record<string, boolean>>({});
+  const [registeredWords, setRegisteredWords] = useState<Record<string, boolean>>({});
   const [levelFilter, setLevelFilter] = useState<WordLevel | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<WordCategory | null>(null);
   const [playingWord, setPlayingWord] = useState<string | null>(null);
@@ -393,6 +425,8 @@ export default function ToeicWordsPage() {
     try {
       const stored = localStorage.getItem(LS_KEY);
       if (stored) setLearnedWords(JSON.parse(stored));
+      const reg = localStorage.getItem(REG_KEY);
+      if (reg) setRegisteredWords(JSON.parse(reg));
     } catch { /* noop */ }
     // Auto-select today
     const today = new Date();
@@ -437,6 +471,19 @@ export default function ToeicWordsPage() {
       try {
         localStorage.setItem(LS_KEY, JSON.stringify(next));
       } catch { /* noop */ }
+      return next;
+    });
+  }, []);
+
+  const registerWord = useCallback((entry: ToeicWordEntry) => {
+    setRegisteredWords(prev => {
+      const key = wordKey(entry);
+      if (prev[key]) return prev;
+      try {
+        addPhrase({ english: entry.word, japanese: entry.meaning, category: 'toeic-words', date: todayStr(), context: entry.context });
+      } catch { /* noop */ }
+      const next = { ...prev, [key]: true };
+      try { localStorage.setItem(REG_KEY, JSON.stringify(next)); } catch { /* noop */ }
       return next;
     });
   }, []);
@@ -917,8 +964,10 @@ export default function ToeicWordsPage() {
                         key={wordKey(entry)}
                         entry={entry}
                         learned={!!learnedWords[wordKey(entry)]}
+                        registered={!!registeredWords[wordKey(entry)]}
                         playing={playingWord === wordKey(entry)}
                         onToggleLearned={() => toggleLearned(entry)}
+                        onRegister={() => registerWord(entry)}
                         onPlay={() => handlePlay(entry)}
                       />
                     ))
