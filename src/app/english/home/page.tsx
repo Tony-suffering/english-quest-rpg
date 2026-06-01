@@ -101,6 +101,7 @@ export default function EnglishHomeHub() {
                     gap: 12,
                     marginBottom: 14,
                 }}>
+                    {/* 商品を2本に集約: ネイティブ365 / ヨミクエ / リスクエ は一旦非表示。戻すときはこのコメントを外す。
                     <HubCard
                         href="/english/native365"
                         tagline="ADVANCED / 発音+文法"
@@ -122,6 +123,7 @@ export default function EnglishHomeHub() {
                         desc={`Day ${lis} / 30 -- 聞ける耳を作る`}
                         color="#3B82F6"
                     />
+                    */}
                     <HubCard
                         href="/english/harvest"
                         tagline="MOVIE / 毎日1本"

@@ -109,10 +109,27 @@ const PROGRAMS: Program[] = [
         basePath: '/english/native365',
         items: [
             { id: '/english/native365', label: 'ネイティブ365 HOME' },
+            { id: '/english/native365/phrases', label: 'Phrase Bank', featured: true },
             { id: '/english/native365/lp', label: 'ネイティブ365とは？' },
         ],
     },
 ];
+
+// ─── 商品を絞るための非表示設定 (コードは残す・戻すのはここを編集するだけ) ──
+// 売る2本に集約: 居酒屋TOEIC + 英会話マスター365。他はナビから隠す。
+const HIDDEN_PROGRAMS = new Set(['tokyo52', 'lisque', 'yomique', 'native365']);
+// 居酒屋TOEIC はコア4つだけ表示: のれん30夜 / 居酒屋300フレーズ / TOEIC頻出310語 / スコア通知表
+const HIDDEN_ITEMS = new Set([
+    '/english/toeic/episodes',
+    '/english/toeic/characters',
+    '/english/toeic/guide',
+    '/english/toeic/paraphrase',
+    '/english/toeic/sounds',
+    '/english/toeic/traps',
+    '/english/toeic/mistakes',
+    '/english/toeic/achievements',
+    '/english/tonio-words',
+]);
 
 // ─── Component ─────────────────────────────────────────────
 
@@ -177,9 +194,10 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         return null;
     })();
 
+    const shownPrograms = PROGRAMS.filter(p => !HIDDEN_PROGRAMS.has(p.id));
     const visiblePrograms = currentAppId
-        ? PROGRAMS.filter(p => p.id === currentAppId)
-        : PROGRAMS;
+        ? shownPrograms.filter(p => p.id === currentAppId)
+        : shownPrograms;
 
     const isActive = (path: string) => {
         if (!pathname) return false;
@@ -364,7 +382,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     transition: 'max-height 0.25s ease',
                 }}>
                     <div style={{ paddingTop: 2, paddingBottom: 4 }}>
-                        {program.items.map(item => renderSubItem(item, program.color))}
+                        {program.items.filter(item => !HIDDEN_ITEMS.has(item.id)).map(item => renderSubItem(item, program.color))}
                     </div>
                 </div>
             </div>
