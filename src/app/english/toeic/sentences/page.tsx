@@ -4,13 +4,15 @@
 // データ: src/data/english/365/duo-style-300.ts (30話 × 10文, 根拠付き)
 // 1文ごとに: キャラ / 場面 / 英文(音声) / 和訳 / targets(根拠チップ) / pitfall(誤用注意) / YouGlish実音声
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { DUO_STYLE_300, DUO_EPISODES, type DuoSentence } from '@/data/english/365/duo-style-300';
 import { IZAKAYA_CHARACTERS, charIcon } from '@/data/izakaya-toeic/characters';
 import { T } from '@/data/izakaya-toeic/theme';
+import { addPhrase } from '@/lib/local-store';
 
 const LS_KEY = 'toeic-duo300-learned';
+const REG_KEY = 'toeic-duo300-registered';
 
 const CHAR_MAP = Object.fromEntries(IZAKAYA_CHARACTERS.map(c => [c.id, c])) as Record<string, (typeof IZAKAYA_CHARACTERS)[number]>;
 
@@ -21,6 +23,16 @@ const SOURCE_COLOR: Record<string, string> = {
 function cleanQuery(item: string): string {
   // "get back to (someone)" -> "get back to" / "between A and B" -> 整形
   return item.replace(/\([^)]*\)/g, '').replace(/\bA and B\b/i, '').replace(/\s+/g, ' ').trim();
+}
+function youglishUrl(item: string): string {
+  return `https://youglish.com/pronounce/${encodeURIComponent(cleanQuery(item))}/english`;
+}
+function playphraseUrl(item: string): string {
+  return `https://www.playphrase.me/#/search?q=${encodeURIComponent(cleanQuery(item))}`;
+}
+function todayStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function speak(en: string, ja: string, onStart: () => void, onEnd: () => void) {
@@ -40,13 +52,28 @@ function speak(en: string, ja: string, onStart: () => void, onEnd: () => void) {
 export default function DuoSentencesPage() {
   const [episode, setEpisode] = useState(1);
   const [learned, setLearned] = useState<Set<number>>(new Set());
+  const [registered, setRegistered] = useState<Set<number>>(new Set());
   const [playing, setPlaying] = useState<number | null>(null);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(LS_KEY);
       if (raw) setLearned(new Set(JSON.parse(raw)));
+      const reg = localStorage.getItem(REG_KEY);
+      if (reg) setRegistered(new Set(JSON.parse(reg)));
     } catch { /* noop */ }
+  }, []);
+
+  const register = useCallback((s: DuoSentence) => {
+    setRegistered(prev => {
+      if (prev.has(s.no)) return prev;
+      try {
+        addPhrase({ english: s.en, japanese: s.ja, category: 'izakaya-300', date: todayStr(), context: s.note || s.beat });
+      } catch { /* noop */ }
+      const next = new Set(prev); next.add(s.no);
+      try { localStorage.setItem(REG_KEY, JSON.stringify([...next])); } catch { /* noop */ }
+      return next;
+    });
   }, []);
 
   const toggleLearned = useCallback((no: number) => {
@@ -111,8 +138,10 @@ export default function DuoSentencesPage() {
           <SentenceCard
             key={s.no} s={s}
             isLearned={learned.has(s.no)}
+            isRegistered={registered.has(s.no)}
             isPlaying={playing === s.no}
             onToggle={() => toggleLearned(s.no)}
+            onRegister={() => register(s)}
             onPlay={() => speak(s.en, s.ja, () => setPlaying(s.no), () => setPlaying(null))}
           />
         ))}
@@ -121,13 +150,11 @@ export default function DuoSentencesPage() {
   );
 }
 
-function SentenceCard({ s, isLearned, isPlaying, onToggle, onPlay }: {
-  s: DuoSentence; isLearned: boolean; isPlaying: boolean; onToggle: () => void; onPlay: () => void;
+function SentenceCard({ s, isLearned, isRegistered, isPlaying, onToggle, onRegister, onPlay }: {
+  s: DuoSentence; isLearned: boolean; isRegistered: boolean; isPlaying: boolean;
+  onToggle: () => void; onRegister: () => void; onPlay: () => void;
 }) {
   const char = CHAR_MAP[s.character];
-  const primary = s.targets[0];
-  const ygQuery = cleanQuery(primary?.item || s.en);
-  const ygUrl = `https://youglish.com/pronounce/${encodeURIComponent(ygQuery)}/english`;
 
   return (
     <div style={{
@@ -163,34 +190,47 @@ function SentenceCard({ s, isLearned, isPlaying, onToggle, onPlay }: {
         </div>
       )}
 
-      {/* targets (根拠) */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-        {s.targets.map((t, i) => (
-          <span key={i} style={{
-            fontSize: 11, padding: '2px 8px', borderRadius: 6,
-            background: (SOURCE_COLOR[t.source] || T.textSub) + '14',
-            color: SOURCE_COLOR[t.source] || T.textSub, fontWeight: 600,
-            opacity: t.reinforcement ? 0.6 : 1,
-          }}>
-            {t.item} <span style={{ fontSize: 9, opacity: 0.8 }}>{t.source}</span>
-          </span>
-        ))}
+      {/* targets (根拠) + 各表現の実音声 (YouGlish / PlayPhrase) */}
+      <div style={{ display: 'grid', gap: 6, marginTop: 10 }}>
+        {s.targets.map((t, i) => {
+          const c = SOURCE_COLOR[t.source] || T.textSub;
+          return (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{
+                fontSize: 12, padding: '2px 8px', borderRadius: 6,
+                background: c + '14', color: c, fontWeight: 600, opacity: t.reinforcement ? 0.6 : 1,
+              }}>
+                {t.item} <span style={{ fontSize: 9, opacity: 0.8 }}>{t.source}</span>
+              </span>
+              <a href={youglishUrl(t.item)} target="_blank" rel="noopener noreferrer" style={MINI_LINK(T.blue)}>YouGlish</a>
+              <a href={playphraseUrl(t.item)} target="_blank" rel="noopener noreferrer" style={MINI_LINK(T.purple)}>PlayPhrase</a>
+            </div>
+          );
+        })}
       </div>
 
       {s.note && <div style={{ fontSize: 11.5, color: T.textMuted, marginTop: 8, lineHeight: 1.5 }}>{s.note}</div>}
 
       {/* actions */}
       <div style={{ display: 'flex', gap: 8, marginTop: 12, alignItems: 'center' }}>
-        <a href={ygUrl} target="_blank" rel="noopener noreferrer" style={{
-          fontSize: 12, fontWeight: 600, color: T.blue, textDecoration: 'none',
-          border: `1px solid ${T.blue}40`, borderRadius: 8, padding: '5px 10px',
-        }}>実発音 (YouGlish)</a>
+        <button onClick={onRegister} disabled={isRegistered} style={{
+          fontSize: 12, fontWeight: 700, cursor: isRegistered ? 'default' : 'pointer',
+          border: `1px solid ${isRegistered ? T.green : T.gold}`, borderRadius: 8, padding: '6px 12px',
+          background: isRegistered ? T.greenBg : T.goldBg, color: isRegistered ? T.green : '#92400E',
+        }}>{isRegistered ? '登録済' : '+ トレーニング登録'}</button>
         <button onClick={onToggle} style={{
           marginLeft: 'auto', fontSize: 12, fontWeight: 700, cursor: 'pointer',
-          border: `1px solid ${isLearned ? T.gold : T.border}`, borderRadius: 8, padding: '5px 14px',
+          border: `1px solid ${isLearned ? T.gold : T.border}`, borderRadius: 8, padding: '6px 14px',
           background: isLearned ? T.goldBg : T.surface, color: isLearned ? '#92400E' : T.textSub,
         }}>{isLearned ? '覚えた' : '未'}</button>
       </div>
     </div>
   );
+}
+
+function MINI_LINK(color: string): CSSProperties {
+  return {
+    fontSize: 11, fontWeight: 600, color, textDecoration: 'none',
+    border: `1px solid ${color}40`, borderRadius: 6, padding: '2px 8px', whiteSpace: 'nowrap',
+  };
 }
