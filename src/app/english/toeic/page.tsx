@@ -323,6 +323,36 @@ export default function IzakayaToeicPage() {
         <ScoreImpact />
       </div>
 
+      {/* ====== 居酒屋300 (DUOスタイル例文) ====== */}
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '28px 16px 0' }}>
+        <Link href="/english/toeic/sentences" style={{
+          display: 'block', textDecoration: 'none', color: T.text,
+          background: `linear-gradient(135deg, ${T.surface} 0%, ${T.goldBg} 100%)`,
+          border: `1px solid ${T.goldBorder}`, borderRadius: 16,
+          padding: '20px 18px', boxShadow: T.shadowMd,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 10, color: T.gold, fontWeight: 700, letterSpacing: 2, marginBottom: 4 }}>
+                居酒屋300 ・ DUO式
+              </div>
+              <h2 style={{ fontSize: 19, fontWeight: 900, margin: '0 0 6px' }}>
+                根拠のある300フレーズ
+              </h2>
+              <p style={{ fontSize: 12.5, color: T.textSub, margin: 0, lineHeight: 1.5 }}>
+                1日10個・30日で一周。常連6人が事件のなかで使う一言を、頻度データの裏付け（NGSL/TSL/句動詞）と実発音つきで。間違いは正しい形に直して覚える。
+              </p>
+            </div>
+            <div style={{
+              flexShrink: 0, fontSize: 26, fontWeight: 900, color: T.gold,
+              textAlign: 'center', lineHeight: 1,
+            }}>
+              300<div style={{ fontSize: 10, color: T.textMuted, fontWeight: 600, marginTop: 2 }}>例文</div>
+            </div>
+          </div>
+        </Link>
+      </div>
+
       {/* ====== CHARACTERS TEASER ====== */}
       <div style={{ padding: '48px 16px', maxWidth: 640, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
