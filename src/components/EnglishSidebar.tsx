@@ -53,6 +53,7 @@ const PROGRAMS: Program[] = [
         basePath: '/english/toeic',
         items: [
             { id: '/english/toeic', label: 'のれん30夜' },
+            { id: '/english/toeic/sentences', label: '居酒屋300フレーズ', featured: true },
             { id: '/english/toeic/episodes', label: 'エピソード一覧' },
             { id: '/english/toeic/characters', label: '常連ファイル' },
             { id: '/english/toeic/guide', label: '攻略メモ' },
