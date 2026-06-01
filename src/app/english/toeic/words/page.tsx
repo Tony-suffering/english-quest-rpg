@@ -8,6 +8,7 @@ import { TOEIC_WORD_ENTRIES } from '@/data/izakaya-toeic/toeic-words';
 import { T } from '@/data/izakaya-toeic/theme';
 import { IZAKAYA_CHARACTERS } from '@/data/izakaya-toeic/characters';
 import { addPhrase } from '@/lib/local-store';
+import { WORD_EXAMPLES } from '@/data/izakaya-toeic/toeic-words/examples';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -52,6 +53,14 @@ function playphraseUrl(q: string): string {
 function todayStr(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+// 金フレ式の伏せ字: 例文中の対象語を「頭文字 + ダッシュ」に置換 (Let's try a-------)
+function blankWord(en: string, word: string): string {
+  const idx = en.toLowerCase().indexOf(word.toLowerCase());
+  if (idx < 0) return en;
+  const matched = en.slice(idx, idx + word.length);
+  const blanked = matched[0] + '-'.repeat(Math.max(matched.length - 1, 1));
+  return en.slice(0, idx) + blanked + en.slice(idx + word.length);
 }
 
 function speakWord(word: string, meaning: string, onStart: () => void, onEnd: () => void) {
@@ -156,6 +165,8 @@ function WordCard({
 }) {
   const catMeta = WORD_CATEGORY_META[entry.category];
   const lvlMeta = WORD_LEVEL_META[entry.level];
+  const ex = WORD_EXAMPLES[entry.word];
+  const [revealed, setRevealed] = useState(false);
 
   return (
     <motion.div
@@ -210,6 +221,25 @@ function WordCard({
       <div style={{ fontSize: 14, color: T.textSub, marginTop: 6 }}>
         {entry.meaning}
       </div>
+
+      {/* 金フレ式 穴埋め例文 (タップで答え) */}
+      {ex && (
+        <div
+          onClick={() => setRevealed(r => !r)}
+          style={{
+            marginTop: 10, padding: '10px 12px', borderRadius: 8, cursor: 'pointer',
+            background: T.bgSecondary, border: `1px solid ${T.border}`,
+          }}
+        >
+          <div style={{ fontSize: 13, color: T.textSub, lineHeight: 1.5 }}>{ex.ja}</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: T.text, marginTop: 4, lineHeight: 1.5 }}>
+            {revealed ? ex.en : blankWord(ex.en, entry.word)}
+          </div>
+          <div style={{ fontSize: 10, color: revealed ? T.green : T.gold, marginTop: 5, fontWeight: 600 }}>
+            {revealed ? 'タップで隠す' : 'タップで答え'}
+          </div>
+        </div>
+      )}
 
       {/* Context box */}
       <div
