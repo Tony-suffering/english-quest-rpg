@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const lifeGodToolEntry: JournalEntry = {
     id: '158',
-    date: '2026-04-21',
+    date: '2026-06-03',
     title: '俺の「ふとした一言」を、英語学習の神ツールに変える過程',
     summary: '/life を日記ツールから、ボイス録音→3パターン英語化→Training持ち帰り→将来的なコーパスまで全部縫い合わせた神ツールに作り変える。初日の作業は、編集機能と、溜まってた録音10本の英語化。寝かせた日本語を後で編集できるようにしたら、録音のハードルが一段下がった。',
     featured: true,

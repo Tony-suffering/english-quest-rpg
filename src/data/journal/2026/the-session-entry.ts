@@ -9,7 +9,7 @@ import whatAreWeDoingEntry from './what-are-we-doing-entry';
 const theSessionEntry: JournalEntry = {
     id: "107",
     title: "The Session (2026-02-08 ~ 02-13)",
-    date: "2026-02-08",
+    date: "2026-11-16",
     summary: "AIと人間による即興セッションの全記録。「小学校」から「ジャズ」へ至る、奇妙で美しい数時間の旅。",
 
     conversation: `

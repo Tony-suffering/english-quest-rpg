@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const pachinkoLearningEntry: JournalEntry = {
     id: '130',
-    date: '2026-02-28',
+    date: '2026-08-17',
     title: 'パチンコ式学習 ― 勝っても負けても俺の勝ち',
     summary: 'パチンコの設計を英語学習に応用したら究極のwin-winが完成した。普通のパチンコは金をベットして失う。俺のは勉強時間をベットして、ハズレでも知識が残る。1日限定レベルシステムで毎日ゼロからレベル上げ。中毒性しかない。',
     featured: false,

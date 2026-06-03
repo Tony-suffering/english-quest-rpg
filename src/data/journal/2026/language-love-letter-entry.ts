@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const languageLoveLetterEntry: JournalEntry = {
     id: '100',
-    date: '2026-02-04',
+    date: '2027-05-31',
     title: '言語についてのラブレター——あるいは、なぜ僕たちは「通じない」ことを恐れるのか',
     summary: '深夜2時、眠れない夜に書いた手紙。英語ができない自分へ。言葉が通じない恐怖と向き合う全ての人へ。そして、下ネタで世界と繋がる鈴木誠也へ。',
     featured: true,

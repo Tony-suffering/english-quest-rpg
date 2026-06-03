@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const englishIndustryLightEntry: JournalEntry = {
     id: '153',
-    date: '2026-04-28',
+    date: '2026-12-21',
     title: '英語業界の全員が、実はすごい -- 殺されないための後編',
     summary: '前回全員をボロクソに書いた。今回は全員を褒める。PROGRITの本当の価値、NativeCampの革命、Duolingoの民主化。全部ソース付き。コインの両面を見せないとフェアじゃない。',
     featured: true,

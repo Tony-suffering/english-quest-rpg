@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const clientProfilePageEntry: JournalEntry = {
     id: '145',
-    date: '2026-04-04',
+    date: '2026-09-07',
     title: 'クロス職人がAIでクライアントのプロフィールページを作った話',
     summary: '壁紙を張り替えに行った先のクライアントが、30年日本で活躍してきた凄い人だった。感銘を受けて、Claude Codeで1日でプロフィールページを作った。',
     featured: false,

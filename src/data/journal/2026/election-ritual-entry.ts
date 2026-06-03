@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const electionRitualEntry: JournalEntry = {
     id: '100',
-    date: '2026-02-07',
+    date: '2027-01-29',
     title: '選挙という宗教——疑うことが許されないもの',
     summary: '明日は選挙だ。でも選挙について本当に考えたことがあるだろうか？「選挙は大切」という言説があまりにも支配的で、選挙そのものを疑うことがタブーになっている。疑うことが許されないものは、宗教だ。',
     featured: true,

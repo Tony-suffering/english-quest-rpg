@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const jjkEnglishPracticeEntry: JournalEntry = {
     id: '071',
-    date: '2026-01-12',
+    date: '2026-11-20',
     title: '呪術廻戦で英語を学ぶ——五条悟、七海建人、東堂葵を語る',
     summary: '英会話練習をしていたら、呪術廻戦のキャラクター語りになった。AIのジョークは滑り、ゾンビ哲学が飛び出し、最後は「思考には真実がない」という悟りに至る。',
     featured: true,

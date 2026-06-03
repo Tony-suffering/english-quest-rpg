@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const cloudflareDeploymentGuideEntry: JournalEntry = {
     id: '120',
-    date: '2026-02-16',
+    date: '2026-06-10',
     title: 'ウェブサイトを公開するまでの全工程',
     summary: 'toniolab.comのデプロイ作業を通して、Cloudflare Workers、GitHub Actions、D1データベース、DNS設定、バンドルサイズ制限まで、ウェブサイト公開に必要なインフラ知識を体系的に解説。',
     businessTags: ['インフラ', 'デプロイ', '技術解説'],

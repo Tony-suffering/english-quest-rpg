@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const convenienceStorePanicEntry: JournalEntry = {
     id: '132',
-    date: '2026-03-02',
+    date: '2026-06-08',
     title: 'レジで英語が来た ― 日本語ペラペラの店員が突然キレた英語を投げてきた話',
     summary: 'コンビニで外国人店員に英語で話しかけられて完全フリーズした。毎日英語アプリ作ってるのに。「話せるようになりたい」と「話す」の間にある溝の話。',
     featured: false,

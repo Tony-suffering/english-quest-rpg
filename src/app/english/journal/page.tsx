@@ -28,8 +28,11 @@ export default function EnglishJournalPage() {
     }, [playMode, settingsLoaded]);
 
     // Filter entries that have English summaries
+    // ドリップ公開: 未来日付のエントリは、その日が来るまで非表示
+    const now = new Date();
+    const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const entriesWithEnglish = journalEntries
-        .filter(entry => entry.englishSummary)
+        .filter(entry => entry.englishSummary && entry.date <= todayKey)
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     // Calculate total tracks for an entry

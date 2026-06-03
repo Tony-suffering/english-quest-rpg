@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const ikasamaBlackjackEntry: JournalEntry = {
     id: '135',
-    date: '2026-03-05',
+    date: '2026-11-06',
     title: 'イカサマブラックジャック ― トランプを捨てた日',
     summary: 'ブラックジャックを作った。チップの代わりにSP、トランプの代わりに英語カード。チャクラで覗き見、種族値で数字操作、属性コンボで+1。バラトロ風ローグライクにしたら、途中でスペードもハートも意味ないことに気づいた。トランプ、いらなくね？',
     featured: false,

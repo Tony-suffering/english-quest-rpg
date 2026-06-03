@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const wbcJapanEntry: JournalEntry = {
     id: '139',
-    date: '2026-03-09',
+    date: '2027-05-26',
     title: '侍ジャパンに学ぶ"勝つ空気"の正体 ― WBC日本代表が持ってた異常なもの',
     summary: 'WBC 2023の映像を見返してたら気づいた。侍ジャパンが持ってた"空気"の正体は技術でも気合いでもなく、全員が同じ方向を向いてる時に生まれる圧だった。',
     featured: false,

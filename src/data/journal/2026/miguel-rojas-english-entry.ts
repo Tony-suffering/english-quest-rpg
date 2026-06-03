@@ -8,7 +8,7 @@ import { JournalEntry } from '../types';
 
 export const miguelRojasEnglishEntry: JournalEntry = {
     id: '112',
-    date: '2026-02-09',
+    date: '2026-09-16',
     title: 'ミゲル・ロハスの英語はネイティブより聞き取りやすい——非ネイティブの武器と、日本人が本当に目指すべき英語',
     summary: '#099で「スペイン語話者は音素が近いから英語が通じる」と書いた。浅かった。ロハスの実際の発言30本を構造解剖したら、音素の話なんかより遥かに深い構造的な理由が見えてきた。そしてそれは日本人にとって希望でもある。',
     featured: true,

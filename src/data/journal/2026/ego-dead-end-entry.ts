@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const egoDeadEndEntry: JournalEntry = {
     id: '124',
-    date: '2026-02-21',
+    date: '2026-10-21',
     title: 'エゴのデッドエンド——意味製造機が故障する日',
     summary: '苦しみガイ、気づきガイ、怒りガイ、疲れガイ。全部エゴ。全部デッドエンド。JPBもフランクルもニーチェの手前で止まった。意味を超えた先には何もない。何もないのにまだ動いてる。',
     featured: true,

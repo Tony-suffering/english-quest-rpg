@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const aiGotItWrongEntry: JournalEntry = {
     id: '144',
-    date: '2026-04-01',
+    date: '2026-12-11',
     title: 'AIに自分のアプリを診断させたら全部間違えてた',
     summary: '英会話マスターと居酒屋トーイック。2つのアプリのリリース診断をAIに頼んだ。LPの帰属が逆。記事の帰属も逆。仕込み帳がトレーニングに変わったことも知らなかった。正確さのないアドバイスに価値はない。',
     featured: true,

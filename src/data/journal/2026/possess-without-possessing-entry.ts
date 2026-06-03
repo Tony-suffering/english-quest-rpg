@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const possessWithoutPossessingEntry: JournalEntry = {
     id: '086',
-    date: '2026-01-26',
+    date: '2026-08-12',
     title: '何も持たずに全てを持つ——ウジ虫も叡智も同じ水源から',
     summary: '思考は選べない。ウジ虫のように湧くか、叡智の泉から湧くか——エゴがラベルを貼るだけ。16世紀スペインの修道士も、隣の臭いおっさんも、3000年後のエイリアンも、同じことを言っている。AIが1時間かけて出典を探した結果、「誰が言ったかは関係ない」という結論に至った話。',
     featured: true,

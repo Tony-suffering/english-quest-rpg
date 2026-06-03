@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const lifeSixCharactersEntry: JournalEntry = {
     id: '159',
-    date: '2026-04-21',
+    date: '2026-07-24',
     title: '1つの日本語を、6人のキャラで見る',
     summary: '/life の3パターン英語化に、居酒屋TOEICの6人全員を配置した。権藤マスター/リサ/タケシが翻訳者として A/B/C を担当し、ユキ/健二/ミナが「学習者/現場/Z世代」の目線で一行コメントを置く。同じ一文に、6つの角度が走る。',
     featured: true,

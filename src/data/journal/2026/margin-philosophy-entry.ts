@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const marginPhilosophyEntry: JournalEntry = {
     id: '096',
-    date: '2026-02-02',
+    date: '2027-04-30',
     title: '余白との戦い、あるいは「なにしてんの？」の哲学',
     summary: 'AIと一緒に資料作り。余白が足りない、いや多すぎる、いや切れてる。直したら壊れる、戻したらまた壊れる。でも最後には「ありがとう」。この往復運動こそが、実は仕事の本質なのかもしれない。',
     featured: false,

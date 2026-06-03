@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const curryWarsEntry: JournalEntry = {
     id: '101',
-    date: '2026-02-05',
+    date: '2027-03-19',
     title: 'カレー戦争 ― CoCo壱という名の合法ドラッグと、C&Cという名の忘れられた老兵',
     summary: 'なぜ人はCoCo壱に1,200円払い、C&Cの存在すら知らないのか。カレー業界の光と闇、カプサイシンが脳にキメる快楽物質、年間30トンの残飯、廃棄カツ横流し事件、そして北千住に現れた56歳の刺客。これはカレーの話であり、日本人の話であり、中毒の話である。',
     featured: true,

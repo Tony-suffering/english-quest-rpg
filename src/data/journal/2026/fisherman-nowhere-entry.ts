@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const fishermanNowhereEntry: JournalEntry = {
     id: '129',
-    date: '2026-02-26',
+    date: '2027-04-09',
     title: '遥か彼方の人 ― 知らない漁師がとっくに答えを持ってた',
     summary: '離島に住む老漁師。毎朝3時に海に出る。40年間一度も「なぜ」と問わなかった。俺は毎日ダッシュボードを作り、分析し、計測している。どちらが正しいのか。たぶん漁師。',
     featured: false,

@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const failedEnglishNotesEntry: JournalEntry = {
     id: '069',
-    date: '2026-01-13',
+    date: '2027-03-08',
     title: '今日は英語のノート作れなかったｗｗｗ——全部見せることについて',
     summary: 'ノート作れなかった。英語学習したくない。恥だ。やる必要ない。AIに「誰にも見せない」と言われて、「全部見せてるじゃん」と返した。苦しみも、恥も、矛盾も。',
     featured: true,

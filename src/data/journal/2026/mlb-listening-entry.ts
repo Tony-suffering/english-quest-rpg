@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const mlbListeningEntry: JournalEntry = {
     id: '070',
-    date: '2026-01-15',
+    date: '2026-12-25',
     title: 'MLBオフシーズン配信を英語教材にしたら再生プレイヤーまで作り直すことになった',
     summary: '日本人MLB配信者の1時間半の配信を日英バイリンガルコンテンツに変換。リスニングページのUIがゴミだったので、ConversationPlayerレベルに作り直した。ElevenLabsは高い。',
     featured: true,

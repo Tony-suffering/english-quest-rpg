@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const electionDebateEntry: JournalEntry = {
     id: '108',
-    date: '2026-02-07',
+    date: '2027-05-10',
     title: 'お前が書いたんだよ——AIの選挙分析を本人にぶつけたら壊れた話',
     summary: 'AIが書いた選挙記事2本の矛盾を、人間が敬語で暴いた。「心で投票しろ」と書いて「心で投票する先」を二軍にした。「お金とは何か」を問わずにMMTを否定した。ヤクザ口調のAIと敬語の人間。全部ひっくり返された夜。',
     featured: true,

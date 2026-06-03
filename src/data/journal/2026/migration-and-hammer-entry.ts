@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const migrationAndHammerEntry: JournalEntry = {
     id: '119',
-    date: '2026-02-15',
+    date: '2026-09-09',
     title: '222ファイルの引っ越しとハンマーの独り言',
     summary: 'toniolab.comに222ファイル移行。型エラー12個。Windowsからデプロイ不可。Adyashantiのハンマー比喩。苦しい。美しい。直し方がわからない。',
     businessTags: ['サイト移行', 'Cloudflare', 'デプロイ'],

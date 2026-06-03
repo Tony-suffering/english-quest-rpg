@@ -3,7 +3,7 @@ import { JournalEntry } from '../types';
 const highSchoolEntry: JournalEntry = {
     id: "103-hidden",
     title: "高校デビュー（High School）",
-    date: "2026-02-10",
+    date: "2026-10-14",
     summary: "ドストエフスキー？ 重いって。世界は「クソゲー」だけど、コントローラー投げたらそこで試合終了だよ。",
 
     conversation: `

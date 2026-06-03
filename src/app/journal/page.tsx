@@ -29,9 +29,13 @@ export default function JournalPage() {
     }, []);
 
     const publishedEntries = useMemo(() => {
-        if (PUBLISHED_JOURNAL_IDS.length === 0) return journalEntries;
-        const idSet = new Set(PUBLISHED_JOURNAL_IDS);
-        return journalEntries.filter(e => idSet.has(e.id));
+        const base = PUBLISHED_JOURNAL_IDS.length === 0
+            ? journalEntries
+            : journalEntries.filter(e => new Set(PUBLISHED_JOURNAL_IDS).has(e.id));
+        // ドリップ公開: 未来日付のエントリは、その日が来るまで非表示
+        const now = new Date();
+        const todayKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        return base.filter(e => e.date <= todayKey);
     }, []);
 
     const entriesByDate = useMemo(() => {

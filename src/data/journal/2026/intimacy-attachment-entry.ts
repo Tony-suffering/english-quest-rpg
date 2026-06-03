@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const intimacyAttachmentEntry: JournalEntry = {
     id: '095',
-    date: '2026-02-01',
+    date: '2026-09-28',
     title: '万物との親密さと、執着の接着剤——「私の痛み」か、「ただの痛み」か',
     summary: 'アジャシャンティが言う「Intimacy with 10,000 things（万物との親密さ）」とは何か。執着（Attachment）との決定的な違いは、「私」という接着剤の有無にある。背中の痛みを例に、分離のない親密さと、恐れによる癒着の違いを探る。',
     featured: true,

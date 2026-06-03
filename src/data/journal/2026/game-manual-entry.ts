@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const gameManualEntry: JournalEntry = {
     id: '134',
-    date: '2026-03-04',
+    date: '2027-02-12',
     title: 'ゲームの説明書を書いたら、ゲームが始まった ― XPガイドと仕様書の魔法',
     summary: '英語トレーニングの全仕組みをゲームマニュアルとして書き出した。パチンコ、ポケモン、スロット。書いた瞬間、コードより先にゲームが存在し始めた。',
     featured: false,

@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const sobaNeuroscienceEntry: JournalEntry = {
     id: '122',
-    date: '2026-02-18',
+    date: '2027-06-09',
     title: 'そば1杯の神経科学',
     summary: '気分が悪い日にそばを食ったら直った。なぜか。7つのメカニズムが同時に走ってた。トリプトファン、迷走神経、腸内細菌、すする物理学。28本の論文を読んだ。結論：理由なんか知らなくていい。そば食え。',
     featured: true,

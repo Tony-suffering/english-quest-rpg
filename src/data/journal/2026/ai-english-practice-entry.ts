@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const aiEnglishPracticeEntry: JournalEntry = {
     id: '121',
-    date: '2026-02-17',
+    date: '2026-08-14',
     title: 'AIと英会話して疲れた',
     summary: 'ChatGPTと1時間英会話した。AIを躾けた。テストするな、質問で終わるな、短すぎ、長すぎ。酒が入ったら英語が変わった。自分のロハス記事をそのまま体現してた。構造分析で英語が喋れるようになった人間は、人類史上たぶんいない。',
     featured: true,

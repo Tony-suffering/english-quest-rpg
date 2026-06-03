@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const vrttiAndLanguageSpeedEntry: JournalEntry = {
     id: '127',
-    date: '2026-02-24',
+    date: '2026-12-16',
     title: '心が止まったら英語も止まる',
     summary: '日本語は遅い。英語は速い。両方から遅いと言われてるなら本当に遅い。でもその分析自体がvrtti（心の波）だった。ヨーガ・スートラは心の波を止めろと言う。止めたら英語の勉強も止まる。アジャシャンティは「心が止まっても体は動く」と言う。じゃあ心なしで英語を喋れるのか。八村塁は分析せずに喋れるようになった。vrtti全開の俺はジャーナルが書けるようになった。',
     featured: true,

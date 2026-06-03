@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const englishIndustryLiesEntry: JournalEntry = {
     id: '152',
-    date: '2026-04-25',
+    date: '2027-04-05',
     title: '英語業界の全員が嘘をついている -- note特別記事の裏側',
     summary: 'AIに英語業界を調べさせたら、ソース付きで全業態の闇を暴いてきた。コーチング68万円の中身、レアジョブ利益率1.6%、アフィブログのランキング＝報酬額順。記事の制作過程と、なぜこれを書いたか。',
     featured: true,

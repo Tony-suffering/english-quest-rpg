@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const grindCalendarLaunchEntry: JournalEntry = {
     id: '157',
-    date: '2026-04-14',
+    date: '2026-11-02',
     title: 'TOEIC900なのに喋れない男、365日のカレンダーで逃げ道を塞ぐ',
     summary: '俺の勉強記録カレンダーをtoniolabに2枚設置した。キュレーション側(/english/grind)と、俺の自白側(/english/my-log)。D1は消した。穴が見える形式にした。1マス目を埋めた。',
     featured: false,

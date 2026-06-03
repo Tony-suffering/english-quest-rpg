@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const beAwareOfBeingAwareEntry: JournalEntry = {
     id: '084',
-    date: '2026-01-25',
+    date: '2026-08-28',
     title: 'Be Aware of Being Aware——目覚めとは「集中していない」こと',
     summary: '目覚めとは何か？巻き込まれるとは？信じるとは？現実とは？言語とは？集中とは？——ソクラテス式の対話を通じて、最終的に辿り着いた答えは「気づきが気づき自身を知る」というシンプルな真実だった。',
     featured: true,

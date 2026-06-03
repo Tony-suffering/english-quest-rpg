@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const timeAttackSidebarEntry: JournalEntry = {
     id: '150',
-    date: '2026-04-19',
+    date: '2027-02-03',
     title: 'タイムアタックが暴走してた。直したら別のとこも気になって結局全部触った。',
     summary: 'タイムアタック3連バグ退治。ついでにサイドバー整理、HPリダイレクト、ABOUTから嘘を消した。',
     featured: false,

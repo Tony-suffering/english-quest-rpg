@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const philosophyEnglishEntry: JournalEntry = {
     id: '136',
-    date: '2026-03-08',
+    date: '2027-01-04',
     title: '哲学は英語で殴れ ― アジャシャンティの5語が翻訳14音節を殺した日',
     summary: 'アジャシャンティを英語で聴いたら翻訳で読んでた時と全然違った。"You are not your thoughts"の5語が「あなたはあなたの思考ではありません」の14音節より100倍刺さる。哲学は原語じゃないと死ぬ。翻訳は説明で、原語は体験。',
     featured: false,

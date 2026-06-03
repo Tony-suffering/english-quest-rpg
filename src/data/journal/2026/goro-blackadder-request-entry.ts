@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const goroBlackadderRequestEntry: JournalEntry = {
     id: '155',
-    date: '2026-05-04',
+    date: '2027-01-18',
     title: 'メンバーリクエスト第1号 -- ごろさんがBlackadderを持ってきた',
     summary: 'noteにごろさんからコメントが来た。「ローワン・アトキンソンのコメディなんかないかしら？Mr.BeanとかBlackadderとか。」イギリス英語の皮肉ハーベスト20個を作った。メンバーのリクエストでコンテンツが動く。これがやりたかった。',
     featured: true,

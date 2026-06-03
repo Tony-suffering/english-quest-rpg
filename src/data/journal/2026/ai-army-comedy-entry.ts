@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const aiArmyComedyEntry: JournalEntry = {
     id: '151',
-    date: '2026-04-22',
+    date: '2026-09-30',
     title: 'AIに48人の分身を作らせて3,500文を一晩で書き直した話',
     summary: '365日英語マスターの「返し」が全部ゴミだった。スクリプトで一括変換したら余計ゴミになった。結局AIの分身48体を同時に走らせて全部手作業で書き直した。これが2026年のソフトウェア開発。',
     featured: true,

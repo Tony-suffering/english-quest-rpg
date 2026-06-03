@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const spamWarningEntry: JournalEntry = {
     id: '072',
-    date: '2026-01-16',
+    date: '2026-07-22',
     title: '【注意喚起】「会社にいらっしゃいますか」メールが届いたら',
     summary: 'フィッシングメールが届いた。実在する会社名を騙り、ランダムなGmailアドレスから。CEO詐欺の典型パターン。エックハルト・トールの視点で「恐怖ではなく意識的行動」を考える。',
     featured: true,

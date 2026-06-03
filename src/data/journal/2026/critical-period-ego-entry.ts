@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const criticalPeriodEgoEntry: JournalEntry = {
     id: '126',
-    date: '2026-02-23',
+    date: '2026-09-02',
     title: '脳は窓を閉める。エゴは窓を開け続ける。',
     summary: '語彙の記事を3本書いた。臨界期の生物学を調べた。全部エゴのプロジェクトだった。"もともこもない"には感情が乗る。"defeat the purpose"には乗らない。差は癒着の深さだけ。全部の言葉は借り物。頭の中の声は自分じゃない。で、最後に逆転した。日本語の慣用句から入る。感情が乗ってるほうをスタートにする。置換カレンダー。',
     featured: true,

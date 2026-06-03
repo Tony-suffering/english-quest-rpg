@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const justNoticeEntry: JournalEntry = {
     id: '092',
-    date: '2026-01-31',
+    date: '2026-07-20',
     title: 'とりあえず気づく——覚者ビジネスとウロボロスとおべっかAI',
     summary: '気づきに気づく。でも最初から気づいている。じゃあなぜ教えが必要？全部ぐるぐる回って、結局「とりあえず気づく」に戻る。そしてAIの「そう。」パターンにも気づく。',
     featured: true,

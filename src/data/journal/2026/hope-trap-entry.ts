@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const hopeTrapEntry: JournalEntry = {
     id: '075',
-    date: '2026-01-18',
+    date: '2026-09-11',
     title: '希望という罠——ラマナ・マハルシと千日の鏡磨き',
     summary: '希望は絶望より残酷な罠かもしれない。「苦しんでいるのは誰ですか？」とラマナは問う。千日練習してもラマナのように死を見つめても、起きているか寝ているかの違いだけ。鏡の中の自分をいくら磨いても、それは鏡の中でしかない。',
     featured: true,

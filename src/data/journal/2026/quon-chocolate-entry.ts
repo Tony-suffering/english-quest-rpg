@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const quonChocolateEntry: JournalEntry = {
     id: '114',
-    date: '2026-02-10',
+    date: '2026-06-01',
     title: '素材を変えただけで10倍になった——久遠チョコレートと設計の話',
     summary: 'noteで流れてきた久遠チョコレートの記事。B型事業所の月給16,000円が、素材をパンからチョコに変えただけで170,000円になった。能力の問題じゃなかった。設計の問題だった。「壊すことも仕事になる」パウダーラボの話と、英語学習にも同じ構造があるという話。',
     featured: true,

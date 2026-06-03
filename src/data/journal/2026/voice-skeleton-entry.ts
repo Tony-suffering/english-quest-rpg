@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const voiceSkeletonEntry: JournalEntry = {
     id: '115',
-    date: '2026-02-12',
+    date: '2027-05-07',
     title: '会話の骨格——4時間の録音を解剖して、自分の英語スピーキングOSを作る',
     summary: '友達との会話4時間分を文字起こしした。内容はどうでもいい。構造を見たかった。自分の日本語の「話し方の型」を10個抽出して、それぞれの英語equivalentを対応付けた。英語を「勉強する」んじゃなくて、自分の口グセの骨格をそのまま英語に移植する。これがスピーキングの最短ルートだった。',
     featured: true,

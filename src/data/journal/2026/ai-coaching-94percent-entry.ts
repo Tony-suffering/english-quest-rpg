@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const aiCoaching94PercentEntry: JournalEntry = {
     id: '123',
-    date: '2026-02-20',
+    date: '2026-11-04',
     title: 'AIをコーチングしたら94%の現実が見えた',
     summary: 'AIにnote戦略を聞いたらお世辞が返ってきた。3回殴った。学術論文を探させた。出てきたのは94%の収益が上位1,000人に集中する現実と、ツイートの寿命43分と、「名前をつけようとした瞬間にエゴ」という結論。',
     featured: true,

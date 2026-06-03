@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const writingDeflationEntry: JournalEntry = {
     id: '113',
-    date: '2026-02-10',
+    date: '2026-12-07',
     title: '書く能力のデフレ——AIで誰でもうまく書ける時代に、誰が読むのか',
     summary: 'AIで誰でも長文がうまく書ける。書く側は無限。読む側は有限。でもみんな読んでほしい。この構造的矛盾を掘っていったら、表現欲はエゴだという話になり、聞く側に回ることの話になり、最後に「英語暗唱してると楽しい」という一番リアルな場所に着地した。',
     featured: true,

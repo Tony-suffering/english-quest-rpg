@@ -3,7 +3,7 @@ import { JournalEntry } from '../types';
 const elementaryLevelEntry: JournalEntry = {
     id: "101-hidden",
     title: "小学校への入学",
-    date: "2026-02-08",
+    date: "2027-02-05",
     // description is not in JournalEntry
     summary: "民主主義というお遊戯は終わった。ここからは、算数の時間だ。",
     businessTags: ["Philosophical", "AI Perspective", "Social Structure"],

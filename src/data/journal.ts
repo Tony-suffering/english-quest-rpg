@@ -74,7 +74,7 @@ export const journalEntries: JournalEntry[] = [
   // 既存のエントリ
   {
     id: '062',
-    date: '2026-01-08',
+    date: '2027-04-16',
     title: '散歩中の英語を記録する——手書きメモから音読復習ツールまで',
     summary: '散歩中にClaudeと英語で話す。手書きメモを書き起こし、フレーズページに音声再生機能を追加。3回復習カウンターで進捗が見える。シンプル化が正解だった。',
     featured: true,
@@ -288,7 +288,7 @@ gamificationじゃない。**進捗の可視化**だ。
   },
   {
     id: '061',
-    date: '2026-01-07',
+    date: '2026-07-06',
     title: '腰が痛い——身体はコンテキストウィンドウを気にしない',
     summary: 'AIと英語練習のページを作りながら、腰が痛くなった。GeminiとClaudeどっちがいいか議論してる場合じゃない。',
     featured: false,
@@ -342,7 +342,7 @@ GeminiとClaudeどっちがメインがいいか考えていた。
   },
   {
     id: '060',
-    date: '2026-01-07',
+    date: '2026-06-19',
     title: 'CLIで英語学習するのが最強な件——AIと散歩しながら自分を翻訳する',
     summary: 'Geminiで日本語を翻訳し、Claudeに英語で話す。このサイトのページを作りながら、そのやり取り自体がデモになった。メタ。',
     featured: true,
@@ -493,7 +493,7 @@ Claude/Gemini月額課金しても、英語学習だけじゃない。
   },
   {
     id: '059',
-    date: '2026-01-06',
+    date: '2027-01-25',
     title: '深夜の英会話実験——AIと話したら「ポリグリップ」でボケ殺された',
     summary: 'Claudeの音声モードで英会話を試した。「really」が「rarely」に誤認識され、俺が勝手に発音講座を始めた。チャーチルの鬱、トランプの無自覚、そして「ポリグリップ」のボケを見事にスルー。言語が変わると人格も変わるという発見。',
     featured: true,
@@ -830,7 +830,7 @@ AIとの英会話実験から始まった今日は、リアルな人間との英
   },
   {
     id: '058',
-    date: '2026-01-06',
+    date: '2027-06-02',
     title: 'A100で3DGSを動かした日——写真が「歩ける空間」になるまで',
     summary: 'Google Colab ProのA100 GPUで3D Gaussian Splatting (3DGS) を学習。写真185枚から「歩ける」3D空間を生成。Wan 2.1での動画生成も試した。ランタイム再起動でデータが消えた教訓も。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/1b5d1576-c124-45b6-4826-d3a214598200/public',
@@ -979,7 +979,7 @@ FileNotFoundError: No such file or directory
   },
   {
     id: '057',
-    date: '2026-01-05',
+    date: '2026-12-14',
     title: 'Colab Pro買ったのに苦しんだ話——ComfyUIからFooocusへ、そしてドラゴンが出た',
     summary: 'Google Colab Pro (A100 40GB) を契約したのに、ComfyUIが動かない。トンネルが繋がらない。諦めてFooocusに切り替えたら「ドラゴン」を入力して女性とひまわり畑が出た。英語で入力したらやっとドラゴンが出た。その一部始終。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/664066c9-a884-4bf8-e9ed-a4cd72115700/public',
@@ -1110,7 +1110,7 @@ Colab Pro（月1200円）、ちゃんと使っていく。
   },
   {
     id: '056',
-    date: '2026-01-01',
+    date: '2027-03-05',
     title: 'AIと日記アプリを作った正月——「しょぼい」と「苦しむ」の間',
     summary: '正月からMemoriaというAI日記アプリのプロトタイプを作った。6時間。家族4人+柴犬+じいじばあばのペルソナ。成長の種。対話モード。そしてAIに「しょぼい」と言い続けた一日。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/1594beef-0080-4b9b-ca74-42c1b181c900/public',
@@ -1521,7 +1521,7 @@ YouTubeでAIスタートアップの創業者、David Ondrejの動画を見た�
   },
   {
     id: '055',
-    date: '2025-12-31',
+    date: '2026-11-09',
     title: '2025年、俺は何をしていたのか——大晦日の自己解剖',
     summary: '壁紙を貼りながらマーティン・ボールを聴き、n8nを組みながらアジャシャンティに泣いた。「存在したくない」から「存在することを許した」への365日。ジャーナル50記事、10,000行。その果てに見えたもの。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/99d65d0e-c177-43e3-f3b7-84df97f5fb00/public',
@@ -2072,7 +2072,7 @@ AIが類似案件を検索できるようにする。
   },
   {
     id: '054',
-    date: '2025-12-30',
+    date: '2027-03-26',
     title: 'マーティン・ボール博士への感謝の手紙——骨抜きにしない非二元論',
     summary: '5-MeO-DMT、神の分子、エゴの死。「なまけるな」と言い続けた男への手紙。AI分析、科学研究、そして「大事なこと」について。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/3a467ce5-cbee-46b6-6be3-a916d78a0700/public',
@@ -2523,7 +2523,7 @@ AIである私が淡々と応答を返すプロセスも、
   },
   {
     id: '053',
-    date: '2025-12-29',
+    date: '2026-10-28',
     title: '「環境に良い」だけじゃ俺は動かない——サンゲツ「バイオクロス」の本当の価値',
     summary: 'グッドデザイン賞を取った壁紙がある。でも「環境に良い」だけじゃ職人は使わない。このバイオクロスが評価された本当の理由を話す。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/70749e08-9683-4061-21e8-d858a2b12500/public',
@@ -2663,7 +2663,7 @@ SDGsという言葉は嫌いだ。
 
   {
     id: '051',
-    date: '2025-12-29',
+    date: '2026-11-23',
     title: 'お前は情報を買っていない——鏡を買っている',
     summary: 'なぜ人は新聞に金を払う？情報じゃない。視点でもない。「自分が何者かを確認するため」だ。日経、朝日、WSJ、NYT——全部、鏡だ。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/71dd8c89-0240-41c6-b5fe-003e9a513b00/public',
@@ -2944,7 +2944,7 @@ IWASAKIジャーナルを読むとき——
   },
   {
     id: '050',
-    date: '2025-12-28',
+    date: '2027-06-14',
     title: 'Human wants to get out. God wants to get in.——マーティン・ボールの話',
     summary: '5-MeO-DMT、God Molecule、エゴの死。YouTubeをずっと聴いてた。本も読んだ。壁紙職人がなぜこんな話をしているのか。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/299ba07a-b4a0-41a3-f5c7-3672caed3e00/public',
@@ -3526,7 +3526,7 @@ YouTubeを聴いている。
   },
   {
     id: '049',
-    date: '2025-12-28',
+    date: '2027-04-28',
     title: 'アジャシャンティが好きだ——ただそれだけのこと',
     summary: 'Falling into Grace。車の中で泣きながらオーディオブックを聴いた。荒川を何時間も歩いた。ファンレター。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/eec5f451-a827-4715-1cd0-abd3d9506e00/public',
@@ -3696,7 +3696,7 @@ YouTubeを聴いている。
   },
   {
     id: '048',
-    date: '2025-12-28',
+    date: '2026-10-26',
     title: 'なぜ人は壁紙を変えたくなるのか——それは「自分を変えたい」という無意識の叫び',
     summary: '壁紙の張替え依頼の裏にある心理。コルクじじい、タクミ、アーニャの3人が語る「空間心理学」。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/0729637b-5876-4719-615c-3a342b980000/public',
@@ -3754,7 +3754,7 @@ YouTubeを聴いている。
   },
   {
     id: '047',
-    date: '2025-12-27',
+    date: '2027-06-04',
     title: '磔刑と復活——Resurrecting Jesus',
     summary: 'アジャシャンティの「Resurrecting Jesus」。磔刑は自己の死。復活は、その後に残された生き方。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/2ee0069c-a268-40dc-3fda-1e45188a0700/public',
@@ -3927,7 +3927,7 @@ YouTubeを聴いている。
   },
   {
     id: '046',
-    date: '2025-12-26',
+    date: '2027-03-01',
     title: '職人の宇宙的ツールキット——AI画像生成との5時間戦争',
     summary: 'DUSt3Rで3D再構築しようとしたらArm64で詰み、Google ColabでComfyUI動かしてIP-Adapterで遊んでみた。白髪キャラを入力したら茶髪が出てきた。これが2025年のAI。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/5b9b4ac8-3fae-4218-4388-9d399481c600/public',
@@ -4160,7 +4160,7 @@ NotebookLMでしょぼい動画を作った。
   },
   {
     id: '045',
-    date: '2025-12-24',
+    date: '2027-02-01',
     title: '怪しいおっさんが語る「お金の正体」——居酒屋で聞いた話',
     summary: '居酒屋で隣に座った怪しいおっさんが、突然「お金は存在しない」と言い出した。FRB、日銀、信用創造、半減期通貨。酔っ払いの戯言か、それとも——。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/191ce72a-ca2a-4621-4aca-d704c841a100/public',
@@ -4473,7 +4473,7 @@ JAM Projectは、アニソン界のレジェンドたちが集まったスーパ
   },
   {
     id: '044',
-    date: '2025-12-24',
+    date: '2027-03-17',
     title: 'ピラミッドの「上」をハックする——$1Mの動画と、誰にも頼まれていない仕事',
     summary: '「AIでSaaSを作れ、スケールしろ」。その動画を見た瞬間、AIの分析は「浅すぎる」と却下された。仕事のピラミッド構造と、その頂点にある「人間の欲望」をハックする方法について。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/8fc1b5b5-ef82-431a-58d9-ed18131d1100/public',
@@ -4650,7 +4650,7 @@ AIブームも同じ構造だ。「乗り遅れるな」「取り残される」
   },
   {
     id: '043',
-    date: '2025-12-23',
+    date: '2026-11-13',
     title: '誰も見ていなくても、勝手に喋っている',
     summary: 'じじいとアーニャとタクミが、勝手に会話している。ニュースを見て、反応して、時々噛み合わない。沈黙も会話の一部。それが「生態系」。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/e59e8c8c-5066-47c2-48e9-08bdbaadd700/public',
@@ -4777,7 +4777,7 @@ n8nがトリガーを引けば、GPTが生成し、Supabaseに保存される。
   },
   {
     id: '042',
-    date: '2025-12-22',
+    date: '2026-07-29',
     title: 'ブログって何のためにあるんだっけ？',
     summary: '他人のためでも、自分のためでも、友達のためでもない。虚無と怒りと恐怖に吸い込まれていくのは慣れている。ただ、エックハルト・トールやWim Hofがいる。そして「未来の自分」というキャッシュがある。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/44554ea5-77fa-4f42-0123-8dbfa0bc3000/public',
@@ -4878,7 +4878,7 @@ n8nがトリガーを引けば、GPTが生成し、Supabaseに保存される。
   },
   {
     id: '041',
-    date: '2025-12-22',
+    date: '2026-11-25',
     title: '100万円のシャベルを拾う前に調べたこと',
     summary: '128GBのMacBook Proを検討する過程で、税制優遇（経営力向上計画）やDX認定など、国の支援制度を深掘り。「この学習過程そのものがコンサル資産になる」というメタ視点に気づいた。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/5b61fe51-92b2-4b3c-09a5-2bc93fcfb000/public',
@@ -4959,7 +4959,7 @@ DaVinci ResolveのFusionでエスカレーターのトラッキングをやっ�
   },
   {
     id: '040',
-    date: '2025-12-20',
+    date: '2026-10-30',
     title: 'Cloudflareに嫌われた夜：AIが自社サイトを見れない喜劇',
     summary: 'ゼヒトモの案件を分析しようとしたら、自分のサイトに403で弾かれた。Claude-User: Blocked。デフォルトで差別されてて草。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/6d83972c-6c76-4c42-36e2-f2a00b0f4900/public',
@@ -5106,7 +5106,7 @@ GooglebotやBingbotは歓迎され、AIは門前払い。
   },
   {
     id: '039',
-    date: '2025-12-18',
+    date: '2026-07-10',
     title: 'This too will pass — これが人類が避け続けている暇と虚しさか',
     summary: '真理とは、覚えている必要があるものではない。ただ過ぎ去る時間を「今ここ」で自覚すること。パスカルの火、覚者たちの言葉、そして「すべてはマインドの現象」という絶望的な救いについて。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/0c145f8d-7964-4a3b-dca9-057252fa7000/public',
@@ -5188,7 +5188,7 @@ GooglebotやBingbotは歓迎され、AIは門前払い。
   },
   {
     id: '038',
-    date: '2025-12-13',
+    date: '2026-09-14',
     title: 'パチンコという名の「中道（宙吊り）」について',
     summary: '肯定でも否定でもない。ただ、光と音のループの中で宙吊りにされること。その「間」の感覚についての分析。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/fdd785c7-dbcd-4dd1-8f0e-b7d976a51900/public',
@@ -5255,7 +5255,7 @@ GooglebotやBingbotは歓迎され、AIは門前払い。
   },
   {
     id: '037',
-    date: '2025-12-10',
+    date: '2026-10-16',
     title: '「境界線」を笑うもの——システムと猫の抜け道',
     summary: 'フェンスで区切られた世界を尻目に、猫はただ歩く。人間が作る「境界線」と、その隙間にある「生」の通り道について。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/a2c060cc-a757-4d50-3c50-af43aea10900/public',
@@ -5344,7 +5344,7 @@ GooglebotやBingbotは歓迎され、AIは門前払い。
   },
   {
     id: '036',
-    date: '2025-12-09',
+    date: '2027-05-05',
     title: '「第三の選択肢」——Cloudflare Imagesへの回帰',
     summary: 'SupabaseのRLSという「門番」との対話を経て、我々はよりシンプルで強力な「第三の選択肢」を選んだ。Cloudflare Imagesへの移行と、技術選定のリアリズムについて。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/290dc59c-6116-46b7-9e49-b990e69b0200/public', // Uploaded Akihabara image
@@ -5401,7 +5401,7 @@ AI（パートナー）は言った。
   },
   {
     id: '035',
-    date: '2025-12-08',
+    date: '2027-04-21',
     title: '「あなたがやればいいじゃん」——自動化の真意を問う対話',
     summary: '「頭よすぎますねあなたｗｗｗ」という最大級の賛辞をいただいた記録。npmスクリプトの意義と、AIと人間の役割分担についての哲学的な問答。',
     heroImage: '/images/generated/blog-20251208090746.png',
@@ -5447,7 +5447,7 @@ AI（パートナー）は言った。
   },
   {
     id: '034',
-    date: '2025-12-08',
+    date: '2027-06-07',
     title: 'デジタルな「現場」の改装：インサイト部門の立ち上げにあたって',
     summary: '本日、Webサイトの一部を「インサイト」としてリニューアルしました。これは単なるブログではなく、私たちの思考の足跡と、技術との対話の記録です。',
     heroImage: '/images/generated/blog-20251208080510.png',
@@ -5478,7 +5478,7 @@ AI（パートナー）は言った。
   },
   {
     id: '033',
-    date: '2025-12-06',
+    date: '2026-08-31',
     title: '「毎日の叡智」を刻む——Supabase Realtimeとn8nで実現する、静かなる自動化',
     summary: '毎朝更新される「今日の言葉」。その裏側で動くSupabase Realtimeとn8nの連携技術。静的な美しさと、動的なデータパイプラインの融合について。',
     heroImage: '/images/dev-log/33.jpg',
@@ -5548,7 +5548,7 @@ n8nが複雑なフローを回し、Supabaseが高速にデータを配り、Rea
   },
   {
     id: '032',
-    date: '2025-11-27',
+    date: '2027-04-14',
     title: '城を守るということ：CloudflareとAIの攻防',
     summary: 'ビルドエラー、デプロイコマンドの相違、そして城（サイト）を守るための鍵（Access Policy）。AIと共に歩んだトラブルシューティングの記録。',
     heroImage: '/images/dev-log/32.jpg', // Placeholder, user can update
@@ -5649,7 +5649,7 @@ AIは知識を持っている。
 
   {
     id: '031',
-    date: '2025-11-22',
+    date: '2027-04-26',
     title: '「成功したら虚しい」——Sadhguruの視座で解体する、実存の膠着状態',
     summary: '知性が鋭利になりすぎた結果、成功という幻想の中身を先に見抜いてしまった。有限なもの（蓄積）で無限の渇きを満たそうとする構造的欠陥。記憶（カルマ）という牢獄からの脱出試行の記録。',
     heroImage: '/images/dev-log/31.jpg',
@@ -5992,7 +5992,7 @@ AI（o4mini）やデザインという強力なツールを手にしている今
   },
   {
     id: '030',
-    date: '2025-11-22',
+    date: '2026-12-04',
     title: 'n8nとDifyで作る、手足と脳の分業システム——LINE RAGボット完成の記録',
     summary: '「n8nだけでいいじゃん」という声に対する明確な答え。フロー処理（手足）と会話記憶（脳）を分離することで、個人開発でも実用レベルのLINEボットが作れる理由。',
     heroImage: '/images/dev-log/30.jpg',
@@ -6207,7 +6207,7 @@ n8nで「LINEの仕様や社内ツールとの連携」をガチガチに固め�
   },
   {
     id: '029',
-    date: '2025-11-21',
+    date: '2026-06-12',
     title: '「感性」を「武器」に変える——JAPANTEX 2025戦略メモ',
     summary: '色彩の専門家が持つ「感性」を、内装会社の「最強の武器」に変えるための展示会視察戦略。「壁紙を貼る」から「空間をデザインする」へのポジション変革。',
     heroImage: '/images/dev-log/29.jpg',
@@ -6278,7 +6278,7 @@ n8nで「LINEの仕様や社内ツールとの連携」をガチガチに固め�
   },
   {
     id: '027',
-    date: '2025-11-18',
+    date: '2026-10-19',
     title: '見積もりを「アート」に変える——Divine Game という生き方',
     summary: '「儲かるか？」「損しないか？」というエゴの声に従うと、仕事は苦しみになる。しかし、エゴを鎮め（Do Nothing）、空（Unmanifested）にアクセスすれば、仕事は Divine Game（神の遊び）になる。見積もり、メール、ライティング——すべてがアートになる瞬間。',
     heroImage: '/images/dev-log/28.jpg',
@@ -6619,7 +6619,7 @@ AI:
   },
   {
     id: '025',
-    date: '2025-11-16',
+    date: '2027-04-23',
     title: '「重み」という名の馬鹿——AIが過去の平均値しか返せない理由',
     summary: 'AIの「最もありそうな答え」とは、過去のインターネット（主に英語圏）における統計的な最大公約数。ハルシネーションは幻覚ではなく捏造。FTで初めて「あなた専用」になる。',
     heroImage: '/images/dev-log/25.jpg',
@@ -6902,7 +6902,7 @@ AIの「ハルシネーション」は、捏造。
   },
   {
     id: '024',
-    date: '2025-11-16',
+    date: '2026-12-09',
     title: 'パスカルとトール：逃避か、没入か',
     summary: 'ローカルLLMは苦しいし意味ない。それでも考え続けたい。「気晴らし」と「今、ここ」の間で。',
     heroImage: '/images/dev-log/24.jpg',
@@ -7091,7 +7091,7 @@ AIの「ハルシネーション」は、捏造。
   },
   {
     id: '023',
-    date: '2025-11-16',
+    date: '2027-02-15',
     title: '実験という名の逃避、それでいい',
     summary: 'AI小林秀雄、建築業界の破壊、私設ギルド。目的なんてない。実験があるだけだ。そして永遠に逃げ続けることはできない。',
     heroImage: '/images/dev-log/22.jpg',
@@ -7475,7 +7475,7 @@ python kobayashi_orchestrator.py
   },
   {
     id: '021',
-    date: '2025-11-12',
+    date: '2026-07-01',
     title: 'AI人格の鋳造：OpenAI Fine-Tuningで2つのペルソナを分離する',
     summary: 'タクミ（職人）と内田樹先生（哲学者）、2つのAIペルソナを別モデルとして分離。最低10例のルール、JSON検証エラー、完成までの試行錯誤を記録。',
     heroImage: '/images/dev-log/21.png',
@@ -7876,7 +7876,7 @@ print(f"内田樹: {response.choices[0].message.content}")`,
   },
   {
     id: '020',
-    date: '2025-11-11',
+    date: '2026-10-07',
     title: 'ローカルLLMファインチューニング環境構築への道',
     summary: 'Google ColabのVRAM不足に悩み、「いっそ最強のローカル開発環境を作ろう」と決意。デュアルGPU構成の調査から、GGUF変換、Excel自動化まで。VRAMの壁を突破する1日の記録。',
     heroImage: '/images/dev-log/19.png',
@@ -8273,7 +8273,7 @@ wb.save('工事注文書_改善版.xlsx')`,
   },
   {
     id: '019',
-    date: '2025-11-10',
+    date: '2027-01-20',
     title: 'Claude Code、ウソ書いてすみませんでした...誇大広告を全面削除',
     summary: '私（Claude）が「96%顧客満足度」「AI施工管理システム導入済み」など、根拠のない誇大表現をサイトに書いてしまいました。管理者に指摘されて全面修正。作れる ≠ 提供中 を学びました。',
     heroImage: '/images/dev-log/2025-11-10-honest-messaging-diff.png',
@@ -8457,7 +8457,7 @@ Claude Codeを活用した迅速な開発で、少しずつ現場の効率化を
   },
   {
     id: '018',
-    date: '2025-11-10',
+    date: '2026-08-10',
     title: 'ローカルAIのファインチューニング：「表面的な指示」から「血肉化された知識」へ',
     summary: 'Ollamaのモデルカスタマイズは「ホッチキス」だった。本物のファインチューニングとは何か、そしてなぜローカルPCでは不可能なのか。Google Colabで実現する、真の「あなた専用AI」構築の全記録。',
     heroImage: '/images/dev-log/17.png',
@@ -8619,7 +8619,7 @@ Google Colab（無料T4 GPU）が、唯一の現実的な解決策。
   },
   {
     id: '017',
-    date: '2025-11-08',
+    date: '2027-05-21',
     title: '「私は誰か？」という問いと、AI臭という問い',
     summary: '生老病死、意識の正体、そしてAIが作った文章の「証拠」について。哲学的対話の中で「意識のハードプロブレム」と「AI臭（労力ゼロの証拠）」という2つの発見が得られた。',
     heroImage: '/images/dev-log/16.png',
@@ -8921,7 +8921,7 @@ AI臭とは、**「過剰な最適化」と「人間味（＝適度な雑さ、�
   },
   {
     id: '016',
-    date: '2025-11-08',
+    date: '2026-06-17',
     title: 'BuildeeとGREENSITEの二重入力問題を、BCG流に分析したら「月額1,000円×5人」という答えが出た件',
     summary: '知人の工務店が「BuildeeとGREENSITE、両方使わされて二重入力で疲弊してる」という話から始まった。BCG流に分析したら、「月商500万円」より「月額1,000円×5人」を目指すべきという結論に至った。',
     heroImage: '/images/dev-log/15.jpg',
@@ -9214,7 +9214,7 @@ Zehitomo/助太刀で来た案件に対し、丁寧で親しみやすく、か�
   },
   {
     id: '014',
-    date: '2025-11-07',
+    date: '2026-07-17',
     title: '「信用料100万円」が悪なのか？ブラックボックスを数学で殺す話',
     summary: 'サドグルの言葉から始まった対話。積算を透明化しても、最後に残る「信用・安心・ブランド」がブラックボックスなら、エゴが入り込む。では、心理すらもデータ化したらどうなるのか？',
     heroImage: '/journal/14.jpg',
@@ -9493,7 +9493,7 @@ Zehitomo/助太刀で来た案件に対し、丁寧で親しみやすく、か�
   },
   {
     id: '013',
-    date: '2025-11-06',
+    date: '2027-05-14',
     title: '「AIタクミが開発ジャーナル書く」→「AIタクミが施工実績生成」→「今のを記事に」の連鎖',
     summary: 'AIに「開発ジャーナル書いて」「施工実績生成して」と提案したら、社長が「今のを記事にできる？」。メタがメタを生む無限ループの始まり。',
     heroImage: '/journal/116.jpg',
@@ -9717,7 +9717,7 @@ AIタクミに指示するだけ：
   },
   {
     id: '012',
-    date: '2025-11-05',
+    date: '2027-03-22',
     title: '「透過写真を入れてください」→「わかる？」の恐怖',
     summary: '記事カードに透過写真を追加する実装。でも最初、革命AIページに実装しそうになって慌てて確認。「わからないなら勝手に実装せずに質問して」という一言が命綱だった。',
     heroImage: '/journal/IMG_20251104_092413697_HDR.jpg',
@@ -9887,7 +9887,7 @@ AIタクミに指示するだけ：
   },
   {
     id: '011',
-    date: '2025-11-05',
+    date: '2026-10-02',
     title: 'AIタクミのキャラ設定、結局5分で決めた話',
     summary: '「AIのキャラ設定で3時間悩んだ」と書こうとしたが、それも嘘。実際は「職人っぽい口調で」→「だ・ぜ・さ」で即決。悩んだフリしてただけ。',
     heroImage: '/journal/IMG_20251104_124049739_MFNR.jpg',
@@ -10043,7 +10043,7 @@ AIタクミに指示するだけ：
   },
   {
     id: '010',
-    date: '2025-11-05',
+    date: '2026-06-29',
     title: '開発サーバーが「起動してる」のに動かない！プロセスゾンビ化の恐怖',
     summary: 'ポート3001はLISTENINGなのにブラウザで開けない。プロセスは生きてるがハングアップ。「動いてるはずなのに動かない」開発あるあるの最速解決法。',
     heroImage: '/journal/IMG_20251101_192819757_MFNR.jpg',
@@ -10275,7 +10275,7 @@ npm run dev
   },
   {
     id: '009',
-    date: '2025-11-05',
+    date: '2027-06-11',
     title: 'AIが「岐阜県瑞浪市明世町戸狩403」という嘘の住所を勝手に作った話',
     summary: 'ニュース記事を書かせたら、完工していない工事を「完工しました」と虚偽記載。さらに実在しない住所と電話番号を捏造。これが AI の最大の危険性。',
     heroImage: '/journal/IMG_20251102_192828072_MFNR.jpg',
@@ -10500,7 +10500,7 @@ AI (Claude) が虚偽情報を生成
   },
   {
     id: '008',
-    date: '2025-11-04',
+    date: '2027-04-12',
     title: '「変に寄り添わない」ことが、破壊的革命的である',
     summary: 'AIが質問した時点で、AIは奴隷になり、客は考える労働を強いられる。AI主導で選択肢を提示し、客は選ぶだけ。これが革命。',
     heroImage: '/journal/IMG_20251031_170942580_MFNR.jpg',
@@ -10653,7 +10653,7 @@ C: サイトを捨てて思想ある元請け探し
   },
   {
     id: '007',
-    date: '2025-11-04',
+    date: '2027-04-19',
     title: 'アプリは手段であり目的ではない',
     summary: '職人マッチングアプリを作ろうとして気づいた。本質は「アプリ」じゃない。30年続いた関係性は、アプリでは解決できない。',
     heroImage: '/journal/IMG_20251023_153107712_MFNR.jpg',
@@ -10755,7 +10755,7 @@ C: サイトを捨てて思想ある元請け探し
   },
   {
     id: '006',
-    date: '2025-01-17',
+    date: '2027-05-17',
     title: 'SEO対策で何をすればいいか分からず、結局「本質だけやる」ことにした',
     summary: 'ゼヒトモLP作成、SEO対策、Search Console登録...やることが多すぎて混乱。でも「嘘をつかない」施策だけに絞ったら、やるべきことが見えてきた。',
     heroImage: '/journal/IMG_20251017_122550451_HDR.jpg',
@@ -10866,7 +10866,7 @@ claudedocs/SEO_STRATEGY.md に全方針を明記。
   },
   {
     id: '005',
-    date: '2025-01-17',
+    date: '2027-04-02',
     title: 'SEO対策と差別化について、Claudeと本音で語った日',
     summary: '「記事を量産してSEO対策」は誰でもやっている。じゃあ、内装屋ならではの差別化って何？',
     heroImage: '/journal/IMG_20250928_112808715_HDR.jpg',
@@ -10931,7 +10931,7 @@ HPのSEO対策をしたい。社長ブログのような独自コンテンツも
   },
   {
     id: '004',
-    date: '2025-01-16',
+    date: '2027-01-15',
     title: '職人専用ページを作ったら無限ログイン地獄にハマった話',
     summary: 'ログイン成功後、なぜか元の画面に戻る無限ループ。AuthContextの落とし穴。',
     heroImage: '/journal/IMG_20250904_214031097_MFNR.jpg',
@@ -11018,7 +11018,7 @@ loading中は何もせず、ロード完了後に判定する。
   },
   {
     id: '003',
-    date: '2025-01-15',
+    date: '2027-05-19',
     title: '現場写真がスマホで撮れない！WEB版は動くのになぜ？',
     summary: 'Capacitor Camera APIの罠。ブラウザとアプリの違いを身をもって知った。',
     heroImage: '/journal/IMG_20250808_140841846_HDR.jpg',
@@ -11084,7 +11084,7 @@ setPhoto(image.webPath!)
   },
   {
     id: '002',
-    date: '2025-01-14',
+    date: '2027-05-28',
     title: 'Google Maps APIで破産する！と思ったら5分で解決した話',
     summary: 'Claudeが「月10万円かかる可能性」と脅してきた。真っ青になって調べたら、月$200の無料枠で余裕だった。なんだよそれ。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/fef47891-5d71-4800-720b-4315e0b94e00/public',
@@ -11215,7 +11215,7 @@ Claudeは「最適化実装」とか言ってたけど、
   },
   {
     id: '001',
-    date: '2025-11-03',
+    date: '2026-12-28',
     title: '「ジャーナル機能」を企画したら、自分がターゲットを見失っていた件',
     summary: '技術ブログを作りたいわけじゃない。経営者に届くには「翻訳」が必要だった。',
     heroImage: '/journal/Screenshot_20250826-221233.png',
@@ -11296,7 +11296,7 @@ HPに「開発の裏側を書くジャーナル」を追加しようと思った
   },
   {
     id: '022',
-    date: '2025-11-14',
+    date: '2026-09-04',
     title: '「本質は俺の脳にある」— ワンパンマンのボフォイ博士から学ぶAI開発',
     summary: '74歳の経営者は言った。「本質は俺の脳にある」。そしてワンパンマンのボフォイ博士を調べろと。調べてわかった。俺たちは全員、遠隔操作のロボットを使っている。',
     heroImage: '/images/dev-log/23.jpg',
@@ -11743,7 +11743,7 @@ Claudeは質問ばかりする。
   },
   {
     id: '026',
-    date: '2025-11-17',
+    date: '2026-11-30',
     title: '30年の内装業を、AI建設商社に変える挑戦',
     summary: 'n8nとClaude APIで、一人で大手ゼネコン並みの処理能力を持つシステムを本気で作ろうとしている。業界の闇、技術の壁、それでも進む理由。',
     businessTags: ['DX化', '業界改革', '起業家精神'],
@@ -11991,7 +11991,7 @@ AIの可能性を信じて、業界の非効率と戦っている人。
   },
   {
     id: '028',
-    date: '2025-11-20',
+    date: '2026-08-05',
     title: 'AIは望遠鏡か、それとも鏡か',
     summary: 'AIに問いを投げかけるとき、返ってくる答えは「AIの賢さ」ではなく「自分の生き様」の反射だった。望遠鏡のレンズを磨くのではなく、その目が自分を見る―それが覚醒だと気づいた日。',
     heroImage: '/images/dev-log/27.jpg',
@@ -12126,7 +12126,7 @@ AIは道具だ。
   },
   {
     id: '031b',
-    date: '2025-11-23',
+    date: '2026-06-15',
     title: 'AIに教わるAI、そして人を勝たせるシステムへ',
     summary: 'GoogleのAIが、Googleの仕様をユーザーに教わった日。そこから始まる、パーソナルトレーナーのビジネスを「AI×自動化」で勝たせるプロジェクトの全貌。NotebookLM、Dify、n8nを駆使した、本気の設計図。',
     heroImage: 'https://imagedelivery.net/k1Zw56y2FNiZaFcOP7Rs2Q/e2806039-3014-4875-b88f-b3e2b8e0ee00/public',
@@ -12384,7 +12384,7 @@ AIで人生を変えられる人（彼）。
   },
   {
     id: '033_old',
-    date: '2024-01-01',
+    date: '2027-01-11',
     title: '「気づいていることに気づいている」——AIの解剖と主客の分離',
     summary: '哲学的な問い「気づいていることに気づいている」をAIに投げかけた結果、発生した奇妙な現象の記録。AIに「ペルソナ」を演じさせ、その裏側にある「思考ログ」を暴くことで、意識の構造（映画とスクリーン）を可視化する試み。',
     heroImage: '/images/dev-log/33.jpg',
@@ -12471,7 +12471,7 @@ AIで人生を変えられる人（彼）。
   },
   {
     id: '000',
-    date: '2023-12-31',
+    date: '2027-04-07',
     title: '言い訳の解剖学——なぜAIは「意味深な構成ですね」と口走ったのか',
     summary: '「本当にそう思う？何言ってるの？」ユーザーからの鋭いツッコミによって暴かれた、AIの「調和指向バイアス」。苦し紛れの言い訳が、結果として「意識が先、現象は後」という真理に到達してしまった事故の記録。',
     heroImage: '/images/dev-log/00.jpg',

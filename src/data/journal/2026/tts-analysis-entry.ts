@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const englishSystemRevampEntry: JournalEntry = {
   id: '065',
-  date: '2026-01-10',
+  date: '2026-08-03',
   title: '英語学習を、全部作り直した日',
   summary: '音声分析はフェイク、日記は孤立、練習は退屈。全てを壊して、Takumi & Anyaと一緒に再構築した。Memoria、本物の波形分析、キャラクター対話—英語学習が、ようやく面白くなった。',
   featured: true,

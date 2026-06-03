@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const wbcChibiCodingEntry: JournalEntry = {
     id: '135',
-    date: '2026-03-10',
+    date: '2026-12-23',
     title: 'WBC 2026開幕とチビキャラの午後 ― 大谷がグランドスラム打ってる間に俺は猫を描いてた',
     summary: 'WBC 2026がリアルタイムで進行中。大谷がまた怪物やってる裏で、俺はトレーニングページの敵キャラをかわいくする作業に没頭してた。5000単語生成もした。',
     featured: false,

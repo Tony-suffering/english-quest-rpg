@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const harvestEvolutionEntry: JournalEntry = {
     id: '148',
-    date: '2026-04-13',
+    date: '2027-03-15',
     title: '300フレーズ、30本の映画、全部手動。これが本物のハーベスター',
     summary: '映画から英語を自動収穫する機能がゴミだったので捨てた。代わりにAIに30本の映画スクリプトを読ませて、300フレーズを手動で厳選した。1日1映画、10フレーズ。4月分全部埋めた。',
     featured: true,

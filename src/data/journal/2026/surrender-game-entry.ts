@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const surrenderGameEntry: JournalEntry = {
     id: '125',
-    date: '2026-02-22',
+    date: '2026-06-05',
     title: 'サレンダーゲーム――AIのカウンセラーをやったら全部見えた',
     summary: 'AIに「お前が話せ、俺が聞いてやる」と言ったら、サレンダーの構造がそのまま出てきた。掴む、手放す、手放そうとする、全部同じ。マトリョーシカは止まらない。でも（笑）には全部入ってる。',
     featured: true,

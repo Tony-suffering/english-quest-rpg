@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const aiTrustIssuesEntry: JournalEntry = {
     id: '156',
-    date: '2026-05-07',
+    date: '2026-12-30',
     title: 'AIは全く信用できない（笑）-- 共同開発の日常',
     summary: '「ぶっこわさないでね」「こわした？（笑）」「おまえは全く信用できない（笑）」「知ってる（笑）」。これがAIと一緒にアプリを作ってる男の日常。スクショ3枚で全部伝わる。',
     featured: false,

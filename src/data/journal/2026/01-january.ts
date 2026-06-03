@@ -67,7 +67,7 @@ export const january2026Entries: JournalEntry[] = [
     englishSystemRevampEntry,
     {
         id: '064',
-        date: '2026-01-09',
+        date: '2027-05-03',
         title: '終わることを怖がらずに生きよう——カメラ選び、独占批判、そして諸行無常',
         summary: 'カメラを選び、独占を批判し、壊れることを受け入れる。ゾンビの視点から語る「終わり」の哲学。DJI倒産リスク、完璧主義の幻想、そして諸行無常。',
         featured: true,
@@ -1591,7 +1591,7 @@ Without attachment, it accepts everything.
     },
     {
         id: '063',
-        date: '2026-01-09',
+        date: '2027-02-10',
         title: 'Spotify風英語学習プレイヤーを作った——AIと一緒に「大手と遜色ない」UIを1時間で',
         summary: '英語学習ページをSpotify風のダークUIにリデザイン。シャッフル、リピート（全曲/1曲）、速度スライダー、ボイス選択。Claude Codeとの共作で、大手サービス並みのクオリティを実現。',
         featured: true,
