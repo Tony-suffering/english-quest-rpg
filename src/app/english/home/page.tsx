@@ -138,6 +138,13 @@ export default function EnglishHomeHub() {
                         desc="毎日10フレーズ。今日も続ける。"
                         color="#10B981"
                     />
+                    <HubCard
+                        href="/english/story-vocab"
+                        tagline="PRE-1 / 物語で覚える"
+                        title="呪術廻戦で英検準1級"
+                        desc="宿儺・五条・七海。好きな物語に単語を乗せる。"
+                        color="#B91C1C"
+                    />
                 </div>
 
                 <div style={{
