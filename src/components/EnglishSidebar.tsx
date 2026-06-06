@@ -510,7 +510,12 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     })()}
                     {renderToolItem({ id: '/english/harvest', label: 'Movie Harvest', color: '#D4AF37' })}
                     {renderToolItem({ id: '/english/jp-yt', label: '罪悪感ゼロ英語 (JP→EN)', color: '#0EA5E9' })}
-                    {renderToolItem({ id: '/english/survival', label: '修羅場英会話 (会話シミュレーター)', color: '#DC2626' })}
+                    {renderToolItem({ id: '/english/jp-yt-v2', label: '罪悪感ゼロ TODAY (v2)', color: '#0EA5E9' })}
+                    {renderToolItem({ id: '/english/survival', label: '修羅場英会話 v3 (会話シミュレーター)', color: '#DC2626' })}
+                    {renderToolItem({ id: '/english/dictation', label: '聞き取りディクテーション v4', color: '#7C3AED' })}
+                    {renderToolItem({ id: '/english/interpret', label: '同時通訳ジム v5', color: '#0891B2' })}
+                    {renderToolItem({ id: '/english/reflex', label: '3秒で返せ v6', color: '#EA580C' })}
+                    {renderToolItem({ id: '/english/story', label: '物語没入チャット v7', color: '#DB2777' })}
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
                     {renderToolItem({ id: '/english/dashboard', label: 'ダッシュボード', color: '#D4AF37' })}
 

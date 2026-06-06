@@ -161,6 +161,22 @@ export default function EnglishHomeHub() {
                     />
                 </div>
 
+                {/* ===== 英語ラボ v1〜v7 (でかでか) ===== */}
+                <div style={{ marginTop: 30, marginBottom: 14 }}>
+                    <div style={{ fontSize: 11, letterSpacing: '0.2em', color: '#DC2626', fontWeight: 800 }}>LAB ・ 実験版</div>
+                    <h2 style={{ fontSize: 24, fontWeight: 900, color: '#1C1917', margin: '4px 0 4px', letterSpacing: '-0.02em' }}>英語ラボ — 7つの全く違う型</h2>
+                    <p style={{ fontSize: 12.5, color: '#78716C', margin: 0, lineHeight: 1.7 }}>同じ「崩れた実英語」を、7つの違うやり方で。読む・聞く・話す・反射・没入・切り抜ける。全部ここに残してある。</p>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, marginBottom: 14 }}>
+                    <HubCard href="/english/jp-yt" tagline="v1 ・ 読む(カレンダー)" title="罪悪感ゼロ英語" desc="日本語YouTubeの言葉をネイティブ英語に。30日分の表現を月めくりで。" color="#0EA5E9" />
+                    <HubCard href="/english/jp-yt-v2" tagline="v2 ・ 習慣(TODAY)" title="罪悪感ゼロ TODAY" desc="1日1本やり切る型。1表現ずつ自己採点、連続日数で続ける。" color="#0EA5E9" />
+                    <HubCard href="/english/survival" tagline="v3 ・ 切り抜ける(分岐)" title="修羅場英会話" desc="高圧の会話を選択肢で切り抜けるシミュレーター。選ぶたび相手が変わる。" color="#DC2626" primary />
+                    <HubCard href="/english/dictation" tagline="v4 ・ 聞く(打つ)" title="聞き取りディクテーション" desc="速い崩れた音を聞いて打つ。聞き間違えポイントを潰す。本丸。" color="#7C3AED" />
+                    <HubCard href="/english/interpret" tagline="v5 ・ 話す(通訳)" title="同時通訳ジム" desc="日本語→3秒で英語を口に。通訳案内士・英検二次の筋トレ。" color="#0891B2" />
+                    <HubCard href="/english/reflex" tagline="v6 ・ 反射(3秒)" title="3秒で返せ" desc="相手の一言に3秒で返す。会話は反射。詰まる前に何か言え。" color="#EA580C" />
+                    <HubCard href="/english/story" tagline="v7 ・ 没入(物語)" title="物語没入チャット" desc="短い物語をチャットで読み進める。シーンごと体に入れる。" color="#DB2777" />
+                </div>
+
                 <div style={{
                     marginTop: 8,
                     padding: '10px 14px',
