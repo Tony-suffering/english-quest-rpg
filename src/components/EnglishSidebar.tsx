@@ -509,6 +509,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                         );
                     })()}
                     {renderToolItem({ id: '/english/harvest', label: 'Movie Harvest', color: '#D4AF37' })}
+                    {renderToolItem({ id: '/english/jp-yt', label: '罪悪感ゼロ英語 (JP→EN)', color: '#0EA5E9' })}
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
                     {renderToolItem({ id: '/english/dashboard', label: 'ダッシュボード', color: '#D4AF37' })}
 

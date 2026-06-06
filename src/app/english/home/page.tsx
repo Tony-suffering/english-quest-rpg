@@ -145,6 +145,13 @@ export default function EnglishHomeHub() {
                         desc="宿儺・五条・七海。好きな物語に単語を乗せる。"
                         color="#B91C1C"
                     />
+                    <HubCard
+                        href="/english/jp-yt"
+                        tagline="JP→EN / 罪悪感ゼロ"
+                        title="罪悪感ゼロ英語"
+                        desc="ヒカキン見るの、もう罪悪感いらない。その日本語、英語に変えれば勉強になる。"
+                        color="#0EA5E9"
+                    />
                 </div>
 
                 <div style={{
