@@ -1,5 +1,8 @@
 'use client';
 
+// 罪悪感ゼロ英語 (JP→EN)
+// 日本語YouTubeのフレーズを「ネイティブが言う英語」に変換。観た動画が勉強になる。
+
 import { useState, useMemo, useCallback } from 'react';
 import { PPButton, PPPopup, usePPWordPicker } from '@/components/english/PPWordPicker';
 import {
@@ -9,9 +12,12 @@ import {
     type JpYtSource,
 } from '@/data/english/jp-yt-seed';
 
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const ACCENT = '#0EA5E9'; // sky blue — distinguish from podcast (gold) and casual (emerald)
+const WEEKDAYS = ['日', '月', '火', '水', '木', '金', '土'];
+const ACCENT = '#0EA5E9';
 const ROSE = '#F472B6';
+const INK = '#1C1917';
+const SUB = '#78716C';
+const LINE = '#E7E5E4';
 
 function speakText(text: string) {
     if (typeof window === 'undefined' || !window.speechSynthesis) return;
@@ -41,7 +47,6 @@ function buildCalendarGrid(year: number, month: number): (number | null)[] {
 function dateKey(year: number, month: number, day: number): string {
     return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
-
 function buildMonthKey(year: number, month: number): string {
     return `${year}-${String(month + 1).padStart(2, '0')}`;
 }
@@ -81,17 +86,15 @@ export default function JpYtPage() {
             if (!map.has(monthKey)) map.set(monthKey, []);
             const list = map.get(monthKey)!;
             const idx = list.filter(e => e.daySlot === seed.daySlot).length;
-            list.push({
-                ...seed,
-                id: `jpyt_${monthKey}_${String(seed.daySlot).padStart(2, '0')}_${idx}`,
-            });
+            list.push({ ...seed, id: `jpyt_${monthKey}_${String(seed.daySlot).padStart(2, '0')}_${idx}` });
         }
         return map;
     }, []);
 
-    const monthEntries = useMemo(() => {
-        return entriesByMonth.get(buildMonthKey(viewYear, viewMonth)) || [];
-    }, [entriesByMonth, viewYear, viewMonth]);
+    const monthEntries = useMemo(
+        () => entriesByMonth.get(buildMonthKey(viewYear, viewMonth)) || [],
+        [entriesByMonth, viewYear, viewMonth]
+    );
 
     const entriesByDay = useMemo(() => {
         const map = new Map<number, DisplayEntry[]>();
@@ -105,12 +108,8 @@ export default function JpYtPage() {
     const grid = useMemo(() => buildCalendarGrid(viewYear, viewMonth), [viewYear, viewMonth]);
 
     const selectedDateKey = selectedDay ? dateKey(viewYear, viewMonth, selectedDay) : null;
-    const selectedSource: JpYtSource | null = selectedDateKey
-        ? (JPYT_SOURCE_BY_DATE[selectedDateKey] || null)
-        : null;
+    const selectedSource: JpYtSource | null = selectedDateKey ? (JPYT_SOURCE_BY_DATE[selectedDateKey] || null) : null;
     const selectedEntries = selectedDay ? (entriesByDay.get(selectedDay) || []) : [];
-
-    const seededDays = entriesByDay.size;
 
     const prevMonth = () => {
         if (viewMonth === 0) { setViewYear(y => y - 1); setViewMonth(11); }
@@ -130,12 +129,7 @@ export default function JpYtPage() {
             const res = await fetch('/api/phrases', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    english: entry.english,
-                    japanese: entry.japanese,
-                    category: 'jp-yt',
-                    date: dateStr,
-                }),
+                body: JSON.stringify({ english: entry.english, japanese: `${entry.japanese} = ${entry.english}`, category: 'jp-yt', date: dateStr }),
             });
             if (res.ok) {
                 setRegistered(prev => {
@@ -149,261 +143,52 @@ export default function JpYtPage() {
         }
     }, [viewYear, viewMonth]);
 
-    function EntryCard({ entry, index }: { entry: DisplayEntry; index: number }) {
-        const rank = rankBadge(entry.rank);
-        const isReg = registered.has(entry.id);
-        const isReging = registeringId === entry.id;
-
-        return (
-            <div style={{
-                backgroundColor: '#fff',
-                borderRadius: '14px',
-                border: '1px solid #E7E5E4',
-                padding: '18px 20px',
-            }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '12px' }}>
-                    <span style={{
-                        fontSize: '11px', fontWeight: '700', color: '#A8A29E',
-                        width: '20px', textAlign: 'right', flexShrink: 0, paddingTop: '4px',
-                    }}>
-                        {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span style={{
-                        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                        width: '28px', height: '28px', borderRadius: '8px', flexShrink: 0,
-                        backgroundColor: rank.bg, color: rank.color,
-                        fontSize: '12px', fontWeight: '800',
-                    }}>
-                        {entry.rank}
-                    </span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{
-                            fontSize: '20px', fontWeight: '700', color: '#1C1917',
-                            lineHeight: 1.3, letterSpacing: '-0.01em',
-                        }}>
-                            「{entry.japanese}」
-                        </div>
-                    </div>
-                </div>
-
-                {/* Japanese context (the scene) */}
-                <div style={{
-                    margin: '8px 0 12px 30px',
-                    padding: '12px 16px',
-                    backgroundColor: '#FAFAF9',
-                    borderRadius: '10px',
-                    borderLeft: '3px solid #D6D3D1',
-                    fontSize: '13px',
-                    lineHeight: 1.7,
-                }}>
-                    <div style={{ color: '#A8A29E', fontStyle: 'italic', marginBottom: '4px' }}>
-                        {entry.contextBefore}
-                    </div>
-                    <div style={{ color: '#1C1917', fontWeight: '600' }}>
-                        {entry.target}
-                    </div>
-                    <div style={{ color: '#A8A29E', fontStyle: 'italic', marginTop: '4px' }}>
-                        {entry.contextAfter}
-                    </div>
-                </div>
-
-                {/* Primary English translation */}
-                <div style={{
-                    margin: '0 0 8px 30px',
-                    padding: '12px 16px',
-                    backgroundColor: '#F0F9FF',
-                    borderRadius: '10px',
-                    borderLeft: `3px solid ${ACCENT}`,
-                }}>
-                    <div style={{ fontSize: '10px', fontWeight: '700', color: ACCENT, marginBottom: '4px', letterSpacing: '0.04em' }}>
-                        ENGLISH
-                    </div>
-                    <div style={{ fontSize: '16px', fontWeight: '600', color: '#1C1917', lineHeight: 1.5 }}>
-                        &ldquo;{entry.english}&rdquo;
-                    </div>
-                    <button
-                        onClick={() => speakText(entry.english)}
-                        style={{
-                            marginTop: '6px',
-                            padding: '4px 10px', borderRadius: '6px',
-                            border: '1px solid #BAE6FD', backgroundColor: '#fff',
-                            cursor: 'pointer', fontSize: '11px', color: ACCENT,
-                            fontWeight: '600',
-                        }}
-                    >
-                        Play
-                    </button>
-                </div>
-
-                {/* Alternative phrasings */}
-                {entry.alternatives.length > 0 && (
-                    <div style={{
-                        margin: '0 0 12px 30px',
-                        padding: '10px 14px',
-                        backgroundColor: '#FAFAF9',
-                        borderRadius: '8px',
-                        border: '1px dashed #E7E5E4',
-                    }}>
-                        <div style={{ fontSize: '10px', fontWeight: '700', color: '#A8A29E', marginBottom: '6px', letterSpacing: '0.04em' }}>
-                            ALTERNATIVES
-                        </div>
-                        {entry.alternatives.map((alt, i) => (
-                            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
-                                <span style={{ fontSize: '13px', color: '#44403C', flex: 1 }}>
-                                    &ldquo;{alt}&rdquo;
-                                </span>
-                                <button
-                                    onClick={() => speakText(alt)}
-                                    style={{
-                                        padding: '2px 8px', borderRadius: '5px',
-                                        border: '1px solid #E7E5E4', backgroundColor: '#fff',
-                                        cursor: 'pointer', fontSize: '10px', color: '#78716C',
-                                    }}
-                                >
-                                    play
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* とにお note */}
-                <div style={{
-                    fontSize: '13px', color: '#44403C',
-                    margin: '0 0 12px 30px', padding: '10px 14px',
-                    backgroundColor: '#FDF2F8', borderRadius: '8px',
-                    borderLeft: `3px solid ${ROSE}`, lineHeight: 1.7,
-                }}>
-                    {entry.note}
-                </div>
-
-                {/* Actions */}
-                <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginLeft: '30px', flexWrap: 'wrap' }}>
-                    <PPButton onClick={() => openPP(entry.id, entry.english)} />
-                    <button
-                        onClick={() => !isReg && !isReging && handleRegister(entry)}
-                        disabled={isReg || isReging}
-                        style={{
-                            padding: '7px 14px', borderRadius: '8px', border: 'none',
-                            backgroundColor: isReg ? '#D1FAE5' : ACCENT,
-                            color: isReg ? '#065F46' : '#fff',
-                            fontSize: '12px', fontWeight: '600',
-                            cursor: isReg ? 'default' : 'pointer',
-                            opacity: isReging ? 0.6 : 1,
-                        }}
-                    >
-                        {isReging ? '...' : isReg ? 'Added' : '+ Training'}
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    function SourceHeader({ source, count }: { source: JpYtSource; count: number }) {
-        return (
-            <div style={{
-                backgroundColor: '#fff', borderRadius: '16px',
-                border: '1px solid #E7E5E4', padding: '24px',
-                marginBottom: '16px',
-                background: 'linear-gradient(135deg, #F0F9FF 0%, #fff 50%)',
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                    <span style={{
-                        fontSize: '11px', fontWeight: '700', color: ACCENT,
-                        padding: '3px 10px', borderRadius: '6px', backgroundColor: '#E0F2FE',
-                        textTransform: 'uppercase', letterSpacing: '0.05em',
-                    }}>
-                        罪悪感ゼロ
-                    </span>
-                    <span style={{ fontSize: '12px', color: '#78716C', fontWeight: '600' }}>
-                        {source.creator}
-                    </span>
-                </div>
-                <h2 style={{
-                    fontSize: '22px', fontWeight: '800', color: '#1C1917',
-                    margin: '4px 0 8px', letterSpacing: '-0.02em', lineHeight: 1.3,
-                }}>
-                    {source.title}
-                </h2>
-                <p style={{
-                    fontSize: '13px', color: '#57534E', margin: '0 0 12px',
-                    lineHeight: 1.6,
-                }}>
-                    {source.tagline}
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                    <a
-                        href={source.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{
-                            fontSize: '12px', color: '#1E40AF', textDecoration: 'none',
-                            padding: '5px 10px', borderRadius: '6px',
-                            backgroundColor: '#EFF6FF', fontWeight: '600',
-                        }}
-                    >
-                        Watch on YouTube &rarr;
-                    </a>
-                    <span style={{ fontSize: '12px', color: '#A8A29E', fontWeight: '600' }}>
-                        {count} EXPRESSIONS
-                    </span>
-                </div>
-            </div>
-        );
-    }
-
-    const monthLabel = new Date(viewYear, viewMonth).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+    const monthLabel = new Date(viewYear, viewMonth).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' });
+    const seededDays = entriesByDay.size;
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#FAFAF9', padding: '32px 24px 80px' }}>
-            <div style={{ maxWidth: '920px', margin: '0 auto' }}>
-                <div style={{ marginBottom: '24px' }}>
-                    <h1 style={{
-                        fontSize: '28px', fontWeight: '800', color: '#1C1917',
-                        letterSpacing: '-0.02em', margin: '0 0 6px',
-                    }}>
+        <div style={{ minHeight: '100vh', background: '#FAFAF9', padding: '28px 16px 96px' }}>
+            <div style={{ maxWidth: '880px', margin: '0 auto' }}>
+
+                {/* Hero header */}
+                <div style={{
+                    background: 'linear-gradient(135deg, #0EA5E9 0%, #38BDF8 55%, #F472B6 130%)',
+                    borderRadius: '20px', padding: '26px 24px', color: '#fff', marginBottom: '18px',
+                    boxShadow: '0 10px 30px rgba(14,165,233,0.20)',
+                }}>
+                    <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.14em', opacity: 0.9 }}>
+                        JP → EN ・ GUILT-FREE ENGLISH
+                    </div>
+                    <h1 style={{ fontSize: '30px', fontWeight: 900, margin: '6px 0 8px', letterSpacing: '-0.02em' }}>
                         罪悪感ゼロ英語
                     </h1>
-                    <p style={{ fontSize: '14px', color: '#78716C', margin: 0, lineHeight: 1.5 }}>
-                        日本語YouTube → 英語 -- 観た動画の日本語フレーズを「ネイティブが言う英語」に変換
+                    <p style={{ fontSize: '14px', lineHeight: 1.7, margin: 0, opacity: 0.96, maxWidth: '560px' }}>
+                        ヒカキン見るの、もう罪悪感いらない。観た動画の日本語を「ネイティブが本当に言う英語」に変えれば、
+                        ダラ見が勉強に化ける。教科書に1ミリも載ってない、生きた表現だけ。
                     </p>
-                    <p style={{ fontSize: '12px', color: '#A8A29E', margin: '4px 0 0' }}>
-                        {seededDays} day(s) seeded this month -- {monthEntries.length} total expressions
-                    </p>
+                    <div style={{ fontSize: '12px', marginTop: '12px', opacity: 0.9, fontWeight: 600 }}>
+                        {monthLabel} ・ {seededDays}日ぶん ・ {monthEntries.length}表現
+                    </div>
                 </div>
 
-                <div style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    marginBottom: '16px',
-                }}>
-                    <button onClick={prevMonth} style={{
-                        padding: '8px 16px', borderRadius: '10px',
-                        border: '1px solid #E7E5E4', backgroundColor: '#fff',
-                        cursor: 'pointer', fontSize: '16px', color: '#57534E',
-                    }}>&larr;</button>
-                    <span style={{ fontSize: '18px', fontWeight: '700', color: '#1C1917' }}>
-                        {monthLabel}
-                    </span>
-                    <button onClick={nextMonth} style={{
-                        padding: '8px 16px', borderRadius: '10px',
-                        border: '1px solid #E7E5E4', backgroundColor: '#fff',
-                        cursor: 'pointer', fontSize: '16px', color: '#57534E',
-                    }}>&rarr;</button>
+                {/* Month nav */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <button onClick={prevMonth} style={navBtn}>&larr;</button>
+                    <span style={{ fontSize: '17px', fontWeight: 800, color: INK }}>{monthLabel}</span>
+                    <button onClick={nextMonth} style={navBtn}>&rarr;</button>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '4px' }}>
-                    {WEEKDAYS.map(d => (
-                        <div key={d} style={{
-                            textAlign: 'center', fontSize: '11px', fontWeight: '600',
-                            color: '#A8A29E', padding: '6px 0',
-                            textTransform: 'uppercase', letterSpacing: '0.05em',
-                        }}>
+                {/* Weekday labels */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '5px', marginBottom: '5px' }}>
+                    {WEEKDAYS.map((d, i) => (
+                        <div key={d} style={{ textAlign: 'center', fontSize: '11px', fontWeight: 700, padding: '4px 0', color: i === 0 ? '#EF4444' : i === 6 ? ACCENT : '#A8A29E' }}>
                             {d}
                         </div>
                     ))}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '24px' }}>
+                {/* Calendar */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '5px', marginBottom: '22px' }}>
                     {grid.map((day, i) => {
                         if (day === null) return <div key={`e${i}`} />;
                         const dk = dateKey(viewYear, viewMonth, day);
@@ -412,54 +197,31 @@ export default function JpYtPage() {
                         const isSelected = selectedDay === day;
                         const isToday = dk === today;
                         const source = JPYT_SOURCE_BY_DATE[dk];
-
                         return (
                             <button
                                 key={`d${day}`}
                                 onClick={() => setSelectedDay(day)}
                                 style={{
-                                    minHeight: '72px',
-                                    borderRadius: '10px',
-                                    border: isSelected
-                                        ? `2px solid ${ACCENT}`
-                                        : isToday
-                                            ? `2px solid ${ROSE}`
-                                            : '1px solid #E7E5E4',
-                                    backgroundColor: isSelected
-                                        ? '#F0F9FF'
-                                        : hasData
-                                            ? '#fff'
-                                            : '#F5F5F4',
-                                    cursor: 'pointer',
-                                    display: 'flex', flexDirection: 'column',
-                                    alignItems: 'center', justifyContent: 'flex-start',
-                                    gap: '3px', padding: '6px 3px', textAlign: 'center',
-                                    opacity: hasData ? 1 : 0.55,
-                                    transition: 'all 0.15s',
+                                    minHeight: '74px', borderRadius: '12px',
+                                    border: isSelected ? `2px solid ${ACCENT}` : isToday ? `2px solid ${ROSE}` : `1px solid ${LINE}`,
+                                    background: isSelected ? '#F0F9FF' : hasData ? '#fff' : '#F5F5F4',
+                                    cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                                    alignItems: 'center', justifyContent: 'flex-start', gap: '3px',
+                                    padding: '6px 3px', textAlign: 'center', opacity: hasData ? 1 : 0.5,
+                                    transition: 'transform 0.12s ease, box-shadow 0.12s ease',
+                                    boxShadow: isSelected ? '0 4px 12px rgba(14,165,233,0.18)' : 'none',
                                 }}
                             >
-                                <span style={{
-                                    fontSize: '12px',
-                                    fontWeight: isSelected || isToday ? '800' : '600',
-                                    color: isSelected ? '#0369A1' : isToday ? '#BE185D' : '#78716C',
-                                }}>
+                                <span style={{ fontSize: '12px', fontWeight: isSelected || isToday ? 800 : 600, color: isSelected ? '#0369A1' : isToday ? '#BE185D' : '#78716C' }}>
                                     {day}
                                 </span>
                                 {source && (
-                                    <span style={{
-                                        fontSize: '9px', fontWeight: '700',
-                                        color: '#78716C',
-                                        maxWidth: '100%', overflow: 'hidden',
-                                        textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                                    }}>
+                                    <span style={{ fontSize: '9px', fontWeight: 700, color: '#57534E', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                         {source.creator.slice(0, 5)}
                                     </span>
                                 )}
                                 {hasData && (
-                                    <span style={{
-                                        fontSize: '9px', fontWeight: '700',
-                                        color: ACCENT,
-                                    }}>
+                                    <span style={{ fontSize: '9px', fontWeight: 800, color: '#fff', background: ACCENT, borderRadius: '999px', padding: '1px 6px' }}>
                                         {dayEntries.length}
                                     </span>
                                 )}
@@ -468,33 +230,31 @@ export default function JpYtPage() {
                     })}
                 </div>
 
+                {/* Selected day */}
                 {selectedDay && (
                     <div>
-                        {selectedSource && (
-                            <SourceHeader source={selectedSource} count={selectedEntries.length} />
-                        )}
+                        {selectedSource && <SourceHeader source={selectedSource} count={selectedEntries.length} />}
                         {!selectedSource && (
-                            <h2 style={{
-                                fontSize: '16px', fontWeight: '700', color: '#1C1917',
-                                margin: '0 0 12px',
-                            }}>
+                            <h2 style={{ fontSize: '16px', fontWeight: 800, color: INK, margin: '0 0 12px' }}>
                                 {viewYear}/{viewMonth + 1}/{selectedDay}
                             </h2>
                         )}
                         {selectedEntries.length === 0 ? (
-                            <div style={{
-                                padding: '40px', textAlign: 'center',
-                                backgroundColor: '#fff', borderRadius: '14px',
-                                border: '1px solid #E7E5E4',
-                            }}>
-                                <p style={{ color: '#A8A29E', fontSize: '14px', margin: 0 }}>
-                                    No video harvested yet
-                                </p>
+                            <div style={{ padding: '40px', textAlign: 'center', background: '#fff', borderRadius: '16px', border: `1px solid ${LINE}` }}>
+                                <p style={{ color: '#A8A29E', fontSize: '14px', margin: 0 }}>この日はまだ動画を仕込んでない</p>
                             </div>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 {selectedEntries.map((entry, idx) => (
-                                    <EntryCard key={entry.id} entry={entry} index={idx} />
+                                    <EntryCard
+                                        key={entry.id}
+                                        entry={entry}
+                                        index={idx}
+                                        isReg={registered.has(entry.id)}
+                                        isReging={registeringId === entry.id}
+                                        onRegister={() => handleRegister(entry)}
+                                        openPP={() => openPP(entry.id, entry.english)}
+                                    />
                                 ))}
                             </div>
                         )}
@@ -502,9 +262,165 @@ export default function JpYtPage() {
                 )}
             </div>
 
-            {ppWordPicker && (
-                <PPPopup state={ppWordPicker} onToggle={toggleWord} onClose={closePP} onSearch={search} />
-            )}
+            {ppWordPicker && <PPPopup state={ppWordPicker} onToggle={toggleWord} onClose={closePP} onSearch={search} />}
         </div>
     );
 }
+
+function YouTubeBlock({ source }: { source: JpYtSource }) {
+    if (source.youtubeId) {
+        return (
+            <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: '14px', overflow: 'hidden', marginTop: '14px', background: '#000' }}>
+                <iframe
+                    src={`https://www.youtube.com/embed/${source.youtubeId}`}
+                    title={source.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                />
+            </div>
+        );
+    }
+    // Fallback: styled "watch on channel" card (no fake video IDs)
+    return (
+        <a href={source.url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', display: 'block', marginTop: '14px' }}>
+            <div style={{
+                display: 'flex', alignItems: 'center', gap: '14px',
+                background: 'linear-gradient(135deg, #FEF2F2 0%, #FFF 60%)',
+                border: `1px solid ${LINE}`, borderRadius: '14px', padding: '14px 16px',
+                transition: 'transform 0.12s ease',
+            }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#FF0000', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '13px', fontWeight: 800, color: INK }}>{source.creator} のチャンネルで観る</div>
+                    <div style={{ fontSize: '11px', color: SUB, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>YouTube で開く &rarr;</div>
+                </div>
+            </div>
+        </a>
+    );
+}
+
+function SourceHeader({ source, count }: { source: JpYtSource; count: number }) {
+    return (
+        <div style={{ background: '#fff', borderRadius: '18px', border: `1px solid ${LINE}`, padding: '20px', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '40px', height: '40px', borderRadius: '999px', background: `linear-gradient(135deg, ${ACCENT}, ${ROSE})`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 900, fontSize: '17px', flexShrink: 0 }}>
+                    {source.creator.slice(0, 1)}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '12px', fontWeight: 700, color: SUB }}>{source.creator}</div>
+                    <h2 style={{ fontSize: '19px', fontWeight: 800, color: INK, margin: '2px 0 0', letterSpacing: '-0.01em', lineHeight: 1.3 }}>{source.title}</h2>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: ACCENT, background: '#E0F2FE', borderRadius: '999px', padding: '4px 10px', whiteSpace: 'nowrap' }}>
+                    {count} 表現
+                </span>
+            </div>
+            <p style={{ fontSize: '13px', color: '#57534E', margin: '12px 0 0', lineHeight: 1.7 }}>{source.tagline}</p>
+            <YouTubeBlock source={source} />
+        </div>
+    );
+}
+
+function EntryCard({ entry, index, isReg, isReging, onRegister, openPP }: {
+    entry: DisplayEntry; index: number; isReg: boolean; isReging: boolean; onRegister: () => void; openPP: () => void;
+}) {
+    const rank = rankBadge(entry.rank);
+    const hasScene = !!(entry.target && entry.target.trim());
+    const [showScene, setShowScene] = useState(false);
+
+    return (
+        <div style={{ background: '#fff', borderRadius: '16px', border: `1px solid ${LINE}`, padding: '18px 20px' }}>
+            {/* Header: rank + japanese word */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: '#CBC4B4', width: '18px', textAlign: 'right', flexShrink: 0 }}>
+                    {String(index + 1).padStart(2, '0')}
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', borderRadius: '8px', background: rank.bg, color: rank.color, fontSize: '12px', fontWeight: 800, flexShrink: 0 }}>
+                    {entry.rank}
+                </span>
+                <span style={{ fontSize: '21px', fontWeight: 800, color: INK, lineHeight: 1.25, letterSpacing: '-0.01em' }}>
+                    「{entry.japanese}」
+                </span>
+            </div>
+
+            {/* English (hero) */}
+            <div style={{ background: '#F0F9FF', borderRadius: '12px', borderLeft: `3px solid ${ACCENT}`, padding: '13px 16px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 800, color: ACCENT, marginBottom: '4px', letterSpacing: '0.06em' }}>ENGLISH</div>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                    <div style={{ flex: 1, fontSize: '17px', fontWeight: 700, color: INK, lineHeight: 1.5 }}>
+                        &ldquo;{entry.english}&rdquo;
+                    </div>
+                    <button onClick={() => speakText(entry.english)} aria-label="play" style={playBtn}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill={ACCENT}><path d="M8 5v14l11-7z" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            {/* Alternatives as chips */}
+            {entry.alternatives.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '10px' }}>
+                    {entry.alternatives.map((alt, i) => (
+                        <button key={i} onClick={() => speakText(alt)} style={{
+                            display: 'inline-flex', alignItems: 'center', gap: '6px',
+                            background: '#FAFAF9', border: `1px solid ${LINE}`, borderRadius: '999px',
+                            padding: '5px 11px', fontSize: '12px', color: '#44403C', cursor: 'pointer',
+                        }}>
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="#A8A29E"><path d="M8 5v14l11-7z" /></svg>
+                            {alt}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* とにお note */}
+            <div style={{ fontSize: '13px', color: '#44403C', margin: '12px 0 0', padding: '11px 14px', background: '#FDF2F8', borderRadius: '10px', borderLeft: `3px solid ${ROSE}`, lineHeight: 1.75 }}>
+                <span style={{ fontSize: '10px', fontWeight: 800, color: ROSE, letterSpacing: '0.05em', marginRight: '6px' }}>とにお</span>
+                {entry.note}
+            </div>
+
+            {/* Scene (conditional + collapsible) */}
+            {hasScene && (
+                <div style={{ marginTop: '10px' }}>
+                    <button onClick={() => setShowScene(s => !s)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '11px', fontWeight: 700, color: SUB, padding: '2px 0' }}>
+                        {showScene ? '▾ 動画の場面を隠す' : '▸ 動画の場面を見る'}
+                    </button>
+                    {showScene && (
+                        <div style={{ marginTop: '6px', padding: '12px 16px', background: '#FAFAF9', borderRadius: '10px', borderLeft: `3px solid #D6D3D1`, fontSize: '13px', lineHeight: 1.7 }}>
+                            {entry.contextBefore && <div style={{ color: '#A8A29E', fontStyle: 'italic' }}>{entry.contextBefore}</div>}
+                            <div style={{ color: INK, fontWeight: 700, margin: '3px 0' }}>{entry.target}</div>
+                            {entry.contextAfter && <div style={{ color: '#A8A29E', fontStyle: 'italic' }}>{entry.contextAfter}</div>}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '12px', flexWrap: 'wrap' }}>
+                <PPButton onClick={openPP} />
+                <button
+                    onClick={() => !isReg && !isReging && onRegister()}
+                    disabled={isReg || isReging}
+                    style={{
+                        padding: '8px 16px', borderRadius: '9px', border: 'none',
+                        background: isReg ? '#D1FAE5' : ACCENT, color: isReg ? '#065F46' : '#fff',
+                        fontSize: '12px', fontWeight: 700, cursor: isReg ? 'default' : 'pointer', opacity: isReging ? 0.6 : 1,
+                    }}
+                >
+                    {isReging ? '...' : isReg ? '登録済み' : '+ トレーニングに追加'}
+                </button>
+            </div>
+        </div>
+    );
+}
+
+const navBtn: React.CSSProperties = {
+    padding: '8px 16px', borderRadius: '10px', border: `1px solid ${LINE}`,
+    background: '#fff', cursor: 'pointer', fontSize: '16px', color: '#57534E',
+};
+const playBtn: React.CSSProperties = {
+    flexShrink: 0, width: '30px', height: '30px', borderRadius: '8px',
+    border: '1px solid #BAE6FD', background: '#fff', cursor: 'pointer',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+};
