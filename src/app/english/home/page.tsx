@@ -152,6 +152,13 @@ export default function EnglishHomeHub() {
                         desc="ヒカキン見るの、もう罪悪感いらない。その日本語、英語に変えれば勉強になる。"
                         color="#0EA5E9"
                     />
+                    <HubCard
+                        href="/english/survival"
+                        tagline="SURVIVAL / 会話シミュレーター"
+                        title="修羅場英会話"
+                        desc="空港で欠航、病院で激痛。崩れた英語のまま、その場を切り抜けろ。選ぶたび相手が変わる。"
+                        color="#DC2626"
+                    />
                 </div>
 
                 <div style={{
