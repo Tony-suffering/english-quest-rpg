@@ -175,6 +175,7 @@ export default function EnglishHomeHub() {
                     <HubCard href="/english/interpret" tagline="v5 ・ 話す(通訳)" title="同時通訳ジム" desc="日本語→3秒で英語を口に。通訳案内士・英検二次の筋トレ。" color="#0891B2" />
                     <HubCard href="/english/reflex" tagline="v6 ・ 反射(3秒)" title="3秒で返せ" desc="相手の一言に3秒で返す。会話は反射。詰まる前に何か言え。" color="#EA580C" />
                     <HubCard href="/english/story" tagline="v7 ・ 没入(物語)" title="物語没入チャット" desc="短い物語をチャットで読み進める。シーンごと体に入れる。" color="#DB2777" />
+                    <HubCard href="/english/mistakes" tagline="復習 ・ 間違い帳" title="俺の英語エラー帳" desc="会話で出た文法ミスを溜めて見返す。同じパターンを何回やってるかも分かる。" color="#DC2626" />
                 </div>
 
                 <div style={{

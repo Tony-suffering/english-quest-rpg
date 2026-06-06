@@ -516,6 +516,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     {renderToolItem({ id: '/english/interpret', label: '同時通訳ジム v5', color: '#0891B2' })}
                     {renderToolItem({ id: '/english/reflex', label: '3秒で返せ v6', color: '#EA580C' })}
                     {renderToolItem({ id: '/english/story', label: '物語没入チャット v7', color: '#DB2777' })}
+                    {renderToolItem({ id: '/english/mistakes', label: '俺の英語エラー帳', color: '#DC2626' })}
                     {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
                     {renderToolItem({ id: '/english/dashboard', label: 'ダッシュボード', color: '#D4AF37' })}
 
