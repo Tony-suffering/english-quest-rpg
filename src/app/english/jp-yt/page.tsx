@@ -169,6 +169,9 @@ export default function JpYtPage() {
                     <div style={{ fontSize: '12px', marginTop: '12px', opacity: 0.9, fontWeight: 600 }}>
                         {monthLabel} ・ {seededDays}日ぶん ・ {monthEntries.length}表現
                     </div>
+                    <a href="/english/jp-yt-v2" style={{ display: 'inline-block', marginTop: '12px', fontSize: '12px', fontWeight: 800, color: '#fff', background: 'rgba(255,255,255,0.22)', borderRadius: '999px', padding: '6px 14px', textDecoration: 'none' }}>
+                        TODAY版を試す（1日1本やり切る型）→
+                    </a>
                 </div>
 
                 {/* Month nav */}
