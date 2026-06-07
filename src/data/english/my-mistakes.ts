@@ -22,6 +22,8 @@ export const PATTERN_LABELS: Record<string, string> = {
     'aux-base': '助動詞+原形に have',
     uncountable: '不可算の複数化',
     'extra-to': '余分な to / to の不足',
+    ramble: 'ランブル(長すぎ/言い切れない)',
+    'word-choice': '語の取り違え',
     other: 'その他',
 };
 
@@ -35,4 +37,9 @@ export const MISTAKES: Mistake[] = [
     { id: 'm-007', date: '2026-06-07', context: 'DMM会話 ChopValue回', said: "no such things as internet", fix: "no such thing as the internet", patternKey: 'uncountable', pattern: '不可算の複数化' },
     { id: 'm-008', date: '2026-06-07', context: 'DMM会話 ChopValue回', said: "trying to the same stuff", fix: "trying the same thing", patternKey: 'extra-to', pattern: '余分な to' },
     { id: 'm-009', date: '2026-06-06', context: 'v6 反射トレ指摘', said: "I have so many works", fix: "I have so much work", patternKey: 'uncountable', pattern: 'work は不可算。many works は誤り' },
+    { id: 'm-010', date: '2026-06-07', context: 'DMM 自己紹介回(Mark)', said: "casually enjoying English contents", fix: "enjoying English content", patternKey: 'uncountable', pattern: 'content は不可算。contents は「目次・中身一覧」の別語。これで不可算ミス3度目(work/work/content)。最頻出。' },
+    { id: 'm-011', date: '2026-06-07', context: 'DMM 自己紹介回(Mark)', said: "jobs that requires English", fix: "jobs that require English", patternKey: 'third-s', pattern: '先行詞 jobs は複数→関係詞内も require。三単現を逆に付けた。主語との一致を見る。' },
+    { id: 'm-012', date: '2026-06-07', context: 'DMM 自己紹介回(Mark)', said: "I didn't have a energy", fix: "I didn't have the energy", patternKey: 'article', pattern: 'energy は不可算、a は付かない。the energy / any energy。冠詞ミス再発。' },
+    { id: 'm-013', date: '2026-06-07', context: 'DMM 自己紹介回(Mark)', said: "I had to dug into the awning", fix: "I had to duck into the awning", patternKey: 'word-choice', pattern: 'duck into=さっと身をかがめて入る。dig の過去 dug と混同。to の後は原形 duck。' },
+    { id: 'm-014', date: '2026-06-07', context: 'DMM 自己紹介回(Mark)', said: "(長い独白) ...I'm rambling, you know...", fix: "2〜3文で言い切る", patternKey: 'ramble', pattern: '最大の癖。中身は良いが1ターンが長すぎて、自分でも「rambling」と自覚してる。内容は削らず、2-3文のバイトサイズに切る練習。文法より先にこれ。' },
 ];
