@@ -121,6 +121,24 @@ export default function EnglishHomeHub() {
                     </div>
                 </Link>
 
+                {/* ===== 2.5 コーチング(募集中) ===== */}
+                <Link href="/english/coach" style={{ textDecoration: 'none', display: 'block' }}>
+                    <div style={{
+                        background: '#fff', border: `1px solid ${LINE}`, borderLeft: '4px solid #DC2626',
+                        borderRadius: 12, padding: '15px 17px', marginBottom: 12,
+                    }}>
+                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: '#DC2626', fontWeight: 800, marginBottom: 5 }}>
+                            COACHING ・ モニター1名募集
+                        </div>
+                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
+                            話せないコーチが、28日つきあいます
+                        </div>
+                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
+                            完璧な先生より、もがいてる先生のほうが効く。根拠のある研究と、28日の手順を全部公開しています。
+                        </div>
+                    </div>
+                </Link>
+
                 {/* ===== 3. メンバーシップ ===== */}
                 <Link href="/membership" style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{
