@@ -128,7 +128,7 @@ export default function EnglishHomeHub() {
                         borderRadius: 12, padding: '15px 17px', marginBottom: 12,
                     }}>
                         <div style={{ fontSize: 9, letterSpacing: '0.2em', color: '#DC2626', fontWeight: 800, marginBottom: 5 }}>
-                            COACHING ・ モニター1名募集
+                            COACHING ・ メンバーシップ
                         </div>
                         <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
                             話せないコーチが、28日つきあいます
@@ -146,13 +146,13 @@ export default function EnglishHomeHub() {
                         borderRadius: 12, padding: '15px 17px', marginBottom: 30,
                     }}>
                         <div style={{ fontSize: 9, letterSpacing: '0.2em', color: DEEPGOLD, fontWeight: 800, marginBottom: 5 }}>
-                            MEMBERSHIP ・ ¥100 / 月
+                            MEMBERSHIP ・ ¥980 / 月
                         </div>
                         <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
                             続きを、一緒に作る
                         </div>
                         <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
-                            作りかけを全部見せます。要望がそのまま次の機能になります。
+                            毎日こちらが先に失敗を出します。作りかけも全部見せます。要望がそのまま次の機能になります。
                         </div>
                     </div>
                 </Link>
