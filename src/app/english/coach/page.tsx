@@ -58,7 +58,7 @@ export default function CoachMethodPage() {
                         <div style={{
                             background: `linear-gradient(135deg, ${GOLD}, #E6C75E)`, color: '#fff',
                             padding: '15px 26px', borderRadius: 11, fontSize: 15, fontWeight: 900,
-                        }}>モニター1名に応募する</div>
+                        }}>メンバーシップに入る</div>
                     </a>
                     <Link href="/english/ear" style={{ textDecoration: 'none' }}>
                         <div style={{
@@ -160,10 +160,10 @@ export default function CoachMethodPage() {
                 </Section>
 
                 {/* ===== 値段 ===== */}
-                <Section eyebrow="PRICE" title={`最初の1名。${PRICE.monitorLabel}。`}>
+                <Section eyebrow="PRICE" title={`最初の1名。${PRICE.monthlyLabel}。`}>
                     <div style={{ background: '#fff', border: `2px solid ${GOLD}`, borderRadius: 16, padding: '30px 22px', textAlign: 'center', marginBottom: 16 }}>
-                        <div style={{ fontFamily: 'Georgia, serif', fontSize: 44, fontWeight: 900, lineHeight: 1 }}>{PRICE.monitorLabel}</div>
-                        <div style={{ fontSize: 12.5, color: SUB, fontWeight: 700, margin: '11px 0 22px' }}>{PRICE.monitorNote}</div>
+                        <div style={{ fontFamily: 'Georgia, serif', fontSize: 44, fontWeight: 900, lineHeight: 1 }}>{PRICE.monthlyLabel}</div>
+                        <div style={{ fontSize: 12.5, color: SUB, fontWeight: 700, margin: '11px 0 22px' }}>{PRICE.monthlyNote}</div>
                         <a href={WAITLIST} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
                             <div style={{
                                 background: `linear-gradient(135deg, ${GOLD}, #E6C75E)`, color: '#fff',
