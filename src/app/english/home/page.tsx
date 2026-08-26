@@ -122,21 +122,43 @@ export default function EnglishHomeHub() {
                     </div>
                 </Link>
 
-                {/* ===== 2.2 100日課程(測ったあとの道のり) ===== */}
-                <Link href="/english/course" style={{ textDecoration: 'none', display: 'block' }}>
+                {/* ===== 2.2 百日課程(測ったあとの道のり。玄関では刷り物として見せる) ===== */}
+                <Link href="/english/course" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>
                     <div style={{
-                        background: '#fff', border: `1px solid ${GOLD}55`, borderLeft: `4px solid ${GOLD}`,
-                        borderRadius: 12, padding: '15px 17px', marginBottom: 12,
+                        border: `1px solid ${INK}`, background: '#0E2A3F', color: '#F3ECDC',
+                        boxShadow: `0 2px 0 rgba(16,24,32,0.9)`, overflow: 'hidden',
                     }}>
-                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: DEEPGOLD, fontWeight: 800, marginBottom: 5 }}>
-                            100日課程 ・ 1日10個 ・ 無料 ・ 登録不要
+                        <div style={{ padding: '20px 20px 16px' }}>
+                            <div style={{ fontSize: 9.5, letterSpacing: '0.34em', color: '#EFC65B', fontWeight: 800, marginBottom: 9 }}>
+                                THE VOYAGE OF ONE HUNDRED DAYS
+                            </div>
+                            <div style={{
+                                fontFamily: "Georgia, 'Times New Roman', 'Yu Mincho', 'Hiragino Mincho ProN', serif",
+                                fontSize: 34, fontWeight: 900, letterSpacing: 3, lineHeight: 1.2, marginBottom: 10,
+                            }}>
+                                百日課程
+                            </div>
+                            <div style={{ fontSize: 12.5, lineHeight: 1.9, opacity: 0.86 }}>
+                                37万9,475の表現という海を、出会う回数の多い1,000個だけで渡る。
+                                測ったあと、何をどれだけやるか。1日10個で百日。
+                            </div>
                         </div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
-                            測ったあと、何をどれだけやるか
-                        </div>
-                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
-                            3億3,374万語を数えて、出会う回数の多い順に1,000個だけ渡します。1日10個で100日。
-                            終わると、出会う表現の<b style={{ color: DEEPGOLD }}>出現回数の18.1%</b>を覆います。
+                        <div style={{
+                            borderTop: `1px solid #EFC65B`, background: 'rgba(0,0,0,0.28)',
+                            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', textAlign: 'center',
+                        }}>
+                            {[['1,000', 'EXPRESSIONS'], ['10', 'A DAY'], ['100', 'DAYS'], ['18.11%', 'COVERAGE']].map(([v, l], i) => (
+                                <div key={l} style={{
+                                    padding: '11px 4px',
+                                    borderLeft: i === 0 ? 'none' : '1px solid rgba(243,236,220,0.22)',
+                                }}>
+                                    <div style={{
+                                        fontFamily: "Georgia, 'Times New Roman', serif",
+                                        fontSize: 19, fontWeight: 900, color: i === 3 ? '#EFC65B' : '#F3ECDC', lineHeight: 1.1,
+                                    }}>{v}</div>
+                                    <div style={{ fontSize: 8, letterSpacing: '0.24em', opacity: 0.6, marginTop: 3 }}>{l}</div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </Link>
