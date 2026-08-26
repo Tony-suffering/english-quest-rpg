@@ -11,6 +11,7 @@
  * ■ 構成
  *  1. フック(実測した数字を1行)     — 止まる理由
  *  2. 無料の測定 1つだけ             — 登録なし / 5分 / 数字が出る
+ *  2.2 100日課程                     — 測ったあとの道のり。実測の順位から1,000個
  *  3. メンバーシップ                 — 続きを一緒に作る
  *  4. これまでのアプリ(畳んで下に)  — 消さない。探しに来た人のために残す
  */
@@ -117,6 +118,25 @@ export default function EnglishHomeHub() {
                             padding: '11px 22px', borderRadius: 10, fontSize: 14, fontWeight: 900,
                         }}>
                             {earLv !== null ? 'もう一度測る' : '測定を始める'}
+                        </div>
+                    </div>
+                </Link>
+
+                {/* ===== 2.2 100日課程(測ったあとの道のり) ===== */}
+                <Link href="/english/course" style={{ textDecoration: 'none', display: 'block' }}>
+                    <div style={{
+                        background: '#fff', border: `1px solid ${GOLD}55`, borderLeft: `4px solid ${GOLD}`,
+                        borderRadius: 12, padding: '15px 17px', marginBottom: 12,
+                    }}>
+                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: DEEPGOLD, fontWeight: 800, marginBottom: 5 }}>
+                            100日課程 ・ 1日10個 ・ 無料 ・ 登録不要
+                        </div>
+                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
+                            測ったあと、何をどれだけやるか
+                        </div>
+                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
+                            3億3,374万語を数えて、出会う回数の多い順に1,000個だけ渡します。1日10個で100日。
+                            終わると、出会う表現の<b style={{ color: DEEPGOLD }}>出現回数の18.1%</b>を覆います。
                         </div>
                     </div>
                 </Link>
