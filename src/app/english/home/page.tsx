@@ -181,6 +181,24 @@ export default function EnglishHomeHub() {
                     </div>
                 </Link>
 
+                {/* ===== 2.7 TONIO STACK (教材) ===== */}
+                <Link href="/english/stack" style={{ textDecoration: 'none', display: 'block' }}>
+                    <div style={{
+                        background: '#fff', border: `1px solid ${LINE}`, borderLeft: '4px solid #1E293B',
+                        borderRadius: 12, padding: '15px 17px', marginBottom: 12,
+                    }}>
+                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: '#1E293B', fontWeight: 800, marginBottom: 5 }}>
+                            TONIO STACK ・ 全10章
+                        </div>
+                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
+                            自分専用の英語アプリを、自分で建てる
+                        </div>
+                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
+                            市販のアプリは「自分がどこで詰まったか」を持っていない。ここで毎日動かしているアプリのコードを、そのまま10章に割りました。
+                        </div>
+                    </div>
+                </Link>
+
                 {/* ===== 3. メンバーシップ ===== */}
                 <Link href="/membership" style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{
