@@ -163,6 +163,42 @@ export default function EnglishHomeHub() {
                     </div>
                 </Link>
 
+                {/* ===== 2.4 書く / 読む (無料の道具。測ったあと、手を動かす側) ===== */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 12, marginBottom: 12 }}>
+                    <HubCard
+                        href="/english/write"
+                        tagline="WRITE ・ 英作文"
+                        title="書けないのは、形が無いから"
+                        desc="意見の論点は10個、要約の型は5つ。形はこちらが持つので、埋めるのは名詞と動詞だけ。"
+                        color="#10B981"
+                    />
+                    <HubCard
+                        href="/english/newspaper"
+                        tagline="READ ・ 英字新聞 88号"
+                        title="The Tonio Times"
+                        desc="A4一枚の英字新聞を毎日1号。文をタップすると一言一句の日本語が出る。読み上げつき。"
+                        color="#7A1F1F"
+                    />
+                </div>
+
+                {/* ===== 2.45 全部の説明 (知りたい人だけ) ===== */}
+                <Link href="/english/about" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>
+                    <div style={{
+                        background: '#fff', border: `1px dashed ${LINE}`, borderRadius: 10,
+                        padding: '12px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+                    }}>
+                        <div>
+                            <div style={{ fontSize: 13, fontWeight: 900, color: INK, marginBottom: 2 }}>
+                                ここにあるもの、全部の説明
+                            </div>
+                            <div style={{ fontSize: 11.5, color: SUB, lineHeight: 1.6 }}>
+                                何を数えて、何を作って、どういう順番で使うと効くのか。日本語で7分。
+                            </div>
+                        </div>
+                        <div style={{ fontSize: 15, color: '#A8A29E', flexShrink: 0 }}>→</div>
+                    </div>
+                </Link>
+
                 {/* ===== 2.5 コーチング(募集中) ===== */}
                 <Link href="/english/coach" style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{
