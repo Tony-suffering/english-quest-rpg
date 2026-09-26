@@ -199,6 +199,24 @@ export default function EnglishHomeHub() {
                     </div>
                 </Link>
 
+                {/* ===== 2.48 DMM英会話 無料公開 ===== */}
+                <Link href="/english/dmm-open" style={{ textDecoration: 'none', display: 'block' }}>
+                    <div style={{
+                        background: '#fff', border: `1px solid ${LINE}`, borderLeft: '4px solid #D4AF37',
+                        borderRadius: 12, padding: '15px 17px', marginBottom: 12,
+                    }}>
+                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: '#9A7B16', fontWeight: 800, marginBottom: 5 }}>
+                            DMM英会話 ・ 音源と原稿を無料公開
+                        </div>
+                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
+                            英語がペラペラになる唯一の方法を、本気で教えます
+                        </div>
+                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
+                            TOEIC900点、英検1級を目指す芸人の25分を、崩れた英語ごと全部。1行ずつの直しつき。
+                        </div>
+                    </div>
+                </Link>
+
                 {/* ===== 2.5 コーチング(募集中) ===== */}
                 <Link href="/english/coach" style={{ textDecoration: 'none', display: 'block' }}>
                     <div style={{
