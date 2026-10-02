@@ -134,6 +134,35 @@ export default function WriteHubPage() {
                     />
                 </div>
 
+                {/* 2.5 英検1級を30日で通す (ライトパス一式) */}
+                <div style={{
+                    background: '#fff', border: `1px solid ${GOLD}55`, borderRadius: '14px',
+                    padding: '20px 20px 16px', marginBottom: '28px',
+                }}>
+                    <div style={{ fontSize: '9.5px', letterSpacing: '0.22em', color: DEEPGOLD, fontWeight: 800, marginBottom: '8px' }}>
+                        ライトパス ・ 英検1級の英作文を30日で
+                    </div>
+                    <p style={{ margin: '0 0 14px', fontSize: '13px', color: '#44403C', lineHeight: 1.95 }}>
+                        上の2つを、1日1本の模範解答(意見論述30本・要約30本)に載せて通しでやる一式です。
+                        写して型を入れ、同じお題を自分で書き、全文を型に分解した表と見比べます。
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+                        {[
+                            { href: '/english/writepass', t: 'ライトパスとは', d: '何をどの順でやるかの説明' },
+                            { href: '/english/write/days', t: '30日', d: '模範解答・逆の立場・型・口語の4層' },
+                            { href: '/english/writepass/koryaku', t: '攻略読本', d: '6人の会話で読む30日分の攻略' },
+                            { href: '/english/write/core5/sheet', t: 'CORE 5 の1枚', d: '本番の朝に上から読むだけの1枚' },
+                        ].map((x) => (
+                            <Link key={x.href} href={x.href} style={{ textDecoration: 'none' }}>
+                                <div style={{ border: `1px solid ${LINE}`, borderRadius: '10px', padding: '10px 12px', background: PAPER }}>
+                                    <div style={{ fontSize: '13.5px', fontWeight: 900, color: INK }}>{x.t}</div>
+                                    <div style={{ fontSize: '11px', color: SUB, marginTop: '2px' }}>{x.d}</div>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+
                 {/* 3. 中の仕組み */}
                 <div style={{
                     background: '#fff', border: `1px solid ${LINE}`, borderRadius: '14px',

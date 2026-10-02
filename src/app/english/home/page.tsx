@@ -173,6 +173,13 @@ export default function EnglishHomeHub() {
                         color="#10B981"
                     />
                     <HubCard
+                        href="/english/writepass"
+                        tagline="WRITE PASS ・ 英検1級 英作文"
+                        title="ライトパス 30日"
+                        desc="意見論述30本・要約30本の模範解答を1日1本写す。全文を型に分解した表つき。"
+                        color="#D4AF37"
+                    />
+                    <HubCard
                         href="/english/newspaper"
                         tagline="READ ・ 英字新聞 88号"
                         title="The Tonio Times"

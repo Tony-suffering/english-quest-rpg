@@ -4,7 +4,8 @@
  * OUTPUT PASS (アウトプットパス) -- 共通ブランドの外装。公開版 (toniolab)。
  *
  * iwasaki 側には 1次(書く) / 2次(話す) の2枚看板があるが、こちらに持ってきているのは
- * 「書く」の2本だけなので、タブもその2本にしてある (行き先の無いタブを出さない)。
+ * 「書く」側だけなので、タブも書く側の3本にしてある (行き先の無いタブを出さない)。
+ *   - ライトパス30日 = 模範解答を写す30日 (/english/write/days)
  *   - CORE 5 = 意見を書く型 (/english/write/core5)
  *   - SUM 5  = 要約を書く型 (/english/write/sum5)
  *
@@ -54,6 +55,7 @@ export function EikenOutputNav({ active }: { active: Active }) {
                     </span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
+                    {tab('/english/write/days', 'write', '30日', 'ライトパス ー 写す')}
                     {tab('/english/write/core5', 'core5', '意見を書く', 'CORE 5 ー 指10本')}
                     {tab('/english/write/sum5', 'sum5', '要約を書く', 'SUM 5 ー 本文の形5つ')}
                 </div>
