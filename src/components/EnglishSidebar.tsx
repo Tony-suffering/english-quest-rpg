@@ -68,6 +68,20 @@ const PROGRAMS: Program[] = [
         ],
     },
     {
+        id: 'writepass',
+        label: 'ライトパス',
+        tagline: '英検1級の英作文を30日で',
+        color: C.gold,
+        basePath: '/english/writepass',
+        items: [
+            { id: '/english/writepass', label: 'ライトパスとは？' },
+            { id: '/english/write/days', label: 'ライトパス 30日', featured: true },
+            { id: '/english/writepass/koryaku', label: 'ライトパス 攻略読本' },
+            { id: '/english/write/core5/sheet', label: 'CORE 5 — 1枚 (英作文)' },
+            { id: '/english/write/sum5', label: 'SUM 5 — 要約の型' },
+        ],
+    },
+    {
         id: 'tokyo52',
         label: 'Tokyo52',
         tagline: '英語ドラマで学ぶ',
@@ -161,6 +175,8 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
             setExpandedProgram('kaiwa');
         } else if (pathname.startsWith('/english/toeic') || pathname.startsWith('/english/tonio-words')) {
             setExpandedProgram('izakaya');
+        } else if (pathname.startsWith('/english/writepass') || pathname.startsWith('/english/write/')) {
+            setExpandedProgram('writepass');
         } else if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) {
             setExpandedProgram('tokyo52');
         } else if (pathname.startsWith('/english/lisque')) {
@@ -187,6 +203,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
             pathname.startsWith('/english/toeic') ||
             pathname.startsWith('/english/tonio-words')
         ) return 'izakaya';
+        if (pathname.startsWith('/english/writepass') || pathname.startsWith('/english/write/')) return 'writepass';
         if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) return 'tokyo52';
         if (pathname.startsWith('/english/lisque')) return 'lisque';
         if (pathname.startsWith('/english/yomique')) return 'yomique';
