@@ -4,6 +4,8 @@
  * No server dependency. No D1. No R2. Everything in the browser.
  */
 
+import { saveClip, loadClip, deleteClip, loadAllClipIds } from '@/lib/eigo/training-clips'
+
 const PREFIX = 'tl_'
 const k = (name: string) => `${PREFIX}${name}`
 
@@ -51,7 +53,7 @@ function rollGacha(pity: number, chainTier: number) {
 
 // ── Route Handlers ──
 
-type Handler = (url: URL, method: string, body: Record<string, unknown> | null) => Response
+type Handler = (url: URL, method: string, body: Record<string, unknown> | null) => Response | Promise<Response>
 
 const routes: Record<string, Handler> = {
 
@@ -121,6 +123,87 @@ const routes: Record<string, Handler> = {
             mastery[pid] = { ...existing, level, lastLeveled: level > (existing.level as number) ? t : existing.lastLeveled }
             save('mastery', mastery)
             return json({ success: true })
+        }
+        // 英語魂 TrainingClient の RETIRE(除外/復帰): { phraseId, retired }
+        if (method === 'PATCH' && body && typeof body.phraseId === 'string') {
+            const pid = body.phraseId
+            const existing = mastery[pid] || { level: 0, lastLeveled: '', cardPoints: 0, cardName: '' }
+            mastery[pid] = { ...existing, retired: !!body.retired }
+            save('mastery', mastery)
+            return json({ success: true })
+        }
+        return json({ success: false }, 400)
+    },
+
+    // ── +CLIP 音声(英語魂 TrainingClient)── R2 の代わりに端末の IndexedDB に置く
+    '/api/phrase-clips': async (url, method, body) => {
+        if (method === 'GET') {
+            const clips: { phrase_id: string; url: string }[] = []
+            try {
+                const ids = await loadAllClipIds()
+                for (const id of ids) {
+                    const blob = await loadClip(id)
+                    if (blob) clips.push({ phrase_id: id, url: URL.createObjectURL(blob) })
+                }
+            } catch { /* IndexedDB が使えない環境 */ }
+            return json({ success: true, clips })
+        }
+        if (method === 'POST' && body) {
+            const audio = body.audio
+            const phraseId = typeof body.phraseId === 'string' ? body.phraseId : ''
+            if (!(audio instanceof Blob) || !phraseId) return json({ success: false, error: 'no audio' }, 400)
+            try {
+                await saveClip(phraseId, audio, {
+                    english: String(body.english ?? ''), japanese: String(body.japanese ?? ''),
+                    date: String(body.date ?? ''), category: String(body.category ?? ''),
+                })
+                return json({ success: true, url: URL.createObjectURL(audio), phraseId })
+            } catch {
+                return json({ success: false, error: 'save failed' }, 500)
+            }
+        }
+        if (method === 'DELETE') {
+            const phraseId = url.searchParams.get('phraseId')
+            if (phraseId) { try { await deleteClip(phraseId) } catch { /* noop */ } }
+            return json({ success: true })
+        }
+        return json({ success: false }, 400)
+    },
+
+    // ── TIME ATTACK sessions(英語魂 TrainingClient)──
+    '/api/training-sessions': (url, method, body) => {
+        type Session = { id: number; date: string; duration_preset: number; duration_actual: number; cards_reviewed: number; xp_earned: number; grade: string; cards_per_minute: number; max_chain: number; completed: number }
+        const sessions = store('training_sessions') as Session[]
+        if (method === 'GET' && url.searchParams.get('stats') === 'true') {
+            const records: Record<number, { best_cards: number }> = {}
+            const dates = new Set<string>()
+            let total_cards = 0, total_time = 0, s_rank_count = 0, longest_chain = 0
+            for (const s of sessions) {
+                if (!records[s.duration_preset] || s.cards_reviewed > records[s.duration_preset].best_cards) records[s.duration_preset] = { best_cards: s.cards_reviewed }
+                total_cards += s.cards_reviewed || 0
+                total_time += s.duration_actual || 0
+                if (s.grade === 'S') s_rank_count++
+                if ((s.max_chain || 0) > longest_chain) longest_chain = s.max_chain
+                dates.add(s.date)
+            }
+            let streak_days = 0
+            const d = new Date()
+            for (let i = 0; i < 365; i++) {
+                const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+                if (dates.has(key)) { streak_days++; d.setDate(d.getDate() - 1) } else break
+            }
+            return json({ success: true, total_sessions: sessions.length, total_cards, total_time, s_rank_count, longest_chain, streak_days, records_by_preset: records })
+        }
+        if (method === 'GET') {
+            const limit = Number(url.searchParams.get('limit') || 20)
+            const sorted = [...sessions].sort((a, b) => b.id - a.id).slice(0, limit)
+            return json({ success: true, sessions: sorted })
+        }
+        if (method === 'POST' && body) {
+            const entry = { id: Date.now(), date: today(), ...body } as Session
+            sessions.push(entry)
+            save('training_sessions', sessions)
+            return json({ success: true, session: entry })
         }
         return json({ success: false }, 400)
     },

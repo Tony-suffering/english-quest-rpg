@@ -26,6 +26,11 @@ export interface Student {
     slug: string;
     name: string;
     coach: string;
+    /**
+     * 合言葉の SHA-256(hex)。合言葉そのものはコードに置かない。
+     * 作り方: node -e "console.log(require('crypto').createHash('sha256').update('<合言葉>').digest('hex'))"
+     */
+    accessHash: string;
     /** ページ上部の一言(任意) */
     intro?: string;
     lessons: StudentLesson[];
