@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Sora, Zen_Kaku_Gothic_New, Noto_Sans_JP } from 'next/font/google'
 import "./globals.css";
 import { Toaster } from '@/components/ui/sonner'
+import { SITE_URL, SITE_DESCRIPTION } from '@/lib/site'
 
 // モバイル最適化: 必要最小限のフォントのみpreload
 const zenKaku = Zen_Kaku_Gothic_New({
@@ -24,9 +25,9 @@ const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora', weight: ['400', '700'], display: 'swap', preload: false })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.toniolab.com'),
+  metadataBase: new URL(SITE_URL),
   title: 'とにおラボ | TONIO LAB',
-  description: 'TOEIC900点なのに喋れない男が、自分で英語アプリを作ってる。英語フレーズをポケモンみたいに捕まえて、育てて、戦わせる。',
+  description: SITE_DESCRIPTION,
   keywords: ['とにおラボ', 'TONIO LAB', 'TOEIC', '英語学習', '居酒屋TOEIC', '英語アプリ'],
   authors: [{ name: 'tonio' }],
   manifest: '/manifest.json',
@@ -37,8 +38,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'とにおラボ | TONIO LAB',
-    description: 'TOEIC900点なのに喋れない男が、自分で英語アプリを作ってる。',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://www.toniolab.com',
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
     siteName: 'とにおラボ',
     locale: 'ja_JP',
     type: 'website',
@@ -54,7 +55,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'とにおラボ | TONIO LAB',
-    description: 'TOEIC900点なのに喋れない男が、自分で英語アプリを作ってる。',
+    description: SITE_DESCRIPTION,
     images: ['/english-icon.png'],
   },
   robots: {

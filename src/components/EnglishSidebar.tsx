@@ -1,28 +1,44 @@
 'use client';
 
+/**
+ * サイドバー(公開版 とにおラボ)
+ *
+ * 上から順に:
+ *   1. メイン: 今日の練習 / 教材 / 記録
+ *   2. いま使っている教材: 居酒屋TOEIC・英会話マスター365・ライトパスの中にいるときだけ、その教材の目次
+ *   3. 補助: 使い方・案内 / 設定 / ホーム画面に追加
+ *
+ * 作者個人の記録(勉強記録、GRIND動画など)は公開版の目次に載せない。
+ * 教材の目次(PROGRAMS)は既存のURLをそのまま使う。
+ */
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { CirclePlay, BookOpen, CalendarDays } from 'lucide-react';
+import { PUBLIC_TABS, isTabActive } from '@/components/english/public/PublicTabBar';
 
 // ─── Color tokens ──────────────────────────────────────────
 const C = {
     gold: '#D4AF37',
+    deepGold: '#9A7B16',
     green: '#10B981',
     purple: '#8B5CF6',
     blue: '#3B82F6',
-    red: '#EF4444',
-    brown: '#92400E',
     orange: '#F97316',
-    pink: '#EC4899',
+    ink: '#1C1917',
+    sub: '#78716C',
+    faint: '#A8A29E',
+    line: '#E7E5E4',
 };
 
-// ─── Program definitions ───────────────────────────────────
+// ─── Program definitions(教材の目次。URLは既存のまま) ───────
 interface Program {
     id: string;
     label: string;
     tagline: string;
     color: string;
-    basePath: string;
+    prefixes: string[];
     items: { id: string; label: string; featured?: boolean }[];
 }
 
@@ -30,13 +46,11 @@ const PROGRAMS: Program[] = [
     {
         id: 'kaiwa',
         label: '英会話マスター365',
-        tagline: '毎日の英会話トレーニング',
+        tagline: '毎日10表現。居酒屋の6人と',
         color: C.green,
-        basePath: '/english/izakaya-toeic/kaiwa',
+        prefixes: ['/english/izakaya-toeic/kaiwa', '/english/my-training', '/english/5min', '/english/goroku'],
         items: [
             { id: '/english/izakaya-toeic/kaiwa', label: 'マスター365 HOME' },
-            { id: '/english/grind', label: '毎日GRIND動画', featured: true },
-            { id: '/english/my-log', label: '俺の勉強記録', featured: true },
             { id: '/english/my-training', label: 'Daily Training', featured: true },
             { id: '/english/my-training/practice', label: 'Practice Drills', featured: true },
             { id: '/english/izakaya-toeic/kaiwa/lp', label: '英会話マスター365とは？' },
@@ -48,23 +62,14 @@ const PROGRAMS: Program[] = [
     {
         id: 'izakaya',
         label: '居酒屋TOEIC',
-        tagline: '30日でスコアUP',
+        tagline: '30日の物語でスコアUP',
         color: C.gold,
-        basePath: '/english/toeic',
+        prefixes: ['/english/toeic', '/english/tonio-words'],
         items: [
             { id: '/english/toeic', label: 'のれん30夜' },
             { id: '/english/toeic/sentences', label: '居酒屋300フレーズ', featured: true },
-            { id: '/english/toeic/episodes', label: 'エピソード一覧' },
-            { id: '/english/toeic/characters', label: '常連ファイル' },
-            { id: '/english/toeic/guide', label: '攻略メモ' },
-            { id: '/english/toeic/paraphrase', label: '言い換えお品書き' },
-            { id: '/english/toeic/sounds', label: '聞き酒ノート' },
-            { id: '/english/toeic/traps', label: '引っかけ毒見帳' },
-            { id: '/english/toeic/score', label: 'スコア通知表' },
-            { id: '/english/toeic/mistakes', label: '反省ノート' },
-            { id: '/english/toeic/achievements', label: 'のれんの勲章' },
             { id: '/english/toeic/words', label: 'TOEIC頻出310語' },
-            { id: '/english/tonio-words', label: 'TOEIC英単語' },
+            { id: '/english/toeic/score', label: 'スコア通知表' },
         ],
     },
     {
@@ -72,7 +77,7 @@ const PROGRAMS: Program[] = [
         label: 'ライトパス',
         tagline: '英検1級の英作文を30日で',
         color: C.gold,
-        basePath: '/english/writepass',
+        prefixes: ['/english/writepass', '/english/write'],
         items: [
             { id: '/english/writepass', label: 'ライトパスとは？' },
             { id: '/english/write/days', label: 'ライトパス 30日', featured: true },
@@ -82,78 +87,32 @@ const PROGRAMS: Program[] = [
         ],
     },
     {
-        id: 'tokyo52',
-        label: 'Tokyo52',
-        tagline: '英語ドラマで学ぶ',
-        color: C.purple,
-        basePath: '/english/tokyo52',
-        items: [
-            { id: '/english/tokyo52', label: 'Tokyo52 HOME' },
-            { id: '/english/tokyo52/words', label: '単語リスト' },
-            { id: '/memoria', label: 'メモリア' },
-        ],
-    },
-    {
-        id: 'lisque',
-        label: 'リスクエ',
-        tagline: '30日リスニング特訓',
+        id: 'course',
+        label: '百日課程',
+        tagline: '会話で本当によく出る1,000表現',
         color: C.blue,
-        basePath: '/english/lisque',
+        prefixes: ['/english/course'],
         items: [
-            { id: '/english/lisque', label: 'リスクエ HOME' },
-            { id: '/english/lisque/lp', label: 'リスクエとは？' },
-        ],
-    },
-    {
-        id: 'yomique',
-        label: 'ヨミクエ',
-        tagline: '30日リーディング特訓',
-        color: C.orange,
-        basePath: '/english/yomique',
-        items: [
-            { id: '/english/yomique', label: 'ヨミクエ HOME' },
-            { id: '/english/yomique/lp', label: 'ヨミクエとは？' },
-        ],
-    },
-    {
-        id: 'native365',
-        label: 'ネイティブ365',
-        tagline: '英語の最後の1マイル',
-        color: C.purple,
-        basePath: '/english/native365',
-        items: [
-            { id: '/english/native365', label: 'ネイティブ365 HOME' },
-            { id: '/english/native365/phrases', label: 'Phrase Bank', featured: true },
-            { id: '/english/native365/lp', label: 'ネイティブ365とは？' },
+            { id: '/english/course', label: '百日課程の海図' },
+            { id: '/english/today?deck=course', label: 'この教材で練習する', featured: true },
         ],
     },
 ];
 
-// ─── 商品を絞るための非表示設定 (コードは残す・戻すのはここを編集するだけ) ──
-// 売る2本に集約: 居酒屋TOEIC + 英会話マスター365。他はナビから隠す。
-const HIDDEN_PROGRAMS = new Set(['tokyo52', 'lisque', 'yomique', 'native365']);
-// 居酒屋TOEIC はコア4つだけ表示: のれん30夜 / 居酒屋300フレーズ / TOEIC頻出310語 / スコア通知表
-const HIDDEN_ITEMS = new Set([
-    '/english/toeic/episodes',
-    '/english/toeic/characters',
-    '/english/toeic/guide',
-    '/english/toeic/paraphrase',
-    '/english/toeic/sounds',
-    '/english/toeic/traps',
-    '/english/toeic/mistakes',
-    '/english/toeic/achievements',
-    '/english/tonio-words',
-]);
+const AUX = [
+    { id: '/english/info', label: '使い方・案内' },
+    { id: '/english/settings', label: '設定' },
+    { id: '/install', label: 'ホーム画面に追加' },
+];
+
+const TAB_ICON = { '/english/home': CirclePlay, '/english/materials': BookOpen, '/english/record': CalendarDays } as const;
 
 // ─── Component ─────────────────────────────────────────────
 
 export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: boolean }) {
     const pathname = usePathname();
-    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
-    const [expandedProgram, setExpandedProgram] = useState<string | null>(null);
-    // showMore removed -- all items in programs now
 
     useEffect(() => {
         const checkMobile = () => {
@@ -167,80 +126,40 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
 
     useEffect(() => { setIsOpen(false); }, [pathname]);
 
-    // Auto-expand the program that contains the current page
-    useEffect(() => {
-        if (!pathname) return;
-        // Check kaiwa first (more specific path)
-        if (pathname.startsWith('/english/izakaya-toeic/kaiwa') || pathname.startsWith('/english/my-training') || pathname.startsWith('/english/5min') || pathname.startsWith('/english/goroku') || pathname.startsWith('/english/grind') || pathname.startsWith('/english/my-log')) {
-            setExpandedProgram('kaiwa');
-        } else if (pathname.startsWith('/english/toeic') || pathname.startsWith('/english/tonio-words')) {
-            setExpandedProgram('izakaya');
-        } else if (pathname.startsWith('/english/writepass') || pathname.startsWith('/english/write/')) {
-            setExpandedProgram('writepass');
-        } else if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) {
-            setExpandedProgram('tokyo52');
-        } else if (pathname.startsWith('/english/lisque')) {
-            setExpandedProgram('lisque');
-        } else if (pathname.startsWith('/english/yomique')) {
-            setExpandedProgram('yomique');
-        } else if (pathname.startsWith('/english/native365')) {
-            setExpandedProgram('native365');
-        }
-        // (legacy auto-expand removed)
-    }, [pathname]);
-
-    // ─── Determine which app the user is currently inside ─────
-    // Returns null when on shared/root pages → show all programs.
-    const currentAppId: string | null = (() => {
-        if (!pathname) return null;
-        if (
-            pathname.startsWith('/english/izakaya-toeic/kaiwa') ||
-            pathname.startsWith('/english/my-training') ||
-            pathname.startsWith('/english/5min') ||
-            pathname.startsWith('/english/goroku')
-        ) return 'kaiwa';
-        if (
-            pathname.startsWith('/english/toeic') ||
-            pathname.startsWith('/english/tonio-words')
-        ) return 'izakaya';
-        if (pathname.startsWith('/english/writepass') || pathname.startsWith('/english/write/')) return 'writepass';
-        if (pathname.startsWith('/english/tokyo52') || pathname.startsWith('/memoria')) return 'tokyo52';
-        if (pathname.startsWith('/english/lisque')) return 'lisque';
-        if (pathname.startsWith('/english/yomique')) return 'yomique';
-        if (pathname.startsWith('/english/native365')) return 'native365';
-        return null;
-    })();
-
-    const shownPrograms = PROGRAMS.filter(p => !HIDDEN_PROGRAMS.has(p.id));
-    const visiblePrograms = currentAppId
-        ? shownPrograms.filter(p => p.id === currentAppId)
-        : shownPrograms;
+    const currentProgram = PROGRAMS.find(p => p.prefixes.some(pre => pathname === pre || (pathname?.startsWith(pre + '/') ?? false)
+        || (pre === '/english/write' && pathname?.startsWith('/english/write/'))));
 
     const isActive = (path: string) => {
         if (!pathname) return false;
-        if (path === '/english/toeic') return pathname === '/english/toeic' || pathname === '/english/toeic/program';
-        if (path === '/english/izakaya-toeic/kaiwa') return pathname === '/english/izakaya-toeic/kaiwa';
-        if (path === '/english/training/card-preview') return pathname === '/english/training/card-preview';
-        if (path === '/english/training') return pathname === '/english/training' || pathname.startsWith('/english/training/card-slot');
-        if (path === '/memoria') return pathname.startsWith('/memoria');
-        return pathname === path || pathname.startsWith(path + '/');
-    };
-
-    const toggleProgram = (id: string) => {
-        const program = PROGRAMS.find(p => p.id === id);
-        if (expandedProgram === id) {
-            // Already expanded — collapse
-            setExpandedProgram(null);
-        } else {
-            // Expand + navigate to HOME (first item)
-            setExpandedProgram(id);
-            if (program) {
-                router.push(program.items[0].id);
-            }
-        }
+        const clean = path.split('?')[0];
+        if (clean === '/english/toeic') return pathname === '/english/toeic' || pathname === '/english/toeic/program';
+        if (clean === '/english/izakaya-toeic/kaiwa') return pathname === '/english/izakaya-toeic/kaiwa';
+        if (clean === '/english/today') return false;
+        return pathname === clean || pathname.startsWith(clean + '/');
     };
 
     // ─── Render helpers ────────────────────────────────────
+
+    const MainItem = ({ href, label, match }: { href: string; label: string; match: readonly string[] }) => {
+        const active = isTabActive(pathname, match);
+        const Icon = TAB_ICON[href as keyof typeof TAB_ICON];
+        return (
+            <Link href={href} style={{ textDecoration: 'none', display: 'block', margin: '2px 12px' }} aria-current={active ? 'page' : undefined}>
+                <div style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '11px 12px', borderRadius: 10,
+                    background: active ? '#FFFBEB' : 'transparent',
+                    border: `1px solid ${active ? '#FDE68A' : 'transparent'}`,
+                    color: active ? C.ink : '#44403C',
+                    fontSize: 14, fontWeight: 800,
+                    transition: 'all 0.15s ease',
+                }}>
+                    {Icon && <Icon size={18} strokeWidth={active ? 2.4 : 1.8} color={active ? C.deepGold : C.sub} aria-hidden />}
+                    {label}
+                </div>
+            </Link>
+        );
+    };
 
     const renderSubItem = (item: { id: string; label: string; featured?: boolean }, color: string) => {
         const active = isActive(item.id);
@@ -261,11 +180,7 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                         alignItems: 'center',
                         gap: 6,
                     }}>
-                        <span style={{
-                            width: 5, height: 5, borderRadius: 2,
-                            backgroundColor: active ? color : color + '80',
-                            flexShrink: 0,
-                        }} />
+                        <span style={{ width: 5, height: 5, borderRadius: 2, backgroundColor: active ? color : color + '80', flexShrink: 0 }} />
                         {item.label}
                     </div>
                 </Link>
@@ -289,15 +204,15 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         );
     };
 
-    const renderToolItem = (item: { id: string; label: string; color: string }) => {
+    const renderAuxItem = (item: { id: string; label: string }) => {
         const active = isActive(item.id);
         return (
             <Link key={item.id} href={item.id} style={{ textDecoration: 'none', display: 'block' }}>
                 <div style={{
                     padding: '8px 20px',
                     color: active ? '#1a1a1a' : '#666',
-                    backgroundColor: active ? (item.color + '10') : 'transparent',
-                    borderLeft: active ? `3px solid ${item.color}` : '3px solid transparent',
+                    backgroundColor: active ? 'rgba(212,175,55,0.08)' : 'transparent',
+                    borderLeft: active ? `3px solid ${C.gold}` : '3px solid transparent',
                     fontSize: 13,
                     fontWeight: active ? 700 : 500,
                     transition: 'all 0.15s ease',
@@ -308,106 +223,6 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
         );
     };
 
-    const renderCompactItem = (item: { id: string; label: string }) => {
-        const active = isActive(item.id);
-        return (
-            <Link key={item.id} href={item.id} style={{ textDecoration: 'none', display: 'block' }}>
-                <div style={{
-                    padding: '6px 20px 6px 28px',
-                    color: active ? '#1a1a1a' : '#888',
-                    backgroundColor: active ? 'rgba(212,175,55,0.08)' : 'transparent',
-                    borderLeft: active ? '3px solid #D4AF37' : '3px solid transparent',
-                    fontSize: 12,
-                    fontWeight: active ? 600 : 400,
-                    transition: 'all 0.15s ease',
-                }}>
-                    {item.label}
-                </div>
-            </Link>
-        );
-    };
-
-    // ─── Program Card ──────────────────────────────────────
-
-    const ProgramCard = ({ program }: { program: Program }) => {
-        const expanded = expandedProgram === program.id;
-        const hasActivePage = program.items.some(item => isActive(item.id));
-
-        return (
-            <div style={{ margin: '0 12px 4px' }}>
-                {/* Program header button */}
-                <button
-                    onClick={() => toggleProgram(program.id)}
-                    style={{
-                        width: '100%',
-                        padding: '10px 12px',
-                        background: expanded ? (program.color + '08') : 'transparent',
-                        border: expanded ? `1px solid ${program.color}20` : '1px solid transparent',
-                        borderRadius: 10,
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        transition: 'all 0.2s ease',
-                    }}
-                >
-                    {/* Color dot */}
-                    <div style={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: '50%',
-                        backgroundColor: program.color,
-                        flexShrink: 0,
-                        boxShadow: hasActivePage ? `0 0 8px ${program.color}60` : 'none',
-                    }} />
-                    {/* Text */}
-                    <div style={{ flex: 1, textAlign: 'left' }}>
-                        <div style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: expanded ? '#1a1a1a' : '#444',
-                            lineHeight: 1.3,
-                        }}>
-                            {program.label}
-                        </div>
-                        <div style={{
-                            fontSize: 10,
-                            color: expanded ? program.color : '#aaa',
-                            marginTop: 1,
-                            letterSpacing: '0.02em',
-                            transition: 'color 0.2s ease',
-                        }}>
-                            {program.tagline}
-                        </div>
-                    </div>
-                    {/* Chevron */}
-                    <div style={{
-                        fontSize: 10,
-                        color: '#bbb',
-                        transition: 'transform 0.2s ease',
-                        transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
-                        flexShrink: 0,
-                    }}>
-                        &#9654;
-                    </div>
-                </button>
-
-                {/* Expanded items */}
-                <div style={{
-                    maxHeight: expanded ? 500 : 0,
-                    overflow: 'hidden',
-                    transition: 'max-height 0.25s ease',
-                }}>
-                    <div style={{ paddingTop: 2, paddingBottom: 4 }}>
-                        {program.items.filter(item => !HIDDEN_ITEMS.has(item.id)).map(item => renderSubItem(item, program.color))}
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    // ─── Section divider ───────────────────────────────────
-
     const SectionLabel = ({ text }: { text: string }) => (
         <>
             <div style={{ height: 1, backgroundColor: '#e5e5e5', margin: '10px 20px 6px' }} />
@@ -415,6 +230,25 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                 {text}
             </div>
         </>
+    );
+
+    const ProgramBlock = ({ program }: { program: Program }) => (
+        <div style={{ margin: '0 12px 4px' }}>
+            <div style={{
+                padding: '10px 12px', borderRadius: 10,
+                background: program.color + '08', border: `1px solid ${program.color}20`,
+                display: 'flex', alignItems: 'center', gap: 10,
+            }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: program.color, flexShrink: 0 }} />
+                <div style={{ flex: 1, textAlign: 'left' }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a', lineHeight: 1.3 }}>{program.label}</div>
+                    <div style={{ fontSize: 10, color: program.color, marginTop: 1, letterSpacing: '0.02em' }}>{program.tagline}</div>
+                </div>
+            </div>
+            <div style={{ paddingTop: 2, paddingBottom: 4 }}>
+                {program.items.map(item => renderSubItem(item, program.color))}
+            </div>
+        </div>
     );
 
     // ─── Render ────────────────────────────────────────────
@@ -430,11 +264,14 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     padding: '0 16px', zIndex: 1001,
                 }}>
-                    <Link href="/english" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 16, fontWeight: 900, color: C.gold }}>英語魂</span>
+                    <Link href="/english/home" style={{ textDecoration: 'none', display: 'flex', alignItems: 'baseline', gap: 6 }}>
+                        <span style={{ fontSize: 16, fontWeight: 900, color: C.gold }}>とにおラボ</span>
+                        <span style={{ fontSize: 9, color: '#bbb', letterSpacing: '0.12em' }}>TONIO LAB</span>
                     </Link>
                     <button
                         onClick={() => setIsOpen(!isOpen)}
+                        aria-label={isOpen ? 'メニューを閉じる' : 'メニューを開く'}
+                        aria-expanded={isOpen}
                         style={{ background: 'none', border: 'none', padding: 8, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 5 }}
                     >
                         <span style={{ display: 'block', width: 22, height: 2, backgroundColor: '#999', transition: 'all 0.2s ease', transform: isOpen ? 'rotate(45deg) translateY(7px)' : 'none' }} />
@@ -463,97 +300,41 @@ export default function EnglishSidebar({ desktopOpen = true }: { desktopOpen?: b
                 {/* Logo - Desktop */}
                 {!isMobile && (
                     <div style={{ padding: '20px 20px 16px', borderBottom: '1px solid #e5e5e5' }}>
-                        <Link href="/english" style={{ textDecoration: 'none' }}>
+                        <Link href="/english/home" style={{ textDecoration: 'none' }}>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-                                <span style={{ fontSize: 20, fontWeight: 900, color: C.gold }}>英語魂</span>
-                                <span style={{ fontSize: 10, color: '#bbb', letterSpacing: '0.1em' }}>EIGODAMASHII</span>
+                                <span style={{ fontSize: 20, fontWeight: 900, color: C.gold }}>とにおラボ</span>
+                                <span style={{ fontSize: 10, color: '#bbb', letterSpacing: '0.1em' }}>TONIO LAB</span>
                             </div>
                         </Link>
                     </div>
                 )}
 
-                <nav style={{ flex: 1, paddingTop: isMobile ? 0 : 8 }}>
-                    {/* ── PROGRAMS ── */}
-                    <SectionLabel text={currentAppId ? 'CURRENT APP' : 'PROGRAMS'} />
-                    {visiblePrograms.map(p => <ProgramCard key={p.id} program={p} />)}
-                    {currentAppId && (
-                        <Link href="/english" style={{ textDecoration: 'none', display: 'block', margin: '4px 16px 8px' }}>
-                            <div style={{
-                                padding: '6px 12px',
-                                fontSize: 11,
-                                color: '#888',
-                                border: '1px dashed #d5d5d5',
-                                borderRadius: 6,
-                                textAlign: 'center',
-                                fontWeight: 500,
-                                letterSpacing: '0.05em',
-                            }}>
-                                ← 他のアプリを見る
-                            </div>
-                        </Link>
-                    )}
+                <nav style={{ flex: 1, paddingTop: isMobile ? 0 : 8 }} aria-label="サイトのメニュー">
+                    {PUBLIC_TABS.map(t => <MainItem key={t.href} href={t.href} label={t.label} match={t.match} />)}
 
-                    {/* ── TOOLS ── */}
-                    <SectionLabel text="TOOLS" />
-                    {renderToolItem({ id: '/english/noren', label: 'のれん', color: C.green })}
-                    {/* Sub-item: 俺の旅 — personal journey under のれん */}
-                    {(() => {
-                        const active = isActive('/english/noren/me');
-                        return (
-                            <Link href="/english/noren/me" style={{ textDecoration: 'none', display: 'block' }}>
+                    {currentProgram && (
+                        <>
+                            <SectionLabel text="いま使っている教材" />
+                            <ProgramBlock program={currentProgram} />
+                            <Link href="/english/materials" style={{ textDecoration: 'none', display: 'block', margin: '4px 16px 8px' }}>
                                 <div style={{
-                                    padding: '6px 20px 6px 36px',
-                                    color: active ? '#1a1a1a' : '#888',
-                                    backgroundColor: active ? (C.green + '10') : 'transparent',
-                                    borderLeft: active ? `2px solid ${C.green}` : '2px solid transparent',
-                                    fontSize: 12,
-                                    fontWeight: active ? 600 : 400,
-                                    transition: 'all 0.15s ease',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 6,
+                                    padding: '6px 12px', fontSize: 11, color: '#888',
+                                    border: '1px dashed #d5d5d5', borderRadius: 6, textAlign: 'center',
+                                    fontWeight: 500, letterSpacing: '0.05em',
                                 }}>
-                                    <span style={{
-                                        width: 4,
-                                        height: 4,
-                                        borderRadius: '50%',
-                                        backgroundColor: active ? C.green : '#bbb',
-                                        flexShrink: 0,
-                                    }} />
-                                    俺の旅
+                                    ← ほかの教材を見る
                                 </div>
                             </Link>
-                        );
-                    })()}
-                    {renderToolItem({ id: '/english/harvest', label: 'Movie Harvest', color: '#D4AF37' })}
-                    {renderToolItem({ id: '/english/home', label: '英語ラボ (実験版 v1-v7 ＋エラー帳)', color: '#0EA5E9' })}
-                    {renderToolItem({ id: '/english/training/card-preview', label: 'カードコレクション', color: '#A855F7' })}
-                    {renderToolItem({ id: '/english/dashboard', label: 'ダッシュボード', color: '#D4AF37' })}
+                        </>
+                    )}
 
-                    {/* CONTENT section removed -- items moved into programs */}
-
-                    {/* ── その他 ── */}
-                    <SectionLabel text="その他" />
-                    {renderToolItem({ id: '/install', label: 'ホーム画面に追加', color: C.gold })}
-                    {renderToolItem({ id: '/english/settings', label: '設定', color: '#78716C' })}
-                    <button
-                        onClick={() => {
-                            localStorage.removeItem('tl_chosen_app');
-                            router.push('/');
-                        }}
-                        style={{
-                            width: '100%', background: 'none', border: 'none', cursor: 'pointer',
-                            padding: '8px 20px', textAlign: 'left',
-                            fontSize: 13, fontWeight: 500, color: '#666',
-                            borderLeft: '3px solid transparent',
-                            transition: 'all 0.15s ease',
-                        }}
-                    >
-                        アプリ切り替え
-                    </button>
-
-                    {/* MORE section removed -- all items in programs now */}
+                    <SectionLabel text="そのほか" />
+                    {AUX.map(renderAuxItem)}
                 </nav>
+
+                <div style={{ padding: '12px 20px 16px', fontSize: 10.5, lineHeight: 1.6, color: '#A8A29E' }}>
+                    無料・登録不要。記録はこの端末の中にだけ保存されます。
+                </div>
             </div>
 
             {/* Spacer for mobile header */}

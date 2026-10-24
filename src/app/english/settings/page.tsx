@@ -92,6 +92,8 @@ export default function SettingsPage() {
             'izakaya_card_points', 'toeic_30day_start',
             'toeic_training_tutorial_done', 'toeic_episode_tutorial_done',
             'quest-days-active',
+            // 今日の練習(公開版)の記録
+            'tonio-practice:cards', 'tonio-practice:state', 'tonio-practice:log',
         ];
         keys.forEach(k => localStorage.removeItem(k));
         setTotalPhrases(0);

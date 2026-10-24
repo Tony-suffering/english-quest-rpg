@@ -20,7 +20,7 @@ const HOVER_COLOR = '#10B981'; // Hover Color
 const TARGET_COLOR = '#F97316'; // Orange for Target (Softer than Red)
 
 const NAV_ITEMS = [
-    { label: 'Dashboard', href: '/english/dashboard-v2', icon: ArrowLeft },
+    { label: 'Home', href: '/english/home', icon: ArrowLeft },
     { label: 'World Map', href: '/english/world-map', icon: MapIcon },
 ];
 

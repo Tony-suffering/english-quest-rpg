@@ -1,13 +1,15 @@
 import { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/site'
 
 export default function robots(): MetadataRoute.Robots {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://english-quest-rpg.vercel.app'
+    const baseUrl = SITE_URL
 
     return {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: '/private/',
+            // 運営用・作者個人の記録は検索に出さない
+            disallow: ['/private/', '/dev', '/voice-lab', '/membership/life/admin', '/api/'],
         },
         sitemap: `${baseUrl}/sitemap.xml`,
     }
