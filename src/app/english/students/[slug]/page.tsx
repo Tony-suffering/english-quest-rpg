@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
-import { getStudent, STUDENTS } from '@/data/english/students';
+import { getStudent } from '@/data/english/students';
 import { cookieName, keyMatches } from '@/data/english/students/access';
 import StudentClient from './StudentClient';
 
@@ -20,12 +20,9 @@ type Props = {
     searchParams: Promise<{ key?: string }>;
 };
 
-export function generateStaticParams() {
-    return Object.keys(STUDENTS).map(slug => ({ slug }));
-}
-
-// 台帳に無い slug は 404(生徒は data に登録した人だけ)
-export const dynamicParams = false;
+// cookie で本人かどうかを見るページなので、必ずリクエスト時に描画する(静的生成すると
+// ビルド時の「cookie 無し」の結果が全員に配られてしまう)。台帳に無い slug は middleware が LP へ返す
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
