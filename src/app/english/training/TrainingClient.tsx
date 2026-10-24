@@ -19,7 +19,8 @@ const IS_PUBLIC = typeof window !== 'undefined' && (
     window.location.hostname.includes('toniolab') ||
     window.location.hostname.includes('english-quest') ||
     window.location.hostname.includes('vercel.app') ||
-    window.location.pathname.includes('/my-training')
+    window.location.pathname.includes('/my-training') ||
+    window.location.pathname.includes('/english/students/')
 );
 
 interface VoiceRecording {
