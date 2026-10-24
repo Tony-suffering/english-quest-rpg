@@ -1,5 +1,6 @@
-import { redirect } from 'next/navigation'
+import { redirect } from 'next/navigation';
 
-export default function EnglishPage() {
-  redirect('/english/training')
+// /english は2択ページにリダイレクト
+export default function EnglishHomePage() {
+    redirect('/');
 }

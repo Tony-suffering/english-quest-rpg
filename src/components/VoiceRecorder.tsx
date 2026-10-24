@@ -145,31 +145,8 @@ export default function VoiceRecorder({
         setIsPlaying(true);
     };
 
-    // 音読した: register a sentinel (no audio) so the card reaches the VOICE level
-    const markReadAloud = useCallback(async () => {
-        setIsUploading(true);
-        try {
-            const fd = new FormData();
-            fd.append('phraseId', phraseIdRef.current);
-            fd.append('readAloud', 'true');
-            const res = await fetch('/api/voice-recordings', { method: 'POST', body: fd });
-            const data = await res.json();
-            if (data.success && data.recording) {
-                onCompleteRef.current(data.recording);
-            } else {
-                throw new Error(data.error || 'Failed');
-            }
-        } catch (error) {
-            console.error('Error marking read-aloud:', error);
-            alert('音読の登録に失敗しました');
-        } finally {
-            setIsUploading(false);
-        }
-    }, []);
-
     const latestRecording = recordings[0];
     const hasRecording = recordings.length > 0;
-    const isMarker = latestRecording?.url === 'read-aloud';
 
     // Mic icon SVG
     const MicIcon = () => (
@@ -254,30 +231,9 @@ export default function VoiceRecorder({
                 </button>
             )}
 
-            {/* 音読した: skip recording, advance to the next level */}
-            {!hasRecording && !isRecording && (
-                <button
-                    onClick={markReadAloud}
-                    disabled={isUploading}
-                    title="音読しました（次のレベルへ）"
-                    style={{
-                        height: '28px', padding: '0 12px', borderRadius: '14px', border: 'none',
-                        background: isUploading ? '#e5e5e5' : 'linear-gradient(135deg, #34d399 0%, #059669 100%)',
-                        color: isUploading ? '#999' : '#fff', cursor: isUploading ? 'not-allowed' : 'pointer',
-                        fontSize: '12px', fontWeight: 700, whiteSpace: 'nowrap',
-                        boxShadow: isUploading ? 'none' : '0 1px 4px rgba(5,150,105,0.3)',
-                    }}
-                >
-                    音読した
-                </button>
-            )}
-
             {/* Play button (if recording exists) */}
             {hasRecording && (
                 <>
-                    {isMarker ? (
-                        <span title="音読済み" style={{ height: '28px', padding: '0 12px', display: 'flex', alignItems: 'center', borderRadius: '14px', background: '#ECFDF5', color: '#059669', fontSize: '11px', fontWeight: 700, border: '1px solid #A7F3D0' }}>音読済</span>
-                    ) : (
                     <button
                         onClick={() => isPlaying ? stopPlaying() : playUserRecording(latestRecording.url)}
                         title={isPlaying ? 'Stop' : 'Play'}
@@ -300,7 +256,6 @@ export default function VoiceRecorder({
                     >
                         {isPlaying ? <StopIcon /> : <CompareIcon />}
                     </button>
-                    )}
                     <button
                         onClick={() => deleteRecording(latestRecording)}
                         title="Delete"

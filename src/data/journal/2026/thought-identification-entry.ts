@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const thoughtIdentificationEntry: JournalEntry = {
     id: '082',
-    date: '2026-01-24',
+    date: '2026-08-26',
     title: '同一化が「普通」だと思っていた——腰痛を「私です」とは言わないのに',
     summary: '周りの全員が思考と同一化している。だからそれが「普通」だと思ってしまう。でも腰痛を「私です」とは誰も言わない。怒りや不安も同じはずなのに。アジャシャンティとエックハルトが教えてくれた——同一化は「普通」じゃない、ただの習慣だった。',
     featured: true,

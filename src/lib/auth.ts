@@ -215,7 +215,7 @@ export async function sendPasswordResetEmail(email: string) {
     // サイトURLを取得（サーバーサイド対応）
     const siteUrl = typeof window !== 'undefined'
       ? window.location.origin
-      : (process.env.NEXT_PUBLIC_SITE_URL || 'https://iwasaki-naisou.com')
+      : (process.env.NEXT_PUBLIC_SITE_URL || 'https://english-quest-rpg.vercel.app')
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${siteUrl}/craftsman/reset-password`,

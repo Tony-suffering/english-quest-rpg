@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/data/english/write-eiken1-counter-a.ts
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * WRITE COUNTER A -- Day 1-6 の「裏」模範解答。
  *

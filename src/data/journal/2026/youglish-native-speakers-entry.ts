@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const youglishNativeSpeakersEntry: JournalEntry = {
     id: '090',
-    date: '2026-01-29',
+    date: '2026-09-21',
     title: 'YouGlishとネイティブの英語——教科書VRから脱出する方法',
     summary: '英語を「勉強」してきた人間には、ネイティブの英語が聞き取れない。なぜか？教科書英語という「VR」の中で生きてきたから。YouGlishでリアルなYouTubeの発音を浴びると、VRのバグが見えてくる。',
     featured: true,

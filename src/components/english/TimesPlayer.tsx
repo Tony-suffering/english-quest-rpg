@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/components/english/TimesPlayer.tsx
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 // The Tonio Times — 紙面読み上げ (TTS)。

@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const layoutDecouplingEntry: JournalEntry = {
     id: '087',
-    date: '2026-01-27',
+    date: '2027-01-27',
     title: 'AIがCSSで1時間格闘した末、人間が5秒で解決した話——absolute positioning の教訓',
     summary: 'カレンダーのセルがクリックするたびにサイズ変わる問題。AIは「minmax」「overflow: hidden」「contain: strict」と次々試したが全滅。人間が「右パネルをabsoluteにすれば？」と言って5秒で解決。レイアウト要素が互いに影響し合うとき、切り離せ。',
     featured: true,

@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/data/english/write-spoken-e.ts
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * WRITE SPOKEN E -- Day 25-30 の口語版(2次スピーキング用)。
  *

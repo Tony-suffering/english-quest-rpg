@@ -27,11 +27,6 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'iwasaki-naisou.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
         hostname: 'imagedelivery.net',
         pathname: '/**',
       },

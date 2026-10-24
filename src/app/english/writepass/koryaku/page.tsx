@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/app/english/writepass/koryaku/page.tsx
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -53,7 +56,7 @@ export default function KoryakuPage() {
                     </div>
                     <p style={{ margin: '8px 0 0', fontSize: isMobile ? '16px' : '18px', fontWeight: 800 }}>1級ライティング研究会</p>
                     <p style={{ margin: '2px 0 0', fontSize: '12px', color: SUB }}>公開されない採点の輪郭、テンプレ対策の真実、要約まで。6人で攻略する30日の物語。</p>
-                    <Link href="/english/write" style={{ textDecoration: 'none' }}>
+                    <Link href="/english/write/days" style={{ textDecoration: 'none' }}>
                         <span style={{ display: 'inline-block', marginTop: '12px', fontSize: '12px', fontWeight: 800, color: DEEPGOLD, background: '#FEF9E7', border: `1px solid ${GOLD}55`, padding: '7px 14px', borderRadius: '99px' }}>
                             30日プログラム本体へ →
                         </span>

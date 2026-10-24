@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/app/english/write/sum5/page.tsx
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 /**
@@ -185,7 +188,7 @@ export default function Sum5Page() {
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
                         <Link href="/english/write"
                             style={{ textDecoration: 'none', fontSize: '12px', fontWeight: 800, color: DEEPGOLD, background: '#FEF9E7', border: `1px solid ${GOLD}55`, padding: '7px 14px', borderRadius: '99px' }}>
-                            ← ライトパス 30日(要約の書き写し)
+                            ← 英作文の玄関にもどる
                         </Link>
                         <Link href="/english/write/core5"
                             style={{ textDecoration: 'none', fontSize: '12px', fontWeight: 800, color: DEEPGREEN, background: '#ECFDF5', border: `1px solid ${GREEN}55`, padding: '7px 14px', borderRadius: '99px' }}>

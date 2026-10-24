@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const sumasloCardSlotEntry: JournalEntry = {
     id: '139',
-    date: '2026-03-14',
+    date: '2026-10-12',
     title: 'スマスロ英語 ― 3リールが止まるたびに語彙が増える男',
     summary: 'Entry 130のパチンコ式学習を進化させ、3リール同時回転のスマスロ英語カードシステムを構築。カード=英単語、揃えばボーナス、ステートマシンはNORMAL→CZ→RUSH→SPECIAL→FEVER。パチンコの設計が甘いと言ってた男が、自分のスロット台のUIに3時間かけている。',
     featured: false,

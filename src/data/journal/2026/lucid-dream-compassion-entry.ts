@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const lucidDreamCompassionEntry: JournalEntry = {
     id: '094',
-    date: '2026-01-31',
+    date: '2027-02-19',
     title: '明晰夢から目覚めても、思いやりは本物だった——みんな眠ってる、でも優しくはいられる',
     summary: '吉良吉影＝ブッダ＝エックハルト・トール。「静かに在りたい」——他人は邪魔。compassionのない覚醒はゴミ。仗助のほうが偉い。壊れたものを直すから。半分起きたまま、この町で暮らす。それが本当の勝ち。',
     featured: true,

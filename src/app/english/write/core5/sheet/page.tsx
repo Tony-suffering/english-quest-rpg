@@ -1,11 +1,13 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/app/english/write/core5/sheet/page.tsx
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 /**
  * CORE 5 — 1枚。日本語だけ、操作なし、上から下に読むだけのページ。
  *
  * 【なぜ別に作るか】
- * /english/write/core5 は道具ぜんぶを説明する場所で、/demo は講師に見せる場所。
- * どちらも長い。**本番の朝に見るための1枚が無かった。**
+ * /english/write/core5 は道具ぜんぶを説明する場所でで、長い。**本番の朝に見るための1枚が無かった。**
  * ここは説明を削って、覚えるものと固定のものだけを順番に並べる。
  *
  * 【並べる順番 = 本番で使う順番】
@@ -14,7 +16,6 @@
  */
 
 import Link from 'next/link';
-import EnglishSidebar from '@/components/EnglishSidebar';
 import {
     ENGINES_BY_HAND, BRANCH_SLOTS, FINGERS,
     ESSAY_FRAME, BODY_OPENERS, ESSAY_SHAPES,
@@ -70,7 +71,6 @@ export default function Core5SheetPage() {
 
     return (
         <div style={{ minHeight: '100vh', background: CREAM }}>
-            <EnglishSidebar />
             <main style={{ maxWidth: '760px', margin: '0 auto', padding: '26px 18px 80px' }}>
 
                 <div style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '1.5px', color: FAINT }}>
@@ -88,10 +88,6 @@ export default function Core5SheetPage() {
                         fontSize: '10.5px', fontWeight: 800, color: DEEPGOLD, textDecoration: 'none',
                         border: `1px solid ${GOLD}66`, borderRadius: '999px', padding: '4px 12px',
                     }}>道具の説明はこちら</Link>
-                    <Link href="/english/write/core5/demo" style={{
-                        fontSize: '10.5px', fontWeight: 800, color: DEEPGOLD, textDecoration: 'none',
-                        border: `1px solid ${GOLD}66`, borderRadius: '999px', padding: '4px 12px',
-                    }}>講師に見せる実演はこちら</Link>
                 </div>
 
                 {/* ---------- 0 手順 ---------- */}
@@ -353,7 +349,7 @@ export default function Core5SheetPage() {
 
                 {/* ---------- 7 I think ---------- */}
                 <Section n="7" title="I think をやめる"
-                    lead={`録音${I_THINK_COUNT.lessons}レッスン、自分の発話${I_THINK_COUNT.myWords.toLocaleString()}語のうち I think は${I_THINK_COUNT.total}回。1回の25分で${I_THINK_COUNT.worstNight}回言った夜が2つある。もう句読点になっている。`}>
+                    lead={`作者の録音${I_THINK_COUNT.lessons}レッスン、作者の発話${I_THINK_COUNT.myWords.toLocaleString()}語のうち I think は${I_THINK_COUNT.total}回。1回の25分で${I_THINK_COUNT.worstNight}回言った夜が2つある。もう句読点になっている。`}>
                     <div style={{ border: `1px solid ${LINE}`, borderRadius: '10px', background: '#fff', padding: '4px 13px 10px' }}>
                         {INSTEAD_OF_I_THINK.map((p, i) => (
                             <div key={p.en} style={{

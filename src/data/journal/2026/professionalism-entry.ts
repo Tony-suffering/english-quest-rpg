@@ -3,7 +3,7 @@ import { JournalEntry } from '../types';
 const professionalismEntry: JournalEntry = {
     id: "105-hidden",
     title: "プロフェッショナル（Professionalism）",
-    date: "2026-02-12",
+    date: "2026-12-02",
     summary: "幼稚な感情論は終わりだ。愛とは、完璧に機能すること（Functioning Perfectly）。それ以外にない。",
 
     conversation: `

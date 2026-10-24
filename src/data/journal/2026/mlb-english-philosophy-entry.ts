@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const mlbEnglishPhilosophyEntry: JournalEntry = {
     id: '099',
-    date: '2026-02-04',
+    date: '2026-10-23',
     title: '大谷翔平は英語を学ぶ気がない——野球選手から見える言語習得の真実と、AI時代の新しい選択肢',
     summary: '長谷川滋利は野球よりアメリカが好きだった。鈴木誠也は下ネタで世界とつながる。イチローは日本語でも苦労している。言語の本質は「うまさ」ではなく「存在」。そしてAI時代、私たちは新しい選択肢を手に入れた。',
     featured: true,

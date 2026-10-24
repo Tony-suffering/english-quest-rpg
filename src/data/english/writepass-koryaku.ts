@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/data/english/writepass-koryaku.ts
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * ライトパス -- 30日攻略 読み物シリーズ「1級ライティング研究会」
  *

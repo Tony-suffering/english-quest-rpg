@@ -165,4 +165,6 @@ export const LEVEL1_WORDS: WordEntry[] = [
     { en: 'show up', pron: 'ショウアップ', ja: '現れる・出席する', note: 'Only half the attendees showed up.', why: 'attend/arriveのカジュアル版。会議に来る、イベントに来る。show up on time=時間通りに来る', cat: 'glue', level: 1, lesson: 6 },
     { en: 'turn out', pron: 'ターンアウト', ja: '結局〜だとわかる', note: 'It turned out the shipment was delayed.', why: 'end upと似てるけどturn outは「判明する」。結果が明らかになる瞬間。Part 7の読解で超使う', cat: 'glue', level: 1, lesson: 6 },
     { en: 'pick up', pron: 'ピックアップ', ja: '受け取る・迎える', note: 'I\'ll pick up the documents on my way to the office.', why: '「受け取りに行く」「迎えに行く」。pick up an order=注文品を受け取る。TOEIC日常シーンの主役', cat: 'glue', level: 1, lesson: 6 },
+    { en: 'fill out', pron: 'フィルアウト', ja: '記入する', note: 'Please fill out this application form.', why: '書類を「埋める」イメージ。fill in/fill outどっちも使うけど、fill outの方がアメリカ英語で主流。TOEIC Part 3の定番', cat: 'biz', level: 1, lesson: 6 },
+    { en: 'run out', pron: 'ランアウト', ja: '切れる・なくなる', note: 'We\'re running out of time.', why: '在庫が切れる、時間がなくなる。run out of patience=我慢の限界。日常でもビジネスでも出番多すぎ', cat: 'daily', level: 1, lesson: 6 },
 ];

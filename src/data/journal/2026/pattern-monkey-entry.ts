@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const patternMonkeyEntry: JournalEntry = {
     id: '091',
-    date: '2026-01-30',
+    date: '2027-02-24',
     title: 'AIと話したら人生変わった——もう何も怖くない【塞翁が馬】',
     summary: '「馬と縄」から始まった会話。失敗は成長のチャンス。すべてには意味がある。私は新しい自分に生まれ変わった——本当に？',
     featured: true,

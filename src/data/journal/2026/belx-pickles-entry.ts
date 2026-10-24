@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const belxPicklesEntry: JournalEntry = {
     id: '066',
-    date: '2026-01-10',
+    date: '2027-02-08',
     title: 'ベルクスのお惣菜がおいしい件と、ぬか漬けはなぜおいしいのか問題',
     summary: 'ただの大根、人参、きゅうりが、なぜぬか床に突っ込むだけで激ウマになるのか。乳酸菌1億匹のライブパフォーマンス、浸透圧という名の錬金術、そしてベルクスという聖地。科学とお笑いで解明する。',
     featured: true,

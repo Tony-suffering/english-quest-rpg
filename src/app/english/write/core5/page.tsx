@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/app/english/write/core5/page.tsx
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 /**
@@ -1188,7 +1191,7 @@ export default function WriteCore5Page() {
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '9px' }}>
                     {[
                         { title: 'FIVE HINGES', ja: '話題を立てる5本', list: SPEAKING_FIVE },
-                        { title: 'INSTEAD OF I THINK', ja: `I think の代わり(録音${I_THINK_COUNT.lessons}回で${I_THINK_COUNT.total}回言っている)`, list: INSTEAD_OF_I_THINK },
+                        { title: 'INSTEAD OF I THINK', ja: `I think の代わり(作者の録音${I_THINK_COUNT.lessons}レッスンで${I_THINK_COUNT.total}回)`, list: INSTEAD_OF_I_THINK },
                     ].map((box) => (
                         <div key={box.title} style={{ border: `1px solid ${LINE}`, borderRadius: '12px', background: '#fff', padding: '10px 13px' }}>
                             <div style={{ fontSize: '9px', fontWeight: 900, color: DEEPGOLD, letterSpacing: '1px' }}>{box.title}</div>

@@ -16,9 +16,9 @@ export default function HomePage() {
     const router = useRouter()
     const [mounted, setMounted] = useState(false)
     useEffect(() => {
-        // Returning user with data -> skip HP, land on the English app (英語魂 training)
-        if (localStorage.getItem('quest-mastery')) {
-            router.replace('/english/training')
+        // Returning user with data -> skip HP, land on 今日の練習
+        if (localStorage.getItem('tonio-practice:state') || localStorage.getItem('quest-mastery')) {
+            router.replace('/english/home')
             return
         }
         setMounted(true)
@@ -151,32 +151,32 @@ export default function HomePage() {
                             </Link>
                         </motion.div>
 
-                        {/* TOEIC フル模試 (SCOREPASS) — 英語魂の /english/toeic */}
+                        {/* 居酒屋TOEIC */}
                         <motion.div variants={f}>
-                            <Link href="/english/toeic" className="block group">
+                            <Link href="/english/toeic/lp" className="block group">
                                 <div className="rounded-2xl border border-[#E7E5E4] bg-white overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-[#10B981]/30">
                                     <div className="h-1.5 bg-gradient-to-r from-[#10B981] to-[#10B981]/40" />
                                     <div className="p-8">
-                                        <p className="text-[10px] tracking-[0.3em] text-[#10B981] font-mono mb-4">TOEIC MOCK TEST</p>
+                                        <p className="text-[10px] tracking-[0.3em] text-[#10B981] font-mono mb-4">TOEIC DRAMA</p>
                                         <h3 className="text-2xl font-black mb-3 group-hover:text-[#10B981] transition-colors">
-                                            TOEIC L&amp;R <span className="text-[#10B981]">フル模試</span>
+                                            居酒屋<span className="text-[#10B981]">TOEIC</span>
                                         </h3>
                                         <p className="text-sm text-[#252423]/50 leading-[1.9] mb-6">
-                                            本番と同じ形式のフル模試(SCOREPASS)。<br />
-                                            解説は全訳と「つながらない語」の2階建て。<br />
-                                            語注だけでは上がらない解像度を、文ごと持ち上げる。
+                                            全30話の連続ドラマ。<br />
+                                            6人のキャラクター。伏線。涙。<br />
+                                            物語を読んでたらTOEICのスコアが上がってた。そういう設計。
                                         </p>
 
                                         <div className="bg-[#FAFAF9] rounded-lg p-4 mb-6 border border-[#E7E5E4]">
-                                            <p className="text-[10px] text-[#A8A29E] mb-2">ドクター(診断書)つき</p>
+                                            <p className="text-[10px] text-[#A8A29E] mb-2">のれんの常連たち</p>
                                             <p className="text-xs text-[#57534E] leading-[1.8]">
-                                                解き終わったら、どのパートのどの形で落としたかを診断書で見る。弱点だけを次の模試で潰す。
+                                                480点のおっさんが泣きながら勉強してる。860点の帰国子女がプライドを砕かれてる。全員どこかが壊れてる。
                                             </p>
                                         </div>
 
                                         <div className="flex gap-8">
-                                            <div><span className="text-2xl font-black text-[#10B981]">200</span><span className="text-[10px] text-[#A8A29E] ml-1">questions</span></div>
-                                            <div><span className="text-2xl font-black text-[#10B981]">7</span><span className="text-[10px] text-[#A8A29E] ml-1">parts</span></div>
+                                            <div><span className="text-2xl font-black text-[#10B981]">30</span><span className="text-[10px] text-[#A8A29E] ml-1">episodes</span></div>
+                                            <div><span className="text-2xl font-black text-[#10B981]">6</span><span className="text-[10px] text-[#A8A29E] ml-1">characters</span></div>
                                             <div><span className="text-2xl font-black text-[#10B981]">0</span><span className="text-[10px] text-[#A8A29E] ml-1">yen</span></div>
                                         </div>
                                     </div>
@@ -358,8 +358,8 @@ export default function HomePage() {
                         <Link href="/english/izakaya-toeic/kaiwa/lp" className="inline-flex items-center gap-3 px-8 py-4 bg-[#D4AF37] text-white text-sm font-bold tracking-wide hover:bg-[#252423] transition-colors">
                             英会話マスター365 を始める <span className="text-xs opacity-50">→</span>
                         </Link>
-                        <Link href="/english/toeic" className="inline-flex items-center gap-3 px-8 py-4 bg-[#10B981] text-white text-sm font-bold tracking-wide hover:bg-[#252423] transition-colors">
-                            TOEIC フル模試 を始める <span className="text-xs opacity-50">→</span>
+                        <Link href="/english/toeic/lp" className="inline-flex items-center gap-3 px-8 py-4 bg-[#10B981] text-white text-sm font-bold tracking-wide hover:bg-[#252423] transition-colors">
+                            居酒屋TOEIC を始める <span className="text-xs opacity-50">→</span>
                         </Link>
                     </motion.div>
                 </motion.div>

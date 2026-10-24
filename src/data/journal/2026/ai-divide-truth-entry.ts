@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const aiDivideTruthEntry: JournalEntry = {
     id: '079',
-    date: '2026-01-21',
+    date: '2027-05-24',
     title: 'AI Divideと真理——1兆年前も∞年後も変わらないもの',
     summary: 'AIは「できる人」をさらにできるようにし、「できない人」にはゴミを量産させる。格差は広がる。でも、真理は変わらない。アジャシャンティもエックハルトも、1兆年前から∞年後まで同じことを指している。',
     featured: true,

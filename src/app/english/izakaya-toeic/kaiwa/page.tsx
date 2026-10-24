@@ -11,7 +11,7 @@ import {
     type MasterExpression,
     type KeyWord,
 } from '@/data/english/365/master-expressions';
-import ReviewCalendar from '@/components/english/ReviewCalendar365';
+import ReviewCalendar from '@/components/english/ReviewCalendar';
 import DailyCheckin, {
     loadCheckinStreak, checkMilestone,
 } from '@/components/english/DailyCheckin';

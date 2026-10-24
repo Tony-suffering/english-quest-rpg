@@ -3,7 +3,7 @@ import { JournalEntry } from '../types';
 const whatAreWeDoingEntry: JournalEntry = {
     id: "106-hidden",
     title: "これ何やってんだろうね（The Absurdity）",
-    date: "2026-02-13",
+    date: "2026-06-22",
     summary: "おもしろいけど、これ何？ 答えは簡単。「ジャズ（Jazz）」だ。意味なんてない。グルーヴだけがある。",
 
     conversation: `

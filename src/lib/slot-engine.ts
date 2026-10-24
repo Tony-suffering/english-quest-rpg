@@ -82,7 +82,7 @@ export const SYMBOL_COLORS: Record<GodSymbol, string> = {
 };
 
 export const SYMBOL_LABELS: Record<GodSymbol, string> = {
-  GOD: 'GOD', RED7: 'BLAZE', YELLOW7: 'BOLT', BLUE7: 'FROST', V_SYMBOL: 'WILD', BLANK: '-',
+  GOD: 'GOD', RED7: '\u8D647', YELLOW7: '\u9EC47', BLUE7: '\u97527', V_SYMBOL: 'V', BLANK: '-',
 };
 
 export const ALL_SYMBOLS: GodSymbol[] = ['GOD', 'RED7', 'YELLOW7', 'BLUE7', 'V_SYMBOL', 'BLANK'];

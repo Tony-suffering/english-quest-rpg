@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const dodgersSpeechAnalysisEntry: JournalEntry = {
     id: '110',
-    date: '2026-02-09',
+    date: '2027-02-26',
     title: 'なぜアメリカ人は息継ぎしないのか——Dodgersポッドキャスト37分の構造的解剖と、自分の分析を疑う',
     summary: 'Dodgers Territoryの37分ポッドキャストを全文書き起こして構造解剖した。ストレスタイミング、機能語の消滅、節の接着剤、-ingの支配。だがそこで終わらず、自分の分析を徹底的に疑い直す。統語論、情報理論、生理学、そして日本語にも「立て板に水」は存在するという事実。',
     featured: true,

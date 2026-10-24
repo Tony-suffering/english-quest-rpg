@@ -9,7 +9,7 @@ import { ElementBadge } from '@/components/english/ElementIcon';
 // 布陣バトル — 3x3 / 4x4 カード布陣 + グリッド評価
 // ═══════════════════════════════════════════════════════════
 
-type GridSize = 3;
+type GridSize = 2 | 3 | 4;
 
 // ── Sound Engine (Web Audio API, no external files) ──
 let _audioCtx: AudioContext | null = null;
@@ -174,7 +174,6 @@ interface Synergy {
     multiplier: number;
     color: string;
     icon: string;
-    contributingCardIds: string[];
 }
 
 interface BattleResult {
@@ -231,7 +230,7 @@ function loadGrid(n: GridSize): Grid { try { const r = localStorage.getItem(`puz
 function saveGrid(g: Grid, n: GridSize) { try { localStorage.setItem(`puzzle-board-${n}`, JSON.stringify({ grid: g, month: curMonth() })); } catch {} }
 function loadStats(n: GridSize): PuzzleStats { const m = curMonth(); const def: PuzzleStats = { totalBattles: 0, bestDamage: 0, totalGP: 0, sRanks: 0, month: m }; try { const r = localStorage.getItem(`puzzle-stats-${n}`); if (r) { const d = JSON.parse(r); if (d.month === m && typeof d.bestDamage === 'number') return { ...def, ...d }; } } catch {} return def; }
 function saveStats(s: PuzzleStats, n: GridSize) { try { localStorage.setItem(`puzzle-stats-${n}`, JSON.stringify(s)); } catch {} }
-function loadGridSize(): GridSize { return 3; }
+function loadGridSize(): GridSize { try { const v = localStorage.getItem('puzzle-grid-size'); if (v === '2' || v === '3' || v === '4') return Number(v) as GridSize; } catch {} return 3; }
 
 // ── Grid Helpers ──
 
@@ -240,30 +239,34 @@ function cl(g: Grid): Grid { return g.map(r => r.map(c => c ? { ...c } : null));
 function cnt(g: Grid): number { let n = 0; for (const r of g) for (const c of r) if (c) n++; return n; }
 function allCards(g: Grid): PuzzleCard[] { const a: PuzzleCard[] = []; for (const r of g) for (const c of r) if (c) a.push(c); return a; }
 
-// Smart auto-placement: synergy-aware, picks best spot automatically
 function placeAuto(g: Grid, card: PuzzleCard, N: number): { grid: Grid; row: number; col: number; synHit: boolean } {
     const grid = cl(g);
+    // Smart placement: prioritize cells adjacent to same-element cards (synergy optimization)
     let bestR = -1, bestC = -1, bestScore = -1;
     for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
         if (grid[r][c]) continue;
         let score = 0;
+        // Check 4 neighbors for same element (synergy bonus)
         const neighbors: [number, number][] = [[r-1,c],[r+1,c],[r,c-1],[r,c+1]];
         for (const [nr, nc] of neighbors) {
             if (nr >= 0 && nr < N && nc >= 0 && nc < N && grid[nr][nc]) {
-                if (grid[nr][nc]!.element === card.element) score += 10;
-                else score += 1;
+                if (grid[nr][nc]!.element === card.element) score += 10; // same element = synergy
+                else score += 1; // adjacent to any card = mild preference (cluster)
             }
         }
+        // Diagonal neighbors — weaker synergy hint
         const diags: [number, number][] = [[r-1,c-1],[r-1,c+1],[r+1,c-1],[r+1,c+1]];
         for (const [nr, nc] of diags) {
             if (nr >= 0 && nr < N && nc >= 0 && nc < N && grid[nr][nc]?.element === card.element) score += 3;
         }
+        // Center preference when grid is empty (looks better)
         const centerDist = Math.abs(r - (N-1)/2) + Math.abs(c - (N-1)/2);
         score += (N - centerDist) * 0.5;
         if (score > bestScore) { bestScore = score; bestR = r; bestC = c; }
     }
-    const synHit = bestScore >= 10;
+    const synHit = bestScore >= 10; // did we find a synergy match?
     if (bestR >= 0) { grid[bestR][bestC] = card; return { grid, row: bestR, col: bestC, synHit }; }
+    // Full — shouldn't happen (battle triggers when full)
     grid[0][0] = card; return { grid, row: 0, col: 0, synHit: false };
 }
 
@@ -283,30 +286,23 @@ function evaluateParty(cards: PuzzleCard[]): BattleResult {
     const maxElemCount = Math.max(...Object.values(elemCounts));
     const dominantElem = Object.entries(elemCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
 
-    // Build per-element card ID lists
-    const elemCardIds: Record<string, string[]> = {};
-    for (const c of cards) {
-        if (!elemCardIds[c.element]) elemCardIds[c.element] = [];
-        elemCardIds[c.element].push(c.id);
-    }
-
     // Rainbow: all 5 elements present
     if (uniqueElems >= 5) {
-        synergies.push({ name: 'RAINBOW', description: '5属性コンプリート', multiplier: 2.0, color: '#A855F7', icon: 'R', contributingCardIds: cards.map(c => c.id) });
+        synergies.push({ name: 'RAINBOW', description: '5属性コンプリート', multiplier: 2.0, color: '#A855F7', icon: 'R' });
     }
-    // Mono: 4+ of same element (3x3)
+    // Mono: 4+ of same element (3x3) or 6+ (4x4)
     if (maxElemCount >= Math.ceil(cards.length * 0.6)) {
         const elColor = ELEMENT_COLORS[dominantElem as Element] || '#78716C';
         const elLabel = ELEMENT_LABELS[dominantElem] || dominantElem;
-        synergies.push({ name: `${elLabel}の力`, description: `${elLabel}属性の結束`, multiplier: 1.6, color: elColor, icon: elLabel, contributingCardIds: elemCardIds[dominantElem] || [] });
+        synergies.push({ name: `${elLabel}の力`, description: `${elLabel}属性の結束`, multiplier: 1.6, color: elColor, icon: elLabel });
     }
     // Duo: exactly 2 elements, balanced
     if (uniqueElems === 2) {
-        synergies.push({ name: 'DUAL CORE', description: '二属性の均衡', multiplier: 1.3, color: '#3B82F6', icon: 'D', contributingCardIds: cards.map(c => c.id) });
+        synergies.push({ name: 'DUAL CORE', description: '二属性の均衡', multiplier: 1.3, color: '#3B82F6', icon: 'D' });
     }
     // Trio: exactly 3 elements, each 2+
     if (uniqueElems === 3 && Object.values(elemCounts).every(v => v >= 2)) {
-        synergies.push({ name: 'TRIANGLE', description: '三すくみの陣', multiplier: 1.4, color: '#10B981', icon: 'T', contributingCardIds: cards.map(c => c.id) });
+        synergies.push({ name: 'TRIANGLE', description: '三すくみの陣', multiplier: 1.4, color: '#10B981', icon: 'T' });
     }
 
     // ── Element advantage chain: A→B→C where A beats B beats C ──
@@ -316,8 +312,7 @@ function evaluateParty(cards: PuzzleCard[]): BattleResult {
             if (a !== b && ELEMENT_ADVANTAGE[a] === b) {
                 for (const c of elems) {
                     if (c !== a && c !== b && ELEMENT_ADVANTAGE[b] === c) {
-                        const chainIds = [...(elemCardIds[a] || []), ...(elemCardIds[b] || []), ...(elemCardIds[c] || [])];
-                        synergies.push({ name: 'KILL CHAIN', description: '相性連鎖ボーナス', multiplier: 1.3, color: '#EF4444', icon: 'K', contributingCardIds: chainIds });
+                        synergies.push({ name: 'KILL CHAIN', description: '相性連鎖ボーナス', multiplier: 1.3, color: '#EF4444', icon: 'K' });
                     }
                 }
             }
@@ -326,48 +321,40 @@ function evaluateParty(cards: PuzzleCard[]): BattleResult {
 
     // ── Rank synergies ──
     const rankCounts: Record<string, number> = {};
-    const rankCardIds: Record<string, string[]> = {};
-    for (const c of cards) {
-        rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1;
-        if (!rankCardIds[c.rank]) rankCardIds[c.rank] = [];
-        rankCardIds[c.rank].push(c.id);
-    }
+    for (const c of cards) rankCounts[c.rank] = (rankCounts[c.rank] || 0) + 1;
 
     // Elite Squad: 3+ cards GOLD or above
-    const eliteCards = cards.filter(c => RANK_VAL[c.rank] >= 3);
-    const eliteCount = eliteCards.length;
+    const eliteCount = cards.filter(c => RANK_VAL[c.rank] >= 3).length;
     if (eliteCount >= 3) {
-        synergies.push({ name: 'ELITE SQUAD', description: `GOLD以上${eliteCount}枚`, multiplier: 1.0 + eliteCount * 0.2, color: '#F6C85F', icon: 'E', contributingCardIds: eliteCards.map(c => c.id) });
+        synergies.push({ name: 'ELITE SQUAD', description: `GOLD以上${eliteCount}枚`, multiplier: 1.0 + eliteCount * 0.2, color: '#F6C85F', icon: 'E' });
     }
     // Legendary presence
     if ((rankCounts['LEGENDARY'] || 0) >= 1) {
-        synergies.push({ name: 'LEGEND', description: '伝説のカード降臨', multiplier: 1.5, color: '#D4AF37', icon: 'L', contributingCardIds: rankCardIds['LEGENDARY'] || [] });
+        synergies.push({ name: 'LEGEND', description: '伝説のカード降臨', multiplier: 1.5, color: '#D4AF37', icon: 'L' });
     }
     // All same rank (3+ cards)
     const maxRankCount = Math.max(...Object.values(rankCounts));
     if (maxRankCount >= 3) {
-        const uniformRank = Object.entries(rankCounts).find(([, v]) => v === maxRankCount)?.[0] || '';
-        synergies.push({ name: 'UNIFORM', description: '統一ランク部隊', multiplier: 1.2, color: '#78716C', icon: 'U', contributingCardIds: rankCardIds[uniformRank] || [] });
+        synergies.push({ name: 'UNIFORM', description: '統一ランク部隊', multiplier: 1.2, color: '#78716C', icon: 'U' });
     }
 
     // ── BST synergies ──
     const avgBST = Math.round(basePower / cards.length);
-    const s600Cards = cards.filter(c => c.bstTotal >= 600);
-    const s600Count = s600Cards.length;
+    const s600Count = cards.filter(c => c.bstTotal >= 600).length;
 
     // 600族 x2+
     if (s600Count >= 2) {
-        synergies.push({ name: 'S-TIER ARMY', description: `600族が${s600Count}体`, multiplier: 1.0 + s600Count * 0.25, color: '#DC2626', icon: 'S', contributingCardIds: s600Cards.map(c => c.id) });
+        synergies.push({ name: 'S-TIER ARMY', description: `600族が${s600Count}体`, multiplier: 1.0 + s600Count * 0.25, color: '#DC2626', icon: 'S' });
     }
     // High AVG BST
     if (avgBST >= 500) {
-        synergies.push({ name: 'POWER HOUSE', description: `平均BST ${avgBST}`, multiplier: 1.3, color: '#F97316', icon: 'P', contributingCardIds: cards.map(c => c.id) });
+        synergies.push({ name: 'POWER HOUSE', description: `平均BST ${avgBST}`, multiplier: 1.3, color: '#F97316', icon: 'P' });
     }
 
     // ── SP synergies ──
     const totalSP = cards.reduce((s, c) => s + c.points, 0);
     if (totalSP >= 100) {
-        synergies.push({ name: 'SP SURGE', description: `合計SP ${totalSP}`, multiplier: 1.0 + Math.min(totalSP / 200, 0.8), color: '#D4AF37', icon: '$', contributingCardIds: cards.map(c => c.id) });
+        synergies.push({ name: 'SP SURGE', description: `合計SP ${totalSP}`, multiplier: 1.0 + Math.min(totalSP / 200, 0.8), color: '#D4AF37', icon: '$' });
     }
 
     // ── Adjacency bonus: same-element neighbors (positional) ──
@@ -766,7 +753,7 @@ function CardModal({ card, onClose, isMobile, chakra }: { card: PuzzleCard; onCl
 // ═══════════════════════════════════════════════════════════
 
 export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGridMilestone, onGridUpdate, externalBattleActive, isMobile, mastery: masteryProp, hideSidePanel }: PuzzleBoardProps) {
-    const [gridSize] = useState<GridSize>(3);
+    const [gridSize, setGridSize] = useState<GridSize>(() => loadGridSize());
     const N = gridSize;
     const total = N * N;
 
@@ -777,35 +764,14 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
     const [synergyFlash, setSynergyFlash] = useState<{ row: number; col: number; element: string; key: number } | null>(null);
     const [modalCard, setModalCard] = useState<PuzzleCard | null>(null);
     const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
-    const [battlePhase, setBattlePhase] = useState<'idle' | 'darkening' | 'battleStart' | 'synergies' | 'damage' | 'grade' | 'done'>('idle');
+    const [battlePhase, setBattlePhase] = useState<'idle' | 'charging' | 'synergies' | 'damage' | 'grade' | 'done'>('idle');
     const [shownSynergies, setShownSynergies] = useState<number>(0);
     const [isBattling, setIsBattling] = useState(false);
     const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-    // Tap-to-drop card reveal states
-    const [revealCard, setRevealCard] = useState<PuzzleCard | null>(null);
-    const [revealPhase, setRevealPhase] = useState<'reveal' | 'waiting' | null>(null);
-
-    // Battle glow states
-    const [activeSynergyIdx, setActiveSynergyIdx] = useState(-1);
-    const [glowingCardIds, setGlowingCardIds] = useState<Set<string>>(new Set());
-
-    // Cell refs for SVG connection lines
-    const cellRefs = useRef<(HTMLDivElement | null)[][]>(Array.from({ length: 3 }, () => Array(3).fill(null)));
-    const gridContainerRef = useRef<HTMLDivElement | null>(null);
-
-    // Mobile status bar expansion
-    const [mobileStatusExpanded, setMobileStatusExpanded] = useState(false);
-
-    // Combo system — consecutive battles, tempo acceleration
-    const [combo, setCombo] = useState(0);
-    const comboRef = useRef(0);
-    const [nearMissMsg, setNearMissMsg] = useState<string | null>(null);
-
     const prevKeyRef = useRef(0);
     const sizeRef = useRef(gridSize);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const cardQueueRef = useRef<PuzzleCard[]>([]);
     const onGridMilestoneRef = useRef(onGridMilestone);
     onGridMilestoneRef.current = onGridMilestone;
 
@@ -813,19 +779,10 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
     const resetBoard = useCallback(() => {
         if (isBattling) return;
         const sz = sizeRef.current;
-        const freshGrid = mk(sz);
-        setGrid(freshGrid);
-        gridRef.current = freshGrid;
-        saveGrid(freshGrid, sz);
+        setGrid(mk(sz));
+        saveGrid(mk(sz), sz);
         setBattleResult(null);
         setBattlePhase('idle');
-        setRevealCard(null);
-        setRevealPhase(null);
-        setGlowingCardIds(new Set());
-        setActiveSynergyIdx(-1);
-        setCombo(0);
-        comboRef.current = 0;
-        setNearMissMsg(null);
         if (onGridUpdate) onGridUpdate({ filled: 0, total: sz * sz });
         setShowResetConfirm(false);
     }, [isBattling]);
@@ -840,18 +797,24 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
         setShowResetConfirm(false);
     }, [isBattling]);
 
-    // Grid size fixed to 3x3
+    // Switch grid size
+    const switchSize = useCallback((n: GridSize) => {
+        if (n === sizeRef.current || isBattling) return;
+        sizeRef.current = n;
+        localStorage.setItem('puzzle-grid-size', String(n));
+        setGridSize(n);
+        setGrid(loadGrid(n));
+        setStats(loadStats(n));
+        setBattleResult(null);
+        setBattlePhase('idle');
+    }, [isBattling]);
 
-    // Grid size fixed to 3x3 — cards auto-place, no user interaction needed
-
-    // Run milestone evaluation when grid is full — pachinko battle sequence
+    // Run milestone evaluation when grid is full
     const runMilestone = useCallback((g: Grid) => {
         const cards = allCards(g);
         const result = evaluateParty(cards);
         setBattleResult(result);
         setIsBattling(true);
-        setGlowingCardIds(new Set());
-        setActiveSynergyIdx(-1);
 
         // Emit grid milestone data
         if (onGridMilestoneRef.current) {
@@ -869,65 +832,53 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
             });
         }
 
-        // Phase 1: Darkening (500ms)
-        sfxCrush();
-        setBattlePhase('darkening');
+        // Phase 1: Charging (board glows)
+        sfxDrop();
+        setBattlePhase('charging');
 
         setTimeout(() => {
-            // Phase 2: BATTLE START flash (800ms)
-            sfxSpike();
-            setBattlePhase('battleStart');
+            // Phase 2: Show synergies one by one
+            setBattlePhase('synergies');
+            setShownSynergies(0);
+            const total = result.synergies.length;
 
-            setTimeout(() => {
-                // Phase 3: Synergy confirms one by one
-                setBattlePhase('synergies');
-                setShownSynergies(0);
-                const synTotal = result.synergies.length;
-
-                if (synTotal === 0) {
+            if (total === 0) {
+                // No synergies, skip to damage
+                setTimeout(() => {
+                    sfxOverflow();
+                    setBattlePhase('damage');
                     setTimeout(() => {
-                        sfxOverflow();
-                        setGlowingCardIds(new Set());
+                        setBattlePhase('grade');
+                        setTimeout(() => finishMilestone(result, g), 2000);
+                    }, 1500);
+                }, 500);
+                return;
+            }
+
+            let i = 0;
+            const showNext = () => {
+                if (i < total) {
+                    sfxMatch(i + 1);
+                    setShownSynergies(i + 1);
+                    i++;
+                    timerRef.current = setTimeout(showNext, 600);
+                } else {
+                    // Phase 3: Damage reveal
+                    setTimeout(() => {
+                        sfxBomb();
                         setBattlePhase('damage');
                         setTimeout(() => {
+                            // Phase 4: Grade reveal
+                            if (result.grade === 'S') sfxPerfect();
+                            else sfxSpike();
                             setBattlePhase('grade');
-                            if (result.grade === 'S') sfxPerfect(); else sfxSpike();
                             setTimeout(() => finishMilestone(result, g), 2500);
                         }, 1500);
-                    }, 500);
-                    return;
+                    }, 400);
                 }
-
-                let i = 0;
-                const showNextSynergy = () => {
-                    if (i < synTotal) {
-                        const syn = result.synergies[i];
-                        sfxMatch(i + 1);
-                        setActiveSynergyIdx(i);
-                        setGlowingCardIds(new Set(syn.contributingCardIds));
-                        setShownSynergies(i + 1);
-                        i++;
-                        timerRef.current = setTimeout(showNextSynergy, 700);
-                    } else {
-                        // Phase 4: Damage reveal (1500ms)
-                        setTimeout(() => {
-                            sfxBomb();
-                            setGlowingCardIds(new Set());
-                            setActiveSynergyIdx(-1);
-                            setBattlePhase('damage');
-                            setTimeout(() => {
-                                // Phase 5: Grade reveal (2500ms)
-                                if (result.grade === 'S') sfxPerfect();
-                                else sfxSpike();
-                                setBattlePhase('grade');
-                                setTimeout(() => finishMilestone(result, g), 2500);
-                            }, 1500);
-                        }, 400);
-                    }
-                };
-                timerRef.current = setTimeout(showNextSynergy, 300);
-            }, 800);
-        }, 500);
+            };
+            timerRef.current = setTimeout(showNext, 300);
+        }, 1200);
     }, []);
 
     const finishMilestone = useCallback((result: BattleResult, g: Grid) => {
@@ -959,137 +910,21 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
             }));
         } catch {}
 
-        setGlowingCardIds(new Set());
-        setActiveSynergyIdx(-1);
         setBattlePhase('done');
 
-        // Combo system
-        const newCombo = comboRef.current + 1;
-        comboRef.current = newCombo;
-        setCombo(newCombo);
-
-        // Auto-reset after 1.5s — no button needed, keep the loop going
+        // Auto-reset grid after milestone completes (2s delay for results to show)
         setTimeout(() => {
             const sz = sizeRef.current;
-            const freshGrid = mk(sz);
-            setGrid(freshGrid);
-            gridRef.current = freshGrid;
-            saveGrid(freshGrid, sz);
+            setGrid(mk(sz));
+            saveGrid(mk(sz), sz);
             setBattleResult(null);
             setBattlePhase('idle');
             setIsBattling(false);
-            setShownSynergies(0);
-            setGlowingCardIds(new Set());
-            setActiveSynergyIdx(-1);
             if (onGridUpdate) onGridUpdate({ filled: 0, total: sz * sz });
-
-            // Process queued cards immediately
-            if (cardQueueRef.current.length > 0) {
-                const next = cardQueueRef.current.shift()!;
-                setTimeout(() => autoPlaceCard(next), 200);
-            }
-        }, 1500);
+        }, 2000);
     }, [stats, onChainResult]);
 
-    // Tempo: combo increases speed. Base 500ms flash, min 150ms
-    const getTempoMs = useCallback((base: number) => {
-        const c = comboRef.current;
-        if (c <= 1) return base;
-        if (c <= 3) return Math.round(base * 0.7);
-        if (c <= 6) return Math.round(base * 0.5);
-        return Math.round(base * 0.35); // combo 7+ = blazing
-    }, []);
-
-    // Near-miss detection: check synergies approaching at 7-8 cards
-    const checkNearMiss = useCallback((g: Grid, N: number) => {
-        const cards = allCards(g);
-        const count = cards.length;
-        if (count < 6 || count >= N * N) { setNearMissMsg(null); return; }
-
-        const elemCounts: Record<string, number> = {};
-        for (const c of cards) elemCounts[c.element] = (elemCounts[c.element] || 0) + 1;
-
-        // Check MONO (all same element) — need all 9 same
-        const maxElem = Object.entries(elemCounts).sort((a, b) => b[1] - a[1])[0];
-        if (maxElem && maxElem[1] >= count - 1 && count >= 7) {
-            setNearMissMsg(`MONO ${ELEMENT_LABELS[maxElem[0] as Element]} あと${N * N - count}枚!`);
-            return;
-        }
-
-        // Check RAINBOW (all 5 elements) — need 5 different
-        const uniqueElems = Object.keys(elemCounts).length;
-        if (uniqueElems >= 4 && count >= 7) {
-            setNearMissMsg('RAINBOW あと少し!');
-            return;
-        }
-
-        // Check TRIO (3 of same element)
-        for (const [el, cnt_] of Object.entries(elemCounts)) {
-            if (cnt_ === 2 && count >= 7) {
-                setNearMissMsg(`TRIO ${ELEMENT_LABELS[el as Element]} リーチ!`);
-                return;
-            }
-        }
-
-        setNearMissMsg(null);
-    }, []);
-
-    // Auto-place: card arrives → brief flash → auto-place with smart algorithm
-    const autoPlaceCard = useCallback((card: PuzzleCard) => {
-        const currentGrid = gridRef.current;
-        const N = sizeRef.current;
-        const t = N * N;
-        if (cnt(currentGrid) >= t) return;
-
-        // Flash the card briefly (tempo-adjusted)
-        setRevealCard(card);
-        setRevealPhase('reveal');
-
-        const flashMs = getTempoMs(500);
-        const nextCardMs = getTempoMs(400);
-
-        setTimeout(() => {
-            setRevealCard(null);
-            setRevealPhase(null);
-
-            const g = gridRef.current;
-            if (cnt(g) >= t) return;
-
-            const { grid: ng, row, col, synHit } = placeAuto(g, card, N);
-            if (synHit) { sfxMatch(1); } else { sfxDrop(); }
-
-            setGrid(ng);
-            gridRef.current = ng;
-            setDropHL({ row, col, key: Date.now() });
-            setGridFlash({ color: ELEMENT_COLORS[card.element as Element] || '#78716C', key: Date.now() });
-            if (synHit) setSynergyFlash({ row, col, element: card.element, key: Date.now() });
-            saveGrid(ng, gridSize);
-            if (onGridUpdate) onGridUpdate({ filled: cnt(ng), total: t });
-
-            // Near-miss check
-            checkNearMiss(ng, N);
-
-            setTimeout(() => setDropHL(null), 600);
-            setTimeout(() => setGridFlash(null), 400);
-            if (synHit) setTimeout(() => setSynergyFlash(null), 800);
-
-            // Check if grid is now full → trigger battle
-            if (cnt(ng) >= t) {
-                setTimeout(() => runMilestone(ng), getTempoMs(800));
-            } else {
-                // Process next queued card
-                if (cardQueueRef.current.length > 0) {
-                    const next = cardQueueRef.current.shift()!;
-                    setTimeout(() => autoPlaceCard(next), nextCardMs);
-                }
-            }
-        }, flashMs);
-    }, [gridSize]);
-
-    // gridRef to allow autoPlaceCard to read latest grid
-    const gridRef = useRef(grid);
-    useEffect(() => { gridRef.current = grid; }, [grid]);
-
+    // When a new dropCard arrives, auto-place it
     useEffect(() => {
         if (!dropCard || dropCard.key === prevKeyRef.current || isBattling) return;
         prevKeyRef.current = dropCard.key;
@@ -1105,19 +940,29 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
             bstTotal: dropCard.bstTotal,
         };
 
-        // If an animation is in progress, queue the card
-        if (revealCard) {
-            cardQueueRef.current.push(card);
-            return;
-        }
+        const { grid: ng, row, col, synHit } = placeAuto(grid, card, N);
+        if (synHit) { sfxMatch(1); } else { sfxDrop(); }
+        setGrid(ng);
+        setDropHL({ row, col, key: Date.now() });
+        setGridFlash({ color: ELEMENT_COLORS[card.element as Element] || '#78716C', key: Date.now() });
+        if (synHit) setSynergyFlash({ row, col, element: card.element, key: Date.now() });
+        saveGrid(ng, gridSize);
+        if (onGridUpdate) onGridUpdate({ filled: cnt(ng), total });
 
-        autoPlaceCard(card);
+        setTimeout(() => setDropHL(null), 600);
+        setTimeout(() => setGridFlash(null), 400);
+        if (synHit) setTimeout(() => setSynergyFlash(null), 800);
+
+        // Check if grid is now full → trigger battle
+        if (cnt(ng) >= total) {
+            setTimeout(() => runMilestone(ng), 800);
+        }
     }, [dropCard?.key]);
 
     useEffect(() => { return () => { if (timerRef.current) clearTimeout(timerRef.current); }; }, []);
 
     // ── Render ──
-    const gap = isMobile ? 4 : 6;
+    const gap = isMobile ? 4 : (N === 4 ? 4 : 6);
     const cardCount = cnt(grid);
     const boardMaxH = isMobile ? 'calc(100vh - 180px)' : 'calc(100vh - 170px)';
 
@@ -1136,6 +981,33 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
     const previewResult = cardCount >= 2 ? evaluateParty(allCards(grid)) : null;
 
     const GRADE_COLORS: Record<string, string> = { S: '#D4AF37', A: '#EF4444', B: '#3B82F6', C: '#10B981', D: '#78716C' };
+
+    const sizeToggle = (
+        <div style={{
+            display: 'flex', gap: '2px',
+            background: '#F0EFED', borderRadius: '6px', padding: '2px',
+            border: '1px solid #E7E5E4',
+        }}>
+            {([2, 3, 4] as GridSize[]).map(n => (
+                <button
+                    key={n}
+                    onClick={() => switchSize(n)}
+                    disabled={isBattling}
+                    style={{
+                        border: 'none', cursor: isBattling ? 'default' : 'pointer',
+                        borderRadius: '4px', padding: '2px 7px',
+                        fontSize: '10px', fontWeight: '800', letterSpacing: '0.5px',
+                        background: gridSize === n ? '#fff' : 'transparent',
+                        color: gridSize === n ? '#1C1917' : '#A8A29E',
+                        boxShadow: gridSize === n ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                        transition: 'all 0.15s',
+                    }}
+                >
+                    {n}x{n}
+                </button>
+            ))}
+        </div>
+    );
 
     // Side panel (PC only)
     const avgBST = cardCount > 0 ? Math.round(totalBST / cardCount) : 0;
@@ -1347,6 +1219,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                     <span style={{ fontSize: '12px', fontWeight: '700', color: '#A8A29E' }}>
                         {cardCount}/{total}
                     </span>
+                    {sizeToggle}
                     {/* Reset button */}
                     {cardCount > 0 && !isBattling && (
                         <div style={{ position: 'relative' }}>
@@ -1389,13 +1262,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                         </div>
                     )}
                 </div>
-                <div style={{ display: 'flex', gap: '10px', fontSize: '10px', fontWeight: '700', letterSpacing: '0.5px', alignItems: 'center' }}>
-                    {combo > 0 && (
-                        <span style={{
-                            color: combo >= 5 ? '#D4AF37' : '#F59E0B',
-                            textShadow: combo >= 3 ? '0 0 6px rgba(245,158,11,0.3)' : 'none',
-                        }}>x{combo}</span>
-                    )}
+                <div style={{ display: 'flex', gap: '10px', fontSize: '10px', fontWeight: '700', letterSpacing: '0.5px' }}>
                     <span style={{ color: '#EF4444' }}>DMG {stats.bestDamage.toLocaleString()}</span>
                     <span style={{ color: '#D4AF37' }}>GP {stats.totalGP.toLocaleString()}</span>
                 </div>
@@ -1408,22 +1275,8 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
             }}>
                 {/* Board column */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0px', flexShrink: 0 }}>
-                    {/* Near-miss notification */}
-                    {nearMissMsg && !isBattling && (
-                        <div style={{
-                            textAlign: 'center', padding: '4px 10px', marginBottom: '4px',
-                            background: 'linear-gradient(135deg, #FEF3C7, #FDE68A)',
-                            borderRadius: '8px', border: '1px solid #F59E0B40',
-                            fontSize: '11px', fontWeight: '900', color: '#A16207',
-                            letterSpacing: '1px',
-                            animation: 'puzzle-chain-pop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-                        }}>
-                            {nearMissMsg}
-                        </div>
-                    )}
-
                     {/* Board */}
-                    <div ref={gridContainerRef} style={{
+                    <div style={{
                         position: 'relative',
                         flexShrink: 0,
                     }}>
@@ -1467,28 +1320,14 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                             </div>
                         )}
 
-                        {/* Battle darkening overlay */}
-                        {(battlePhase === 'darkening' || battlePhase === 'battleStart') && (
+                        {/* Battle charging overlay */}
+                        {battlePhase === 'charging' && (
                             <div style={{
                                 position: 'absolute', inset: 0, zIndex: 30, pointerEvents: 'none',
                                 borderRadius: '12px',
-                                background: 'rgba(0,0,0,0.85)',
-                                animation: 'battle-darken 0.5s ease-out forwards',
+                                background: 'radial-gradient(circle, rgba(212,175,55,0.3) 0%, rgba(212,175,55,0) 70%)',
+                                animation: 'puzzle-perfect-glow 1.2s ease-in-out infinite',
                             }} />
-                        )}
-                        {battlePhase === 'battleStart' && (
-                            <div style={{
-                                position: 'absolute', inset: 0, zIndex: 31, pointerEvents: 'none',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                animation: 'battle-shake 0.8s ease-in-out',
-                            }}>
-                                <span style={{
-                                    fontSize: isMobile ? '24px' : '32px', fontWeight: '900',
-                                    color: '#D4AF37', letterSpacing: '3px',
-                                    textShadow: '0 0 20px rgba(212,175,55,0.8), 0 0 40px rgba(212,175,55,0.4)',
-                                    animation: 'battle-start-text 0.8s cubic-bezier(0.34,1.56,0.64,1)',
-                                }}>BATTLE START</span>
-                            </div>
                         )}
 
                         <div style={{
@@ -1500,7 +1339,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                             maxWidth: isMobile ? '100%' : undefined,
                             gap: `${gap}px`,
                             // Grid bg evolves: empty=neutral → filling=warm → almost full=golden → battling=gold
-                            backgroundColor: (battlePhase === 'darkening' || battlePhase === 'battleStart') ? '#FEF3C7'
+                            backgroundColor: battlePhase === 'charging' ? '#FEF3C7'
                                 : cardCount >= total - 1 ? '#FEF9C3'
                                 : cardCount >= total * 0.7 ? '#FFFBEB'
                                 : cardCount >= total * 0.4 ? '#FEFCE8'
@@ -1540,22 +1379,20 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                             const hintEl = neighbors.length > 0 ? neighbors[0] : null;
                             const hintColor = hintEl ? ELEMENT_COLORS[hintEl] : null;
                             return (
-                                <div
-                                    key={key}
-                                    ref={el => { if (cellRefs.current[row]) cellRefs.current[row][col] = el; }}
-                                    style={{
-                                        borderRadius: '8px',
-                                        backgroundColor: isLastSlot ? '#FEF9C3' : isAlmostFull ? '#FFF7ED' : '#E7E5E4',
-                                        border: isLastSlot ? '2px solid #D4AF3780'
-                                            : hintColor ? `2px dashed ${hintColor}40`
-                                            : '2px dashed #D6D3D1',
-                                        opacity: isAlmostFull ? 0.8 : 0.5,
-                                        transition: 'all 0.3s ease',
-                                        animation: isLastSlot ? 'puzzle-perfect-glow 1s ease-in-out infinite' : undefined,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        boxShadow: isLastSlot ? '0 0 12px rgba(212,175,55,0.3)' : 'none',
-                                    }}
-                                >
+                                <div key={key} style={{
+                                    borderRadius: '8px',
+                                    backgroundColor: isLastSlot ? '#FEF9C3' : isAlmostFull ? '#FFF7ED' : '#E7E5E4',
+                                    border: isLastSlot
+                                        ? '2px solid #D4AF3780'
+                                        : hintColor
+                                        ? `2px dashed ${hintColor}40`
+                                        : '2px dashed #D6D3D1',
+                                    opacity: isAlmostFull ? 0.8 : 0.5,
+                                    transition: 'all 0.3s ease',
+                                    animation: isLastSlot ? 'puzzle-perfect-glow 1s ease-in-out infinite' : undefined,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    boxShadow: isLastSlot ? '0 0 12px rgba(212,175,55,0.3)' : 'none',
+                                }}>
                                     {isLastSlot && (
                                         <span style={{ fontSize: '10px', fontWeight: '900', color: '#D4AF37', letterSpacing: '1px' }}>!</span>
                                     )}
@@ -1577,31 +1414,22 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                         const sameRight = col < N-1 && grid[row]?.[col+1]?.element === card.element;
                         const hasConnection = sameTop || sameBottom || sameLeft || sameRight;
                         const connectionCount = [sameTop, sameBottom, sameLeft, sameRight].filter(Boolean).length;
-                        const isGlowing = glowingCardIds.has(card.id);
-                        const glowSynergy = isGlowing && battleResult?.synergies[activeSynergyIdx];
-                        const glowColor = glowSynergy ? glowSynergy.color : '#D4AF37';
 
                         return (
                             <div
                                 key={key}
-                                ref={el => { if (cellRefs.current[row]) cellRefs.current[row][col] = el; }}
                                 onClick={() => { if (!isBattling) setModalCard(card); }}
                                 style={{
                                     position: 'relative', overflow: 'hidden',
                                     display: 'flex', flexDirection: 'column',
                                     cursor: isBattling ? 'default' : 'pointer',
                                     ...getFrameMini(card.rank),
-                                    boxShadow: isGlowing
-                                        ? `0 0 16px ${glowColor}, 0 0 32px ${glowColor}80`
-                                        : getShadow(card.rank),
-                                    borderColor: isGlowing ? glowColor : undefined,
-                                    transition: 'transform 0.15s ease, box-shadow 0.3s ease',
-                                    animation: isGlowing
-                                        ? 'battle-card-glow 0.8s ease-in-out infinite'
-                                        : isSynDrop
+                                    boxShadow: getShadow(card.rank),
+                                    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                                    animation: isSynDrop
                                         ? 'puzzle-synergy-land 0.6s cubic-bezier(0.34,1.56,0.64,1)'
                                         : isDrop
-                                        ? 'column-card-drop 0.5s cubic-bezier(0.34,1.56,0.64,1)'
+                                        ? 'puzzle-drop 0.4s cubic-bezier(0.34,1.56,0.64,1)'
                                         : isLeg ? 'card-legendary-aura 4s ease-in-out infinite'
                                         : card.rank === 'GOLD' ? 'card-gold-pulse 5s ease-in-out infinite'
                                         : undefined,
@@ -1676,10 +1504,10 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                                     position: 'relative', zIndex: 7, flexShrink: 0,
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                        <ElementBadge element={card.element} size={isMobile ? 10 : 14} />
+                                        <ElementBadge element={card.element} size={isMobile ? 10 : N === 4 ? 10 : 14} />
                                         {card.rank !== 'NORMAL' && (
                                             <span style={{
-                                                fontSize: isMobile ? '7px' : '9px', fontWeight: '800',
+                                                fontSize: isMobile || N === 4 ? '7px' : '9px', fontWeight: '800',
                                                 color: RANK_META[card.rank].borderColor,
                                                 letterSpacing: '0.5px',
                                                 textShadow: isHolo ? `0 0 6px ${RANK_META[card.rank].borderColor}40` : 'none',
@@ -1689,10 +1517,10 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                                         )}
                                     </div>
                                     <span style={{
-                                        fontSize: isMobile ? '9px' : '11px', fontWeight: '900',
+                                        fontSize: isMobile || N === 4 ? '9px' : '11px', fontWeight: '900',
                                         color: RANK_VAL[card.rank] >= 3 ? RANK_META[card.rank].borderColor : '#A8A29E',
                                     }}>
-                                        {card.points}<span style={{ fontSize: isMobile ? '6px' : '8px', opacity: 0.5 }}> SP</span>
+                                        {card.points}<span style={{ fontSize: isMobile || N === 4 ? '6px' : '8px', opacity: 0.5 }}> SP</span>
                                     </span>
                                 </div>
 
@@ -1706,7 +1534,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                                     borderRadius: '4px',
                                 }}>
                                     <div style={{
-                                        fontSize: isMobile ? '10px' : '13px',
+                                        fontSize: isMobile ? '10px' : N === 4 ? '10px' : '13px',
                                         fontWeight: '700',
                                         color: isTextLight ? '#FAFAF9' : '#1C1917',
                                         lineHeight: 1.3, textAlign: 'center',
@@ -1718,7 +1546,7 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                                         {card.english}
                                     </div>
                                     <div style={{
-                                        fontSize: isMobile ? '8px' : '10px',
+                                        fontSize: isMobile || N === 4 ? '8px' : '10px',
                                         color: isTextLight ? 'rgba(255,255,255,0.4)' : '#A8A29E',
                                         marginTop: '3px', textAlign: 'center',
                                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
@@ -1728,55 +1556,30 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                                     </div>
                                 </div>
 
-                                {/* Bottom bar — BST focused */}
+                                {/* Bottom bar */}
                                 <div style={{
-                                    display: 'flex', justifyContent: 'center', alignItems: 'center',
-                                    padding: '2px 5px',
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '3px 5px',
                                     borderTop: `1px solid ${isTextLight ? 'rgba(255,255,255,0.06)' : accent + '15'}`,
                                     position: 'relative', zIndex: 7, flexShrink: 0,
-                                    gap: '4px',
                                 }}>
                                     <span style={{
-                                        fontSize: isMobile ? '8px' : '10px', fontWeight: '900', color: bstTier.color,
-                                        letterSpacing: '0.3px',
-                                        textShadow: card.bstTotal >= 600 ? `0 0 6px ${bstTier.color}50` : 'none',
+                                        fontSize: isMobile || N === 4 ? '7px' : '9px', fontWeight: '700',
+                                        color: isTextLight ? 'rgba(255,255,255,0.3)' : '#C8C3BC',
+                                        letterSpacing: '0.5px',
                                     }}>
-                                        {bstTier.tier}
+                                        {RANK_META[card.rank].label || 'NORMAL'}
                                     </span>
                                     <span style={{
-                                        fontSize: isMobile ? '10px' : '12px', fontWeight: '900', color: bstTier.color,
-                                        fontFamily: 'monospace',
-                                        textShadow: card.bstTotal >= 600 ? `0 0 8px ${bstTier.color}60` : 'none',
+                                        fontSize: isMobile || N === 4 ? '7px' : '9px', fontWeight: '800', color: bstTier.color,
                                     }}>
-                                        {card.bstTotal}
+                                        {bstTier.tier} {card.bstTotal}
                                     </span>
                                 </div>
 
-                                {/* BST tier color stripe */}
-                                <div style={{
-                                    position: 'absolute', left: 0, right: 0, bottom: 0,
-                                    height: isMobile ? '4px' : '6px',
-                                    background: card.bstTotal >= 600
-                                        ? `linear-gradient(90deg, ${bstTier.color}, ${bstTier.color}cc, ${bstTier.color})`
-                                        : card.bstTotal >= 530
-                                        ? `linear-gradient(90deg, ${bstTier.color}cc, ${bstTier.color}80)`
-                                        : `${bstTier.color}60`,
-                                    borderRadius: '0 0 3px 3px', zIndex: 8,
-                                    animation: card.bstTotal >= 600 ? 'puzzle-bst-s-glow 2s ease-in-out infinite' : undefined,
-                                }} />
-
-                                {/* S-tier glow pulse border */}
-                                {card.bstTotal >= 600 && (
-                                    <div style={{
-                                        position: 'absolute', inset: '-1px', borderRadius: '6px', pointerEvents: 'none', zIndex: 3,
-                                        border: `2px solid ${bstTier.color}60`,
-                                        animation: 'puzzle-bst-s-pulse 2s ease-in-out infinite',
-                                    }} />
-                                )}
-
                                 {/* Element accent strip */}
                                 <div style={{
-                                    position: 'absolute', left: 0, top: '20%', bottom: '20%', width: isMobile ? '2px' : '3px',
+                                    position: 'absolute', left: 0, top: '20%', bottom: '20%', width: isMobile || N === 4 ? '2px' : '3px',
                                     backgroundColor: ELEMENT_COLORS[card.element], opacity: 0.5,
                                     borderRadius: '0 2px 2px 0', zIndex: 8,
                                 }} />
@@ -1785,37 +1588,29 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                     })}
                 </div>
 
-                {/* Battle Overlay — pachinko style: dark bg, synergy glow, damage, grade */}
-                {isBattling && battleResult && !externalBattleActive && battlePhase !== 'darkening' && battlePhase !== 'battleStart' && (
+                {/* Battle Overlay — synergy reveal + damage + grade (hidden while MiniRunner animates) */}
+                {isBattling && battleResult && battlePhase !== 'charging' && !externalBattleActive && (
                     <div style={{
                         position: 'absolute', inset: 0,
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                        gap: '10px',
-                        pointerEvents: 'none', zIndex: 35,
-                        backgroundColor: 'rgba(0,0,0,0.82)', borderRadius: '12px',
-                        backdropFilter: 'blur(3px)',
+                        gap: '12px',
+                        pointerEvents: 'none', zIndex: 20,
+                        backgroundColor: 'rgba(255,255,255,0.88)', borderRadius: '12px',
+                        backdropFilter: 'blur(2px)',
                     }}>
-                        {/* Synergies one by one — slide in from left */}
+                        {/* Synergies one by one */}
                         {(battlePhase === 'synergies' || battlePhase === 'damage' || battlePhase === 'grade' || battlePhase === 'done') && (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'center', maxWidth: '90%' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
                                 {battleResult.synergies.slice(0, shownSynergies).map((s, i) => (
                                     <div key={i} style={{
                                         display: 'flex', alignItems: 'center', gap: '8px',
-                                        background: `${s.color}20`, borderRadius: '8px', padding: '5px 12px',
-                                        border: `1px solid ${s.color}50`,
-                                        animation: 'battle-synergy-slide 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-                                        boxShadow: `0 0 12px ${s.color}30`,
+                                        background: `${s.color}15`, borderRadius: '8px', padding: '6px 14px',
+                                        border: `1px solid ${s.color}40`,
+                                        animation: 'puzzle-chain-pop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
                                     }}>
-                                        <span style={{
-                                            fontSize: '14px', fontWeight: '900', color: s.color,
-                                            width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            background: `${s.color}30`, borderRadius: '5px',
-                                        }}>{s.icon}</span>
-                                        <span style={{ fontSize: '11px', fontWeight: '800', color: '#fff' }}>{s.name}</span>
-                                        <span style={{
-                                            fontSize: '12px', fontWeight: '900', color: s.color,
-                                            textShadow: `0 0 8px ${s.color}60`,
-                                        }}>x{s.multiplier.toFixed(1)}</span>
+                                        <span style={{ fontSize: '14px', fontWeight: '900', color: s.color }}>{s.icon}</span>
+                                        <span style={{ fontSize: '12px', fontWeight: '800', color: s.color }}>{s.name}</span>
+                                        <span style={{ fontSize: '11px', fontWeight: '900', color: s.color }}>x{s.multiplier.toFixed(1)}</span>
                                     </div>
                                 ))}
                                 {battleResult.synergies.length === 0 && (
@@ -1826,130 +1621,95 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                             </div>
                         )}
 
-                        {/* Damage counter */}
+                        {/* Damage number */}
                         {(battlePhase === 'damage' || battlePhase === 'grade' || battlePhase === 'done') && (
-                            <div style={{ animation: 'battle-damage-count 0.6s cubic-bezier(0.34,1.56,0.64,1)' }}>
-                                <div style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.5)', textAlign: 'center', letterSpacing: '2px' }}>
+                            <div style={{
+                                animation: 'puzzle-perfect-slam 0.6s cubic-bezier(0.34,1.56,0.64,1)',
+                            }}>
+                                <div style={{ fontSize: '10px', fontWeight: '700', color: '#78716C', textAlign: 'center', letterSpacing: '1px' }}>
                                     TOTAL DAMAGE
                                 </div>
                                 <div style={{
-                                    fontSize: isMobile ? '36px' : '48px', fontWeight: '900',
-                                    color: '#fff', textAlign: 'center',
-                                    textShadow: '0 0 20px rgba(255,255,255,0.3), 0 2px 8px rgba(0,0,0,0.5)',
+                                    fontSize: isMobile ? '32px' : '40px', fontWeight: '900',
+                                    color: '#1C1917', textAlign: 'center',
+                                    textShadow: '0 2px 8px rgba(0,0,0,0.1)',
                                 }}>
                                     {battleResult.finalDamage.toLocaleString()}
                                 </div>
-                                <div style={{ fontSize: '11px', fontWeight: '800', color: '#D4AF37', textAlign: 'center', textShadow: '0 0 8px rgba(212,175,55,0.5)' }}>
+                                <div style={{ fontSize: '10px', fontWeight: '700', color: '#D4AF37', textAlign: 'center' }}>
                                     +{battleResult.gpEarned} GP
                                 </div>
                             </div>
                         )}
 
-                        {/* Grade explosion */}
+                        {/* Grade stamp + Milestone result */}
                         {(battlePhase === 'grade' || battlePhase === 'done') && (
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', position: 'relative' }}>
-                                {/* S-rank gold particles */}
-                                {battleResult.grade === 'S' && (
-                                    <div style={{ position: 'absolute', inset: '-40px', pointerEvents: 'none', zIndex: -1 }}>
-                                        {Array.from({ length: 12 }).map((_, i) => {
-                                            const angle = (Math.PI * 2 * i) / 12;
-                                            const dist = 40 + Math.random() * 30;
-                                            return (
-                                                <div key={i} style={{
-                                                    position: 'absolute',
-                                                    left: '50%', top: '50%',
-                                                    width: '6px', height: '6px',
-                                                    borderRadius: '50%',
-                                                    background: i % 2 === 0 ? '#D4AF37' : '#F6C85F',
-                                                    boxShadow: `0 0 6px ${i % 2 === 0 ? '#D4AF37' : '#F6C85F'}`,
-                                                    // @ts-ignore
-                                                    '--px': `${Math.cos(angle) * dist}px`,
-                                                    '--py': `${Math.sin(angle) * dist}px`,
-                                                    animation: `battle-grade-s-particles 1.2s ease-out ${i * 0.05}s forwards`,
-                                                } as React.CSSProperties} />
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                                {/* White flash for S */}
-                                {battleResult.grade === 'S' && (
-                                    <div style={{
-                                        position: 'absolute', inset: '-100px',
-                                        background: 'radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)',
-                                        animation: 'battle-flash-white 0.6s ease-out forwards',
-                                        pointerEvents: 'none',
-                                    }} />
-                                )}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                                 <div style={{
-                                    fontSize: isMobile ? '72px' : '96px', fontWeight: '900',
+                                    fontSize: isMobile ? '64px' : '80px', fontWeight: '900',
                                     color: GRADE_COLORS[battleResult.grade],
                                     textShadow: battleResult.grade === 'S'
-                                        ? '0 0 40px rgba(212,175,55,0.8), 0 0 80px rgba(212,175,55,0.4)'
-                                        : `0 0 30px ${GRADE_COLORS[battleResult.grade]}60`,
+                                        ? '0 0 30px rgba(212,175,55,0.5), 0 0 60px rgba(212,175,55,0.3)'
+                                        : `0 0 20px ${GRADE_COLORS[battleResult.grade]}40`,
                                     letterSpacing: '8px',
                                     animation: battleResult.grade === 'S'
-                                        ? 'battle-grade-s-explode 1s cubic-bezier(0.34,1.56,0.64,1)'
-                                        : 'battle-grade-burst 0.5s cubic-bezier(0.34,1.56,0.64,1)',
+                                        ? 'puzzle-perfect-slam 1s cubic-bezier(0.34,1.56,0.64,1)'
+                                        : 'puzzle-chain-mega 0.5s cubic-bezier(0.34,1.56,0.64,1)',
                                     lineHeight: 1,
                                 }}>
                                     {battleResult.grade}
                                 </div>
-                                {/* Stars */}
+                                {/* Grid milestone result */}
                                 <div style={{
-                                    display: 'flex', justifyContent: 'center', gap: '3px',
-                                    animation: 'puzzle-chain-pop 0.5s cubic-bezier(0.34,1.56,0.64,1)',
-                                    marginBottom: 4,
-                                }}>
-                                    {Array.from({ length: 5 }).map((_, i) => {
-                                        const starCount = { S: 5, A: 4, B: 3, C: 2, D: 1 }[battleResult.grade] || 1;
-                                        return (
-                                            <span key={i} style={{
-                                                fontSize: '16px',
-                                                color: i < starCount ? GRADE_COLORS[battleResult.grade] : 'rgba(255,255,255,0.1)',
-                                                textShadow: i < starCount ? `0 0 8px ${GRADE_COLORS[battleResult.grade]}80` : 'none',
-                                            }}>&#9733;</span>
-                                        );
-                                    })}
-                                </div>
-                                <div style={{
-                                    fontSize: '12px', fontWeight: '800',
-                                    color: GRADE_COLORS[battleResult.grade],
-                                    letterSpacing: '2px',
-                                    textShadow: `0 0 12px ${GRADE_COLORS[battleResult.grade]}80`,
-                                    animation: 'puzzle-chain-pop 0.5s cubic-bezier(0.34,1.56,0.64,1)',
-                                    marginBottom: 4,
-                                }}>
-                                    {{ S: '大当たり確定', A: '期待大', B: 'いい感じ', C: 'ワンチャン', D: '祈れ' }[battleResult.grade] || battleResult.grade}
-                                </div>
-                                <div style={{
-                                    fontSize: '16px', fontWeight: '900',
-                                    color: '#10B981', letterSpacing: '3px',
-                                    textShadow: '0 0 16px rgba(16,185,129,0.6)',
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
                                     animation: 'puzzle-chain-pop 0.5s cubic-bezier(0.34,1.56,0.64,1)',
                                 }}>
-                                    GRID COMPLETE
-                                </div>
-                                {/* Combo counter + auto-reset indicator */}
-                                {battlePhase === 'done' && (
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', marginTop: '10px' }}>
-                                        {combo > 1 && (
-                                            <div style={{
-                                                fontSize: '18px', fontWeight: '900', color: combo >= 5 ? '#D4AF37' : '#F59E0B',
-                                                textShadow: combo >= 5 ? '0 0 20px rgba(212,175,55,0.8)' : '0 0 10px rgba(245,158,11,0.5)',
-                                                letterSpacing: '2px',
-                                                animation: 'puzzle-chain-pop 0.5s cubic-bezier(0.34,1.56,0.64,1)',
-                                            }}>
-                                                COMBO x{combo}
-                                            </div>
-                                        )}
-                                        <div style={{
-                                            fontSize: '10px', color: 'rgba(255,255,255,0.5)',
-                                            animation: 'card-pending-float 1s ease-in-out infinite',
-                                        }}>
-                                            NEXT BATTLE...
-                                        </div>
+                                    <div style={{
+                                        fontSize: '18px', fontWeight: '900',
+                                        color: '#10B981',
+                                        letterSpacing: '2px',
+                                        textShadow: '0 0 12px rgba(16,185,129,0.4)',
+                                    }}>
+                                        GRID COMPLETE!
                                     </div>
-                                )}
+                                    {/* Story generation link + reset */}
+                                    {battlePhase === 'done' && (
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', marginTop: '8px', pointerEvents: 'auto' }}>
+                                            <a
+                                                href="/english/fujin-story"
+                                                style={{
+                                                    display: 'inline-block',
+                                                    padding: '6px 16px', borderRadius: '6px',
+                                                    background: 'linear-gradient(135deg, #D4AF37, #F6C85F)',
+                                                    color: '#1C1917', fontSize: '11px', fontWeight: '800',
+                                                    textDecoration: 'none', letterSpacing: '0.5px',
+                                                    boxShadow: '0 2px 6px rgba(212,175,55,0.3)',
+                                                }}
+                                            >
+                                                会話ガチャを回す
+                                            </a>
+                                            <button
+                                                onClick={() => {
+                                                    const sz = sizeRef.current;
+                                                    setGrid(mk(sz));
+                                                    saveGrid(mk(sz), sz);
+                                                    setBattleResult(null);
+                                                    setBattlePhase('idle');
+                                                    setIsBattling(false);
+                                                    setShownSynergies(0);
+                                                }}
+                                                style={{
+                                                    border: 'none', cursor: 'pointer',
+                                                    padding: '5px 14px', borderRadius: '6px',
+                                                    background: '#F0EFED',
+                                                    color: '#78716C', fontSize: '10px', fontWeight: '700',
+                                                }}
+                                            >
+                                                次のバトルへ
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -1960,177 +1720,6 @@ export default function PuzzleBoard({ dropCard, chainMode, onChainResult, onGrid
                 {/* Side Panel -- PC only, hidden when hideSidePanel */}
                 {!isMobile && !hideSidePanel && sidePanel}
             </div>
-
-            {/* Mobile Status Bar */}
-            {isMobile && cardCount > 0 && !isBattling && (
-                <div style={{
-                    display: 'flex', alignItems: 'center', gap: '8px',
-                    padding: '8px 12px', marginTop: '4px',
-                    background: '#fff', borderRadius: '10px',
-                    border: '1px solid #E7E5E4',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                }}>
-                    {/* Element distribution dots */}
-                    <div style={{ display: 'flex', gap: '3px', alignItems: 'center' }}>
-                        {(['flame', 'aqua', 'wind', 'earth', 'thunder'] as Element[]).map(el => {
-                            const count = elemCounts[el] || 0;
-                            return (
-                                <div key={el} style={{ display: 'flex', alignItems: 'center', gap: '1px' }}>
-                                    <div style={{
-                                        width: '8px', height: '8px', borderRadius: '50%',
-                                        backgroundColor: count > 0 ? ELEMENT_COLORS[el] : '#E7E5E4',
-                                        boxShadow: count > 0 ? `0 0 4px ${ELEMENT_COLORS[el]}40` : 'none',
-                                    }} />
-                                    {count > 0 && (
-                                        <span style={{ fontSize: '9px', fontWeight: '800', color: ELEMENT_COLORS[el] }}>{count}</span>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* Synergy count badge */}
-                    <button
-                        onClick={() => setMobileStatusExpanded(!mobileStatusExpanded)}
-                        style={{
-                            border: 'none', cursor: 'pointer',
-                            background: previewResult && previewResult.synergies.length > 0 ? '#FEF3C7' : '#F5F5F4',
-                            borderRadius: '12px', padding: '2px 8px',
-                            display: 'flex', alignItems: 'center', gap: '3px',
-                        }}
-                    >
-                        <span style={{ fontSize: '10px', fontWeight: '800', color: previewResult && previewResult.synergies.length > 0 ? '#D4AF37' : '#A8A29E' }}>
-                            SYN {previewResult?.synergies.length || 0}
-                        </span>
-                        <span style={{ fontSize: '8px', color: '#A8A29E' }}>{mobileStatusExpanded ? '\u25B2' : '\u25BC'}</span>
-                    </button>
-
-                    {/* Grade + Damage */}
-                    <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        {previewResult && (
-                            <>
-                                <span style={{
-                                    fontSize: '14px', fontWeight: '900',
-                                    color: GRADE_COLORS[previewResult.grade],
-                                }}>{previewResult.grade}</span>
-                                <span style={{
-                                    fontSize: '11px', fontWeight: '800', color: '#EF4444',
-                                }}>{previewResult.finalDamage.toLocaleString()}</span>
-                            </>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {/* Mobile synergy expansion */}
-            {isMobile && mobileStatusExpanded && previewResult && previewResult.synergies.length > 0 && (
-                <div style={{
-                    padding: '8px 12px',
-                    background: 'linear-gradient(135deg, #FFF7ED, #FFF)',
-                    borderRadius: '10px', border: '1px solid #FED7AA',
-                    animation: 'status-synergy-expand 0.3s ease-out',
-                    overflow: 'hidden',
-                }}>
-                    {previewResult.synergies.map((s, i) => (
-                        <div key={i} style={{
-                            display: 'flex', alignItems: 'center', gap: '6px',
-                            padding: '3px 0',
-                        }}>
-                            <span style={{ fontSize: '12px', fontWeight: '900', color: s.color, width: '18px', textAlign: 'center' }}>{s.icon}</span>
-                            <span style={{ fontSize: '10px', fontWeight: '800', color: s.color, flex: 1 }}>{s.name}</span>
-                            <span style={{ fontSize: '10px', fontWeight: '900', color: s.color }}>x{s.multiplier.toFixed(1)}</span>
-                        </div>
-                    ))}
-                </div>
-            )}
-
-            {/* Card Reveal Overlay */}
-            {revealCard && revealPhase === 'reveal' && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 1100,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    backgroundColor: 'rgba(0,0,0,0.6)',
-                    backdropFilter: 'blur(4px)',
-                    WebkitBackdropFilter: 'blur(4px)',
-                    padding: '16px',
-                }}>
-                    <div style={{
-                        width: isMobile ? '75vw' : '320px',
-                        maxWidth: '360px',
-                        animation: 'card-reveal-enter 0.6s cubic-bezier(0.34,1.56,0.64,1)',
-                        ...getFrameFull(revealCard.rank),
-                        boxShadow: getShadowFull(revealCard.rank),
-                        overflow: 'hidden',
-                    }}>
-                        {/* Reveal header */}
-                        <div style={{
-                            padding: '16px 16px 12px',
-                            background: getWindowBg(revealCard.rank),
-                            borderBottom: `1px solid ${getAccent(revealCard.rank)}30`,
-                        }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                    <ElementBadge element={revealCard.element} size={20} />
-                                    <span style={{
-                                        fontSize: '12px', fontWeight: '800',
-                                        color: RANK_META[revealCard.rank].borderColor,
-                                        letterSpacing: '1px',
-                                    }}>{RANK_META[revealCard.rank].label}</span>
-                                </div>
-                                <span style={{
-                                    fontSize: '18px', fontWeight: '900',
-                                    color: RANK_META[revealCard.rank].borderColor,
-                                    fontFamily: 'monospace',
-                                }}>{revealCard.points} <span style={{ fontSize: '10px' }}>SP</span></span>
-                            </div>
-                            <div style={{
-                                fontSize: '20px', fontWeight: '800',
-                                color: revealCard.rank === 'LEGENDARY' ? '#FAFAF9' : '#1C1917',
-                                lineHeight: 1.35, marginBottom: '6px',
-                                textShadow: revealCard.rank === 'LEGENDARY' ? '0 1px 6px rgba(0,0,0,0.5)' : 'none',
-                            }}>{revealCard.english}</div>
-                            <div style={{
-                                fontSize: '13px',
-                                color: revealCard.rank === 'LEGENDARY' ? 'rgba(255,255,255,0.55)' : '#78716C',
-                            }}>{revealCard.japanese}</div>
-                        </div>
-                        {/* BST stats */}
-                        <div style={{
-                            padding: '12px 16px',
-                            background: revealCard.rank === 'LEGENDARY' ? '#1C1917' : '#FAFAF9',
-                        }}>
-                            {(() => {
-                                const bstStats = calcBstStats(revealCard.phraseId);
-                                const bstTotal = bstStats.reduce((a, b) => a + b, 0);
-                                const bstTier = getBstTier(bstTotal);
-                                const statColors = ['#EF4444', '#F97316', '#EAB308', '#10B981', '#3B82F6', '#A855F7'];
-                                return (
-                                    <>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                            <span style={{ fontSize: '10px', fontWeight: '700', color: revealCard.rank === 'LEGENDARY' ? 'rgba(255,255,255,0.5)' : '#A8A29E', letterSpacing: '1px' }}>BST</span>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                <span style={{ fontSize: '9px', fontWeight: '700', color: bstTier.color, background: `${bstTier.color}18`, padding: '1px 6px', borderRadius: '4px' }}>{bstTier.ja}</span>
-                                                <span style={{ fontSize: '18px', fontWeight: '900', color: bstTier.color, fontFamily: 'monospace' }}>{bstTotal}</span>
-                                            </div>
-                                        </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                            {BST_STAT_NAMES_JA.map((name, i) => (
-                                                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                    <span style={{ fontSize: '9px', fontWeight: '700', color: statColors[i], width: '20px' }}>{name}</span>
-                                                    <div style={{ flex: 1, height: '5px', background: revealCard.rank === 'LEGENDARY' ? 'rgba(255,255,255,0.06)' : '#F0EFED', borderRadius: '3px', overflow: 'hidden' }}>
-                                                        <div style={{ height: '100%', width: `${(bstStats[i] / 120) * 100}%`, background: statColors[i], borderRadius: '3px', transition: 'width 0.5s ease' }} />
-                                                    </div>
-                                                    <span style={{ fontSize: '10px', fontWeight: '800', color: statColors[i], fontFamily: 'monospace', width: '22px', textAlign: 'right' }}>{bstStats[i]}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </>
-                                );
-                            })()}
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Card Modal */}
             {modalCard && <CardModal card={modalCard} onClose={() => setModalCard(null)} isMobile={isMobile} chakra={Math.min(masteryProp?.[modalCard.phraseId] || 0, 6)} />}

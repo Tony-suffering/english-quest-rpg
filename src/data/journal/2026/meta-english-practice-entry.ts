@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const metaEnglishPracticeEntry: JournalEntry = {
   id: '068',
-  date: '2026-01-12',
+  date: '2026-07-27',
   title: 'AIに英語を教えさせようとしたら、AIが「英語練習」という日本語を理解できなかった話',
   summary: 'CLAUDE.mdに「英語練習」トリガーを書いた。Claudeは読んだ。でも発動しなかった。なぜ？「英語練習」と言ったのに、日本語だったから。AIは賢い。でもバカ。',
   featured: true,

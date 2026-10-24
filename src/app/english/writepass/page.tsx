@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/app/english/writepass/page.tsx
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -35,7 +38,7 @@ export default function WritePassLP() {
     }, []);
 
     const Cta = ({ label, sub }: { label: string; sub?: string }) => (
-        <Link href="/english/write" style={{ textDecoration: 'none' }}>
+        <Link href="/english/write/days" style={{ textDecoration: 'none' }}>
             <div style={{
                 display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
                 background: `linear-gradient(135deg, ${GOLD}, #E6C75E)`, color: '#fff',

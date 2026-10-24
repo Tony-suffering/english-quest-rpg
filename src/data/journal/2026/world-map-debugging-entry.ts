@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const worldMapDebuggingEntry: JournalEntry = {
     id: '096',
-    date: '2026-02-04',
+    date: '2026-12-18',
     title: '世界征服ゲームがバグった——ReferenceErrorと重複キーの戦い',
     summary: 'World Map 6でReferenceErrorが発生。関数が定義される前に呼ばれていた。コードを全面書き直し。モバイルランドスケープ警告も実装。',
     featured: true,

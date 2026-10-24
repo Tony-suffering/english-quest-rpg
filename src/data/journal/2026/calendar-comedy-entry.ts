@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const calendarComedyEntry: JournalEntry = {
     id: '080',
-    date: '2026-01-22',
+    date: '2026-09-25',
     title: 'カレンダー地獄——デザイン7変化の喜劇',
     summary: '「おしゃれにして」「だっさい」「PVって何？」「シリーズまとめてよ」——AIとの壮絶なデザインバトルの記録。ヒートマップ、同心円、棒グラフ、GitHub風、そして最終形態まで。笑いあり、涙あり、リファクタリングあり。',
     featured: true,

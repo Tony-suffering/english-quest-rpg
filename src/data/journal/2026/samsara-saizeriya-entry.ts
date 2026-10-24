@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const samsaraSaizeriyaEntry: JournalEntry = {
     id: '074',
-    date: '2026-01-17',
+    date: '2026-06-24',
     title: 'サンサーラとサイゼリヤ——ブッダは息子を「束縛」と名付けて家出した',
     summary: 'なぜブッダは虚しさを感じたのか。サイゼで幸せな人と問いを持つ人に優劣はない。メメント・モリの呪い、サレンダーの一瞬の解放、acceptance = freedom。覚者たちのやらかしリスト付き。',
     featured: true,

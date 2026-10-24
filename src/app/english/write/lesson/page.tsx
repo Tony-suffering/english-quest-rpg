@@ -1,7 +1,10 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/app/english/write/lesson/page.tsx
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 /**
- * Day 1 インタラクティブ・レッスン(試作) -- DMM英会話風。
+ * Day 1 インタラクティブ・レッスン(試作) -- オンライン英会話風。
  * 模範解答を「全文タップ辞書 + 語彙演習 + 文法重要事項」に。
  */
 
@@ -114,7 +117,7 @@ export default function WriteLessonDay1Page() {
             {/* HEADER */}
             <div style={{ backgroundColor: '#fff', borderBottom: `1px solid ${LINE}`, padding: isMobile ? '16px' : '20px 32px' }}>
                 <div style={{ maxWidth: '820px', margin: '0 auto' }}>
-                    <Link href="/english/write" style={{ textDecoration: 'none', color: SUB, fontSize: '12px', fontWeight: 700 }}>← ライトパス 30日に戻る</Link>
+                    <Link href="/english/write/days" style={{ textDecoration: 'none', color: SUB, fontSize: '12px', fontWeight: 700 }}>← ライトパス 30日に戻る</Link>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
                         <span style={{ fontFamily: 'Georgia, serif', fontSize: isMobile ? '22px' : '26px', fontWeight: 900, color: GOLD, letterSpacing: '0.5px' }}>LESSON</span>
                         <span style={{ fontSize: '11px', fontWeight: 900, color: '#fff', background: INK, padding: '3px 8px', borderRadius: '6px' }}>Day 1 ・ 体験版</span>

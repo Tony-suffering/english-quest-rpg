@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const boiledInEvilEntry: JournalEntry = {
     id: '097',
-    date: '2026-02-02',
+    date: '2027-03-12',
     title: '邪悪に煮込まれそうになっているのがわかる——59分の退屈と大根の悟り',
     summary: '「飲み込まれる」が「煮込まれる」になった瞬間、私は悲劇の主人公からおでんの具になった。誤変換から始まる、エネルギーの因数分解、OSHOのメール論、そしてイーロン・マスクという名の止まったら死ぬマグロについて。',
     featured: false,

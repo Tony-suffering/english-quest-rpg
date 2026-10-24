@@ -8,7 +8,7 @@ import { JournalEntry } from '../types';
 
 export const sufferingRightHereEntry: JournalEntry = {
     id: '109',
-    date: '2026-02-08',
+    date: '2027-05-12',
     title: '今ここにあるsuffering——苦の三層と、半分覚めた者の地獄',
     summary: 'アジャシャンティは「sufferingには2つの成分がある」と言い、Sadhguruは「身体は想像と現実を区別できない」と言う。仏教は苦を三層に分けた——苦苦、壊苦、行苦。三番目は腰痛のように消えない。そして半分覚めた人間が一番苦しい。逃げ場を失ったのに、まだ「自分」が残っているから。',
     featured: true,

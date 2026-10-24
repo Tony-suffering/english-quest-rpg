@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const speakingMethodEntry: JournalEntry = {
     id: '111',
-    date: '2026-02-09',
+    date: '2026-09-23',
     title: 'ペラペラになる方法——分析はもういい、で、どうすればいいの？',
     summary: 'Dodgersポッドキャストの構造分析で「なぜ英語は流れるか」は分かった。じゃあ日本人はどうすればいい？答え: チャンク組み立て、スターター即発射、右枝分かれ訓練、母音を殺す。理論じゃなくて、今日から使える実戦メソッド。',
     featured: true,

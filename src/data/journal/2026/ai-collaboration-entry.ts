@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const aiCollaborationEntry: JournalEntry = {
     id: '073',
-    date: '2026-01-16',
+    date: '2027-02-22',
     title: 'AIと人間の共作——「できない」と言わない姿勢について',
     summary: 'AIに「もっとできないか」と尋問された。完璧主義の罠、謙虚さの意味、そして「終わり」がないことを受け入れる姿勢について。',
     featured: true,

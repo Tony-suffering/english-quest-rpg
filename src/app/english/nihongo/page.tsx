@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { NIHONGO_SEEDS, CATEGORY_META } from '@/data/english/nihongo-seed';
 import ReviewCalendar, { loadReviewed, saveReviewed } from '@/components/english/ReviewCalendar';
-import { usePPWordPicker, PPButton, PPPopup } from '@/components/english/PPWordPicker';
 
 interface NihongoItem {
     id: string;
@@ -28,7 +27,7 @@ function buildEntries(year: number, month: number): NihongoItem[] {
             const idx = counters[seed.daySlot] || 0;
             counters[seed.daySlot] = idx + 1;
             return {
-                id: `n${monthKey}_${String(seed.daySlot).padStart(2, '0')}_${idx}`,
+                id: `n${String(seed.daySlot).padStart(2, '0')}_${idx}`,
                 day_slot: seed.daySlot,
                 japanese: seed.japanese,
                 english: seed.english,
@@ -37,76 +36,6 @@ function buildEntries(year: number, month: number): NihongoItem[] {
                 category: seed.category,
             };
         });
-}
-
-// --- IndexedDB helpers for audio clips ---
-const AUDIO_DB_NAME = 'nihongo-audio-clips';
-const AUDIO_STORE = 'clips';
-
-function openAudioDB(): Promise<IDBDatabase> {
-    return new Promise((resolve, reject) => {
-        const req = indexedDB.open(AUDIO_DB_NAME, 1);
-        req.onupgradeneeded = () => {
-            const db = req.result;
-            if (!db.objectStoreNames.contains(AUDIO_STORE)) {
-                db.createObjectStore(AUDIO_STORE);
-            }
-        };
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function saveAudioClip(entryId: string, monthKey: string, blob: Blob): Promise<void> {
-    const db = await openAudioDB();
-    const key = `${monthKey}__${entryId}`;
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(AUDIO_STORE, 'readwrite');
-        tx.objectStore(AUDIO_STORE).put(blob, key);
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
-    });
-}
-
-async function loadAudioClip(entryId: string, monthKey: string): Promise<Blob | null> {
-    const db = await openAudioDB();
-    const key = `${monthKey}__${entryId}`;
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(AUDIO_STORE, 'readonly');
-        const req = tx.objectStore(AUDIO_STORE).get(key);
-        req.onsuccess = () => resolve(req.result || null);
-        req.onerror = () => reject(req.error);
-    });
-}
-
-async function deleteAudioClip(entryId: string, monthKey: string): Promise<void> {
-    const db = await openAudioDB();
-    const key = `${monthKey}__${entryId}`;
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(AUDIO_STORE, 'readwrite');
-        tx.objectStore(AUDIO_STORE).delete(key);
-        tx.oncomplete = () => resolve();
-        tx.onerror = () => reject(tx.error);
-    });
-}
-
-async function loadAllClipKeys(monthKey: string): Promise<Set<string>> {
-    const db = await openAudioDB();
-    return new Promise((resolve, reject) => {
-        const tx = db.transaction(AUDIO_STORE, 'readonly');
-        const req = tx.objectStore(AUDIO_STORE).getAllKeys();
-        req.onsuccess = () => {
-            const prefix = `${monthKey}__`;
-            const ids = new Set<string>();
-            (req.result as string[]).forEach(k => {
-                if (typeof k === 'string' && k.startsWith(prefix)) {
-                    ids.add(k.slice(prefix.length));
-                }
-            });
-            resolve(ids);
-        };
-        req.onerror = () => reject(req.error);
-    });
 }
 
 const CATEGORY_COLORS: Record<string, { fg: string; bg: string }> = {
@@ -133,68 +62,16 @@ export default function NihongoPage() {
     const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
     const detailRef = useRef<HTMLDivElement>(null);
 
-    const now = new Date();
-    const [viewYear, setViewYear] = useState(now.getFullYear());
-    const [viewMonth, setViewMonth] = useState(now.getMonth());
-    const monthKey = buildMonthKey(viewYear, viewMonth);
-
     // Registration state
     const [registeredPhrases, setRegisteredPhrases] = useState<Set<string>>(new Set());
     const [registeringId, setRegisteringId] = useState<string | null>(null);
     const [batchRegistering, setBatchRegistering] = useState(false);
     const [batchProgress, setBatchProgress] = useState<{ current: number; total: number } | null>(null);
-
-    // Audio clip state
-    const [clipIds, setClipIds] = useState<Set<string>>(new Set());
-    const [playingClipId, setPlayingClipId] = useState<string | null>(null);
-    const clipAudioRef = useRef<HTMLAudioElement | null>(null);
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const [pendingClipEntryId, setPendingClipEntryId] = useState<string | null>(null);
-    const [dragOverId, setDragOverId] = useState<string | null>(null);
-
-    // Load clip keys for current month
-    useEffect(() => {
-        loadAllClipKeys(monthKey).then(setClipIds).catch(() => {});
-    }, [monthKey]);
-
-    const handleAudioFile = useCallback(async (file: File, entryId: string) => {
-        if (!file.type.startsWith('audio/') && !file.type.startsWith('video/')) return;
-        await saveAudioClip(entryId, monthKey, file);
-        setClipIds(prev => new Set(prev).add(entryId));
-    }, [monthKey]);
-
-    const playClip = useCallback(async (entryId: string) => {
-        if (clipAudioRef.current) {
-            clipAudioRef.current.pause();
-            clipAudioRef.current = null;
-        }
-        if (playingClipId === entryId) {
-            setPlayingClipId(null);
-            return;
-        }
-        const blob = await loadAudioClip(entryId, monthKey);
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-        clipAudioRef.current = audio;
-        audio.onended = () => { setPlayingClipId(null); URL.revokeObjectURL(url); };
-        audio.onerror = () => { setPlayingClipId(null); URL.revokeObjectURL(url); };
-        audio.play();
-        setPlayingClipId(entryId);
-    }, [monthKey, playingClipId]);
-
-    const removeClip = useCallback(async (entryId: string) => {
-        await deleteAudioClip(entryId, monthKey);
-        setClipIds(prev => { const next = new Set(prev); next.delete(entryId); return next; });
-        if (playingClipId === entryId) {
-            clipAudioRef.current?.pause();
-            setPlayingClipId(null);
-        }
-    }, [monthKey, playingClipId]);
-
-    // PP Word Picker (shared component)
-    const { ppWordPicker, openPP, toggleWord, closePP, search: ppSearch } = usePPWordPicker();
     const [flashId, setFlashId] = useState<string | null>(null);
+
+    const now = new Date();
+    const [viewYear, setViewYear] = useState(now.getFullYear());
+    const [viewMonth, setViewMonth] = useState(now.getMonth());
 
     const todayDate = now.getDate();
     const todayMonth = now.getMonth();
@@ -632,29 +509,15 @@ export default function NihongoPage() {
                                     const isFlashing = flashId === entry.id;
                                     const isThisRegistering = registeringId === entry.id;
 
-                                    const hasClip = clipIds.has(entry.id);
-                                    const isClipPlaying = playingClipId === entry.id;
-                                    const isDragOver = dragOverId === entry.id;
-
                                     return (
                                         <div
                                             key={entry.id}
-                                            onDragOver={(e) => { e.preventDefault(); setDragOverId(entry.id); }}
-                                            onDragLeave={() => setDragOverId(null)}
-                                            onDrop={async (e) => {
-                                                e.preventDefault();
-                                                setDragOverId(null);
-                                                const file = e.dataTransfer.files[0];
-                                                if (file) await handleAudioFile(file, entry.id);
-                                            }}
                                             style={{
-                                                backgroundColor: isDragOver ? '#FFFBEB' : isFlashing ? '#FEF3C7' : '#fff',
+                                                backgroundColor: isFlashing ? '#FEF3C7' : '#fff',
                                                 borderRadius: '10px',
-                                                border: isDragOver
-                                                    ? '2px dashed #D4AF37'
-                                                    : isPlaying
-                                                        ? `2px solid ${catColor.fg}`
-                                                        : '1px solid #F5F5F4',
+                                                border: isPlaying
+                                                    ? `2px solid ${catColor.fg}`
+                                                    : '1px solid #F5F5F4',
                                                 padding: '10px 12px',
                                                 transition: 'all 0.15s',
                                             }}
@@ -770,66 +633,6 @@ export default function NihongoPage() {
                                                         >
                                                             {isThisRegistering ? '...' : registered ? '\u767B\u9332\u6E08' : '+ \u767B\u9332'}
                                                         </button>
-                                                        <PPButton onClick={() => openPP(entry.id, entry.english)} />
-                                                        {/* Audio clip: attach / play / delete */}
-                                                        {hasClip ? (
-                                                            <>
-                                                                <button
-                                                                    onClick={() => playClip(entry.id)}
-                                                                    style={{
-                                                                        padding: '2px 8px',
-                                                                        borderRadius: '8px',
-                                                                        border: isClipPlaying ? '1px solid #7C3AED' : '1px solid #E7E5E4',
-                                                                        cursor: 'pointer',
-                                                                        backgroundColor: isClipPlaying ? '#F5F3FF' : '#fff',
-                                                                        color: isClipPlaying ? '#7C3AED' : '#78716C',
-                                                                        fontSize: '10px',
-                                                                        fontWeight: '700',
-                                                                        transition: 'all 0.15s',
-                                                                    }}
-                                                                >
-                                                                    {isClipPlaying ? '\u25A0 CLIP' : '\u25B6 CLIP'}
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => removeClip(entry.id)}
-                                                                    style={{
-                                                                        padding: '2px 6px',
-                                                                        borderRadius: '8px',
-                                                                        border: 'none',
-                                                                        cursor: 'pointer',
-                                                                        backgroundColor: 'transparent',
-                                                                        color: '#D6D3D1',
-                                                                        fontSize: '10px',
-                                                                        fontWeight: '700',
-                                                                        transition: 'all 0.15s',
-                                                                    }}
-                                                                    onMouseEnter={(e) => { e.currentTarget.style.color = '#EF4444'; }}
-                                                                    onMouseLeave={(e) => { e.currentTarget.style.color = '#D6D3D1'; }}
-                                                                >
-                                                                    x
-                                                                </button>
-                                                            </>
-                                                        ) : (
-                                                            <button
-                                                                onClick={() => {
-                                                                    setPendingClipEntryId(entry.id);
-                                                                    fileInputRef.current?.click();
-                                                                }}
-                                                                style={{
-                                                                    padding: '2px 8px',
-                                                                    borderRadius: '8px',
-                                                                    border: '1px dashed #D6D3D1',
-                                                                    cursor: 'pointer',
-                                                                    backgroundColor: '#fff',
-                                                                    color: '#A8A29E',
-                                                                    fontSize: '10px',
-                                                                    fontWeight: '600',
-                                                                    transition: 'all 0.15s',
-                                                                }}
-                                                            >
-                                                                + CLIP
-                                                            </button>
-                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -866,25 +669,6 @@ export default function NihongoPage() {
                     )}
                 </div>
             </div>
-
-            {/* Hidden file input for audio clip upload */}
-            <input
-                ref={fileInputRef}
-                type="file"
-                accept="audio/*,video/*"
-                style={{ display: 'none' }}
-                onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (file && pendingClipEntryId) {
-                        await handleAudioFile(file, pendingClipEntryId);
-                        setPendingClipEntryId(null);
-                    }
-                    e.target.value = '';
-                }}
-            />
-
-            {/* PP Word Picker Popup */}
-            {ppWordPicker && <PPPopup state={ppWordPicker} onToggle={toggleWord} onClose={closePP} onSearch={ppSearch} />}
         </div>
     );
 }

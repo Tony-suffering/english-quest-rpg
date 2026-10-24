@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const vercelSurrenderEntry: JournalEntry = {
     id: '133',
-    date: '2026-03-02',
+    date: '2026-07-15',
     title: 'Vercelが落ちて覚者になりかけた ― デプロイ障害とサレンダーの構造',
     summary: 'Vercelの大規模障害でデプロイできず、1時間ログと格闘。結局Twitterで障害情報を見つけて終了。インフラも感情も、全部サレンダーゲームだった。',
     featured: false,

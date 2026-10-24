@@ -82,7 +82,6 @@ export interface ReviewSlotPanelProps {
   gridInfo?: { filled: number; total: number };
   gridCompleteGrade?: string | null;
   onBonusSlotPress?: () => void;
-  onReset?: () => void;
   sessionGP?: number;
   isMobile: boolean;
 }
@@ -100,52 +99,6 @@ const STATE_BG: Record<SlotState, string> = {
 };
 
 const LS_KEY = 'review-slot-state';
-
-// Bonus slot odds by grid grade — NOT guaranteed
-function rollBonusSlot(grade: string): { symbols: GodSymbol[]; triple: GodSymbol | null } {
-  const roll = Math.random() * 100;
-  // S: 70% GOD, 20% RED7, 10% pair
-  // A: 40% RED7, 30% YELLOW7, 20% pair, 10% miss
-  // B: 20% YELLOW7, 30% BLUE7, 30% pair, 20% miss
-  // C: 10% BLUE7, 25% pair, 35% single, 30% miss
-  // D: 5% BLUE7, 15% pair, 30% single, 50% miss
-  type Outcome = { triple: GodSymbol } | { pair: GodSymbol } | 'single' | 'miss';
-  let outcome: Outcome;
-  switch (grade) {
-    case 'S':
-      outcome = roll < 70 ? { triple: 'GOD' } : roll < 90 ? { triple: 'RED7' } : { pair: 'GOD' };
-      break;
-    case 'A':
-      outcome = roll < 40 ? { triple: 'RED7' } : roll < 70 ? { triple: 'YELLOW7' } : roll < 90 ? { pair: 'RED7' } : 'miss';
-      break;
-    case 'B':
-      outcome = roll < 20 ? { triple: 'YELLOW7' } : roll < 50 ? { triple: 'BLUE7' } : roll < 80 ? { pair: 'YELLOW7' } : 'miss';
-      break;
-    case 'C':
-      outcome = roll < 10 ? { triple: 'BLUE7' } : roll < 35 ? { pair: 'BLUE7' } : roll < 70 ? 'single' : 'miss';
-      break;
-    default: // D
-      outcome = roll < 5 ? { triple: 'BLUE7' } : roll < 20 ? { pair: 'BLUE7' } : roll < 50 ? 'single' : 'miss';
-      break;
-  }
-  if (typeof outcome === 'object' && 'triple' in outcome) {
-    const s = outcome.triple;
-    return { symbols: [s, s, s] as GodSymbol[], triple: s };
-  }
-  if (typeof outcome === 'object' && 'pair' in outcome) {
-    const s = outcome.pair;
-    const others: GodSymbol[] = ALL_SYMBOLS.filter(x => x !== s && x !== 'BLANK');
-    const third = others[Math.floor(Math.random() * others.length)];
-    return { symbols: [s, s, third] as GodSymbol[], triple: null };
-  }
-  if (outcome === 'single') {
-    const syms: GodSymbol[] = ['RED7', 'YELLOW7', 'BLUE7', 'V_SYMBOL'];
-    const s = syms[Math.floor(Math.random() * syms.length)];
-    return { symbols: [s, 'BLANK', 'BLANK'] as GodSymbol[], triple: null };
-  }
-  // miss
-  return { symbols: ['BLANK', 'BLANK', 'BLANK'] as GodSymbol[], triple: null };
-}
 
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -174,7 +127,105 @@ function buildCardFromDrop(drop: NonNullable<ReviewSlotPanelProps['dropCard']>):
 }
 
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ROGUELIKE SYSTEM
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+const ROGUE_LS_KEY = 'rsp-rogue-v1';
+
+const ENEMY_POOL = [
+  { name: 'シャドウ', tier: 1, color: '#78716C', emoji: '/' },
+  { name: 'ダークウルフ', tier: 1, color: '#6B7280', emoji: 'W' },
+  { name: 'ファントム', tier: 2, color: '#8B5CF6', emoji: 'P' },
+  { name: 'ブラッディ', tier: 2, color: '#B91C1C', emoji: 'B' },
+  { name: 'ヘルハウンド', tier: 3, color: '#EA580C', emoji: 'H' },
+  { name: 'ネクロマンサー', tier: 3, color: '#7C3AED', emoji: 'N' },
+  { name: 'デモンロード', tier: 4, color: '#BE123C', emoji: 'D' },
+  { name: 'アビスウォーカー', tier: 4, color: '#1D4ED8', emoji: 'A' },
+];
+
+const BOSS_POOL = [
+  { name: '魔戒騎士', color: '#D4AF37', emoji: 'K' },
+  { name: '暗黒竜バハムート', color: '#DC2626', emoji: 'X' },
+  { name: '深淵の王', color: '#7C3AED', emoji: 'Q' },
+  { name: '混沌のメシア', color: '#BE185D', emoji: 'M' },
+  { name: '終焉のゼロ', color: '#0F172A', emoji: 'Z' },
+  { name: '黄金騎士ガロ', color: '#D4AF37', emoji: 'G' },
+];
+
+interface RogueRecord {
+  bestFloor: number;
+  bestStreak: number;
+  totalBossKills: number;
+  totalRuns: number;
+}
+
+interface RogueState {
+  floor: number;
+  playerHP: number;
+  playerMaxHP: number;
+  enemyHP: number;
+  enemyMaxHP: number;
+  enemyName: string;
+  enemyIcon: string;
+  enemyColor: string;
+  isBoss: boolean;
+  killStreak: number;
+  runActive: boolean;
+  lastDamageDealt: number;
+  lastDamageTaken: number;
+  damageAnim: boolean;
+  enemyHitAnim: boolean;
+}
+
+function loadRogueRecord(): RogueRecord {
+  try {
+    const raw = localStorage.getItem(ROGUE_LS_KEY);
+    if (!raw) return { bestFloor: 0, bestStreak: 0, totalBossKills: 0, totalRuns: 0 };
+    return JSON.parse(raw);
+  } catch { return { bestFloor: 0, bestStreak: 0, totalBossKills: 0, totalRuns: 0 }; }
+}
+
+function saveRogueRecord(r: RogueRecord) {
+  try { localStorage.setItem(ROGUE_LS_KEY, JSON.stringify(r)); } catch { /* */ }
+}
+
+function spawnEnemy(floor: number): Pick<RogueState, 'enemyHP' | 'enemyMaxHP' | 'enemyName' | 'enemyIcon' | 'enemyColor' | 'isBoss'> {
+  const isBoss = floor > 0 && floor % 5 === 0;
+  const pool = isBoss ? BOSS_POOL : ENEMY_POOL;
+  const enemy = pool[Math.floor(Math.random() * pool.length)];
+  const baseHP = isBoss ? floor * 120 + 200 : floor * 40 + 60;
+  return {
+    enemyHP: baseHP,
+    enemyMaxHP: baseHP,
+    enemyName: isBoss ? `BOSS: ${enemy.name}` : enemy.name,
+    enemyIcon: enemy.icon,
+    enemyColor: isBoss ? '#D4AF37' : enemy.color,
+    isBoss,
+  };
+}
+
+function calcPlayerMaxHP(stats: number[]): number {
+  // HP stat (index 0) determines max HP
+  return 80 + Math.round(stats[0] * 1.5);
+}
+
+function calcDamageDealt(gp: number, stats: number[]): number {
+  // ATK (index 1) boosts damage, SPA (index 3) adds crit chance
+  const atkBonus = 1 + stats[1] / 120;
+  const critRoll = Math.random() < stats[3] / 250;
+  const baseDmg = Math.max(1, Math.round(gp * atkBonus));
+  return critRoll ? baseDmg * 2 : baseDmg;
+}
+
+function calcDamageTaken(floor: number, stats: number[]): number {
+  // DEF (index 2) reduces damage, SPD (index 4) gives dodge chance
+  const dodgeRoll = Math.random() < stats[4] / 300;
+  if (dodgeRoll) return 0;
+  const enemyAtk = Math.round(floor * 2.5 + 5);
+  const defReduction = 1 - stats[2] / 250;
+  return Math.max(1, Math.round(enemyAtk * defReduction));
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PERSISTED STATE
@@ -192,17 +243,6 @@ interface PersistedSlotState {
   czSpinsLeft: number;
   specialSpinsLeft: number;
   feverSpinsLeft: number;
-  // Stage Chase persistence
-  stage: number;
-  shields: number | null;
-  maxShields: number;
-  jackpotPool: number;
-  bestCombo: number;
-  czCount: number;
-  rushCount: number;
-  specialCount: number;
-  feverCount: number;
-  peakState: SlotState;
 }
 
 function loadPersisted(): PersistedSlotState | null {
@@ -247,17 +287,8 @@ const KEYFRAMES = `
 @keyframes rsp-enemyHit { 0% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } 100% { transform: translateX(0); } }
 @keyframes rsp-playerHit { 0% { opacity: 1; } 25% { opacity: 0.3; } 50% { opacity: 1; } 75% { opacity: 0.3; } 100% { opacity: 1; } }
 @keyframes rsp-dmgFloat { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-24px) scale(0.8); } }
-@keyframes rsp-reachPulse { 0%,100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
-@keyframes rsp-reachFlash { 0% { opacity: 0; } 20% { opacity: 0.6; } 100% { opacity: 0; } }
-@keyframes rsp-bigWinFlash { 0% { opacity: 0; transform: scale(0.5); } 20% { opacity: 1; transform: scale(1.1); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(0.95); } }
-@keyframes rsp-screenShake { 0%,100% { transform: translate(0,0); } 10% { transform: translate(-4px,-2px); } 20% { transform: translate(4px,2px); } 30% { transform: translate(-3px,3px); } 40% { transform: translate(3px,-3px); } 50% { transform: translate(-2px,2px); } 60% { transform: translate(2px,-1px); } 70% { transform: translate(-1px,1px); } }
-@keyframes rsp-tripleExplode { 0% { transform: scale(0.3) rotate(-10deg); opacity: 0; } 40% { transform: scale(1.3) rotate(3deg); opacity: 1; } 70% { transform: scale(0.95) rotate(-1deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
-@keyframes rsp-reachReel3Glow { 0%,100% { box-shadow: inset 0 0 20px rgba(0,0,0,0.5); } 50% { box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 0 30px rgba(212,175,55,0.6); } }
-@keyframes rsp-transitionBanner { 0% { transform: scaleX(0); opacity: 0; } 20% { transform: scaleX(1.1); opacity: 1; } 40% { transform: scaleX(1); } 80% { transform: scaleX(1); opacity: 1; } 100% { transform: scaleX(0.95); opacity: 0; } }
-@keyframes rsp-dangerPulse { 0%,100% { opacity: 0; } 50% { opacity: 0.15; } }
-@keyframes rsp-shieldCrack { 0% { transform: scale(1); opacity: 1; } 30% { transform: scale(1.4); opacity: 1; } 60% { transform: scale(0.8); opacity: 0.6; } 100% { transform: scale(0); opacity: 0; } }
-@keyframes rsp-gameOverCrack { 0% { clip-path: inset(0 50% 0 50%); opacity: 0; } 30% { clip-path: inset(0 20% 0 20%); opacity: 1; } 100% { clip-path: inset(0 0 0 0); opacity: 1; } }
-@keyframes rsp-gameOverShake { 0%,100% { transform: translate(0,0); } 5% { transform: translate(-8px,-4px); } 10% { transform: translate(8px,4px); } 15% { transform: translate(-6px,6px); } 20% { transform: translate(6px,-6px); } 25% { transform: translate(-4px,4px); } 30% { transform: translate(0,0); } }
+@keyframes rsp-bossGlow { 0%,100% { box-shadow: 0 0 8px rgba(212,175,55,0.3); } 50% { box-shadow: 0 0 20px rgba(212,175,55,0.6); } }
+@keyframes rsp-deathFlash { 0% { opacity: 0; } 30% { opacity: 0.8; } 100% { opacity: 0; } }
 `;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -274,7 +305,6 @@ export default function ReviewSlotPanel({
   gridInfo,
   gridCompleteGrade,
   onBonusSlotPress,
-  onReset,
   sessionGP,
   isMobile,
 }: ReviewSlotPanelProps) {
@@ -321,29 +351,27 @@ export default function ReviewSlotPanel({
   const [comboShake, setComboShake] = useState(false);
   const [lastCard, setLastCard] = useState<CardData | null>(null);
 
-  // ── Reach演出 State ──
-  const [reachActive, setReachActive] = useState(false);
-  const [reachSymbol, setReachSymbol] = useState<GodSymbol | null>(null);
-  const [bigWinType, setBigWinType] = useState<GodSymbol | null>(null);
-  const [transitionBanner, setTransitionBanner] = useState<string | null>(null);
-
-  // ── Stage Chase + Jackpot System ──
-  const STAGE_TARGETS = [1000, 2500, 5000, 10000, 25000, 50000, 100000];
-  const [stage, setStage] = useState(() => {
-    try { return parseInt(localStorage.getItem('gg-stage') || '1', 10); } catch { return 1; }
+  // ── Roguelike State ──
+  const initEnemy = spawnEnemy(1);
+  const [rogue, setRogue] = useState<RogueState>({
+    floor: 1,
+    playerHP: 200,
+    playerMaxHP: 200,
+    enemyHP: initEnemy.enemyMaxHP,
+    enemyMaxHP: initEnemy.enemyMaxHP,
+    enemyName: initEnemy.enemyName,
+    enemyIcon: initEnemy.enemyIcon,
+    enemyColor: initEnemy.enemyColor,
+    isBoss: initEnemy.isBoss,
+    killStreak: 0,
+    runActive: true,
+    lastDamageDealt: 0,
+    lastDamageTaken: 0,
+    damageAnim: false,
+    enemyHitAnim: false,
   });
-  const [shields, setShields] = useState<number | null>(null); // null = not initialized
-  const [maxShields, setMaxShields] = useState(3);
-  const [shieldBreak, setShieldBreak] = useState(false);
-  const [shieldBreakText, setShieldBreakText] = useState(false);
-  const [jackpotPool, setJackpotPool] = useState(0); // kept for persistence compat
-  const [stageClear, setStageClear] = useState(false);
-  const [bestStage, setBestStage] = useState(() => {
-    try { return parseInt(localStorage.getItem('gg-best-stage') || '1', 10); } catch { return 1; }
-  });
-  const [jackpotWin, setJackpotWin] = useState<{ amount: number; symbol: string } | null>(null); // legacy
-  const [lastStatEffect, setLastStatEffect] = useState<string | null>(null);
-  const targetGP = STAGE_TARGETS[Math.min(stage - 1, STAGE_TARGETS.length - 1)];
+  const [rogueRecord, setRogueRecord] = useState<RogueRecord>(loadRogueRecord);
+  const [rogueGameOver, setRogueGameOver] = useState(false);
 
   // ── Refs ──
   const gpAnimRef = useRef<number>(0);
@@ -358,7 +386,6 @@ export default function ReviewSlotPanel({
   const timerRefs = useRef<ReturnType<typeof setTimeout>[]>([]);
   const stylesInjectedRef = useRef(false);
   const specialModeRef = useRef(false);
-  const specialGradeRef = useRef<string | null>(null);
 
   // ── Build pool cards from cardPool prop ──
   const poolCards = useMemo(() => {
@@ -385,11 +412,8 @@ export default function ReviewSlotPanel({
     return result;
   }, [poolCards]);
 
-  // Track specialMode prop + grade
-  useEffect(() => {
-    specialModeRef.current = !!specialMode;
-    if (specialMode && gridCompleteGrade) specialGradeRef.current = gridCompleteGrade;
-  }, [specialMode, gridCompleteGrade]);
+  // Track specialMode prop
+  useEffect(() => { specialModeRef.current = !!specialMode; }, [specialMode]);
 
   // ── Inject keyframes ──
   useEffect(() => {
@@ -401,7 +425,7 @@ export default function ReviewSlotPanel({
     return () => { style.remove(); stylesInjectedRef.current = false; };
   }, []);
 
-  // ── Load persisted state + restart BGM if needed ──
+  // ── Load persisted state ──
   useEffect(() => {
     const saved = loadPersisted();
     if (saved) {
@@ -417,22 +441,6 @@ export default function ReviewSlotPanel({
       setCzSpinsLeft(saved.czSpinsLeft);
       setSpecialSpinsLeft(saved.specialSpinsLeft);
       setFeverSpinsLeft(saved.feverSpinsLeft);
-      // Stage Chase state
-      if (saved.stage !== undefined) setStage(saved.stage);
-      if (saved.shields !== undefined) setShields(saved.shields);
-      if (saved.maxShields !== undefined) setMaxShields(saved.maxShields);
-      if (saved.jackpotPool !== undefined) setJackpotPool(saved.jackpotPool);
-      if (saved.bestCombo !== undefined) setBestCombo(saved.bestCombo);
-      if (saved.czCount !== undefined) setCzCount(saved.czCount);
-      if (saved.rushCount !== undefined) setRushCount(saved.rushCount);
-      if (saved.specialCount !== undefined) setSpecialCount(saved.specialCount);
-      if (saved.feverCount !== undefined) setFeverCount(saved.feverCount);
-      if (saved.peakState !== undefined) setPeakState(saved.peakState);
-
-      // Restart fever BGM if state was FEVER before reload
-      if (saved.slotState === 'FEVER' && !feverBGMRef.current) {
-        feverBGMRef.current = startFeverBGM();
-      }
     }
   }, []);
 
@@ -443,11 +451,8 @@ export default function ReviewSlotPanel({
       slotState, ceilingCounter, combo, totalGP, totalSpins,
       loopRate, ggSetSpinsLeft, ggSetsRemaining,
       czSpinsLeft, specialSpinsLeft, feverSpinsLeft,
-      stage, shields, maxShields, jackpotPool,
-      bestCombo, czCount, rushCount, specialCount, feverCount, peakState,
     });
-  }, [slotState, ceilingCounter, combo, totalGP, totalSpins, loopRate, ggSetSpinsLeft, ggSetsRemaining, czSpinsLeft, specialSpinsLeft, feverSpinsLeft, spinning,
-    stage, shields, maxShields, jackpotPool, bestCombo, czCount, rushCount, specialCount, feverCount, peakState]);
+  }, [slotState, ceilingCounter, combo, totalGP, totalSpins, loopRate, ggSetSpinsLeft, ggSetsRemaining, czSpinsLeft, specialSpinsLeft, feverSpinsLeft, spinning]);
 
   // ── Audio init + cleanup ──
   useEffect(() => {
@@ -465,22 +470,11 @@ export default function ReviewSlotPanel({
     };
   }, []);
 
-  // GP Counter Animation: read displayedGP via ref so it stays out of deps —
-  // including it caused per-frame effect re-runs and stale-closure races between
-  // queued RAFs, which surfaced as wild number jumps when offscreen on mobile.
-  const displayedGPRef = useRef(0);
-  useEffect(() => { displayedGPRef.current = displayedGP; }, [displayedGP]);
-
+  // ── GP Counter Animation ──
   useEffect(() => {
-    const start = displayedGPRef.current;
+    if (displayedGP === totalGP) return;
     const target = totalGP;
-    if (start === target) return;
-    // Hidden tab: RAF is throttled, so skip animation and snap to target.
-    if (typeof document !== 'undefined' && document.hidden) {
-      setDisplayedGP(target);
-      displayedGPRef.current = target;
-      return;
-    }
+    const start = displayedGP;
     const diff = target - start;
     const duration = Math.min(400, Math.max(150, diff * 3));
     const startTime = performance.now();
@@ -488,33 +482,12 @@ export default function ReviewSlotPanel({
       const elapsed = now - startTime;
       const progress = Math.min(1, elapsed / duration);
       const eased = 1 - Math.pow(1 - progress, 3);
-      const next = Math.round(start + diff * eased);
-      setDisplayedGP(next);
-      displayedGPRef.current = next;
+      setDisplayedGP(Math.round(start + diff * eased));
       if (progress < 1) gpAnimRef.current = requestAnimationFrame(animate);
     }
     gpAnimRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(gpAnimRef.current);
-  }, [totalGP]);
-
-  // Auto-advance to next stage after brief celebration (1.8s)
-  useEffect(() => {
-    if (!stageClear) return;
-    const t = setTimeout(() => {
-      const newStage = stage + 1;
-      setStage(newStage);
-      setStageClear(false);
-      setTotalGP(0);
-      setDisplayedGP(0);
-      setJackpotPool(0);
-      try { localStorage.setItem('gg-stage', String(newStage)); } catch { /* */ }
-      if (newStage > bestStage) {
-        setBestStage(newStage);
-        try { localStorage.setItem('gg-best-stage', String(newStage)); } catch { /* */ }
-      }
-    }, 1800);
-    return () => clearTimeout(t);
-  }, [stageClear, stage, bestStage]);
+  }, [totalGP, displayedGP]);
 
   const stateConfig = STATE_CONFIG[slotState];
   const stateColor = stateConfig.color;
@@ -540,7 +513,7 @@ export default function ReviewSlotPanel({
     // Pre-roll symbols FIRST to determine if triple (win = same card 3x)
     const isSpecial = specialModeRef.current;
     const reelRoll = isSpecial
-      ? rollBonusSlot(specialGradeRef.current || 'C')
+      ? { symbols: ['GOD', 'GOD', 'GOD'] as GodSymbol[], triple: 'GOD' as GodSymbol }
       : rollReelSymbols(slotState);
     const drawnSymbols = reelRoll.symbols;
     const isTriple = reelRoll.triple !== null;
@@ -596,53 +569,22 @@ export default function ReviewSlotPanel({
       }, 90 + r * 15);
     }
 
-    // ── REACH演出: detect if first 2 symbols match (non-BLANK) ──
-    const isReach = drawnSymbols[0] !== 'BLANK' && drawnSymbols[0] === drawnSymbols[1];
-    const reachDelay = isReach ? 2500 : 0; // Extra delay for 3rd reel on reach
-    const reel3Delay = REEL_STOP_DELAYS[2] + reachDelay;
-
     // Stop each reel sequentially
     const timers: ReturnType<typeof setTimeout>[] = [];
-    const stopReel = (r: number) => {
-      if (reelFlickerRefs.current[r]) clearInterval(reelFlickerRefs.current[r]!);
-      playReelStop(r);
-      setReelSpinning(prev => { const n = [...prev]; n[r] = false; return n; });
-      setReelStopped(prev => { const n = [...prev]; n[r] = true; return n; });
-      setReels(prev => { const n = [...prev]; n[r] = cards[r]; return n; });
-      setReelFlicker(prev => { const n = [...prev]; n[r] = null; return n; });
-      setReelSymbols(prev => { const n = [...prev]; n[r] = drawnSymbols[r]; return n; });
-      setSymbolFlicker(prev => { const n = [...prev]; n[r] = 'BLANK'; return n; });
-    };
+    for (let r = 0; r < 3; r++) {
+      const t = setTimeout(() => {
+        if (reelFlickerRefs.current[r]) clearInterval(reelFlickerRefs.current[r]!);
+        playReelStop(r);
 
-    // Reel 1 stop
-    timers.push(setTimeout(() => stopReel(0), REEL_STOP_DELAYS[0]));
-
-    // Reel 2 stop + reach detection
-    timers.push(setTimeout(() => {
-      stopReel(1);
-      if (isReach) {
-        // Activate reach tension mode
-        setReachActive(true);
-        setReachSymbol(drawnSymbols[0]);
-        playReachAlert();
-      }
-    }, REEL_STOP_DELAYS[1]));
-
-    // Reel 3 stop (delayed if reach)
-    timers.push(setTimeout(() => {
-      stopReel(2);
-      if (isReach) {
-        setReachActive(false);
-        setReachSymbol(null);
-        // If triple, trigger big win celebration
-        if (isTriple) {
-          setBigWinType(drawnSymbols[0]);
-          playImpactHit(1.0);
-          const clearBigWin = setTimeout(() => setBigWinType(null), 3000);
-          timers.push(clearBigWin);
-        }
-      }
-    }, reel3Delay));
+        setReelSpinning(prev => { const n = [...prev]; n[r] = false; return n; });
+        setReelStopped(prev => { const n = [...prev]; n[r] = true; return n; });
+        setReels(prev => { const n = [...prev]; n[r] = cards[r]; return n; });
+        setReelFlicker(prev => { const n = [...prev]; n[r] = null; return n; });
+        setReelSymbols(prev => { const n = [...prev]; n[r] = drawnSymbols[r]; return n; });
+        setSymbolFlicker(prev => { const n = [...prev]; n[r] = 'BLANK'; return n; });
+      }, REEL_STOP_DELAYS[r]);
+      timers.push(t);
+    }
 
     // After all reels stop: evaluate result
     const evalTimer = setTimeout(() => {
@@ -663,21 +605,21 @@ export default function ReviewSlotPanel({
 
       if (symbolTriple === 'GOD') {
         gp = Math.round(baseGP * 10);
-        setMatchBonus('GOD TRIPLE! x10');
+        setMatchBonus('GOD\u63C3\u3044! x10');
         playGachaSound('LEGENDARY');
       } else if (symbolTriple === 'RED7') {
         gp = Math.round(baseGP * 5);
-        setMatchBonus('BLAZE TRIPLE! x5');
+        setMatchBonus('\u8D647\u63C3\u3044! x5');
         playGachaSound('SUPER');
       } else if (symbolTriple === 'YELLOW7') {
         gp = Math.round(baseGP * 3);
-        setMatchBonus('BOLT TRIPLE! x3');
+        setMatchBonus('\u9EC47\u63C3\u3044! x3');
       } else if (symbolTriple === 'BLUE7') {
         gp = Math.round(baseGP * 2);
-        setMatchBonus('FROST TRIPLE! x2');
+        setMatchBonus('\u97527\u63C3\u3044! x2');
       } else if (symbolTriple === 'V_SYMBOL') {
         gp = Math.round(baseGP * 3);
-        setMatchBonus('WILD TRIPLE! x3');
+        setMatchBonus('V\u63C3\u3044! x3');
       } else {
         const symbolCounts: Record<string, number> = {};
         drawnSymbols.forEach(s => { symbolCounts[s] = (symbolCounts[s] || 0) + 1; });
@@ -690,7 +632,7 @@ export default function ReviewSlotPanel({
             setMatchBonus('GOD x2!');
           } else if (pairSymbol === 'RED7') {
             gp = Math.round(baseGP * 0.8);
-            setMatchBonus('BLAZE x2');
+            setMatchBonus('\u8D647 x2');
           } else {
             gp = Math.round(baseGP * 0.5);
             setMatchBonus(`${SYMBOL_LABELS[pairSymbol as GodSymbol]} x2`);
@@ -906,47 +848,6 @@ export default function ReviewSlotPanel({
 
       const finalGP = Math.round(gp);
 
-      // ═══ STAGE CHASE SYSTEM ═══
-      const stats = card.stats; // [HP, ATK, DEF, SPA, SPD, SPE]
-
-      // Initialize shields on first spin (HP → shield count)
-      if (shields === null) {
-        const initShields = Math.max(1, Math.min(5, Math.floor(stats[0] / 20)));
-        setShields(initShields);
-        setMaxShields(initShields);
-      }
-
-      // ═══ BAD LUCK = LIFE LOSS ═══
-      // All blanks = potential CURSE. ~15% of all-blanks actually trigger LIFE loss.
-      // DEF stat reduces curse chance (high DEF = luckier).
-      const allBlank = drawnSymbols.every(s => s === 'BLANK');
-      const defStat = stats[2] || 0;
-      const curseRate = Math.max(0.05, 0.15 - defStat * 0.001); // 5-15%
-      const isCursed = allBlank && Math.random() < curseRate && shields !== null && shields > 0;
-
-      if (isCursed) {
-        // Shield loss is purely visual/dramatic — never terminal.
-        // When shields hit 0 we refill to max so the danger loop continues.
-        const next = shields! - 1;
-        const newShields = next <= 0 ? maxShields : next;
-        setShields(newShields);
-        setShieldBreak(true);
-        setShieldBreakText(true);
-        playImpactHit(0.8);
-        const sbTimer = setTimeout(() => setShieldBreak(false), 1200);
-        timers.push(sbTimer);
-        const sbtTimer = setTimeout(() => setShieldBreakText(false), 2000);
-        timers.push(sbtTimer);
-      }
-
-      // STAGE CLEAR check
-      const newTotalGPCheck = totalGP + Math.round(gp);
-      if (newTotalGPCheck >= targetGP && !stageClear) {
-        setStageClear(true);
-        playGachaSound('LEGENDARY');
-        playFeverEntrySound();
-      }
-
       prevTraitRef.current = card.trait;
       nextTraitDoubledRef.current = card.trait.name === 'Harmonizer';
       spinInStateRef.current = newSpinInState;
@@ -961,21 +862,17 @@ export default function ReviewSlotPanel({
       if (transition === 'NORMAL_TO_CZ') {
         playKakuhenEntry();
         setCzCount(c => c + 1);
-        setTransitionBanner('G-STOP');
       } else if (transition === 'CZ_TO_RUSH') {
         playFeverEntrySound();
         setRushCount(c => c + 1);
-        setTransitionBanner('GOD GAME');
       } else if (transition === 'RUSH_TO_SPECIAL') {
         playFeverEntrySound();
         playImpactHit(0.8);
         setSpecialCount(c => c + 1);
-        setTransitionBanner('SUPER GOD GAME');
       } else if (transition === 'SPECIAL_TO_FEVER') {
         playFeverEntrySound();
         playImpactHit(1.0);
         setFeverCount(c => c + 1);
-        setTransitionBanner('PREMIUM GOD GAME');
         // Cancel any pending BGM start to prevent double-play
         if (feverBGMTimerRef.current) { clearTimeout(feverBGMTimerRef.current); feverBGMTimerRef.current = null; }
         feverBGMTimerRef.current = setTimeout(() => {
@@ -1035,10 +932,6 @@ export default function ReviewSlotPanel({
         const transTimer = setTimeout(() => setTransitionEffect(null), 1200);
         timers.push(transTimer);
       }
-      if (transition && transition !== 'FALL_TO_NORMAL') {
-        const bannerTimer = setTimeout(() => setTransitionBanner(null), 2500);
-        timers.push(bannerTimer);
-      }
 
       // Fire callbacks
       if (onSpinComplete) {
@@ -1052,6 +945,110 @@ export default function ReviewSlotPanel({
         onSpecialSpinDone(finalGP);
       }
 
+      // ── Roguelike Battle ──
+      if (rogue.runActive && finalGP > 0) {
+        const dmgDealt = calcDamageDealt(finalGP, card.stats);
+        const dmgTaken = calcDamageTaken(rogue.floor, card.stats);
+        const speBonus = card.stats[5] > 80 ? 1.2 : 1.0; // SPE first-strike bonus
+        const actualDmg = Math.round(dmgDealt * speBonus);
+
+        setRogue(prev => {
+          const newEnemyHP = Math.max(0, prev.enemyHP - actualDmg);
+          const newPlayerHP = Math.max(0, prev.playerHP - dmgTaken);
+
+          // Enemy defeated
+          if (newEnemyHP <= 0) {
+            const newFloor = prev.floor + 1;
+            const newStreak = prev.killStreak + 1;
+            const wasBoss = prev.isBoss;
+
+            // Update records
+            const rec = { ...rogueRecord };
+            if (newFloor - 1 > rec.bestFloor) rec.bestFloor = newFloor - 1;
+            if (newStreak > rec.bestStreak) rec.bestStreak = newStreak;
+            if (wasBoss) rec.totalBossKills += 1;
+            setRogueRecord(rec);
+            saveRogueRecord(rec);
+
+            // Spawn next enemy
+            const next = spawnEnemy(newFloor);
+            // Heal a bit on kill (SPE bonus = more heal)
+            const healAmt = Math.round(10 + card.stats[5] * 0.3 + (wasBoss ? 30 : 0));
+            const maxHP = calcPlayerMaxHP(card.stats);
+
+            return {
+              ...prev,
+              floor: newFloor,
+              playerHP: Math.min(maxHP, (newPlayerHP > 0 ? newPlayerHP : prev.playerHP) + healAmt),
+              playerMaxHP: maxHP,
+              enemyHP: next.enemyMaxHP,
+              enemyMaxHP: next.enemyMaxHP,
+              enemyName: next.enemyName,
+              enemyIcon: next.enemyIcon,
+              enemyColor: next.enemyColor,
+              isBoss: next.isBoss,
+              killStreak: newStreak,
+              lastDamageDealt: actualDmg,
+              lastDamageTaken: dmgTaken,
+              damageAnim: false,
+              enemyHitAnim: true,
+            };
+          }
+
+          // Player defeated
+          if (newPlayerHP <= 0) {
+            const rec = { ...rogueRecord };
+            rec.totalRuns += 1;
+            if (prev.floor > rec.bestFloor) rec.bestFloor = prev.floor;
+            if (prev.killStreak > rec.bestStreak) rec.bestStreak = prev.killStreak;
+            setRogueRecord(rec);
+            saveRogueRecord(rec);
+            setRogueGameOver(true);
+            const goTimer = setTimeout(() => setRogueGameOver(false), 3000);
+            timers.push(goTimer);
+
+            // Reset run
+            const fresh = spawnEnemy(1);
+            const maxHP = calcPlayerMaxHP(card.stats);
+            return {
+              floor: 1,
+              playerHP: maxHP,
+              playerMaxHP: maxHP,
+              enemyHP: fresh.enemyMaxHP,
+              enemyMaxHP: fresh.enemyMaxHP,
+              enemyName: fresh.enemyName,
+              enemyIcon: fresh.enemyIcon,
+              enemyColor: fresh.enemyColor,
+              isBoss: fresh.isBoss,
+              killStreak: 0,
+              runActive: true,
+              lastDamageDealt: actualDmg,
+              lastDamageTaken: dmgTaken,
+              damageAnim: true,
+              enemyHitAnim: false,
+            };
+          }
+
+          // Both alive — continue
+          return {
+            ...prev,
+            enemyHP: newEnemyHP,
+            playerHP: newPlayerHP,
+            playerMaxHP: calcPlayerMaxHP(card.stats),
+            lastDamageDealt: actualDmg,
+            lastDamageTaken: dmgTaken,
+            enemyHitAnim: true,
+            damageAnim: dmgTaken > 0,
+          };
+        });
+
+        // Clear anim flags
+        const animTimer = setTimeout(() => {
+          setRogue(prev => ({ ...prev, enemyHitAnim: false, damageAnim: false }));
+        }, 500);
+        timers.push(animTimer);
+      }
+
       // Settle
       const settleTimer = setTimeout(() => {
         setCardAnimState('idle');
@@ -1059,7 +1056,7 @@ export default function ReviewSlotPanel({
       }, 1500);
       timers.push(settleTimer);
 
-    }, reel3Delay + 300);
+    }, REEL_STOP_DELAYS[2] + 300);
     timers.push(evalTimer);
 
     timerRefs.current = timers;
@@ -1067,7 +1064,8 @@ export default function ReviewSlotPanel({
     spinning, slotState, combo, czSpinsLeft, specialSpinsLeft,
     feverSpinsLeft, ceilingCounter, totalGP, totalSpins,
     loopRate, ggSetSpinsLeft, ggSetsRemaining, onSpinComplete,
-    onBigWin, onSpecialSpinDone, poolCards, pickPoolCards, shields, maxShields, jackpotPool, stage, targetGP, stageClear, bestStage,
+    onBigWin, onSpecialSpinDone, poolCards, pickPoolCards,
+    rogue, rogueRecord,
   ]);
 
   // Keep doSpin in a ref so the auto-trigger effect doesn't re-fire on doSpin identity changes
@@ -1337,15 +1335,10 @@ export default function ReviewSlotPanel({
                   overflow: 'hidden',
                   position: 'relative',
                   transition: 'all 300ms ease',
-                  border: stopped ? `2px solid ${stateColor}80`
-                    : reachActive && reelIdx === 2 ? `2px solid ${reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37'}80`
-                    : '2px solid #44403C',
+                  border: stopped ? `2px solid ${stateColor}80` : '2px solid #44403C',
                   boxShadow: stopped
                     ? `0 0 15px ${stateColor}30, inset 0 0 20px rgba(0,0,0,0.5)`
-                    : reachActive && reelIdx === 2
-                    ? `0 0 30px ${reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37'}60, inset 0 0 20px rgba(0,0,0,0.5)`
                     : 'inset 0 0 20px rgba(0,0,0,0.5)',
-                  ...(reachActive && reelIdx === 2 ? { animation: 'rsp-reachReel3Glow 600ms ease-in-out infinite' } : {}),
                 }}>
                   {/* Reel window background */}
                   <div style={{
@@ -1487,8 +1480,8 @@ export default function ReviewSlotPanel({
 
   const renderStateBar = () => {
     const isActive = slotState !== 'NORMAL';
-    const gridRemaining = gridInfo ? gridInfo.total - gridInfo.filled : 0;
-    const gridTotal = gridInfo ? gridInfo.total : 0;
+    const bossRemaining = gridInfo ? gridInfo.total - gridInfo.filled : 0;
+    const bossTotal = gridInfo ? gridInfo.total : 0;
 
     return (
       <div style={{
@@ -1601,14 +1594,14 @@ export default function ReviewSlotPanel({
           )}
 
           {/* Grid fill countdown */}
-          {gridInfo && gridRemaining > 0 && (
+          {gridInfo && bossRemaining > 0 && (
             <div style={{
               fontSize: 9, color: '#57534E',
               display: 'flex', alignItems: 'center', gap: 3,
             }}>
               <span style={{ fontWeight: 700 }}>GRID</span>
               <span style={{ fontFamily: 'monospace', color: '#78716C' }}>
-                {gridRemaining}/{gridTotal}
+                {bossRemaining}/{bossTotal}
               </span>
             </div>
           )}
@@ -1847,173 +1840,6 @@ export default function ReviewSlotPanel({
         display: 'flex', flexDirection: 'column', alignItems: 'center',
         gap: 12,
       }}>
-        {/* ═══ STAGE PROGRESS + SHIELDS ═══ */}
-        {shields !== null && (
-          <div style={{
-            width: '100%', marginBottom: 6,
-            background: 'linear-gradient(180deg, rgba(28,25,23,0.6) 0%, rgba(41,37,36,0.4) 100%)',
-            borderRadius: 12, padding: isMobile ? '10px 12px' : '14px 16px',
-            border: totalGP >= targetGP * 0.8
-              ? '1px solid rgba(212,175,55,0.3)'
-              : '1px solid rgba(255,255,255,0.06)',
-            position: 'relative',
-            overflow: 'hidden',
-          }}>
-            {/* Glow when close to target */}
-            {totalGP >= targetGP * 0.8 && (
-              <div style={{
-                position: 'absolute', inset: 0, borderRadius: 12, pointerEvents: 'none',
-                background: 'radial-gradient(ellipse at center, rgba(212,175,55,0.08) 0%, transparent 70%)',
-                animation: 'rsp-dangerPulse 2s ease-in-out infinite',
-              }} />
-            )}
-
-            {/* Top row: STAGE badge + LIFE hearts */}
-            <div style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              marginBottom: 10,
-            }}>
-              {/* STAGE badge */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div style={{
-                  background: 'linear-gradient(135deg, #D4AF37, #B8941E)',
-                  borderRadius: 6, padding: '3px 10px',
-                  display: 'flex', alignItems: 'center', gap: 4,
-                }}>
-                  <span style={{
-                    fontSize: 9, fontWeight: 900, letterSpacing: '0.15em',
-                    color: '#1C1917',
-                  }}>STAGE</span>
-                  <span style={{
-                    fontSize: 16, fontWeight: 900, color: '#1C1917',
-                    fontFamily: 'monospace',
-                  }}>{stage}</span>
-                </div>
-                {bestStage > 1 && (
-                  <span style={{ fontSize: 9, fontWeight: 700, color: '#57534E' }}>
-                    BEST {bestStage}
-                  </span>
-                )}
-              </div>
-
-              {/* LIFE hearts -- compact row */}
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 3,
-                ...(shields <= 1 && shields > 0 ? { animation: 'rsp-dangerPulse 0.8s ease-in-out infinite' } : {}),
-              }}>
-                {Array.from({ length: maxShields }).map((_, i) => {
-                  const alive = i < shields;
-                  const breaking = shieldBreak && i === shields;
-                  const danger = shields <= 1 && alive;
-                  const size = isMobile ? 18 : 20;
-                  return (
-                    <div key={i} style={{
-                      width: size, height: size, position: 'relative',
-                      ...(breaking ? { animation: 'rsp-shieldCrack 600ms ease-out forwards' } : {}),
-                      ...(danger ? { animation: 'rsp-pulse 0.6s ease-in-out infinite' } : {}),
-                    }}>
-                      <svg width={size} height={size} viewBox="0 0 24 24"
-                        fill={alive ? '#EF4444' : '#292524'}
-                        stroke="none"
-                        style={{
-                          filter: alive
-                            ? (danger ? 'drop-shadow(0 0 6px rgba(239,68,68,0.7))' : 'drop-shadow(0 0 3px rgba(239,68,68,0.3))')
-                            : 'none',
-                          opacity: alive ? 1 : 0.2,
-                        }}
-                      >
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                      </svg>
-                      {!alive && !breaking && (
-                        <svg width={size} height={size} viewBox="0 0 24 24"
-                          style={{ position: 'absolute', inset: 0, opacity: 0.4 }}
-                          fill="none" stroke="#EF4444" strokeWidth="2.5" strokeLinecap="round"
-                        >
-                          <line x1="9" y1="9" x2="15" y2="15" />
-                          <line x1="15" y1="9" x2="9" y2="15" />
-                        </svg>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* ═══ HERO: GP Progress ═══ */}
-            <div style={{ textAlign: 'center', marginBottom: 8 }}>
-              {/* Big GP number */}
-              <div style={{
-                fontSize: isMobile ? 32 : 42, fontWeight: 900,
-                fontFamily: 'monospace',
-                color: totalGP >= targetGP * 0.8 ? '#FDE68A' : '#D4AF37',
-                lineHeight: 1,
-                textShadow: totalGP >= targetGP * 0.8
-                  ? '0 0 20px rgba(212,175,55,0.6), 0 0 40px rgba(212,175,55,0.3)'
-                  : '0 0 8px rgba(212,175,55,0.3)',
-                letterSpacing: '-1px',
-              }}>
-                {displayedGP.toLocaleString()}
-              </div>
-              {/* "/ TARGET" subtitle */}
-              <div style={{
-                fontSize: 11, fontWeight: 700, color: '#78716C',
-                marginTop: 2, letterSpacing: '0.05em',
-              }}>
-                / {targetGP.toLocaleString()} GP
-              </div>
-            </div>
-
-            {/* Progress bar -- thick and prominent */}
-            <div style={{
-              width: '100%', height: 14, borderRadius: 7,
-              backgroundColor: '#1C1917', overflow: 'hidden',
-              border: '1px solid #292524',
-              position: 'relative',
-              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)',
-            }}>
-              <div style={{
-                height: '100%', borderRadius: 7,
-                width: `${Math.min(100, (totalGP / targetGP) * 100)}%`,
-                background: totalGP >= targetGP * 0.8
-                  ? 'linear-gradient(90deg, #D4AF37 0%, #FDE68A 60%, #D4AF37 100%)'
-                  : totalGP >= targetGP * 0.5
-                  ? 'linear-gradient(90deg, #059669 0%, #10B981 60%, #34D399 100%)'
-                  : 'linear-gradient(90deg, #0284C7 0%, #38BDF8 60%, #7DD3FC 100%)',
-                transition: 'width 400ms ease, background 400ms ease',
-                boxShadow: totalGP >= targetGP * 0.8
-                  ? '0 0 12px rgba(212,175,55,0.6), inset 0 1px 0 rgba(255,255,255,0.3)'
-                  : '0 0 6px rgba(16,185,129,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
-              }} />
-            </div>
-
-            {/* Remaining GP */}
-            <div style={{
-              textAlign: 'center', marginTop: 6,
-              fontSize: 12, fontWeight: 800, fontFamily: 'monospace',
-              color: totalGP >= targetGP ? '#10B981' : '#A8A29E',
-              letterSpacing: '0.05em',
-            }}>
-              {totalGP >= targetGP
-                ? 'CLEAR!'
-                : `${Math.max(0, targetGP - totalGP).toLocaleString()} to go`
-              }
-            </div>
-
-            {/* Stat effect feedback */}
-            {lastStatEffect && (
-              <div style={{
-                fontSize: 9, fontWeight: 700, color: '#A8A29E',
-                marginTop: 2, textAlign: 'center',
-                animation: 'rsp-gpCount 1500ms ease-out forwards',
-              }}>
-                {lastStatEffect}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Jackpot removed — Stage Chase is the core */}
-
         {/* GP Delta popup */}
         {showGpDelta && gpDelta > 0 && (
           <div style={{
@@ -2037,84 +1863,31 @@ export default function ReviewSlotPanel({
         )}
 
         {/* BONUS SLOT button — above the reels, appears once when grid completes */}
-        {gridCompleteGrade && onBonusSlotPress && !specialMode && (() => {
-          const gradeInfo: Record<string, { stars: number; label: string; color: string; bg: string; border: string; starColor: string }> = {
-            S: { stars: 5, label: '大当たり確定', color: '#FDE68A', bg: 'linear-gradient(180deg, #D4AF37 0%, #B8941E 50%, #92710C 100%)', border: '#FDE68A', starColor: '#FDE68A' },
-            A: { stars: 4, label: '期待大', color: '#fff', bg: 'linear-gradient(180deg, #DC2626 0%, #B91C1C 50%, #991B1B 100%)', border: '#FCA5A5', starColor: '#FCA5A5' },
-            B: { stars: 3, label: 'いい感じ', color: '#fff', bg: 'linear-gradient(180deg, #2563EB 0%, #1D4ED8 50%, #1E40AF 100%)', border: '#93C5FD', starColor: '#93C5FD' },
-            C: { stars: 2, label: 'ワンチャン', color: '#fff', bg: 'linear-gradient(180deg, #059669 0%, #047857 50%, #065F46 100%)', border: '#6EE7B7', starColor: '#6EE7B7' },
-            D: { stars: 1, label: '祈れ', color: '#D6D3D1', bg: 'linear-gradient(180deg, #57534E 0%, #44403C 50%, #292524 100%)', border: '#78716C', starColor: '#78716C' },
-          };
-          const gi = gradeInfo[gridCompleteGrade] || gradeInfo.D;
-          return (
-            <button
-              onClick={onBonusSlotPress}
-              style={{
-                width: '100%', padding: '14px 0', marginBottom: 8,
-                background: gi.bg,
-                border: `2px solid ${gi.border}`,
-                borderRadius: 10,
-                color: gi.color, fontSize: 14, fontWeight: 900,
-                letterSpacing: '0.15em',
-                cursor: 'pointer',
-                textShadow: '0 2px 4px rgba(0,0,0,0.5)',
-                boxShadow: gridCompleteGrade === 'S'
-                  ? '0 0 20px rgba(212,175,55,0.5), 0 4px 12px rgba(0,0,0,0.3)'
-                  : gridCompleteGrade === 'A'
-                  ? '0 0 16px rgba(239,68,68,0.4), 0 4px 12px rgba(0,0,0,0.3)'
-                  : '0 4px 12px rgba(0,0,0,0.2)',
-                animation: gridCompleteGrade === 'S' || gridCompleteGrade === 'A'
-                  ? 'golden-button-pulse 1.5s ease-in-out infinite' : 'none',
-              }}
-            >
-              <div style={{ fontSize: 10, letterSpacing: '0.3em', opacity: 0.7, marginBottom: 4 }}>GRID COMPLETE</div>
-              {/* Stars row */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: 2, marginBottom: 4 }}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} style={{
-                    fontSize: 14,
-                    color: i < gi.stars ? gi.starColor : 'rgba(255,255,255,0.15)',
-                    textShadow: i < gi.stars ? `0 0 6px ${gi.starColor}80` : 'none',
-                  }}>&#9733;</span>
-                ))}
-              </div>
-              <div style={{ fontSize: 16, letterSpacing: '0.2em' }}>BONUS SLOT</div>
-              <div style={{ fontSize: 11, opacity: 0.8, marginTop: 2, letterSpacing: '0.1em' }}>{gi.label}</div>
-            </button>
-          );
-        })()}
+        {gridCompleteGrade && onBonusSlotPress && !specialMode && (
+          <button
+            onClick={onBonusSlotPress}
+            style={{
+              width: '100%', padding: '14px 0', marginBottom: 8,
+              background: 'linear-gradient(180deg, #D4AF37 0%, #B8941E 50%, #92710C 100%)',
+              border: '2px solid #FDE68A',
+              borderRadius: 10,
+              color: '#fff', fontSize: 16, fontWeight: 900,
+              letterSpacing: '0.2em',
+              cursor: 'pointer',
+              textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+              boxShadow: '0 0 20px rgba(212,175,55,0.4), 0 4px 12px rgba(0,0,0,0.3)',
+              animation: 'golden-button-pulse 1.5s ease-in-out infinite',
+            }}
+          >
+            BONUS SLOT
+          </button>
+        )}
 
         {/* Reel machine or idle display */}
         {isSpinActive ? renderReelMachine() : renderIdleState()}
 
         {/* State bar */}
         {renderStateBar()}
-
-        {/* ═══ LIVE COMMENTARY ═══ */}
-        {shields !== null && (
-          <div style={{
-            width: '100%', padding: '6px 12px',
-            backgroundColor: '#0A0908', borderRadius: 8,
-            border: '1px solid #1C191740',
-            textAlign: 'center',
-          }}>
-            <span style={{
-              fontSize: 10, fontWeight: 700, color: '#78716C',
-              letterSpacing: '0.05em',
-            }}>
-              {stageClear ? `STAGE ${stage} CLEAR -- 次のステージへ`
-                : shieldBreakText ? `空振り! LIFE ${shields}/${maxShields}`
-                : slotState === 'NORMAL' && ceilingCounter === 0 ? `STAGE ${stage} -- ${targetGP.toLocaleString()} GPを目指せ`
-                : slotState === 'NORMAL' ? `G-STOPまであと${Math.max(0, ceiling - ceilingCounter)}回`
-                : slotState === 'CZ' ? `G-STOP -- 残り${czSpinsLeft}回でGOD GAMEを引け`
-                : slotState === 'RUSH' ? `GOD GAME -- GPを稼げ! ループ率${loopRate}%`
-                : slotState === 'SPECIAL' ? `SUPER GOD GAME -- GP 1.5倍! 残り${specialSpinsLeft}回`
-                : slotState === 'FEVER' ? `PREMIUM GOD GAME -- GP 3倍! 残り${feverSpinsLeft}回`
-                : `STAGE ${stage} -- ${targetGP.toLocaleString()} GPを目指せ`
-              }
-            </span>
-          </div>
-        )}
 
         {/* Current Card BST Panel — above SESSION */}
         {lastCard && (() => {
@@ -2260,6 +2033,193 @@ export default function ReviewSlotPanel({
           );
         })()}
 
+        {/* ── ROGUELIKE BATTLE PANEL ── */}
+        <div style={{
+          width: '100%', marginTop: 8,
+          backgroundColor: '#0A0908', borderRadius: 12,
+          border: rogue.isBoss ? '1px solid rgba(212,175,55,0.5)' : '1px solid #292524',
+          position: 'relative', overflow: 'hidden',
+          animation: rogue.isBoss ? 'rsp-bossGlow 2s ease-in-out infinite' : undefined,
+        }}>
+          {/* Game Over flash */}
+          {rogueGameOver && (
+            <div style={{
+              position: 'absolute', inset: 0, borderRadius: 12,
+              backgroundColor: 'rgba(220,38,38,0.3)',
+              animation: 'rsp-deathFlash 3s ease-out forwards',
+              pointerEvents: 'none', zIndex: 5,
+            }} />
+          )}
+
+          {/* Floor header */}
+          <div style={{
+            padding: '8px 12px 4px',
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.15em',
+                color: rogue.isBoss ? '#D4AF37' : '#78716C',
+              }}>FLOOR</span>
+              <span style={{
+                fontSize: 16, fontWeight: 900, fontFamily: 'monospace',
+                color: rogue.isBoss ? '#D4AF37' : '#E7E5E4',
+                textShadow: rogue.isBoss ? '0 0 8px rgba(212,175,55,0.6)' : 'none',
+              }}>{rogue.floor}</span>
+              {rogue.isBoss && (
+                <span style={{
+                  fontSize: 8, fontWeight: 800, padding: '1px 5px', borderRadius: 3,
+                  backgroundColor: 'rgba(212,175,55,0.2)', color: '#D4AF37',
+                  letterSpacing: '0.1em',
+                }}>BOSS</span>
+              )}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 9, color: '#78716C' }}>
+                {rogue.killStreak > 0 ? `${rogue.killStreak} KILLS` : ''}
+              </span>
+            </div>
+          </div>
+
+          {/* Battle area */}
+          <div style={{
+            padding: '4px 12px 10px',
+            display: 'flex', flexDirection: 'column', gap: 6,
+          }}>
+            {/* Enemy row */}
+            <div style={{
+              animation: rogue.enemyHitAnim ? 'rsp-enemyHit 0.4s ease' : undefined,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: 4,
+                    backgroundColor: `${rogue.enemyColor}25`,
+                    border: `1px solid ${rogue.enemyColor}50`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 11, fontWeight: 900, color: rogue.enemyColor,
+                  }}>{rogue.enemyIcon}</div>
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, color: rogue.enemyColor,
+                    maxWidth: isMobile ? 100 : 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  }}>{rogue.enemyName}</span>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, fontFamily: 'monospace', color: '#EF4444' }}>
+                    {rogue.enemyHP}/{rogue.enemyMaxHP}
+                  </span>
+                  {rogue.lastDamageDealt > 0 && rogue.enemyHitAnim && (
+                    <span style={{
+                      position: 'absolute', top: -14, right: 0,
+                      fontSize: 11, fontWeight: 900, color: '#F59E0B', fontFamily: 'monospace',
+                      animation: 'rsp-dmgFloat 0.8s ease-out forwards',
+                      textShadow: '0 0 4px rgba(245,158,11,0.5)',
+                    }}>-{rogue.lastDamageDealt}</span>
+                  )}
+                </div>
+              </div>
+              {/* Enemy HP bar */}
+              <div style={{
+                height: 8, backgroundColor: '#1C1917', borderRadius: 4, overflow: 'hidden',
+                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.5)',
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: `${Math.max(0, (rogue.enemyHP / rogue.enemyMaxHP) * 100)}%`,
+                  borderRadius: 4,
+                  background: rogue.isBoss
+                    ? 'linear-gradient(90deg, #B91C1C, #DC2626, #EF4444)'
+                    : 'linear-gradient(90deg, #DC2626, #EF4444)',
+                  boxShadow: '0 0 6px rgba(239,68,68,0.4)',
+                  transition: 'width 300ms ease',
+                }} />
+              </div>
+            </div>
+
+            {/* VS divider */}
+            <div style={{
+              textAlign: 'center', fontSize: 8, fontWeight: 900, color: '#57534E',
+              letterSpacing: '0.3em', margin: '-2px 0',
+            }}>VS</div>
+
+            {/* Player row */}
+            <div style={{
+              animation: rogue.damageAnim ? 'rsp-playerHit 0.4s ease' : undefined,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 3 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: 4,
+                    backgroundColor: 'rgba(16,185,129,0.15)',
+                    border: '1px solid rgba(16,185,129,0.3)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 11, fontWeight: 900, color: '#10B981',
+                  }}>P</div>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: '#10B981' }}>PLAYER</span>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <span style={{
+                    fontSize: 10, fontWeight: 800, fontFamily: 'monospace',
+                    color: rogue.playerHP < rogue.playerMaxHP * 0.3 ? '#EF4444' : '#10B981',
+                  }}>
+                    {rogue.playerHP}/{rogue.playerMaxHP}
+                  </span>
+                  {rogue.lastDamageTaken > 0 && rogue.damageAnim && (
+                    <span style={{
+                      position: 'absolute', top: -14, right: 0,
+                      fontSize: 11, fontWeight: 900, color: '#EF4444', fontFamily: 'monospace',
+                      animation: 'rsp-dmgFloat 0.8s ease-out forwards',
+                    }}>-{rogue.lastDamageTaken}</span>
+                  )}
+                </div>
+              </div>
+              {/* Player HP bar */}
+              <div style={{
+                height: 8, backgroundColor: '#1C1917', borderRadius: 4, overflow: 'hidden',
+                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.5)',
+              }}>
+                <div style={{
+                  height: '100%',
+                  width: `${Math.max(0, (rogue.playerHP / rogue.playerMaxHP) * 100)}%`,
+                  borderRadius: 4,
+                  background: rogue.playerHP < rogue.playerMaxHP * 0.3
+                    ? 'linear-gradient(90deg, #DC2626, #EF4444)'
+                    : 'linear-gradient(90deg, #059669, #10B981)',
+                  boxShadow: rogue.playerHP < rogue.playerMaxHP * 0.3
+                    ? '0 0 6px rgba(239,68,68,0.4)'
+                    : '0 0 6px rgba(16,185,129,0.4)',
+                  transition: 'width 300ms ease',
+                }} />
+              </div>
+            </div>
+
+            {/* Game Over message */}
+            {rogueGameOver && (
+              <div style={{
+                textAlign: 'center', padding: '6px 0',
+                fontSize: 12, fontWeight: 900, color: '#EF4444',
+                letterSpacing: '0.2em',
+                textShadow: '0 0 8px rgba(239,68,68,0.5)',
+              }}>
+                GAME OVER -- Floor {rogue.floor}
+              </div>
+            )}
+          </div>
+
+          {/* Records bar */}
+          <div style={{
+            padding: '6px 12px 8px',
+            borderTop: '1px solid #1C1917',
+            display: 'flex', justifyContent: 'space-between',
+            fontSize: 9, color: '#57534E',
+          }}>
+            <span>BEST: F{rogueRecord.bestFloor}</span>
+            <span>STREAK: {rogueRecord.bestStreak}</span>
+            <span>BOSS: {rogueRecord.totalBossKills}</span>
+            <span>RUNS: {rogueRecord.totalRuns}</span>
+          </div>
+        </div>
+
         {/* SESSION stats panel */}
         <div style={{
           width: '100%', marginTop: 8,
@@ -2312,111 +2272,42 @@ export default function ReviewSlotPanel({
             <span style={{ fontSize: 12 }}>?</span> RULES
           </summary>
           <div style={{
-            marginTop: 6, padding: '10px 12px',
+            marginTop: 6, padding: '8px 10px',
             backgroundColor: '#151311', borderRadius: 8,
-            fontSize: 11, color: '#D6D3D1', lineHeight: 1.7,
+            fontSize: 10, color: '#A8A29E', lineHeight: 1.6,
           }}>
-            {/* 1. ゴール */}
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ color: '#D4AF37', fontWeight: 800, fontSize: 12, marginBottom: 4, letterSpacing: '0.05em' }}>1. ゴール</div>
-              <div>目標の <span style={{ color: '#D4AF37', fontWeight: 700 }}>GP</span> を貯めたら自動で次のステージへ。どこまで行けるか挑戦するゲームです。</div>
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ color: '#D4AF37', fontWeight: 700 }}>GP</span> = Gold Points. 単語を復習するとスピンしてGPが貯まる
             </div>
-
-            {/* 2. GPの貯め方 */}
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ color: '#D4AF37', fontWeight: 800, fontSize: 12, marginBottom: 4, letterSpacing: '0.05em' }}>2. GPの貯め方</div>
-              <div style={{ marginBottom: 3 }}>単語カードを復習するとスロットが回り、揃った図柄に応じてGPが入ります。</div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 10px', marginTop: 4 }}>
-                <span><span style={{ color: '#D4AF37' }}>GOD</span> x10</span>
-                <span><span style={{ color: '#EF4444' }}>BLAZE</span> x5</span>
-                <span><span style={{ color: '#EAB308' }}>BOLT</span> x3</span>
-                <span><span style={{ color: '#A855F7' }}>WILD</span> x3</span>
-                <span><span style={{ color: '#3B82F6' }}>FROST</span> x2</span>
-              </div>
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ color: '#D4AF37', fontWeight: 700 }}>3枚揃い</span> = 同じカード3枚でWIN。図柄によってGP倍率が変わる
             </div>
-
-            {/* 3. モードの流れ */}
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ color: '#D4AF37', fontWeight: 800, fontSize: 12, marginBottom: 4, letterSpacing: '0.05em' }}>3. モードの流れ</div>
-              <div style={{ marginBottom: 3 }}>
-                <span style={{ color: '#78716C' }}>NORMAL</span>
-                {' → '}
-                <span style={{ color: '#0EA5E9', fontWeight: 700 }}>G-STOP</span>
-                {' → '}
-                <span style={{ color: '#EF4444', fontWeight: 700 }}>GOD GAME</span>
-              </div>
-              <div style={{ marginBottom: 3 }}><span style={{ color: '#0EA5E9', fontWeight: 700 }}>G-STOP</span> はチャンスゾーン。ここでGOD GAMEを引ければ大当たり。</div>
-              <div><span style={{ color: '#EF4444', fontWeight: 700 }}>GOD GAME</span> は連チャンモード。GPがガンガン増えます。ループ率で継続。</div>
+            <div style={{ marginBottom: 4, color: '#78716C', fontWeight: 600 }}>図柄と倍率:</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 8px', marginBottom: 6 }}>
+              <span><span style={{ color: '#D4AF37' }}>GOD</span> x30</span>
+              <span><span style={{ color: '#EF4444' }}>赤7</span> x10</span>
+              <span><span style={{ color: '#EAB308' }}>黄7</span> x5</span>
+              <span><span style={{ color: '#3B82F6' }}>青7</span> x3</span>
+              <span><span style={{ color: '#A855F7' }}>V</span> x2</span>
+              <span><span style={{ color: '#78716C' }}>BLANK</span> x1</span>
             </div>
-
-            {/* 4. LIFE */}
-            <div style={{ marginBottom: 10 }}>
-              <div style={{ color: '#D4AF37', fontWeight: 800, fontSize: 12, marginBottom: 4, letterSpacing: '0.05em' }}>4. LIFE について</div>
-              <div>全ハズレ(空振り)が続くと <span style={{ color: '#EF4444', fontWeight: 700 }}>LIFE</span> が減りますが、ゼロになっても全回復するだけで終わりません。安心してどんどん回してOK。</div>
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ color: '#0EA5E9', fontWeight: 700 }}>G-STOP</span> = チャンスゾーン(10回転)。当たりやすい
             </div>
-
-            {/* 5. カードのステータス */}
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ color: '#EF4444', fontWeight: 700 }}>GG</span> = GOD GAME。連チャンモード。ループ率で継続
+            </div>
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ color: '#A855F7', fontWeight: 700 }}>SGG</span> = SUPER GOD GAME。GGの上位版
+            </div>
+            <div style={{ marginBottom: 6 }}>
+              <span style={{ color: '#D4AF37', fontWeight: 700 }}>PGG</span> = PREMIUM GOD GAME。最上位。ループ率MAX
+            </div>
             <div>
-              <div style={{ color: '#10B981', fontWeight: 800, fontSize: 12, marginBottom: 4, letterSpacing: '0.05em' }}>5. カードのステータス (BST)</div>
-              <div style={{ marginBottom: 3 }}>HP = LIFE初期数 / ATK = GP倍率 / DEF = 空振り回避</div>
-              <div>SPA = G-STOP突入率 / SPD = 天井短縮 / SPE = 2連スピン率</div>
+              <span style={{ color: '#78716C', fontWeight: 700 }}>天井</span> = 規定回転数でGG確定。カウンターで確認
             </div>
           </div>
         </details>
-
-        {/* RESET button */}
-        <div style={{ marginTop: 8, display: 'flex', gap: 8, justifyContent: 'center' }}>
-          <button
-            onClick={() => {
-              if (!confirm('記録をリセットしますか？\nベストステージ記録も消えます。')) return;
-              setStageClear(false);
-              setShields(null);
-              setMaxShields(3);
-              setJackpotPool(0);
-              setStage(1);
-              setBestStage(1);
-              setTotalGP(0);
-              setDisplayedGP(0);
-              setTotalSpins(0);
-              setCombo(0);
-              setBestCombo(0);
-              setCzCount(0);
-              setRushCount(0);
-              setSpecialCount(0);
-              setFeverCount(0);
-              setPeakState('NORMAL');
-              setStateHistory([]);
-              setSlotState('NORMAL');
-              setCeilingCounter(0);
-              setLoopRate(0);
-              setGgSetSpinsLeft(0);
-              setGgSetsRemaining(0);
-              setCzSpinsLeft(0);
-              setSpecialSpinsLeft(0);
-              setFeverSpinsLeft(0);
-              setLastCard(null);
-              if (feverBGMRef.current) { stopFeverBGM(feverBGMRef.current); feverBGMRef.current = null; }
-              try {
-                localStorage.removeItem(LS_KEY);
-                localStorage.removeItem('gg-stage');
-                localStorage.removeItem('gg-best-stage');
-                localStorage.removeItem('training-chain-state');
-              } catch { /* */ }
-              onReset?.();
-            }}
-            style={{
-              padding: '6px 16px',
-              background: 'transparent',
-              border: '1px solid #44403C',
-              borderRadius: 6,
-              color: '#78716C', fontSize: 10, fontWeight: 700,
-              letterSpacing: '0.1em',
-              cursor: 'pointer',
-            }}
-          >
-            RESET ALL
-          </button>
-        </div>
       </div>
 
       {/* State transition overlay */}
@@ -2460,175 +2351,6 @@ export default function ReviewSlotPanel({
         </div>
       )}
 
-      {/* REACH演出 overlay — pulsing tension when first 2 reels match */}
-      {reachActive && (
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 25,
-          pointerEvents: 'none',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        }}>
-          {/* Pulsing border glow */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            border: `3px solid ${reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37'}`,
-            borderRadius: 16,
-            animation: 'rsp-reachPulse 600ms ease-in-out infinite',
-            boxShadow: `inset 0 0 40px ${reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37'}30`,
-          }} />
-          {/* REACH text */}
-          <div style={{
-            fontSize: isMobile ? 36 : 52,
-            fontWeight: 900,
-            color: reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37',
-            letterSpacing: '0.3em',
-            textShadow: `0 0 30px ${reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37'}, 0 0 60px ${reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37'}80`,
-            animation: 'rsp-reachPulse 600ms ease-in-out infinite',
-          }}>
-            REACH
-          </div>
-          {/* Symbol indicator */}
-          {reachSymbol && (
-            <div style={{
-              fontSize: isMobile ? 14 : 18,
-              fontWeight: 800,
-              color: SYMBOL_COLORS[reachSymbol],
-              letterSpacing: '0.2em',
-              marginTop: 8,
-              opacity: 0.8,
-            }}>
-              {SYMBOL_LABELS[reachSymbol]} x 2
-            </div>
-          )}
-          {/* Scanning line effect */}
-          <div style={{
-            position: 'absolute', left: 0, right: 0,
-            height: 2,
-            background: `linear-gradient(90deg, transparent, ${reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37'}, transparent)`,
-            animation: 'rsp-reachFlash 800ms ease-in-out infinite',
-            top: '30%',
-          }} />
-          <div style={{
-            position: 'absolute', left: 0, right: 0,
-            height: 2,
-            background: `linear-gradient(90deg, transparent, ${reachSymbol ? SYMBOL_COLORS[reachSymbol] : '#D4AF37'}, transparent)`,
-            animation: 'rsp-reachFlash 800ms ease-in-out infinite',
-            animationDelay: '400ms',
-            top: '70%',
-          }} />
-        </div>
-      )}
-
-      {/* Big Win celebration — full panel takeover */}
-      {bigWinType && (
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 30,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-          background: `radial-gradient(ellipse at center, ${SYMBOL_COLORS[bigWinType]}40 0%, rgba(0,0,0,0.9) 70%)`,
-          pointerEvents: 'none',
-          animation: 'rsp-screenShake 500ms ease-out',
-        }}>
-          {/* Flash burst */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: `radial-gradient(circle at center, ${SYMBOL_COLORS[bigWinType]}60 0%, transparent 50%)`,
-            animation: 'rsp-reachFlash 400ms ease-out',
-          }} />
-          {/* Symbol name */}
-          <div style={{
-            fontSize: isMobile ? 48 : 72,
-            fontWeight: 900,
-            color: SYMBOL_COLORS[bigWinType],
-            letterSpacing: '0.2em',
-            textShadow: `0 0 40px ${SYMBOL_COLORS[bigWinType]}, 0 0 80px ${SYMBOL_COLORS[bigWinType]}80, 0 4px 20px rgba(0,0,0,0.8)`,
-            animation: 'rsp-tripleExplode 800ms ease-out',
-            position: 'relative',
-          }}>
-            {SYMBOL_LABELS[bigWinType]}
-          </div>
-          <div style={{
-            fontSize: isMobile ? 20 : 28,
-            fontWeight: 900,
-            color: '#fff',
-            letterSpacing: '0.5em',
-            textShadow: `0 0 20px ${SYMBOL_COLORS[bigWinType]}`,
-            marginTop: 8,
-            animation: 'rsp-tripleExplode 800ms ease-out',
-            animationDelay: '200ms',
-            animationFillMode: 'backwards',
-          }}>
-            TRIPLE
-          </div>
-          {/* Radial particle lines */}
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} style={{
-              position: 'absolute',
-              width: 2,
-              height: isMobile ? 60 : 100,
-              background: `linear-gradient(180deg, ${SYMBOL_COLORS[bigWinType]} 0%, transparent 100%)`,
-              top: '50%', left: '50%',
-              transformOrigin: 'top center',
-              transform: `rotate(${i * 45}deg)`,
-              opacity: 0.4,
-              animation: 'rsp-reachFlash 600ms ease-out',
-              animationDelay: `${i * 50}ms`,
-            }} />
-          ))}
-        </div>
-      )}
-
-      {/* State transition banner -- dramatic full-width announcement */}
-      {transitionBanner && (
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 28,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          pointerEvents: 'none',
-        }}>
-          <div style={{
-            width: '120%',
-            padding: isMobile ? '16px 0' : '24px 0',
-            background: (() => {
-              const color = transitionBanner === 'G-STOP' ? '#0EA5E9'
-                : transitionBanner === 'GOD GAME' ? '#EF4444'
-                : transitionBanner === 'SUPER GOD GAME' ? '#A855F7'
-                : '#D4AF37';
-              return `linear-gradient(90deg, transparent 0%, ${color}CC 15%, ${color} 50%, ${color}CC 85%, transparent 100%)`;
-            })(),
-            textAlign: 'center',
-            animation: 'rsp-transitionBanner 2500ms ease-out forwards',
-            boxShadow: (() => {
-              const color = transitionBanner === 'G-STOP' ? '#0EA5E9'
-                : transitionBanner === 'GOD GAME' ? '#EF4444'
-                : transitionBanner === 'SUPER GOD GAME' ? '#A855F7'
-                : '#D4AF37';
-              return `0 0 40px ${color}80, 0 0 80px ${color}40`;
-            })(),
-          }}>
-            <div style={{
-              fontSize: isMobile ? 22 : 32,
-              fontWeight: 900,
-              color: '#fff',
-              letterSpacing: '0.3em',
-              textShadow: '0 2px 10px rgba(0,0,0,0.8), 0 0 40px rgba(255,255,255,0.3)',
-            }}>
-              {transitionBanner}
-            </div>
-            {transitionBanner !== 'G-STOP' && (
-              <div style={{
-                fontSize: isMobile ? 10 : 12,
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.7)',
-                letterSpacing: '0.5em',
-                marginTop: 4,
-              }}>
-                {transitionBanner === 'GOD GAME' ? '確変突入'
-                  : transitionBanner === 'SUPER GOD GAME' ? '超確変突入'
-                  : 'PREMIUM確変突入'}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* FEVER rainbow overlay */}
       {slotState === 'FEVER' && (
         <div style={{
@@ -2639,109 +2361,6 @@ export default function ReviewSlotPanel({
           pointerEvents: 'none',
         }} />
       )}
-
-      {/* ═══ SHIELD BREAK OVERLAY ═══ */}
-      {shieldBreak && (
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 40,
-          pointerEvents: 'none',
-        }}>
-          {/* Red flash */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'radial-gradient(ellipse at center, rgba(239,68,68,0.5) 0%, rgba(239,68,68,0.2) 50%, transparent 80%)',
-            animation: 'rsp-bigWinFlash 1200ms ease-out forwards',
-          }} />
-          {/* Screen shake container */}
-          <div style={{
-            position: 'absolute', inset: 0,
-            animation: 'rsp-screenShake 600ms ease-out',
-          }} />
-        </div>
-      )}
-
-      {/* ═══ SHIELD BREAK TEXT ═══ */}
-      {shieldBreakText && (
-        <div style={{
-          position: 'absolute', top: '35%', left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 45, textAlign: 'center', pointerEvents: 'none',
-        }}>
-          <div style={{
-            fontSize: isMobile ? 24 : 34, fontWeight: 900,
-            color: '#EF4444', letterSpacing: '0.15em',
-            textShadow: '0 0 30px rgba(239,68,68,0.8), 0 0 60px rgba(239,68,68,0.4), 0 2px 4px rgba(0,0,0,0.8)',
-            animation: 'rsp-tripleExplode 600ms ease-out',
-          }}>
-            LIFE LOST
-          </div>
-          {shields !== null && (
-            <div style={{
-              fontSize: isMobile ? 14 : 18, fontWeight: 900,
-              color: 'rgba(239,68,68,0.9)', marginTop: 8,
-              animation: 'rsp-tripleExplode 600ms ease-out',
-              animationDelay: '150ms', animationFillMode: 'backwards',
-              letterSpacing: '0.1em',
-            }}>
-              {shields > 0 ? `LIFE ${shields}/${maxShields}` : 'LAST LIFE GONE'}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ═══ STAGE CLEAR SCREEN ═══ */}
-      {stageClear && (
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 50,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'radial-gradient(ellipse at center, rgba(28,25,23,0.92) 0%, rgba(10,9,8,0.98) 70%)',
-          backdropFilter: 'blur(4px)',
-        }}>
-          <div style={{ textAlign: 'center', padding: '20px' }}>
-            <div style={{
-              fontSize: isMobile ? 28 : 40, fontWeight: 900,
-              color: '#D4AF37', letterSpacing: '0.2em',
-              textShadow: '0 0 30px rgba(212,175,55,0.6), 0 0 60px rgba(212,175,55,0.3)',
-              marginBottom: 8,
-              animation: 'rsp-tripleExplode 600ms ease-out',
-            }}>
-              STAGE CLEAR
-            </div>
-            <div style={{
-              fontSize: isMobile ? 48 : 64, fontWeight: 900, fontFamily: 'monospace',
-              color: '#FDE68A',
-              textShadow: '0 0 40px rgba(212,175,55,0.8)',
-              marginBottom: 16,
-              animation: 'rsp-tripleExplode 600ms ease-out',
-              animationDelay: '200ms', animationFillMode: 'backwards',
-            }}>
-              {stage}
-            </div>
-            <div style={{
-              fontSize: 14, fontWeight: 700, color: '#A8A29E', marginBottom: 24,
-            }}>
-              {totalGP.toLocaleString()} GP
-            </div>
-            <div style={{
-              fontSize: 11, fontWeight: 700, color: '#78716C', letterSpacing: '0.2em',
-              marginTop: 8,
-            }}>
-              次のステージへ...
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ═══ DANGER BORDER — constant when shields = 1 ═══ */}
-      {shields === 1 && !stageClear && (
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 2, pointerEvents: 'none',
-          border: '2px solid rgba(239,68,68,0.3)',
-          borderRadius: 16,
-          animation: 'rsp-dangerPulse 1.5s ease-in-out infinite',
-        }} />
-      )}
-
     </div>
   );
 }

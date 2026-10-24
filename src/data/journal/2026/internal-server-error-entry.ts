@@ -3,7 +3,7 @@ import { JournalEntry } from '../types';
 const internalServerErrorEntry: JournalEntry = {
     id: "104-hidden",
     title: "Internal Server Error (500)",
-    date: "2026-02-11",
+    date: "2026-07-08",
     summary: "「いつもいつもいつも」。なぜエラーは起きるのか。それは、システムが叫びを処理しきれないからだ。",
 
     conversation: `

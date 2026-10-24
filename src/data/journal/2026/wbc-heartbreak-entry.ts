@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const wbcHeartbreakEntry: JournalEntry = {
     id: '140',
-    date: '2026-03-16',
+    date: '2027-01-06',
     title: 'WBC 2026 敗戦日記 ― 日本が負けた日に英語を学ぶ男の矛盾',
     summary: 'WBC 2026、アメリカ優勝。日本は準決勝で散った。前回の記事で「勝つ空気」を語った男が、今度は「負けた空気」の中で英語を勉強してる。皮肉がすごい。',
     featured: false,

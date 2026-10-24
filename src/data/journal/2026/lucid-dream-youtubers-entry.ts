@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const lucidDreamYoutubersEntry: JournalEntry = {
     id: '093',
-    date: '2026-01-31',
+    date: '2026-07-13',
     title: '明晰夢YouTuberを調べたら悟りの話になった——空飛ぶ夢 vs エゴの死',
     summary: '「夢をコントロールできるぜ！」系YouTuberと「夢の中で死んでエゴを溶かせ」系仏教徒。同じ明晰夢なのに全然違う。調べてたら非二元の話に戻ってきた。',
     featured: true,

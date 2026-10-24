@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const antigravityHidakayaEntry: JournalEntry = {
     id: '083',
-    date: '2026-01-24',
+    date: '2027-02-17',
     title: '友達にAntigravityを紹介した日、日高屋で語った「無料」の裏側',
     summary: 'GoogleのAI IDE「Antigravity」を友達に紹介。無料の裏にある本当の狙いとは？日高屋で会えてありがとう！',
     featured: true,

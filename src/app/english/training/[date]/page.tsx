@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { addPhraseToTraining } from '@/lib/saved-phrases';
+import { SavedPhrasesStorage } from '@/lib/saved-phrases';
 import VoiceRecorder from '@/components/VoiceRecorder';
 
 interface VoiceRecording {
@@ -110,15 +110,10 @@ export default function PhraseDatePage() {
         return false;
     });
     const [showJapanese, setShowJapanese] = useState(true);
-    const [clipsOnly, setClipsOnly] = useState(false); // play only phrases that have a registered CLIP
-    const [useClipAudio, setUseClipAudio] = useState(true); // ON = play real CLIP audio (MediaSession, can pause background YouTube). OFF = always TTS (lets background YouTube keep playing)
     const [selectedMonth, setSelectedMonth] = useState(() => getMonthKey(dateParam || '2026-03-01'));
 
     // Shuffled playlist (regenerated when shuffle/filter changes)
     const [playlist, setPlaylist] = useState<Phrase[]>([]);
-
-    // Registered CLIP audio (real movie/PP audio on R2), keyed by phrase id
-    const [clipUrls, setClipUrls] = useState<Record<string, string>>({});
 
     const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const repeatModeRef = useRef(0);
@@ -127,20 +122,7 @@ export default function PhraseDatePage() {
     const shuffleDaysRef = useRef(false);
     const gapSecondsRef = useRef(0.5);
     const playlistRef = useRef<Phrase[]>([]);
-    const clipUrlsRef = useRef<Record<string, string>>({});
-    const clipAudioRef = useRef<HTMLAudioElement | null>(null);
-    const useClipAudioRef = useRef(true);
-    // Cards already heard this cycle (persisted) so a restart continues instead of replaying the top
-    const playedIdsRef = useRef<Set<string>>(new Set());
-    const playedCountRef = useRef(0);
-    const buildPlaylistRef = useRef<() => Phrase[]>(() => []);
 
-    const persistPlayed = () => {
-        try { localStorage.setItem('phrases_playedIds', JSON.stringify([...playedIdsRef.current])); } catch { /* */ }
-    };
-
-    useEffect(() => { clipUrlsRef.current = clipUrls; }, [clipUrls]);
-    useEffect(() => { useClipAudioRef.current = useClipAudio; }, [useClipAudio]);
     useEffect(() => { repeatModeRef.current = repeatMode; }, [repeatMode]);
     useEffect(() => { shuffleModeRef.current = shuffleMode; }, [shuffleMode]);
     useEffect(() => { autoNextDayRef.current = autoNextDay; }, [autoNextDay]);
@@ -159,7 +141,6 @@ export default function PhraseDatePage() {
             const g = localStorage.getItem('phrases_gap');
             const sj = localStorage.getItem('phrases_showJapanese');
             const ps = localStorage.getItem('phrases_playScope');
-            const uca = localStorage.getItem('phrases_useClipAudio');
 
             if (s) setSpeed(parseFloat(s));
             if (r) { const mode = parseInt(r); setRepeatMode(mode); repeatModeRef.current = mode; }
@@ -175,10 +156,6 @@ export default function PhraseDatePage() {
             if (g) setGapSeconds(parseFloat(g));
             if (sj === 'false') setShowJapanese(false);
             if (ps) setPlayScope(ps as PlayScope);
-            if (uca === 'false') { setUseClipAudio(false); useClipAudioRef.current = false; }
-
-            const pid = localStorage.getItem('phrases_playedIds');
-            if (pid) { try { playedIdsRef.current = new Set(JSON.parse(pid) as string[]); } catch { /* */ } }
         } catch { /* */ }
 
         // Load mastery from API
@@ -193,19 +170,8 @@ export default function PhraseDatePage() {
             .then(data => { if (data.success) setVoiceRecordings(data.recordings || {}); })
             .catch(() => {});
 
-        // Load registered CLIP audio (R2)
-        fetch('/api/phrase-clips')
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && Array.isArray(data.clips)) {
-                    const m: Record<string, string> = {};
-                    for (const c of data.clips) m[c.phrase_id] = c.url;
-                    setClipUrls(m);
-                }
-            })
-            .catch(() => {});
-
-        setSavedPhrases(new Set());
+        const saved = SavedPhrasesStorage.getAll();
+        setSavedPhrases(new Set(saved.map(p => p.english)));
         setSettingsLoaded(true);
     }, []);
 
@@ -243,10 +209,6 @@ export default function PhraseDatePage() {
         if (!settingsLoaded) return;
         localStorage.setItem('phrases_playScope', playScope);
     }, [playScope, settingsLoaded]);
-    useEffect(() => {
-        if (!settingsLoaded) return;
-        localStorage.setItem('phrases_useClipAudio', useClipAudio.toString());
-    }, [useClipAudio, settingsLoaded]);
 
     // ── Load phrases ──
     useEffect(() => {
@@ -291,9 +253,7 @@ export default function PhraseDatePage() {
 
         return () => {
             window.speechSynthesis.cancel();
-            clipAudioRef.current?.pause();
             stopProgress();
-            persistPlayed(); // save heard-cards progress on navigation/unmount
         };
     }, [dateParam, router]);
 
@@ -308,46 +268,28 @@ export default function PhraseDatePage() {
         return allPhrases;
     }, [playScope, dateParam, selectedMonth, allDates, phrasesByDate, allPhrases]);
 
-    // ── Derived: filtered by mastery (+ optional CLIP-only) ──
+    // ── Derived: filtered by mastery ──
     const filteredPhrases = useMemo(() => {
         return scopePhrases.filter(p => {
-            if (clipsOnly && !clipUrls[p.id]) return false;
             const m = (phraseMastery[p.id] || 0) as MasteryLevel;
             return masteryFilter.has(m);
         });
-    }, [scopePhrases, phraseMastery, masteryFilter, clipsOnly, clipUrls]);
+    }, [scopePhrases, phraseMastery, masteryFilter]);
 
-    // ── Build the playlist from the current filtered set ──
-    // Sequential keeps the listed order. Shuffle modes put cards NOT yet heard this cycle first
-    // (skipping playedIds), so reopening the page continues instead of replaying from the top.
-    // When everything has been heard, the cycle resets and a fresh shuffle of all cards begins.
-    const buildPlaylist = useCallback((): Phrase[] => {
-        const all = filteredPhrases;
-        if (all.length === 0) return [];
-        if (shuffleMode === 'off') return [...all];
-
-        let pool = all.filter(p => !playedIdsRef.current.has(p.id));
-        if (pool.length === 0) {
-            // Every card in THIS set has been heard -> start a fresh cycle for just this set.
-            // Only clear the current set's ids so progress for cards outside the scope/filter
-            // (e.g. the wider All set) is preserved.
-            const next = new Set(playedIdsRef.current);
-            all.forEach(p => next.delete(p.id));
-            playedIdsRef.current = next;
-            persistPlayed();
-            pool = [...all];
-        }
-        return shuffleMode === 'weighted'
-            ? weightedShuffle(pool, p => [4, 3, 2, 1][phraseMastery[p.id] || 0])
-            : randomShuffle(pool);
-    }, [filteredPhrases, shuffleMode, phraseMastery]);
-
-    useEffect(() => { buildPlaylistRef.current = buildPlaylist; }, [buildPlaylist]);
-
+    // ── Build playlist when filter/shuffle changes ──
     useEffect(() => {
-        setPlaylist(buildPlaylist());
+        let list = [...filteredPhrases];
+        if (shuffleMode === 'random') {
+            list = randomShuffle(list);
+        } else if (shuffleMode === 'weighted') {
+            list = weightedShuffle(list, p => {
+                const m = phraseMastery[p.id] || 0;
+                return [4, 3, 2, 1][m]; // NEW=4x weight, CLEAR=1x
+            });
+        }
+        setPlaylist(list);
         setCurrentIndex(0);
-    }, [buildPlaylist]);
+    }, [filteredPhrases, shuffleMode, phraseMastery]);
 
     // ── Available months ──
     const availableMonths = useMemo(() => {
@@ -390,64 +332,38 @@ export default function PhraseDatePage() {
         }
 
         const phrase = list[index];
-
-        // Stop whatever was playing before
-        window.speechSynthesis.cancel();
-        if (clipAudioRef.current) { clipAudioRef.current.pause(); }
-
-        // Remember this card as heard (so a later restart skips it). Persist every few cards.
-        playedIdsRef.current.add(phrase.id);
-        playedCountRef.current++;
-        if (playedCountRef.current % 5 === 0) persistPlayed();
-
-        setCurrentIndex(index);
-        setIsPlaying(true);
-
-        // Advance to the next line after this one finishes (shared by clip + TTS)
-        const advance = () => {
-            stopProgress();
-            setProgress(100);
-            const gap = gapSecondsRef.current * 1000;
-            setTimeout(() => {
-                const nextIndex = getNextIndex(index);
-                if (nextIndex >= 0) playLine(nextIndex);
-                else { setIsPlaying(false); setProgress(0); }
-            }, gap);
-        };
-
-        // If this phrase has a registered CLIP, play the real audio (works in background on mobile).
-        // When useClipAudio is OFF, skip the real audio and use TTS instead -- TTS does not grab the
-        // MediaSession "now playing" slot, so background YouTube keeps playing.
-        const clipUrl = useClipAudioRef.current ? clipUrlsRef.current[phrase.id] : undefined;
-        if (clipUrl) {
-            const audio = clipAudioRef.current;
-            if (audio) {
-                audio.src = clipUrl;
-                audio.playbackRate = speed;
-                if (typeof navigator !== 'undefined' && 'mediaSession' in navigator) {
-                    try {
-                        navigator.mediaSession.metadata = new MediaMetadata({
-                            title: phrase.english, artist: phrase.japanese || 'CLIP', album: 'Training',
-                        });
-                    } catch { /* */ }
-                }
-                audio.onended = advance;
-                audio.onerror = advance;
-                audio.play().catch(() => advance());
-                startProgress();
-                return;
-            }
-        }
-
-        // Otherwise fall back to TTS (synthesized voice)
         const utterance = new SpeechSynthesisUtterance(phrase.english);
         utterance.lang = 'en-US';
         utterance.rate = speed;
+
         const enVoice = voices.find(v => v.name.includes('Google US English')) || voices[0];
         if (enVoice) utterance.voice = enVoice;
+
+        setCurrentIndex(index);
+        setIsPlaying(true);
         startProgress();
-        utterance.onend = advance;
-        utterance.onerror = () => { setIsPlaying(false); stopProgress(); };
+
+        utterance.onend = () => {
+            stopProgress();
+            setProgress(100);
+
+            const gap = gapSecondsRef.current * 1000;
+            setTimeout(() => {
+                const nextIndex = getNextIndex(index);
+                if (nextIndex >= 0) {
+                    playLine(nextIndex);
+                } else {
+                    setIsPlaying(false);
+                    setProgress(0);
+                }
+            }, gap);
+        };
+
+        utterance.onerror = () => {
+            setIsPlaying(false);
+            stopProgress();
+        };
+
         window.speechSynthesis.speak(utterance);
     }, [speed, voices]);
 
@@ -457,19 +373,12 @@ export default function PhraseDatePage() {
 
         if (repeatModeRef.current === 2) return current; // repeat one
 
+        if (shuffleModeRef.current === 'random') {
+            return Math.floor(Math.random() * list.length);
+        }
+
         const next = current + 1;
         if (next >= list.length) {
-            // Reached the end of the playlist. In shuffle modes every card has now been heard
-            // this cycle, so buildPlaylist() resets playedIds and returns a fresh full shuffle --
-            // a full-permutation walk (no draw-with-replacement), so nothing repeats until the
-            // whole set has played once.
-            if (shuffleModeRef.current !== 'off') {
-                const fresh = buildPlaylistRef.current();
-                playlistRef.current = fresh; // update synchronously so playLine(0) uses the new order
-                setPlaylist(fresh);
-                return 0;
-            }
-
             if (repeatModeRef.current === 1) return 0; // repeat all
 
             if (autoNextDayRef.current && allDates.length > 1) {
@@ -509,10 +418,8 @@ export default function PhraseDatePage() {
     const togglePlay = () => {
         if (isPlaying) {
             window.speechSynthesis.cancel();
-            clipAudioRef.current?.pause();
             setIsPlaying(false);
             stopProgress();
-            persistPlayed(); // flush heard-cards progress when the user stops
         } else {
             playLine(currentIndex);
         }
@@ -530,17 +437,6 @@ export default function PhraseDatePage() {
         stopProgress();
         const prev = currentIndex <= 0 ? playlist.length - 1 : currentIndex - 1;
         playLine(prev);
-    };
-
-    // Flip to another card without auto-playing audio (keeps the view light)
-    const goToCard = (index: number) => {
-        if (playlist.length === 0) return;
-        window.speechSynthesis.cancel();
-        if (clipAudioRef.current) clipAudioRef.current.pause();
-        stopProgress();
-        setIsPlaying(false);
-        setProgress(0);
-        setCurrentIndex((index + playlist.length) % playlist.length);
     };
 
     const toggleRepeat = () => {
@@ -569,21 +465,16 @@ export default function PhraseDatePage() {
     };
 
     const reshuffle = () => {
-        setPlaylist(buildPlaylist());
-        setCurrentIndex(0);
-    };
-
-    // Wipe all heard-cards progress and start a brand-new full cycle from scratch.
-    const resetProgress = () => {
-        if (!window.confirm('聞いた記録を全部リセットして最初から再生し直す？')) return;
-        window.speechSynthesis.cancel();
-        clipAudioRef.current?.pause();
-        stopProgress();
-        setIsPlaying(false);
-        playedIdsRef.current = new Set();
-        playedCountRef.current = 0;
-        persistPlayed();
-        setPlaylist(buildPlaylist());
+        let list = [...filteredPhrases];
+        if (shuffleMode === 'random') {
+            list = randomShuffle(list);
+        } else if (shuffleMode === 'weighted') {
+            list = weightedShuffle(list, p => {
+                const m = phraseMastery[p.id] || 0;
+                return [4, 3, 2, 1][m];
+            });
+        }
+        setPlaylist(list);
         setCurrentIndex(0);
     };
 
@@ -603,11 +494,17 @@ export default function PhraseDatePage() {
         }
     };
 
-    const toggleSavePhrase = async (text: string, japanese: string, e: React.MouseEvent) => {
+    const toggleSavePhrase = (text: string, japanese: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (savedPhrases.has(text)) return;
-        const result = await addPhraseToTraining(text, japanese || '', dateParam);
-        if (result !== 'error') setSavedPhrases(prev => new Set(prev).add(text));
+        if (savedPhrases.has(text)) {
+            const all = SavedPhrasesStorage.getAll();
+            const found = all.find(p => p.english === text);
+            if (found) SavedPhrasesStorage.remove(found.id);
+            setSavedPhrases(prev => { const n = new Set(prev); n.delete(text); return n; });
+        } else {
+            SavedPhrasesStorage.save({ english: text, japanese, source: `Phrases: ${dateParam}` });
+            setSavedPhrases(prev => new Set(prev).add(text));
+        }
     };
 
     const getMasteryDisplay = (level: MasteryLevel) => {
@@ -684,8 +581,6 @@ export default function PhraseDatePage() {
 
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#FAFAF9', color: '#1C1917' }}>
-            {/* Persistent audio element for registered CLIPs (background playback on mobile) */}
-            <audio ref={clipAudioRef} preload="auto" playsInline />
             {/* Header */}
             <div style={{
                 padding: '12px 20px', borderBottom: '1px solid #F5F5F4', backgroundColor: '#fff',
@@ -710,15 +605,16 @@ export default function PhraseDatePage() {
                         Settings
                     </button>
                     {savedPhrases.size > 0 && (
-                        <span
+                        <button
+                            onClick={() => router.push('/english/bookmarks')}
                             style={{
-                                border: '1px solid #B8960C', color: '#B8960C',
-                                padding: '5px 10px', borderRadius: '6px',
+                                background: 'none', border: '1px solid #B8960C', color: '#B8960C',
+                                cursor: 'pointer', padding: '5px 10px', borderRadius: '6px',
                                 fontSize: '11px', fontWeight: 600,
                             }}
                         >
-                            Added {savedPhrases.size}
-                        </span>
+                            Saved {savedPhrases.size}
+                        </button>
                     )}
                 </div>
             </div>
@@ -812,6 +708,25 @@ export default function PhraseDatePage() {
                                     );
                                 })}
                             </div>
+                            {/* Quick presets */}
+                            <div style={{ display: 'flex', gap: '4px', marginTop: '6px' }}>
+                                <button onClick={() => setMasteryFilter(new Set([0, 1]))} style={{
+                                    padding: '3px 8px', fontSize: '10px', border: '1px solid #E7E5E4',
+                                    borderRadius: '4px', backgroundColor: '#fff', color: '#78716C', cursor: 'pointer',
+                                }}>Unlearned</button>
+                                <button onClick={() => setMasteryFilter(new Set([0]))} style={{
+                                    padding: '3px 8px', fontSize: '10px', border: '1px solid #E7E5E4',
+                                    borderRadius: '4px', backgroundColor: '#fff', color: '#78716C', cursor: 'pointer',
+                                }}>NEW only</button>
+                                <button onClick={() => setMasteryFilter(new Set([2, 3]))} style={{
+                                    padding: '3px 8px', fontSize: '10px', border: '1px solid #E7E5E4',
+                                    borderRadius: '4px', backgroundColor: '#fff', color: '#78716C', cursor: 'pointer',
+                                }}>Review Mastered</button>
+                                <button onClick={() => setMasteryFilter(new Set([0, 1, 2, 3]))} style={{
+                                    padding: '3px 8px', fontSize: '10px', border: '1px solid #E7E5E4',
+                                    borderRadius: '4px', backgroundColor: '#fff', color: '#78716C', cursor: 'pointer',
+                                }}>All Levels</button>
+                            </div>
                         </div>
 
                         {/* Shuffle Mode */}
@@ -823,6 +738,7 @@ export default function PhraseDatePage() {
                                 {([
                                     { key: 'off' as ShuffleMode, label: 'Sequential', desc: 'Order as listed' },
                                     { key: 'random' as ShuffleMode, label: 'Random', desc: 'Pure random' },
+                                    { key: 'weighted' as ShuffleMode, label: 'Weighted', desc: 'NEW first' },
                                 ]).map(s => (
                                     <button key={s.key} onClick={() => setShuffleMode(s.key)} style={{
                                         padding: '5px 12px', fontSize: '11px', fontWeight: 600, borderRadius: '6px',
@@ -842,25 +758,6 @@ export default function PhraseDatePage() {
                                         Reshuffle
                                     </button>
                                 )}
-                            </div>
-                        </div>
-
-                        {/* Progress (heard cards) */}
-                        <div style={{ marginBottom: '14px' }}>
-                            <div style={{ fontSize: '10px', fontWeight: 700, color: '#A8A29E', letterSpacing: '1px', marginBottom: '6px' }}>
-                                PROGRESS
-                            </div>
-                            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                <span style={{ fontSize: '12px', color: '#57534E' }}>
-                                    聞いた {filteredPhrases.filter(p => playedIdsRef.current.has(p.id)).length} / {filteredPhrases.length} 枚
-                                </span>
-                                <button onClick={resetProgress} style={{
-                                    padding: '5px 12px', fontSize: '11px', fontWeight: 600, borderRadius: '6px',
-                                    border: '1px solid #E7E5E4', backgroundColor: '#fff',
-                                    color: '#B91C1C', cursor: 'pointer', marginLeft: 'auto',
-                                }}>
-                                    進捗リセット
-                                </button>
                             </div>
                         </div>
 
@@ -904,28 +801,7 @@ export default function PhraseDatePage() {
                             }}>
                                 JP {showJapanese ? 'ON' : 'OFF'}
                             </button>
-                            <button onClick={() => setClipsOnly(!clipsOnly)} style={{
-                                padding: '5px 12px', fontSize: '11px', fontWeight: 600, borderRadius: '6px',
-                                border: clipsOnly ? '1px solid #7C3AED' : '1px solid #E7E5E4',
-                                backgroundColor: clipsOnly ? '#F5F3FF' : '#fff',
-                                color: clipsOnly ? '#7C3AED' : '#78716C', cursor: 'pointer',
-                            }}>
-                                CLIPのみ {clipsOnly ? 'ON' : 'OFF'}
-                            </button>
-                            <button onClick={() => setUseClipAudio(!useClipAudio)} style={{
-                                padding: '5px 12px', fontSize: '11px', fontWeight: 600, borderRadius: '6px',
-                                border: useClipAudio ? '1px solid #7C3AED' : '1px solid #E7E5E4',
-                                backgroundColor: useClipAudio ? '#F5F3FF' : '#fff',
-                                color: useClipAudio ? '#7C3AED' : '#78716C', cursor: 'pointer',
-                            }}>
-                                {useClipAudio ? 'CLIP音声 ON' : 'CLIP音声 OFF (TTS)'}
-                            </button>
                         </div>
-                        {!useClipAudio && (
-                            <div style={{ marginTop: '8px', fontSize: '10px', color: '#A8A29E', lineHeight: 1.5 }}>
-                                CLIP音声 OFF: クリップ登録済みでもTTSで再生します。MediaSessionを使わないので、バックグラウンドのYouTube等が止まりません。
-                            </div>
-                        )}
                     </div>
                 )}
 
@@ -1002,7 +878,7 @@ export default function PhraseDatePage() {
                             </div>
                         )}
                         {currentPhrase && (
-                            <div style={{ marginTop: '6px', display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <div style={{ marginTop: '6px' }}>
                                 {(() => {
                                     const m = (phraseMastery[currentPhrase.id] || 0) as MasteryLevel;
                                     const d = getMasteryDisplay(m);
@@ -1015,14 +891,6 @@ export default function PhraseDatePage() {
                                         </span>
                                     );
                                 })()}
-                                {clipUrls[currentPhrase.id] && (
-                                    <span style={{
-                                        fontSize: '10px', fontWeight: 700, padding: '2px 8px',
-                                        borderRadius: '4px', backgroundColor: '#F5F3FF', color: '#7C3AED',
-                                    }}>
-                                        CLIP
-                                    </span>
-                                )}
                             </div>
                         )}
                     </div>
@@ -1090,10 +958,10 @@ export default function PhraseDatePage() {
                     </div>
                 )}
 
-                {/* ── Current Card (one at a time, keeps the page light) ── */}
+                {/* ── Phrase List ── */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                     <span style={{ fontSize: '10px', fontWeight: 700, color: '#A8A29E', letterSpacing: '1px' }}>
-                        CARD {playlist.length > 0 ? currentIndex + 1 : 0} / {playlist.length}
+                        PLAYLIST ({playlist.length})
                     </span>
                     {shuffleMode !== 'off' && (
                         <button onClick={reshuffle} style={{
@@ -1105,54 +973,60 @@ export default function PhraseDatePage() {
                     )}
                 </div>
 
-                {currentPhrase && (() => {
-                    const phrase = currentPhrase;
-                    const mastery = (phraseMastery[phrase.id] || 0) as MasteryLevel;
-                    const masteryDisplay = getMasteryDisplay(mastery);
-                    const isSaved = savedPhrases.has(phrase.english);
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                    {playlist.map((phrase, i) => {
+                        const isActive = i === currentIndex;
+                        const mastery = (phraseMastery[phrase.id] || 0) as MasteryLevel;
+                        const masteryDisplay = getMasteryDisplay(mastery);
+                        const isSaved = savedPhrases.has(phrase.english);
 
-                    return (
-                        <div style={{
-                            backgroundColor: '#fff', borderRadius: '12px',
-                            border: '1px solid #FDE68A', padding: '20px',
-                        }}>
-                            {/* Tap-to-play body */}
+                        return (
                             <div
-                                onClick={() => { window.speechSynthesis.cancel(); stopProgress(); playLine(currentIndex); }}
-                                style={{ cursor: 'pointer' }}
+                                key={`${phrase.id}-${i}`}
+                                onClick={() => {
+                                    window.speechSynthesis.cancel();
+                                    stopProgress();
+                                    playLine(i);
+                                }}
+                                style={{
+                                    display: 'flex', alignItems: 'center', gap: '12px',
+                                    padding: '10px 12px', backgroundColor: isActive ? '#FFFBEB' : '#fff',
+                                    borderRadius: '8px', cursor: 'pointer',
+                                    border: isActive ? '1px solid #FDE68A' : '1px solid transparent',
+                                    marginBottom: '2px',
+                                }}
                             >
-                                <div style={{ fontSize: '20px', lineHeight: 1.6, color: '#1C1917', fontWeight: 500, marginBottom: '6px' }}>
-                                    {phrase.english}
-                                    {clipUrls[phrase.id] && (
-                                        <span style={{
-                                            marginLeft: '8px', fontSize: '9px', fontWeight: 700, padding: '2px 6px',
-                                            borderRadius: '3px', backgroundColor: '#F5F3FF', color: '#7C3AED',
-                                            verticalAlign: 'middle',
-                                        }}>
-                                            CLIP
-                                        </span>
+                                <div style={{
+                                    width: '24px', textAlign: 'center', fontSize: '12px',
+                                    color: isActive ? '#B8960C' : '#D6D3D1', fontWeight: isActive ? 700 : 400,
+                                }}>
+                                    {isActive && isPlaying ? '\u266B' : i + 1}
+                                </div>
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{
+                                        fontSize: '14px', lineHeight: 1.5, marginBottom: '2px',
+                                        color: isActive ? '#B8960C' : '#1C1917',
+                                        fontWeight: isActive ? 600 : 400,
+                                    }}>
+                                        {phrase.english}
+                                    </div>
+                                    {showJapanese && (
+                                        <div style={{ fontSize: '12px', color: '#A8A29E', lineHeight: 1.4 }}>
+                                            {phrase.japanese}
+                                        </div>
+                                    )}
+                                    {playScope !== 'day' && (
+                                        <div style={{ fontSize: '10px', color: '#D6D3D1', marginTop: '2px' }}>
+                                            {formatDateDisplay(phrase.date)}
+                                        </div>
                                     )}
                                 </div>
-                                {showJapanese && (
-                                    <div style={{ fontSize: '14px', color: '#78716C', lineHeight: 1.5 }}>
-                                        {phrase.japanese}
-                                    </div>
-                                )}
-                                {playScope !== 'day' && (
-                                    <div style={{ fontSize: '11px', color: '#D6D3D1', marginTop: '4px' }}>
-                                        {formatDateDisplay(phrase.date)}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Action row */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '16px', flexWrap: 'wrap' }}>
                                 <button
                                     onClick={e => cycleMastery(phrase.id, e)}
                                     style={{
                                         background: masteryDisplay.bg, border: 'none', borderRadius: '6px',
-                                        padding: '6px 12px', fontSize: '11px', color: masteryDisplay.color,
-                                        cursor: 'pointer', fontWeight: 700,
+                                        padding: '4px 8px', fontSize: '10px', color: masteryDisplay.color,
+                                        cursor: 'pointer', fontWeight: 700, flexShrink: 0,
                                     }}
                                 >
                                     {masteryDisplay.label}
@@ -1177,43 +1051,26 @@ export default function PhraseDatePage() {
                                     onClick={e => openVocabModal(phrase.english, e)}
                                     style={{
                                         background: 'none', border: '1px solid #10B981', borderRadius: '4px',
-                                        cursor: 'pointer', padding: '5px 10px', fontSize: '11px',
-                                        color: '#10B981', fontWeight: 600,
+                                        cursor: 'pointer', padding: '3px 6px', fontSize: '10px',
+                                        color: '#10B981', fontWeight: 600, flexShrink: 0,
                                     }}
                                 >
                                     +V
                                 </button>
                                 <button
                                     onClick={e => toggleSavePhrase(phrase.english, phrase.japanese, e)}
-                                    title={isSaved ? 'Added to training' : 'Add to training'}
                                     style={{
                                         background: 'none', border: 'none', cursor: 'pointer',
-                                        padding: '2px', fontSize: '18px', color: isSaved ? '#B8960C' : '#E7E5E4',
-                                        marginLeft: 'auto',
+                                        padding: '2px', fontSize: '16px', color: isSaved ? '#B8960C' : '#E7E5E4',
+                                        flexShrink: 0,
                                     }}
                                 >
                                     {isSaved ? '\u2605' : '\u2606'}
                                 </button>
                             </div>
-
-                            {/* Flip nav (no auto-play) */}
-                            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-                                <button onClick={() => goToCard(currentIndex - 1)} style={{
-                                    flex: 1, background: '#fff', border: '1px solid #E7E5E4', color: '#57534E',
-                                    cursor: 'pointer', padding: '10px', borderRadius: '8px', fontSize: '13px', fontWeight: 600,
-                                }}>
-                                    Prev card
-                                </button>
-                                <button onClick={() => goToCard(currentIndex + 1)} style={{
-                                    flex: 1, background: '#fff', border: '1px solid #E7E5E4', color: '#57534E',
-                                    cursor: 'pointer', padding: '10px', borderRadius: '8px', fontSize: '13px', fontWeight: 600,
-                                }}>
-                                    Next card
-                                </button>
-                            </div>
-                        </div>
-                    );
-                })()}
+                        );
+                    })}
+                </div>
 
                 {playlist.length === 0 && scopePhrases.length > 0 && (
                     <div style={{ textAlign: 'center', padding: '40px 24px', backgroundColor: '#D1FAE5', borderRadius: '12px' }}>

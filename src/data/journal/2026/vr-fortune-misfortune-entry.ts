@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const vrFortuneMisfortuneEntry: JournalEntry = {
     id: '088',
-    date: '2026-01-28',
+    date: '2027-03-10',
     title: 'VRの中では、いいも悪いも入れ替わる——アジャシャンティと「禍福は糾える縄の如し」',
     summary: 'アジャシャンティが言う「VR」の中にいる限り、良いと思ったことが悪くなり、悪いと思ったことが良くなる。エゴの視点では、禍福はあざなえる縄のようにぐるぐる回り続ける。でも、その「回転」を見ている意識は、どっちでもない。',
     featured: true,

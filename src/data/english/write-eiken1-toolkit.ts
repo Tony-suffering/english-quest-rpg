@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/data/english/write-eiken1-toolkit.ts
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * 英検1級 ライティング 表現マスター (Expression Toolkit)
  *

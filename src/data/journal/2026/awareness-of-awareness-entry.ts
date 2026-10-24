@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const awarenessOfAwarenessEntry: JournalEntry = {
     id: '117',
-    date: '2026-02-14',
+    date: '2026-07-03',
     title: '気づきについての気づき——常にそれだけ',
     summary: '気づきについての気づき。常にそれだけ。覚者・山家直生のバクティ記事とラマナの「私は誰か？」。いまここになにかがある、トラックが突っ込んでも快楽が突っ込んでも変わらない事実。Nick Castellanosのリリースで起きた名前のないエネルギー。苦しみはDBから生産される。ソクラテスは「生という病が治った」と言って死んだ。哲学とは思考が自分の限界に突き当たる行為。だるい。',
     featured: true,

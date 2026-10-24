@@ -14,14 +14,8 @@ import { siteExorcismEntry } from './site-exorcism-entry';
 import { standfmKaraokeEntry } from './standfm-karaoke-entry';
 import { sumasloCardSlotEntry } from './sumaslo-card-slot-entry';
 import { wbcHeartbreakEntry } from './wbc-heartbreak-entry';
-import { pianoComebackEntry } from './piano-comeback-entry';
-import { toeicBarLaunchEntry } from './toeic-bar-launch-entry';
-import { phraseInventoryEntry } from './phrase-inventory-entry';
 
 export const march2026Entries: JournalEntry[] = [
-    phraseInventoryEntry,
-    toeicBarLaunchEntry,
-    pianoComebackEntry,
     wbcHeartbreakEntry,
     sumasloCardSlotEntry,
     standfmKaraokeEntry,

@@ -1,15 +1,16 @@
 'use client';
 
 /**
- * OUTPUT PASS (アウトプットパス) -- 共通ブランドの外装。
+ * OUTPUT PASS (アウトプットパス) -- 共通ブランドの外装。公開版 (toniolab)。
  *
- * コンセプト: 英検は 1次=ライティング / 2次=スピーキング と、出口が両方アウトプット。
- * その「アウトプット限定」の対策だけに絞った自主教材シリーズとして、
- * /english/write (1次 ライトパス) と /english/speak (2次 スピークパス) を
- * "パス"(=合格 pass / 通行証)で揃えた一つのブランドで束ねる。「英検」は説明文に置くだけ。
+ * iwasaki 側には 1次(書く) / 2次(話す) の2枚看板があるが、こちらに持ってきているのは
+ * 「書く」側だけなので、タブも書く側の3本にしてある (行き先の無いタブを出さない)。
+ *   - ライトパス30日 = 模範解答を写す30日 (/english/write/days)
+ *   - CORE 5 = 意見を書く型 (/english/write/core5)
+ *   - SUM 5  = 要約を書く型 (/english/write/sum5)
  *
- * - EikenOutputNav: 1次⇄2次⇄トピック100 を行き来する共通ナビ + コンセプト一行
- * - EikenOutputDisclaimer: 英検協会と無関係・過去問非転載・商標のガード文言
+ * EikenOutputDisclaimer は文言ごと同じものを使う。英検の名前を出す以上、
+ * 無関係であること・過去問を写していないことは公開側でこそ要る。
  */
 
 import Link from 'next/link';
@@ -21,7 +22,7 @@ const SUB = '#78716C';
 const FAINT = '#A8A29E';
 const LINE = '#ECE7DA';
 
-type Active = 'write' | 'speak' | 'topic100' | 'theme30';
+type Active = 'write' | 'core5' | 'sum5' | 'speak' | 'topic100' | 'theme30';
 
 export function EikenOutputNav({ active }: { active: Active }) {
     const tab = (href: string, key: Active, label: string, sub: string) => {
@@ -44,16 +45,19 @@ export function EikenOutputNav({ active }: { active: Active }) {
         <div style={{ background: '#fff', borderBottom: `1px solid ${LINE}` }}>
             <div style={{ maxWidth: '760px', margin: '0 auto', padding: '12px 16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                    <span style={{ fontFamily: 'Georgia, serif', fontSize: '15px', fontWeight: 900, color: GOLD, letterSpacing: '1px' }}>
-                        OUTPUT<span style={{ color: INK }}> PASS</span>
-                    </span>
+                    <Link href="/english/write" style={{ textDecoration: 'none' }}>
+                        <span style={{ fontFamily: 'Georgia, serif', fontSize: '15px', fontWeight: 900, color: GOLD, letterSpacing: '1px' }}>
+                            OUTPUT<span style={{ color: INK }}> PASS</span>
+                        </span>
+                    </Link>
                     <span style={{ fontSize: '11px', color: FAINT, letterSpacing: '0.3px' }}>
-                        アウトプット限定の英検対策 ・ 1次=書く / 2次=話す / 土台=撃つ
+                        英語を「書く」型だけの道具 ・ 無料 ・ 登録不要
                     </span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                    {tab('/english/write', 'write', '1次 ライティング', '意見論述・要約を書く')}
-                    {tab('/english/speak', 'speak', '2次 スピーキング', 'スピーチを声に出す')}
+                    {tab('/english/write/days', 'write', '30日', 'ライトパス ー 写す')}
+                    {tab('/english/write/core5', 'core5', '意見を書く', 'CORE 5 ー 指10本')}
+                    {tab('/english/write/sum5', 'sum5', '要約を書く', 'SUM 5 ー 本文の形5つ')}
                 </div>
             </div>
         </div>

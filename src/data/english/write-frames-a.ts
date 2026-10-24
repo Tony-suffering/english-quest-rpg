@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/data/english/write-frames-a.ts
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * WRITE FRAMES -- Day 1 (見本)。
  * frame に slots を代入すると original に完全一致する。verify-write-frames.cjs で検査。

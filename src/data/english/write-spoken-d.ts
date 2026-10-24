@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/data/english/write-spoken-d.ts
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * WRITE SPOKEN D -- day 19-24 の口語版(2次スピーキング用)。
  * 表(write-eiken1.ts)と同じお題・同じ立場・同じ三理由を、口から出る形に直したもの。

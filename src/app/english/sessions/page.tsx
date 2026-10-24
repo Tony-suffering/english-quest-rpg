@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { addPhraseToTraining } from '@/lib/saved-phrases';
+import { SavedPhrasesStorage } from '@/lib/saved-phrases';
 
 type ThemeMode = 'dark' | 'light';
 type LineMode = 'sequential' | 'shuffle' | 'repeat-one';
@@ -335,6 +335,12 @@ export default function SessionsPage() {
         localStorage.setItem('session_speed', speed.toString());
     }, [speed, settingsLoaded]);
 
+    // Load saved phrases
+    useEffect(() => {
+        const saved = SavedPhrasesStorage.getAll();
+        setSavedPhrases(new Set(saved.map(p => p.english)));
+    }, []);
+
     // Get next index based on mode
     const getNextIndex = useCallback((current: number): number => {
         const total = allLines.length;
@@ -446,12 +452,26 @@ export default function SessionsPage() {
         });
     };
 
-    const toggleSavePhrase = async (text: string, e: React.MouseEvent) => {
+    const toggleSavePhrase = (text: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (savedPhrases.has(text)) return;
-        const line = allLines.find(l => l.text === text);
-        const result = await addPhraseToTraining(text, line?.japanese || '');
-        if (result !== 'error') setSavedPhrases(prev => new Set(prev).add(text));
+        if (savedPhrases.has(text)) {
+            const all = SavedPhrasesStorage.getAll();
+            const found = all.find(p => p.english === text);
+            if (found) SavedPhrasesStorage.remove(found.id);
+            setSavedPhrases(prev => {
+                const next = new Set(prev);
+                next.delete(text);
+                return next;
+            });
+        } else {
+            const line = allLines.find(l => l.text === text);
+            SavedPhrasesStorage.save({
+                english: text,
+                ...(line?.japanese ? { japanese: line.japanese } : {}),
+                source: 'Session: Iwasaki x Kuma',
+            });
+            setSavedPhrases(prev => new Set(prev).add(text));
+        }
     };
 
     const openVocabModal = (text: string, e: React.MouseEvent) => {
@@ -528,6 +548,26 @@ export default function SessionsPage() {
                     <span style={{ fontSize: '18px' }}>&#8249;</span> English
                 </button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {savedPhrases.size > 0 && (
+                        <button
+                            onClick={() => router.push('/english/bookmarks')}
+                            style={{
+                                background: 'none',
+                                border: `1px solid ${t.accent}`,
+                                color: t.accent,
+                                cursor: 'pointer',
+                                padding: '5px 10px',
+                                borderRadius: '6px',
+                                fontSize: '11px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                            }}
+                        >
+                            <span>Saved</span>
+                            <span>{savedPhrases.size}</span>
+                        </button>
+                    )}
                     <button
                         onClick={toggleTheme}
                         style={{
@@ -831,7 +871,7 @@ export default function SessionsPage() {
                                                                 fontSize: '16px',
                                                                 color: savedPhrases.has(line.text) ? '#FFD700' : t.textMuted,
                                                             }}
-                                                            title={savedPhrases.has(line.text) ? 'Added to training' : 'Add to training'}
+                                                            title={savedPhrases.has(line.text) ? 'Remove from saved' : 'Save phrase'}
                                                         >
                                                             {savedPhrases.has(line.text) ? 'S' : 'B'}
                                                         </button>

@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const eightyBillionVrWorldsEntry: JournalEntry = {
     id: '086',
-    date: '2026-01-26',
+    date: '2026-07-31',
     title: '80億のバーチャルリアリティ——この世界に生きていないことの代償',
     summary: '目覚めているとは何か？思考との距離、感情の痛み、幸せな無明、そして「この世界に生きていない」ことの代償について。Sadhguruは言う——「頭に思考がない。だからこの世界に生きている」',
     featured: true,

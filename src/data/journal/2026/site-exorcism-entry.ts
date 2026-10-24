@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const siteExorcismEntry: JournalEntry = {
     id: '137',
-    date: '2026-03-11',
+    date: '2027-01-08',
     title: 'サイト除霊 ― 消しても消しても出てくる会社のHP',
     summary: '個人サイトをCloudflare WorkersからVercelに移行。リポジトリが会社HPの完全コピーで、英語アプリの代わりに会社のサイトが表示され続けた。AIに何度言っても気づかない地獄。',
     featured: false,

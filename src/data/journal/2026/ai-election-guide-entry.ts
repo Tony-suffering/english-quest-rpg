@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const aiElectionGuideEntry: JournalEntry = {
     id: '102',
-    date: '2026-02-07',
+    date: '2026-09-18',
     title: 'AIに本気で聞いたら本気で答えた——明日の選挙、誰に入れるか',
     summary: '「選ぶ立場にない」とか言わない。データとロジックだけで、骨抜きなしの投票ガイド。小選挙区は戦略投票、比例は国民民主。理由は一つ。310を超えさせるな。',
     featured: true,

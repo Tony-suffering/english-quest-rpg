@@ -1,3 +1,6 @@
+// 自動生成 — ここでは直さない。
+// 元: iwasaki-naisou-website/src/app/english/write/sheet/page.tsx
+// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
@@ -415,7 +418,7 @@ function SheetInner() {
             {/* toolbar */}
             <div className="no-print" style={{ width: '210mm', maxWidth: '100%', marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', flexWrap: 'wrap' }}>
-                    <a href="/english/write" style={{ textDecoration: 'none', color: '#78716C', fontSize: '13px', fontWeight: 700 }}>← ライトパスに戻る</a>
+                    <a href="/english/write/days" style={{ textDecoration: 'none', color: '#78716C', fontSize: '13px', fontWeight: 700 }}>← ライトパスに戻る</a>
                     <button onClick={() => window.print()} style={{ padding: '10px 22px', borderRadius: '10px', border: 'none', background: '#1C1917', color: '#fff', fontSize: '14px', fontWeight: 800, cursor: 'pointer' }}>
                         印刷する / PDF保存
                     </button>

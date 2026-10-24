@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const standfmKaraokeEntry: JournalEntry = {
     id: '138',
-    date: '2026-03-12',
+    date: '2026-11-18',
     title: 'Stand.fmカラオケ方式 ― AIの台本を読むだけの男',
     summary: 'Stand.fmでAIに台本書いてもらって朗読を始めた。日本語と英語を交互に喋る。イカサマだけど口が動き始めた。過去記事には台本不要と気づいて022/023を削除。カラオケ方式 = 人の歌を歌うだけ。',
     featured: false,

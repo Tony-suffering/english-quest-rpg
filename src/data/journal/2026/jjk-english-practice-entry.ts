@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const jjkEnglishPracticeEntry: JournalEntry = {
     id: '071',
-    date: '2026-01-12',
+    date: '2026-11-20',
     title: '呪術廻戦で英語を学ぶ——五条悟、七海建人、東堂葵を語る',
     summary: '英会話練習をしていたら、呪術廻戦のキャラクター語りになった。AIのジョークは滑り、ゾンビ哲学が飛び出し、最後は「思考には真実がない」という悟りに至る。',
     featured: true,
@@ -105,7 +105,7 @@ export const jjkEnglishPracticeEntry: JournalEntry = {
         ],
         japanese: [
             { speaker: 'male', text: "この会話はお前がリードしてくれ。俺が喋って、お前が直して、返事する。わかった？" },
-            { speaker: 'female', text: "わかった！じゃあ質問。岩崎内装を30年以上やってるって聞いたけど、今でも何にワクワクする？" },
+            { speaker: 'female', text: "わかった！じゃあ質問。内装の仕事を長くやってるって聞いたけど、今でも何にワクワクする？" },
             { speaker: 'male', text: "いや、30年は嘘だよ。俺まだ34歳だし。そんなに長くやってない。" },
             { speaker: 'female', text: "あ、ごめん！途中で切れたね。何を言おうとしてた？" },
             { speaker: 'male', text: "特に話したいことないんだ。だからお前がリードして、面白いこと言って笑わせてよ。" },

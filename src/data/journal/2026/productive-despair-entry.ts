@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const productiveDespairEntry: JournalEntry = {
     id: '131',
-    date: '2026-03-01',
+    date: '2027-03-24',
     title: 'どうしようもなさの効用 ― 完成を捨てたら手が止まらなくなった',
     summary: 'バグは永遠に出る。完成は来ない。それを受け入れた瞬間、開発が速くなった。希望のフォーマットを「未来の完成」から「今日の1ミリ」に変えた話。',
     featured: false,

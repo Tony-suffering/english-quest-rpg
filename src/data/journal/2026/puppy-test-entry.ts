@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const puppyTestEntry: JournalEntry = {
     id: '999',
-    date: '2026-01-23',
+    date: '2027-01-01',
     title: '子犬が可愛すぎる件について',
     summary: '散歩中に子犬に遭遇。あまりの可愛さに仕事が手につかない。',
     featured: false,

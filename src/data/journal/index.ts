@@ -18,8 +18,10 @@ import { january2026Entries } from './2026/01-january';
 import { february2026Entries } from './2026/02-february';
 import { march2026Entries } from './2026/03-march';
 import { april2026Entries } from './2026/04-april';
+import { may2026Entries } from './2026/05-may';
 // 全エントリを統合（新しい順）
 export const journalEntries: JournalEntry[] = [
+    ...may2026Entries,
     ...april2026Entries,
     ...march2026Entries,
     ...february2026Entries,

@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const existenceFatigueEntry: JournalEntry = {
     id: '081',
-    date: '2026-01-24',
+    date: '2026-08-19',
     title: '存在に疲れる——思考とエゴと「今ここ」の間で',
     summary: 'サルトル＝カミュ論争からラマナ・マハルシまで。思考は思考でしかなく、真理ではない。だるくても思いやりはある。',
     featured: true,

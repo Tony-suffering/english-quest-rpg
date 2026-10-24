@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const aiEnglishLearningEntry: JournalEntry = {
    id: '067',
-   date: '2026-01-11',
+   date: '2027-03-29',
    title: 'AIに英語学習システムを作らせようとしたら、アジャシャンティの教えに辿り着いた話',
    summary: 'Duolingo年2.2万円、PROGRIT3ヶ月68万円。市場調査、技術検証、そして「本当は何もしたくない」という真実。68万円払う前に、アジャシャンティを読もう。',
    featured: true,

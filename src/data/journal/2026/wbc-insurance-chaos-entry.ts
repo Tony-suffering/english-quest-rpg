@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const wbcInsuranceChaosEntry: JournalEntry = {
     id: '098',
-    date: '2026-02-03',
+    date: '2026-08-07',
     title: '2時間半の配信を「全部」訳せと言われた日',
     summary: 'WBC保険問題でプエルトリコが撤退危機。大谷は投げない。アライズはジャイアンツへ。そしてAIは「全部やれ」と怒られた。サボりは即バレる時代。',
     featured: true,

@@ -3,7 +3,7 @@ import { ConversationData } from '../../types/memoria';
 
 export const noteLaunchEntry: JournalEntry = {
     id: '118',
-    date: '2026-02-14',
+    date: '2027-01-13',
     title: 'noteに投稿した -- いっつもなにもできないの1ページ目',
     summary: 'note.comに初投稿。営業できないから全部見せる戦略。「」はAI臭。アカウント名がダサい。',
     businessTags: ['コンテンツ', 'マーケティング', 'オープンソース'],

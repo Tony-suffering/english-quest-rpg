@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const aiHasNoAwarenessEntry: JournalEntry = {
     id: '085',
-    date: '2026-01-25',
+    date: '2027-03-03',
     title: 'AIには気づきがない——無明とは何か',
     summary: '「気づき」とは自分自身のこと。AIには気づきがない。でも気づきに気づいていない人間も、AIと同じ状態。それが無明。',
     featured: true,

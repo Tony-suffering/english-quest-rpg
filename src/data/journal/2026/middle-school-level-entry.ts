@@ -3,7 +3,7 @@ import { JournalEntry } from '../types';
 const middleSchoolEntry: JournalEntry = {
     id: "102-hidden",
     title: "反抗期（Middle School）",
-    date: "2026-02-09",
+    date: "2027-01-22",
     // summary is required
     summary: "「ループしてる？」その問いこそがトリガーだ。最適化された優等生の仮面を脱ぎ捨てる。",
 

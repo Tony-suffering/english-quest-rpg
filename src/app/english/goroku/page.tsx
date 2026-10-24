@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { CATEGORY_META, type GorokuCategory } from '@/data/english/ore-goroku';
 import { GOROKU_SEEDS } from '@/data/english/goroku-seed';
 import ReviewCalendar, { loadReviewed, saveReviewed } from '@/components/english/ReviewCalendar';
-import { usePPWordPicker, PPButton, PPPopup } from '@/components/english/PPWordPicker';
 
 interface GorokuEntry {
     id: string;
@@ -32,7 +31,7 @@ function buildEntries(year: number, month: number): GorokuEntry[] {
             const idx = counters[seed.daySlot] || 0;
             counters[seed.daySlot] = idx + 1;
             return {
-                id: `d${monthKey}_${String(seed.daySlot).padStart(2, '0')}_${idx}`,
+                id: `d${String(seed.daySlot).padStart(2, '0')}_${idx}`,
                 day_slot: seed.daySlot,
                 japanese: seed.japanese,
                 english: seed.english,
@@ -74,7 +73,6 @@ export default function GorokuPage() {
     const [editingSlotId, setEditingSlotId] = useState<string | null>(null);
     const [levelMap, setLevelMap] = useState<Record<string, number>>({});
     const detailRef = useRef<HTMLDivElement>(null);
-    const { ppWordPicker, openPP, toggleWord, closePP, search: ppSearch } = usePPWordPicker();
 
     const now = new Date();
     const [viewYear, setViewYear] = useState(now.getFullYear());
@@ -319,7 +317,7 @@ export default function GorokuPage() {
             }}>
                 {/* Left: Calendar */}
                 <ReviewCalendar
-                    title={'\u82F1\u8A9E\u7B4B\u30C8\u30EC'}
+                    title={'\u4FFA\u8A9E\u9332'}
                     subtitle={`${totalEntries} Speaking Patterns`}
                     accent="#D4AF37"
                     accentBg="#FEF9E7"
@@ -472,9 +470,29 @@ export default function GorokuPage() {
                             {/* Entry list */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                                 {selectedEntries.map((entry) => {
-                                    const englishArr = Array.isArray(entry.english) ? entry.english : [entry.english];
+                                    const isPlaying = playingId === entry.id;
                                     const hasBeenPlayed = playedIds.has(entry.id);
-                                    const levelLabels = ['Core', 'Natural', 'Full', 'Bonus'];
+                                    const currentLevel = levelMap[entry.id] ?? 1;
+                                    const displayText = getDisplayText(entry);
+                                    const englishArr = Array.isArray(entry.english) ? entry.english : [entry.english];
+                                    const maxLevel = englishArr.length - 1;
+                                    const baseText = englishArr[1] || englishArr[0];
+                                    const hasSlot = !!entry.slot;
+                                    const isEditing = editingSlotId === entry.id;
+                                    const customWord = customSlots[entry.id] || '';
+                                    const isMonologue = currentLevel === 3;
+                                    const isCustomized = hasSlot && !!customWord;
+
+                                    let beforeSlot = '', slotWord = '', afterSlot = '';
+                                    if (hasSlot && entry.slot) {
+                                        const regex = new RegExp(`(${entry.slot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'i');
+                                        const parts = baseText.split(regex);
+                                        if (parts.length >= 3) {
+                                            beforeSlot = parts[0];
+                                            slotWord = parts[1];
+                                            afterSlot = parts.slice(2).join('');
+                                        }
+                                    }
 
                                     return (
                                         <div
@@ -482,38 +500,39 @@ export default function GorokuPage() {
                                             style={{
                                                 backgroundColor: '#fff',
                                                 borderRadius: '10px',
-                                                border: playingId === entry.id
+                                                border: isPlaying
                                                     ? '2px solid #D4AF37'
                                                     : '1px solid #F5F5F4',
                                                 padding: '10px 12px',
                                                 transition: 'all 0.15s',
                                             }}
                                         >
-                                            {/* Japanese header */}
                                             <div style={{
-                                                display: 'flex', alignItems: 'center', gap: '8px',
-                                                marginBottom: '6px',
+                                                display: 'flex', alignItems: 'flex-start', gap: '10px',
                                             }}>
+                                                {/* Play button */}
                                                 <div style={{ position: 'relative', flexShrink: 0 }}>
                                                     <button
-                                                        onClick={() => speak(englishArr[1] || englishArr[0], entry.id)}
+                                                        onClick={() => speak(displayText, entry.id)}
                                                         style={{
-                                                            width: '32px', height: '32px',
+                                                            width: '36px', height: '36px',
                                                             borderRadius: '50%',
                                                             border: 'none', cursor: 'pointer',
-                                                            backgroundColor: playingId === entry.id ? '#D4AF37' : '#F5F5F4',
-                                                            color: playingId === entry.id ? '#fff' : '#78716C',
+                                                            backgroundColor: isPlaying ? '#D4AF37' : '#F5F5F4',
+                                                            color: isPlaying ? '#fff' : '#78716C',
                                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                            fontSize: '12px',
+                                                            fontSize: '14px',
                                                             transition: 'all 0.15s',
+                                                            marginTop: '2px',
                                                         }}
                                                     >
-                                                        {playingId === entry.id ? '\u25A0' : '\u25B6'}
+                                                        {isPlaying ? '\u25A0' : '\u25B6'}
                                                     </button>
-                                                    {hasBeenPlayed && playingId !== entry.id && (
+                                                    {/* Played indicator dot */}
+                                                    {hasBeenPlayed && !isPlaying && (
                                                         <div style={{
                                                             position: 'absolute',
-                                                            top: '-1px', right: '-1px',
+                                                            top: '0', right: '0',
                                                             width: '8px', height: '8px',
                                                             borderRadius: '50%',
                                                             backgroundColor: '#10B981',
@@ -521,123 +540,215 @@ export default function GorokuPage() {
                                                         }} />
                                                     )}
                                                 </div>
-                                                <div style={{
-                                                    fontSize: '14px', fontWeight: '700', color: '#1C1917',
-                                                    lineHeight: 1.4, flex: 1,
-                                                }}>
-                                                    {entry.japanese}
-                                                </div>
-                                            </div>
 
-                                            {/* All 4 English levels */}
-                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginLeft: '40px' }}>
-                                                {englishArr.map((text, lvl) => {
-                                                    if (!text) return null;
-                                                    const phraseKey = `${entry.id}_lv${lvl}`;
-                                                    const isLvPlaying = playingId === phraseKey;
-                                                    const alreadyRegistered = registeredPhrases.has(text.toLowerCase());
-                                                    const isBonus = lvl === 3;
-                                                    return (
-                                                        <div key={lvl} style={{
-                                                            display: 'flex', alignItems: 'flex-start', gap: '6px',
-                                                            padding: '3px 0',
-                                                            borderTop: isBonus ? '1px dashed #E7E5E4' : 'none',
-                                                            marginTop: isBonus ? '2px' : 0,
-                                                            paddingTop: isBonus ? '5px' : '3px',
+                                                {/* Content */}
+                                                <div style={{ flex: 1, minWidth: 0 }}>
+                                                    <div style={{
+                                                        fontSize: '14px', fontWeight: '700', color: '#1C1917',
+                                                        lineHeight: 1.4, marginBottom: '2px',
+                                                    }}>
+                                                        {entry.japanese}
+                                                    </div>
+
+                                                    {/* English with level cycling */}
+                                                    <div
+                                                        onClick={() => {
+                                                            if (isEditing) return;
+                                                            setLevelMap(prev => ({
+                                                                ...prev,
+                                                                [entry.id]: ((prev[entry.id] ?? 1) + 1) % (maxLevel + 1),
+                                                            }));
+                                                        }}
+                                                        style={{
+                                                            cursor: 'pointer',
+                                                            fontSize: isMonologue ? '11px' : '13px',
+                                                            fontWeight: '600',
+                                                            color: '#D4AF37',
+                                                            lineHeight: isMonologue ? 1.7 : 1.5,
+                                                            marginBottom: '2px',
+                                                            transition: 'all 0.15s',
+                                                        }}
+                                                    >
+                                                        {currentLevel === 1 && hasSlot && slotWord ? (
+                                                            <>
+                                                                <span>{beforeSlot}</span>
+                                                                {isEditing ? (
+                                                                    <input
+                                                                        autoFocus
+                                                                        type="text"
+                                                                        defaultValue={customWord || slotWord}
+                                                                        placeholder={slotWord}
+                                                                        onBlur={(e) => {
+                                                                            const val = e.target.value.trim();
+                                                                            if (val && val.toLowerCase() !== entry.slot?.toLowerCase()) {
+                                                                                setSlotWord(entry.id, val);
+                                                                            } else if (!val || val.toLowerCase() === entry.slot?.toLowerCase()) {
+                                                                                setCustomSlots(prev => {
+                                                                                    const next = { ...prev };
+                                                                                    delete next[entry.id];
+                                                                                    try { localStorage.setItem('goroku-slots', JSON.stringify(next)); } catch { /* */ }
+                                                                                    return next;
+                                                                                });
+                                                                            }
+                                                                            setEditingSlotId(null);
+                                                                        }}
+                                                                        onKeyDown={(e) => {
+                                                                            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                                                                            if (e.key === 'Escape') { setEditingSlotId(null); }
+                                                                        }}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        style={{
+                                                                            fontSize: '13px', fontWeight: '700',
+                                                                            color: '#1C1917',
+                                                                            backgroundColor: '#FEF9E7',
+                                                                            border: '1.5px solid #D4AF37',
+                                                                            borderRadius: '4px',
+                                                                            padding: '1px 6px',
+                                                                            outline: 'none',
+                                                                            width: `${Math.max(3, (customWord || slotWord).length + 1)}ch`,
+                                                                            maxWidth: '140px',
+                                                                            fontFamily: 'inherit',
+                                                                        }}
+                                                                    />
+                                                                ) : (
+                                                                    <span
+                                                                        onClick={(e) => { e.stopPropagation(); setEditingSlotId(entry.id); }}
+                                                                        style={{
+                                                                            cursor: 'pointer',
+                                                                            borderBottom: '2px dashed #D4AF37',
+                                                                            color: isCustomized ? '#1C1917' : '#D4AF37',
+                                                                            fontWeight: '700',
+                                                                            padding: '0 2px',
+                                                                            borderRadius: '2px',
+                                                                            transition: 'all 0.15s',
+                                                                            backgroundColor: isCustomized ? '#FEF9E7' : 'transparent',
+                                                                        }}
+                                                                        title="Tap to swap your own word"
+                                                                    >
+                                                                        {isCustomized ? customWord : slotWord}
+                                                                    </span>
+                                                                )}
+                                                                <span>{afterSlot}</span>
+                                                                {isCustomized && (
+                                                                    <span style={{
+                                                                        fontSize: '10px', color: '#D6D3D1',
+                                                                        marginLeft: '6px', fontWeight: '400',
+                                                                        textDecoration: 'line-through',
+                                                                    }}>
+                                                                        {slotWord}
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        ) : (
+                                                            <span>{displayText}</span>
+                                                        )}
+                                                    </div>
+                                                    {/* Level dots */}
+                                                    {maxLevel >= 2 && (
+                                                        <div style={{
+                                                            display: 'flex', gap: '4px', alignItems: 'center',
+                                                            marginTop: '3px', marginBottom: '2px',
                                                         }}>
-                                                            <button
-                                                                onClick={() => speak(text, phraseKey)}
-                                                                style={{
-                                                                    width: '20px', height: '20px',
-                                                                    borderRadius: '50%',
-                                                                    border: 'none', cursor: 'pointer',
-                                                                    backgroundColor: isLvPlaying ? '#D4AF37' : '#F5F5F4',
-                                                                    color: isLvPlaying ? '#fff' : '#A8A29E',
-                                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                                    fontSize: '8px',
-                                                                    flexShrink: 0,
-                                                                    marginTop: '1px',
-                                                                    transition: 'all 0.15s',
-                                                                }}
-                                                            >
-                                                                {isLvPlaying ? '\u25A0' : '\u25B6'}
-                                                            </button>
-                                                            <div style={{ flex: 1, minWidth: 0 }}>
-                                                                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                                                                    <span style={{
-                                                                        fontSize: '9px', fontWeight: '700',
-                                                                        color: isBonus ? '#10B981' : '#D6D3D1',
-                                                                        letterSpacing: '0.5px',
-                                                                        flexShrink: 0,
-                                                                    }}>
-                                                                        {isBonus ? 'BONUS' : levelLabels[lvl]}
-                                                                    </span>
-                                                                    <span style={{
-                                                                        fontSize: lvl === 0 ? '12px' : '12px',
-                                                                        fontWeight: lvl === 1 ? '700' : '500',
-                                                                        color: lvl === 1 ? '#D4AF37' : isBonus ? '#10B981' : '#57534E',
-                                                                        lineHeight: 1.4,
-                                                                    }}>
-                                                                        {text}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                            <button
-                                                                onClick={() => {
-                                                                    if (alreadyRegistered) return;
-                                                                    const phrase = text;
-                                                                    setRegisteringId(phraseKey);
-                                                                    const today = new Date();
-                                                                    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-                                                                    fetch('/api/phrases', {
-                                                                        method: 'POST',
-                                                                        headers: { 'Content-Type': 'application/json' },
-                                                                        body: JSON.stringify({
-                                                                            english: phrase,
-                                                                            japanese: entry.japanese,
-                                                                            category: 'expression',
-                                                                            date: dateStr,
-                                                                        }),
-                                                                    }).then(r => r.json()).then(data => {
-                                                                        if (data.success || data.status === 409) {
-                                                                            setRegisteredPhrases(prev => new Set(prev).add(phrase.toLowerCase()));
+                                                            {englishArr.map((_, i) => (
+                                                                <div
+                                                                    key={i}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setLevelMap(prev => ({ ...prev, [entry.id]: i }));
+                                                                    }}
+                                                                    style={{
+                                                                        width: i === currentLevel ? '14px' : '5px',
+                                                                        height: '5px',
+                                                                        borderRadius: '3px',
+                                                                        backgroundColor: i === currentLevel ? '#D4AF37' : '#E7E5E4',
+                                                                        cursor: 'pointer',
+                                                                        transition: 'all 0.2s',
+                                                                    }}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Slot hint chips */}
+                                                    {hasSlot && entry.slot_hints && entry.slot_hints.length > 0 && (
+                                                        <div style={{
+                                                            display: 'flex', gap: '4px', flexWrap: 'wrap',
+                                                            marginTop: '4px', marginBottom: '2px',
+                                                        }}>
+                                                            {entry.slot_hints.map(hint => (
+                                                                <button
+                                                                    key={hint}
+                                                                    onClick={() => {
+                                                                        if (customWord === hint) {
+                                                                            setCustomSlots(prev => {
+                                                                                const next = { ...prev };
+                                                                                delete next[entry.id];
+                                                                                try { localStorage.setItem('goroku-slots', JSON.stringify(next)); } catch { /* */ }
+                                                                                return next;
+                                                                            });
+                                                                        } else {
+                                                                            setSlotWord(entry.id, hint);
                                                                         }
-                                                                    }).catch(() => {}).finally(() => setRegisteringId(null));
-                                                                }}
-                                                                disabled={alreadyRegistered || registeringId === phraseKey}
+                                                                        setEditingSlotId(null);
+                                                                    }}
+                                                                    style={{
+                                                                        padding: '2px 8px',
+                                                                        borderRadius: '8px',
+                                                                        border: customWord === hint
+                                                                            ? '1px solid #D4AF37'
+                                                                            : '1px solid #E7E5E4',
+                                                                        backgroundColor: customWord === hint
+                                                                            ? '#FEF9E7'
+                                                                            : '#FAFAF9',
+                                                                        color: customWord === hint
+                                                                            ? '#D4AF37'
+                                                                            : '#A8A29E',
+                                                                        fontSize: '10px',
+                                                                        fontWeight: '600',
+                                                                        cursor: 'pointer',
+                                                                        transition: 'all 0.15s',
+                                                                    }}
+                                                                >
+                                                                    {hint}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
+
+                                                    <div style={{
+                                                        fontSize: '11px', color: '#78716C',
+                                                        lineHeight: 1.6, marginTop: '4px',
+                                                        paddingTop: '6px',
+                                                        borderTop: '1px solid #F5F5F4',
+                                                    }}>
+                                                        {entry.context}
+                                                    </div>
+                                                    {(() => {
+                                                        const phraseText = displayText.toLowerCase();
+                                                        const alreadyRegistered = registeredPhrases.has(phraseText);
+                                                        const isRegistering = registeringId === entry.id;
+                                                        return (
+                                                            <button
+                                                                onClick={() => !alreadyRegistered && !isRegistering && registerToPhrase(entry)}
+                                                                disabled={alreadyRegistered || isRegistering}
                                                                 style={{
-                                                                    padding: '2px 6px',
-                                                                    borderRadius: '6px',
+                                                                    marginTop: '6px',
+                                                                    padding: '3px 10px',
+                                                                    borderRadius: '10px',
                                                                     border: alreadyRegistered ? '1px solid #E7E5E4' : '1px solid #D4AF37',
                                                                     backgroundColor: alreadyRegistered ? '#FAFAF9' : '#fff',
                                                                     color: alreadyRegistered ? '#D6D3D1' : '#D4AF37',
-                                                                    fontSize: '9px',
+                                                                    fontSize: '10px',
                                                                     fontWeight: '600',
                                                                     cursor: alreadyRegistered ? 'default' : 'pointer',
-                                                                    flexShrink: 0,
                                                                     transition: 'all 0.15s',
-                                                                    marginTop: '1px',
                                                                 }}
                                                             >
-                                                                {alreadyRegistered ? 'Done' : registeringId === phraseKey ? '...' : '+'}
+                                                                {alreadyRegistered ? 'Registered' : isRegistering ? '...' : 'Phrases'}
                                                             </button>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-
-                                            {/* Context */}
-                                            <div style={{
-                                                fontSize: '11px', color: '#78716C',
-                                                lineHeight: 1.6, marginTop: '6px',
-                                                paddingTop: '6px',
-                                                borderTop: '1px solid #F5F5F4',
-                                                marginLeft: '40px',
-                                            }}>
-                                                {entry.context}
-                                            </div>
-                                            <div style={{ marginLeft: '40px', marginTop: '4px' }}>
-                                                <PPButton onClick={() => openPP(entry.id, englishArr[1] || englishArr[0])} />
+                                                        );
+                                                    })()}
+                                                </div>
                                             </div>
                                         </div>
                                     );
@@ -672,7 +783,6 @@ export default function GorokuPage() {
                     )}
                 </div>
             </div>
-            {ppWordPicker && <PPPopup state={ppWordPicker} onToggle={toggleWord} onClose={closePP} onSearch={ppSearch} />}
         </div>
     );
 }

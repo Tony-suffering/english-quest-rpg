@@ -6,7 +6,7 @@ import { JournalEntry } from '../types';
 
 export const tiredBuildingEntry: JournalEntry = {
     id: '076',
-    date: '2026-01-20',
+    date: '2026-10-09',
     title: '疲れた——作っても作っても、どうでもいい',
     summary: '英語学習アプリを作り続けている。ボタンを追加し、UIを統一し、機能を整える。でも、ふと思う。「ほんとうは英語とかどうでもいいかも」。作ることに意味があるのか、それとも作ることで何かを埋めようとしているのか。',
     featured: true,

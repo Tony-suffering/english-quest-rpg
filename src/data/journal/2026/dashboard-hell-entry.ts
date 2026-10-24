@@ -7,7 +7,7 @@ import { JournalEntry } from '../types';
 
 export const dashboardHellEntry: JournalEntry = {
     id: '128',
-    date: '2026-02-25',
+    date: '2027-03-31',
     title: 'ダッシュボード地獄 ― 3つの指標を作ったら2つは同じだった',
     summary: '英語の勉強0分、ダッシュボードの開発5時間。Reps・Power・XPを定義したらPowerとXPがほぼ同じだった。測るのが目的になってる。でもダッシュボードがあると毎日やる気が出る。本末転倒が結果的に回ってる。',
     featured: false,
