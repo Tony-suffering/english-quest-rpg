@@ -103,7 +103,7 @@ function HomeScreenMock() {
         <div className="w-12 h-12 rounded-xl bg-[#D4AF37] flex items-center justify-center shadow-lg border-2 border-[#D4AF37]">
           <span className="text-sm font-black text-white">英</span>
         </div>
-        <span className="text-[10px] font-bold text-[#252423]/60">英語魂</span>
+        <span className="text-[10px] font-bold text-[#252423]/60">とにおラボ</span>
       </div>
       <div className="w-12 h-12 rounded-xl bg-[#E5E7EB]" />
     </div>
@@ -172,7 +172,7 @@ function AlreadyInstalled() {
       </div>
       <h1 className="text-2xl font-black mb-3">インストール済み</h1>
       <p className="text-sm text-[#252423]/50 leading-relaxed text-center mb-8">
-        英語魂は既にホーム画面に追加されています。<br />このままアプリをお楽しみください。
+        とにおラボは既にホーム画面に追加されています。<br />このままアプリをお楽しみください。
       </p>
       <Link href="/english" className="inline-flex items-center gap-3 px-8 py-3 bg-[#252423] text-white text-sm font-bold tracking-wide hover:bg-[#D4AF37] transition-colors">
         アプリを開く <span className="text-xs opacity-50">--</span>
@@ -216,7 +216,7 @@ export default function InstallPage() {
             INSTALL GUIDE
           </motion.p>
           <motion.h1 variants={f} className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.3] tracking-tight mb-6">
-            <span className="text-[#D4AF37]">英語魂</span>を<br />ホーム画面に追加する。
+            <span className="text-[#D4AF37]">とにおラボ</span>を<br />ホーム画面に追加する。
           </motion.h1>
           <motion.p variants={f} className="text-base sm:text-lg text-[#252423]/60 leading-relaxed max-w-xl mb-12">
             App StoreやGoogle Playからのダウンロードは不要。<br />
@@ -246,7 +246,7 @@ export default function InstallPage() {
             {[
               { title: 'ワンタップ起動', desc: 'ホーム画面のアイコンをタップするだけ。URLを打つ必要なし。' },
               { title: 'フルスクリーン', desc: 'ブラウザのバーが消えて、アプリと同じ画面サイズで使える。' },
-              { title: '容量ほぼゼロ', desc: '普通のアプリは数百MB。英語魂はブラウザ上で動くので数MBで完結。' },
+              { title: '容量ほぼゼロ', desc: '普通のアプリは数百MB。とにおラボはブラウザ上で動くので数MBで完結。' },
             ].map(item => (
               <motion.div key={item.title} variants={f} className="bg-white border border-[#DAE2E8] p-5">
                 <p className="text-sm font-black mb-2">{item.title}</p>
@@ -312,7 +312,7 @@ export default function InstallPage() {
             <motion.div variants={f} className="border-l-[5px] border-[#8B5CF6] pl-5 mb-8 py-2">
               <p className="text-sm font-bold text-[#5B21B6] mb-1">PC での利用</p>
               <p className="text-xs text-[#252423]/50 leading-relaxed">
-                英語魂はスマホに最適化していますが、PC でも使えます。Chrome を推奨。
+                とにおラボはスマホに最適化していますが、PC でも使えます。Chrome を推奨。
               </p>
             </motion.div>
           )}
@@ -323,7 +323,7 @@ export default function InstallPage() {
               <>
                 <StepCard number={1} title="共有ボタンをタップ" description="画面下のバーにある四角に上矢印のアイコンをタップ。" visual={<IosShareButtonMock />} />
                 <StepCard number={2} title="「ホーム画面に追加」を選択" description="メニューを下にスクロールすると見つかります。右上の「追加」をタップ。" visual={<IosAddToHomeMock />} delay={0.1} />
-                <StepCard number={3} title="ホーム画面から起動" description="英語魂のアイコンが追加されます。タップするとフルスクリーンで起動。" visual={<HomeScreenMock />} delay={0.2} />
+                <StepCard number={3} title="ホーム画面から起動" description="とにおラボのアイコンが追加されます。タップするとフルスクリーンで起動。" visual={<HomeScreenMock />} delay={0.2} />
               </>
             )}
             {platform === 'android' && (
@@ -338,7 +338,7 @@ export default function InstallPage() {
                 <StepCard number={1} title="Chrome でアクセス" description="アドレスバー右側にあるインストールアイコン(モニタに矢印のマーク)をクリック。" visual={<DesktopAddressBarMock />} />
                 <StepCard number={2} title="「インストール」をクリック" description="確認ダイアログで「インストール」を選択。デスクトップに独立ウインドウとして起動するショートカットが作成されます。" visual={
                   <div className="bg-white border-2 border-[#4285F4] px-6 py-4 text-center shadow-sm">
-                    <p className="text-sm font-bold text-[#252423] mb-3">「英語魂」をインストールしますか？</p>
+                    <p className="text-sm font-bold text-[#252423] mb-3">「とにおラボ」をインストールしますか？</p>
                     <span className="inline-block px-6 py-2 bg-[#4285F4] text-white text-xs font-bold">インストール</span>
                   </div>
                 } delay={0.1} />
@@ -366,7 +366,7 @@ export default function InstallPage() {
               },
               {
                 title: 'ストレージを食わない',
-                desc: '普通のアプリは数百MB。英語魂はブラウザ上で動くから数MBで完結する。スマホの容量を圧迫しない。',
+                desc: '普通のアプリは数百MB。とにおラボはブラウザ上で動くから数MBで完結する。スマホの容量を圧迫しない。',
               },
               {
                 title: 'アプリと同じ体験ができる',
@@ -401,7 +401,7 @@ export default function InstallPage() {
           </motion.p>
           <motion.div variants={f} className="flex flex-wrap gap-4 justify-center">
             <Link href="/english" className="inline-flex items-center gap-3 px-8 py-3 bg-[#252423] text-white text-sm font-bold tracking-wide hover:bg-[#D4AF37] transition-colors">
-              英語魂を開く <span className="text-xs opacity-50">--</span>
+              とにおラボを開く <span className="text-xs opacity-50">--</span>
             </Link>
             <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 border border-[#DAE2E8] text-sm font-bold text-[#252423]/60 hover:border-[#252423]/30 transition-colors">
               TONIO LAB トップへ

@@ -1,8 +1,0 @@
-# English Quest RPG
-User-agent: *
-Allow: /
-
-Sitemap: https://english-quest-rpg.vercel.app/sitemap.xml
-
-Disallow: /api/
-Disallow: /_next/

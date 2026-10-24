@@ -1,345 +1,156 @@
 'use client';
 
 /**
- * 英語の玄関
+ * 今日の練習(とにおラボの玄関)
  *
- * ■ 直した理由
- * ここには13枚のカードが並んでいた。作った側は全部違うものだと分かっているが、
- * 初めて来た人には13択でしかなく、**選べないので何もせずに帰る。**
- * 集客の入口に必要なのは選択肢ではなく、迷わず押せる1つと、押す理由になる1行。
+ * 開いて最初に押すものを1つにする。
+ *   - 初めての人     : 練習をはじめる(5問だけ)
+ *   - 途中でやめた人 : 続きから
+ *   - 今日まだの人   : 今日の練習をはじめる(復習 n + 新しい表現 m)
+ *   - 今日終えた人   : 今日はここまで(もう1セットは選べる)
  *
- * ■ 構成
- *  1. フック(実測した数字を1行)     — 止まる理由
- *  2. 無料の測定 1つだけ             — 登録なし / 5分 / 数字が出る
- *  2.2 100日課程                     — 測ったあとの道のり。実測の順位から1,000個
- *  3. メンバーシップ                 — 続きを一緒に作る
- *  4. これまでのアプリ(畳んで下に)  — 消さない。探しに来た人のために残す
+ * 教材の選択、耳の診断、説明の閲覧は始める条件にしない。
+ * 保存は端末内だけ(src/lib/english/practice/engine.ts)。
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import {
+    loadState, loadCards, loadLog, summarize, localToday, newBudgetFor, type PracticeState, type PracticeSummary,
+} from '@/lib/english/practice/engine';
+import { getDeck } from '@/lib/english/practice/decks';
+import { PageShell, Kicker, Card, Button, Footnote, Skeleton, C } from '@/components/english/public/ui';
 
-type CardProps = {
-    href: string;
-    tagline: string;
-    title: string;
-    desc: string;
-    color: string;
-    primary?: boolean;
-};
-
-function HubCard({ href, tagline, title, desc, color, primary = false }: CardProps) {
-    return (
-        <Link href={href} style={{ textDecoration: 'none', display: 'block' }}>
-            <div style={{
-                background: '#fff',
-                border: `1px solid ${primary ? color + '55' : '#E7E5E4'}`,
-                borderLeft: `4px solid ${color}`,
-                borderRadius: 12,
-                padding: primary ? '18px 20px' : '14px 16px',
-                transition: 'all 0.15s ease',
-                boxShadow: primary ? '0 2px 10px rgba(212,175,55,0.08)' : 'none',
-                height: '100%',
-            }}>
-                <div style={{ fontSize: 9, letterSpacing: '0.2em', color, fontWeight: 800, marginBottom: 6 }}>
-                    {tagline}
-                </div>
-                <div style={{ fontSize: primary ? 19 : 15, fontWeight: 900, color: '#1C1917', marginBottom: 4, letterSpacing: '-0.01em' }}>
-                    {title}
-                </div>
-                <div style={{ fontSize: 12, color: '#78716C', lineHeight: 1.6 }}>{desc}</div>
-            </div>
-        </Link>
-    );
-}
-
-const GOLD = '#D4AF37';
-const DEEPGOLD = '#9A7B16';
-const INK = '#1C1917';
-const SUB = '#78716C';
-const LINE = '#E7E5E4';
-
-export default function EnglishHomeHub() {
-    const [earLv, setEarLv] = useState<number | null>(null);
-    const [showAll, setShowAll] = useState(false);
+export default function EnglishHome() {
+    const [state, setState] = useState<PracticeState | null>(null);
+    const [summary, setSummary] = useState<PracticeSummary | null>(null);
 
     useEffect(() => {
-        try {
-            const raw = localStorage.getItem('ear:result');
-            if (raw) {
-                const r = JSON.parse(raw);
-                if (typeof r.lv === 'number') setEarLv(r.lv);
-            }
-        } catch { /* noop */ }
+        const s = loadState();
+        const cards = loadCards();
+        const log = loadLog();
+        setState(s);
+        setSummary(summarize(cards, log, localToday()));
+        try { if (!localStorage.getItem('tl_welcome_seen')) localStorage.setItem('tl_welcome_seen', 'true'); } catch { /* noop */ }
     }, []);
 
+    const today = localToday();
+    const deck = getDeck(state?.deck ?? 'course') ?? getDeck('course')!;
+
+    const view = useMemo(() => {
+        if (!state || !summary) return null;
+        const session = state.session;
+        const remaining = session ? session.keys.filter(k => !session.results[k]).length : 0;
+        const inProgress = !!session && remaining > 0 && session.keys.length > 0;
+        const budget = newBudgetFor(state, today, false);
+        const firstTime = summary.totalCards === 0 && summary.activeDays === 0;
+        const nothingLeft = summary.dueCount === 0 && budget === 0;
+        return { session, remaining, inProgress, budget, firstTime, nothingLeft };
+    }, [state, summary, today]);
+
     return (
-        <div style={{ minHeight: '100vh', background: '#FAFAF9', padding: '28px 16px 64px' }}>
-            <div style={{ maxWidth: 760, margin: '0 auto' }}>
+        <PageShell>
+            <Kicker>TONIO LAB ・ 英語の練習</Kicker>
+            <h1 className="text-[26px] md:text-[30px] font-black leading-snug tracking-tight mb-3" style={{ color: C.ink }}>
+                知っている英語を、<br />会話で出るようにする。
+            </h1>
+            <p className="text-[13.5px] leading-relaxed mb-6" style={{ color: C.body }}>
+                単語や文法は勉強したのに、会話になると出てこない。そういう人のための1日5分の練習です。
+                日本語を見て英語を思い出し、答えを確かめて、自分で評価する。思い出せなかった表現は、後日もう一度出ます。
+            </p>
 
-                {/* ===== 1. フック ===== */}
-                <div style={{ fontSize: 10, letterSpacing: '0.3em', color: '#A8A29E', fontWeight: 700, marginBottom: 8 }}>
-                    TONIO LAB ・ 英語
+            {!view ? (
+                <Skeleton h={190} />
+            ) : view.inProgress ? (
+                <Card className="p-5" accent={C.gold}>
+                    <div className="text-[11px] font-bold tracking-widest mb-1" style={{ color: C.deepGold }}>途中のセットがあります</div>
+                    <div className="text-[18px] font-black mb-1" style={{ color: C.ink }}>残り {view.remaining} 問</div>
+                    <div className="text-[12.5px] mb-4" style={{ color: C.sub }}>前回の続きから始められます。</div>
+                    <Button href="/english/today">続きから</Button>
+                    <div className="mt-2">
+                        <Button href="/english/today?restart=1" variant="ghost" size="md">最初からやり直す</Button>
+                    </div>
+                </Card>
+            ) : view.firstTime ? (
+                <Card className="p-5" accent={C.gold}>
+                    <div className="text-[11px] font-bold tracking-widest mb-1" style={{ color: C.deepGold }}>はじめての人へ</div>
+                    <div className="text-[18px] font-black mb-1" style={{ color: C.ink }}>まずは5問だけ。3分ほどで終わります</div>
+                    <div className="text-[12.5px] leading-relaxed mb-4" style={{ color: C.sub }}>
+                        教材は「{deck.name}」から始まります。設定も登録もいりません。あとから教材は変えられます。
+                    </div>
+                    <Button href="/english/today">練習をはじめる</Button>
+                </Card>
+            ) : view.nothingLeft ? (
+                <Card className="p-5" accent={C.green}>
+                    <div className="text-[11px] font-bold tracking-widest mb-1" style={{ color: C.deepGreen }}>今日はここまで</div>
+                    <div className="text-[18px] font-black mb-1" style={{ color: C.ink }}>
+                        今日は {summary!.today.reviewed} 問 練習しました
+                    </div>
+                    <div className="text-[12.5px] leading-relaxed mb-4" style={{ color: C.sub }}>
+                        すぐ言えた {summary!.today.good} ・ 少し迷った {summary!.today.hard} ・ 出てこなかった {summary!.today.again}。
+                        復習は明日以降に出ます。
+                    </div>
+                    <Button href="/english/record" variant="outline">記録を見る</Button>
+                    <div className="mt-2">
+                        <Button href="/english/today?extra=1" variant="ghost" size="md">もう1セットやる(新しい表現を追加)</Button>
+                    </div>
+                </Card>
+            ) : (
+                <Card className="p-5" accent={C.gold}>
+                    <div className="text-[11px] font-bold tracking-widest mb-1" style={{ color: C.deepGold }}>
+                        {summary!.today.reviewed > 0 ? '今日の続き' : '今日の練習'}
+                    </div>
+                    <div className="text-[18px] font-black mb-1" style={{ color: C.ink }}>
+                        復習 {Math.min(summary!.dueCount, 10)} 問{view.budget > 0 ? ` ＋ 新しい表現 ${view.budget} 問` : ''}
+                    </div>
+                    <div className="text-[12.5px] leading-relaxed mb-4" style={{ color: C.sub }}>
+                        {summary!.dueCount > 10 ? `復習待ちは全部で ${summary!.dueCount} 問。1セット10問ずつ出ます。` : '前に迷った表現を先に出し、そのあと新しい表現が続きます。'}
+                    </div>
+                    <Button href="/english/today">{summary!.today.reviewed > 0 ? '続けて練習する' : '今日の練習をはじめる'}</Button>
+                </Card>
+            )}
+
+            {/* いまの教材 */}
+            <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border bg-white px-4 py-3" style={{ borderColor: C.line }}>
+                <div className="min-w-0">
+                    <div className="text-[10px] font-bold tracking-widest" style={{ color: C.faint }}>いまの教材</div>
+                    <div className="text-[14px] font-bold truncate" style={{ color: C.ink }}>{deck.name}<span className="font-medium text-[12px] ml-2" style={{ color: C.sub }}>{deck.tagline}</span></div>
                 </div>
-                <h1 style={{ fontSize: 27, fontWeight: 900, color: INK, margin: '0 0 14px', letterSpacing: '-0.02em', lineHeight: 1.4 }}>
-                    あなたは単語を知らないんじゃない。<br />
-                    <span style={{ color: DEEPGOLD }}>並びを知らないだけ。</span>
-                </h1>
-                <p style={{ fontSize: 13.5, color: '#44403C', margin: '0 0 8px', lineHeight: 1.95 }}>
-                    英語を話す人が <b style={{ fontFamily: 'Georgia, serif' }}>kind</b> に会う回数は一生で <b>131,909回</b>。
-                    そのうち <b style={{ color: INK }}>89%が <span style={{ fontFamily: 'Georgia, serif' }}>kind of</span></b>(なんか、ちょっと)。
-                    単語帳で「親切な」と覚えた人は、9割を取り逃します。
-                </p>
-                <p style={{ fontSize: 12, color: SUB, margin: '0 0 22px', lineHeight: 1.85 }}>
-                    1億語の話し言葉コーパスを自分で作って数えた結果です。ここは、その数字で英語をやり直す実験場です。
-                </p>
-
-                {/* ===== 2. 無料の測定(唯一の主導線) ===== */}
-                <Link href="/english/ear" style={{ textDecoration: 'none', display: 'block' }}>
-                    <div style={{
-                        background: INK, color: '#fff', borderRadius: 14,
-                        padding: '22px 22px', marginBottom: 12,
-                    }}>
-                        <div style={{ fontSize: 9.5, letterSpacing: '0.24em', color: GOLD, fontWeight: 900, marginBottom: 8 }}>
-                            まずここから ・ 無料 ・ 5分 ・ 登録不要
-                        </div>
-                        <div style={{ fontSize: 21, fontWeight: 900, letterSpacing: '-0.01em', marginBottom: 6 }}>
-                            あなたの耳が、どこで壊れるか測る
-                        </div>
-                        <div style={{ fontSize: 12.5, opacity: 0.78, lineHeight: 1.75 }}>
-                            速度と雑音を10段まで上げて、文が保てなくなる段を出します。
-                            {earLv !== null && (
-                                <span style={{ color: GOLD, fontWeight: 800 }}>　前回: Lv.{earLv} / 10</span>
-                            )}
-                        </div>
-                        <div style={{
-                            display: 'inline-block', marginTop: 14,
-                            background: `linear-gradient(135deg, ${GOLD}, #E6C75E)`,
-                            padding: '11px 22px', borderRadius: 10, fontSize: 14, fontWeight: 900,
-                        }}>
-                            {earLv !== null ? 'もう一度測る' : '測定を始める'}
-                        </div>
-                    </div>
-                </Link>
-
-                {/* ===== 2.2 百日課程(測ったあとの道のり。玄関では刷り物として見せる) ===== */}
-                <Link href="/english/course" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>
-                    <div style={{
-                        border: `1px solid ${INK}`, background: '#0E2A3F', color: '#F3ECDC',
-                        boxShadow: `0 2px 0 rgba(16,24,32,0.9)`, overflow: 'hidden',
-                    }}>
-                        <div style={{ padding: '20px 20px 16px' }}>
-                            <div style={{ fontSize: 9.5, letterSpacing: '0.34em', color: '#EFC65B', fontWeight: 800, marginBottom: 9 }}>
-                                THE VOYAGE OF ONE HUNDRED DAYS
-                            </div>
-                            <div style={{
-                                fontFamily: "Georgia, 'Times New Roman', 'Yu Mincho', 'Hiragino Mincho ProN', serif",
-                                fontSize: 34, fontWeight: 900, letterSpacing: 3, lineHeight: 1.2, marginBottom: 10,
-                            }}>
-                                百日課程
-                            </div>
-                            <div style={{ fontSize: 12.5, lineHeight: 1.9, opacity: 0.86 }}>
-                                37万9,475の表現という海を、出会う回数の多い1,000個だけで渡る。
-                                測ったあと、何をどれだけやるか。1日10個で百日。
-                            </div>
-                        </div>
-                        <div style={{
-                            borderTop: `1px solid #EFC65B`, background: 'rgba(0,0,0,0.28)',
-                            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', textAlign: 'center',
-                        }}>
-                            {[['1,000', 'EXPRESSIONS'], ['10', 'A DAY'], ['100', 'DAYS'], ['18.11%', 'COVERAGE']].map(([v, l], i) => (
-                                <div key={l} style={{
-                                    padding: '11px 4px',
-                                    borderLeft: i === 0 ? 'none' : '1px solid rgba(243,236,220,0.22)',
-                                }}>
-                                    <div style={{
-                                        fontFamily: "Georgia, 'Times New Roman', serif",
-                                        fontSize: 19, fontWeight: 900, color: i === 3 ? '#EFC65B' : '#F3ECDC', lineHeight: 1.1,
-                                    }}>{v}</div>
-                                    <div style={{ fontSize: 8, letterSpacing: '0.24em', opacity: 0.6, marginTop: 3 }}>{l}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </Link>
-
-                {/* ===== 2.4 書く / 読む (無料の道具。測ったあと、手を動かす側) ===== */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 12, marginBottom: 12 }}>
-                    <HubCard
-                        href="/english/write"
-                        tagline="WRITE ・ 英作文"
-                        title="書けないのは、形が無いから"
-                        desc="意見の論点は10個、要約の型は5つ。形はこちらが持つので、埋めるのは名詞と動詞だけ。"
-                        color="#10B981"
-                    />
-                    <HubCard
-                        href="/english/writepass"
-                        tagline="WRITE PASS ・ 英検1級 英作文"
-                        title="ライトパス 30日"
-                        desc="意見論述30本・要約30本の模範解答を1日1本写す。全文を型に分解した表つき。"
-                        color="#D4AF37"
-                    />
-                    <HubCard
-                        href="/english/newspaper"
-                        tagline="READ ・ 英字新聞 88号"
-                        title="The Tonio Times"
-                        desc="A4一枚の英字新聞を毎日1号。文をタップすると一言一句の日本語が出る。読み上げつき。"
-                        color="#7A1F1F"
-                    />
-                </div>
-
-                {/* ===== 2.45 全部の説明 (知りたい人だけ) ===== */}
-                <Link href="/english/about" style={{ textDecoration: 'none', display: 'block', marginBottom: 12 }}>
-                    <div style={{
-                        background: '#fff', border: `1px dashed ${LINE}`, borderRadius: 10,
-                        padding: '12px 15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
-                    }}>
-                        <div>
-                            <div style={{ fontSize: 13, fontWeight: 900, color: INK, marginBottom: 2 }}>
-                                ここにあるもの、全部の説明
-                            </div>
-                            <div style={{ fontSize: 11.5, color: SUB, lineHeight: 1.6 }}>
-                                何を数えて、何を作って、どういう順番で使うと効くのか。日本語で7分。
-                            </div>
-                        </div>
-                        <div style={{ fontSize: 15, color: '#A8A29E', flexShrink: 0 }}>→</div>
-                    </div>
-                </Link>
-
-                {/* ===== 2.48 DMM英会話 無料公開 ===== */}
-                <Link href="/english/dmm-open" style={{ textDecoration: 'none', display: 'block' }}>
-                    <div style={{
-                        background: '#fff', border: `1px solid ${LINE}`, borderLeft: '4px solid #D4AF37',
-                        borderRadius: 12, padding: '15px 17px', marginBottom: 12,
-                    }}>
-                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: '#9A7B16', fontWeight: 800, marginBottom: 5 }}>
-                            DMM英会話 ・ 音源と原稿を無料公開
-                        </div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
-                            英語がペラペラになる唯一の方法を、本気で教えます
-                        </div>
-                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
-                            TOEIC900点、英検1級を目指す芸人の25分を、崩れた英語ごと全部。1行ずつの直しつき。
-                        </div>
-                    </div>
-                </Link>
-
-                {/* ===== 2.5 コーチング(募集中) ===== */}
-                <Link href="/english/coach" style={{ textDecoration: 'none', display: 'block' }}>
-                    <div style={{
-                        background: '#fff', border: `1px solid ${LINE}`, borderLeft: '4px solid #DC2626',
-                        borderRadius: 12, padding: '15px 17px', marginBottom: 12,
-                    }}>
-                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: '#DC2626', fontWeight: 800, marginBottom: 5 }}>
-                            COACHING ・ メンバーシップ
-                        </div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
-                            話せないコーチが、28日つきあいます
-                        </div>
-                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
-                            完璧な先生より、もがいてる先生のほうが効く。根拠のある研究と、28日の手順を全部公開しています。
-                        </div>
-                    </div>
-                </Link>
-
-                {/* ===== 2.7 TONIO STACK (教材) ===== */}
-                <Link href="/english/stack/demo" style={{ textDecoration: 'none', display: 'block' }}>
-                    <div style={{
-                        background: '#fff', border: `1px solid ${LINE}`, borderLeft: '4px solid #1E293B',
-                        borderRadius: 12, padding: '15px 17px', marginBottom: 12,
-                    }}>
-                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: '#1E293B', fontWeight: 800, marginBottom: 5 }}>
-                            TONIO STACK ・ 全12回
-                        </div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
-                            自分専用の英語アプリを、自分で建てる
-                        </div>
-                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
-                            コードは1行も書きません。全部 Claude Code に日本語で頼むだけ。1回30分、全12回で、自分の詰まった英語だけが貯まる箱ができます。
-                        </div>
-                    </div>
-                </Link>
-
-                {/* ===== 3. メンバーシップ ===== */}
-                <Link href="/membership" style={{ textDecoration: 'none', display: 'block' }}>
-                    <div style={{
-                        background: '#fff', border: `1px solid ${GOLD}55`, borderLeft: `4px solid ${GOLD}`,
-                        borderRadius: 12, padding: '15px 17px', marginBottom: 30,
-                    }}>
-                        <div style={{ fontSize: 9, letterSpacing: '0.2em', color: DEEPGOLD, fontWeight: 800, marginBottom: 5 }}>
-                            MEMBERSHIP ・ ¥980 / 月
-                        </div>
-                        <div style={{ fontSize: 15, fontWeight: 900, color: INK, marginBottom: 4 }}>
-                            続きを、一緒に作る
-                        </div>
-                        <div style={{ fontSize: 12, color: SUB, lineHeight: 1.65 }}>
-                            毎日こちらが先に失敗を出します。作りかけも全部見せます。要望がそのまま次の機能になります。
-                        </div>
-                    </div>
-                </Link>
-
-                {/* ===== 4. これまでのアプリ(畳む) ===== */}
-                <button
-                    onClick={() => setShowAll(!showAll)}
-                    style={{
-                        width: '100%', background: '#fff', border: `1px solid ${LINE}`, borderRadius: 10,
-                        padding: '13px 16px', textAlign: 'left', cursor: 'pointer',
-                        fontSize: 13, fontWeight: 800, color: INK,
-                    }}
-                >
-                    これまでに作ったアプリ(13本) {showAll ? '▲' : '▼'}
-                    <span style={{ fontSize: 11, fontWeight: 600, color: SUB, marginLeft: 8 }}>
-                        全部無料・登録不要
-                    </span>
-                </button>
-
-                {showAll && (
-                    <div style={{ marginTop: 14 }}>
-                        <div style={{ marginBottom: 14 }}>
-                            <HubCard
-                                href="/english/toeic"
-                                tagline="TOEIC / 30日でスコアUP"
-                                title="居酒屋TOEIC"
-                                desc="DUO式300例文 + 金フレ式310単語。居酒屋の6人と、30日。"
-                                color="#D4AF37"
-                                primary
-                            />
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12, marginBottom: 14 }}>
-                            <HubCard href="/english/harvest" tagline="MOVIE / 毎日1本" title="Movie Harvest" desc="映画の名セリフ10個を分解" color="#92400E" />
-                            <HubCard href="/english/izakaya-toeic/kaiwa" tagline="DAILY PHRASES" title="英会話マスター365" desc="毎日10フレーズ。今日も続ける。" color="#10B981" />
-                            <HubCard href="/english/story-vocab" tagline="PRE-1 / 物語で覚える" title="呪術廻戦で英検準1級" desc="宿儺・五条・七海。好きな物語に単語を乗せる。" color="#B91C1C" />
-                            <HubCard href="/english/jp-yt" tagline="JP→EN / 罪悪感ゼロ" title="罪悪感ゼロ英語" desc="ヒカキン見るの、もう罪悪感いらない。その日本語、英語に変えれば勉強になる。" color="#0EA5E9" />
-                            <HubCard href="/english/survival" tagline="SURVIVAL / 会話シミュレーター" title="修羅場英会話" desc="空港で欠航、病院で激痛。崩れた英語のまま、その場を切り抜けろ。" color="#DC2626" />
-                        </div>
-
-                        <div style={{ marginTop: 24, marginBottom: 12 }}>
-                            <div style={{ fontSize: 10.5, letterSpacing: '0.2em', color: '#DC2626', fontWeight: 800 }}>LAB ・ 実験版</div>
-                            <h2 style={{ fontSize: 19, fontWeight: 900, color: INK, margin: '4px 0 4px', letterSpacing: '-0.02em' }}>7つの全く違う型</h2>
-                            <p style={{ fontSize: 12, color: SUB, margin: 0, lineHeight: 1.7 }}>
-                                同じ「崩れた実英語」を、7つの違うやり方で。読む・聞く・話す・反射・没入・切り抜ける。
-                            </p>
-                        </div>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-                            <HubCard href="/english/jp-yt-v2" tagline="v2 ・ 習慣(TODAY)" title="罪悪感ゼロ TODAY" desc="1日1本やり切る型。1表現ずつ自己採点、連続日数で続ける。" color="#0EA5E9" />
-                            <HubCard href="/english/dictation" tagline="v4 ・ 聞く(打つ)" title="聞き取りディクテーション" desc="速い崩れた音を聞いて打つ。聞き間違えポイントを潰す。" color="#7C3AED" />
-                            <HubCard href="/english/interpret" tagline="v5 ・ 話す(通訳)" title="同時通訳ジム" desc="日本語→3秒で英語を口に。通訳案内士・英検二次の筋トレ。" color="#0891B2" />
-                            <HubCard href="/english/reflex" tagline="v6 ・ 反射(3秒)" title="3秒で返せ" desc="相手の一言に3秒で返す。会話は反射。詰まる前に何か言え。" color="#EA580C" />
-                            <HubCard href="/english/story" tagline="v7 ・ 没入(物語)" title="物語没入チャット" desc="短い物語をチャットで読み進める。シーンごと体に入れる。" color="#DB2777" />
-                            <HubCard href="/english/mistakes" tagline="復習 ・ 間違い帳" title="俺の英語エラー帳" desc="会話で出た文法ミスを溜めて見返す。同じパターンを何回やってるかも分かる。" color="#DC2626" />
-                        </div>
-                    </div>
-                )}
-
-                <div style={{
-                    marginTop: 22, padding: '10px 14px', background: '#fff',
-                    border: `1px dashed ${LINE}`, borderRadius: 10,
-                    fontSize: 11, color: '#A8A29E', lineHeight: 1.7,
-                }}>
-                    すべて無料・登録不要。データは端末内に保存されます。
-                </div>
+                <Link href="/english/materials" className="shrink-0 text-[12.5px] font-bold" style={{ color: C.deepGold }}>教材を変える</Link>
             </div>
-        </div>
+
+            {/* 今日の数字(やった日だけ) */}
+            {summary && summary.activeDays > 0 && (
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                    {[
+                        ['今日', `${summary.today.reviewed} 問`],
+                        ['復習待ち', `${summary.dueCount} 問`],
+                        ['連続', `${summary.streak} 日`],
+                    ].map(([k, v]) => (
+                        <div key={k} className="rounded-xl border bg-white px-3 py-2.5 text-center" style={{ borderColor: C.line }}>
+                            <div className="text-[10px] font-bold tracking-widest" style={{ color: C.faint }}>{k}</div>
+                            <div className="text-[16px] font-black" style={{ color: C.ink }}>{v}</div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* 任意のもの */}
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Link href="/english/record" className="rounded-xl border bg-white px-4 py-3 hover:bg-[#FAFAF9]" style={{ borderColor: C.line, textDecoration: 'none' }}>
+                    <div className="text-[13.5px] font-bold" style={{ color: C.ink }}>記録を見る</div>
+                    <div className="text-[12px]" style={{ color: C.sub }}>今日の量、最近の日、復習する表現</div>
+                </Link>
+                <Link href="/english/ear" className="rounded-xl border bg-white px-4 py-3 hover:bg-[#FAFAF9]" style={{ borderColor: C.line, textDecoration: 'none' }}>
+                    <div className="text-[13.5px] font-bold" style={{ color: C.ink }}>耳の診断(任意・5分)</div>
+                    <div className="text-[12px]" style={{ color: C.sub }}>速度と雑音をどこまで上げても聞けるか測る</div>
+                </Link>
+            </div>
+
+            <Footnote>
+                無料・登録不要。練習の記録はこの端末のブラウザの中にだけ保存されます。別の端末には引き継がれません。
+                ブラウザのデータを消すと記録も消えます。詳しくは <Link href="/english/info" style={{ color: C.deepGold }}>使い方・案内</Link>。
+            </Footnote>
+        </PageShell>
     );
 }
