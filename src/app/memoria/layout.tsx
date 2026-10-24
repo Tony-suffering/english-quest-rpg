@@ -2,14 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import EnglishSidebar from '@/components/EnglishSidebar';
-import { installLocalApi } from '@/lib/local-api';
 
 export default function MemoriaLayout({ children }: { children: React.ReactNode }) {
     const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        installLocalApi();
-    }, []);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);

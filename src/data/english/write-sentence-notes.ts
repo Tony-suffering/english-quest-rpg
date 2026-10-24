@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/data/english/write-sentence-notes.ts
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * 自動生成(merge-sentences.mjs)。1次ライティング全30日の「一文ずつ完全解説」。
  * 各文: 和訳 + 文の骨格(structure) + 完全文法解説(grammar) + 英作ポイント(writing)。

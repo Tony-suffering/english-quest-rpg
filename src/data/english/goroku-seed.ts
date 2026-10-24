@@ -20,7 +20,7 @@ export interface GorokuSeed {
 // 7-pillar systematic curriculum, mixed across all days
 // ============================================================
 
-export const GOROKU_SEEDS: GorokuSeed[] = [
+const GOROKU_SEEDS_BASE: GorokuSeed[] = [
     // ── Day 1 ──
     { daySlot: 1, japanese: '暑いな', english: [
         "it's so hot",
@@ -2756,48 +2756,48 @@ export const GOROKU_SEEDS: GorokuSeed[] = [
     ], context: "hobby は「趣味」だけど、英語圏では hobby の範囲が日本語より狭い。日本語は「趣味は読書です」が普通だけど、英語で My hobby is reading はちょっと堅い。I like to read / I'm into reading が自然。hobby はもっと具体的な活動（模型作り、釣りなど）に使う。saving money を hobby と呼ぶ違和感は日英共通。どっちの言語でもツッコまれる。", category: 'shutdown', month: '2026-03' },
 
     // -- Day 14: 比較・評価 --
-    { daySlot: 14, japanese: 'どっちでもいい', english: [
-        "either way's fine",
-        "honestly either way's fine, I don't have a preference",
-        "I really don't mind either way, just pick whichever one you think is better",
-        "either way's fine. and I mean that. I genuinely do not have a preference. I know that annoys people. they want me to pick. but my brain is sayin' both options are equally fine and forcin' me to choose is just addin' stress for no reason. just flip a coin. if I'm disappointed with the result, then I had a preference all along. life hack."
-    ], context: "either way は「どっちでも」。either は二択の両方。I don't mind either way は「どちらでも気にしない」。日本語の「どっちでもいい」は投げやりに聞こえることがあるけど、英語は I'm fine with either で丁寧にできる。fine with = 「〜でOK」。英語は「OK の出し方」のバリエーションが豊富。I'm good with that, works for me, I'm cool with it。全部「いいよ」の言い方違い。", category: 'filler', month: '2026-03' },
+    { daySlot: 14, japanese: 'つかれとむなしさがあってもしょうがないよね', english: [
+        "it is what it is",
+        "tired and empty? yeah, that's just... part of it, I guess",
+        "I mean, the fatigue and emptiness come with the territory, right? you can't really avoid it",
+        "tired and empty? yeah. that comes with the territory. you signed up for this thing -- the building, the grinding, the staring at code at 2am -- and this is the tax you pay. it's not a bug, it's a feature. you don't get to have the fire without the smoke. the emptiness is just the smoke. wave it away and keep cookin'."
+    ], context: "comes with the territory は「その領域に入った以上ついてくるもの」。英語は「しょうがない」を地理で語る。日本語は「仕方がない」で諦め。英語は territory（領土）に足を踏み入れた以上、そこの天候も受け入れろ、という空間メタファー。疲れも虚しさも、自分が選んだ土地の気候。", category: 'filler', month: '2026-03' },
     { daySlot: 14, japanese: '比べるものじゃないでしょ', english: [
         "apples and oranges",
         "that's apples and oranges, you can't compare 'em",
         "those are two completely different things and comparing them doesn't even make sense",
         "that's apples and oranges. you can't compare 'em. it's like sayin' 'what's better, pizza or a sunset?' they're not in the same category. they don't compete. they exist in different universes. so stop tryin' to rank everything. not everything is a competition. some things are just... different. and different doesn't mean one is better."
     ], context: "apples and oranges は「リンゴとオレンジ」=「比較にならない」。英語圏で最もよく使われる比較不可能の表現。日本語だと「比べるものじゃない」で直接言うけど、英語はフルーツに例える。なぜリンゴとオレンジかは諸説あるけど、どっちも果物なのに全然違う、という絶妙な距離感。完全に違うものは比較しようとすらしない。微妙に近いから困る。", category: 'shutdown', month: '2026-03' },
-    { daySlot: 14, japanese: '圧倒的にこっちの方がいい', english: [
-        "this one's way better",
-        "this one's way better, it's not even close",
-        "there's no competition between the two, this one is leagues ahead of the other",
-        "this one's way better. and it's not even close. like, they're not even in the same league. one is in the major leagues and the other is still in Little League eatin' orange slices. I don't even know why this is a debate. just look at 'em side by side. one is clearly superior and if you can't see that I question your eyesight."
-    ], context: "it's not even close は「比較にもならない」。接戦ですらない。way better の way は「ずっと」「はるかに」の強調。leagues ahead は「リーグ(段階)が上」。英語は比較を距離やスポーツの階級で表現する。日本語の「圧倒的」は「圧倒する」で力のメタファー。英語は distance（距離）。差を「どれくらい離れてるか」で測る。", category: 'opinion', month: '2026-03' },
-    { daySlot: 14, japanese: '一長一短だね', english: [
-        "pros and cons",
-        "both got their pros and cons honestly",
-        "each one has its strengths and weaknesses so it really depends on what you prioritize",
-        "both got their pros and cons. like, this one's faster but that one's cheaper. this one looks better but that one lasts longer. there's no perfect option. there never is. life is just a series of trade-offs where you pick the least annoying combination of problems. 'which set of flaws can I live with?' that's basically every decision."
-    ], context: "pros and cons は「良い点と悪い点」。pro = 賛成、con = 反対。ラテン語から来てる。日本語の「一長一短」は「一つの長所と一つの短所」。英語の方が複数形(pros, cons)で、良い点も悪い点も複数ある前提。日本語は「一つずつ」でバランスを強調。英語は「リストにして全部並べよう」。分析的。pros and cons list を作るのが英語圏の意思決定文化。", category: 'opinion', month: '2026-03' },
-    { daySlot: 14, japanese: '人それぞれでしょ', english: [
-        "to each their own",
-        "to each their own, I'm not gonna judge",
-        "everyone's different and what works for one person might not work for another",
-        "to each their own. and I mean that. no judgment. you like what you like. I like what I like. we don't gotta agree. the world would be boring if everyone had the same taste. imagine if everyone liked the same music. the same food. the same everything. nightmare. variety is what makes it interesting. so go be weird. I'll be weird over here."
-    ], context: "to each their own は「人それぞれ」の完璧な対訳。each = それぞれ、their own = 自分の好み。この表現は寛容を示すときの定番。different strokes for different folks（人によってやり方が違う）も同じ意味。日本語の「人それぞれ」は議論を終わらせるフレーズ。英語の to each their own も同じ機能。「もうこの話やめよう」の合図。世界共通の会話終了ボタン。", category: 'filler', month: '2026-03' },
-    { daySlot: 14, japanese: '思ったほどじゃなかった', english: [
-        "didn't live up to the hype",
-        "it didn't really live up to the hype honestly",
-        "everyone was raving about it but when I actually tried it I was kind of underwhelmed",
-        "it didn't live up to the hype. and the hype was HUGE. everyone was losin' their minds over this thing. so I tried it. and it was... fine. just fine. not bad. not amazing. fine. and fine after massive hype feels like a letdown. it's not the thing's fault. it's the expectation's fault. hype ruins everything. we gotta stop hyping stuff. we won't. but we should."
-    ], context: "live up to the hype は「期待に応える」。hype は「大騒ぎ・誇大宣伝」。live up to は「〜に達する」。hype が高すぎて実物が追いつかない。underwhelmed は overwhelmed（圧倒された）の反対。whelm は「波に飲まれる」で、under = 波が足りない=期待外れ。英語は感動を波の高さで測る。高い波=感動、低い波=がっかり。", category: 'reaction', month: '2026-03' },
-    { daySlot: 14, japanese: 'あれに比べたらマシ', english: [
-        "could be worse",
-        "I mean, could be worse -- remember that other time?",
-        "it's not great but compared to what happened last time this is actually pretty decent",
-        "could be worse. that's my go-to coping mechanism. bad day? could be worse. bad meal? could be worse. bad haircut? at least I have hair. I compare everything to the worst-case scenario and suddenly everything's fine. it's not optimism. it's strategic lowering of expectations. if you expect nothin', you can't be disappointed. galaxy brain move."
-    ], context: "could be worse は「もっと悪くなり得た」=「まだマシ」。英語圏の鉄板フレーズ。どんな状況でも could be worse と言えば慰めになる。日本語の「マシ」は「まだいい」で比較が内蔵されてる。英語は could（可能性）を使って「最悪じゃない」と確率論で慰める。「80%の確率でもっと悪い結果だった」と統計で自分を励ます。理系的ポジティブシンキング。", category: 'filler', month: '2026-03' },
+    { daySlot: 14, japanese: 'ドーパミンヒットを狙うだけしかしてないことがわかってないよね みんな', english: [
+        "just chasin' hits",
+        "nobody gets it -- all they're doin' is chasin' dopamine hits",
+        "people don't even realize all they're doing is chasing the next dopamine hit, that's literally it",
+        "nobody gets it. they're just chasin' dopamine hits. scroll, like, scroll, like. buy somethin'. feel good for five seconds. buy somethin' else. it's literally a drug cycle and nobody calls it that 'cause it's legal and the dealer is your phone. and they're out here judging actual addicts? bro, you're the same. your dealer just has a better logo."
+    ], context: "chase = 追いかける。hit = 一発の快感。ドーパミンは「打つもの」じゃなくて「当たるもの」。英語はドラッグの文脈から来てて、hit は注射一回分。日本語の「快感を求める」は上品。英語の chase a hit は中毒者の行動そのもの。遠慮なし。", category: 'opinion', month: '2026-03' },
+    { daySlot: 14, japanese: '子供はなにもなくてもドーパミンまみれだから自然でいられる', english: [
+        "kids don't need a reason",
+        "kids are drowning in dopamine without even tryin' -- that's why they're natural",
+        "kids don't need anything to feel good, they're just soaking in dopamine 24/7 and that's what keeps them so natural",
+        "kids don't need a reason to be happy. they're just marinating in dopamine 24/7. no app, no scroll, no purchase. just a stick and some dirt and they're peaking. and then we grow up and suddenly you need a five-star meal and a promotion just to feel somethin'. we dried out. kids are still in the pool. we climbed out and forgot how to swim."
+    ], context: "drowning in = 溺れるほど浸かってる。soaking in = 浸かってる。英語は感情や状態を「液体に漬かる」メタファーで語る。drowned in work、soaked in sweat。日本語の「まみれ」も近いけど、英語は水没レベル。子供は意識のプールに浮かんでるだけ。大人はプールから出て乾いてる。", category: 'opinion', month: '2026-03' },
+    { daySlot: 14, japanese: 'アジャシャンティガイの俺', english: [
+        "the Adyashanti guy",
+        "I'm literally the Adyashanti guy -- and here I am buildin' slot machines",
+        "I'm out here readin' Adyashanti and talkin' about emptiness while also spending three hours on slot machine gradients",
+        "I'm the Adyashanti guy. the guy who reads about spiritual awakening and the nature of consciousness. and what did I do today? I spent three hours tweakin' slot machine gradients. three hours. on fake gambling UI. for an English learning app. the enlightened master would be so proud. 'you have transcended the ego.' sir I am adjusting drop shadows."
+    ], context: "英語で自分にラベルを貼るとき the ~ guy と言う。the coffee guy、the always-late guy。自分の矛盾を笑うときに最強。「悟りの本読んでる男が3時間スロットのUI作ってる」。英語は自虐を the X guy のフォーマットに入れると一瞬でコメディになる。", category: 'filler', month: '2026-03' },
+    { daySlot: 14, japanese: 'もっとデラックスにできる', english: [
+        "we can go bigger",
+        "we can go way more deluxe than this",
+        "this isn't bad but I know we can take it to a whole other level if we really go for it",
+        "we can go way more deluxe. like, this is fine. it works. but 'it works' is not the vibe I'm goin' for. I want people to see this and go 'oh damn.' right now they're goin' 'oh, okay.' big difference. one letter. the difference between okay and damn is where I live. let's push it. we got room."
+    ], context: "go + 形容詞 は「〜な方向に行く」。go big、go dark、go crazy。日本語は「もっと〜にする」と「する」で変化させるけど、英語は「行く」で状態を移動として表現する。go deluxe は deluxe という場所に向かって歩いていくイメージ。英語は品質改善すら旅。", category: 'request', month: '2026-03' },
+    { daySlot: 14, japanese: 'ルールがわからない', english: [
+        "I don't even know the rules",
+        "I literally don't know the rules of my own game",
+        "I built this whole thing and I still can't figure out how the matching system works",
+        "I literally don't know the rules. of my own game. that I built. with my own hands. I coded every line and I'm sittin' here like 'wait, how does this work?' this is like a chef who can't eat his own cooking 'cause he forgot what's in it. I'm the architect who got lost in his own building. somebody send help. or a tutorial. for my own app."
+    ], context: "literally は「文字通り」が元の意味だけど、今の英語では強調に使う。I literally died = 死ぬほどだった。literally don't know は「マジでわからない」。日本語の「マジで」と同じ進化。本来の意味(文字通り)を捨てて感情増幅器になった。言語は真面目な単語をエモーション用に転用するのが好き。", category: 'reaction', month: '2026-03' },
     { daySlot: 14, japanese: 'あいつ過大評価されてる', english: [
         "overrated",
         "honestly they're kinda overrated and I'm not afraid to say it",
@@ -3894,4 +3894,9617 @@ export const GOROKU_SEEDS: GorokuSeed[] = [
         "I'm done for the day, my brain checked out an hour ago",
         "I'm cooked. not tired. cooked. there's a difference. tired is 'I could use a nap.' cooked is 'my soul left my body three tasks ago and I've been operatin' on pure spite since then.' the screen is blurry. my thoughts are blurry. my will to live is blurry. tomorrow me can deal with whatever's left. tonight me is goin' horizontal."
     ], context: "I'm cookedは「完全に消耗した」のGen Zスラング。料理が焼き上がった=もう終わり。stick a fork in me(フォーク刺して)=肉が焼けたか確認する動作。「つかれた」は日本語では状態の報告。英語のcookedは「加熱されて変質した」という比喩。自分を料理に例えてる。他にも I'm fried(揚がった)、I'm toast(トーストになった)、I'm burnt out(燃え尽きた)。英語は疲労を「熱で調理された」イメージで語る。全部キッチン用語。", category: 'reaction', month: '2026-03' },
+
+
+    // ============================================================
+    // April 2026 -- 300 expressions (Day 1-30, 10/day)
+    // ============================================================
+
+    // ── Day 1 ──
+    { daySlot: 1, japanese: '財布忘れた', english: [
+        "left my wallet",
+        "I left my wallet at home, of course",
+        "I just realized I left my wallet at home and now I'm panicking",
+        "I didn't bring any cash either"
+    ], context: "leaveは「置いてきた」。I forgot my walletでも通じるけど、I left itの方が場所のニュアンスが出る。「家に置いてきた」感がリアル。forgetは頭から消えた、leaveは物理的にそこにある。英語は物の居場所にうるさい言語。", category: 'reaction', month: '2026-04' },
+    { daySlot: 1, japanese: '全然眠れなかった', english: [
+        "couldn't sleep at all",
+        "I was up all night, didn't sleep a wink",
+        "I tossed and turned all night and still couldn't fall asleep",
+        "I was staring at the ceiling for hours"
+    ], context: "not a winkは「まばたき一つ分も」という超古い表現だけど今でも普通に使う。日本語は「全然眠れない」で量を否定するけど、英語は「一秒も」と最小単位に落とす。否定の強調の方向が逆。", category: 'reaction', month: '2026-04' },
+    { daySlot: 1, japanese: '後で連絡して', english: [
+        "hit me up later",
+        "hit me up later when you're free",
+        "just shoot me a text later and we can figure it out then",
+        "reach out whenever works for you"
+    ], context: "hit me upは「叩いて起こして」が元の意味だけど「連絡して」として完全定着。SNS世代の定番。shoot me a textはメッセージを「撃つ」。英語の連絡表現は全部物理的な動作の比喩。日本語の「連絡する」は抽象的なのに英語は常に身体が動いてる。", category: 'request', month: '2026-04' },
+    { daySlot: 1, japanese: 'うまくいった', english: [
+        "it worked out",
+        "it actually worked out pretty well",
+        "I wasn't sure it would work but it all worked out in the end",
+        "things fell into place"
+    ], context: "work outは「うまくいった」の定番。ジムのworkoutと同じ単語なのに意味が全然違う。things fell into placeは「ピースがはまった」。英語は成功をパズルが完成するイメージで語る。日本語の「うまくいく」はもっと流れのイメージ。", category: 'reaction', month: '2026-04' },
+    { daySlot: 1, japanese: '飲み会断れなかった', english: [
+        "couldn't say no",
+        "I couldn't say no to the work drinks",
+        "I tried to get out of it but I just couldn't say no this time",
+        "I caved and went anyway"
+    ], context: "cave inは「洞窟が崩れる」→「折れる」。プレッシャーに負けて崩れ落ちるイメージ。日本語の「断れなかった」は能力の否定(断るができなかった)だけど英語のcaveは物理的に崩壊する感覚。どっちが正直かっていうと英語の方かもしれない。", category: 'reaction', month: '2026-04' },
+    { daySlot: 1, japanese: 'それ本当の話？', english: [
+        "is that for real",
+        "wait, is that actually for real?",
+        "hold on, are you seriously telling me that's a true story?",
+        "no way, you're making that up"
+    ], context: "for realは「マジで」の英語版。Is that for real? / For real though. / I'm for real right now. と使い方がいろいろある。no wayは「道がない」→「あり得ない」。否定の強さを物理空間で表す。居酒屋では一番よく飛び交う表現。", category: 'reaction', month: '2026-04' },
+    { daySlot: 1, japanese: 'また体重増えた', english: [
+        "gained weight again",
+        "I gained weight again, I knew it",
+        "I stepped on the scale this morning and yep, gained weight again",
+        "I've been eating like there's no tomorrow"
+    ], context: "eat like there's no tomorrowは「明日がないように食べる」。今日が最後の日みたいに全力で食う、という絶望的なほど食欲に忠実なイメージ。日本語に直訳できない表現だけど意味は完全に伝わる。", category: 'reaction', month: '2026-04' },
+    { daySlot: 1, japanese: 'もうちょっと考えてみる', english: [
+        "let me think on it",
+        "let me think on it a little more",
+        "I'm not ready to decide yet, just let me think on it",
+        "I'll sleep on it"
+    ], context: "sleep on itは「それの上で寝る」→「一晩考える」。英語は時間をかける決断を寝ている間に処理するイメージで表す。脳が夜中に勝手に整理してくれるって感覚。日本語の「考えてみる」より生物学的でリアル。", category: 'filler', month: '2026-04' },
+    { daySlot: 1, japanese: 'あいつ何でも知ってる', english: [
+        "knows everything",
+        "that guy knows everything, it's kind of scary",
+        "honestly he knows way too much about way too many things",
+        "he's a walking encyclopedia"
+    ], context: "walking encyclopediaは「歩く百科事典」。英語ではすごい人間を「歩く〇〇」で表す。walking contradiction(矛盾の塊)、walking disaster(災害みたいな人)。「歩く」をつけるだけで人間が概念になる。日本語にはない発想。", category: 'opinion', month: '2026-04' },
+    { daySlot: 1, japanese: 'ちょうど良かった', english: [
+        "perfect timing",
+        "oh, perfect timing, I was just thinking about you",
+        "you showed up at exactly the right moment, that's perfect timing",
+        "talk of the devil"
+    ], context: "speak of the devil(日本では「うわさをすれば影」)は完全に状況で使い方が決まる表現。perfect timingは場面を選ばない万能。英語は「タイミング」という抽象的な概念を褒める。日本語の「ちょうどよかった」は結果を喜んでいる。視点の向きが少し違う。", category: 'reaction', month: '2026-04' },
+    // ── Day 2 ──
+    { daySlot: 2, japanese: '今日は調子いい', english: [
+        "feeling good today",
+        "I'm feeling really good today, actually",
+        "I don't know what it is but I'm in a great mood today",
+        "I woke up on the right side of the bed"
+    ], context: "wake up on the right side of the bedは「ベッドの右側で起きた」→「機嫌がいい」。逆のwoke up on the wrong sideは機嫌が悪い。なぜ右が正解なのか誰も知らないけど全員使う。英語のイディオムは理屈より慣用が勝つ。", category: 'reaction', month: '2026-04' },
+    { daySlot: 2, japanese: '何か食べたい気分', english: [
+        "in the mood for something",
+        "I'm kind of in the mood for something to eat",
+        "I'm not even that hungry but I'm just in the mood for snacking",
+        "I could go for something right now"
+    ], context: "I could go for〜は「〜に行けそう」→「〜が欲しい気分」。I could go for a beer right now.みたいに使う。「飲めるっちゃ飲める」というゆるい欲求の表現。日本語の「気分」より少しだけ意志の弱さがにじみ出てる。", category: 'filler', month: '2026-04' },
+    { daySlot: 2, japanese: '先輩に怒鳴られた', english: [
+        "got yelled at",
+        "I got yelled at by my senior again",
+        "my senior completely lost it on me today and I just stood there",
+        "he ripped me a new one"
+    ], context: "rip someone a new oneは直訳不可の口語。「新しい穴を開ける」→超激しく怒られる。かなり強い表現だけど普通に使われる。got yelled atは汎用版。英語の「怒られた表現」は物理的ダメージの比喩が多い。やられた感がある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 2, japanese: 'お腹いっぱい', english: [
+        "I'm stuffed",
+        "I'm so stuffed I can barely move",
+        "don't offer me dessert, I am absolutely stuffed right now",
+        "I ate way too much"
+    ], context: "stuffedは「詰め込まれた」。お腹に食べ物が詰め込まれた状態。七面鳥の中に詰め物するstuffingと同じ単語。I'm fullも使えるけどstuffedの方が「もう限界」感が出る。日本語の「お腹いっぱい」より物理的な重さがある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 2, japanese: 'やっぱりそうだった', english: [
+        "called it",
+        "I called it, I knew that was going to happen",
+        "see, I told you so, I totally called it from the beginning",
+        "I knew it all along"
+    ], context: "call itは「それを呼んだ」→「予言していた」。スポーツの実況でよく使う。I called that shot(あのシュートを予言した)。I told you soは「だから言ったでしょ」の定番でちょっと勝ち誇った感じが出る。日本人が苦手な自己主張をさらっとやる表現。", category: 'reaction', month: '2026-04' },
+    { daySlot: 2, japanese: 'スマホ壊れた', english: [
+        "my phone died",
+        "my phone just died on me, great",
+        "my phone completely died on me right when I needed it most",
+        "my phone is toast"
+    ], context: "died on meのon meは「俺のところで」というニュアンス。机の上で壊れたじゃなくて、俺が使ってる最中に裏切った感じ。my car broke down on me(俺のところで故障した)も同じパターン。機械への恨みが文法に出てる。", category: 'reaction', month: '2026-04' },
+    { daySlot: 2, japanese: 'ちゃんと聞いてた？', english: [
+        "were you even listening",
+        "were you even listening to me just now?",
+        "I just said that like two seconds ago, were you even paying attention?",
+        "hello, earth to you"
+    ], context: "earth to 〜は「地球から〇〇へ」。宇宙にいる人を呼び戻す感覚。ぼーっとしてる人への「おーい聞こえてる?」。were you even〜のevenは「そもそも〜すらしてた?」という疑いの強調。「ちゃんと」より少し攻撃的。", category: 'request', month: '2026-04' },
+    { daySlot: 2, japanese: 'どうせ無理だよ', english: [
+        "there's no way",
+        "there's no way that's going to happen",
+        "I hate to be negative but there's seriously no way that works out",
+        "don't hold your breath"
+    ], context: "don't hold your breathは「息を止めて待つな」→「期待するな」。ずっと息を止めて待ってたら死ぬ。それくらい来ない、実現しない、というジョークっぽい否定。日本語の「どうせ無理」より少しユーモアがある分だけ言いやすい。", category: 'opinion', month: '2026-04' },
+    { daySlot: 2, japanese: '確認するのを忘れた', english: [
+        "forgot to check",
+        "I completely forgot to check, my bad",
+        "I should have checked before I left but I totally forgot",
+        "that one's on me"
+    ], context: "that's on meは「それは俺の上にある」→「俺のせい」。責任を自分の上に乗っかってるイメージ。I'll take the blame(俺が責任を取る)より軽くてカジュアル。ミスをさらっと認めるのに便利。日本語の「忘れた」に比べて責任の所在が明確。", category: 'reaction', month: '2026-04' },
+    { daySlot: 2, japanese: 'なんかいい感じじゃん', english: [
+        "not bad at all",
+        "hey, this is actually not bad at all",
+        "I didn't expect much but honestly this is not bad at all",
+        "this is pretty solid"
+    ], context: "not badは「悪くない」だけど英語では十分な褒め言葉。日本語で「悪くないね」と言われたらちょっと微妙だけど英語のnot badはポジティブ。solidは「固い」→「しっかりしてる」→「いい感じ」。物理的な安定感を品質に転用する英語らしい表現。", category: 'reaction', month: '2026-04' },
+    // ── Day 3 ──
+    { daySlot: 3, japanese: '最近忙しすぎる', english: [
+        "swamped lately",
+        "I've been absolutely swamped lately",
+        "work has been insane lately, I've been completely swamped",
+        "I'm stretched thin right now"
+    ], context: "swampedは「沼に沈む」→「忙しすぎて溺れてる」。stretched thinは「薄く引き伸ばされた」→あちこちに引っ張られて限界。日本語の「忙しい」は中立的だけど英語の忙しい表現はほぼ全部溺れるか崩れるかのイメージ。体感的な正直さがある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 3, japanese: 'もう帰りたい', english: [
+        "ready to go home",
+        "I am so ready to go home right now",
+        "I've been ready to leave for the last two hours honestly",
+        "I'm done with today"
+    ], context: "I'm done with todayは「今日で終わり」。done withは完全に関係を切るニュアンス。I'm done with him(あいつとはもう終わり)と同じ構造。今日という日を人間関係みたいに切り捨てる感覚。「帰りたい」より覚悟が決まってる。", category: 'reaction', month: '2026-04' },
+    { daySlot: 3, japanese: 'お金がない', english: [
+        "flat broke",
+        "I'm flat broke right now, not gonna lie",
+        "I literally have no money until payday, I'm completely flat broke",
+        "I'm running on empty"
+    ], context: "flat brokeのflatは「平ら」→「ゼロに均された」イメージ。completly broke、dead broke、stone brokeと強調の仕方がいろいろある。running on emptyはガソリン切れの状態で走ってる車。体力も金も残り0でなんとか動いてる感じ。", category: 'reaction', month: '2026-04' },
+    { daySlot: 3, japanese: '全部自分でやった', english: [
+        "did it all myself",
+        "I did the whole thing myself from start to finish",
+        "nobody helped me, I figured it all out and did it myself",
+        "I built it from the ground up"
+    ], context: "from the ground upは「地面から上に向かって」→ゼロから全部。build from scratchとほぼ同じだけど、from the ground upはもう少し建築的なスケール感がある。「一人でやった」という事実より「ゼロから積み上げた」過程に重点がある表現。", category: 'opinion', month: '2026-04' },
+    { daySlot: 3, japanese: '運がよかっただけ', english: [
+        "just got lucky",
+        "honestly I just got lucky, that's all",
+        "I'd love to take credit for it but I really just got lucky this time",
+        "right place, right time"
+    ], context: "right place, right timeは「正しい場所に正しい時間に」。成功の理由を謙遜する定番フレーズ。I'd love to take creditは「功績をもらいたいけど」という前置き。take creditは「信用/名誉を取る」。日本語の謙遜より能動的に「俺のものにしたいけど」と言ってから譲る。", category: 'opinion', month: '2026-04' },
+    { daySlot: 3, japanese: '気にしすぎかな', english: [
+        "overthinking it",
+        "I'm probably just overthinking it again",
+        "knowing me I'm probably just overthinking this like I always do",
+        "I need to stop reading into things"
+    ], context: "overthinkingは「考えすぎ」だけどover-がついてる分だけ限度を超えた感じがある。read into thingsは「物事の中に意味を読み込む」→深読みする。日本語の「気にしすぎ」より思考のプロセスが見えてくる表現。", category: 'filler', month: '2026-04' },
+    { daySlot: 3, japanese: 'お前が言うなよ', english: [
+        "look who's talking",
+        "look who's talking, seriously",
+        "you're the last person who should be saying that, look who's talking",
+        "that's rich coming from you"
+    ], context: "look who's talkingは「誰が話してるか見てみろ」→お前が言えた義理か。that's richは「それは豊かだ」→皮肉で「笑える」「よく言えたな」。richに「図々しい」という意味がある。日本語の「お前が言うな」より少し上品な皮肉。でも刺さる。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 3, japanese: 'この前行ったとこ', english: [
+        "that place we went",
+        "you know that place we went to the other day?",
+        "remember that place we checked out last time, the one near the station?",
+        "that spot we hit up before"
+    ], context: "the other dayは「先日」。具体的な日付は言わない。spotはplaceよりカジュアルで「場所」というより「いい感じのスポット」のニュアンス。英語の場所の言い方はplaceよりspotの方が若くて軽い。日本語の「とこ」と似たようなフランクさがある。", category: 'filler', month: '2026-04' },
+    { daySlot: 3, japanese: '声に出して笑った', english: [
+        "laughed out loud",
+        "that actually made me laugh out loud",
+        "I wasn't expecting that and it actually made me laugh out loud for real",
+        "I lost it"
+    ], context: "laugh out loudがLOL。インターネット以前からある正式な表現。lost itは「それを失った」→自制心を失って笑いが止まらなくなった状態。lost my mindとも言う。英語の爆笑は「何かを失う」表現。日本語は「笑いが止まらない」と動詞を使う。", category: 'reaction', month: '2026-04' },
+    { daySlot: 3, japanese: '考えてみればそうだよな', english: [
+        "when you think about it",
+        "when you think about it, that actually makes sense",
+        "it sounds weird at first but when you really think about it, it totally makes sense",
+        "now that you mention it"
+    ], context: "when you think about itは相手を思考に招待する表現。「一緒に考えてみよう」という共同作業感がある。now that you mention itは「あなたが言うまで気づかなかったけど言われてみれば」。日本語の「考えてみれば」より他者がトリガーになってる感じが正直。", category: 'opinion', month: '2026-04' },
+    // ── Day 4 ──
+    { daySlot: 4, japanese: 'マジで辛かった', english: [
+        "that was brutal",
+        "that was honestly brutal, not going to lie",
+        "I'm not going to sugarcoat it, that whole experience was brutal",
+        "that was rough"
+    ], context: "brutalは「残酷」が元の意味だけど日常会話では「きつかった」。not going to sugarcoat itは「砂糖でコーティングしない」→美化しない、正直に言う。日本語の「辛かった」は感情の表現だけど、brutalは体験の客観的な評価に近い。距離が取れてる。", category: 'reaction', month: '2026-04' },
+    { daySlot: 4, japanese: 'もう少し安くなる？', english: [
+        "any wiggle room",
+        "is there any wiggle room on the price?",
+        "I like it but I was wondering if there's any wiggle room on what you're asking",
+        "can you do any better on that?"
+    ], context: "wiggle roomは「モジモジする余地」→交渉の余地。値段だけじゃなくてスケジュールや条件でも使える。Can you do better?は「もっとうまくできる?」→「もう少し頑張れる?」。直接「値引きして」と言わずに相手に提案させる技術。", category: 'request', month: '2026-04' },
+    { daySlot: 4, japanese: 'そんな大したことないよ', english: [
+        "it's not that serious",
+        "relax, it's really not that serious",
+        "I think you're blowing this out of proportion, it's not that serious",
+        "you're making a mountain out of a molehill"
+    ], context: "make a mountain out of a molehillは「モグラ塚から山を作る」→些細なことを大げさにする。日本語にこれほど視覚的なイディオムはあまりない。blow out of proportionは「比率を壊すくらい吹き飛ばす」。英語は大げさを物理的な破壊で表す。", category: 'opinion', month: '2026-04' },
+    { daySlot: 4, japanese: '先に行っててもいいよ', english: [
+        "go ahead without me",
+        "go ahead without me, I'll catch up",
+        "seriously just go ahead, don't wait for me, I'll catch up later",
+        "I'll meet you there"
+    ], context: "I'll catch upは「追いつく」。物理的な話だけどスピード感がある。go aheadは「先に行く許可を与える」ニュアンス。日本語の「先に行っていいよ」は軽いけど英語のgo aheadには「あなたにゴーサインを出す」感じがある。ちょっと偉い。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 4, japanese: '今日何もしたくない', english: [
+        "zero motivation today",
+        "I have absolutely zero motivation today",
+        "I woke up this morning with zero motivation and it has not improved",
+        "I can't be bothered with anything today"
+    ], context: "can't be botheredは「わざわざやる気になれない」。めんどくさいの究極形。日本語の「したくない」は欲求の否定だけど、can't be botheredは労力を払う価値すら感じない感じ。zero motivationはシンプルだけどインパクトがある。計測可能な無気力。", category: 'reaction', month: '2026-04' },
+    { daySlot: 4, japanese: 'それ前に聞いたよ', english: [
+        "you already told me",
+        "you literally already told me that",
+        "I hate to break it to you but you've told me this story at least three times now",
+        "yeah, you mentioned that"
+    ], context: "I hate to break it to youは「これを言いたくないけど」→残念なことを伝える前置き。相手の期待を壊すbreak itが元の意味。you mentioned thatはやんわりした版。literallyは「文字通り」だけど強調として使う。「絶対に」「本当に」の口語強調。", category: 'reaction', month: '2026-04' },
+    { daySlot: 4, japanese: 'こっちはこっちで大変だよ', english: [
+        "I've got my own stuff",
+        "I've got my own stuff going on too, you know",
+        "it's not like I'm sitting around doing nothing, I've got my own things to deal with",
+        "I'm dealing with a lot myself right now"
+    ], context: "I've got stuff going onは「いろいろ進行中のことがある」。事情や状況が動いているニュアンス。deal withは「対処する」→問題を手で扱うイメージ。日本語の「こっちはこっちで」という距離感、英語ではmy ownとtooで表す。", category: 'opinion', month: '2026-04' },
+    { daySlot: 4, japanese: '思ったより難しかった', english: [
+        "harder than I expected",
+        "that was way harder than I expected, honestly",
+        "I thought it would be simple but it turned out to be way harder than I expected",
+        "I underestimated that one"
+    ], context: "underestimateは「過小評価した」。見くびったという意味。日本語では「甘く見てた」に近い。turned out to beは「結果的にそうだった」。最初の予想と結果が違った時の定番フレーズ。結果から過去を振り返る英語らしい語順。", category: 'reaction', month: '2026-04' },
+    { daySlot: 4, japanese: 'ここだけの話なんだけど', english: [
+        "between you and me",
+        "between you and me, this doesn't leave the room",
+        "OK, between you and me only, you can't tell anyone else about this",
+        "off the record"
+    ], context: "between you and meは「あなたと私の間で」→2人だけの秘密。this doesn't leave the roomは「この話は部屋から出ない」。秘密が空間に閉じ込められるイメージ。off the recordは記録に残さない、オフィシャルじゃない。ジャーナリストが使う言葉が日常に降りてきた表現。", category: 'filler', month: '2026-04' },
+    { daySlot: 4, japanese: '信じられないくらいうまい', english: [
+        "insanely good",
+        "this is insanely good, what is this?",
+        "I don't know what they put in this but it is insanely good",
+        "this hits different"
+    ], context: "hits differentは「違う当たり方をする」→普通じゃない感動。SNS世代の表現で「なんか今回は特別においしい/刺さる」感じ。insanelyは「狂ったくらい」の強調副詞。日本語の「信じられないくらい」と構造が似てる。狂気で美味しさを表す言語の不思議。", category: 'reaction', month: '2026-04' },
+    // ── Day 5 ──
+    { daySlot: 5, japanese: '仕事終わった', english: [
+        "called it a day",
+        "finally called it a day around seven",
+        "I couldn't focus anymore so I just called it a day and headed home",
+        "I wrapped up for the day"
+    ], context: "call it a dayは「今日はここまで」と宣言すること。直訳は「それを一日と呼ぶ」。誰かが決めて終わりにする感じ。wrap upは「ラップで包む」→まとめて締める。日本語の「仕事終わった」はただの事実の報告だけど英語は能動的に「終わりにした」感がある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 5, japanese: 'それ俺もやったことある', english: [
+        "been there",
+        "been there, done that",
+        "trust me, I've been there and it's not as fun as it looks",
+        "I know that feeling"
+    ], context: "been there, done thatは「そこに行った、それをした」→経験済み。もう知ってる、飽きた、というニュアンスも含む。超短い2フレーズで「俺も通ってきた」が全部言える。英語は経験を「場所に行く」で表す。I've been through thatも同じ発想。", category: 'reaction', month: '2026-04' },
+    { daySlot: 5, japanese: '後悔してる', english: [
+        "I regret that",
+        "yeah, I kind of regret that now",
+        "looking back, I honestly regret that decision more than I expected to",
+        "I should have known better"
+    ], context: "should have known betterは「もっとわかってるべきだった」→わかるはずだったのにという自責。経験があったのに同じミスをした時に使う。regretより少し自分への怒りがある。I knew this would happenと言えるのに言わなかった自分への苦情。", category: 'reaction', month: '2026-04' },
+    { daySlot: 5, japanese: 'どこ座る？', english: [
+        "where do you want to sit",
+        "where do you want to sit, any preference?",
+        "I don't mind either way, where do you want to sit?",
+        "you pick the spot"
+    ], context: "you pickは「あなたが選んで」。選択権を相手に渡す最短の言い方。I don't mindは「気にしない」→どちらでもいい。「どちらでもいい」は日本語で使いすぎると優柔不断に見えるけど、英語のI don't mindはむしろ気遣いのある柔軟性として受け取られる。", category: 'request', month: '2026-04' },
+    { daySlot: 5, japanese: '最近どう？', english: [
+        "how have you been",
+        "hey, how have you been lately?",
+        "it's been a while, how have you been, what's going on with you?",
+        "what's new with you?"
+    ], context: "what's new?は「新しいことある?」→「最近どう?」の英語版。how have you beenは久しぶりの人への定番。how are you?との違いは時間の幅。how are youは今この瞬間、how have you beenは「ここしばらく」を聞いてる。英語は時制で質問の範囲が変わる。", category: 'filler', month: '2026-04' },
+    { daySlot: 5, japanese: 'そのうちやる', english: [
+        "I'll get around to it",
+        "yeah, I'll get around to it eventually",
+        "it's on my list, I'll get around to it when I have time",
+        "it's on the back burner"
+    ], context: "get around to itは「それにたどり着く」→いつかやる。今は回り道してるけど最終的には着く感じ。back burnerはコンロの奥のバーナー→優先度低いものを置いておく場所。料理の比喩が仕事の優先順位の表現になった。日本語の「そのうち」よりちゃんとした言い訳っぽい。", category: 'filler', month: '2026-04' },
+    { daySlot: 5, japanese: 'どっちが得か考える', english: [
+        "weighing the options",
+        "I'm just weighing my options right now",
+        "before I commit to anything I want to make sure I'm weighing all my options",
+        "running the numbers"
+    ], context: "weigh the optionsは「選択肢を量る」。秤に乗せて重さを比べるイメージ。run the numbersは「数字を走らせる」→計算する。英語の判断は常に重さや数字で表される。日本語の「得か損かを考える」は概念的だけど英語は身体的な作業になる。", category: 'opinion', month: '2026-04' },
+    { daySlot: 5, japanese: '疲れたのに眠れない', english: [
+        "wired but tired",
+        "I'm completely wired but tired, it's the worst",
+        "my body is exhausted but my brain won't shut off, I'm wired but tired",
+        "I can't switch off"
+    ], context: "wiredは「電線でつながれた」→脳が興奮状態。wired but tiredは韻を踏んでて言いやすいし記憶に残る。can't switch offは「スイッチを切れない」→脳が止まらない。日本語の「眠れない」は結果だけど英語は原因(脳が覚醒してる)から説明する。", category: 'reaction', month: '2026-04' },
+    { daySlot: 5, japanese: '早く終わらせたい', english: [
+        "want to get this over with",
+        "I just want to get this over with already",
+        "let's just get this over with so we can move on to something better",
+        "let's knock it out"
+    ], context: "get it over withは「それを越えて終わらせる」→早く済ませたい。嫌なことに対して使う表現。楽しいことには使わない。knock it outは「それをノックアウトする」→素早く片付ける。日本語の「早く終わらせたい」は中立だけど英語は「嫌だから早く終わらせたい」感が強い。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 5, japanese: 'そういうもんだよ', english: [
+        "that's just how it is",
+        "that's just how it is, nothing you can do about it",
+        "I know it's frustrating but honestly that's just how it is sometimes",
+        "it is what it is"
+    ], context: "it is what it isは英語で最強の諦め表現。「それはそれだ」という同語反復が哲学的な響きを持つ。that's just how it isより少しだけ達観した感じ。日本語の「そういうもんだよ」に近いけど、英語版はもっと宇宙的な受け入れ方がある。", category: 'opinion', month: '2026-04' },
+    // ── Day 6 ──
+    { daySlot: 6, japanese: '久しぶりに会った', english: [
+        "it's been a while",
+        "it's been a while, great to see you again",
+        "wow it's been so long, it's great to see you, how has everything been?",
+        "long time no see"
+    ], context: "long time no seeは面白い表現で文法的に正しくないのに定着した。もともとネイティブアメリカンや中国語話者の英語から来たという説がある。it's been a whileは正規版。どちらも使えるけどlong time no seeの方が少しだけ懐かしさと温かみがある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 6, japanese: '全部食べた', english: [
+        "cleaned my plate",
+        "I cleaned my plate, it was that good",
+        "everything was so good that I cleaned my entire plate without thinking",
+        "I ate every last bite"
+    ], context: "clean your plateは「皿をきれいにする」→全部食べる。皿が綺麗になった状態をゴールとするイメージ。every last biteは「最後の一口まで全部」。lastがあることで名残惜しさがある。日本語の「全部食べた」より行為の完了感が強い。", category: 'reaction', month: '2026-04' },
+    { daySlot: 6, japanese: '友達に勧められた', english: [
+        "my friend recommended it",
+        "my friend actually recommended this place",
+        "I never would have found this place if my friend hadn't recommended it",
+        "I heard about it through a friend"
+    ], context: "recommend vs suggest の違い。recommendは「これがいい」と責任を持って勧める。suggestは「これもいいかも」という提案。日本語の「勧める」はrecommend寄り。through a friendは「友達を経由して」。情報の流れを人間のルートで追跡する英語らしい表現。", category: 'filler', month: '2026-04' },
+    { daySlot: 6, japanese: '絶対に嫌だ', english: [
+        "absolutely not",
+        "no, absolutely not, that's out of the question",
+        "I don't care what you say, that is absolutely not happening",
+        "hard pass"
+    ], context: "hard passはビジネス用語が日常に降りてきた表現。「強く通過する」→断固お断り。soft passだと少し迷いがある。out of the questionは「議論の外」→検討の余地すらない。日本語の「絶対嫌」より英語の方がバリエーションが多くて面白い。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 6, japanese: 'ちょっと遠慮しとく', english: [
+        "I'll pass",
+        "thanks but I'll pass on that one",
+        "I appreciate the offer but I think I'll pass this time around",
+        "I'm going to sit this one out"
+    ], context: "I'll passは「パスします」がそのまま英語になった表現。sit this one outは「今回はベンチに座ってる」→参加しない。スポーツの交代要員が試合に出ない感じ。日本語の「遠慮する」は相手への配慮が含まれるけど英語のI'll passは自分の選択として断る。", category: 'filler', month: '2026-04' },
+    { daySlot: 6, japanese: '気が向いたらやる', english: [
+        "if I feel like it",
+        "I'll do it if I feel like it, no promises",
+        "I'm not committing to anything, I'll go if I feel like it",
+        "maybe, we'll see"
+    ], context: "if I feel like itは「そんな気分になったら」。コミットしない返事の王様。no promisesは「約束はしない」→期待するな。we'll seeは「見てみましょう」→やんわりした保留。日本語の「気が向いたら」は少し投げやりだけど英語のif I feel like itは自分の気分を尊重するニュアンスになる。", category: 'filler', month: '2026-04' },
+    { daySlot: 6, japanese: 'なんか疲れた顔してるよ', english: [
+        "you look tired",
+        "hey, are you OK? you look really tired",
+        "I don't want to be rude but you look exhausted, is everything alright?",
+        "you look like you need some sleep"
+    ], context: "you look tiredは英語では結構ダイレクトな表現。日本語では「疲れた顔してるよ」と少し婉曲に言うことが多い。I don't want to be rudeは「失礼なことを言いたくないけど」という前置き。英語でもこういうクッションを置く文化はある。むしろ置かないと失礼になるシーンがある。", category: 'opinion', month: '2026-04' },
+    { daySlot: 6, japanese: '試しにやってみよう', english: [
+        "worth a shot",
+        "I mean, it's worth a shot, right?",
+        "we don't know if it'll work but it's definitely worth a shot",
+        "nothing to lose"
+    ], context: "worth a shotは「一発撃つ価値がある」→試す価値がある。nothing to loseは「失うものがない」→リスクがないから試せる。日本語の「試しに」は気楽なトーンだけど英語のworth a shotは少しだけギャンブル感がある。やってみる、という決断を勇気として捉える文化。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 6, japanese: 'それは知らなかった', english: [
+        "didn't know that",
+        "huh, I actually didn't know that",
+        "genuinely didn't know that, thanks for telling me",
+        "you learn something new every day"
+    ], context: "you learn something new every dayは「毎日新しいことを学ぶ」→知らないことがあって当然、という楽観的な受け取り方。日本語で「知らなかった」と言うと少し恥ずかしい感じがあるけど英語のyou learn〜は好奇心として表現する。知らないことをポジティブに変換する技術。", category: 'reaction', month: '2026-04' },
+    { daySlot: 6, japanese: '正直どうでもいい', english: [
+        "I honestly don't care",
+        "I'm going to be honest, I really don't care either way",
+        "I know I should have an opinion on this but I genuinely just don't care",
+        "makes no difference to me"
+    ], context: "makes no difference to meは「俺には何も変わらない」→どちらでも一緒。I don't careはちょっと冷たく聞こえることがあるのでI really don't mindの方が柔らかい。日本語の「どうでもいい」も文脈次第で冷たくなる。温度差は英語も日本語も同じくらいある。", category: 'opinion', month: '2026-04' },
+    // ── Day 7 ──
+    { daySlot: 7, japanese: '連絡くれよ', english: [
+        "keep me posted",
+        "keep me posted on how it goes",
+        "let me know what happens and keep me posted as things develop",
+        "give me a heads up"
+    ], context: "keep me postedは「ポスターを更新し続けて」→情報を随時知らせて。昔の公告板で情報が更新されるイメージ。give me a heads upは「頭の上を教えて」→事前に知らせて。postは「後で教えて」、heads upは「前もって教えて」という時制の違いがある。", category: 'request', month: '2026-04' },
+    { daySlot: 7, japanese: '全然わかんなかった', english: [
+        "completely lost",
+        "I was completely lost the entire time",
+        "I sat there and nodded along but I was completely lost from the start",
+        "it went right over my head"
+    ], context: "it went over my headは「頭の上を通り過ぎた」→理解できなかった。高すぎて届かなかった感じ。completely lostは道に迷ったのと同じ言葉。理解できない=方向感覚を失う、という身体的なイメージ。日本語の「わかんない」は静的だけど英語は空間的に迷子になってる。", category: 'reaction', month: '2026-04' },
+    { daySlot: 7, japanese: '話が変わるけど', english: [
+        "on a different note",
+        "on a completely different note, did you hear about this?",
+        "I know we were talking about something else but on a different note, this happened",
+        "anyway, changing the subject"
+    ], context: "on a different noteの「note」は音楽の音符。話のトーンや音を変える感じ。on that noteは「その音のまま」→同じ流れで締める。日本語の「話が変わるけど」は話題転換の宣言だけど英語のon a different noteはもう少し流れるように変わる感じがある。", category: 'filler', month: '2026-04' },
+    { daySlot: 7, japanese: '全力でやった', english: [
+        "gave it my all",
+        "I gave it my all and that's all I can say",
+        "whatever the result, I can honestly say I gave it my all",
+        "I left it all on the field"
+    ], context: "left it all on the fieldはスポーツ由来。フィールドに全部置いてきた→出し切った。gave it my allはmy all(俺の全部)をgiveした。日本語の「全力」は力の量を全部使う感じだけど英語は「フィールドに置いてきた」という残り物のないイメージ。どちらも清々しい。", category: 'opinion', month: '2026-04' },
+    { daySlot: 7, japanese: '聞こえなかった', english: [
+        "didn't catch that",
+        "sorry, I didn't quite catch that",
+        "could you repeat that? I didn't catch what you said at the end",
+        "come again?"
+    ], context: "catch=「捕まえる」が言葉を受け取るにも使える。I didn't catch itは言葉が耳まで飛んできたけど捕まえられなかった。come again?は古めだけど今でも使う。日本語の「聞こえない」は受信できなかった事実だけど英語のcatchは積極的に受け取ろうとしたニュアンスがある。", category: 'filler', month: '2026-04' },
+    { daySlot: 7, japanese: '頑張れっていうのは簡単だよね', english: [
+        "easy for you to say",
+        "that's easy for you to say though",
+        "I know you mean well but that's really easy for you to say from where you're standing",
+        "try walking in my shoes"
+    ], context: "easy for you to sayは英語の万能カウンパンチ。外野から「頑張れ」と言う人への返し。walk in my shoesは「俺の靴で歩いてみろ」→俺の立場を経験してから言え。日本語の「言うのは簡単」と構造が全く同じ。英語でも日本語でも人類共通の感情は同じ形をしてる。", category: 'opinion', month: '2026-04' },
+    { daySlot: 7, japanese: 'また始まった', english: [
+        "here we go again",
+        "oh great, here we go again",
+        "I knew it, here we go again, same thing every single time",
+        "not this again"
+    ], context: "here we goは「さあ始まるぞ」のポジティブ版と「またか」のネガティブ版がある。againをつけると完全にうんざり系になる。not this againも同じ感情。日本語の「また始まった」も全く同じ。繰り返しへの疲労は万国共通で英語も日本語も同じ言葉の形になる。", category: 'reaction', month: '2026-04' },
+    { daySlot: 7, japanese: '期待してなかった', english: [
+        "didn't expect much",
+        "I honestly didn't expect much going in",
+        "I went in with pretty low expectations and that turned out to be the right call",
+        "I was pleasantly surprised"
+    ], context: "pleasantly surprisedは「気持ちよく驚かされた」→嬉しい意味での予想外。surprisedは中立だけどpleasantlyをつけると方向が決まる。日本語では「期待してなかったのに良かった」と原因と結果を両方言うけど英語のpleasantly surprisedは結果だけで全部伝わる。効率がいい。", category: 'reaction', month: '2026-04' },
+    { daySlot: 7, japanese: '仕方ないか', english: [
+        "what can you do",
+        "I mean, what can you do, right?",
+        "it's frustrating but honestly, what can you do, that's just how things go",
+        "you can't win them all"
+    ], context: "what can you do?は修辞疑問文。答えを求めてない。「どうしようもないよね」という諦めと受け入れの両方がある。you can't win them allは「全部勝てるわけじゃない」→全部うまくいくことはない。日本語の「仕方ない」の英語版はこのくらい哲学的になる。", category: 'filler', month: '2026-04' },
+    { daySlot: 7, japanese: 'なんで急に？', english: [
+        "where did that come from",
+        "wait, where did that come from all of a sudden?",
+        "I wasn't expecting that at all, where did that come from?",
+        "out of nowhere"
+    ], context: "where did that come from?は「それどこから来たの?」→突然すぎて脈絡が見えない時の反応。out of nowhereは「どこでもない場所から」→突然。日本語の「急に」は時間軸の話だけど英語は空間で表す。どこからともなく来た感じ。", category: 'reaction', month: '2026-04' },
+    // ── Day 8 ──
+    { daySlot: 8, japanese: '来週でもいい？', english: [
+        "can we push it to next week",
+        "is it OK if we push this to next week instead?",
+        "I hate to ask but would it be possible to push this to next week?",
+        "can we push it back?"
+    ], context: "push it backは「後ろに押す」→延期する。pull it forwardは「前に引く」→前倒し。英語の日程変更は方向で表現する。日本語の「来週にしていい?」は質問だけど英語のcould we push it backは相手への配慮を含む依頼になる。聞き方が少し上手。", category: 'request', month: '2026-04' },
+    { daySlot: 8, japanese: '全部私のせいじゃない', english: [
+        "not entirely my fault",
+        "I'll admit I messed up, but it's not entirely my fault",
+        "I take some responsibility but honestly this is not entirely my fault here",
+        "there's plenty of blame to go around"
+    ], context: "there's plenty of blame to go aroundは「責任は全員に行き渡るくらいある」→みんなに非がある。blame is shareableという英語的な発想。日本語では「責任を分散する」感覚はあまり言語化されない。英語は責任を量として扱い分配できるものとして語る。", category: 'opinion', month: '2026-04' },
+    { daySlot: 8, japanese: '食べてみる価値ある', english: [
+        "worth trying",
+        "it's definitely worth trying at least once",
+        "I don't know if you'll love it but it's absolutely worth trying at least once in your life",
+        "give it a chance"
+    ], context: "worth + ingは「〜する価値がある」の万能構造。worth trying、worth seeing、worth the wait。日本語の「価値がある」は少し重いけど英語のworthはとても軽い。「一回くらいやってみな」くらいのノリで使える。give it a chanceはチャンスをものに与えるイメージ。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 8, japanese: '少しだけ時間ある？', english: [
+        "got a minute",
+        "hey, do you got a minute right now?",
+        "sorry to bother you, do you have a minute? it won't take long",
+        "quick question"
+    ], context: "got a minute?は「一分ある?」→少し話せる? という許可を求める定番。it won't take longは「長くかからない」→さっと済む、という安心材料をセットにする。quick questionも同じ機能。「短くすませます」という宣言が相手への配慮になってる。英語は時間のコストに敏感。", category: 'request', month: '2026-04' },
+    { daySlot: 8, japanese: '同じこと考えてた', english: [
+        "I was thinking the same thing",
+        "funny, I was thinking the exact same thing",
+        "I'm glad you said that because I was thinking the exact same thing this whole time",
+        "we're on the same page"
+    ], context: "we're on the same pageは「同じページを読んでいる」→同じ理解・状況にいる。文書の比喩が会議や仕事で頻出になった表現。get on the same page(同じページに合わせる)も使う。日本語の「同じこと考えてた」はシンプルだけどsame pageには共同作業の感覚がある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 8, japanese: 'なんでそんなこと知ってんの', english: [
+        "how do you even know that",
+        "wait, how do you even know that?",
+        "that's such a specific thing to know, how do you even know that?",
+        "where did you learn that"
+    ], context: "how do you even know that?のevenは「そもそも」という驚きの強調。知識の存在自体が意外な時に使う。such a specific thing to knowは「そんな具体的なことを知っているとは」。日本語の「なんで知ってんの」は疑惑混じりだけど英語版は純粋な驚きに近い。", category: 'reaction', month: '2026-04' },
+    { daySlot: 8, japanese: '慌てないで', english: [
+        "no rush",
+        "hey, no rush, take your time",
+        "seriously, there's no rush, just take as much time as you need",
+        "don't stress about it"
+    ], context: "no rushは「急ぎなし」→焦らなくていい。take your timeは「自分の時間を取って」→ゆっくりどうぞ。日本語の「慌てないで」は相手の状態への指摘だけど英語のno rushは状況の定義として伝える。「急ぐ状況じゃないよ」と場を設定してあげる感覚。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 8, japanese: '普通にうまい', english: [
+        "pretty solid",
+        "honestly, this is pretty solid",
+        "I wasn't expecting much from this place but honestly it's pretty solid",
+        "decent stuff"
+    ], context: "pretty solidは「かなりしっかりしてる」→普通においしい・いい感じ。日本語の「普通においしい」の「普通に」は強調として使われるが英語ではprettyがその役割を担う。solidは食べ物だけじゃなくて仕事の質や人物評価にも使える便利な形容詞。", category: 'reaction', month: '2026-04' },
+    { daySlot: 8, japanese: '一回やったらもう十分', english: [
+        "once was enough",
+        "I tried it once and honestly once was enough",
+        "it was an experience and I'm glad I did it but once was definitely enough",
+        "I can check that off my list"
+    ], context: "once was enoughは潔い表現。経験したことを否定せずに「もういい」と言える。I can check that off my listはやることリストにチェックを入れる感覚。「やった、終わり」。日本語の「一回で十分」より少し積極的に経験を完了させる感じがある。バケットリスト文化。", category: 'opinion', month: '2026-04' },
+    { daySlot: 8, japanese: '急に眠くなった', english: [
+        "hit a wall",
+        "I just hit a wall all of a sudden",
+        "I was fine and then out of nowhere I just hit a wall and could barely keep my eyes open",
+        "my energy crashed"
+    ], context: "hit a wallは「壁に激突する」→突然の限界。エネルギーやモチベーションが急になくなる時に使う。energy crashedはエネルギーが墜落した感じ。日本語の「急に眠くなった」は受動的だけど英語は能動的に壁に当たりに行ってる感じが出てる。突然感が物理的。", category: 'reaction', month: '2026-04' },
+    // ── Day 9 ──
+    { daySlot: 9, japanese: '趣味って何？', english: [
+        "what do you do for fun",
+        "so what do you do for fun outside of work?",
+        "I feel like I don't know that much about you, what do you do for fun?",
+        "what are you into these days"
+    ], context: "what do you do for fun?は「何が楽しくてやってるの?」。hobbyとは言わない。hobbyは少しフォーマルでhobbyを聞くより「楽しいこと」として聞く方がナチュラル。what are you into?は「何にはまってる?」。英語は趣味を活動として聞く。", category: 'filler', month: '2026-04' },
+    { daySlot: 9, japanese: 'うまく説明できない', english: [
+        "hard to explain",
+        "it's kind of hard to explain, you'd have to see it",
+        "I know exactly what I mean but I can't find the words, it's just hard to explain",
+        "you kind of have to experience it yourself"
+    ], context: "you'd have to see itは「見てみないとわからない」→言葉で伝えられない体験の感覚。you have to experience it yourselfも同じ意味。日本語の「うまく説明できない」は能力の限界表現だけど英語はyou'dと仮定法を使って「あなたが見れば分かる」と相手に委ねる。", category: 'filler', month: '2026-04' },
+    { daySlot: 9, japanese: '最悪なタイミングだった', english: [
+        "worst timing ever",
+        "that was honestly the worst timing ever",
+        "of all the moments that could have happened, that was genuinely the worst timing ever",
+        "talk about bad timing"
+    ], context: "talk about〜は「〜の話はやめてよ」じゃなくて「まさに〜だよね」という皮肉のイントネーションで使う表現。talk about bad luck(まさにツイてないよな)。日本語の「最悪なタイミング」は評価だけど英語のtalk about〜は状況を実況してる感じ。", category: 'reaction', month: '2026-04' },
+    { daySlot: 9, japanese: '思ったより時間かかった', english: [
+        "took longer than expected",
+        "it took a lot longer than I expected, honestly",
+        "I thought it would be quick but it ended up taking way longer than expected",
+        "I lost track of time"
+    ], context: "lose track of timeは「時間の軌跡を失う」→時間を忘れる。trackは足跡や軌跡。時間の流れから外れてしまった感じ。took longer than expectedは結果報告。日本語の「思ったより」は予測と現実のギャップだけど英語のlost track of timeは没頭してた事実に焦点がある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 9, japanese: 'そこまでしなくていいよ', english: [
+        "you don't have to do that",
+        "you really don't have to do that, but thank you",
+        "I appreciate it but seriously you don't have to go out of your way for me",
+        "don't go to any trouble"
+    ], context: "go out of your wayは「自分の道から外れてまで」→わざわざ。don't go to any troubleは「面倒かけないで」。日本語の「そこまでしなくていい」は遠慮だけど英語のyou don't have toは純粋に相手の負担を心配している感じがある。義務じゃないですよ、という解放。", category: 'reaction', month: '2026-04' },
+    { daySlot: 9, japanese: '慣れてきた', english: [
+        "getting the hang of it",
+        "I'm slowly getting the hang of it",
+        "it was confusing at first but I'm definitely starting to get the hang of it now",
+        "it's clicking"
+    ], context: "get the hang of itのhangは「感覚、コツ」という意味。道具の持ち方から来たという説がある。clickingは「カチッとはまる」→理解が合う音。突然わかった瞬間の感覚を音で表す。日本語の「慣れた」は時間的な適応だけど英語は「感覚を掴んだ」という達成感がある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 9, japanese: '気のせいかな', english: [
+        "maybe I'm imagining things",
+        "maybe I'm just imagining things, I don't know",
+        "it could be nothing but I can't shake the feeling, or maybe I'm imagining things",
+        "could be in my head"
+    ], context: "it's all in your headは「全部頭の中にある」→気のせい。could be in my headは自己疑いのバージョン。can't shake the feelingは「その感覚を振り払えない」→なんか気になって仕方ない。日本語の「気のせい」は軽いけど英語のin my headは脳内の幻覚という少し重い表現。", category: 'filler', month: '2026-04' },
+    { daySlot: 9, japanese: '全部うまくいくよ', english: [
+        "it'll all work out",
+        "trust me, it'll all work out in the end",
+        "I know it doesn't look great right now but these things always work out in the end",
+        "hang in there"
+    ], context: "hang in thereは「そこにぶら下がっていろ」→踏ん張れ。崖にぶら下がって落ちないでいる感じ。it'll work outはいつもの通り全部うまく着地する楽観的な宣言。日本語の「大丈夫だよ」より少しだけ根拠がない感じがあるが、根拠がないからこそ慰めになる。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 9, japanese: 'めちゃくちゃ笑えた', english: [
+        "I was dying",
+        "I was absolutely dying, that was too funny",
+        "I don't even know how long I was laughing, I was literally dying",
+        "I couldn't stop laughing"
+    ], context: "I was dyingは「死にそうだった」→笑いすぎた。英語は大きな反応を全部死に例える。dying of laughter(笑い死に)、dying of embarrassment(恥ずかしさで死にそう)。日本語の「めちゃくちゃ笑った」は量だけど英語の「dying」は生命レベルのダメージ。大げさだけど正直。", category: 'reaction', month: '2026-04' },
+    { daySlot: 9, japanese: '久しぶりにリラックスできた', english: [
+        "finally got to decompress",
+        "I finally got to decompress a little, it's been a while",
+        "I really needed this, I haven't had a chance to decompress in so long",
+        "much needed break"
+    ], context: "decompressは「圧縮を解く」→ストレスや張りつめた状態を解放する。パソコンのファイル解凍と同じ単語。much needed breakは「とても必要だった休憩」。日本語の「リラックス」はそのまま英語から来たけど、decompressの方が「溜まってた何かを出す」感じがリアル。", category: 'reaction', month: '2026-04' },
+    // ── Day 10 ──
+    { daySlot: 10, japanese: '同意するしかないじゃん', english: [
+        "what was I supposed to say",
+        "I mean, what was I supposed to say, I had no choice",
+        "I didn't actually agree but what was I supposed to say in that situation?",
+        "I couldn't exactly say no"
+    ], context: "what was I supposed to say?は「俺に何を言えっていうんだ?」→選択肢がなかった言い訳。I couldn't exactly say noはexactlyで「まさに」→「そうそう断れるわけないでしょ」。日本語の「同意するしかない」は状況の説明だけど英語は「俺に何をしろというんだ」と聴衆に問いかける。", category: 'reaction', month: '2026-04' },
+    { daySlot: 10, japanese: '本当はやりたくなかった', english: [
+        "didn't really want to",
+        "I'll be honest, I didn't really want to do it",
+        "I went along with it but if I'm being honest I really didn't want to at all",
+        "I wasn't exactly thrilled about it"
+    ], context: "wasn't exactly thrilledは「めちゃくちゃ興奮してたわけじゃない」→乗り気じゃなかった。二重否定と曖昧表現で本音を柔らかく言う技術。if I'm being honestは「正直に言うと」の前置き。日本語の「本当は」は内面の開示だけど英語のif I'm being honestは「今から本音モードに切り替えます」という宣言。", category: 'opinion', month: '2026-04' },
+    { daySlot: 10, japanese: 'もうちょっとだけ', english: [
+        "just a little more",
+        "give me just a little more time",
+        "I know I keep saying this but just a little more, I'm almost done",
+        "almost there"
+    ], context: "almost thereは「もう少しでそこに着く」→ゴール直前の励まし。物理的な移動と進捗の両方で使える。I'm almost doneは「ほぼ終わった」。日本語の「もうちょっと」は時間のお願いだけど英語のalmost thereは「到達点が見えてる」という希望のニュアンスがある。", category: 'filler', month: '2026-04' },
+    { daySlot: 10, japanese: '絶対覚えてない', english: [
+        "totally gonna forget that",
+        "I'm going to be totally honest, I'm going to forget that",
+        "you should write that down because I'm definitely going to forget it by tomorrow",
+        "it's already gone"
+    ], context: "it's already goneは「もう消えた」→記憶から即座に消えた。短期記憶が弱い自虐表現。you should write that downは「書いておいた方がいい」→俺に頼るな、という間接的な警告。日本語で「覚えてない」は言い訳だけど英語で予告してしまうのは潔さがある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 10, japanese: 'とりあえずやってみる', english: [
+        "just going to go for it",
+        "I don't have a plan but I'm just going to go for it",
+        "maybe it'll work maybe it won't but I'm just going to go for it and see what happens",
+        "wing it"
+    ], context: "wing itは「翼でやる」→準備なしで即興でやる。鳥が翼を使って飛ぶ感覚から来たという説がある。go for itは積極的に突っ込む感じ。日本語の「とりあえず」は無計画の照れ隠しだけど英語のjust go for itは冒険として前向きに言える。ノリが違う。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 10, japanese: '話が早い', english: [
+        "now we're talking",
+        "now we're talking, let's do it",
+        "OK, now we're talking, that's exactly what I was hoping to hear",
+        "that's more like it"
+    ], context: "now we're talkingは「今こそ話してる」→「それだよ、そういうことだよ」という盛り上がり表現。that's more like itは「それの方が近い」→「そうこなくちゃ」。どちらも相手の提案や変化を歓迎する時に使う。日本語の「話が早い」は効率を褒めてるけど英語版は感情的な興奮がある。", category: 'reaction', month: '2026-04' },
+    { daySlot: 10, japanese: '結果が全てじゃないよ', english: [
+        "it's not just about results",
+        "you know, it's not just about the results in the end",
+        "I really believe it's not just about the results, the process matters too",
+        "the journey matters"
+    ], context: "the journey mattersは「旅が大事」→過程に価値がある。英語の成功哲学の定番フレーズ。it's not about〜は「〜が全てじゃない」の万能構造。日本語の「結果が全てじゃない」はちょっと負け惜しみに聞こえることがあるけど英語のthe journey mattersはむしろ積極的な価値観の表明になる。", category: 'opinion', month: '2026-04' },
+    { daySlot: 10, japanese: '疲れてるのに元気なふりした', english: [
+        "pushed through it",
+        "I was exhausted but I just pushed through it",
+        "I had nothing left in the tank but I smiled and pushed through the whole thing",
+        "I was running on fumes"
+    ], context: "running on fumesは「排気ガスで走ってる」→ガソリン切れでかすかな蒸気だけで動いてる状態。nothing left in the tankはガソリンタンクが空。英語の「限界で頑張る」はほぼ全部車のガソリン比喩。push throughは「突き抜ける」→困難を貫いて進む。日本語の「ふり」のずるさが英語には出にくい。", category: 'reaction', month: '2026-04' },
+    { daySlot: 10, japanese: 'どう思う？正直に', english: [
+        "be honest with me",
+        "I need you to be completely honest with me on this one",
+        "don't just say what I want to hear, I really need you to be honest with me",
+        "give it to me straight"
+    ], context: "give it to me straightは「それをまっすぐ俺に渡せ」→ストレートに言え。曲げずに、飾らずに伝えてほしい時の表現。don't just say what I want to hearは「俺が聞きたいことだけ言うな」→忖度するな。日本語の「正直に言って」より英語版は相手に行動を要求してる感じが強い。", category: 'request', month: '2026-04' },
+    { daySlot: 10, japanese: 'とっくに気づいてたよ', english: [
+        "I knew all along",
+        "oh I knew all along, I just didn't say anything",
+        "I figured it out a long time ago, I was just waiting to see if you'd tell me",
+        "I had a feeling"
+    ], context: "all alongは「ずっと最初から」。I knew it all alongは「最初からわかってた」と言える最強のドヤ表現。I had a feelingは「予感してた」→断言より柔らかい版。日本語の「とっくに気づいてた」はすでに知ってる事実だけど英語のall alongは時間の長さを強調することで「ずっと上手だった」感を出す。", category: 'opinion', month: '2026-04' },
+
+    // -- Day 11 --
+    { daySlot: 11, japanese: '電波が悪い', english: [
+        "bad signal",
+        "I have zero signal right now.",
+        "I keep losing service every time I walk into this building.",
+        "Can you hear me? You are breaking up."
+    ], context: "日本語は「電波」が主語だけど、英語は「I have no signal」と自分が主語になる。電波が悪いんじゃなくて、自分がsignalを持ってない。英語って何でも自分の責任にしたがる言語だな。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 11, japanese: '寝坊して遅刻した', english: [
+        "overslept",
+        "I totally overslept this morning.",
+        "My alarm went off three times and I slept through all of them.",
+        "I woke up in a panic and ran out the door."
+    ], context: "'Overslept' 一語で「寝坊」が完結する。日本語だと「寝坊して遅刻した」と2ステップだけど、英語は原因だけ言えば結果は察してくれる。言わなくてもバレてるから。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 11, japanese: '何回言えばわかるの', english: [
+        "how many times",
+        "How many times do I have to say this?",
+        "I have told you a hundred times and you still do the exact same thing.",
+        "It goes in one ear and out the other."
+    ], context: "「何回言えば」は怒りの定番だけど、英語の 'how many times' も全く同じ怒りのテンプレ。珍しい1対1対応。最後のイディオム「片耳から入ってもう片耳から出る」は万国共通の怒り方。", category: 'shutdown', month: '2026-04' },
+
+    { daySlot: 11, japanese: 'やっと見つけた', english: [
+        "finally found it",
+        "I finally found it after looking everywhere.",
+        "I spent like an hour searching and it was right in front of me the whole time.",
+        "It was hiding in plain sight."
+    ], context: "'Finally' は「やっと」の完璧な翻訳。でも 'hiding in plain sight' が面白い。目の前にあるのに見えないって、英語だと「見えるところに隠れてた」って表現する。隠れてたのはお前じゃなくてモノの方。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 11, japanese: 'ちょっと聞いていい？', english: [
+        "quick question",
+        "Hey, can I ask you something real quick?",
+        "Sorry to bother you, but I have a quick question if you have a sec.",
+        "Do you have a minute?"
+    ], context: "日本語の「ちょっと聞いていい？」は許可を求めてるけど、英語の 'quick question' は許可じゃなくて予告。「短いから聞くよ」という宣言に近い。聞く前に相手の時間をブロックする技術。", category: 'request', month: '2026-04' },
+
+    { daySlot: 11, japanese: '肉が焼けすぎた', english: [
+        "overcooked",
+        "I overcooked the meat again.",
+        "I left it on the grill too long and now it is like chewing rubber.",
+        "Well done is one thing, but this is charcoal."
+    ], context: "'Overcooked' は over + cook で「焼きすぎ」。英語の over- は便利で、oversleep, overeat, overthink と何でもくっつく。やりすぎ系は全部 over- で解決。覚えるコスパ最強の接頭辞。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 11, japanese: 'あの映画つまんなかった', english: [
+        "boring movie",
+        "That movie was so boring I almost fell asleep.",
+        "I was checking my phone the whole time because the plot went absolutely nowhere.",
+        "I want those two hours of my life back."
+    ], context: "「つまんなかった」に対して 'I want my two hours back' は最高の返し。時間を返せって、映画を商品として扱ってる。英語の不満って消費者クレームのフォーマットで出てくること多い。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 11, japanese: '明日でいいんじゃない', english: [
+        "tomorrow is fine",
+        "It can wait until tomorrow.",
+        "There is no rush on this, so let us just deal with it tomorrow.",
+        "No point stressing about it tonight."
+    ], context: "'It can wait' が自然。日本語は「明日でいい」と時間を指定するけど、英語は「それは待てる」とモノに待つ能力を与える。英語では物事が意志を持つ。擬人化が好きなんだよな。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 11, japanese: '鍵どこに置いたか覚えてない', english: [
+        "lost my keys",
+        "I have no idea where I put my keys.",
+        "I swear I left them on the counter but they just vanished.",
+        "I end up checking the same pockets three times."
+    ], context: "'I have no idea' は「全く覚えてない」のカジュアル版。'I do not remember' より強くて日常的。あと英語では鍵が 'vanished' する。消えたのは自分の記憶なのに、鍵のせいにする。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 11, japanese: '今日はサボっていい日', english: [
+        "cheat day",
+        "Today is officially a cheat day.",
+        "I have been working hard all week so I deserve a day off from everything.",
+        "Sometimes you just need to do absolutely nothing."
+    ], context: "'Cheat day' はダイエット用語だったのが、今は何でも使える。仕事サボる日も勉強サボる日も全部 cheat day。「ズルしていい日」って自分に許可を出すシステム。合理的な怠け方。", category: 'opinion', month: '2026-04' },
+
+    // -- Day 12 --
+    { daySlot: 12, japanese: '靴擦れした', english: [
+        "got a blister",
+        "I got a blister from these new shoes.",
+        "I wore them for like an hour and now my heel is completely destroyed.",
+        "I should have broken them in first."
+    ], context: "「靴擦れ」は英語だと 'blister'（水ぶくれ）になる。靴が擦ったんじゃなくて結果の水ぶくれを言う。英語は原因じゃなくて結果を名詞にしがち。あと 'break in' は靴を慣らすこと。靴を壊すんじゃないよ。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 12, japanese: '言い出しっぺがやれよ', english: [
+        "your idea, your job",
+        "You brought it up, so you do it.",
+        "If it was your idea in the first place, you should be the one handling it.",
+        "Do not volunteer me for your plans."
+    ], context: "'You brought it up' で「お前が言い出したんだろ」。'Bring up' は話題を持ち出すこと。日本語の「言い出しっぺ」は人を指すけど、英語は行為を指す。誰がじゃなくて何をしたかで責任を問う。", category: 'shutdown', month: '2026-04' },
+
+    { daySlot: 12, japanese: '朝からバタバタしてた', english: [
+        "hectic morning",
+        "It has been a hectic morning.",
+        "I have been running around since six and I still feel like I am behind.",
+        "I did not even have time to eat breakfast."
+    ], context: "'Hectic' は「バタバタ」にぴったり。忙しいだけじゃなくて混乱してる感じまで入ってる。'Busy' だと単に予定が多いだけだけど、'hectic' は走り回ってる絵が見える。一語の情報量が違う。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 12, japanese: 'あの人見た目と中身が違う', english: [
+        "not what they seem",
+        "They are not what they seem at all.",
+        "They look super friendly on the outside but they are actually kind of cold.",
+        "You can not judge a book by its cover."
+    ], context: "英語のことわざ 'judge a book by its cover' は本の表紙で判断するな。日本語の「人は見かけによらない」と完全に同じ発想。本と表紙。どっちの文化も「パッケージ詐欺あるよね」って言ってる。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 12, japanese: 'ちょっと場所変えない？', english: [
+        "let us move",
+        "Hey, want to move somewhere else?",
+        "It is getting kind of loud in here, let us find a quieter spot.",
+        "Let us grab a table outside."
+    ], context: "日本語の「場所変えない？」は提案だけど、英語だと理由をセットで言う方が自然。'It is loud' とか 'It is crowded' とか。理由なしだと「何で？」って聞かれる。英語は提案に根拠を求めがち。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 12, japanese: '手が空いたら教えて', english: [
+        "let me know when you are free",
+        "Just let me know when you have a sec.",
+        "No rush at all, but whenever you are free, I could use your help with something.",
+        "Ping me when you are done."
+    ], context: "「手が空く」を直訳すると 'hands are empty' だけど、英語では 'free' か 'available' を使う。手じゃなくて人が空く。あと 'ping me' はIT系から来た表現で、軽く連絡してって意味。便利。", category: 'request', month: '2026-04' },
+
+    { daySlot: 12, japanese: 'まあ、なんとなくね', english: [
+        "kind of, I guess",
+        "I mean, kind of, I guess.",
+        "I do not have a specific reason, it just sort of happened that way.",
+        "It is hard to explain, but yeah."
+    ], context: "'Kind of, I guess' は曖昧さの二段重ね。'Kind of' で「なんとなく」、'I guess' で「たぶん」。日本語の「まあ、なんとなく」と同じ逃げ方。どっちの言語も本音を隠す技術は一流。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 12, japanese: 'エレベーター来ないなあ', english: [
+        "elevator is taking forever",
+        "This elevator is taking forever.",
+        "I have been standing here for five minutes and it has not moved from the tenth floor.",
+        "I might as well just take the stairs."
+    ], context: "'Taking forever' は「永遠にかかってる」。大げさだけどこれが日常会話。英語はちょっとした不満を大げさに言うのが普通。日本語の「来ないなあ」は控えめすぎて英語にすると物足りない。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 12, japanese: '夜ご飯何にする？', english: [
+        "what is for dinner",
+        "What should we do for dinner tonight?",
+        "I am open to anything, but I really do not feel like cooking.",
+        "Want to just order something?"
+    ], context: "'What is for dinner' と 'What should we do for dinner' は微妙に違う。前者は「何が出る？」で後者は「どうする？」。一人暮らしか同居かで選ぶ表現が変わる。生活環境が文法に出る。", category: 'request', month: '2026-04' },
+
+    { daySlot: 12, japanese: '自分に甘いんだよな', english: [
+        "too easy on myself",
+        "I am way too easy on myself.",
+        "Every time I set a goal I find some excuse to let myself off the hook.",
+        "I need to stop cutting myself slack."
+    ], context: "'Easy on myself' は「自分に甘い」のドンピシャ。'Let myself off the hook' は釣り針から自分を外す、つまり「見逃す」。英語の自己批判は釣りの比喩が多い。自分を捕まえられない感じ。", category: 'opinion', month: '2026-04' },
+
+    // -- Day 13 --
+    { daySlot: 13, japanese: '日焼けした', english: [
+        "got sunburned",
+        "I got sunburned so bad yesterday.",
+        "I forgot to put on sunscreen and now my shoulders are bright red.",
+        "I look like a lobster right now."
+    ], context: "日本語の「日焼け」はポジティブにもネガティブにも使うけど、英語は 'tan'（良い焼け）と 'sunburn'（やけど）に分かれる。良い結果と悪い結果で単語が変わる。英語は結果主義。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 13, japanese: '空気読めないやつだな', english: [
+        "zero social awareness",
+        "That person has zero social awareness.",
+        "Everyone was clearly uncomfortable and they just kept going like nothing was wrong.",
+        "They totally missed the vibe."
+    ], context: "「空気を読む」は英語に直訳できない有名なやつ。'Read the room' が一番近いけど、日本語ほど日常的じゃない。英語圏は空気を読むより自分の意見を言う文化。読むべき空気が少ない。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 13, japanese: 'ここ座っていいですか', english: [
+        "is this seat taken",
+        "Excuse me, is this seat taken?",
+        "Sorry to bother you, but do you mind if I sit here?",
+        "Is anyone sitting here?"
+    ], context: "「座っていいですか」は許可を求めてるけど、英語は 'Is this seat taken?' と席に聞く。人じゃなくて席が主語。「この席、取られてる？」って、席に所有権がある発想。椅子にも人権がある国。", category: 'request', month: '2026-04' },
+
+    { daySlot: 13, japanese: '今の仕事にやりがいがない', english: [
+        "unfulfilling job",
+        "My job does not feel fulfilling at all.",
+        "I go in every day, do the same thing, and come home feeling like none of it matters.",
+        "I am just going through the motions."
+    ], context: "'Going through the motions' は「動きだけやってる」。心がない状態。日本語の「やりがい」は英語だと 'fulfilling' か 'rewarding'。でも「やりがい」ほどピンとくる英語がない。日本語の方が良い概念持ってる珍しいケース。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 13, japanese: 'お湯が出ない', english: [
+        "no hot water",
+        "There is no hot water coming out.",
+        "I turned on the shower and it is ice cold no matter how long I wait.",
+        "Nothing wakes you up faster than a cold shower."
+    ], context: "日本語は「お湯が出ない」でお湯が主語。英語は 'There is no hot water' と存在を否定する。出ないんじゃなくて、ない。英語は原因を探らず事実だけ述べる。シンプルだけど冷たい言い方。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 13, japanese: 'それ何の略？', english: [
+        "what does that stand for",
+        "Wait, what does that stand for?",
+        "I see that abbreviation everywhere but I have no idea what it actually means.",
+        "I have been nodding along pretending I knew."
+    ], context: "'Stand for' は「何を表してるの」。略語が「何のために立ってるか」と聞く。ASAP, FYI, ETA とか英語は略語だらけ。日本語のKYも英語話者に説明しようとすると地獄。文化が違いすぎる。", category: 'request', month: '2026-04' },
+
+    { daySlot: 13, japanese: 'まだ届いてないって言われた', english: [
+        "they said it has not arrived",
+        "They told me it still has not arrived yet.",
+        "I ordered it a week ago and they keep saying it is on the way but nothing shows up.",
+        "At this point I am starting to think it is lost."
+    ], context: "'On the way' は「途中です」。通販のカスタマーサービスが使う定番フレーズ。「配送中」って言っとけば客が黙ると思ってる。日本の「お届けまでもう少しお待ちください」と同じ誤魔化し。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 13, japanese: '一旦落ち着こう', english: [
+        "let us calm down",
+        "Okay, let us all just calm down for a second.",
+        "Getting worked up is not going to solve anything, so let us take a step back.",
+        "Let us just take a breather."
+    ], context: "'Take a step back' は「一歩引く」。物理的な距離を取る比喩で冷静になれって言ってる。'Take a breather' は息をしろ。英語は冷静になる方法を体の動きで表現する。頭じゃなくて体で落ち着け。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 13, japanese: 'そこまで詳しくないけど', english: [
+        "not an expert or anything",
+        "I am not an expert or anything, but...",
+        "I know a little bit about it but I would not say I really understand it deeply.",
+        "I know enough to be dangerous."
+    ], context: "'I know enough to be dangerous' は「中途半端に知ってる」の最高の表現。知識が少しだけあって危険なレベル。日本語にはない自虐の角度。謙遜しながらユーモアも入る一石二鳥フレーズ。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 13, japanese: '写真撮ってもらえますか', english: [
+        "could you take a picture",
+        "Excuse me, could you take a picture of us?",
+        "Sorry to bother you, would you mind taking a quick photo? Just press this button.",
+        "Do you want me to take one for you too?"
+    ], context: "'Would you mind' は丁寧さMAXの頼み方。「嫌じゃなければ」と聞いてるから、答えは 'No, not at all'（嫌じゃない）。Yes/Noが日本語と逆になるトラップ。丁寧にしたせいで混乱する。", category: 'request', month: '2026-04' },
+
+    // -- Day 14 --
+    { daySlot: 14, japanese: '虫に刺された', english: [
+        "got bitten",
+        "Something bit me and it is swelling up.",
+        "I woke up with like five bug bites on my arms and they itch so bad.",
+        "I am a mosquito magnet."
+    ], context: "'Mosquito magnet' は蚊に好かれる人のこと。磁石みたいに引き寄せるって表現。日本語の「蚊に好かれる」と発想が似てるけど、磁石の方がもっと抗えない感じ。物理法則には逆らえない。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 14, japanese: '昼飯まだ食ってない', english: [
+        "have not eaten yet",
+        "I still have not had lunch and it is already three.",
+        "I got so caught up in work that I completely forgot to eat.",
+        "My stomach has been yelling at me for an hour."
+    ], context: "'Got caught up in' は「〜に没頭してて」。仕事に捕まってた、という表現。あと英語では胃が 'yelling'（叫ぶ）する。お腹が鳴るんじゃなくて叫ぶ。英語の体は感情豊か。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 14, japanese: 'あれ買わなきゃよかった', english: [
+        "should not have bought that",
+        "I really should not have bought that.",
+        "I used it once and now it is just sitting in the corner collecting dust.",
+        "That was a total waste of money."
+    ], context: "'Collecting dust' はホコリを集めてる、つまり使ってないモノの描写。日本語だと「置物になってる」。英語ではモノがホコリを能動的に集める。仕事してるのはホコリ集めだけ。皮肉が効いてる。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 14, japanese: 'それちょっと失礼じゃない？', english: [
+        "kind of rude",
+        "Do you not think that is kind of rude?",
+        "I did not want to say anything but that comment felt a little out of line.",
+        "There is a fine line between honest and rude."
+    ], context: "'Out of line' は「線を越えた」。失礼の境界線があって、それを超えたって言う。'Fine line between honest and rude' は正直と失礼の境界線は細い。英語は人間関係を線で管理してる。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 14, japanese: 'もう少し具体的に言って', english: [
+        "be more specific",
+        "Can you be a little more specific?",
+        "I get the general idea but I need more details to actually do something about it.",
+        "What exactly do you mean by that?"
+    ], context: "'Specific' は「具体的」だけど、日本語ほど堅くない。日常会話で普通に使う。日本語で「具体的に」って言うとちょっとビジネスっぽいけど、英語の 'specific' は友達同士でもバンバン使う。", category: 'request', month: '2026-04' },
+
+    { daySlot: 14, japanese: '腹減ったけど作るのめんどい', english: [
+        "hungry but lazy",
+        "I am hungry but I really do not feel like cooking.",
+        "I keep opening the fridge hoping something will magically appear.",
+        "The fridge does not refill itself, unfortunately."
+    ], context: "「めんどい」は 'I do not feel like it' が一番近い。「やりたくない気分」って感情で逃げる。冷蔵庫を何回も開ける現象は万国共通。英語でも 'staring into the fridge' はあるある。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 14, japanese: 'とりあえずコーヒー飲も', english: [
+        "coffee first",
+        "Let me get some coffee first.",
+        "I can not function until I have had at least one cup of coffee.",
+        "Coffee is not a want, it is a need."
+    ], context: "'I can not function' は「機能しない」。人間を機械扱いしてる。コーヒーが燃料で、入れないと動かない。日本語の「とりあえず」は英語だと 'first' か 'for now'。優先順位を示す一語。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 14, japanese: '今月もう使いすぎた', english: [
+        "already overspent",
+        "I have already blown through my budget this month.",
+        "It is only the fifteenth and I have already spent more than I planned for the whole month.",
+        "I need to stop checking my bank account."
+    ], context: "'Blown through' は「吹き飛ばした」。予算を風で飛ばすイメージ。'Spend' より破壊力がある。日本語の「使いすぎた」は静かだけど、英語の 'blown through' は爆発してる。金の使い方に迫力がある。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 14, japanese: 'なんか見覚えあるんだけど', english: [
+        "looks familiar",
+        "This looks really familiar for some reason.",
+        "I feel like I have seen this somewhere before but I can not place it.",
+        "It is on the tip of my tongue."
+    ], context: "'I can not place it' は「思い出せない」のおしゃれ版。場所を見つけられない、つまり記憶の棚のどこにあるかわからない。'Tip of my tongue' は舌の先まで来てるのに出ない。体の部位で記憶を表現する。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 14, japanese: 'やめとけって言ったのに', english: [
+        "told you so",
+        "I told you so.",
+        "I literally warned you about this and you did it anyway.",
+        "Next time maybe listen to me."
+    ], context: "'I told you so' は英語で最も嫌われるフレーズの一つ。正しいのに言うと嫌われる矛盾。日本語の「言ったのに」も同じ。どっちの言語でも「ほら見ろ」は人間関係を壊す。正しさは武器になる。", category: 'shutdown', month: '2026-04' },
+
+    // -- Day 15 --
+    { daySlot: 15, japanese: '冷房効きすぎ', english: [
+        "AC is blasting",
+        "The AC is way too strong in here.",
+        "I brought a jacket because I knew they would crank the air conditioning up to full.",
+        "It feels like a freezer in here."
+    ], context: "'Blasting' は「全開で噴射」。冷房が攻撃してくるニュアンス。日本語の「効きすぎ」は効果が強いって言ってるけど、英語は冷房が暴れてる。機械が反乱を起こしてる感じ。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'ゴール見えてきた', english: [
+        "almost there",
+        "I can finally see the finish line.",
+        "After months of grinding, I am starting to feel like the end is actually in sight.",
+        "Just a little more and I am done."
+    ], context: "'The end is in sight' は「終わりが見える」。日本語の「ゴールが見えてきた」とほぼ同じ比喩。マラソンの発想。でも英語は 'finish line' で、日本語は「ゴール」。同じスポーツでも切り取る場面が違う。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'あいつに任せとけば大丈夫', english: [
+        "they got this",
+        "Just leave it to them, they have got this.",
+        "Honestly, they are probably the best person for the job so I am not worried at all.",
+        "They always come through."
+    ], context: "'They got this' は「あいつなら大丈夫」の完璧なカジュアル表現。'Come through' は「期待に応える」。日本語の「任せる」は信頼だけど、英語の 'got this' は能力への確信。任せるじゃなくて、できるって言ってる。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'ちょっと盛ってない？', english: [
+        "exaggerating much",
+        "Are you not exaggerating a little?",
+        "I believe the story happened, but I feel like some details got a lot bigger in the retelling.",
+        "That sounds like a stretch."
+    ], context: "'That sounds like a stretch' は「ちょっと無理あるでしょ」。ストレッチ＝引き伸ばし。話を引き伸ばしてるって比喩。日本語の「盛る」は食べ物を盛る動作から来てるけど、英語は引っ張る。", category: 'shutdown', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'やることが山積み', english: [
+        "piling up",
+        "Everything is piling up on me right now.",
+        "I have like ten things due this week and I have not started any of them.",
+        "I do not even know where to begin."
+    ], context: "'Piling up' は「積み重なってる」。日本語の「山積み」と同じ山のイメージ。でも英語は 'on me' をつけて「自分の上に」積まれてる。圧力が物理的。タスクに潰される絵が見える。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'お先にどうぞ', english: [
+        "after you",
+        "After you, go ahead.",
+        "No really, you were here first, please go ahead.",
+        "I am in no rush."
+    ], context: "'After you' は直訳すると「あなたの後で」。自分が後に行くって言うことで相手を先に通す。日本語の「お先にどうぞ」は相手に先を促すけど、英語は自分の順番を下げる。謙譲の角度が逆。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'また同じパターンだ', english: [
+        "here we go again",
+        "Great, here we go again.",
+        "Every single time it is the exact same cycle and I never learn.",
+        "It is like Groundhog Day."
+    ], context: "'Here we go again' は「また始まった」と同じ。'Groundhog Day' は同じ日を繰り返す映画のこと。英語では繰り返しを映画で例える。日本語の「またか」より文化的な奥行きがある。映画見てないと通じないけど。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'せっかくだから食べてって', english: [
+        "you should try some",
+        "Since you are here, you should have some.",
+        "I made way too much anyway, so you would actually be doing me a favor by eating some.",
+        "Come on, just a little bit."
+    ], context: "「せっかくだから」は英語に直訳できない。'Since you are here' が近いけど、「せっかく」のもったいない感が消える。'You would be doing me a favor' と「あなたが助けてくれる」に変換するのが英語的。お願いを恩に変える技。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'なんかもやもやする', english: [
+        "something feels off",
+        "Something just feels off and I can not explain it.",
+        "I am not upset about anything specific, I just have this weird uneasy feeling.",
+        "It is like a cloud hanging over me."
+    ], context: "「もやもや」は擬態語だから英語に直訳不可。'Something feels off' は「何かがずれてる」。感情じゃなくてセンサーの反応として表現する。日本語は感覚を音で表すけど、英語は機械の異常として表す。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 15, japanese: 'これ以上は言わないでおく', english: [
+        "I will leave it at that",
+        "I will just leave it at that.",
+        "I have said enough and anything more would probably make things worse.",
+        "Some things are better left unsaid."
+    ], context: "'Leave it at that' は「そこに置いとく」。話をそれ以上動かさないって決断。'Better left unsaid' は「言わない方がいい」。英語は沈黙を選ぶ時も一回宣言する。黙る前に黙ると言う。矛盾してるけどそれがルール。", category: 'shutdown', month: '2026-04' },
+
+    // -- Day 16 --
+    { daySlot: 16, japanese: '目の前でドア閉まった', english: [
+        "door closed on me",
+        "The door literally closed right in my face.",
+        "I was two seconds away and the elevator just shut right in front of me.",
+        "Story of my life."
+    ], context: "'In my face' は「顔の前で」。ドアが顔面に向かって閉まるイメージ。'Story of my life' は「俺の人生こんなもん」。些細な不運を人生全体に拡大する自虐。英語の自虐はスケールがでかい。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 16, japanese: '自分で言うのもなんだけど', english: [
+        "not to brag but",
+        "Not to brag, but I think I did pretty well.",
+        "I know it sounds like I am showing off, but I am genuinely proud of how it turned out.",
+        "I will toot my own horn just this once."
+    ], context: "'Not to brag, but' は「自慢じゃないけど」と言いながら自慢する技術。日本語と完全に同じ構造。'Toot my own horn' は自分のラッパを鳴らす＝自画自賛。どっちの言語も自慢する時は先に謝る。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 16, japanese: 'そっちの方が得だよ', english: [
+        "better deal",
+        "You are getting the better deal that way.",
+        "If you compare the two options, that one saves you way more in the long run.",
+        "Trust me, I did the math."
+    ], context: "'Better deal' は「もっといい取引」。日本語の「得」は抽象的だけど、英語は 'deal' と商取引にする。得か損かは全部ビジネス。'I did the math' は計算したって意味で、根拠を示す一言。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 16, japanese: '予約取れなかった', english: [
+        "could not get a reservation",
+        "I tried to book a table but they were fully booked.",
+        "I called three different places and every single one said they had nothing available.",
+        "We should have planned this sooner."
+    ], context: "'Fully booked' は「全部予約済み」。本が全ページ書かれた＝空きゼロ。'Book' は予約する動詞だけど、語源は本に名前を書くこと。予約って元々は名簿に記入する作業だった。語源が見える単語。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 16, japanese: '腰が痛い', english: [
+        "my back is killing me",
+        "My back has been killing me all day.",
+        "I think I slept in a weird position because I woke up and could barely move.",
+        "Getting old is not for the weak."
+    ], context: "'Killing me' は「殺しにかかってる」。痛みが殺人。日本語の「痛い」は状態だけど、英語の 'killing' は攻撃。体の部位が自分を攻撃してくるって、英語の体は敵が多い。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 16, japanese: 'もっと早く知りたかった', english: [
+        "wish I knew sooner",
+        "I wish I had known about this sooner.",
+        "I have been doing it the hard way this whole time when there was an easier option right there.",
+        "Better late than never, I guess."
+    ], context: "'I wish I had known' は仮定法過去完了。文法は難しいけど、使い方はシンプル。「知ってればよかった」をそのまま言える。'Better late than never' は「遅くてもないよりマシ」。自分への慰め定番。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 16, japanese: '一回リセットしたい', english: [
+        "need a reset",
+        "I seriously need a full reset right now.",
+        "Everything feels off lately and I just want to start fresh from zero.",
+        "Can I just ctrl-Z my whole week?"
+    ], context: "'Start fresh' は「新しく始める」。'Fresh' は新鮮って意味だけど、ここでは汚れてないって意味。過去を洗い流す感じ。'Ctrl-Z my week' はパソコンの取り消しを人生に適用。現代的な後悔の表現。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 16, japanese: 'それ半分冗談で言った', english: [
+        "half joking",
+        "I was only half joking when I said that.",
+        "I mean, there is some truth to it, but I did not expect anyone to take it that seriously.",
+        "Every joke has a grain of truth."
+    ], context: "'Half joking' は「半分冗談」。数学的に正確な表現。英語も日本語も冗談の割合を数値化する。'A grain of truth' は「真実の一粒」。冗談の中に小さい本音が入ってるって、どっちの言語も知ってる。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 16, japanese: 'もう関わりたくない', english: [
+        "done with it",
+        "I am completely done with this whole situation.",
+        "I have given it way more energy than it deserves and I just want to move on.",
+        "Not my circus, not my monkeys."
+    ], context: "'Not my circus, not my monkeys' はポーランドのことわざが英語に入ったもの。「俺のサーカスじゃないし、俺の猿でもない」＝関係ない。他人の問題から距離を取る最強フレーズ。絵が面白すぎる。", category: 'shutdown', month: '2026-04' },
+
+    { daySlot: 16, japanese: 'ちょっとそれ貸して', english: [
+        "can I borrow that",
+        "Hey, can I borrow that for a sec?",
+        "I just need it for like two minutes, I promise I will give it right back.",
+        "I will return it in one piece."
+    ], context: "'Borrow' と 'lend' の使い分けは日本人の鬼門。借りる＝borrow、貸す＝lend。主語が逆になる。'In one piece' は「壊さずに」＝「一つのピースのまま」。バラバラにしませんって約束。", category: 'request', month: '2026-04' },
+
+    // -- Day 17 --
+    { daySlot: 17, japanese: '雨の音って落ち着くよね', english: [
+        "rain sounds are calming",
+        "There is something calming about the sound of rain.",
+        "I could sit by the window and just listen to it for hours.",
+        "It is the best white noise there is."
+    ], context: "'There is something about' は「なんかあるよね」の英語版。理由は説明できないけど何かある。日本語の「〜って落ち着くよね」と同じ曖昧な共感を求める表現。感覚の共有は理屈じゃない。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 17, japanese: '筋トレした後のビールは格別', english: [
+        "post-workout beer hits different",
+        "A beer after a workout just hits different.",
+        "I know it kind of defeats the purpose but honestly I do not care because it tastes amazing.",
+        "I work out so I can eat and drink guilt-free."
+    ], context: "'Hits different' は「格別」のスラング。普通と違う刺さり方をする。'Defeats the purpose' は「本末転倒」。筋トレしてビール飲むのは目的を倒してる。でも 'I do not care' で全部チャラにする。正直が一番。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 17, japanese: '先に謝っとく', english: [
+        "apologizing in advance",
+        "I am going to apologize in advance for this.",
+        "I already know this is going to be a mess so I just want to say sorry now.",
+        "Consider yourself warned."
+    ], context: "'In advance' は「前もって」。先に謝る文化は日本も英語も同じ。でも英語の方が「これからやらかします宣言」のニュアンスが強い。'Consider yourself warned' は「警告したからな」。謝罪じゃなくて通告。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 17, japanese: 'あの店なくなったの？', english: [
+        "that place closed down",
+        "Wait, did that place close down?",
+        "I walked by the other day and it was completely empty with the sign taken down.",
+        "I never even got to try it."
+    ], context: "'Close down' は店が潰れること。'Close' だけだと今日閉まってるだけかも。'Down' をつけると永久に終了。この 'down' は「下に落ちる」＝終了のニュアンス。shut down, break down, 全部終わりの down。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 17, japanese: '期待値を下げとこう', english: [
+        "keep expectations low",
+        "Let us just keep our expectations low.",
+        "If we go in expecting nothing, anything decent will feel like a win.",
+        "Hope for the best, prepare for the worst."
+    ], context: "'Keep expectations low' は日本語と同じ戦略。期待を下げて良い結果で喜ぶ。'Hope for the best, prepare for the worst' は「最善を望み最悪に備える」。英語のことわざは対比構造が多い。対称性が美しい。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 17, japanese: '話の腰を折るなよ', english: [
+        "do not cut me off",
+        "Hey, do not cut me off, I was not done.",
+        "I was literally in the middle of making my point and you just jumped right in.",
+        "Let me finish."
+    ], context: "日本語は「話の腰を折る」で、話に腰がある。英語は 'cut off' で切断する。日本語は折る、英語は切る。どっちも物理的な破壊だけど、折るの方が痛そう。腰を折られたら歩けないもんな。", category: 'shutdown', month: '2026-04' },
+
+    { daySlot: 17, japanese: 'それ初耳なんだけど', english: [
+        "first I am hearing of it",
+        "That is the first I am hearing of this.",
+        "Nobody told me anything about it and now you are acting like I should already know.",
+        "I must have missed the memo."
+    ], context: "'First I am hearing of it' は「初めて聞いた」の英語版。'Missed the memo' は「メモを見逃した」＝情報が回ってこなかった。オフィス用語が日常に入ってきた表現。メモなんて回ってないのに。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 17, japanese: '人混みが苦手', english: [
+        "not a crowd person",
+        "I am really not a crowd person.",
+        "Whenever I am in a packed place I start feeling kind of overwhelmed and want to leave.",
+        "I would rather go somewhere quieter."
+    ], context: "'Not a ~ person' は「〜が苦手」の万能表現。'Not a morning person'（朝苦手）、'not a phone person'（電話苦手）。人間をタイプ分けする。日本語の「苦手」より柔らかくて使いやすい。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 17, japanese: 'まだ悩んでんの？', english: [
+        "still going back and forth",
+        "Are you still going back and forth on that?",
+        "At some point you just have to pick one and commit to it.",
+        "Just flip a coin already."
+    ], context: "'Going back and forth' は「行ったり来たり」。悩んでる状態を物理的な往復で表現。日本語の「悩む」は頭の中だけど、英語は体が動いてる。'Flip a coin' はコイン投げ＝もう運に任せろ。決断力のなさへの最終兵器。", category: 'shutdown', month: '2026-04' },
+
+    { daySlot: 17, japanese: '何時に着く？', english: [
+        "what time will you get here",
+        "What time do you think you will get here?",
+        "I am trying to figure out when to start getting ready so just give me a rough estimate.",
+        "Just give me a heads up when you leave."
+    ], context: "'Give me a heads up' は「前もって教えて」。頭を上げろ＝注意しろ、が転じて事前通知。'Rough estimate' は「ざっくりの予想」。rough は雑、estimate は見積もり。雑な見積もりでいいから教えて。効率的。", category: 'request', month: '2026-04' },
+
+    // -- Day 18 --
+    { daySlot: 18, japanese: '部屋が散らかりすぎ', english: [
+        "room is a disaster",
+        "My room is an absolute disaster right now.",
+        "There are clothes everywhere, dishes on the desk, and I can barely see the floor.",
+        "I would not let anyone see this."
+    ], context: "'Disaster' は災害。部屋が散らかってるのを災害と呼ぶ。日本語の「散らかってる」は状態描写だけど、英語は被害報告。台風が来た後みたいな表現。英語は不満をニュースキャスターみたいに言う。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 18, japanese: '今の聞こえた？', english: [
+        "did you hear that",
+        "Wait, did you catch that?",
+        "Something just made a weird noise and I am not sure where it came from.",
+        "Tell me I am not imagining things."
+    ], context: "'Did you catch that' は「聞こえた？」のカジュアル版。'Catch' は捕まえる。音を捕まえたかって聞いてる。英語は音が飛んでくるから捕まえるもの。日本語は音が「聞こえる」で受動的。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 18, japanese: '説明書読まない派', english: [
+        "never read the manual",
+        "I never read the manual, I just wing it.",
+        "I figure things out as I go and honestly it works out most of the time.",
+        "Instructions are more like suggestions anyway."
+    ], context: "'Wing it' は「ぶっつけ本番でやる」。鳥が翼で飛ぶように、計画なしで勢いだけで行く。'Instructions are suggestions' は「説明書は参考程度」。ルールを提案に格下げする英語の反骨精神。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 18, japanese: '口だけのやつ多いよな', english: [
+        "all talk",
+        "So many people are all talk and no action.",
+        "They say they are going to do all these things and then nothing ever happens.",
+        "Actions speak louder than words."
+    ], context: "'All talk, no action' は「口だけ」の定番表現。'Actions speak louder than words' は「行動は言葉より雄弁」。英語のことわざは比較級が好き。louder, better, easier。何でもランキングにしたがる言語。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 18, japanese: '眼鏡どこやった', english: [
+        "where are my glasses",
+        "Where did I put my glasses?",
+        "I literally just had them in my hand two seconds ago and now they are gone.",
+        "They were on my head the whole time, were they not?"
+    ], context: "頭の上に眼鏡を乗せて「眼鏡がない」は日英共通のあるある。'I literally just had them' の 'literally' は強調。「文字通りさっき持ってた」。最近の英語は 'literally' を比喩にも使う。矛盾してるけど流行ってる。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 18, japanese: '意外と楽しかった', english: [
+        "actually pretty fun",
+        "That was actually pretty fun.",
+        "I was not expecting much going in but I ended up having a really good time.",
+        "I would not mind doing it again."
+    ], context: "'Actually' がポイント。予想と違ったって前置きになる。日本語の「意外と」と同じ機能。期待値が低かったことを暗に伝えてから褒める。正直すぎるけど、だからこそ褒め言葉として強い。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 18, japanese: 'あの人声でかいよね', english: [
+        "so loud",
+        "They are always so loud, it is kind of intense.",
+        "You can literally hear them from three rooms away.",
+        "They have no indoor voice."
+    ], context: "'Indoor voice' は「室内用の声」。子供に「室内の声で話して」って注意する時に使う表現。大人に使うと「子供かよ」って皮肉になる。声のボリュームに屋内用と屋外用がある発想が面白い。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 18, japanese: '先にシャワー浴びていい？', english: [
+        "can I shower first",
+        "Do you mind if I hop in the shower first?",
+        "I am all sweaty from the gym and I really need to clean up before anything else.",
+        "I will be quick, I promise."
+    ], context: "'Hop in the shower' は「シャワーに飛び込む」。'Take a shower' より軽くてカジュアル。'Hop' はぴょんと跳ぶ動作。シャワーにジャンプインする。英語は日常動作にいちいち動きをつける。退屈しない言語。", category: 'request', month: '2026-04' },
+
+    { daySlot: 18, japanese: 'なんかいいことないかな', english: [
+        "need something good to happen",
+        "I really need something good to happen right about now.",
+        "Nothing bad is going on, I just feel like life has been kind of flat lately.",
+        "I am due for some good luck."
+    ], context: "'Due for' は「そろそろ来るはず」。良いことが来る順番が回ってきてるって発想。運を順番待ちシステムで考えてる。'Life has been flat' は人生が平坦＝刺激がない。心電図みたいな表現。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 18, japanese: 'それは言い過ぎだろ', english: [
+        "that is going too far",
+        "Okay, that is going way too far.",
+        "I get what you are trying to say but that was honestly pretty harsh.",
+        "There is a difference between being honest and being mean."
+    ], context: "'Going too far' は「行き過ぎ」。距離の比喩。'Being honest and being mean' の違いは英語圏でもよく議論される。正直と意地悪は紙一重。日本語の「言い過ぎ」は量の問題だけど、英語は距離の問題。", category: 'shutdown', month: '2026-04' },
+
+    // -- Day 19 --
+    { daySlot: 19, japanese: '足がつった', english: [
+        "got a cramp",
+        "I just got a cramp in my leg out of nowhere.",
+        "I was just lying in bed and my calf suddenly locked up and I could not move.",
+        "I need to drink more water."
+    ], context: "'Locked up' は「ロックされた」。筋肉が固まる状態を鍵がかかったと表現する。日本語の「つる」は釣る（引っ張る）から来てるけど、英語は鍵をかける。閉じ込められる vs 引っ張られる。痛みの解釈が違う。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 19, japanese: 'あとで絶対やろうと思って忘れる', english: [
+        "always forget",
+        "I always tell myself I will do it later and then completely forget.",
+        "I had a whole mental note about it but it just evaporated the second I got distracted.",
+        "Out of sight, out of mind."
+    ], context: "'Mental note' は「頭の中のメモ」。書いてないメモ。そして 'evaporated' は蒸発した。記憶が水みたいに消える。'Out of sight, out of mind' は「見えなくなったら忘れる」。人間の記憶は視覚依存。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 19, japanese: 'まじで助かった', english: [
+        "you saved me",
+        "Seriously, you saved me back there.",
+        "I had no idea what I was doing and you stepped in at the perfect time.",
+        "I owe you one."
+    ], context: "'You saved me' は「助かった」を「お前が俺を救った」に変換。日本語は状況が「助かる」けど、英語は人が人を「救う」。感謝の矢印が相手に直接向く。'I owe you one' は「一つ借りができた」。恩を数値化。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 19, japanese: 'この際だから全部やっちゃおう', english: [
+        "might as well do it all",
+        "At this point we might as well just do everything.",
+        "We are already halfway through so there is no point stopping now.",
+        "In for a penny, in for a pound."
+    ], context: "'Might as well' は「どうせなら」。'In for a penny, in for a pound' は「1ペニー出したなら1ポンドも出せ」。少しやったなら全部やれ。英語のことわざはお金で例えるのが多い。商売人のDNA。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 19, japanese: '返事遅くてごめん', english: [
+        "sorry for the late reply",
+        "Hey, sorry for the late reply.",
+        "I saw your message earlier but got sidetracked and totally forgot to respond.",
+        "Better late than never, right?"
+    ], context: "'Got sidetracked' は「横道にそれた」。線路から外れたイメージ。返事が遅い理由を「脱線した」と言う。日本語だと「バタバタしてて」が定番だけど、英語は軌道修正の失敗として報告する。", category: 'request', month: '2026-04' },
+
+    { daySlot: 19, japanese: '音楽聞きながらじゃないと集中できない', english: [
+        "need music to focus",
+        "I can not focus unless I have music playing.",
+        "It sounds counterintuitive but silence is way more distracting for me than music.",
+        "My brain needs background noise to function."
+    ], context: "'Counterintuitive' は「直感に反する」。静かな方が集中できそうなのに逆って意味。英語はこういう「普通と逆」を一語で言える。日本語だと「逆に聞こえるかもだけど」と長くなる。一語の破壊力。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 19, japanese: 'あんまり深く考えないで', english: [
+        "do not overthink it",
+        "Seriously, do not overthink it.",
+        "It is not that complicated, you are just making it harder than it needs to be.",
+        "Sometimes the obvious answer is the right one."
+    ], context: "'Overthink' は over + think で「考えすぎ」。overシリーズまた来た。overshleep, overeat, overthink。やりすぎ動詞は全部 over-。「深く考えないで」を英語にすると「考えすぎるな」。深さじゃなくて量で制限する。", category: 'suggestion', month: '2026-04' },
+
+    { daySlot: 19, japanese: 'あの頃に戻りたい', english: [
+        "miss those days",
+        "I really miss those days.",
+        "Life was so much simpler back then and I did not even appreciate it at the time.",
+        "You never know the good old days until they are gone."
+    ], context: "'The good old days' は「古き良き時代」。英語も日本語も過去を美化する表現がある。'You never know until they are gone' は「失って初めて気づく」。joni mitchellの歌詞みたいだけど、本当にそう。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 19, japanese: '鼻水が止まらない', english: [
+        "runny nose",
+        "My nose will not stop running.",
+        "I have gone through an entire box of tissues today and it is not even noon yet.",
+        "I look like a mess right now."
+    ], context: "英語では鼻が「走る」(running)。日本語は鼻水が「出る」。英語の鼻は自分の意志で走り出す。止められない動きを走るで表現。面白いのは 'My nose will not stop' と鼻に意志があるみたいに言うこと。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 19, japanese: 'それ皮肉で言ってる？', english: [
+        "are you being sarcastic",
+        "Wait, are you being sarcastic right now?",
+        "I genuinely can not tell if you are serious or just messing with me.",
+        "Your tone is confusing me."
+    ], context: "'Being sarcastic' は「皮肉を言ってる状態」。英語の皮肉は tone of voice（声のトーン）で判断する。テキストだと判別不能だから /s をつける文化が生まれた。皮肉は声の芸術。文字には向いてない。", category: 'reaction', month: '2026-04' },
+
+    // -- Day 20 --
+    { daySlot: 20, japanese: '無意識にやってた', english: [
+        "did it without thinking",
+        "I did it completely on autopilot.",
+        "I was not even paying attention and my body just did it out of habit.",
+        "Muscle memory is a real thing."
+    ], context: "'On autopilot' は自動操縦モード。飛行機の用語が日常に入った。無意識の行動を機械化で表現する。'Muscle memory' は筋肉の記憶。頭じゃなくて体が覚えてる。英語は無意識を機械と筋肉で説明する。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 20, japanese: 'もうちょい左', english: [
+        "a little to the left",
+        "A little more to the left... right there, perfect.",
+        "No wait, too far, go back a tiny bit... okay that is good.",
+        "Up a little... down... yeah, right there."
+    ], context: "'A little to the left' は位置調整の定番。引っ越しや写真撮影で100回は言う。英語は方向指示がシンプル。left, right, up, down。日本語の「もうちょい」は量が曖昧だけど、英語の 'a little' も同じくらい曖昧。", category: 'request', month: '2026-04' },
+
+    { daySlot: 20, japanese: 'コンセントどこ？', english: [
+        "where is the outlet",
+        "Do you know where the nearest outlet is?",
+        "My laptop is about to die and I desperately need to plug it in somewhere.",
+        "My battery is at two percent."
+    ], context: "「コンセント」は和製英語。英語は 'outlet'（アメリカ）か 'socket'（イギリス）。コンセントはコンセントリック（同心円）から来たらしい。全然関係ない語源。和製英語の闇は深い。", category: 'request', month: '2026-04' },
+
+    { daySlot: 20, japanese: '夢の中で気づいた', english: [
+        "realized in a dream",
+        "I literally figured it out in a dream.",
+        "I was stuck on this problem all day and then the answer just came to me while I was sleeping.",
+        "My brain works better when I am unconscious."
+    ], context: "'Figured it out' は「答えがわかった」。figure は形を作る＝答えの形が見えた。夢で問題を解くのは科学的にもある現象。'My brain works better unconscious' は最高の自虐。起きてる時の俺は無能。", category: 'reaction', month: '2026-04' },
+
+    { daySlot: 20, japanese: '微妙に噛み合わない', english: [
+        "slightly off",
+        "We are slightly off on the same page but not quite.",
+        "It feels like we are talking about the same thing but from totally different angles.",
+        "We are in the same ballpark at least."
+    ], context: "'In the same ballpark' は「同じ球場にはいる」＝大体同じ。'Not on the same page' は「同じページにいない」＝話が合わない。英語は合意を場所の共有で表現する。同じ本、同じ球場、同じ部屋。一緒にいれば分かり合える発想。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 20, japanese: '誰かに似てるんだけど思い出せない', english: [
+        "they look like someone",
+        "They remind me of someone but I can not figure out who.",
+        "It has been bugging me all day because their face is so familiar but the name will not come to me.",
+        "It is going to hit me at 3 AM."
+    ], context: "'It is going to hit me at 3 AM' は「夜中3時に突然思い出す」。記憶が殴りかかってくる。英語では思い出すことが物理攻撃。'It hit me' は「ハッと気づいた」。日本語の「ハッとする」も体の反応だけど、殴られはしない。", category: 'filler', month: '2026-04' },
+
+    { daySlot: 20, japanese: '寝る前にスマホ見るのやめたい', english: [
+        "need to stop scrolling at night",
+        "I really need to stop looking at my phone before bed.",
+        "I tell myself ten more minutes every night and then two hours disappear.",
+        "The screen is basically stealing my sleep."
+    ], context: "'Two hours disappear' は2時間が消える。時間が勝手に消滅する。'Stealing my sleep' は画面が睡眠を盗む。英語ではスマホが泥棒。日本語の「やめたい」は自分の意志の問題だけど、英語はスマホのせいにする。責任転嫁の言語。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 20, japanese: 'やっぱ現金が安心する', english: [
+        "cash feels safer",
+        "I still feel safer carrying cash.",
+        "I know everything is digital now but there is something reassuring about having actual bills.",
+        "Call me old school, but I like knowing exactly what I have."
+    ], context: "'Call me old school' は「古いって言っていいけど」。先に自分でレッテルを貼ることで批判を封じる技術。日本語の「やっぱ」は再確認だけど、英語の 'still' は抵抗。時代に逆らってる感が出る。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 20, japanese: '嘘つくの下手なんだよね', english: [
+        "terrible liar",
+        "I am a terrible liar, it always shows on my face.",
+        "The second I try to lie my voice gets weird and I can not make eye contact.",
+        "Honesty is not a choice for me, it is a limitation."
+    ], context: "'It shows on my face' は「顔に出る」。日英同じ表現。最後の 'Honesty is not a choice, it is a limitation' が秀逸。正直なんじゃなくて嘘がつけないだけ。美徳じゃなくて能力不足。自虐の最高峰。", category: 'opinion', month: '2026-04' },
+
+    { daySlot: 20, japanese: 'ギリ間に合った', english: [
+        "just barely made it",
+        "I just barely made it in time.",
+        "The doors were literally closing and I squeezed through at the last second.",
+        "My heart is still pounding."
+    ], context: "'Just barely' は「ギリギリ」。'Just' と 'barely' は両方「かろうじて」だけど、重ねて使うことで際どさが倍増する。'Squeezed through' は隙間を絞り出すように通った。体を圧縮して通る絵が見える。ギリギリの物理表現。", category: 'reaction', month: '2026-04' },
+
+    // -- Day 21 --
+    { daySlot: 21, japanese: '明日にしよう', english: [
+        "let's do it tomorrow",
+        "let's just push it to tomorrow",
+        "I'm not feeling it today, let's save it for tomorrow",
+        "we can always pick it up in the morning"
+    ], context: "push itは「押す」から「延ばす」。日本語は「明日にする」と時間を選ぶ。英語はpush(押し出す)やsave(取っておく)で先送りを表す。動作のイメージが全然違う。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 21, japanese: '目つき怖いよ', english: [
+        "scary look",
+        "you're giving me a scary look right now",
+        "why are you looking at me like that? you're freaking me out",
+        "ease up on the death stare"
+    ], context: "death stareは「死の視線」。英語は怖い目つきを「殺す視線」まで格上げする。日本語の「目つき怖い」は観察だけど、英語はdeath stareで攻撃に変換。表情ひとつにも大げさな名前をつけるのが英語。", category: 'reaction', month: '2026-04' },
+    { daySlot: 21, japanese: '手抜きしたのバレた', english: [
+        "got caught",
+        "they totally caught me cutting corners",
+        "I tried to take a shortcut and they called me out on it",
+        "busted for half-assing it"
+    ], context: "cut cornersは「角を切る」=「手抜きする」。近道して角を曲がらず突っ切るイメージ。日本語の「手を抜く」は労力を引き算。英語は道のりをショートカット。どっちも「ズルした」だけど、身体の動きが違う。", category: 'reaction', month: '2026-04' },
+    { daySlot: 21, japanese: 'お釣りいらないです', english: [
+        "keep the change",
+        "keep the change, it's all good",
+        "don't worry about the change, just keep it",
+        "you can have the rest"
+    ], context: "keep the changeは「お釣りを保持して」。日本語は「いらない」と自分側の不要を伝える。英語はkeep(持っていて)と相手にあげる動作で表現する。断るのか渡すのか、視点が真逆。チップ文化が生んだフレーズ。", category: 'request', month: '2026-04' },
+    { daySlot: 21, japanese: '予想通りだったわ', english: [
+        "called it",
+        "I totally called it, didn't I?",
+        "I knew that was going to happen, I called it from the start",
+        "saw that coming a mile away"
+    ], context: "call itは「それを呼んだ」=「予言した」。英語では未来を言い当てることを「名前を呼ぶ」で表す。I called itは「俺が先に言ったよね」というドヤ顔フレーズ。日本語の「予想通り」は冷静だけど、英語は手柄を主張する。", category: 'opinion', month: '2026-04' },
+    { daySlot: 21, japanese: '電波入らない', english: [
+        "no signal",
+        "I've got zero signal out here",
+        "I can't even load a page, there's literally no signal anywhere",
+        "I'm completely off the grid right now"
+    ], context: "signalは「信号」。no signalは「信号なし」。off the gridは「電力網の外」→「連絡不能」。日本語の「電波入らない」は電波が建物に入ってくるイメージ。英語は信号を受信する/しないのデジタルな発想。入る vs 受信する。視点が逆。", category: 'reaction', month: '2026-04' },
+    { daySlot: 21, japanese: 'やっぱ地元が落ち着く', english: [
+        "nothing like home",
+        "there's nothing like being back home",
+        "I love traveling but honestly nothing beats coming back to your hometown",
+        "home is where I can actually relax"
+    ], context: "nothing like homeは「家のようなものは何もない」=「家が一番」。nothing beats itは「何もそれに勝てない」。英語は最上級を「他が全部負ける」で表現する。日本語の「落ち着く」は内側の感覚。英語は外との比較で語る。", category: 'opinion', month: '2026-04' },
+    { daySlot: 21, japanese: '充電器貸して', english: [
+        "lend me a charger",
+        "can I borrow your charger for a sec?",
+        "my phone's about to die, can I use your charger real quick?",
+        "got a charger I can use?"
+    ], context: "borrowとlendの使い分けが鬼門。borrowは「借りる」(自分に向かう)、lendは「貸す」(相手に向かう)。日本語は「貸して」で一発なのに、英語は矢印の向きで動詞が変わる。Can I borrow?が一番安全。", category: 'request', month: '2026-04' },
+    { daySlot: 21, japanese: '考えたら負けだよ', english: [
+        "don't overthink it",
+        "the more you think about it, the worse it gets",
+        "if you start overthinking this, you'll never do anything",
+        "just go with your gut"
+    ], context: "overthinkは「考えすぎる」。overを付けるだけで「やりすぎ」になる万能接頭辞。oversleep、overeat、overreact。日本語は「〜しすぎる」と後ろに付けるけど、英語は前に付ける。先に「やりすぎ警告」を出す言語。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 21, japanese: '空気読めよ', english: [
+        "read the room",
+        "come on, read the room",
+        "how can you not see what's going on? just read the room",
+        "take a hint already"
+    ], context: "read the roomは「部屋を読め」=「空気読め」。英語にも空気を読む概念はある。ただしroomという物理空間に限定する。日本語の「空気」は目に見えないけど、英語のroomは壁がある。読む対象を具体物にしないと気が済まない言語。", category: 'shutdown', month: '2026-04' },
+
+    // -- Day 22 --
+    { daySlot: 22, japanese: '寝言でしょ', english: [
+        "you're dreaming",
+        "you've got to be dreaming if you think that",
+        "there's no way that's happening, you must be talking in your sleep",
+        "in your dreams, buddy"
+    ], context: "in your dreamsは「お前の夢の中でな」=「ありえない」。日本語の「寝言」は寝ながら言う言葉。英語は夢の中にだけ存在する話。どっちも「現実じゃない」だけど、日本語は「寝てる時の発言」、英語は「夢の中の出来事」。ちょっとファンタジー入ってる。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 22, japanese: '自炊飽きた', english: [
+        "sick of cooking",
+        "I'm so sick of cooking every single day",
+        "I've been cooking at home for weeks and I'm completely over it",
+        "I need someone else to make my food for a change"
+    ], context: "sick ofは「〜で病気になった」=「うんざり」。tired ofより強い。英語は飽きることを病気で表現する。日本語の「飽きた」は感情だけど、英語は身体症状まで格上げ。fed up(食べさせられすぎ)も同じ系統。飽きる=身体の限界。", category: 'opinion', month: '2026-04' },
+    { daySlot: 22, japanese: 'ちょっとそれ取って', english: [
+        "pass me that",
+        "hey, can you pass me that real quick?",
+        "sorry, can you hand me that thing right there?",
+        "toss it over here"
+    ], context: "passは「通過させる」=「渡す」。手から手へ通過させるイメージ。hand meは「手で渡して」。英語は渡す動作を移動の動詞で表す。toss(投げて)すら使える。日本語の「取って」は取る動作だけど、英語は渡す側の動作で頼む。視点が逆。", category: 'request', month: '2026-04' },
+    { daySlot: 22, japanese: 'その服似合ってるよ', english: [
+        "looks good on you",
+        "that looks really good on you",
+        "seriously, that outfit suits you so well",
+        "you're rocking that look"
+    ], context: "looks good on youは「あなたの上で良く見える」。服が人の上に乗って見える。日本語の「似合う」は人と服の相性。英語は服が「あなたの上でどう見えるか」と位置関係で表す。you're rocking itは「あなたがそれを揺らしてる」で、着こなしを振動で表現。パワフル。", category: 'reaction', month: '2026-04' },
+    { daySlot: 22, japanese: '口だけのやつ多いよね', english: [
+        "all talk",
+        "people are all talk and no action",
+        "everyone says they're going to do something but nobody actually follows through",
+        "talk is cheap around here"
+    ], context: "all talk, no actionは「全部トーク、行動ゼロ」。talk is cheapは「トークは安い」=「口だけなら簡単」。英語はトークに値段をつける。安い=価値がない。日本語の「口だけ」は口という身体部位。英語は言葉自体の価値を語る。商売人の発想。", category: 'opinion', month: '2026-04' },
+    { daySlot: 22, japanese: 'メモしとかないと忘れる', english: [
+        "write it down",
+        "I better write it down or I'll totally forget",
+        "if I don't write it down right now, it's gone forever",
+        "my memory is basically a sieve at this point"
+    ], context: "sieveは「ザル」。英語でも記憶力がないことを「ザル」って言う。my memory is a sieve=「俺の記憶はザル」。日本語と全く同じ比喩。穴だらけの容器から情報が漏れる。こういう偶然の一致を見つけると嬉しい。人間の発想は同じ。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 22, japanese: 'それ今言う？', english: [
+        "now you tell me",
+        "seriously? now you tell me?",
+        "you couldn't have mentioned that before I went ahead and did it?",
+        "great timing on that info"
+    ], context: "now you tell meは「今それ言うの?」。皮肉が込もってる。英語はnowを強調して「今さら」感を出す。great timingも皮肉。タイミングが全然greatじゃない。英語の皮肉は褒め言葉の形で刺す。日本語より陰湿かもしれない。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 22, japanese: '腹減りすぎて集中できない', english: [
+        "can't focus",
+        "I'm so hungry I can't even focus",
+        "I haven't eaten anything and my brain is completely shutting down",
+        "I need food before I can think straight"
+    ], context: "think straightは「まっすぐ考える」=「ちゃんと考える」。英語は思考を直線で表す。曲がった思考=集中できない。brain is shutting downは「脳がシャットダウン中」。PCみたいに脳を機械扱い。日本語は「集中できない」と能力の話。英語は脳の電源の話。", category: 'reaction', month: '2026-04' },
+    { daySlot: 22, japanese: '足引っ張るなよ', english: [
+        "don't drag us down",
+        "don't be the one dragging the team down",
+        "we're all working hard here, so please don't hold everyone back",
+        "pull your weight or step aside"
+    ], context: "drag downは「下に引きずる」。hold backは「後ろに抑える」。pull your weightは「自分の重さを引け」=「自分の分の仕事をしろ」。英語はチームワークを物理的な力学で語る。重さ、引く力、方向。全部ニュートン力学。日本語の「足を引っ張る」も身体的だけど。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 22, japanese: 'エレベーター来ないな', english: [
+        "taking forever",
+        "this elevator is taking forever",
+        "I've been standing here for ages, where is this elevator?",
+        "I should have just taken the stairs"
+    ], context: "taking foreverは「永遠を取っている」=「超遅い」。for agesは「何世紀も」。英語は待ち時間を永遠や世紀に拡大する。1分待っただけでforever。日本語の「来ないな」は事実を述べるだけ。英語は時間を誇張して不満を表す。大げさ民族。", category: 'filler', month: '2026-04' },
+
+    // -- Day 23 --
+    { daySlot: 23, japanese: '気が重い', english: [
+        "dreading it",
+        "I'm honestly dreading it",
+        "I really don't want to do it but I have to, and just thinking about it makes me tired",
+        "I've got a knot in my stomach just thinking about it"
+    ], context: "dreadは「恐れる+嫌がる」が合体した動詞。日本語の「気が重い」は気持ちに重力がかかる。英語のdreadは未来の嫌なことに怯える感覚。knot in my stomachは「胃に結び目」。英語は不安を身体の結び目で表す。ほどけない感じ。", category: 'reaction', month: '2026-04' },
+    { daySlot: 23, japanese: 'とりあえず寝かせて', english: [
+        "let me sleep on it",
+        "let me sleep on it and I'll get back to you",
+        "I don't want to decide right now, let me sleep on it first",
+        "I need a night to think it over"
+    ], context: "sleep on itは「それの上で寝る」=「一晩考える」。情報を枕にして寝ると、朝起きた時に答えが出てるイメージ。日本語の「寝かせて」は問題を寝かせる。英語は自分が問題の上に寝る。主語が逆。英語は自分が動く。", category: 'request', month: '2026-04' },
+    { daySlot: 23, japanese: '先が見えない', english: [
+        "no end in sight",
+        "there's no end in sight with this",
+        "I've been at this forever and I still can't see the finish line",
+        "feels like I'm running on a treadmill"
+    ], context: "no end in sightは「視界にゴールがない」。英語は未来を「見える/見えない」で語る。I can see the light at the end of the tunnel(トンネルの先に光が見える)は希望。見えない=絶望。日本語の「先が見えない」とほぼ同じ構造。珍しく一致する比喩。", category: 'opinion', month: '2026-04' },
+    { daySlot: 23, japanese: 'おごってくれるなら行く', english: [
+        "if you're buying",
+        "I'll go if you're buying",
+        "sure I'm down, as long as you're picking up the tab",
+        "free food? count me in"
+    ], context: "pick up the tabは「伝票を拾う」=「おごる」。tabはバーの伝票。それを拾い上げる=支払う。日本語の「おごる」は行為だけど、英語は伝票という物体を拾う動作。on me(俺の上に)もある。支払いが自分の上に乗る。重力で会計する。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 23, japanese: '何回言ったらわかるの', english: [
+        "how many times",
+        "how many times do I have to say this?",
+        "I've told you this a million times already, why doesn't it stick?",
+        "it's like talking to a wall"
+    ], context: "talking to a wallは「壁に話しかけてる」=「何を言っても無駄」。英語は聞かない人を壁にする。日本語の「馬の耳に念仏」と同じ発想だけど、英語は壁、日本語は馬。どっちも「反応しないもの」を選んでる。壁のほうが冷たい。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 23, japanese: '電波悪いな', english: [
+        "bad signal",
+        "the signal here is terrible",
+        "I keep losing connection, the signal in this place is awful",
+        "can you hear me? you're breaking up"
+    ], context: "you're breaking upは「あなたがバラバラになってる」=「音が途切れてる」。英語は電波が悪いことを「相手が壊れてる」で表現する。声がバラバラに割れるイメージ。日本語は「電波が悪い」と原因を言う。英語は結果(あなたの声が壊れてる)を言う。", category: 'filler', month: '2026-04' },
+    { daySlot: 23, japanese: '人の話聞いてないでしょ', english: [
+        "not even listening",
+        "you're not even listening to me right now",
+        "I've been talking for five minutes and you haven't heard a single word",
+        "am I talking to myself here?"
+    ], context: "am I talking to myself?は「俺は独り言を言ってるのか?」。自分に話しかけてる=相手が聞いてない。日本語は「聞いてない」と相手の行動を指摘。英語は「俺は独り言か?」と自分の状況を疑問形にする。責めるのに自分を主語にするのが英語流。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 23, japanese: '気づいたら1時間経ってた', english: [
+        "lost track of time",
+        "I completely lost track of time",
+        "I sat down to check one thing and an hour just flew by",
+        "time got away from me again"
+    ], context: "lost track of timeは「時間の軌道を見失った」。trackは線路。時間という電車の線路を見失う。time got away from meは「時間が俺から逃げた」。英語は時間を動く物体として追いかける。日本語の「経ってた」は時間が過ぎた事実だけ。英語は追跡失敗の話。", category: 'reaction', month: '2026-04' },
+    { daySlot: 23, japanese: '風呂入ってから考える', english: [
+        "after my bath",
+        "let me take a bath first and then I'll think about it",
+        "I can't think about anything right now, let me soak in the tub first",
+        "hot water fixes everything"
+    ], context: "take a bathは「風呂を取る」。英語はシャワーもtake a shower。takeで体験を「取る」。日本語は「入る」で自分が風呂に入る。英語は風呂を自分のところに持ってくる。take a walk(散歩を取る)、take a nap(昼寝を取る)。体験は全部「取る」もの。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 23, japanese: '締め切りギリギリだった', english: [
+        "just barely made it",
+        "I just barely made the deadline",
+        "I turned it in with literally seconds to spare, my heart was pounding",
+        "cutting it close as usual"
+    ], context: "cutting it closeは「近くで切る」=「ギリギリ」。cutは「切る」で、セーフとアウトの境界線スレスレを切り裂くイメージ。by the skin of my teethは「歯の皮一枚で」=「超ギリギリ」。歯に皮なんかないのに。それくらい薄い差。英語の誇張力。", category: 'reaction', month: '2026-04' },
+
+    // -- Day 24 --
+    { daySlot: 24, japanese: '見た目で判断すんな', english: [
+        "don't judge",
+        "don't judge a book by its cover",
+        "you can't tell what something's really like just by looking at it",
+        "looks can be deceiving"
+    ], context: "don't judge a book by its coverは「表紙で本を判断するな」。英語圏で最もよく使われることわざの一つ。looks can be deceivingは「見た目は騙すことがある」。deceive(騙す)が使われる。英語は見た目を詐欺師扱い。強い。", category: 'opinion', month: '2026-04' },
+    { daySlot: 24, japanese: 'コンセント足りない', english: [
+        "not enough outlets",
+        "there aren't enough outlets in this room",
+        "I've got three things to charge and only one outlet, this is ridiculous",
+        "I need a power strip or something"
+    ], context: "outletは「出口」=「コンセント」。電気の出口。日本語の「コンセント」は和製英語で通じない。英語ではoutletかsocket。power stripは「電源の帯」=「延長タップ」。英語は電気系の名前が全部物理形状から来てる。穴はsocket、出口はoutlet。見たまんま。", category: 'filler', month: '2026-04' },
+    { daySlot: 24, japanese: 'それ絶対嘘だろ', english: [
+        "no way that's true",
+        "there's no way that's true",
+        "I'm calling BS on that, there's absolutely no way",
+        "yeah right, and I'm the queen of England"
+    ], context: "calling BS は「嘘を宣言する」。I'm calling itで「俺が判定する」。yeah right は「そうだよね」だけど、皮肉で使うと「嘘つけ」になる。同じ言葉が真逆の意味になる。イントネーションだけで180度変わる。英語の皮肉は声が命。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 24, japanese: '鍵かけたっけ', english: [
+        "did I lock up",
+        "wait, did I lock the door?",
+        "I'm halfway to work and now I can't remember if I locked the door",
+        "I swear I locked it but now I'm not sure"
+    ], context: "lock upは「施錠する」。upは完了のニュアンス。halfway to workは「仕事場への半分」。英語は距離で状況を説明する。日本語の「かけたっけ」は記憶の確認。英語のdid Iも同じ。でも英語は場所(halfway)を足して焦りを演出する。", category: 'reaction', month: '2026-04' },
+    { daySlot: 24, japanese: 'レシート要りません', english: [
+        "no receipt",
+        "I don't need the receipt, thanks",
+        "you can keep the receipt, I'm not going to return it anyway",
+        "I'm good without it"
+    ], context: "I'm goodは万能の断り文句。「大丈夫です」「要りません」「十分です」全部これ一語。No thanks.より柔らかい。I'm good without itは「それなしで大丈夫」。英語はgood=「良い状態」で断りを肯定文にする。断ってるのにポジティブ。うまい。", category: 'request', month: '2026-04' },
+    { daySlot: 24, japanese: '知り合いに偶然会った', english: [
+        "ran into someone",
+        "I ran into someone I know at the station",
+        "I bumped into an old friend today completely out of nowhere",
+        "small world, huh?"
+    ], context: "ran intoは「走って〜にぶつかった」=「偶然会った」。bump intoも同じ。英語は偶然の再会を衝突事故で表す。ぶつかるくらい予想してなかった。small worldは「世界って狭い」。日本語の「世間は狭い」と完全一致。珍しい。", category: 'reaction', month: '2026-04' },
+    { daySlot: 24, japanese: 'もうちょっと早く言えよ', english: [
+        "heads up",
+        "a little heads up would've been nice",
+        "you could've told me sooner, I would've planned for it",
+        "some warning next time, please"
+    ], context: "heads upは「頭を上げろ」=「注意しろ/事前に教えろ」。元は野球で飛んでくるボールに注意する掛け声。a heads up would've been nice は「事前通知があったらよかったのに」。仮定法で「お前が悪い」を遠回しに言う。英語の嫌味は丁寧語の中に隠す。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 24, japanese: '味噌汁は別腹', english: [
+        "always room for",
+        "there's always room for miso soup",
+        "I don't care how full I am, I can always fit in a bowl of miso",
+        "miso soup doesn't count as eating"
+    ], context: "there's always room forは「〜のための空間は常にある」。roomは「部屋」じゃなくて「余地」。日本語の「別腹」は胃袋がもう一個ある発想。英語は一つの胃の中に「まだスペースがある」と言う。別腹 vs 同じ腹の空きスペース。建築的に違う。", category: 'opinion', month: '2026-04' },
+    { daySlot: 24, japanese: 'ポイント溜まってた', english: [
+        "had points saved up",
+        "I had a ton of points saved up and didn't even know",
+        "I just checked and I had enough points to get it for free",
+        "that's basically free money"
+    ], context: "saved upは「貯めてあった」。英語は「上に向かって貯める」イメージ。free moneyは「タダの金」。ポイント=お金の感覚。日本語の「溜まってた」は水が溜まるイメージだけど、英語のsave upは意図的に積み上げる。偶然 vs 努力。でもどっちも結果は同じ。嬉しい。", category: 'reaction', month: '2026-04' },
+    { daySlot: 24, japanese: '出かける気力がない', english: [
+        "don't have it in me",
+        "I just don't have it in me to go out today",
+        "I thought about going out but I literally have zero energy to even get dressed",
+        "today is strictly a couch day"
+    ], context: "don't have it in meは「自分の中にそれがない」。気力を体内の物質として扱う。I don't have the energy(エネルギーがない)もよく使う。couch dayは「ソファの日」=何もしない日。英語は怠ける日に専用名をつける。名前がつくと正当化される。", category: 'reaction', month: '2026-04' },
+
+    // -- Day 25 --
+    { daySlot: 25, japanese: 'タイミング悪すぎ', english: [
+        "worst timing",
+        "that was literally the worst timing ever",
+        "of all the times it could've happened, it had to be right then",
+        "Murphy's law in action"
+    ], context: "Murphy's lawは「マーフィーの法則」=うまくいかない時は全部うまくいかない。英語圏では日常会話でも使う。of all the timesは「全ての時間の中で」。最悪のタイミングを宇宙規模で嘆く。英語は不運を壮大に語る。", category: 'reaction', month: '2026-04' },
+    { daySlot: 25, japanese: '誘ってくれてありがとう', english: [
+        "thanks for asking",
+        "thanks for thinking of me",
+        "I really appreciate you inviting me, it means a lot",
+        "glad you reached out"
+    ], context: "thanks for thinking of meは「俺のことを考えてくれてありがとう」。inviteより深い。「誘う」の前に「思い出してくれた」ことに感謝する。reached outは「手を伸ばしてくれた」。英語は誘いを物理的な接触で表す。距離を縮める動作。", category: 'reaction', month: '2026-04' },
+    { daySlot: 25, japanese: 'ケチるなよ', english: [
+        "don't be cheap",
+        "come on, don't be so cheap about it",
+        "it's not that much money, stop being so stingy",
+        "live a little, will you?"
+    ], context: "cheapは「安い」=「ケチ」。物の安さと人の安さが同じ単語。stingyは「刺す」が語源=「出し渋る」。live a littleは「ちょっとは生きろ」=「楽しめよ」。金を使わない=生きてない、という哲学がある。英語圏の消費文化が見える。", category: 'request', month: '2026-04' },
+    { daySlot: 25, japanese: '昼飯何にする？', english: [
+        "what's for lunch",
+        "what are we doing for lunch today?",
+        "I'm starving, what do you feel like eating for lunch?",
+        "you pick, I'm good with anything"
+    ], context: "what do you feel like eating?は「何を食べたい気分?」。feel likeは「〜な気がする」=「〜したい気分」。英語は食欲を気分(feeling)で語る。I feel like pizza(ピザな気分)。日本語の「何にする?」は決定を求める。英語は今の感情を聞く。意思決定 vs 感情確認。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 25, japanese: '話盛ってない？', english: [
+        "you're exaggerating",
+        "are you sure you're not exaggerating a little?",
+        "that sounds way too dramatic to be true, are you making it up?",
+        "I feel like you're stretching the truth here"
+    ], context: "stretch the truthは「真実を引き伸ばす」=「話を盛る」。真実はゴムみたいに伸びる。make it upは「作り上げる」=「でっち上げ」。盛ると嘘の中間がstretch。日本語の「盛る」は量を増やすイメージ。英語は形を引き伸ばすイメージ。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 25, japanese: 'やる気スイッチどこ', english: [
+        "where's my motivation",
+        "I can't find my motivation anywhere",
+        "I know I should be working but my motivation is completely gone",
+        "somebody flip my switch already"
+    ], context: "motivationをfind(見つける)やlose(失う)で扱う。やる気が物体として存在して、どこかに落ちてる。flip my switchは「スイッチを入れて」。日本語の「やる気スイッチ」と全く同じ発想。ON/OFFで切り替わる。人間を機械に見立てるのは世界共通。", category: 'filler', month: '2026-04' },
+    { daySlot: 25, japanese: 'それ言われると弱い', english: [
+        "that's my weak spot",
+        "you know that's my weak spot, don't use it against me",
+        "when you put it that way, I can't say no",
+        "you're hitting me where it hurts"
+    ], context: "weak spotは「弱い場所」=「弱点」。hitting me where it hurtsは「痛いところを叩く」=「痛いところを突く」。日本語の「弱い」と英語のweak spotはほぼ同じだけど、英語はspot(場所)をつける。弱さに住所がある。地図に載ってる弱点。", category: 'reaction', month: '2026-04' },
+    { daySlot: 25, japanese: '保険かけとこ', english: [
+        "play it safe",
+        "let's play it safe, just in case",
+        "I'd rather have a backup plan than be caught off guard",
+        "better safe than sorry"
+    ], context: "play it safeは「安全にプレイする」=「無難にいく」。ゲーム用語。better safe than sorryは「安全なほうが後悔よりマシ」。日本語の「保険をかける」は金融用語。英語はゲームか比較で語る。どっちもリスク回避だけど、フレームが違う。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 25, japanese: '鍵どこ置いたっけ', english: [
+        "where'd I put my keys",
+        "where the heck did I put my keys?",
+        "I swear I just had them in my hand two seconds ago",
+        "they've got to be here somewhere"
+    ], context: "where the heckは「一体どこ」。heckはhellの丁寧版。I swear(誓って)は「マジで」。英語は物を失くした時にやたら大げさになる。they've got to beは「絶対あるはず」。存在を確信してるのに見つからない。この矛盾を英語は義務のgot toで表す。面白い。", category: 'filler', month: '2026-04' },
+    { daySlot: 25, japanese: 'その考え甘くない？', english: [
+        "that's naive",
+        "don't you think that's a little naive?",
+        "I hear what you're saying but I think you're being way too optimistic",
+        "reality check time"
+    ], context: "naiveは「世間知らず」。フランス語由来で英語では「甘い考え」を指す。reality checkは「現実確認」。夢から覚ませという意味。日本語の「甘い」は味覚から来てるけど、英語のnaiveは経験不足。optimisticは「楽観的すぎる」。角度が全部違う。", category: 'opinion', month: '2026-04' },
+
+    // -- Day 26 --
+    { daySlot: 26, japanese: '匂いだけでお腹空く', english: [
+        "smells amazing",
+        "that smells so good, I'm getting hungry just from the smell",
+        "I wasn't even hungry but now I can smell whatever that is and my stomach is growling",
+        "my nose is doing all the eating right now"
+    ], context: "my stomach is growlingは「胃が唸ってる」。英語はお腹が鳴ることを動物の唸り声で表現する。growlは犬の「グルル」。胃が犬になる。日本語の「お腹空く」は状態だけど、英語は胃が音を出す動作として描く。臓器が主役。", category: 'reaction', month: '2026-04' },
+    { daySlot: 26, japanese: 'もうそういうのいいから', english: [
+        "save it",
+        "save it, I've heard enough",
+        "I don't want to hear any more excuses, just stop",
+        "spare me the details"
+    ], context: "save itは「それを保存しろ」=「もういい、黙れ」。保存=今は出すな。spare meは「俺を免除してくれ」。detailsから免除される。日本語の「いいから」は許可の形で拒否する。英語は「保存」か「免除」。どっちも「今は聞きたくない」だけど動詞の選び方が違う。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 26, japanese: '結局あの店つぶれたんだ', english: [
+        "went out of business",
+        "that place ended up going out of business",
+        "remember that restaurant we used to go to? turns out it closed down",
+        "another one bites the dust"
+    ], context: "go out of businessは「ビジネスの外に出る」=「閉店する」。外に出る=もう中にいない。another one bites the dustは「もう一つが土を噛んだ」=「また一つ消えた」。Queenの曲名でもある。英語は閉店を死の比喩で語る。ビジネスは生き物。", category: 'opinion', month: '2026-04' },
+    { daySlot: 26, japanese: '最初から言ってよ', english: [
+        "should've said so",
+        "you should've said that from the start",
+        "if you'd told me that in the beginning, I wouldn't have wasted all this time",
+        "lead with that next time"
+    ], context: "lead with thatは「それで先頭を切れ」=「最初にそれを言え」。leadは「先導する」。情報にも順番があって、大事な情報で先頭を切れという発想。日本語の「最初から」は時間軸。英語のlead withは隊列の先頭。情報を行軍で考えてる。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 26, japanese: '散歩でもしようかな', english: [
+        "maybe a walk",
+        "maybe I'll go for a walk or something",
+        "I've been inside all day, maybe a walk would clear my head",
+        "I could use some fresh air"
+    ], context: "clear my headは「頭をクリアにする」。散歩=頭の掃除。could use some fresh airは「新鮮な空気が使えたらいい」=「外の空気を吸いたい」。英語は散歩の目的を「頭のリセット」や「空気の摂取」で説明する。日本語の「でもしようかな」は行動そのものがゆるい。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 26, japanese: '紙に書くと整理できる', english: [
+        "writing helps",
+        "writing things down really helps me think",
+        "whenever I'm confused, I put it on paper and everything starts making sense",
+        "something about seeing it in writing clicks for me"
+    ], context: "put it on paperは「紙の上に置く」=「書き出す」。clicksは「カチッとなる」=「腑に落ちる」。英語は理解の瞬間を機械のスイッチ音で表す。カチッ。日本語の「整理」は片付け。英語のclickは音。理解に音がある言語。", category: 'opinion', month: '2026-04' },
+    { daySlot: 26, japanese: 'あと何分？', english: [
+        "how much longer",
+        "how much longer is this going to take?",
+        "seriously, how many more minutes do we have to wait?",
+        "are we almost done here?"
+    ], context: "how much longerは「あとどれくらい長い?」。英語は残り時間を「長さ」で聞く。how manyで「何分」と数える方法もあるけど、how much longerのほうが「まだ続くの?」という不満が乗る。are we almost done?は「もうほぼ終わり?」。英語は終わりを確認するのが好き。", category: 'request', month: '2026-04' },
+    { daySlot: 26, japanese: '二日酔いでまだきつい', english: [
+        "hungover",
+        "I'm still so hungover from last night",
+        "I drank way too much and now I'm paying for it big time",
+        "never drinking again... until next weekend"
+    ], context: "paying for itは「その代償を払ってる」。飲みすぎた罰金を身体で払う。hungoverはhang over(ぶら下がる)の過去分詞。昨日の酒が今日にぶら下がってる。never drinking again(もう二度と飲まない)は世界共通の嘘。until next weekendがオチ。", category: 'reaction', month: '2026-04' },
+    { daySlot: 26, japanese: '一人で抱え込むなよ', english: [
+        "don't bottle it up",
+        "don't bottle it all up inside, just talk to someone",
+        "you don't have to carry everything by yourself, let people help",
+        "a problem shared is a problem halved"
+    ], context: "bottle it upは「瓶に入れて蓋をする」=「感情を溜め込む」。感情がボトルの中で圧力を高める。いつか爆発する。carry everythingは「全部を運ぶ」。荷物として背負うイメージ。日本語の「抱え込む」は腕で抱える。英語は瓶か荷物。容器が違う。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 26, japanese: 'なんか言いかけてやめたよね', english: [
+        "you held back",
+        "you were about to say something and you held back, right?",
+        "I saw you start to say something and then stop, what was it?",
+        "spit it out, I can tell there's more"
+    ], context: "held backは「後ろに留めた」=「言うのをやめた」。spit it outは「吐き出せ」=「言えよ」。英語は言えない言葉を口の中に溜まった物体として扱う。吐き出せ=口から出せ。日本語の「言いかけてやめた」は行動の中断。英語は口の中の物理学。", category: 'filler', month: '2026-04' },
+
+    // -- Day 27 --
+    { daySlot: 27, japanese: '噛んだ', english: [
+        "I stumbled",
+        "I totally stumbled over my words",
+        "I was trying to say something cool and completely tripped over it",
+        "my mouth had a mind of its own"
+    ], context: "stumble over wordsは「言葉につまずく」。英語は言い間違いを足のつまずきで表現する。trip over(つまずく)も使う。日本語の「噛んだ」は口の動作。英語は足の動作。言葉が道に落ちてて、そこにつまずく。言語が違うと身体部位が変わる。", category: 'reaction', month: '2026-04' },
+    { daySlot: 27, japanese: 'いい夢見ろよ', english: [
+        "sweet dreams",
+        "sweet dreams, don't let the bed bugs bite",
+        "get some good rest tonight, you've earned it",
+        "sleep tight"
+    ], context: "sweet dreamsは「甘い夢を」。夢に味がある。sleep tightは「きつく寝ろ」。昔のベッドはロープで支えてたから、きつく張らないと沈む。由来は知らなくても使う。日本語の「いい夢見ろ」はストレートだけど、英語は「甘い」と「きつい」。矛盾してるけど両方優しい。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 27, japanese: '成り行きに任せよう', english: [
+        "let it play out",
+        "let's just let it play out and see what happens",
+        "there's no point in trying to control everything, let's just go with the flow",
+        "whatever happens, happens"
+    ], context: "let it play outは「それを最後まで演じさせろ」。人生を舞台劇として見る。go with the flowは「流れに乗る」。日本語の「成り行き」は「成っていく行き先」。英語はplay(演劇)かflow(流れ)。運命を演劇で見るか川で見るかの違い。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 27, japanese: '裏があるんじゃない？', english: [
+        "what's the catch",
+        "sounds too good to be true, what's the catch?",
+        "I don't trust this, there's got to be a catch somewhere",
+        "nothing in life is free"
+    ], context: "what's the catch?は「引っ掛かりは何?」。catchは釣り針の引っ掛かり。うまい話には釣り針が隠れてる。too good to be trueは「本当であるには良すぎる」。日本語の「裏がある」は表裏。英語は釣り。美味しい餌の裏に針。漁師の発想。", category: 'opinion', month: '2026-04' },
+    { daySlot: 27, japanese: '髪乾かすのめんどい', english: [
+        "hate blow-drying",
+        "I hate blow-drying my hair, it takes forever",
+        "washing my hair is fine, but drying it is the part I can't stand",
+        "I'm tempted to just let it air dry"
+    ], context: "blow-dryは「吹いて乾かす」。can't standは「立っていられない」=「耐えられない」。英語はイヤなことを「立てない」で表現する。air dryは「空気乾燥」=自然乾燥。temptedは「誘惑されてる」。サボることが悪魔のささやきになる。大げさ。", category: 'opinion', month: '2026-04' },
+    { daySlot: 27, japanese: 'それどこ情報？', english: [
+        "where'd you hear that",
+        "where did you even hear that from?",
+        "I've never heard that before, where are you getting your information?",
+        "sounds like somebody made that up"
+    ], context: "where are you getting your information?は「どこから情報を得てるの?」。getで情報を「手に入れる」。made that upは「作り上げた」=「でっち上げ」。日本語の「どこ情報」は場所を聞くだけ。英語は情報源の信頼性を疑う。ファクトチェック文化。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 27, japanese: '爪切りたい', english: [
+        "need to clip my nails",
+        "I really need to clip my nails, they're getting long",
+        "my nails are so long they're starting to get in the way of everything",
+        "I keep catching them on stuff"
+    ], context: "clipは「パチンと切る」。cutより小さくて軽い切断。catching them on stuffは「物に引っかかる」。英語は爪が長い不便さを「引っかかる」で具体的に描写する。日本語は「切りたい」と欲求だけ。英語は理由まで述べる。情報量が多い言語。", category: 'filler', month: '2026-04' },
+    { daySlot: 27, japanese: 'あの映画また見たい', english: [
+        "want to rewatch",
+        "I kind of want to rewatch that movie",
+        "that movie was so good, I honestly wouldn't mind watching it again",
+        "it hits different the second time"
+    ], context: "rewatchのre-は「再び」。英語はre-をつけるだけで「もう一回」になる。reread、replay、redo。日本語は「また」を前に置く。英語は接頭辞で動詞自体を変える。hits differentは「違う当たり方をする」。2回目は別の味がする。映画がパンチしてくる感覚。", category: 'opinion', month: '2026-04' },
+    { daySlot: 27, japanese: 'それやったら終わりだよ', english: [
+        "game over",
+        "if you do that, it's game over",
+        "trust me, the second you do that, there's no coming back from it",
+        "that's a one-way ticket to disaster"
+    ], context: "game overはゲーム用語だけど日常会話で普通に使う。no coming back from itは「そこから戻って来れない」。one-way ticketは「片道切符」=「帰れない旅」。英語は取り返しのつかないことを旅行の切符で表す。片道切符を買ったら最後。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 27, japanese: '差し入れ持ってきたよ', english: [
+        "brought snacks",
+        "I brought some snacks for everyone",
+        "hey, I stopped by the store on my way and picked up some stuff for you all",
+        "help yourselves, there's plenty"
+    ], context: "help yourselvesは「自分たち自身を助けて」=「ご自由にどうぞ」。自分で自分をサーブしろ。picked upは「拾った」=「買ってきた」。英語は買い物を「拾う」で表す。差し入れという概念は英語にない。brought snacks(おやつ持ってきた)が一番近い。文化の隙間。", category: 'request', month: '2026-04' },
+
+    // -- Day 28 --
+    { daySlot: 28, japanese: '言い方がムカつく', english: [
+        "it's the tone",
+        "it's not what you said, it's the way you said it",
+        "the words were fine but your tone made me want to punch something",
+        "don't talk to me like that"
+    ], context: "it's not what you said, it's how you said itは英語圏の定番フレーズ。what(内容)よりhow(方法)が問題。toneは「トーン」=声の調子。英語は言い方をwhat/howで分解して怒る。日本語の「言い方」は一語。英語は内容と態度を分離する。分析的に怒る。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 28, japanese: 'この曲耳に残る', english: [
+        "stuck in my head",
+        "that song is completely stuck in my head",
+        "I've been humming it all day, I can't get it out of my head",
+        "it's an earworm and it won't go away"
+    ], context: "stuck in my headは「頭の中に刺さってる」。曲が脳に刺さって抜けない。earwormは「耳の虫」=頭から離れない曲。虫が耳から入って住み着くイメージ。ドイツ語のOhrwurmが語源。日本語の「耳に残る」は残像。英語は寄生虫。怖い。", category: 'reaction', month: '2026-04' },
+    { daySlot: 28, japanese: 'それ超わかる', english: [
+        "I feel that",
+        "I totally feel that, been there myself",
+        "I know exactly what you mean, I've been through the same thing",
+        "you're speaking my language right now"
+    ], context: "I feel thatは「それを感じる」=「超わかる」。feel=「感じる」で共感を表す。been thereは「そこにいたことがある」=「経験済み」。共感を旅の経験で語る。you're speaking my languageは「俺の言語を喋ってる」=「完全に同意」。言語が合う=わかり合える。", category: 'reaction', month: '2026-04' },
+    { daySlot: 28, japanese: '何着て行けばいい？', english: [
+        "what should I wear",
+        "what should I wear to this thing?",
+        "I have no idea what the dress code is, what are you wearing?",
+        "is it casual or do I need to look nice?"
+    ], context: "dress codeは「服装の暗号」。暗号を解読しないと正解がわからない。what are you wearing?は「あなた何着る?」で相手に合わせる作戦。look niceは「良く見える」。日本語の「何着て行けばいい?」は正解を聞く。英語はdress codeという暗号解読ゲーム。", category: 'request', month: '2026-04' },
+    { daySlot: 28, japanese: '結局自分次第でしょ', english: [
+        "it's up to you",
+        "at the end of the day, it's up to you",
+        "nobody else can make that decision for you, it's completely your call",
+        "the ball is in your court"
+    ], context: "the ball is in your courtは「ボールはあなたのコートにある」=「次はあなたの番」。テニスの比喩。your callは「あなたの判定」。call=審判の判定。日本語の「自分次第」は依存関係。英語はスポーツか裁判。決断をゲームの順番で考える。", category: 'opinion', month: '2026-04' },
+    { daySlot: 28, japanese: '暖房つけっぱなしだった', english: [
+        "left the heat on",
+        "I left the heater on all night by accident",
+        "I woke up sweating and realized I forgot to turn off the heat",
+        "there goes my electric bill"
+    ], context: "left it onは「つけたまま放置した」。leaveは「去る」だけど「〜のままにする」の意味もある。leave the door open(ドアを開けたまま)。there goes my electric billは「電気代が行っちゃう」。お金が歩いて去っていくイメージ。出費を脱走で表す。", category: 'reaction', month: '2026-04' },
+    { daySlot: 28, japanese: '余計なお世話だよ', english: [
+        "mind your own business",
+        "that's none of your business, mind your own",
+        "I didn't ask for your opinion, so please keep it to yourself",
+        "stay in your lane"
+    ], context: "mind your own businessは「自分のビジネスを気にしろ」=「余計なお世話」。businessは「仕事」じゃなくて「自分の領域」。stay in your laneは「自分の車線にいろ」。車線をはみ出すな=他人の領域に入るな。英語は人間関係を交通ルールで語る。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 28, japanese: 'まだ信じられない', english: [
+        "still can't believe it",
+        "I still can't believe that actually happened",
+        "it's been hours and I'm still processing what just went down",
+        "somebody pinch me"
+    ], context: "somebody pinch meは「誰かつねって」=「夢じゃないよね?」。つねって痛かったら現実。processing(処理中)は脳をコンピュータに見立てる。what went downは「何が降りていったか」=「何が起きたか」。出来事が降ってくる。英語は現実をダウンロードする感覚。", category: 'reaction', month: '2026-04' },
+    { daySlot: 28, japanese: '今月使いすぎた', english: [
+        "spent too much",
+        "I definitely spent way too much this month",
+        "I looked at my bank account and almost had a heart attack",
+        "my wallet is crying right now"
+    ], context: "almost had a heart attackは「心臓発作を起こしそうになった」=「超ビビった」。銀行残高で心臓発作。英語は驚きを医療緊急事態で表す。my wallet is cryingは「財布が泣いてる」。財布が人格を持つ。日本語の「使いすぎた」は事実報告。英語はドラマにする。", category: 'reaction', month: '2026-04' },
+    { daySlot: 28, japanese: '手伝おうか？', english: [
+        "need a hand",
+        "hey, do you need a hand with that?",
+        "that looks heavy, let me help you out with it",
+        "I've got a free minute if you need some help"
+    ], context: "need a hand?は「手が一本必要?」=「手伝おうか?」。手を一本貸す。give someone a handも同じ。英語は助けることを身体パーツの貸し借りで表す。lend an ear(耳を貸す)もある。日本語も「手を貸す」「耳を傾ける」。身体比喩は世界共通。", category: 'request', month: '2026-04' },
+
+    // -- Day 29 --
+    { daySlot: 29, japanese: '筋肉痛やばい', english: [
+        "so sore",
+        "I'm so sore I can barely move",
+        "I worked out yesterday and now every muscle in my body hates me",
+        "even sitting down hurts at this point"
+    ], context: "soreは「痛い」だけど、筋肉痛専用の痛さ。every muscle hates meは「全筋肉が俺を嫌ってる」。筋肉が擬人化されて敵になる。日本語は「筋肉痛」という名詞一発。英語はsore(痛い)という形容詞で状態を描く。名前 vs 状態描写。", category: 'reaction', month: '2026-04' },
+    { daySlot: 29, japanese: '別にいいけど一応聞くよ', english: [
+        "just checking",
+        "I'm not saying no, just checking",
+        "I mean, I don't really care either way, but I figured I should ask",
+        "no pressure, just curious"
+    ], context: "just checkingは「ただ確認してるだけ」。justで圧を消す。no pressureは「プレッシャーなしで」。聞くけど答えなくてもいいよ、のニュアンス。日本語の「別にいいけど」は「気にしてないよ」を装う。英語はjustとno pressureで同じ装いをする。どっちも本音は気にしてる。", category: 'filler', month: '2026-04' },
+    { daySlot: 29, japanese: '静かにしてくれない？', english: [
+        "keep it down",
+        "can you keep it down a little?",
+        "I'm trying to concentrate here, could you please lower the volume a bit?",
+        "inside voices, please"
+    ], context: "keep it downは「それを下に保て」=「静かにしろ」。音量を下に押さえるイメージ。inside voicesは「室内用の声」。アメリカの小学校で先生が使うフレーズ。外の声と中の声を使い分けろ。大人に使うと皮肉になる。「子供じゃないんだから」というメッセージ。", category: 'request', month: '2026-04' },
+    { daySlot: 29, japanese: '意外と奥が深い', english: [
+        "deeper than it looks",
+        "it's way deeper than it looks on the surface",
+        "I thought it was simple at first, but the more you dig into it the more you find",
+        "there's a lot more to it than meets the eye"
+    ], context: "more than meets the eyeは「目に会う以上のものがある」=「見た目以上」。dig into(掘り込む)は知識を掘る。深さを物理的な深度で表す。日本語の「奥が深い」も空間的。英語も日本語も知識を三次元で考える。表面から深部へ潜っていくイメージ。珍しく同じ。", category: 'opinion', month: '2026-04' },
+    { daySlot: 29, japanese: '新しいの出たらしいよ', english: [
+        "they just dropped",
+        "they just dropped a new one, did you see?",
+        "apparently the new version just came out, everyone's talking about it",
+        "I might have to check it out"
+    ], context: "dropは「落とす」=「リリースする」。音楽やプロダクトの発表をdropと言う。上から落とす。came outは「出てきた」。英語は新商品を「出す」動作で語る。日本語の「出た」もほぼ同じだけど、dropのほうがインパクトがある。爆弾を落とす感覚。", category: 'filler', month: '2026-04' },
+    { daySlot: 29, japanese: '地味に嬉しい', english: [
+        "low-key happy",
+        "I'm low-key really happy about that",
+        "it's not a big deal but it honestly made my day in a quiet way",
+        "it's the little things that get you"
+    ], context: "low-keyは「控えめに」。high-keyの逆。SNSから来た表現。I'm low-key happyは「派手には言わないけど嬉しい」。日本語の「地味に」と完全に一致する珍しいケース。the little thingsは「小さいこと」。英語でも小さな幸せを語る文化はある。", category: 'opinion', month: '2026-04' },
+    { daySlot: 29, japanese: '黙ってればいいのに', english: [
+        "should've kept quiet",
+        "you really should've just kept your mouth shut",
+        "nobody asked you to say anything, you could've just stayed quiet",
+        "some things are better left unsaid"
+    ], context: "keep your mouth shutは「口を閉じたままにしろ」。shutは強い閉鎖。better left unsaidは「言われないままのほうがいい」。言葉を封印するイメージ。日本語の「黙ってれば」は行動の不在を求める。英語は口を物理的に閉じる動作。口にシャッターを下ろす。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 29, japanese: 'その発想はなかった', english: [
+        "never thought of that",
+        "huh, I never would've thought of that",
+        "that's actually a really interesting way to look at it, never crossed my mind",
+        "you just blew my mind a little"
+    ], context: "never crossed my mindは「俺の心を横切ったことがない」。考えが心という道路を通過しなかった。blew my mindは「脳を吹き飛ばした」。新しい発想で脳が爆発する。日本語の「その発想はなかった」は不在を述べるだけ。英語は道路の不通過か脳の爆発。スケールが違う。", category: 'reaction', month: '2026-04' },
+    { daySlot: 29, japanese: '寒いから鍋にしよう', english: [
+        "let's do hot pot",
+        "it's cold out, let's do hot pot tonight",
+        "on a night like this, there's nothing better than sitting around a hot pot",
+        "hot pot weather for sure"
+    ], context: "hot potは「熱い鍋」。英語では鍋料理をhot potと呼ぶ。let's doは「〜をやろう」で、食事をdo(する)で表す。let's do sushi、let's do Italian。英語は食事を「する」もの。日本語は「食べる」もの。行為 vs 摂取。doのほうがカジュアル。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 29, japanese: 'ありがた迷惑', english: [
+        "trying to help but...",
+        "I know they're trying to help but it's kind of making things worse",
+        "their heart's in the right place but honestly I'd rather they didn't",
+        "good intentions, bad execution"
+    ], context: "their heart's in the right placeは「心臓は正しい場所にある」=「悪気はない」。でも結果は迷惑。good intentions, bad executionは「意図は良い、実行が悪い」。日本語の「ありがた迷惑」は一語で矛盾を表す天才的な単語。英語にはこの一語がない。説明するしかない。文化の穴。", category: 'opinion', month: '2026-04' },
+
+    // -- Day 30 --
+    { daySlot: 30, japanese: '肌荒れがひどい', english: [
+        "my skin is a mess",
+        "my skin is such a mess right now, I don't know what happened",
+        "I've been breaking out like crazy and nothing I do seems to help",
+        "my face is staging a full rebellion"
+    ], context: "breaking outは「勃発する」=「吹き出物が出る」。戦争用語。肌の上で戦争が起きてる。staginga rebellionは「反乱を起こしてる」。顔が反乱軍。日本語の「肌荒れ」は荒れる(自然災害)。英語は戦争か反乱。肌の上でどっちも大事件。", category: 'reaction', month: '2026-04' },
+    { daySlot: 30, japanese: 'あとで後悔するぞ', english: [
+        "you'll regret it",
+        "trust me, you're going to regret this later",
+        "I'm telling you right now, if you do that, future you is not going to be happy",
+        "don't say I didn't warn you"
+    ], context: "future youは「未来のあなた」。英語は自分を時間軸で分割する。present me(今の俺)とfuture me(未来の俺)は別人。don't say I didn't warn youは二重否定。「警告しなかったとは言うな」=「言ったからな」。責任を先に回避する。英語は予防線の張り方がうまい。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 30, japanese: '空が綺麗すぎて写真撮った', english: [
+        "had to take a pic",
+        "the sky was so pretty I had to take a picture",
+        "I stepped outside and the sky was so beautiful I couldn't not pull out my phone",
+        "camera doesn't do it justice though"
+    ], context: "doesn't do it justiceは「それに正義を与えない」=「実物の良さが伝わらない」。justice=正義を与える=公平に評価する。カメラが空に正義を与えられない。couldn't not(二重否定)=「撮らないことができなかった」=「撮るしかなかった」。英語は二重否定で衝動を表す。", category: 'reaction', month: '2026-04' },
+    { daySlot: 30, japanese: '期限いつまで？', english: [
+        "when's the deadline",
+        "when's the deadline for this?",
+        "I want to make sure I get it done on time, when's the cutoff?",
+        "how much time do I have?"
+    ], context: "deadlineは「死の線」。元は南北戦争の捕虜収容所で、この線を越えたら撃たれる線。今は締め切り。cutoffは「切断点」。英語は期限を死か切断で表す。日本語の「期限」は「期間の限界」で穏やか。英語は物騒。それだけ期限に厳しい文化。", category: 'request', month: '2026-04' },
+    { daySlot: 30, japanese: '今のなしで', english: [
+        "scratch that",
+        "wait, scratch that, forget what I just said",
+        "actually never mind, pretend I didn't say anything",
+        "rewind, let me start over"
+    ], context: "scratch thatは「それを引っ掻いて消せ」。昔の手書き原稿を引っ掻いて消す動作から。rewindは「巻き戻し」。テープレコーダー時代の遺産。pretend I didn't say anythingは「何も言わなかったふりして」。英語は発言の取り消しを物理的な消去動作で表す。消しゴムからテープまで。", category: 'filler', month: '2026-04' },
+    { daySlot: 30, japanese: 'そこは突っ込まないで', english: [
+        "don't go there",
+        "let's not go there, it's a long story",
+        "I'd rather not get into that right now, it's complicated",
+        "that's a can of worms I don't want to open"
+    ], context: "can of wormsは「虫の缶」。開けたら虫がわらわら出てくる=話が広がって収拾がつかない。don't go thereは「そこに行くな」。話題を場所として扱う。日本語の「突っ込む」はツッコミ文化。英語は虫の缶か立入禁止エリア。どっちも「触るな危険」。", category: 'shutdown', month: '2026-04' },
+    { daySlot: 30, japanese: '電子レンジで済ませた', english: [
+        "just microwaved it",
+        "I was too lazy to cook so I just microwaved something",
+        "I didn't feel like making anything so I threw something in the microwave and called it dinner",
+        "the microwave is my personal chef at this point"
+    ], context: "called it dinnerは「それを夕飯と呼んだ」。チンしたものに夕飯という名前を与える。名付けるだけで食事になる。personal chefは「専属シェフ」。電子レンジをシェフ扱い。日本語の「済ませた」は完了を報告するだけ。英語は電子レンジに人格を与える。", category: 'reaction', month: '2026-04' },
+    { daySlot: 30, japanese: 'うちの猫が最強', english: [
+        "my cat's the best",
+        "my cat is literally the greatest thing on this planet",
+        "I'm not being biased but my cat is objectively the cutest cat that has ever existed",
+        "fight me on this, you'll lose"
+    ], context: "I'm not being biasedは「偏ってない」と言いながら完全に偏ってる。objectivelyは「客観的に」と言いながら主観100%。英語は自分の偏愛を「客観的事実」として発表するのが面白い。fight meは「かかってこい」。ペット自慢は格闘技。世界共通。", category: 'opinion', month: '2026-04' },
+    { daySlot: 30, japanese: '今日は早く寝る', english: [
+        "early night",
+        "I'm calling it an early night tonight",
+        "I'm exhausted so I'm going to bed earlier than usual for once",
+        "let's see if I actually follow through this time"
+    ], context: "calling it an early nightは「今夜を早い夜と宣言する」。call it=終了宣言。let's call it a dayは「今日はここまで」。英語は時間の終わりを「宣言」する。follow throughは「最後までやり通す」。早く寝ると言って結局スマホ見るやつ。自己ツッコミ。", category: 'suggestion', month: '2026-04' },
+    { daySlot: 30, japanese: '嫌な予感しかしない', english: [
+        "bad feeling",
+        "I've got a really bad feeling about this",
+        "something tells me this is not going to end well",
+        "my gut is screaming no right now"
+    ], context: "my gut is screaming noは「腸がノーと叫んでる」。英語は直感を腸(gut)で感じる。gut feelingは「腸の感覚」=「直感」。日本語は「嫌な予感」で予知っぽいけど、英語は内臓が警報を鳴らす。something tells meは「何かが俺に言ってる」。情報源不明の警告。身体が頭より先に気づく。", category: 'reaction', month: '2026-04' },
+
+    // ================================================================
+    // 2026-05 — 5月: 7-pillar curriculum continued, 31日 × 10 = 310
+    // ================================================================
+
+    // ── Day 1: GW明けの英語 ──
+    { daySlot: 1, japanese: 'やる気出ない', english: [
+        "can't be bothered",
+        "I just can't be bothered today",
+        "I literally have zero motivation to do anything productive right now",
+        "I have no motivation. like, none. zero. I sat down to work and stared at the screen for 40 minutes. then I ate a snack. then I checked my phone. then I stared at the screen again. this is the rhythm of my day apparently. yesterday I had drive. today I have nothin'. it just left."
+    ], context: "can't be botheredはイギリス系の鉄板。「面倒くさいから動かない」のニュアンス。アメリカ英語ではnot feeling itが近い。日本語の「やる気」は精神的エネルギーの一括概念。英語はmotivation/energy/drive/willに分解される。日本語のほうが抽象、英語のほうが分析的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 1, japanese: '今日は無理', english: [
+        "not today",
+        "today's not gonna happen for me",
+        "I don't have it in me to deal with anything serious today",
+        "today's a write-off. I'm not gonna pretend otherwise. usually I'd power through but today is the kind of day where powerin' through just makes everything worse. I'm gonna do the bare minimum and call it a victory. there's wisdom in knowin' when to fold."
+    ], context: "not todayはネット文化で「今日はやめとく」の独立フレーズ化。don't have it in meは「腹に余力がない」=「今やる気力がない」。have it in 〜は「〜を内側に持ってる」の構文。call it a victoryは「これを勝利と呼ぶ」=「ここで終わりにする」。call itは命名の動詞で、現実を言葉で確定する英語の癖。", category: 'reaction', month: '2026-05' },
+    { daySlot: 1, japanese: '完全に止まってる', english: [
+        "totally stuck",
+        "I'm totally stuck on this",
+        "I've been spinning my wheels on this for hours and getting nowhere",
+        "I'm stuck. like fully stuck. spent the whole mornin' just spinnin' my wheels. opened the doc, closed the doc. opened it again. typed a sentence. deleted it. typed another one. deleted that too. somethin's not clickin' and forcin' it isn't workin' so I'm gonna walk away and come back and pretend I'm a different person."
+    ], context: "stuckは「貼りついてる」が原義。物理的に動けない=精神的にも動けない、の二重比喩。spinning my wheelsは「タイヤが空回りしてる」=「努力してるけど進まない」。日本語の「行き詰まる」は道の比喩、英語のstuckは粘着の比喩。同じ閉塞でも比喩のソースが違う。", category: 'reaction', month: '2026-05' },
+    { daySlot: 1, japanese: 'もう知らん', english: [
+        "I'm out",
+        "I'm out, this is not my problem anymore",
+        "I'm done trying to figure this out, somebody else can take it from here",
+        "I'm out. wash my hands of it. tried, gave it my best, hit a wall, decided life is short. somebody smarter than me can take a swing at it. I'm goin' to lunch. I'm checkin' out. I'm in the wind. you'll find me at the coffee shop pretendin' I never met any of you."
+    ], context: "I'm outはトランプから来てる。「降ります」=「もう関わらない」。wash my hands of itは聖書由来(ピラトの手洗い)で「責任放棄」。in the windは「風の中」=「行方不明状態」。日本語の「もう知らん」は無責任宣言、英語はカジノ/聖書/天候の比喩でカモフラージュする。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 1, japanese: 'マジでどうでもいい', english: [
+        "do not care",
+        "I literally do not care at this point",
+        "I do not have the energy to care about this one way or the other",
+        "I do not care. and I want that on the record. couldn't care less actually. zero cares given. the cares jar is empty. you could tell me the office was on fire and I'd be like 'oh that's interesting' and keep eatin' my sandwich. apathy unlocked."
+    ], context: "couldn't care lessは「これ以上気にしないことは不可能」=「最大級にどうでもいい」。アメリカ人の半分はI could care less(間違い)を使う。zero cares givenはネット由来の数値化ジョーク。日本語の「どうでもいい」は3語で済む。英語は「ケアの量」を計測する変な構文を必要とする。", category: 'reaction', month: '2026-05' },
+    { daySlot: 1, japanese: '誰か助けて', english: [
+        "send help",
+        "somebody send help, I'm dyin' over here",
+        "if anyone has any spare brain cells I'd really appreciate them right now",
+        "send help. I'm not jokin'. spreadsheet from hell, deadline at 3, brain shut down at 11. I need someone to walk in here, take this laptop out of my hands, and tell me to go outside. or someone bring food. food works too. honestly food might fix this whole situation."
+    ], context: "send helpはネット由来のミーム化フレーズ。普通は災害用語、それを職場の苦境に流用する皮肉。dying over hereは「こっちは死にそう」の誇張。spare brain cellsは「予備の脳細胞」=「貸して欲しい思考力」。日本語の「助けて」はストレート。英語はミーム/誇張/皮肉で包んでから出す。", category: 'reaction', month: '2026-05' },
+    { daySlot: 1, japanese: 'ぼーっとしてた', english: [
+        "I zoned out",
+        "I zoned out for a sec, what'd you say?",
+        "I completely zoned out, can you say that one more time?",
+        "I zoned out. completely. you were talkin' and I was makin' eye contact and noddin' but somewhere in the middle I disappeared. went to a different planet. came back when I heard you say my name. I have no idea what we're discussin' right now. fake it till I get a hint."
+    ], context: "zone outは「ゾーンから出る」=「意識がどこか別の場所に行く」。zoneは精神の「圏」。reverse はzone in(集中する)。日本語の「ぼーっと」は擬態語、英語はzone(空間)の出入りで表現する。out of itも同義。英語は意識を「居る場所」として扱う癖がある。", category: 'reaction', month: '2026-05' },
+    { daySlot: 1, japanese: '今のなし', english: [
+        "scratch that",
+        "scratch that, forget I said anything",
+        "scratch that, lemme rewind for a second and try again",
+        "scratch that. just -- forget I opened my mouth. that came out wrong, the whole thing was wrong, the energy was wrong, my hair was wrong. let me try again from the top. I'm gonna walk back in this room and we're gonna do this scene over."
+    ], context: "scratch thatは「線で消せ」=発言取り消しの定型句。原稿の修正動作が会話に持ち込まれた。do over/from the topは演劇用語。英語は「やり直し」を物理動作(消す/巻き戻す/上から)で表現する。日本語の「なし」は存在の否定、英語は「動作の取消」。発想が違う。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 1, japanese: '流れに任せる', english: [
+        "we'll figure it out",
+        "we'll figure it out, we always do",
+        "I'm sure it'll all work out one way or another",
+        "we'll figure it out. we always do. it might get ugly in the middle and there might be cryin' and definitely there'll be at least one panic moment but historically we've always landed somewhere. the path is invisible. that's fine. we'll cut through the woods if we have to."
+    ], context: "figure it outは「全体像を見出す」=「解決策を探り当てる」。figureは「形」「数字」両方の意味。it'll work outは「うまく転がる」=自然に解決する。日本語の「なんとかなる」は受動的な楽観、英語のfigure outは能動的な解決姿勢。図形を組み立てるイメージ。", category: 'reaction', month: '2026-05' },
+    { daySlot: 1, japanese: 'いつもこう', english: [
+        "story of my life",
+        "yep, story of my life right there",
+        "this is literally how every single one of these turns out",
+        "story of my life. straight up. every time I think I'm finally gettin' my act together, somethin' like this happens. it's like the universe has a sense of humor and I'm the punchline. but you know what? at this point I'm laughin' too. what else can you do."
+    ], context: "story of my lifeは「俺の人生のストーリー」=「いつものパターン」の自虐。straight upは強調の若者言葉「マジで」。英語は人生をstory(物語)に例える。日本語の「いつも」は単純な反復、英語のstory of my lifeは反復+物語化+自虐。情報量が3倍。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 2: 朝の覚醒系英語 ──
+    { daySlot: 2, japanese: 'まだ寝たい', english: [
+        "five more minutes",
+        "just five more minutes, I'll get up I swear",
+        "give me like five more minutes and I promise I'll actually get out of bed",
+        "five more minutes. that's all I need. except we both know that's a lie. five becomes ten becomes twenty becomes my entire mornin' schedule shiftin' to the right. but in this moment, five more minutes feels reasonable. it feels achievable. it feels like a tiny gift I'm givin' myself. and I'm takin' it."
+    ], context: "five more minutesは英語圏の鉄板の自己交渉フレーズ。日本語の「あと5分」と同じ構造だが、I swearで誓約まで付ける誇張が英語的。snoozeボタン文化の語彙。日本語の「まだ寝たい」は願望表明、英語はI swear/I promiseで自分への約束を演じる演劇性がある。", category: 'reaction', month: '2026-05' },
+    { daySlot: 2, japanese: '頭がぼやけてる', english: [
+        "still foggy",
+        "my head's still really foggy",
+        "my brain hasn't fully come online yet, give it a minute",
+        "my brain isn't online yet. I'm conscious in the technical sense. eyes are open, body is uprightish, I can technically respond to stimuli. but the part that processes information and forms opinions? that part is still loadin'. give it twenty minutes and a full cup of coffee and I'll be a different person."
+    ], context: "foggyは「霧がかかった」=「頭が働かない」。come onlineはコンピュータ用語の流用で「起動する」。脳をマシンに例える。日本語の「ぼやける」は視覚の比喩、英語のfoggyは天候の比喩、onlineはテクノロジーの比喩。同じ「不調」を3つの比喩ソースで表現する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 2, japanese: 'シャワー浴びてからじゃないと無理', english: [
+        "need a shower first",
+        "I'm not human until I've showered",
+        "I literally cannot start my day until I've had a shower",
+        "I'm not a person yet. I need a shower to actually become functional. otherwise I'm just a pile of grumpy molecules movin' around the house. the shower is the upgrade. before shower: zombie. after shower: actual human capable of speech and decision-making. there's no in-between."
+    ], context: "I'm not humanは比喩で「人間として機能してない」。pile of grumpy moleculesは英語的なネガティブ自己描写の遊び。日本語の「無理」は単純拒絶、英語は「シャワー浴びるまで人間じゃない」と人格論まで持ち込む誇張。状態の話を存在の話に拡大するのが英語の癖。", category: 'reaction', month: '2026-05' },
+    { daySlot: 2, japanese: 'カフェイン入った', english: [
+        "caffeine kicked in",
+        "OK the caffeine just kicked in",
+        "the caffeine is finally hitting and I'm starting to feel human",
+        "the caffeine kicked in. you can see the moment. one minute I'm starin' at the wall, the next minute I have ideas. I'm typin'. I'm answerin' emails. I'm a productive member of society. the difference between pre-caffeine and post-caffeine me is genuinely concernin' but I'm not gonna think about that right now."
+    ], context: "kick inは「効き始める」。kickは「蹴る」だけど薬物用語で「作用が現れる」。元はドラッグ/酒の用語が日常化した。日本語の「入った」は中立的、英語のkick inは「キックされた」のように身体的衝撃を伴う。化学物質の作用を「キック」で表現する英語の身体性。", category: 'reaction', month: '2026-05' },
+    { daySlot: 2, japanese: '時間ない', english: [
+        "no time",
+        "I don't have time for this right now",
+        "I am running so far behind there is no way I'm makin' it on time",
+        "I have no time. and yet I keep doin' things that aren't gettin' me out the door. like I just spent four minutes findin' a sock. four minutes. for one sock. now I'm makin' coffee even though I don't have time for coffee. why? because future me will need it and present me has poor judgment. I'm gonna be late. it's already decided."
+    ], context: "no timeは英語の超頻出。runningは「走る」だけじゃなく「運営する/動いてる」も。running behindは「遅れて運営してる」=「予定より遅い」。英語は時間管理を「運営」「走り」と動的に捉える。日本語の「ない」は静的な不在、英語は「足りなくなりつつある」の動的不足。", category: 'reaction', month: '2026-05' },
+    { daySlot: 2, japanese: '鏡見て絶望', english: [
+        "rough morning face",
+        "yikes, rough mornin' face today",
+        "I just looked in the mirror and I am not impressed with what I'm seeing",
+        "looked in the mirror and immediately regretted it. who is that. what is that face doin'. when did I start lookin' like this. the eye bags have eye bags now. I'm gonna stop checkin' mirrors. ignorance is peace. I'll just assume I look fine until proven otherwise."
+    ], context: "yikesは英語の「ヤバ」「うわっ」のリアクション語。eye bags have eye bagsは「目袋が目袋を持ってる」の自虐ジョーク。所有関係の入れ子で誇張する英語の遊び。日本語の「絶望」は感情の表明、英語は鏡を見た瞬間の独白形式で、ジョークと観察に変換する。感情を直接言わない自虐文化。", category: 'reaction', month: '2026-05' },
+    { daySlot: 2, japanese: '気合い入れる', english: [
+        "let's do this",
+        "alright, let's do this thing",
+        "OK no more excuses, time to actually buckle down and get it done",
+        "alright. let's do this. I'm done makin' excuses. I'm done procrastinatin'. I'm done makin' coffee that I don't drink. I'm sittin' down, openin' the laptop, and not gettin' up until I've made real progress. this is the moment. me from yesterday would be impressed by me right now. let's go."
+    ], context: "let's do thisは英語の自己鼓舞の鉄板。buckle downは「ベルトを下げて締める」=「真剣に取り組む」。原義は乗馬具からで、姿勢を整える動作。日本語の「気合い」は精神論、英語のbuckle downは身体動作からの比喩。精神を物理動作に翻訳する英語の傾向。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 2, japanese: '今日が長そう', english: [
+        "long day ahead",
+        "looks like it's gonna be a long day",
+        "I have a feeling today is gonna feel like three days in one",
+        "long day ahead. I can already tell. five back-to-back meetings, two deadlines, and a vague sense of doom. I'm gonna need fuel. multiple coffees. probably a snack stash. and I'm gonna need to go to bed early tonight 'cause tomorrow is the same situation. somebody send help."
+    ], context: "long day aheadは「長い一日が前にある」の倒置構文。aheadは「前方」=未来。日本語の「長そう」は推測、英語のlooks likeは観察+予測。 'gonna feel like three days in one'は時間の主観的伸縮を強調する誇張。日本語より明示的にメタ視点(時間の感覚自体への言及)を含む。", category: 'reaction', month: '2026-05' },
+    { daySlot: 2, japanese: 'もう一回寝よ', english: [
+        "back to sleep",
+        "nope, goin' back to sleep",
+        "yeah I'm just goin' right back to sleep, I'll deal with it later",
+        "back to sleep. the alarm went off, I considered it, I weighed the options, and I've decided that bein' a functional adult is overrated. I'll deal with the consequences later. present me is choosin' joy. future me can complain at his own meeting."
+    ], context: "nopeはno+pの強調形でカジュアル拒否。present me / future meは内省を二人称化する英語の特徴。time-self splitting。日本語は「俺」が時間を超えて一人だが、英語は「現在の俺」「未来の俺」を別人格化してジョークにする。自己分裂による責任の擬似的な分散。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 2, japanese: '何曜日かわからん', english: [
+        "what day is it",
+        "wait, what day is it even",
+        "I genuinely do not know what day of the week it is right now",
+        "what day is it. I'm not bein' rhetorical. I genuinely do not know. I checked my phone three times and forgot each time. weeks blur together. is it Wednesday? feels like Wednesday. but it could be Tuesday. or Thursday. I think I had a meeting yesterday that means somethin'. somebody just tell me."
+    ], context: "what day is it evenはネット由来の構文。evenが疑問文末で「そもそも」の意味になる比較的新しい用法。time blindnessの語彙。英語のSNS世代は時間感覚の喪失を頻繁にネタにする。日本語より「記憶喪失/混乱」の自虐表現が豊富。デジタル疲労の語彙が英語のほうが進化してる。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 3: 通勤の英語 ──
+    { daySlot: 3, japanese: '電車止まった', english: [
+        "train stopped",
+        "OK my train just literally stopped",
+        "the train just came to a dead stop in the middle of nowhere",
+        "the train stopped. like fully stopped. between stations. the kind of stop where you know it's gonna be a while 'cause they don't even bother makin' an announcement. I'm gonna miss my mornin' standup. I'm gonna miss my coffee. and there's nothin' I can do about it 'cause I'm in a metal tube under the city."
+    ], context: "came to a dead stopは「死の停止に至った」=「完全停車」。deadは「死んだ」だけでなく「絶対の/完全な」を意味する。dead silence、dead serious、dead stop。英語のdeadは強調副詞として頻出。日本語の「止まった」はシンプル、英語はdeadを使って状態の絶対性を表現する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: '満員すぎ', english: [
+        "way too packed",
+        "this train is way too packed today",
+        "I cannot move my arms, this is a public health hazard at this point",
+        "this is too many humans in one tube. I cannot move. somebody's bag is in my back. somebody else's hair is in my face. I'm makin' eye contact with a stranger six inches away and we both pretend we're not. the doors close and somehow more people get on. how. there's no room. there hasn't been room for three stops."
+    ], context: "way too packedの way は強調副詞「めちゃくちゃ」。way better、way more、way too far、すべて使える。日本語の「すぎ」と同等の口語的強調。public health hazard(公衆衛生上の危険)はオフィシャル用語を日常に流用する皮肉。英語は誇張のために行政用語を借用する遊び。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: '駅員さん怒鳴ってる', english: [
+        "station guy is yelling",
+        "the station guy is yelling at people for some reason",
+        "the station attendant is screaming at someone for trying to force the doors open",
+        "the station guy is yellin'. somebody tried to force the doors open and now the whole platform's gettin' a lecture. I get it. I do. but also it's 8 AM and I just want to make my train. the lecture is at full volume in Japanese, which I half-understand, and that means I get half the secondhand embarrassment."
+    ], context: "secondhand embarrassmentは「他人の恥を代理で感じる」=「こっちが恥ずかしい」。直接の英語にあたる単語がない概念だが、英語ではこの長いフレーズで定着。中古品(secondhand)の比喩で恥ずかしさを表現する独特な構文。日本語の「他人事じゃない」より具体的で物理的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: '隣の人寝てる', english: [
+        "guy next to me passed out",
+        "the guy next to me is fully passed out",
+        "the dude next to me is dead asleep and his head keeps falling on my shoulder",
+        "the guy next to me is out cold. fully gone. his head's done bobbed over four times and twice it landed on my shoulder. I keep movin' my shoulder hopin' he'll wake up. he doesn't wake up. he's snorin'. lightly. but snorin'. and I'm tryin' to figure out if this is rude to gently push his head off or if I just accept this is my life now."
+    ], context: "passed outは「気絶した」=「深く眠った」。out coldは「外で冷たい」=「完全に意識ない」。動詞outとcoldの組合せで意識消失を表現する英語の遊び。日本語の「寝てる」は動作、英語のpassed out/out coldは状態+程度の合成。意識のなさを物理的距離(out)で表現する空間メタファー。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: '今日も詰まってる', english: [
+        "packed schedule again",
+        "another packed schedule day, here we go",
+        "looks like another back-to-back kind of day, no breaks in sight",
+        "another packed day. five meetin's. three different time zones. somehow they all overlap by 15 minutes 'cause people don't read calendars. I'm gonna be one of those Brady Bunch grids. mute on, mute off, mute on. by 4 PM I'll have forgotten what my own face looks like."
+    ], context: "back-to-backは「背中合わせ」=「連続して」。元はバスケットボール用語で「連戦」、それがビジネス英語に流入。Brady Bunch gridは1970年代のテレビ番組から、Zoom画面の格子状ビューを指す。ミレニアル/ジェネZ世代の遠隔会議語彙。日本語の「詰まってる」より具体的な視覚情報を含む。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: 'スマホ忘れた', english: [
+        "forgot my phone",
+        "wait -- I left my phone at home",
+        "I am 30 minutes into my commute and I just realized I left my phone at home",
+        "I forgot my phone. and you know what? I'm not turnin' around. I'm gonna live without it for one day and see what happens. I'll probably miss somethin' important. I'll definitely feel naked. but also there's a chance I become a more peaceful person by 5 PM. or I have a complete nervous breakdown by 10 AM. it's a coin flip."
+    ], context: "feel nakedは「裸の感覚」=「装備不足の不安」。スマホ依存を「裸」で比喩する英語の身体感覚。日本語の「不安」より物理的。coin flipは「コインを投げる」=「五分五分」。決定の偶然性を貨幣の運動で表現する英語の比喩。日本語の「賭け」より具体的なイメージ。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: '今日は座れた', english: [
+        "got a seat",
+        "yes! got a seat today",
+        "I actually got a seat today, this is gonna be a good day",
+        "I got a seat. and not just any seat. a corner seat. by the window. with no one I have to make awkward elbow space with. this is the best thing that's happened to me this week. I'm gonna ride it out, scroll my phone in peace, and feel like I won the morning. small wins matter."
+    ], context: "small wins matterは「小さな勝利が大事」。アメリカの自己啓発文化から日常会話に流入した語彙。日本語の「勝ち」は対他競争、英語のwinは内的達成も含む。日々の小さな成功を「勝利」と命名する英語の傾向は、競技スポーツの語彙が生活化した結果。日本語にこの感覚はない。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: 'ICカードかざすだけ', english: [
+        "tap and go",
+        "just tap and you're in",
+        "the gates are all touchless now, you just tap your card and walk through",
+        "tap and go. don't even think about it. just tap and walk. ten years ago we were diggin' through pockets for paper tickets. now it's a tap and we're past the gate. and somehow we still complain. progress is invisible 'cause we adjust to it instantly. I'm makin' a note to be impressed by tap-to-pay one more time before the day's over."
+    ], context: "tap and goはカード決済の標準語。動詞2つを連続で並べてシンプルさを強調する英語の構文(grab and go、stop and shop)。日本語の「かざす」は対象重視(かざす対象)、英語のtapは動作重視。動作の単純性を2語のセットで表現する英語の経済性。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: '駅で迷う', english: [
+        "lost in the station",
+        "this station is a maze, I'm so lost",
+        "I have been walking around this station for ten minutes and I cannot find the exit",
+        "I'm lost. in a station. that I've been to before. this place is a labyrinth. I keep takin' escalators and they all go to floors I've never seen. there are seven exits and I want exit B3 but every sign just shows me where B1 and B2 are. eventually I'm gonna give up and surface wherever and walk on the street. cheaper than therapy."
+    ], context: "labyrinthはギリシャ神話のミノタウロス迷路。普通のmaze(迷路)より神秘的・逃げられない感が強い。日本語の「迷う」は単純、英語のlabyrinth/mazeは比喩的に状況の複雑さを誇張する。surfaceは動詞で「地上に出る」=「地下から脱出」。地下鉄/駅の語彙としても使う。", category: 'reaction', month: '2026-05' },
+    { daySlot: 3, japanese: '降り損ねた', english: [
+        "missed my stop",
+        "ugh, I missed my stop",
+        "I was scrolling on my phone and completely missed my stop",
+        "I missed my stop. classic. I was deep in my phone, lookin' at memes, and I felt the train accelerate before I realized. now I'm one stop past, gonna have to hop off, switch platforms, wait for the train back. I've added 15 minutes to my commute over a meme. and the meme wasn't even that funny."
+    ], context: "classicは「古典的」だが口語では「お決まりのパターン」=「いつものやつ」の自虐皮肉。失敗を「クラシック」と命名することで距離を取る防衛機制。日本語の「あるある」と機能は近いが、英語のclassicは個人化(自分の典型的失敗)、日本語の「あるある」は集団化(みんなの共感)。指向性が逆。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 4: 仕事の英語 (会議・デスク) ──
+    { daySlot: 4, japanese: '会議多すぎ', english: [
+        "too many meetings",
+        "way too many meetings on the calendar this week",
+        "I have like seven meetings today and zero of them needed to be meetings",
+        "way too many meetings. I had a meeting about a meeting today. that's a real thing that happened. and the meeting about the meeting decided we needed another meeting. I'm not jokin'. I'm gonna start declining things and seein' what happens. probably nothin'. and that'll prove my point."
+    ], context: "this could've been an emailは英語ネット文化の鉄板ミーム。職場の不満を共有するコミュニティ言語。meeting about a meetingは構造を入れ子にして無意味さを誇張する英語の遊び。日本語にも「会議の打ち合わせ」はあるが、英語のほうが自虐の濃度が濃い。リモートワーク文化が生んだ語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 4, japanese: '上司やばい', english: [
+        "boss is trippin'",
+        "the boss is straight-up trippin' today",
+        "the boss is being completely unreasonable today, I don't know what's going on",
+        "the boss is trippin' today. and not the funny kind of trippin'. the 'why are you yellin' at me about a typo' kind. somethin' happened this mornin', someone gave him bad news, and now we're all gettin' the residual energy. day's gonna be one of those days. heads down, mouths shut."
+    ], context: "trippin'はアメリカ黒人英語(AAVE)由来のスラング。tripは元々「つまずく」「旅行」、AAVEで「過剰反応する/混乱する」の意味になり、ヒップホップ文化を経て主流化。straight-upは強調副詞「マジで」。日本語の「やばい」は多義的、英語のtrippin'は「不合理な行動」に特化。専門化した俗語。", category: 'reaction', month: '2026-05' },
+    { daySlot: 4, japanese: 'デッドライン迫ってる', english: [
+        "deadline's tight",
+        "the deadline is super tight on this one",
+        "we are extremely close to deadline and there is still a lot to do",
+        "deadline's breathin' down my neck. I can feel it. every email I open just makes it worse. I'm at the point where I'm doin' the math in my head — if I work straight through lunch, can I make it? probably not. but I'm gonna act like I will because admittin' I won't makes it real. I'm gonna keep pretendin' until 6 PM."
+    ], context: "breathing down my neckは「俺の首に息を吹きかけてる」=「すぐ後ろに迫ってる」。deadlineを擬人化して恐怖を表現する英語の比喩。日本語の「迫る」は動詞、英語は身体接触の感覚に変換する。doing the mathは「計算する」=「現実を直視する」。calculate/figureより口語的で頻出。", category: 'reaction', month: '2026-05' },
+    { daySlot: 4, japanese: 'クライアント面倒', english: [
+        "client is a handful",
+        "this client is honestly a handful",
+        "the client is high-maintenance and changes their mind every five seconds",
+        "this client is a handful. and not in a fun way. they want everythin'. they want it yesterday. and tomorrow they'll change their mind and want somethin' else and forget they ever asked for the first thing. my job is to remember every version, deliver the latest, and never push back. I'm earnin' my salary on this one."
+    ], context: "a handfulは「手いっぱい」=「手に余る相手/もの」。high-maintenanceは「メンテナンス代が高い」=「世話が焼ける」、車・装置・人間関係に使う。日本語の「面倒」は単純、英語のa handful/high-maintenanceは具体的な負担イメージ(物量/コスト)で表現する。抽象を物量化する英語の癖。", category: 'opinion', month: '2026-05' },
+    { daySlot: 4, japanese: '今日は無理ゲー', english: [
+        "today's impossible mode",
+        "today is straight impossible mode",
+        "today's workload is on impossible difficulty, I'm not gonna make it",
+        "today is impossible mode. the to-do list isn't a list, it's a wall. every time I cross somethin' off, two new things appear. and the new things are urgent. somehow they're all urgent. by the end of the day I'll have done 12 things, none of them will have been the right thing, and tomorrow it starts over."
+    ], context: "impossible modeはゲーム用語の流用。難易度設定(easy/normal/hard/impossible)を日常に持ち込む若者英語。日本語の「無理ゲー」も同じくゲーム由来。日英ともに21世紀のゲーミング文化が日常語彙を作っている。straightは強調副詞で「マジで」。日本語の「無理」より具体的で、状況の難易度を数値化するメタ視点を含む。", category: 'reaction', month: '2026-05' },
+    { daySlot: 4, japanese: '同僚に頼みたい', english: [
+        "need to ask for help",
+        "I need to ask the team for help on this",
+        "I'm gonna have to swallow my pride and ask someone for help",
+        "I need help. and that's hard for me to say. I'm the person who figures things out. but this thing? this thing is beyond me. I've been bangin' my head against it for two days. swallow my pride, walk over to Sarah's desk, and admit I'm stuck. she'll probably figure it out in 20 minutes. and I'll feel both grateful and stupid. that's the deal."
+    ], context: "swallow my prideは「プライドを飲み込む」=「面子を捨てる」。pride(プライド)を物体化して胃に入れる比喩。日本語の「面子」「プライド」と同じ概念だが、英語のswallowはspecific動作(飲み込む)で表現する。banging my head againstは「頭を壁に打ちつける」=「無駄な努力」。物理的暴力の比喩で精神疲労を表す。", category: 'request', month: '2026-05' },
+    { daySlot: 4, japanese: 'これ俺じゃ無理', english: [
+        "this isn't my thing",
+        "this really isn't my thing",
+        "this is way outside my area, you need someone else for this",
+        "this isn't my wheelhouse. I can fake it for about 20 minutes but eventually you'll need actual expertise and I don't have it. let me get someone else on this. I'm not too proud to admit when somethin's outside my lane. better to say it now than mess it up and have to apologize later."
+    ], context: "wheelhouseは野球用語(打ちやすいゾーン)から「得意分野」へ。outside my laneは「自分のレーン外」=「専門外」。英語はビジネス語彙が野球/車のレーンなどスポーツ・交通の比喩から成る。日本語は「分野」「専門」など抽象語、英語は具体的な物理空間で抽象を捉える。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 4, japanese: '集中できない', english: [
+        "can't focus today",
+        "I cannot focus to save my life today",
+        "I am completely unable to concentrate on anything today",
+        "I cannot focus. tried five different things. moved my desk. closed all my tabs. put on focus music. nothing's workin'. my brain is a TV with someone else holdin' the remote and they keep flippin' channels. there's a thought, there's a different thought, oh look a snack idea, back to thought one... it's chaos in here."
+    ], context: "to save my lifeは「命を救うためでも(できない)」=「絶対できない」の誇張定型句。直訳が暴力的だが、英語の慣用表現として日常化。日本語の「絶対」より身体的・生命的な誇張。brain is a TV with someone else holding the remoteは現代生活の比喩で、注意の自己制御不能をテクノロジーで表現する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 4, japanese: 'ちょっと別件で', english: [
+        "quick aside",
+        "quick aside, off topic for a sec",
+        "quick aside, can I ask you something completely off-topic?",
+        "quick aside, totally unrelated to what we're talkin' about, but I just remembered somethin' I needed to ask you. it's gonna take 30 seconds. I just don't want to forget. then we can go right back to whatever it was you were sayin'. somethin' about the budget? we'll get back to that. give me 30 seconds first."
+    ], context: "asideは演劇用語で「傍白」、観客にだけ語る独白。会話を「メイン舞台/サイド舞台」と空間的に分ける英語の構造。日本語の「別件」は事案分類、英語のasideは劇場的なメタ視点。off topicはオンライン掲示板由来(2000年代)で、現実の会話にも逆流。デジタル語彙が日常を侵食する例。", category: 'request', month: '2026-05' },
+    { daySlot: 4, japanese: '今日の俺すごい', english: [
+        "I'm on fire today",
+        "I am absolutely on fire today",
+        "I am crushing it today, everything's just clicking",
+        "I'm on fire today. I don't know what's happenin' but every email I send lands. every meeting goes well. I'm makin' decisions in seconds that would normally take me an hour. somebody bottle this and give it to me on my normal days. let me enjoy this 'cause tomorrow I'll probably be useless again."
+    ], context: "on fireは「燃えてる」=「絶好調」。スポーツ実況から日常英語へ。crushing itは「砕いてる」=「圧倒的に上手くやってる」、シリコンバレー文化から拡散。clickは「カチッとはまる」=「機能する/うまくいく」。英語の自己肯定語彙はスポーツ・テック・物理動作の比喩から成る。日本語の「すごい」は抽象的、英語はすべて具体的な動作。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 5: 同僚との雑談 ──
+    { daySlot: 5, japanese: 'コーヒー入れたよ', english: [
+        "made coffee",
+        "I made coffee, want some?",
+        "I just made a fresh pot, you want a cup?",
+        "I made coffee. just put on a fresh pot. it's the good stuff today, the one we got last week. I'm pourin' myself a cup, you want one? I know how you take it. milk, no sugar, that weirdly precise amount of milk you always do. I got you. don't get up, I'll bring it over."
+    ], context: "fresh potは「新鮮な鍋」=「淹れたて(コーヒー)」。アメリカのオフィスコーヒーポット文化からの語彙。I got youは「俺がやる」「お前のことわかってる」のスラング、関係性の親密さを示す。日本語の「俺がやる」より頻度が高く、サポート表明として日常化している。AAVE由来で全世代に拡散。", category: 'request', month: '2026-05' },
+    { daySlot: 5, japanese: 'ランチ何にする', english: [
+        "what's for lunch",
+        "what're you doin' for lunch?",
+        "any thoughts on what we're doing for lunch today?",
+        "what're we thinkin' for lunch. the usual? I'm bored of the usual. but also I don't want to walk far. but also I'm hungry now and decisions take energy I don't have. you decide. I'll eat anything as long as I don't have to be the one who picks. that's the only condition. dealer's choice."
+    ], context: "dealer's choiceはトランプ用語「ディーラーが決める」=「決定権を相手に丸投げ」。casinoの語彙が日常会話に流入。日本語の「お任せ」と機能は同じだが、英語はカジノの賭け事の語彙で日常化する。decision fatigue(決定疲労)は心理学用語が日常語化した例で、選択の重さを名付ける現代語彙。", category: 'request', month: '2026-05' },
+    { daySlot: 5, japanese: '最近どう', english: [
+        "how you been",
+        "how you been holdin' up?",
+        "haven't seen you in a while, how have you been holding up?",
+        "how you been. I haven't seen you in like, what, two weeks? three? we work in the same building and somehow our paths never cross. anything new with you? life update? work update? you're makin' that face. somethin's up. we're sittin' down with these coffees and you're tellin' me everything."
+    ], context: "how you beenはhow have you beenの口語省略。haveが落ちる現代英語の特徴。holding upは「持ちこたえてる」=「やってる」、physical metaphor(物体を支える)が感情に転用。日本語の「最近どう」は時間方向の質問、英語は「持ち応えてる?」と耐久性方向の質問。状態評価の角度が違う。", category: 'request', month: '2026-05' },
+    { daySlot: 5, japanese: '週末予定ある？', english: [
+        "weekend plans",
+        "got any weekend plans?",
+        "you doin' anything fun this weekend or just chillin'?",
+        "got any weekend plans? I'm just askin' to be polite, but also I'm hopin' you say nothin' because I have nothin' and I don't want to feel like the only person whose life is empty. just confirm with me that you're also doin' nothin'. we'll both watch TV alone in our apartments and call it a weekend."
+    ], context: "got any...はhave you got anyの省略形。haveが落ちるイギリス系の言い回し。chillin'は「冷えてる」=「のんびりしてる」。AAVE由来で全世代に拡散したスラング。日本語の「予定」は計画、英語のplansは可算名詞で「複数の計画」。「予定がある=plans」と複数形が標準なのが日本語との文法差。", category: 'request', month: '2026-05' },
+    { daySlot: 5, japanese: 'お菓子もらった', english: [
+        "got snacks",
+        "somebody dropped off snacks",
+        "somebody brought snacks in for the team, free food alert",
+        "somebody brought snacks. I don't know who. there's just a box of cookies in the kitchen with a sticky note that says 'help yourself.' I am helpin' myself. multiple times. these aren't even good cookies, they're the cheap kind, but they're free and they're cookies and I'm at work. that's the whole equation."
+    ], context: "free food alertはオフィスの符牒で、無料食品の発見をアラート(警報)化するジョーク。help yourselfは「自分自身を助けて」=「ご自由にどうぞ」、reflexive(再帰)構文の慣用化。日本語の「ご自由に」は静的な許可、英語のhelp yourselfは動的(自分でアクションを取れ)。命令形の主体性の違い。", category: 'reaction', month: '2026-05' },
+    { daySlot: 5, japanese: '聞いた？あの噂', english: [
+        "did you hear",
+        "wait, did you hear about Mike?",
+        "OK so did you hear about what happened with Mike yesterday?",
+        "did you hear? OK lean in. you didn't hear it from me. but apparently — and I'm not sayin' this is confirmed — Mike from accountin' is leavin'. and not just leavin', leavin' under interesting circumstances. that's all I'm gonna say. I've already said too much. but yeah. interesting times."
+    ], context: "you didn't hear it from meは「俺から聞いたんじゃないよ」=噂を流しながら責任を回避する定型句。情報源を否定して伝える矛盾構文。日本語の「ここだけの話」と機能は同じだが、英語はpassive denial(過去否定)で責任を構造的に分離する。lean inは「身を寄せろ」、秘密話の身体動作を会話に持ち込む。", category: 'opinion', month: '2026-05' },
+    { daySlot: 5, japanese: '昨日のあれな', english: [
+        "yesterday's thing",
+        "yesterday's thing, that was somethin'",
+        "yesterday's thing in the meeting was honestly kinda wild",
+        "that thing yesterday. you know what I'm talkin' about. when so-and-so went on that rant in the all-hands. I haven't stopped thinkin' about it. it was equal parts amazin' and uncomfortable. I'm not gonna say anythin' loud but I would 100% pay to see a re-run."
+    ], context: "yesterday's thingは「昨日の事柄」を曖昧に指す。具体名を避けて文脈で共有する英語の手抜き(efficient)構文。日本語の「あれ」と同じ指示性の手抜き。equal parts X and Yは「X半分Y半分」の混合状態を表す英語の構文で、感情の両義性を表現する独特な並列形式。", category: 'opinion', month: '2026-05' },
+    { daySlot: 5, japanese: '気になることある', english: [
+        "got a question",
+        "I got a real question for you",
+        "I have a kind of weird question I want to run by you",
+        "I got a real question for you. and don't make a big deal out of it but I've been thinkin' about somethin' and I want your honest take. you're gonna be honest right? not the polite kind. the actual kind. OK. so. here's the thing..."
+    ], context: "run X by Yは「XをYの前を走らせる」=「YにXの感想を聞く」。物理動作(走らせる)で意見打診を表現する英語の癖。日本語の「相談する」より動的でカジュアル。real questionは「リアルな質問」=「軽い質問じゃなく本気の質問」。realは強調語として頻出、トーンを変える機能語。", category: 'request', month: '2026-05' },
+    { daySlot: 5, japanese: 'ちょっと愚痴っていい？', english: [
+        "can I vent",
+        "can I vent for a sec?",
+        "I just need to vent for a couple minutes, you got time?",
+        "can I vent for like five minutes. I'm not lookin' for advice. I'm not lookin' for solutions. I just need someone to nod while I get this out of my system. you're gonna nod. you're gonna make 'mhm' sounds. and at the end I'm gonna feel better and you can go back to whatever you were doin'. cool?"
+    ], context: "ventは「換気する」=「感情を吐き出す」。換気装置の比喩で感情解放を表現する英語の独特な構造。日本語の「愚痴る」は対話相手前提、英語のventは「閉じた空間から外に出す」物理現象として一人でも成立する概念。get this out of my systemは「俺のシステムから出す」、人体をシステムとして扱う機械的世界観。", category: 'request', month: '2026-05' },
+    { daySlot: 5, japanese: 'もう終わりじゃん', english: [
+        "almost done",
+        "almost done, hang in there",
+        "we're almost there, just gotta push through the last bit",
+        "we're almost done. like really almost. I can see the end. I see the end. just gotta keep movin' for another hour and we're gonna walk out of here. don't lose it now. we're past the worst part. the rest is downhill. trust the process. one foot in front of the other and we're at the finish line."
+    ], context: "hang in thereは「そこにぶら下がってろ」=「持ちこたえろ」。物理的吊下げの比喩。downhillは「下り坂」=「楽になる/悪化する」両方の意味、文脈で判断。go downhillは悪化、it's all downhill from hereは「ここからは楽」(歩く文脈)。同じ単語が逆の意味になる文脈依存性が英語の特徴。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 6: ランチタイム英語 ──
+    { daySlot: 6, japanese: 'お腹空きすぎ', english: [
+        "I'm hangry",
+        "I am straight-up hangry right now",
+        "I have moved past hungry into hangry territory and it's not pretty",
+        "I'm hangry. that's hungry plus angry, in case you weren't sure. I'm not safe to be around. don't ask me questions. don't make jokes. just hand me food and back away slowly. I'll be a normal human again in 20 minutes. until then? approach with caution."
+    ], context: "hangryはhungry+angryの造語(2010年代に辞書登録)。空腹+怒りという感情のブレンドを1単語で表現する英語の最近の発明。日本語にはこの単語化された複合感情がない。Brexit/staycation/glampingなど、英語は単語の混合で新しい感情・現象を命名する文化が強い。", category: 'reaction', month: '2026-05' },
+    { daySlot: 6, japanese: 'いつものとこ', english: [
+        "the usual spot",
+        "the usual spot, you in?",
+        "we headin' to the usual spot today or tryin' somewhere new?",
+        "the usual spot. yeah I know we go there every day. yeah I know we always order the same thing. but the usual spot has been the usual spot for a reason. it's reliable. it's fast. they know us. we walk in, sit down, our food comes out without us orderin'. that's not a rut, that's a ritual."
+    ], context: "the usualはバー・カフェ・レストランの符牒で「いつもの注文」。定冠詞theが鍵で、唯一性=日常化を表す。日本語の「いつもの」と並行構造。rutは「車の轍」=「マンネリ」、ritualは「儀式」=「神聖化された日常」。同じ反復行動の語彙が、ネガ/ポジで使い分けられる。マンネリかルーティンか、命名で意味が変わる英語の力。", category: 'request', month: '2026-05' },
+    { daySlot: 6, japanese: '今日ヘルシーにする', english: [
+        "going healthy",
+        "I'm goin' healthy today, I think",
+        "I'm tryin' to make a healthy choice today, ask me again in 20 minutes",
+        "I'm goin' healthy today. or so I keep tellin' myself. salad. just a salad. that's the plan. of course the plan also has wiggle room for if I see somethin' really good on the menu. but the default is salad. the hopeful default. ask me in 20 minutes and we'll see what won."
+    ], context: "wiggle roomは「ぐらぐら動かす余地」=「融通の余地」、行動・予算・スケジュールに使える万能フレーズ。日本語の「余裕」と機能は同じだが、英語はwiggle(ぐらぐら)という物理動作で柔軟性を表現する。going X(健康/ヴィーガン/低糖質)はライフスタイル選択を「方向」で示す英語の構文で、選択を旅行のように扱う。", category: 'opinion', month: '2026-05' },
+    { daySlot: 6, japanese: '結局カツ丼', english: [
+        "ended up with the usual",
+        "I ended up gettin' the same thing again",
+        "I had every intention of being healthy and somehow I ordered katsudon",
+        "I ended up with katsudon. of course. I sat down with the menu, I scanned the salads, I read the soup options, I considered the grilled fish. and then the katsudon section caught my eye and that was it. all my plans went out the window. I have no willpower. I never had willpower. I'm at peace with this."
+    ], context: "ended up with〜は「〜という結果になった」、意図と結果の乖離を表す構文。go out the window(窓から飛び出す)は「無効になる」、計画・約束を物理的に放棄する比喩。日本語の「結局」は時間の結末、英語のended upは状態の終着点。end upは「最終的に〜になる」、不本意な結果を運命として受容する英語の表現。", category: 'reaction', month: '2026-05' },
+    { daySlot: 6, japanese: '取り分けよう', english: [
+        "let's share",
+        "let's share, I want a bit of everything",
+        "let's get a couple things and share, that way we can try more stuff",
+        "let's share. you get the noodles, I get the rice bowl, and we trade halfway through. that way we both get to try two things instead of one. it's the smart move. portion control's also a side benefit. and if one of them is bad we don't both suffer. teamwork."
+    ], context: "let's shareはdine sharing文化の語彙で、欧米のtapas/family-style dining習慣に基づく。アジア系ダイニング(中華・日本・韓国)では取り分けが標準、英語圏では家族レストラン以外では珍しかったが、近年カフェ文化で日常化。teamworkは作業用語が日常会話に流入、食事を共同作業として捉える英語の発想。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 6, japanese: '食べきれない', english: [
+        "I'm stuffed",
+        "I am completely stuffed, that was a lot of food",
+        "I cannot eat another bite, I am genuinely full to capacity",
+        "I am stuffed. like full to the brim. I'm in food coma territory. that last bite was a mistake. I'm gonna sit here for ten minutes and not move. don't ask me questions. don't expect intelligent thought. my body is divertin' all blood to digest the meal and there's nothin' left for the brain."
+    ], context: "stuffedは「詰めた」=「お腹一杯」。turkey stuffing(七面鳥の詰め物)由来、Thanksgiving文化の語彙が日常化。food comaは「食事昏睡」=「食後の睡魔」、医学用語coma(昏睡)を食後の眠気に使う英語の誇張。日本語の「満腹」は静的状態、英語のstuffed/food comaは動的(詰め込まれた状態/医学的状態)で表現する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 6, japanese: 'これは罪', english: [
+        "this is a crime",
+        "this dessert is a literal crime",
+        "this dessert is so good it should be illegal",
+        "this dessert is a crime. somebody should be arrested. it's that good. the chocolate is doin' things to my brain that I can't describe in words. I'm not sharin'. don't ask. I will physically defend this from anyone who reaches for it. mine. all mine. no regrets."
+    ], context: "this is a crime / it should be illegalは美味しさを誇張する定型ジョーク。法律用語を快楽に流用する英語の遊び。日本語の「美味しすぎ」より誇張度が高く、刑法レベルで盛る。doing things to my brainは「俺の脳に何かしてる」、感覚を擬人化(食物が能動的)する英語の比喩。受動的快楽を能動的因果に変換する独特な構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 6, japanese: 'おかわり', english: [
+        "seconds",
+        "I'm goin' for seconds, this is too good",
+        "I'm definitely going back for seconds on this one",
+        "goin' back for seconds. I shouldn't but I'm gonna. one helping wasn't enough. that first bite woke up the part of my brain that wanted more, more, more. and now I'm a man on a mission. small plate, second round, no shame. when food's this good you just lean in."
+    ], context: "secondsは「2回目」=「おかわり」。可算名詞で、複数形secondsが「2杯目」を意味する英語の独特な省略構文。helpingは「(料理を)取り分けたもの」=「1人前の量」。日本語の「おかわり」は動作、英語のsecondsは順序・回数。同じ概念を時間順序で表現する英語の数学的な構造。", category: 'request', month: '2026-05' },
+    { daySlot: 6, japanese: 'ご馳走さま', english: [
+        "thanks for the meal",
+        "thanks, that was a great meal",
+        "appreciate it, that was honestly such a good meal",
+        "thanks. that was a great meal. I needed that. I came in here with low energy, low expectations, and now I'm full and I'm content. that's all you need from a meal. fuel and a moment of peace. mission accomplished. I'm walkin' out of here a better human than when I walked in."
+    ], context: "ご馳走さまは英語に直接の等価語がない。thanks for the mealが近いが、家庭・店・神への感謝を一括する日本語の重層性は持たない。英語は感謝対象を分けて表現する(thanks to the chef、thanks for cooking、grace before meal)。日本語の包括的感謝、英語の対象別感謝。文化のOSが違う一例。", category: 'reaction', month: '2026-05' },
+    { daySlot: 6, japanese: '午後乗り切れる', english: [
+        "fueled up",
+        "OK, I'm fueled up for the afternoon",
+        "I think I'm fueled up enough to actually be productive this afternoon",
+        "I'm fueled up. ready for round two. that meal was the gas I needed. afternoon's gonna be a different story now. I have energy. I have ideas. I have the will to actually answer emails instead of starin' at them. give me three hours, I'm gonna make this Tuesday count."
+    ], context: "fueled upは「燃料補給した」=「エネルギー満タン」。人体を機械(車)に例える英語の比喩。日本語の「乗り切る」と機能は同じだが、英語はエンジン補給(fuel)で表現する。round twoはボクシング用語「第2ラウンド」、人生の局面をリングのラウンドに分割する英語の比喩。日本語より戦闘的な世界観。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 7: 午後の眠気・集中切れ ──
+    { daySlot: 7, japanese: 'まぶた重い', english: [
+        "eyelids heavy",
+        "my eyelids are getting really heavy",
+        "I am fightin' off sleep so hard right now, my eyelids weigh ten pounds each",
+        "my eyelids are made of lead. I'm fightin' a losin' battle. every blink takes longer. I keep noddin' off for half a second and snappin' back. people in the meetin' notice. I notice they notice. and I still can't keep my eyes open. somebody talk to me. ask me a question. anything. I need stimulation."
+    ], context: "made of leadは「鉛でできてる」=「重すぎ」。比喩で重量を強調する英語の構文。fighting a losing battleは「負け戦を戦ってる」=「無駄な抵抗」、軍事比喩で日常状況を表現する英語の癖。日本語の「重い」はシンプル、英語は「鉛の重さ」「敗戦の戦い」と複合比喩で表現する。誇張による説得力強化。", category: 'reaction', month: '2026-05' },
+    { daySlot: 7, japanese: '昼寝するべき', english: [
+        "need a nap",
+        "I really need a nap right now",
+        "I just need a 20 minute nap and I'd be a brand new person",
+        "I need a nap. like a real nap, not a desk-doze. I'd give my left arm for 20 minutes on a couch right now. there's a cultural problem in that we don't allow this. why can't we nap at work? other countries do it. siesta is a great word and a great concept. I'm gonna start a movement. nap rights."
+    ], context: "I'd give my left armは「左腕を差し出す」=「何でも引き換えに欲しい」、誇張定型句。臓器・四肢を交換物にする英語の極端な比喩。siestaはスペイン語由来、日本語の「昼寝」と異なり社会制度として認知された語彙。英語にはpower napという発明語もある(15-20分の戦略的昼寝)。睡眠を効率化する英語の語彙。", category: 'request', month: '2026-05' },
+    { daySlot: 7, japanese: '集中切れた', english: [
+        "lost it",
+        "I lost focus, what were we sayin'?",
+        "I completely lost the thread of what you were saying",
+        "I lost it. completely lost it. you were sayin' words and I was hearin' them but somewhere around the third sentence I missed somethin' and now I can't follow. I can fake it. pretend I'm tracking. nod a few more times. or I can be honest and ask you to start over. I'm askin' you to start over."
+    ], context: "lost the threadは「糸を見失った」=「話の筋を見失う」。物語(thread)の比喩で会話の連続性を表す。日本語の「話を見失う」と機能は同じだが、英語のthreadは縦糸・物語・会話・メールスレッドと多重比喩。言葉の連続性を「糸」と捉える英語の構造。fake itは「演技する」、相手に気づかれないための防衛行動。", category: 'reaction', month: '2026-05' },
+    { daySlot: 7, japanese: 'チョコ食べる', english: [
+        "need chocolate",
+        "this is a chocolate moment",
+        "I genuinely think a piece of chocolate would solve all my problems right now",
+        "I need chocolate. emergency rations. I keep a stash in my desk for exactly this kind of moment. it's not a snack, it's medicine. one square and the world feels manageable again. don't judge. don't ask why. just let me have my chocolate."
+    ], context: "emergency rationsは「非常食」=「緊急用備蓄」、軍事用語が日常化。英語の自虐に軍事比喩を使う癖。stashは「隠し場所」=「秘密の備蓄」、ドラッグ用語が日常化した例。日本語の「常備」は中立的、英語のstashは「秘密」のニュアンスを帯びる。chocolate momentはmoment(瞬間)を「特定の感情に対応する時」と分類する英語の構文。", category: 'reaction', month: '2026-05' },
+    { daySlot: 7, japanese: '空気入れ替えよう', english: [
+        "need fresh air",
+        "I need to step out and get some fresh air",
+        "I gotta get some fresh air, I've been at this desk for too long",
+        "I need fresh air. I've been at this desk for four hours and the room is recyclin' my own breath at this point. five minutes outside, I'll come back a different person. it's not a break, it's a reset. somethin' about steppin' outside reminds my brain that there's a world beyond Slack."
+    ], context: "fresh airは英語圏で日常的・心理的浄化の象徴。日本語の「外の空気」より頻度が高く、メンタルヘルス語彙として確立。recycling my own breathは自虐的誇張で、室内の停滞感を呼吸の循環で表現する。英語は空気/酸素/呼吸の語彙が精神状態の表現に多用される。日本語の「気分転換」より物理的。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 7, japanese: '外出ようかな', english: [
+        "step outside",
+        "I might step outside for a sec",
+        "I think I'm gonna step outside for like two minutes to clear my head",
+        "I'm gonna step outside. just for two minutes. I need to break this loop. I'm in a loop. open Slack, refresh email, open Slack, refresh email. it's not productivity, it's anxiety. two minutes outside, ten deep breaths, come back, do real work. that's the plan. accountability please."
+    ], context: "step outsideは「外に踏み出す」=「外に出る」、stepという動詞で動作を強調する英語の構文。日本語の「外出る」より一歩(step)の意識的選択を含む。clear my headは「頭をクリアにする」=「気分をリセット」、頭をfile/storage(空にすべき容器)として扱う英語のメンタル比喩。in a loopはプログラミング用語の流入で、現代英語の精神状態描写に頻出。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 7, japanese: '頭痛い', english: [
+        "headache hitting",
+        "got a headache comin' on",
+        "I can feel a headache starting to come on, this isn't great",
+        "I've got a headache buildin'. I can feel it. it's not full-blown yet but I know the signs. behind my eyes, that pressure. probably dehydration. probably screen time. probably both. I need to drink water and take painkillers before this gets out of hand. ignored once, ignored twice, this becomes a 4-hour migraine."
+    ], context: "comin' on / building upは病気・感情の発生を予兆段階で表現する英語の構文。disease as motion(病気が来る/発展する)。日本語の「痛い」は状態、英語のcoming onはpre-symptom phase(前症状期)を含む。out of handは「手から離れた」=「制御不能」、身体的握り(hand)で抑制を表現する身体性。", category: 'reaction', month: '2026-05' },
+    { daySlot: 7, japanese: '今日早めに切り上げる', english: [
+        "callin' it early",
+        "I'm callin' it early today, I'm done",
+        "I'm gonna call it early today, I've got nothing left in the tank",
+        "I'm callin' it early. I'm not gonna pretend I'm gonna be productive for the next two hours. I'm at 30% battery and the work I'd produce would be garbage anyway. better to log off now, recharge tonight, and come in fresh tomorrow than push through and produce nothin'. that's my excuse. it's a good excuse."
+    ], context: "calling it earlyは「早く終了宣言する」=「定時前に切り上げる」、call(命名)による現実確定の構文。in the tankは車の燃料タンクの比喩、人体機械観の英語。30% batteryはスマホの語彙が日常化した最新の比喩で、エネルギー残量を電池残量で表現する21世紀の英語。日本語の「疲労」より定量的。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 7, japanese: '今日もう一杯', english: [
+        "one more cup",
+        "I need one more cup to get through this",
+        "OK, just one more cup of coffee and I think I can power through",
+        "one more cup of coffee. that's it. I know I've already had three. four. I lost count. but this last one? this last one's gonna do it. it's gonna unlock the rest of the afternoon. or it's gonna give me heart palpitations and make my hands shake. it's a coin flip. either way I'm doin' it."
+    ], context: "one more〜はmore + 名詞で「もう一つ」を表す英語の頻出構文。日本語の「もう一杯」と同構造だが、英語はmore X、X moreの語順両方OK。power throughは「力で抜ける」=「無理して乗り越える」、力技で困難を突破する英語の労働倫理。日本語の「気合い」と機能は近いが、英語のほうがエネルギー量の比喩(power)を強調する。", category: 'request', month: '2026-05' },
+    { daySlot: 7, japanese: 'もう何時？', english: [
+        "what time is it",
+        "wait, what time even is it?",
+        "what time is it? feels like it should be way later than it actually is",
+        "what time is it? feels like 5 PM. tell me it's 5 PM. I've been workin' on this for what feels like 8 hours. ... it's 2:30. how. how is it only 2:30. time is a flat circle. I'm trapped in it. somebody check on me at 5 to see if I'm still alive."
+    ], context: "time is a flat circleはアメリカ哲学/ニーチェからの引用で、TVドラマTrue Detective経由で大衆化したフレーズ。永劫回帰を表現する英語の知的ジョーク。日本語の「時間が止まる」より知的な比喩。flat circleは「平らな円」=「始まりも終わりもない反復」。深い概念を日常会話で軽く投げる英語の知的密度。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 8: 退勤・帰宅の英語 ──
+    { daySlot: 8, japanese: '一区切りついた', english: [
+        "finally done",
+        "thank god, finally done with that",
+        "OK that is finally over, I cannot believe it took that long",
+        "finally done. I have been waitin' to say those two words all day. all week, honestly. that thing was draggin' me down for so long it became part of my identity. and now it's done. I'm a free man. for like 12 hours, until I have to come back and do another thing. but right now? I'm victorious."
+    ], context: "thank godは英語の感嘆語で、宗教的というより慣用句化した感情の発露。無神論者でも使う形骸化した宗教語。日本語の「やっと」と同程度の強調機能。free manは「自由人」=「束縛から解放された人」、原義は奴隷制の対義語。歴史的・社会的重量のある語が、日常の小さな解放感に流用される英語の語彙の深さ。", category: 'reaction', month: '2026-05' },
+    { daySlot: 8, japanese: '退勤します', english: [
+        "headin' out",
+        "I'm headin' out, see y'all tomorrow",
+        "I am out the door, see everyone tomorrow morning",
+        "I'm headin' out. it's been a day. it's been a week. it's been a chapter of my life I'd like to close. tomorrow's a fresh start. tonight is for ramen and reruns. nobody contact me about anything until 9 AM tomorrow. that's the rule. I'm makin' it the rule. enforce it amongst yourselves."
+    ], context: "head out / heading outは「頭(先頭)を外に向ける」=「出発する」。bodyのhead(先端部)を動作の方向指示に使う英語の構造。日本語の「出る」「行く」は動作、英語のhead outは方向感覚を加える。fresh startは「新鮮な始まり」=「再出発」、新鮮さ(fresh)を時間に転用する英語の比喩。日本語の「再出発」より肯定的。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 8, japanese: '電車混むかな', english: [
+        "rush hour traffic",
+        "wonder if rush hour's gonna be brutal",
+        "I'm wondering how bad the trains are gonna be at this hour",
+        "rush hour. or just before it. I'm tryin' to gauge if I should bolt now and beat the wave or wait 30 minutes and let the worst pass. it's a gamble. leave now, get crushed. wait, get home an hour later. there's no winnin'. I'll bolt now and accept fate."
+    ], context: "rush hourは「混雑時間」、19世紀のアメリカ都市労働で生まれた英語、世界共通語化。beat the waveは「波を打ち負かす」=「混雑前に動く」、海の比喩で群衆を表す。日本語の「ラッシュ」は時間帯、英語のrushは動作(突進)。波として人を捉える英語の比喩は地下鉄の物理感覚と一致する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 8, japanese: 'ビール飲みたい', english: [
+        "could go for a beer",
+        "I could really go for a beer right now",
+        "I would absolutely murder a cold beer at this very moment",
+        "I could murder a beer right now. one cold beer. that's all I want. the day's been long, the week's been longer, and there's a beer-shaped hole in my chest. I'm gonna stop on the way home, grab one, drink it on my couch, and not move for two hours. that's the plan."
+    ], context: "could go for〜は「〜のために行ける」=「〜が欲しい」の英語の慣用構文。動作で欲求を表現する英語の癖。murder a beer / kill a sandwichは食欲を暴力動詞で誇張する英語のジョーク。日本語の「飲みたい」より物理的。beer-shaped holeは欠如を物体形状で表現する英語の比喩、心理的欠落を物理的空洞に転換する独特な構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 8, japanese: '今日もう何もしない', english: [
+        "doing nothing tonight",
+        "I'm doing absolutely nothing tonight",
+        "tonight I am doing nothing and I am not apologizing for it",
+        "tonight I'm doin' nothin'. and not the kind of 'nothin' where you pretend you're relaxin' but you're actually still answerin' emails. real nothin'. couch nothin'. TV nothin'. snack nothin'. my brain has earned this. I'll be a productive citizen again tomorrow. tonight I am a vegetable. a happy vegetable."
+    ], context: "doing absolutely nothingは「絶対の何もしない」=「完全な無為」、absoluteで強調する英語の構文。日本語の「何もしない」より積極的・宣言的。and I am not apologizing for itは「謝らない」と二重否定で防衛する英語の自己肯定構文。罪悪感への先制反論。日本語の「いいんだもん」より論争的なトーン。vegetableは「野菜」=「無気力な人」の自虐スラング。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 8, japanese: '料理するの面倒', english: [
+        "can't cook tonight",
+        "I cannot deal with cooking tonight",
+        "there is zero chance I am cooking tonight, takeout it is",
+        "I cannot cook tonight. the energy required to chop, sauté, plate, and clean up is energy I do not possess. takeout it is. I'm gonna order somethin' that arrives at my door, I'm gonna eat it directly out of the container with one fork, and I'm gonna feel zero guilt about it. that's the deal."
+    ], context: "takeout it isは「テイクアウトに決まり」、it isで決定を確定する英語の構文。決定の主体を「事象自体」に置く受動的決断表現。日本語の「〜にする」と機能は同じだが、英語のit isは responsibility-shift(責任転嫁)を含む独特な構造。zero guiltは「ゼロの罪悪感」=「無罪悪感」、量化(quantify)で感情を表現する英語の数学的傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 8, japanese: '配達早く来ないかな', english: [
+        "where's my food",
+        "where the heck is my food, it's been a while",
+        "I ordered like 40 minutes ago, where on earth is my food",
+        "where is my food. I ordered 40 minutes ago. the app says 5 minutes for the past 20 minutes. it's lyin' to me. I'm starvin' and my last meal was a sad lunch. every minute that passes the food gets colder. they better tip well 'cause my hangry rage is buildin'."
+    ], context: "where on earthは「地球のどこに」=「一体どこに」、強調の慣用表現。空間を地球レベルに拡大して誇張する英語の構文。日本語の「一体」と機能は同じ。lying to meは「嘘ついてる」、無生物の表示・データを擬人化して非難する英語の癖。アプリ・GPS・天気予報を「嘘つき」と呼ぶ現代英語の擬人化傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 8, japanese: 'お風呂浸かろう', english: [
+        "long bath",
+        "I'm takin' a long bath tonight, no time limit",
+        "tonight calls for a long, hot bath with absolutely no rush",
+        "I'm takin' a long bath. the kind where I lose track of time. the kind where my fingers go pruney. I deserve it. I've been a stand-up citizen all day. now I'm gonna lie in hot water with my eyes closed until I'm a different person. nobody knock. nobody text. I am unreachable for one hour."
+    ], context: "tonight calls for〜は「今夜は〜を呼んでる」=「今夜は〜が必要」、状況を擬人化(call)で表現する英語の構文。pruneyはprune(干しすもも)の形容詞化、長湯した皮膚のしわ寄り状態を表す英語の比喩。日本語の「ふやける」より具体的(prune=しわしわのドライフルーツ)。stand-up citizenは「立派な市民」、自己評価をシニカルに使う英語のジョーク。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 8, japanese: 'お疲れ自分', english: [
+        "good job, me",
+        "good job today, self",
+        "good job today, you survived another one",
+        "good job, me. you did it. you made it through another one. you put up with the meetings, you answered the emails, you didn't yell at anyone. that's a win. now go relax. you've earned it. self-five. high-five myself in the bathroom mirror. yeah. we made it."
+    ], context: "self-fiveは「自分にハイタッチ」、ハイタッチ(high-five)を再帰化(self)した英語の自己賞賛文化。日本語の「自分褒め」より物理的・身体的。second-personal self-talk(自分への二人称話)はメンタルヘルス語彙として近年定着、自己との対話を「相手」と「俺」に分けることで距離を作る心理技法。日本語の独白との差。", category: 'reaction', month: '2026-05' },
+    { daySlot: 8, japanese: '一日中疲れた', english: [
+        "wiped out",
+        "I am completely wiped out from today",
+        "I am physically and mentally wiped out from today",
+        "I am wiped out. like, fully wiped. I have nothin' left in me. body's tired, brain's tired, even my soul feels tired and I don't usually believe in souls but tonight I do. I'm gonna eat, shower, and sleep. in that order. in 30 minutes. then nothin' until tomorrow."
+    ], context: "wiped outは「拭き消された」=「完全に疲れた」、消える(wipe)動作で疲労を表現する英語の比喩。eraserで人間が消されるイメージ。日本語の「疲れた」よりgraphicな比喩。don't usually believe in souls but tonight I doは哲学/宗教概念を疲労表現に流用するジョーク。深い概念を軽く投げる英語の知的密度。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 9: 夜の家英語 ──
+    { daySlot: 9, japanese: 'チャンネル何にしよう', english: [
+        "what to watch",
+        "what should we even watch tonight?",
+        "what are we even gonna watch tonight, the choices are overwhelming",
+        "what're we watchin'. there are 47 streamin' services and somehow nothin' to watch. I'm scrollin' through Netflix, Hulu, Disney+, HBO. I've added 30 shows to my list and I'm not watchin' any of them. analysis paralysis. eventually we just rewatch the same sitcom for the 6th time. that's how it goes."
+    ], context: "analysis paralysisは「分析麻痺」=「選択肢が多すぎて決められない」、心理学用語の日常化。21世紀のストリーミング文化が生んだ英語の現象を名付けた語彙。日本語に等価語がない。streaming wars文化(Netflix vs Hulu等)から派生した英語特有の問題。decision fatigueと並ぶ現代英語の選択疲労語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 9, japanese: 'これで何回目', english: [
+        "how many times",
+        "how many times have I watched this",
+        "I have lost count of how many times I've watched this same episode",
+        "how many times have I seen this episode. five? six? I know every line. I know exactly when the laughs come. I know which scenes I can skip. and yet I keep choosin' it over somethin' new. comfort over adventure. familiar over fresh. that's a metaphor for my whole life right now and I'm not gonna unpack it tonight."
+    ], context: "I'm not gonna unpack it tonightは「今夜は荷ほどきしない」=「今は深く考えない」、unpack(荷物開ける)を心理分析の比喩に使う英語の構文。心理セラピー文化由来の語彙が日常化した例。日本語の「考えない」よりprocess avoidance(処理回避)が明示的。comfort over adventureは選択を抽象軸で対比する英語の構文。", category: 'reaction', month: '2026-05' },
+    { daySlot: 9, japanese: 'ネタバレやめろ', english: [
+        "no spoilers",
+        "DO NOT spoil it for me",
+        "if you spoil this for me I will literally never forgive you",
+        "no spoilers. don't do it. I'm 4 episodes behind and I do not want to know what happens. don't even hint. don't make a face. don't say 'oh you're gonna love episode 6.' that is information. that's a spoiler. just do not engage with this topic until I've caught up. those are the terms."
+    ], context: "spoilerは「台無しにする物」=「物語を先に教える行為」、20世紀後半の英語俗語、インターネット文化で爆発的拡散。日本語に「ネタバレ」という独自語彙があるのは英語と同様、コンテンツ消費文化が言語を作った現代の特徴。don't even hintは「ヒントすらやめろ」、強調副詞evenで境界線を厳格化する英語の防衛構文。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 9, japanese: 'お酒入った', english: [
+        "feeling it",
+        "OK I'm definitely feeling this drink",
+        "I am starting to feel the wine, this is nice",
+        "I'm feelin' it. one glass in and the day's edges are gettin' softer. shoulders are droppin'. brain's slowin' down in a good way. this is the sweet spot. one more glass and I'm in dangerous territory. for now I'm just enjoyin' the warm fuzzy feelin' that says 'today is over. tomorrow's not here yet.'"
+    ], context: "feeling itは「それを感じてる」=「(酒/音楽の)効果が来てる」、it=効果として動詞内で曖昧化する英語の省略構造。sweet spotはゴルフ用語(クラブの最適打点)から「最良点」へ。スポーツ語彙の日常化は英語の特徴。warm fuzzy feelingは「温かいモコモコした感じ」、感覚を質感(temperature+texture)で表現する英語の身体性。日本語の「いい気分」より触覚的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 9, japanese: 'スマホ見ないと', english: [
+        "doom scrolling",
+        "I'm just doom scrolling at this point",
+        "I have been doom scrolling for 45 minutes for absolutely no reason",
+        "I'm doom scrollin'. and I know I'm doin' it. I see what I'm doin'. I'm just feedin' my brain bad news for fun. nothin' I'm readin' is helpin' me. it's all just makin' me anxious. and yet my thumb keeps scrollin'. somebody take this phone away from me. by force if necessary."
+    ], context: "doomscrollingは2020年に英語に追加された新語(2020年Word of the Year候補)。doom(破滅)+scroll(スクロール)の合成、パンデミック時代の不安症的SNS消費を命名した。日本語に等価語がない、英語特有の現代病理語彙。my thumb keeps scrollingは身体部位を擬人化(thumbが意志を持つ)する英語の構造で、自己制御の喪失を表現する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 9, japanese: '通知うるさい', english: [
+        "notifications are out of control",
+        "the notifications are out of hand right now",
+        "my phone has not stopped buzzing for the last two hours, I'm losing my mind",
+        "the notifications are out of control. it has not stopped buzzin'. work Slack. personal Slack. group chat. text. another text. a different group chat. spam email. more spam. I'm gonna turn it all off. I'm gonna go on Do Not Disturb. and tomorrow I'll come back and they'll all still be there. but at least I'll have peace tonight."
+    ], context: "out of control / out of handは「制御不能」、controlとhandが等価で使える英語の柔軟性。日本語の「手に負えない」と直訳一致するhandの構文と、controlの抽象構文の両方が共存。Do Not Disturb(おやすみモード)はスマホ機能名が英語の動詞・形容詞化した最新例。テクノロジーが英語語彙を創造する21世紀現象。", category: 'reaction', month: '2026-05' },
+    { daySlot: 9, japanese: '夜に強くなった', english: [
+        "second wind",
+        "I'm getting my second wind",
+        "I get my second wind around 10 PM, I become a different person",
+        "I'm gettin' my second wind. it's 10 PM. I should be tired. I'm not tired. I'm wired. the day's quietness is energizing me. ideas are comin'. this is when my brain works best, which is unfortunate because everyone else's brain works best at 10 AM. I'm the night-shift version of myself."
+    ], context: "second windはマラソン・スポーツ用語で「セカンドウィンド」=「疲労後の再覚醒」、生理学現象を日常会話に流用する英語の構造。wiredは「配線された」=「興奮状態」、エネルギーを電気回路で表現する英語の現代比喩。日本語の「目が冴える」と機能は同じだが、英語は神経系を機械として比喩する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 9, japanese: 'もう12時', english: [
+        "midnight already",
+        "it's midnight already, how",
+        "how is it already midnight, where did the evening go?",
+        "midnight already. how. I came home at 7. I had this whole plan. cook dinner, watch one episode, read for 30 minutes, sleep by 11. instead I ate cereal standin' up, watched 4 episodes of somethin' I don't even like, scrolled my phone for 2 hours, and now it's midnight. time is fake. nights are a portal."
+    ], context: "time is fakeは「時間は偽物」=「時間感覚が歪んでる」、時間の客観性を否定する英語のネット文化由来ジョーク。哲学的命題を日常感覚に持ち込む現代英語の知的軽さ。nights are a portalは「夜は異世界の入口」、SF的比喩で時間の主観的歪みを表現する。日本語の「あっという間」より幻想的・形而上学的な誇張。", category: 'reaction', month: '2026-05' },
+    { daySlot: 9, japanese: '寝る前のクセ', english: [
+        "bedtime ritual",
+        "I have this whole bedtime ritual going",
+        "I have a whole pre-bed routine I do every night without fail",
+        "I have a bedtime ritual. it's elaborate. wash face, moisturize, brush teeth, set 3 alarms, put phone on charger across the room (so I have to get up), turn on the white noise machine, fluff the pillow exactly right. if I skip even one step, I cannot fall asleep. it's a system. don't judge."
+    ], context: "ritualは「儀式」=「習慣的儀礼行動」、宗教用語が日常生活の反復行動に流用される英語。日本語の「儀式」は重い宗教語、英語のritualは軽量化されて日常語彙に。bedtime ritual、morning ritual、coffee ritualなど、生活パターンを「儀式」と命名する英語の意味付けの強さ。日本語の「習慣」より神聖化されている。", category: 'reaction', month: '2026-05' },
+    { daySlot: 9, japanese: '明日が早い', english: [
+        "early start tomorrow",
+        "I've got an early start tomorrow",
+        "I've got a really early start tomorrow so I'm trying to get to bed soon",
+        "early start tomorrow. 6 AM alarm. which means realistically 6:15 because I always snooze. which means I should be in bed by 11. which is in 20 minutes. which means I should put my phone down. which I'm not doin'. which means I'm gonna regret this in the mornin'. classic me. predictable to the end."
+    ], context: "early startは「早い始まり」=「早朝予定」、時間方向(starting point)を強調する英語の構文。日本語の「早い」が時刻、英語のearly startは予定の起点。realisticallyは「現実的には」、自己分析の認識副詞、ネイティブの会話で頻出する自己客観化のマーカー。classic meは「典型的な俺」、自分のパターンを「クラシック」と命名する英語の自己ジョーク。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 10: 寝る前の英語 ──
+    { daySlot: 10, japanese: '考えごとが止まらない', english: [
+        "brain won't shut up",
+        "my brain just will not shut up tonight",
+        "my brain refuses to shut up, it's like a meeting I can't leave",
+        "my brain won't shut up. I'm tryin' to sleep. I'm in bed. lights off. phone away. eyes closed. and my brain decides this is the perfect time to go through every embarrassin' thing I said in 8th grade. it's a slideshow. it's chronological. why. why now. why ever. shut up. please."
+    ], context: "won't shut upは強力な意志否定、will not(won't)は単純未来でなく「絶対しない」=「拒否」を表す。脳を擬人化(独立した意志)する英語の構造。日本語の「考えごと」は曖昧、英語のbrain won't shut upは脳が「うるさい客」として扱われる。slideshowは時代別記憶を視覚化する比喩で、トラウマ記憶の現代英語の表現法。", category: 'reaction', month: '2026-05' },
+    { daySlot: 10, japanese: '8年前のあれ', english: [
+        "that thing from 8 years ago",
+        "why am I thinking about that thing from 8 years ago",
+        "I cannot believe my brain just decided to remind me of that thing from 8 years ago",
+        "why am I thinkin' about that. it was 8 years ago. it didn't matter then. it doesn't matter now. but apparently 1 AM is the time my brain throws old embarrassments at me like dodgeballs. I haven't thought about this in years. and now I'm reliving every cringe second of it. cool. great. love it."
+    ], context: "embarrassmentを物理的攻撃(dodgeball=ドッジボール)に例える英語の比喩。記憶を投擲物として扱う現代の自虐表現。reliving every cringe secondは「全ての気まずい一秒を再経験する」、cringeは2010年代に独立形容詞化した感情語彙(SNS文化由来)。日本語の「思い出して恥ずかしい」より、time-travel(再経験)の比喩で表現する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 10, japanese: '羊数えるか', english: [
+        "counting sheep",
+        "OK, time to start counting sheep",
+        "I might actually have to resort to counting sheep tonight",
+        "guess I'm countin' sheep. one sheep, two sheep, three sheep... this is what we've come to. an old, allegedly effective, completely ridiculous mental exercise. and yet here I am. ten sheep. eleven sheep. it's not workin'. of course it's not workin'. when has this ever worked for anyone."
+    ], context: "counting sheepは19世紀の英語イディオムで、不眠時の有名な民間療法。実際に効果がある研究結果と、効かない研究結果の両方があり、効果は不確か。日本語にも「羊を数える」が英語からの輸入で定着した珍しいケース(20世紀後半)。文化の双方向輸入を示す例。allegedly effectiveは「効くとされる」=「実は効かない」の皮肉。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 10, japanese: '寝れない', english: [
+        "can't sleep",
+        "I literally cannot sleep tonight",
+        "for some reason I cannot fall asleep no matter what I try",
+        "I can't sleep. I've been horizontal for 90 minutes. I've changed positions 14 times. I've fluffed the pillow. I've turned the pillow over. I've tried different leg arrangements. nothin's workin'. my body is awake. my mind is awake. tomorrow I'm gonna pay for this. for now I'm just lyin' here, plottin'."
+    ], context: "horizontalは「水平」、姿勢を物理用語で表現する英語の癖。lying down(横たわってる)より科学的・距離感がある。fluffは「ふわっとさせる」、枕や毛布の動詞化した名詞。日本語の「寝返り」より具体的な動作分解。pay for thisは「対価を払う」=「ツケが来る」、行動の結果を金銭比喩で表現する英語の傾向。日本語より会計的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 10, japanese: '羊化', english: [
+        "going to bed",
+        "I'm officially clockin' out for the day",
+        "OK, I am officially calling it and going to sleep now",
+        "I'm done. I'm out. I'm goin' to bed. tomorrow is a new day, a new opportunity, a new chance to mess up in different and exciting ways. tonight is over. lights out. don't text me. don't call me. I'll be unconscious for the next 7 hours and I deserve every minute."
+    ], context: "clocking outは「タイムカードを押す」=「勤務終了」、労働語彙を日常生活に流用する英語。lights outは「消灯」、軍隊語彙が日常化した例。日本語の「おやすみ」が一語で済むのに対し、英語は儀式的に複数の宣言(out, done, gone)を重ねる傾向。 終了の確定を反復で強化する英語の構造。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 10, japanese: 'アラーム何個セット', english: [
+        "three alarms",
+        "I'm settin' three alarms tonight, just in case",
+        "I'm setting like four alarms because I do not trust myself in the morning",
+        "I'm settin' three alarms. 6:00, 6:10, 6:30. layered. each one progressively louder. I do not trust myself in the morning. past me has betrayed present me too many times. only future me deserves alarms. and even she's gonna hit snooze on at least the first two. I know my own pattern."
+    ], context: "layered(層になる)は時間管理の英語独特の表現で、防御策(backup)を複数重ねる。past me / present me / future meは時間自己分割で責任を分散する英語の構造、ミレニアル/ジェネZ世代に特有の自己分裂的アイデンティティ表現。日本語の「明日の自分」と機能は近いが、英語は3人格に分けて対立構造を作る。", category: 'reaction', month: '2026-05' },
+    { daySlot: 10, japanese: '今日は満足', english: [
+        "good day overall",
+        "honestly, today was a good day overall",
+        "all things considered, today was actually a really good day",
+        "today was a good day. all things considered. nothin' major went wrong. I had a few wins. the weather was nice. I ate well. I was nice to people. people were nice back. that's about as much as you can ask for from a Tuesday. mark this in the column of days I want to repeat."
+    ], context: "all things consideredは「全てを考慮すると」=「総合的に判断すると」、英語の客観評価の決まり文句。日本語の「総合的に」より会話的。column of days I want to repeatは「繰り返したい日のカラム」、生活を会計のスプレッドシートに例えるサラリーマン世代の英語の比喩。日本語の「いい日」より統計的・記録的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 10, japanese: '明日に持ち越す', english: [
+        "tomorrow problem",
+        "that's a tomorrow problem",
+        "honestly that whole thing is just a tomorrow problem at this point",
+        "that's a tomorrow problem. not a tonight problem. tonight I'm sleepin'. tomorrow at 9 AM I will deal with it. or 10 AM. or 11. but tonight is a hard cutoff. nothin' that crosses my mind in the next 7 hours is gonna get acted on. it'll wait. it has to. those are the rules."
+    ], context: "tomorrow problemは「明日の問題」=「先送り」、ネット文化由来の現代英語スラング(2010年代後半)。問題に時間軸でラベリングして責任を時間転送する構文、ミレニアル世代の代表的自己防衛語彙。日本語の「明日でいい」と機能は同じだが、英語のproblem化は「やるべきこと」を「問題」としてフレーミングする責任回避の言語装置。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 10, japanese: 'おやすみ自分', english: [
+        "good night, me",
+        "good night, you weird person",
+        "good night to me, see you in seven hours, hopefully a slightly better person",
+        "good night, me. you did okay today. you're gonna do okay tomorrow. see you in 7 hours. probably with bad hair, probably grumpy, but somewhat refreshed. give yourself credit for makin' it through. this counts. this all counts. sleep well, weirdo."
+    ], context: "good night, meは自己への二人称呼びかけ、英語の自己対話文化。日本語の「自分」が一人称、英語のmeは目的格(対象)で、自分を相手として扱う構造的な違いがある。weirdoは「変人」、愛情を込めた自虐スラング。英語のターム・オブ・エンディアメント(愛称)は自己には侮辱的言葉(weirdo, idiot, dummy)を使う独特な習慣。", category: 'reaction', month: '2026-05' },
+    { daySlot: 10, japanese: '寝落ち寸前', english: [
+        "fading fast",
+        "I am fading fast right now",
+        "I'm just about to lose consciousness, can barely keep my eyes open",
+        "I'm fadin' fast. I can feel it. the words on this page are gettin' blurry. my hand keeps droppin'. I'm gonna make it to the end of this paragraph and then it's lights out for me. don't expect me to remember any of this tomorrow. that part of the brain is already offline."
+    ], context: "fading fastは「速く消えていく」=「意識が薄れる」、消失動詞(fade)で意識喪失を表現する英語の比喩。光・音・色の喪失語彙が意識に転用される。lights outは「消灯」=「意識を失う」、軍隊就寝号令が意識喪失メタファーに。going offlineはコンピュータ用語の流入で、脳をデバイス化する21世紀英語の構造。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 11: 週末モード ──
+    { daySlot: 11, japanese: '土曜万歳', english: [
+        "Saturday, baby",
+        "it's Saturday, baby, the day is mine",
+        "Saturday is here and the entire day is whatever I want it to be",
+        "it's Saturday. there's no boss. no calendar. no expectations. for the next 16 hours I am the captain of my ship. I might do somethin'. I might do nothin'. I might start ten projects and finish zero. that's allowed today. nobody can judge. it's Saturday."
+    ], context: "Saturday, babyのbabyは強調の感嘆詞、AAVE由来で全世代に拡散。captain of my shipは「俺の船の船長」=「自分の人生の主人公」、19世紀詩(Henley『Invictus』)由来の英語の自立宣言。日本語の「土曜万歳」より叙事詩的。週末を「自由・自治の領土」と命名する英語の構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 11, japanese: 'お昼まで寝てた', english: [
+        "slept till noon",
+        "I slept till noon and I'm not sorry",
+        "I slept until noon today and I have zero regrets about it",
+        "I slept till noon. and you know what? I needed it. my body needed it. don't @ me with your morning routines and your 5 AM starts. some weeks you grind, some weeks you sleep till noon. this was a noon week. balance. that's what it's called. balance."
+    ], context: "don't @ meはTwitter由来の英語スラング(2017年頃)、「私に異論を唱えないで」=「反論禁止」。SNSの@メンション機能から派生し、現実会話に逆流。zero regretsは「ゼロの後悔」、量化(数値化)で感情を表現する英語の構造。日本語の「後悔ない」より定量的・宣言的。balanceは現代英語の自己肯定キーワード、生活哲学の語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 11, japanese: 'カフェ巡り', english: [
+        "cafe hopping",
+        "I'm cafe hoppin' today, no agenda",
+        "I'm just gonna go cafe hopping today and see where the day takes me",
+        "I'm cafe hoppin' today. no plan. just walkin' around, findin' interestin' looking spots, gettin' a drink, sittin' for 30 minutes, then movin' on. the goal isn't the coffee. the goal is the wanderin'. these are the kind of days you don't post about but you remember most clearly years later."
+    ], context: "hoppingは動詞hopの-ing形で「ホップする」=「短時間ずつ複数の場所を回る」。bar hopping(ハシゴ酒)、cafe hopping、city hoppingなど、移動の繰り返しを表す英語の頻出語彙。日本語の「巡る」と機能は同じだが、英語のhopは跳ねる動作で軽快さを伝える。see where the day takes meは日(時間)を擬人化(人を導く存在)、英語の運命観の構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 11, japanese: '何にもする気ない', english: [
+        "no plans, no stress",
+        "no plans today and that's the plan",
+        "today's plan is having no plans, and I'm sticking to it",
+        "no plans. that's the plan. I'm gonna lie on the couch. I'm gonna read 4 pages of a book before I get distracted. I'm gonna stare out the window. I'm gonna take a nap that wasn't scheduled. and I'm not gonna feel guilty about any of it. productivity isn't the only valid use of time. boredom is also valid."
+    ], context: "no plans is the planは矛盾構文で「無計画こそ計画」を表現する英語の自己肯定語彙。productivity culture(生産性文化)への反論として2010年代後半に流行したフレーズ。boredom is also validは「退屈も認められる」、近年のメンタルヘルス語彙(validation culture)。感情・状態の正当性を言語化する英語の現代傾向。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 11, japanese: '本読みたい', english: [
+        "wanna read",
+        "I really want to dig into a book today",
+        "I really want to spend a few hours actually reading today",
+        "I want to read. like really read. not the kind where I read 2 paragraphs then check my phone. real reading. I'm gonna leave my phone in the other room. I'm gonna make tea. I'm gonna sit in the chair with the good light. and I'm gonna read until my eyes hurt. that's the goal."
+    ], context: "dig intoは「掘り下げる」=「真剣に取り組む」、考古学的・地質学的動詞で深い関与を表現する英語の比喩。dig into a book、dig into the data、dig into your feelings。日本語の「読み込む」と機能は同じだが、英語のdigは物理的・身体的な掘削動作。情報を埋蔵物と捉える英語の構造。", category: 'request', month: '2026-05' },
+    { daySlot: 11, japanese: '部屋ぐちゃぐちゃ', english: [
+        "place is a mess",
+        "this place is a complete disaster zone",
+        "my apartment looks like a tornado came through, it's bad",
+        "my place is a disaster. there are 3 cups of half-drunk water on various surfaces. clothes that I half-decided to wear on the chair. mail I haven't opened. a bowl I should've washed Tuesday. the mess accumulated quietly until one day I looked up and the whole apartment had become this. cleanin' is gonna take all afternoon."
+    ], context: "disaster zoneは「災害地域」、natural disaster語彙の流用ジョーク。tornado came throughは「竜巻が通過した」、自然災害の比喩で散らかりを誇張する英語のお決まりフレーズ。日本語の「ぐちゃぐちゃ」は擬態語、英語は気象・地理用語で具体的な災害イメージを呼ぶ。誇張の単位が大きい。", category: 'reaction', month: '2026-05' },
+    { daySlot: 11, japanese: '掃除しよう', english: [
+        "let's clean",
+        "OK let's actually clean today",
+        "alright, time to actually deep clean this place once and for all",
+        "let's clean. for real this time. I'm gonna start in one room and finish it before movin' to the next. that's the rule. not bouncin' around, not gettin' distracted by old photos, not goin' down memory lane in the closet. focus. one room at a time. and when I'm done I'll feel like a different person."
+    ], context: "deep cleanは「深く掃除する」=「徹底的な清掃」、表面掃除との対比で確立した英語の現代語彙。deep clean、deep dive、deep workなど、deep+動詞で「徹底度」を表す英語の構文。日本語の「大掃除」は文化的(年末)、英語のdeep cleanはタイミングフリーで頻度が高い。going down memory laneは「記憶の小道を下る」=「思い出に浸る」。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 11, japanese: '気分転換', english: [
+        "change of scenery",
+        "I need a change of scenery today",
+        "I just need a complete change of scenery today, even if it's small",
+        "I need a change of scenery. been in this apartment too long. four walls, same view, same routines. gonna grab my book, walk to a different cafe, sit in a different chair, drink a different coffee. it's the smallest thing but it's gonna feel like a vacation. the brain needs novelty. it doesn't have to be big."
+    ], context: "change of sceneryは「景色の変化」=「環境転換」、演劇用語(scene=場面)を日常生活に流用する英語の比喩。日本語の「気分転換」より具体的(視覚的場面の交代)。novelty(新奇性)は心理学・生物学用語が日常化、脳が刺激を求める性質を名付ける英語の科学的語彙。日本語の「飽きる」より中立的・分析的。", category: 'request', month: '2026-05' },
+    { daySlot: 11, japanese: '一人時間最高', english: [
+        "love alone time",
+        "honestly love some alone time",
+        "I genuinely love a good chunk of alone time on weekends",
+        "I love alone time. I know I should love bein' around people. and I do! sometimes! but a Saturday alone, just me and my thoughts and a quiet apartment and no one askin' me anythin'? unmatched. I'm not antisocial. I just need to recharge in silence. extroverts will never get it."
+    ], context: "alone timeは「一人時間」、英語のメンタルヘルス・心理学語彙として21世紀に確立。「孤独」と「自発的一人時間」を区別する英語の意識。recharge in silenceは「沈黙で充電する」、人体を電池化する英語の比喩。introvert/extrovert(内向/外向)は心理学用語が大衆化した近年の例。日本語の「一人好き」より自己分析的でアイデンティティ表現。", category: 'reaction', month: '2026-05' },
+    { daySlot: 11, japanese: '何曜日かわかってない', english: [
+        "lost track",
+        "I've totally lost track of what day it is",
+        "I have completely lost track of what day of the week we're on",
+        "I've lost track. is it Saturday? feels like Saturday. I haven't checked. I'm not gonna check. once I check, the day becomes named, scheduled, finite. right now it's just 'a day off' and that feels infinite. I'm prolongin' the magic by stayin' ignorant. genius move."
+    ], context: "lost trackは「軌道を失う」=「分からなくなる」、tracking(追跡)動詞の否定形で認知の喪失を表す英語の構文。stays ignorant by choiceは「選択的無知」、現代英語のメンタルヘルス語彙で意図的な情報遮断を肯定する。日本語の「知らない方が幸せ」と機能は同じだが、英語は能動的選択(choice)を強調する。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 12: 友達会話 ──
+    { daySlot: 12, japanese: '久しぶりすぎ', english: [
+        "been forever",
+        "it's been forever, how have you been?",
+        "it has been actually forever since we last hung out, I missed this",
+        "it's been forever. I'm not exaggeratin'. when did we last hang out, like Christmas? that's months. that's too many months. I missed this. just sittin' here, talkin' about nothin' important, catchin' up on each other's lives. we gotta do this more. we always say that. this time I mean it."
+    ], context: "been foreverはit's been foreverのit's省略、現代英語の口語短縮。reservation: it's→nothing。日本語の「久しぶり」より時間誇張(forever=永遠)、英語の関係性表現は誇張で親密さを示す傾向。we gotta do this more / we always say thatは英語の友情の儀式的決まり文句、約束を口にすることで関係性を再確認する社会言語学的機能。", category: 'reaction', month: '2026-05' },
+    { daySlot: 12, japanese: '色々あった', english: [
+        "lot has happened",
+        "a lot has happened since we last talked",
+        "honestly so much has happened since we last actually talked",
+        "a lot has happened. and I don't even know where to start. work stuff. family stuff. dating stuff. I had a whole thing happen with my landlord that's its own podcast. let's get drinks first, settle in, and I'll walk you through it chronologically. it's gonna take all night. you good?"
+    ], context: "a lotは「たくさん」の万能定量表現、英語の口語頻度No.1副詞。podcast as metaphorは21世紀ネット時代の比喩、長い物語をエピソード型コンテンツに例える現代英語。日本語の「色々」より具体的・物語的なフレーミング。walk you through itは「君を歩いて連れて行く」=「順を追って説明する」、物理的同行で説明を表現する英語の身体性。", category: 'opinion', month: '2026-05' },
+    { daySlot: 12, japanese: '結婚するんだって', english: [
+        "did you hear, they're getting married",
+        "wait, did you hear about Kenji? he's gettin' married",
+        "I just found out Kenji is getting married next year, can you believe it?",
+        "wait, you didn't know? Kenji's gettin' married. yeah. to that person he's been datin' for like 2 years. it just got engaged last weekend. I would've told you sooner but I figured someone else would've already. apparently not. you're the last to know. sorry."
+    ], context: "wait you didn't know?は驚きと申し訳なさを混ぜた英語の社交辞令、情報格差を相手の責任にせず自分の伝達失敗として処理する。日本語の「知らなかったの?」より柔らかく、関係性維持に配慮した構文。last to knowは「最後に知った人」、情報伝達のヒエラルキーを明示する英語の社会語彙。", category: 'opinion', month: '2026-05' },
+    { daySlot: 12, japanese: 'マジで?', english: [
+        "no way",
+        "no way, you're kidding me",
+        "no way, are you serious right now? I refuse to believe that",
+        "no way. no way. you're makin' this up. somebody told you to mess with me. that did not happen. that cannot have happened. tell me the whole story right now. don't leave any details out. I need to hear every part of this 'cause my brain is rejectin' the basic facts."
+    ], context: "no wayは強い驚き・否定の英語の鉄板。直訳「方法がない」=「ありえない」。kiddingは「冗談を言う」、refuse to believeは「信じることを拒絶する」、信じる動作を能動的拒否として表現する英語の構造。日本語の「マジで?」より疑念・拒否のニュアンスが強く、相手の発言を一旦疑う社会言語学的機能を持つ。", category: 'reaction', month: '2026-05' },
+    { daySlot: 12, japanese: 'どっちが先?', english: [
+        "who started this",
+        "wait, who started talkin' first?",
+        "who actually started seeing who first, I'm getting confused here",
+        "wait wait wait. who came onto who. I'm tryin' to picture this. she texted him first? or he texted her first? I need to know the timeline 'cause it changes the whole story. context matters. the order of events matters. I'm not lettin' this go til I have the full sequence."
+    ], context: "wait wait wait は反復強調で会話を一時停止する英語の構文。日本語の「ちょっと待って」より繰り返しでテンポを作る言語的工夫。come onto someoneは「(誰かに)アプローチする」、ロマンス・出会い系語彙、英語の交際関係の動詞。日本語の「先にアプローチした」より物理動作的(come onto=向かって近づく)。", category: 'request', month: '2026-05' },
+    { daySlot: 12, japanese: '飲み会する?', english: [
+        "should we get drinks",
+        "should we get drinks soon, like actually plan it?",
+        "we should actually plan a real drinks night, not just talk about it forever",
+        "should we plan drinks. real drinks. not 'we should grab drinks sometime' drinks. the kind we put on the calendar. pick a Thursday. lock it in. invite the others. I'm tired of sayin' it and not doin' it. let's be the friends who follow through. for once."
+    ], context: "should weは提案の標準構文、shall weよりカジュアル。drinksは複数形で「飲み会」、英語のsocial drinking文化の語彙。日本語の「飲み会」が形式的(イベント名)、英語のdrinksは行為(動詞)の名詞化、抽象度が違う。follow throughはスポーツ用語(打撃のフォロースルー)から「最後までやり通す」へ、約束遵守を体動作で表現する英語の比喩。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 12, japanese: 'みんな呼ぼう', english: [
+        "let's get the gang",
+        "let's get the gang together, all of us",
+        "let's get everyone together, the whole crew, properly this time",
+        "let's get the gang together. all of us. like the old days. I'll text the group chat. you text the side chat. between us we'll get everybody. there's gonna be 3 people who say maybe and then bail, but the rest will show. that's how it always goes. we're 80% reliable as a unit. that's good enough."
+    ], context: "the gangは「仲間集団」、英語のslang gang(ストリート集団)が中性化して友達グループ表現に使われる。crewはスポーツ・船舶・映画制作の集団用語の流用。日本語の「みんな」が一般、英語のgang/crewはアイデンティティを伴う集団名。group chat / side chat文化はSNS時代の英語特有の友情語彙。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 12, japanese: '車出すよ', english: [
+        "I'll drive",
+        "I got the car tonight, I'll drive",
+        "I have the car tonight, so I'm happy to be the designated driver",
+        "I got the car. I'll drive. you all drink, I'll just have one early and then water the rest of the night. it's fine. somebody's gotta do it. besides, I like bein' the sober one watchin' everybody else lose their minds. it's entertainment. I get a free show."
+    ], context: "designated driverはアメリカで1980年代に確立した社会運動由来の語彙、飲酒運転防止のために誰か一人を「指定運転手」にする習慣。日本語にもこの概念は輸入されたが、英語のほうが社会的に強く規範化されている。get a free showは「無料の見世物を得る」、酔った友達を観察するエンターテインメントとして表現する英語のジョーク。", category: 'opinion', month: '2026-05' },
+    { daySlot: 12, japanese: 'マジ笑う', english: [
+        "I'm dying",
+        "I am literally dying right now",
+        "stop, you are killing me, I cannot breathe right now",
+        "I'm dyin'. stop. you're killin' me. I can't breathe. I can't see. tears in my eyes. people in this restaurant are starin'. I don't care. you cannot just say that with a straight face and expect me to keep it together. you broke me. I'm broken. I'm gonna laugh about this for weeks."
+    ], context: "I'm dyingはネット文化由来(2010年代)の笑い表現、LOLの進化形。誇張動詞die(死ぬ)で笑いの強度を表現する英語の現代スラング。killing meは「殺してくる」=「笑死しそう」、相手を加害者化するシニカルなジョーク。日本語の「マジ笑う」より身体的・暴力的な誇張、感情の物理化が英語の特徴。", category: 'reaction', month: '2026-05' },
+    { daySlot: 12, japanese: '今度こそ会おう', english: [
+        "next time for real",
+        "next time for real, no excuses",
+        "OK seriously, let's actually meet up next time, no flaking",
+        "next time, no excuses. I mean it. I've said that before, I know. but this time I really mean it. I'm gonna pick a date right now. text me back tomorrow with three options. we'll lock one in. and if we cancel, the other one buys lunch as penalty. accountability mechanism. it's gonna work this time."
+    ], context: "no excusesは英語の自己鞭打ち定型句、ジム・スポーツ文化由来。flakingは「flake out」(ドタキャンする)からの動詞化、20世紀後半英語の社交不履行語彙。日本語に直接の等価動詞がない。accountability mechanismはビジネス用語の日常化、人間関係を「機構」として制度化する英語の現代傾向。日本語の「約束」より構造化された責任観。", category: 'suggestion', month: '2026-05' },
+
+    // ── Day 13: 買い物英語 ──
+    { daySlot: 13, japanese: '見てるだけ', english: [
+        "just looking",
+        "just lookin', thanks",
+        "just looking, thanks, but I'll let you know if I have questions",
+        "I'm just lookin'. that's it. I appreciate you askin'. I do not need help right now. I'm gonna walk around the store, look at things, maybe pick somethin' up and put it back, and that's the entire experience I'm here for. if I need you, I'll come find you. I promise."
+    ], context: "just lookingは英語圏の店舗でのstandard responseで、店員の声かけへの定型応答。社交辞令として日本語の「見てるだけ」と直訳一致。英語圏では店員の声かけが頻繁なので、この応答が文化的に確立。アメリカの retail店舗の sales-driven culture(積極販売文化)から派生した防衛フレーズ。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 13, japanese: '高すぎ', english: [
+        "way overpriced",
+        "this is way overpriced, no way",
+        "this is so overpriced, what are they thinking with this price?",
+        "way overpriced. I'm not even mad, I'm impressed. who looks at a $80 t-shirt and decides 'yeah that's reasonable'? someone with a marketing budget bigger than my rent. and people are buyin' it. I'm not. I'm walkin' away. but somebody is. that's the wild part."
+    ], context: "wayは強調副詞、way overpriced=「めちゃ高い」。over-+形容詞は英語の頻出構文(overrated, overdone, overcooked)で「過剰さ」を表す。日本語の「すぎ」と並行構造。who looks at X and decides Yは仮想的他者を立ち上げて批判する英語の構文、自分でない誰かの判断を疑問視する社会的距離化のテクニック。", category: 'reaction', month: '2026-05' },
+    { daySlot: 13, japanese: '色違いある?', english: [
+        "got this in another color",
+        "you got this in any other color?",
+        "do you have this same item in any other colors maybe?",
+        "you got this in other colors? I love the cut, I love the fit, I just don't love the color. is there like a navy version? a black? somethin' less... loud? I'm not really a teal person. but if it comes in like 5 other colors then this is the one for me. show me what you got."
+    ], context: "got this in〜は「これは〜であるか」、haveが落ちるイギリス系・カジュアル英語の構文。日本語の「ある?」と機能は同じだが、英語は色・サイズ・型番をincomingカテゴリーで尋ねる癖。loudは「うるさい」=「派手」、色を音響メタファーで表現する英語の共感覚的構造。日本語にない感覚転移。", category: 'request', month: '2026-05' },
+    { daySlot: 13, japanese: 'サイズ感どう?', english: [
+        "how does it fit",
+        "how does this fit on me?",
+        "what do you think, does this fit me okay or no?",
+        "how does it fit. be honest. don't just say 'yeah it looks great.' I need actual feedback. is it too tight in the shoulders? does it bunch at the waist? what's happenin' from the back? I trust your eyes more than the mirror. mirrors lie. you don't. tell me the truth."
+    ], context: "fitは衣服の動詞「合う」、英語のファッション語彙の中核。how does it fitはファッション店の標準質問。be honestは「正直に」=フィードバック要請の前置き、英語の対人コミュニケーションで頻出する真実性要求の構文。mirrors lieは比喩で「鏡は嘘をつく」=「鏡では分からない」。日本語の「サイズ感」より具体的な物理評価。", category: 'request', month: '2026-05' },
+    { daySlot: 13, japanese: '別にいらん', english: [
+        "I'll pass",
+        "yeah, I'll pass on that one",
+        "yeah I'm gonna pass on that one, thanks though",
+        "I'll pass. it's nice. I'm sure someone will love it. I'm not someone. it doesn't speak to me. I'm not feelin' it. I came in here lookin' for somethin' and this isn't it. I'd rather walk out empty-handed than buy somethin' I'm 60% on. the bar is 90%. that's the rule."
+    ], context: "I'll passは「パス」=「結構です」、トランプ・ゲーム用語の流用。it speaks to meは「私に話しかけてくる」=「ピンとくる」、物体を擬人化(対話相手)する英語の感性表現。日本語の「ピンと来る」と並行構造だが、英語は対話の比喩、日本語は音響(ピン)の比喩。出発点が違う。empty-handedは「空手で」=「手ぶら」、結果状態を物理姿勢で表現。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 13, japanese: '一目惚れ', english: [
+        "love at first sight",
+        "this is love at first sight, I have to have it",
+        "I am in love at first sight with this thing, no questions asked",
+        "love at first sight. I walked in, scanned the room, locked eyes with this thing, and I knew. it's comin' home with me. I don't need to think about it. I don't need to compare prices. I don't need to sleep on it. some purchases are head decisions and some are heart decisions. this one's all heart."
+    ], context: "love at first sightは英語のロマンス語彙(11世紀〜)が物体への愛着に流用されたmodern英語のジョーク。head decisions vs heart decisions(頭の決断vs心の決断)は英語の意思決定の二分法、合理性vs感情を身体部位で対立させる英語の構造。日本語の「一目惚れ」と機能同一だが、英語は決断のメタ分析(身体部位による分類)を含む。", category: 'reaction', month: '2026-05' },
+    { daySlot: 13, japanese: '会計お願いします', english: [
+        "ready to check out",
+        "I'm ready to check out, please",
+        "I think I'm all set, ready to check out whenever you are",
+        "I'm ready to check out. got everything I came for. plus a few things I didn't come for but somehow ended up in my basket. that happens. retail therapy is real. let's just ring it up before I add more. don't show me anythin' else. I have willpower like a wet paper bag right now."
+    ], context: "check outはホテル・ショッピング・ライブラリーで「精算する/退出する」、英語の万能動詞句。retail therapy(リテール・セラピー)は「買い物療法」=ストレス解消としての買い物、心理学・大衆語彙(2000年代に主流化)。日本語に直接の等価語がない、消費社会の心理化を表現する英語独特の現代語彙。willpower like a wet paper bagは「濡れた紙袋のような意志力」=弱い意志を物体強度で比喩。", category: 'request', month: '2026-05' },
+    { daySlot: 13, japanese: 'ポイントカード持ってる?', english: [
+        "you a member",
+        "are you a member with us?",
+        "are you signed up for our rewards program at all?",
+        "are you a member? you sure? wanna sign up real quick? takes 30 seconds, you save 10% today, and you get more rewards goin' forward. yeah I know, you have a million of these. one more isn't gonna hurt. and you'll thank me later 'cause every time you come back you save more. it's a no-brainer."
+    ], context: "rewards programは「報酬プログラム」=「ポイントカード会員制」、loyalty marketing(顧客囲い込み)の英語語彙。アメリカ retail業界が19世紀から発展させた語彙が世界拡散。日本語の「ポイントカード」と機能同一だが、英語のmember/rewardsはより制度的・契約的な響き。no-brainerは「脳を使わずできる」=「明らか」、判断不要の選択を表す英語の頻出スラング。", category: 'request', month: '2026-05' },
+    { daySlot: 13, japanese: 'レシートください', english: [
+        "can I get the receipt",
+        "can I have the receipt please?",
+        "yeah, I'll take the receipt, thanks",
+        "can I get the receipt? I might wanna return one of these. plus my partner likes me to keep the receipts so we can track spendin'. yeah we have a budget. yeah we look at it. yeah it's borin'. but it's also why we can afford things like this. trade-offs. anyway, receipt please."
+    ], context: "can I getは英語の頻出依頼構文、丁寧度はpleaseの位置・声のトーンで調整。アメリカ英語ではcan I getが普通、イギリス英語ではcould I have / may I haveがやや標準的。trade-offsは経済学用語の日常化、選択の代償を分析的に語る英語の合理性志向。日本語の「お願いします」より transactional(取引的)。", category: 'request', month: '2026-05' },
+    { daySlot: 13, japanese: 'これ買う', english: [
+        "I'll take this",
+        "I'll take this one, thanks",
+        "I'll take this one, this is the one for me",
+        "I'll take this. final answer. no more lookin', no more comparin'. this is the one. I tried it on, it fits, the price is acceptable, the color works, and I love it. that's the criteria. all four checks. it's comin' home with me. ring it up."
+    ], context: "I'll take thisは英語の購入決定の鉄板。take=「取る」が「買う」の意味になる古英語からの語彙(market culture起源)。日本語の「買う」(buy)より動作的(物体を取る)、所有権移行を物理動作で表現する英語の経済語彙。final answerはクイズ番組由来(『Who Wants to Be a Millionaire』)、決定の確定を表すスラング、決断の覚悟を強調する。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 14: カフェの英語 ──
+    { daySlot: 14, japanese: '注文どうする?', english: [
+        "you decide",
+        "you decide, I'll have whatever",
+        "you decide for both of us, I'll be happy with whatever you order",
+        "you decide. I'm decision-fatigued. I've made 47 decisions today and I've got nothin' left for what coffee to order. surprise me. order whatever sounds good and I'll have the same. I trust you. just don't get me anythin' with whipped cream and 12 syrups. that's the only rule. otherwise, dealer's choice."
+    ], context: "decision-fatiguedはdecision fatigue(決定疲労)の形容詞化、心理学用語の大衆化が完了した形。日常の判断量が認知資源を消耗する現象を名付けた英語の現代語彙。日本語に等価形容詞がない、英語のほうが心理状態の名付けが豊富。surprise meは「驚かせて」=「あなたに任せる」、創造性・主体性を相手に委譲する英語の社交儀礼。", category: 'request', month: '2026-05' },
+    { daySlot: 14, japanese: 'ホットでお願い', english: [
+        "make it hot",
+        "I'll have that hot, please",
+        "can I get that as a hot one rather than iced, thanks",
+        "I'll take it hot. I know everyone else is doin' iced. it's spring. it's gettin' warm. I'm aware. but I am a creature of habit and that habit is hot coffee, year-round, no exceptions, even in August when I'm sweatin'. it's a comfort thing. don't psychoanalyze me. just make it hot."
+    ], context: "make it hotは命令形+目的語+補語の構文、簡潔な指示形式。creature of habitは「習慣の生き物」=「習慣に縛られた人」、人を生物学的に分類する英語の自己定義文化。don't psychoanalyze meは「分析しないで」=「深く考えないで」、フロイト学派の心理用語が日常化した結果、防衛フレーズとして使われる。日本語の「分析しないで」より知的密度が高い。", category: 'request', month: '2026-05' },
+    { daySlot: 14, japanese: 'カフェイン控えめ', english: [
+        "easy on the caffeine",
+        "go easy on the caffeine for me",
+        "I'm trying to lay off the caffeine a little, do you have decaf?",
+        "easy on the caffeine. I'm tryin' to be less of a jittery mess by 3 PM today. I'll do half-caf. or decaf if it doesn't taste like sad water. I know it ruins the whole point of coffee. but my heart palpitations and I are negotiatin' a peace treaty and this is part of it."
+    ], context: "easy on〜は「〜を控えめに」、料理・トッピング・添加物の調整の英語頻出依頼。lay offは「離れる」=「やめる」、麻薬・タバコ・酒・運動の中断に使う英語のスラング。half-caf(半カフェイン)、decaf(脱カフェ)はアメリカコーヒー文化の専門用語。日本語の「控えめ」より具体的・科学的な指定が可能。", category: 'request', month: '2026-05' },
+    { daySlot: 14, japanese: 'ここで飲む', english: [
+        "for here",
+        "for here, please, thanks",
+        "I'll have it for here, I'm gonna sit and read for a bit",
+        "for here, please. I'm settin' up shop for an hour. got my book, got my notebook, got 30% phone battery which means I have to focus 'cause I won't have a phone to distract me later. this is gonna be the most productive 60 minutes of my week. or at least that's the plan."
+    ], context: "for hereはアメリカ英語のカフェ・ファストフードでの「店内で食べる」、to-go(持ち帰る)の対義語。短い英語のretail語彙の代表例。setting up shopは「店を構える」=「居場所を作る」、商業用語が日常生活に流用される英語の比喩。productivity-aware self-talkは現代英語の特徴、自分の生産性を実況する。日本語より自意識的。", category: 'request', month: '2026-05' },
+    { daySlot: 14, japanese: 'お代わり', english: [
+        "another round",
+        "I'm goin' for another round",
+        "I think I'm gonna grab another one before I head out",
+        "another round. I know I shouldn't. it's already 3 PM. I'm gonna be wired tonight. but I'm in the zone here. words are flowin'. ideas are happenin'. one more cup buys me another 90 minutes of focus. that's worth the bad sleep. trade-off. small price."
+    ], context: "another roundはバー・カフェ・ボクシングで「もう一杯/もう一回戦」、複合的な語彙。round=「回」「ラウンド」「巡回」、英語の多義語。in the zoneはスポーツ心理学から「集中状態」、フロー体験(flow)の英語版。日本語の「乗ってる」と機能同一だが、英語のzoneは空間メタファー、日本語の「乗る」は動作メタファー。", category: 'request', month: '2026-05' },
+    { daySlot: 14, japanese: '長居していい?', english: [
+        "is it cool if I stay",
+        "is it cool if I stay a while?",
+        "would it be okay if I camped out here for a couple hours?",
+        "is it cool if I camp here for a bit. I'll order again, I promise. I'm not one of those people who orders one drink and stays for 5 hours. I'll be like 90 minutes max, two drinks minimum. I'm a respectful long-stayer. and I'll tip well. you got me?"
+    ], context: "is it cool if〜は許可を求めるカジュアル構文、cool=「OK」の口語形。camp here / camp outは「キャンプする」=「長時間滞在する」、野営の比喩で長居を表現する英語の頻出語彙。日本語の「長居」より楽しげ・能動的なニュアンス。respectful long-stayerは「礼儀正しい長居者」、自己アイデンティティを行動類型で表現する英語の癖。", category: 'request', month: '2026-05' },
+    { daySlot: 14, japanese: 'Wi-Fiパスワード', english: [
+        "wifi password",
+        "what's the wifi password?",
+        "is there wifi here? what's the password?",
+        "what's the wifi password. I see the network. yours has like 14 characters and I'm gonna fat-finger it three times before I get it right. is it on a sign somewhere? written on a card? printed on the receipt? I'll find it but you'd save me time if you just told me."
+    ], context: "wifi passwordは21世紀の英語頻出フレーズ、コーヒーショップのstandard transaction。fat-fingerは「太い指で押す」=「タイプミスする」、IT業界由来のスラング(2000年代)、touchscreen時代に拡散。日本語に等価語がない、英語のほうがdigital age語彙が豊富で、身体的失敗(指の太さ)を擬似科学的に名付ける。", category: 'request', month: '2026-05' },
+    { daySlot: 14, japanese: 'コンセント空いてる?', english: [
+        "outlet free",
+        "is that outlet over there free?",
+        "do you mind if I plug in here? is there an outlet I can use?",
+        "is that outlet free? mine's at like 12% and I'm gonna be here a while. I'll just slide my cord over. I'll be careful with the wire. you won't even notice I'm there. I appreciate it. you're savin' my whole afternoon. battery anxiety is real and you're easin' mine."
+    ], context: "outletはアメリカ英語で「コンセント」、イギリス英語ではsocket/power point。語彙の地域差がある英語の代表例。battery anxietyは「電池不安」、modern英語の心理状態語彙(2010年代後半)、スマホ依存社会の感情を名付けた現代語。日本語の「充電したい」より具体的・心理的(anxiety=不安)。", category: 'request', month: '2026-05' },
+    { daySlot: 14, japanese: '気分転換に来た', english: [
+        "needed a change",
+        "I just needed a change of pace today",
+        "I just needed to get out of the apartment for a bit, change of pace",
+        "I needed a change of pace. been workin' from home all week and the apartment was startin' to feel like a cage. I needed humans. I needed background noise. I needed to be reminded that the world exists beyond my front door. cafes are public living rooms and I needed one today."
+    ], context: "change of paceは「ペースの変化」=「気分転換」、音楽・スポーツ用語(tempo change)の流用。public living roomsは「公共のリビング」=「サードプレイス」、社会学者Ray Oldenburgの概念、英語社会の場所論。日本語の「カフェ」より社会的機能を意識した命名。日本語の「気分転換」より具体的(pace=リズム)。", category: 'opinion', month: '2026-05' },
+    { daySlot: 14, japanese: 'ここの音楽好き', english: [
+        "love the playlist here",
+        "OK, I am loving the playlist here",
+        "the playlist in this place is honestly so good, I'm shazamming half the songs",
+        "I love the playlist here. who curated this. I'm Shazammin' every other song. there's some old jazz, some new indie, some random instrumental thing I've never heard. it's somebody's actual taste, not algorithm-generated. that's rare these days. I'm here for the music as much as the coffee at this point."
+    ], context: "Shazammingは音楽認識アプリShazamの動詞化、ブランド名動詞化(Google it、Photoshop, Uber)の代表例。algorithm-generatedは「アルゴリズム生成された」=「自動推薦」、現代英語のテック語彙が文化批評語彙に転用された例。日本語にも輸入されたが、英語のほうが頻度が高く、人間vsアルゴリズムの対比で味付けする。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 15: 自分のケア ──
+    { daySlot: 15, japanese: 'ジムサボった', english: [
+        "skipped the gym",
+        "yeah I skipped the gym this morning",
+        "I'm not even gonna lie, I totally skipped the gym this morning",
+        "I skipped the gym. and I don't feel bad about it. well, I feel a little bad. but mostly I feel relieved. I was gonna go, I had the bag packed, I had the mental energy gathered, and then I just... didn't. and the world didn't end. tomorrow's another day. or it's not. either way."
+    ], context: "skippedは「飛ばす」=「サボる」、義務的活動の不実行を表す英語の動詞。skip the gym、skip class、skip workなど、義務行為に対するカジュアル不履行語彙。I'm not even gonna lieは「嘘もつかない」=「正直に言う」、英語の率直表現の枕詞、ネット由来(2010年代)。日本語の「サボった」より自己分析的(don't feel bad about it)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 15, japanese: '体しんどい', english: [
+        "body's tired",
+        "my body is just so tired today",
+        "my body is genuinely exhausted, I think I've been pushing too hard",
+        "my body is tellin' me to slow down. I've been pushin' for weeks. workouts, work, late nights, early mornin's. it adds up. and my body's startin' to send signals. tight shoulders. weird neck thing. that lower back twinge. I gotta listen. recovery is part of trainin'. I'll do nothin' today and call it strategy."
+    ], context: "body's telling meは身体を擬人化(意志を持つ存在)、英語のメンタルヘルス・ボディアウェアネス語彙。listen to your bodyは現代ウェルネス文化の標語、身体感覚を内なる対話相手として扱う英語の構造。日本語の「体の声を聞く」と機能同一だが、英語のほうが運動科学・心理学で言語化されている。recovery as part of trainingは現代スポーツ理論の応用。", category: 'reaction', month: '2026-05' },
+    { daySlot: 15, japanese: 'お酒減らそう', english: [
+        "cutting back on drinking",
+        "I'm cutting back on drinking for a bit",
+        "I'm trying to cut back on drinking, just doing a few weeks of being more moderate",
+        "I'm cuttin' back on drinkin'. not quittin'. just dialin' it back. I noticed I was havin' wine like 5 nights a week and that was startin' to feel like a habit not a treat. I'm gonna do 2 nights a week tops. see how I feel. better sleep, less puffy face. probably more money. all positives."
+    ], context: "cut back on〜は「削減する」=「量を減らす」、quitting(完全停止)とは区別される英語の段階的削減語彙。dialing it backは「ダイヤルを下げる」=「程度を弱める」、ラジオ・電化製品の比喩で量的調整を表現する英語の構造。日本語の「減らす」より具体的(操作動作)。habit vs treat(習慣vsご褒美)の対立は英語のhealth language。", category: 'opinion', month: '2026-05' },
+    { daySlot: 15, japanese: '水飲んでない', english: [
+        "haven't been drinking water",
+        "I have not been drinking enough water",
+        "I have not been hydrating at all today, I bet that's why I feel terrible",
+        "I haven't drunk water all day. that explains a lot. headache: dehydration. fatigue: dehydration. weird mood: probably dehydration. people say drink water and I always think that's basic advice but turns out the basic advice is basic 'cause it works. I'm gonna chug a bottle right now and reset."
+    ], context: "hydratingは「水分補給する」、医療用語が大衆化した21世紀の英語頻出語。chugは「ガブガブ飲む」=「一気飲み」、英語のスラングで急速摂取を表す。dehydration as universal explanation(脱水を万能説明)は英語のwellness culture特有の現象、頭痛・疲労・不機嫌すべて脱水で説明する文化的傾向。日本語にもあるが頻度は英語のほうが高い。", category: 'reaction', month: '2026-05' },
+    { daySlot: 15, japanese: '肌荒れひどい', english: [
+        "breakout",
+        "I'm breakin' out, what is happening",
+        "my skin is breaking out and I have no idea what triggered it",
+        "I'm breakin' out. all over. forehead, chin, jawline. textbook stress acne. probably the deadlines, the bad sleep, the weeks of takeout. my skin is keepin' track and reportin'. gotta do an audit. cut the dairy maybe. drink more water. sleep more. baby my face for a few days."
+    ], context: "breakoutは「噴き出す」=「肌荒れ・ニキビ発生」、皮膚科用語が大衆化。stress acneは「ストレス性ニキビ」、医学用語の現代英語化。my skin is keeping track and reportingは肌を擬人化(報告者)、身体を内部監視システムとして表現する英語の構造。babying my faceは「赤ちゃん扱いする」=「丁寧にケアする」、子育て動詞のbaby化。日本語の「肌荒れ」より身体への対話的アプローチ。", category: 'reaction', month: '2026-05' },
+    { daySlot: 15, japanese: '美容院行きたい', english: [
+        "need a haircut",
+        "I really need a haircut, it's been forever",
+        "I am long overdue for a haircut, it's getting out of control",
+        "I need a haircut. badly. I haven't been since like January. my hair is doin' weird things. it's stickin' up where it didn't before. it's flat where it shouldn't be. layers have grown out. the cut is just gone. I look at old photos and I had structure to my hair. now it's chaos. I need professional help."
+    ], context: "long overdueは「とっくに期限超過」=「早くすべきなのに」、過去動作の遅延を強調する英語の構文。professional helpは「プロの助け」、医療・心理用語が美容に流用される英語のジョーク。日本語の「行きたい」より緊急性(badly, long overdue)が強調される。chaos as describing personal disorderは英語の現代語彙、生活混乱を哲学概念で表現する誇張。", category: 'request', month: '2026-05' },
+    { daySlot: 15, japanese: '日焼け止め忘れた', english: [
+        "forgot sunscreen",
+        "I forgot sunscreen and it's so sunny",
+        "I cannot believe I forgot sunscreen, I'm gonna pay for this",
+        "I forgot sunscreen. and the UV index is high today. I'm gonna burn. I'm gonna freckle. I'm gonna age 5 years in 2 hours. why didn't I check the weather. why don't I keep a backup tube in my bag. these are basic precautions. and somehow I, a grown adult, missed them all. classic spring blunder."
+    ], context: "UV indexは紫外線指数、気象学用語の大衆化。アメリカでは天気予報の標準項目、健康意識の高い英語社会。skin care anxietyは現代英語のwellness語彙。pay for thisは「対価を払う」=「ツケが回る」、行動結果を経済比喩で表現。日本語の「ツケが回る」より会計的。spring blunderは「春の失策」、季節+失敗の英語のジョーク命名。", category: 'reaction', month: '2026-05' },
+    { daySlot: 15, japanese: 'マッサージ予約した', english: [
+        "booked a massage",
+        "I just booked myself a massage, treat yourself",
+        "I just booked myself a massage for Saturday, I deserve it",
+        "I booked a massage. Saturday afternoon. 90 minutes. deep tissue. it's gonna hurt and then it's gonna feel amazing for about 4 days. I haven't had one in 6 months. my body is gonna be furious for about 24 hours after, then incredibly grateful. trust the process. self-care isn't optional anymore."
+    ], context: "treat yourselfは「自分にご褒美」、英語の self-care movement(2010年代)から確立した語彙。Parks and Recreationのコメディから大衆化したフレーズ。deep tissue massageは深部組織マッサージ、医療・スポーツ語彙が日常化。self-care isn't optionalは現代メンタルヘルス文化の決まり文句、ウェルネスを必要性として位置づける英語の構造。日本語の「自分へのご褒美」より制度的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 15, japanese: '体重戻ってる', english: [
+        "weight crept back",
+        "the weight crept back on, ugh",
+        "the weight has slowly crept back on and I'm not happy about it",
+        "the weight crept back. slowly. quietly. without me noticin'. I lost 5 pounds last fall, kept it off for like 3 months, and then somehow I'm back to where I started. it didn't happen on a Tuesday. it happened across 30 Tuesdays. tiny indulgences add up. I'm gonna get back on it. round two starts tomorrow."
+    ], context: "crept backは「忍び寄る」、動詞creepで知らぬ間の進行を表現する英語の比喩。日本語の「気づいたら」より能動的な進行(creepが行動主体)。tiny indulgences add upは現代の習慣科学の語彙、小さな選択の累積を強調する英語の意思決定論。round twoはボクシング比喩で再挑戦を意味、人生のスポーツ化が英語の特徴。", category: 'reaction', month: '2026-05' },
+    { daySlot: 15, japanese: 'もっと寝たい', english: [
+        "need more sleep",
+        "I really need more sleep in my life",
+        "I genuinely just need more sleep in my life on a regular basis",
+        "I need more sleep. that's the whole answer. all my problems trace back to bad sleep. mood: bad sleep. focus: bad sleep. cravings: bad sleep. skin: bad sleep. if I just got 8 hours every night I'd be a different person. but I don't. and I won't. and that's why I'm cranky. it's all sleep."
+    ], context: "trace back toは「〜に遡る」=「〜が原因」、推理・調査用語が日常化した英語。日本語の「原因は」より動的・物語的(track動作)。crankyは「機嫌が悪い」=「イライラしてる」、英語のmood vocabularyで頻出。sleep as universal cause(睡眠を万能原因)は現代英語のwellness語彙の典型的論理、複雑な問題を単純な睡眠不足に還元する文化的傾向。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 16: 健康習慣 ──
+    { daySlot: 16, japanese: '体重計乗らない', english: [
+        "avoiding the scale",
+        "I am avoiding the scale this week",
+        "I am actively avoiding the scale this week, it's better for my mental health",
+        "I'm avoidin' the scale. for my mental health. the number doesn't help me. it just makes me anxious. I know how I feel. I know how my clothes fit. that's enough information. the scale adds noise without addin' insight. I'm gonna keep workin' out, eat reasonably, and just live my life. weigh-ins are not for me right now."
+    ], context: "for my mental healthは2010年代後半から大衆化した英語のセルフケア宣言、行動を心理的健康で正当化する語彙。日本語にも輸入されつつあるが、英語のほうが頻度・社会的受容度が高い。adds noise without adding insightは情報科学・統計学用語が日常化した例、データ概念で生活を分析する英語の合理性志向。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 16, japanese: '朝ヨガ', english: [
+        "morning yoga",
+        "I started doin' morning yoga, big change",
+        "I've been doing 20 minutes of morning yoga and it's actually changing things",
+        "morning yoga's changin' my life. and I sound like a wellness blogger sayin' that. but it's true. 20 minutes of stretchin' before I do anythin' else. I feel taller. my back doesn't hurt. I'm calmer. I don't know which one of these is the placebo and which is real but the result is positive so I don't care."
+    ], context: "wellness bloggerは2010年代の英語のSNS文化由来、自己啓発・健康をオンラインで発信する人物像、皮肉のターゲットにもなる。placeboは医学用語の日常化、心理効果を科学的に名付ける英語の合理化。日本語にもあるが、英語のほうが頻度高く、自分の経験を「プラセボかも」と相対化する自己懐疑の癖が強い。", category: 'reaction', month: '2026-05' },
+    { daySlot: 16, japanese: '糖質減らす', english: [
+        "cutting carbs",
+        "I'm cutting carbs for a bit",
+        "I'm trying low-carb for a couple weeks, see how it goes",
+        "I'm cuttin' carbs. just for two weeks. see what happens. day 1 was fine. day 2 I had a headache. day 3 my brain was fuzzy. apparently carbs are kind of important. who knew. I'll push through. by day 7 I'll feel great. or I'll quit and order pizza. it's a coin flip at this point."
+    ], context: "low-carbは1990年代Atkins diet以降の英語の標準ダイエット語彙。see how it goesは「成り行きを見る」=「やってみる」、英語の試験的態度の構文。push throughは「押し抜ける」=「困難を乗り越える」、軍事・労働倫理由来の語彙。日本語の「乗り越える」より身体的・force比喩が強い。day 1, day 2 narrativeは progressトラッキングの英語特有の構造。", category: 'opinion', month: '2026-05' },
+    { daySlot: 16, japanese: '断食する', english: [
+        "intermittent fasting",
+        "I started doing intermittent fasting",
+        "I've been doing intermittent fasting and honestly liking it",
+        "I do intermittent fastin'. 16:8. eat between noon and 8 PM, water and coffee the rest of the time. it sounds intense but you adjust fast. and skippin' breakfast saves time in the mornin'. I'm not preachin' it. it's just what works for me right now. ask me in 6 months if I'm still doin' it."
+    ], context: "intermittent fastingは2010年代から大衆化した英語の現代ダイエット語彙、医学用語の通俗化。16:8 / 18:6 / OMADなど数字でプロトコル化する英語の合理性。preachingは「説教する」=「布教する」、宗教用語が習慣推奨の動詞化。日本語の「広める」より宗教的響きを保つ。英語の self-trackingは現代特有のobsession。", category: 'opinion', month: '2026-05' },
+    { daySlot: 16, japanese: '夜走るのいい', english: [
+        "love a night run",
+        "love a good night run",
+        "honestly love a good night run, the streets are quiet and it's just me",
+        "love a good night run. streets are empty. air is cool. nobody's around. it's just me and the rhythm of my feet on pavement. I solve problems while I run. I have ideas I forgot I needed. by the time I get back I've decompressed the whole day. better than therapy. cheaper, too."
+    ], context: "better than therapy, cheaper tooは2010年代後半の英語の自虐スラング、自己ケア活動を専門医療と価格比較するジョーク。アメリカの高額医療費文化が背景。decompressは「減圧する」=「ストレス解放」、ダイビング・航空用語が心理状態に流用された英語の比喩。日本語の「リフレッシュ」より科学的・物理的な比喩。", category: 'reaction', month: '2026-05' },
+    { daySlot: 16, japanese: 'プロテイン頼り', english: [
+        "living on protein",
+        "I'm basically livin' on protein right now",
+        "I've been basically living on protein shakes and grilled chicken this week",
+        "I'm livin' on protein. shakes for breakfast. chicken for lunch. tuna for dinner. it's not glamorous. it's not Instagram-worthy. but my muscles are gettin' bigger and my body fat is gettin' lower and that's the goal right now. I'll add carbs back when I'm done. for now I'm in mission mode."
+    ], context: "Instagram-worthyは「インスタ映えする」、SNS文化由来の英語の現代形容詞(2010年代)、視覚的価値を商業的に判定する語彙。日本語にも「インスタ映え」が並行して生まれた興味深い言語現象。mission modeは軍事・宇宙開発用語が日常化した例、目標達成期間を「ミッション」と命名する英語の語彙拡張。", category: 'opinion', month: '2026-05' },
+    { daySlot: 16, japanese: '禁酒3週目', english: [
+        "three weeks sober",
+        "I'm three weeks sober from drinking",
+        "I'm coming up on three weeks of not drinking, feeling really good about it",
+        "three weeks sober. and I feel amazin'. better sleep. clearer head. money in my account I didn't expect. I miss it socially, sure. it's awkward at parties. but the trade-off is worth it. I'll probably drink again eventually. not now though. not while I'm feelin' this good."
+    ], context: "soberは「素面」=「飲酒していない」、英語のrecovery culture(回復文化)・AA(アルコホリックス・アノニマス)由来の語彙。期間で表現する(3 weeks sober, 1 year sober)習慣はAAから派生した英語の特徴。日本語の「禁酒中」より制度的・コミュニティ語彙的響き。trade-off worth itは現代の合理化decision英語、メリット計算で行動選択を正当化する。", category: 'opinion', month: '2026-05' },
+    { daySlot: 16, japanese: 'ジム行く', english: [
+        "hitting the gym",
+        "I'm hitting the gym after work",
+        "I'm hitting the gym after work, then it's an early night",
+        "I'm hittin' the gym. after work. usually I'd skip but I haven't been all week and I can feel it. the body needs movement. the brain needs the endorphins. 45 minutes, just upper body, then home. simple session. nothin' fancy. just enough to remind myself I'm a person who works out."
+    ], context: "hitting the gymは「ジムを叩く」=「ジムに行く」、暴力動詞hitで日常活動を表現する英語の構文。スポーツ・労働倫理の語彙。endorphinsは脳内物質エンドルフィン、神経科学用語の大衆化。日本語にも輸入されたが、英語のほうが日常会話で頻出。runner's high、endorphin rushなど、運動効果を化学的に語る英語のwellness語彙。", category: 'suggestion', month: '2026-05' },
+    { daySlot: 16, japanese: 'マラソン申し込んだ', english: [
+        "signed up for a half marathon",
+        "I just signed up for a half marathon in October",
+        "I just signed up for a half marathon in October, what was I thinking",
+        "I signed up for a half marathon. October. that gives me 5 months. I've never run more than 10K. this is gonna require actual trainin'. real, structured trainin'. but I needed somethin' to commit to or I was just gonna keep doin' the same lazy 5K twice a week forever. accountability through entry fees. it's the only way."
+    ], context: "signed up forは「申し込んだ」、英語の現代手続きの動詞。accountability through entry feesは「参加費による責任化」、経済的commitmentで行動を縛る英語の心理戦略。日本語の「お金を払って自分を縛る」と機能同一だが、英語はaccountabilityというビジネス用語を生活に流用する。half marathon as commitment deviceは現代英語のself-development語彙。", category: 'opinion', month: '2026-05' },
+    { daySlot: 16, japanese: '変化の実感', english: [
+        "feeling the change",
+        "I'm starting to feel the change",
+        "I'm actually starting to feel the changes, it's working",
+        "I'm feelin' the change. clothes fit different. mirror looks different. workouts feel different. I'm liftin' heavier. runnin' longer. recoverin' faster. it took 3 months to start showin'. I almost gave up at week 6. so glad I didn't. the lesson: stick with stuff longer than you think you need to."
+    ], context: "feeling the changeは「変化を感じる」、進行中の進歩を体感的に確認する英語のwellness語彙。stick with stuff longer than you think you need toは現代英語の自己啓発の格言、忍耐の必要性を強調する。日本語の「続ける」より時間スパンの誇張(longer than you think)。lesson learnedは反省を「教訓」として明示する英語の構造。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 17: 体調不良 ──
+    { daySlot: 17, japanese: '風邪ひいたかも', english: [
+        "feeling a cold",
+        "I think I'm getting a cold",
+        "I think I might be coming down with something, I feel weird",
+        "I think I'm comin' down with somethin'. throat's scratchy. head's foggy. body feels heavy. it's not full-blown yet but I can feel it buildin'. tomorrow I'll wake up and it'll be a real cold. I'm gonna preempt it. tons of water, vitamin C, early bedtime. maybe I can fight it off. probably not."
+    ], context: "coming down withは「(病気が)降りてくる」=「病気にかかる」、空間的下降で病気の発症を表す英語の比喩。病気を「上から来る」存在として擬人化。日本語の「ひく」(風邪をひく)は引き寄せる動作、英語のcoming downは降りてくる動作。動作の方向性が逆。preempt itは軍事・チェス用語「先制する」、病気との対戦を戦闘比喩で表現する英語の構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: 'のど痛い', english: [
+        "throat hurts",
+        "my throat is killin' me",
+        "my throat is honestly killing me, swallowing hurts",
+        "my throat is on fire. swallowing feels like sandpaper. talkin' makes it worse. I keep havin' to clear my throat which makes it worse. and it's only Monday. this is gonna be a whole week. I'm gonna be doin' the soup, tea, honey, lozenge cycle for days. ugh. early sign of a real cold."
+    ], context: "killin' meは「殺してくる」=「すごく痛い」、暴力動詞による誇張、英語の身体感覚表現の特徴。my throat is on fireは「のどが燃えてる」、痛みを温度・破壊力で表現する英語の比喩。日本語の「痛い」よりgraphicな比喩。like sandpaperは「サンドペーパーのような」、感覚を物体の質感で表現する英語の共感覚的表現。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: '熱出た', english: [
+        "fever",
+        "I've got a fever, this is real",
+        "I have an actual fever right now, I have to call out tomorrow",
+        "I've got a fever. 100.4. that's officially over the threshold. I am sick. legitimately sick. not lookin'-for-an-excuse sick, actually-can't-function sick. I'm callin' out tomorrow. don't even care about the deadline. my body needs to fight this off and I'm not gonna make it worse by sittin' upright and answerin' emails."
+    ], context: "callin' outは「電話で休むことを伝える」=「病欠する」、英語のworkplace語彙、特にアメリカ英語のcorporate vocabulary。over the thresholdは「閾値を超えた」、医学・科学用語の日常化。日本語の「熱出た」よりmedical/quantified(数値化)。actually-can't-function sickはハイフン化形容詞で「機能不全レベルの病気」を表す英語の構文遊び、自己診断を細分類する文化。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: '寝込む', english: [
+        "knocked out",
+        "I am completely knocked out by this",
+        "this cold has me completely knocked out, I'm useless",
+        "I'm knocked out. completely. this thing knocked me flat on day 2 and I haven't moved much since. I get up, eat something small, take a pill, go back to bed. that's the cycle. tea, sleep, tea, sleep. by tomorrow I should be better. by tonight I will not be functional. one foot in front of the other."
+    ], context: "knocked outはボクシング用語「ノックアウト」=「打ち倒される」、戦闘比喩で病気を表現する英語の構造。flatは「平らに」=「動けず横たわって」、姿勢で機能不全を表す英語の比喩。日本語の「寝込む」より戦闘的・敗北的なニュアンス。one foot in front of the otherは「片足を前に」=「一歩ずつ進む」、生存努力を歩行動作で表す英語の慣用句。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: '頭割れる', english: [
+        "head is splitting",
+        "my head is literally splitting in half",
+        "I have a splitting headache, like genuinely cannot function",
+        "my head is splittin'. that's what the saying means. it's not a metaphor right now. there's an actual axe in there. behind my left eye. throbbin' in time with my heart. I took ibuprofen 30 minutes ago and it hasn't kicked in. I'm sittin' in a dark room with my eyes closed waitin' for relief."
+    ], context: "splittingは「裂けてる」=「割れるような頭痛」、splitting headacheは英語の鉄板慣用句。axe in thereは「斧が入ってる」、痛みを暴力的な物体侵入で表現する英語の比喩。日本語の「割れる」より物理的・暴力的。throbbing in time with my heartは「心拍と同期して脈動する」、痛みを音楽的リズムで表現する英語の共感覚的表現。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: 'お腹壊した', english: [
+        "stomach's wrecked",
+        "my stomach is wrecked, what did I eat",
+        "my stomach is absolutely wrecked, must've been something I ate",
+        "my stomach's wrecked. somethin' I ate. or somethin' I didn't eat. or some combination. I've been in and out of the bathroom for hours. nothin's stayin' down. or nothin's comin' out, dependin' on the hour. either way, my body's purgin'. I'm gonna sit here, hydrate, and ride it out. tomorrow I'll feel weak but human."
+    ], context: "wreckedは「破壊された」=「ぐちゃぐちゃ」、船・車の難破比喩で身体不調を表す英語の比喩。日本語の「壊した」と同方向だが、英語のwreckedは大規模破壊感を持つ。purgingは「浄化する」=「排出する」、宗教・医学用語の流用で身体反応を高尚化する英語のジョーク。ride it outは「乗り切る」、嵐・波の比喩で病気を耐え忍ぶ英語の構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: '医者行く', english: [
+        "going to the doctor",
+        "I'm finally going to the doctor",
+        "I'm finally going to the doctor about this, it's been too long",
+        "I'm finally goin' to the doctor. I've been ignorin' this thing for like 3 weeks and it's not gettin' better. it's probably nothin'. it's probably somethin'. but I won't know until I go. better to know than to spiral with WebMD at 2 AM. tomorrow at 10. at least then I'll have answers. or different anxieties. tradeoff."
+    ], context: "WebMD文化は2000年代以降の英語インターネット医療検索の総称、自己診断による不安を増幅する現象を指す。spiralingは「螺旋状に下降する」=「精神的悪化」、現代心理学の語彙、不安を渦に喩える英語の現代比喩。better to know than to spiralは「知る方がマシ」と「悪化させる」の対比、英語の自己合理化文法。日本語の「医者行く」より自己心理分析的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: '薬効かない', english: [
+        "meds aren't workin'",
+        "the meds aren't workin' at all",
+        "the medication is not working at all, I'm still in pain",
+        "the meds aren't workin'. it's been 90 minutes. usually I feel relief by now. somethin's different about this one. either it's a really stubborn headache or my body's built up tolerance. or both. I'm gonna give it another 30 and then take a different one. somethin' has to break this. I cannot function like this."
+    ], context: "medsは「medications」の省略、英語の口語化。tolerance(耐性)は薬理学用語の日常化、薬への身体適応を生物学的に表現する英語の科学的志向。stubborn headacheは「頑固な頭痛」、症状を擬人化(性格を持つ存在)する英語の比喩。日本語の「効かない」より動的(working)、薬を労働者として捉える英語の経済比喩。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: '回復してきた', english: [
+        "on the mend",
+        "I'm finally on the mend",
+        "I'm finally on the mend, I can tell I'm getting better",
+        "I'm on the mend. I can tell. yesterday everything hurt. today only most things hurt. that's progress. I had appetite back this morning, just a little. I had energy to shower, just barely. these are the small signs. by tomorrow I'll be 80%. by Friday I'll be 100%. the body knows what to do, you just gotta let it."
+    ], context: "on the mendは「修繕中」=「回復中」、職人語彙(縫い物・修繕)が病気回復に流用された英語の慣用句。19世紀の表現が現代まで継続。the body knowsは身体を擬人化(知識を持つ存在)、英語のwellness culture特有の哲学的表現。日本語の「治ってきた」より過程的・段階的(80%, 100%)で進歩を数値化する英語の合理性。", category: 'reaction', month: '2026-05' },
+    { daySlot: 17, japanese: '無理しない', english: [
+        "taking it easy",
+        "I'm takin' it easy this week",
+        "I'm taking it easy this week, gotta let my body recover properly",
+        "I'm takin' it easy. I learned the hard way that pushin' through illness just makes it worse. I'd rather lose a week to rest than 3 weeks to a relapse. so I'm cancelin' plans. clearin' my schedule. just sleep, hydrate, and binge dumb TV. recovery is the priority. work will be there when I'm back."
+    ], context: "taking it easyは「楽にとる」=「無理しない」、英語の rest cultureの基本フレーズ。learned the hard wayは「困難な方法で学んだ」=「失敗から学んだ」、経験学習を強調する英語の慣用句。relapseは医学用語「再発」、病気・依存症から日常用語化、悪化への警戒を表現する英語の予防語彙。日本語の「無理しない」より具体的なrisk management。", category: 'shutdown', month: '2026-05' },
+
+    // ── Day 18: 運動・ジム ──
+    { daySlot: 18, japanese: '今日は脚の日', english: [
+        "leg day",
+        "today is leg day",
+        "today's leg day, and I'm regretting all my life choices in advance",
+        "leg day. nobody likes leg day. but skippin' it leaves you with that tiny chicken-leg look that nobody wants. so here I am, in the squat rack, dreadin' the next 45 minutes. I'm gonna feel this in 2 days. tomorrow I'll be fine. day after tomorrow I won't be able to walk down stairs."
+    ], context: "leg day / arm day / push day / pull dayは現代英語のジム文化の用語、bodybuildingコミュニティから一般化(2010年代)。chicken-leg lookは「鶏脚状態」、上半身鍛えて下半身を疎かにする身体形を揶揄する英語のスラング。日本語にも「鶏ガラ」があるが、英語のchicken-legはfitness specific。dread + 動詞 -ingは「〜を恐れる」、英語の感情予測の構文。", category: 'reaction', month: '2026-05' },
+    { daySlot: 18, japanese: 'PB更新', english: [
+        "new PR",
+        "just hit a new PR on bench",
+        "I just hit a new personal record on bench press, I'm hyped",
+        "new PR! I just benched 95kg. that's 5kg more than last month. I've been workin' toward this for 3 weeks. 3 weeks of structured volume, 3 weeks of decent sleep, 3 weeks of eatin' enough protein. and today it clicked. small wins. but they add up. one rep at a time. one PR at a time."
+    ], context: "PR (personal record / personal best)はスポーツ・ジム文化の用語、英語のlifting/runningコミュニティで2010年代に普及。日本語の「自己ベスト」と機能同一だが、英語はPR/PB/maxなど用語が複数あり、競技性の高さが言語化されている。one X at a timeは「一つずつ」、英語の頻出構文、漸進的進歩を強調する。日本語の「一歩ずつ」と並行構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 18, japanese: '筋肉つかない', english: [
+        "not seeing gains",
+        "I'm not seeing any gains, what am I doin' wrong",
+        "I'm not seeing any gains lately, must be eating too little",
+        "I'm not seein' any gains. been workin' out 4 days a week for 2 months. and I look exactly the same. eatin' enough? probably not. sleepin' enough? definitely not. it's gotta be food. I need to bump my calories up. or maybe it's stress. cortisol kills gains. could be all three. body's complicated."
+    ], context: "gainsは英語のジム文化の絶対的キーワード、「筋肉量の増加」を一語で表現する英語の特殊用語。日本語に等価語がない(「筋肥大」は学術的)。cortisol kills gainsは「コルチゾールがゲインを殺す」、ストレスホルモンを擬人化(殺人者)、現代英語のfitness scienceとmental healthの交差点。bro science(ジム科学)語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 18, japanese: 'プランク辛い', english: [
+        "plank is brutal",
+        "this plank is straight-up brutal",
+        "this plank is honestly brutal, my core is on fire",
+        "this plank is brutal. 60 seconds doesn't sound long. 60 seconds in plank position is an eternity. I'm shakin'. I'm sweatin'. I'm questionin' my life choices. 30 seconds left. 25. 20. why did I sign up for this. core's on fire. but here we go. just breathe. just hold. just survive."
+    ], context: "brutalは「残酷な」=「めちゃキツい」、暴力性の形容詞でフィットネス強度を表す英語のジム文化用語。core's on fireは「コアが燃えてる」、温度比喩で筋肉疲労を表現する英語の身体感覚表現。questioning my life choicesは現代英語の自虐スラング、日常的選択を哲学的命題に拡大するジョーク。日本語の「後悔」より大袈裟(life choices)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 18, japanese: '筋肉痛ヤバい', english: [
+        "wrecked from yesterday",
+        "I am completely wrecked from yesterday's workout",
+        "I am so sore from yesterday's workout, I can barely move",
+        "I'm wrecked from yesterday. can't lift my arms above my head. shoulders, lats, biceps, all on fire. and not the good fire. the can't-do-anything-today fire. I overdid it. classic mistake. did 4 sets when 3 would've been enough. now I'm payin' for it. 48 hours of misery for 20 minutes of ego."
+    ], context: "wreckedは破壊比喩で疲労を表現する英語の頻出スラング。good fire vs can't-do-anything-today fireは英語のhyphenated adjectives(ハイフン形容詞)で、感情・状態を細分類する。日本語の「火」「燃える」は単一比喩、英語は「火の種類」を分類して語る誇張文化。20 minutes of ego, 48 hours of miseryは比例関係を時間量で対比する英語の合理化。", category: 'reaction', month: '2026-05' },
+    { daySlot: 18, japanese: 'ストレッチ重要', english: [
+        "stretching is everything",
+        "stretching is everything, I learned the hard way",
+        "stretching is honestly everything, I learned that the hard way",
+        "stretchin' is everythin'. I learned this the hard way. 10 years of liftin' without stretchin' and now my hips are tight, my hamstrings are like cables, my back hurts when I sit. I started stretchin' 20 minutes a day and the difference is night and day. don't be me. start now. future you will thank you."
+    ], context: "is everythingは現代英語の絶対的肯定、「これが最重要」の強調表現。stan culture(SNS)由来で2010年代に普及。night and dayは「夜と昼」=「天と地」、対比を昼夜の最大差で表す英語の慣用句。future youはmillennial英語の自己分裂語彙、未来の自分を別人格として説得する現代の自己対話表現。日本語の「未来の自分」より頻度が高い。", category: 'opinion', month: '2026-05' },
+    { daySlot: 18, japanese: 'やる気MAX', english: [
+        "fully locked in",
+        "I'm fully locked in for this workout",
+        "I am fully locked in for this session, no distractions",
+        "I'm locked in. fully. headphones on, music loud, phone on do not disturb. nobody talks to me. nobody distracts me. for the next 75 minutes I am a single-purpose machine. liftin', restin', liftin' again. that's the whole job. the rest of life can wait. this is my hour."
+    ], context: "locked inは「鍵をかけられた」=「集中状態」、現代英語のfocus語彙(2020年代に大流行)。スポーツ・eスポーツ文化由来、強制的集中を機械的な施錠で表現する。single-purpose machineは「単一目的の機械」、人間を機械化する英語の比喩、目的特化を機械操作に喩える現代の自己論。日本語の「集中する」より工学的・機械的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 18, japanese: '走り切った', english: [
+        "made it the full distance",
+        "I made it the full distance today",
+        "I actually made it the full distance today without stopping once",
+        "I made it. full distance. didn't stop. didn't walk. didn't even slow down at the hill that always breaks me. somethin' clicked today. legs were strong. lungs were cooperatin'. mind was quiet. these days don't come often. when they do, I appreciate every step. that runner's high is the real reward."
+    ], context: "runner's highは現代英語のスポーツ・神経科学用語、長距離走中のendorphin高揚状態を指す。日本語に等価語が輸入されていない領域、英語のほうが運動科学・神経化学の語彙が豊富。something clickedは「何かがカチッとはまった」=「うまくハマった」、機械音による感覚体験の表現、英語の共感覚的構造。日本語の「ハマった」より機械的・物理的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 18, japanese: 'もう動けない', english: [
+        "absolutely cooked",
+        "I am absolutely cooked",
+        "I am absolutely cooked, that workout broke me",
+        "I am cooked. fully. that workout broke me into little pieces and I'm not gonna be a person again for at least an hour. I'm sittin' on the floor right now. don't make me get up. I'll get up when I'm ready. somebody bring me water. somebody bring me protein. I made it. that's enough for today."
+    ], context: "cookedは「調理された」=「完全にやられた」、料理動詞による身体疲労表現、現代英語の疲労スラング(2010年代後半)。break me into little piecesは「小片に砕く」、暴力的破壊比喩で完全疲労を表す英語の誇張。日本語の「ぐったり」よりgraphic。be a person againは「再び人間になる」、機能不全状態を「人間でない」と二項化する英語の構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 18, japanese: 'シャワー浴びる', english: [
+        "post-workout shower",
+        "best part of the day, post-workout shower",
+        "honestly the post-workout shower is the best part of the day",
+        "post-workout shower. there is no better feelin' on Earth. you've earned this water. every drop. cold first to bring the heart rate down. then warm. then hot. then back to lukewarm. and you stand under it for 15 minutes thinkin' about nothin'. it's meditation. it's reward. it's the best part of any day with a workout in it."
+    ], context: "post-workout(ワークアウト後)は現代英語のフィットネス語彙、タイミング修飾語。post-X(post-meeting, post-meal, post-game)はビジネス・生活全般に拡張する英語の構文。lukewarmは「ぬるい」、温度を細分する英語(cold/cool/lukewarm/warm/hot/scalding)、日本語の温度語彙より段階数が多い。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 19: お金の英語 ──
+    { daySlot: 19, japanese: '今月キツい', english: [
+        "month is rough",
+        "this month is rough financially",
+        "this month is financially rough, I shouldn't have spent so much last weekend",
+        "this month is rough. I overspent on that weekend trip and now I'm lookin' at the rest of May with too much month and not enough money. classic. I'm gonna eat at home, walk instead of takin' Ubers, and tell everyone no for the next 2 weeks. it'll suck. but it's the price of last weekend's fun."
+    ], context: "too much month and not enough moneyは英語の金銭ジョーク、財政逼迫を時間と金額の不釣合いで表現する慣用句。日本語にも「給料日まで遠い」と並行表現があるが、英語のtoo much X, not enough Yは構文的な対比強調。pay the price for funは「楽しみの代償」、英語の経済比喩で快楽を取引で表現する文化、清教徒的経済倫理の名残。", category: 'reaction', month: '2026-05' },
+    { daySlot: 19, japanese: '貯金頑張る', english: [
+        "saving aggressively",
+        "I'm saving aggressively this year",
+        "I'm being really aggressive with my savings this year, locked in mode",
+        "I'm savin' aggressively. every paycheck, I move 30% to savings before I even see it. out of sight, out of mind. then I live on the rest. it's tight. but it's buildin' a real safety net. by year-end I'll have 6 months of expenses saved. that's the goal. financial independence is freedom."
+    ], context: "aggressivelyは「攻撃的に」、投資・貯金行動を戦闘的に表現する英語のフィナンシャル語彙、Wall Street文化由来。out of sight, out of mindは英語の慣用句「目に見えなくて気にならない」、行動経済学のautomationで使われる。financial independenceは現代英語のFIRE文化(Financial Independence Retire Early)語彙、日本語にも輸入されたが頻度は英語のほうが高い。", category: 'opinion', month: '2026-05' },
+    { daySlot: 19, japanese: 'クレカ怖い', english: [
+        "credit card terrifying",
+        "my credit card statement is terrifying right now",
+        "I cannot bring myself to look at my credit card statement this month",
+        "my credit card statement is terrifyin'. I'm not openin' the email. I know what's in there. I know it's bad. lookin' at it doesn't change the number, it just makes me feel worse. I'll pay it. I always pay it. but for now I'm livin' in blissful ignorance. denial is a financial strategy."
+    ], context: "denial is a financial strategyは皮肉ジョーク、心理用語denial(否認)を経済戦略として誤用化する英語の現代スラング。blissful ignoranceは18世紀英語の慣用句「至福の無知」、知識の負担を強調する。日本語の「見ないふり」と機能同一だが、英語のほうが哲学的・宗教的響き(blissful=祝福された)。financial anxietyは現代英語のmental health語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 19, japanese: 'ボーナス何に使う', english: [
+        "bonus plans",
+        "thinkin' about what to do with the bonus",
+        "I've been thinking about what to do with the bonus, can't decide",
+        "what to do with the bonus. that's the question. half goes to savings, that's locked. the other half? options. trip somewhere? new laptop? invest it? blow it on somethin' fun? probably the boring split: 70% savings, 20% somethin' practical, 10% pure indulgence. but my heart wants 100% trip."
+    ], context: "blowing money(金を吹き飛ばす)は「浪費する」、英語の金銭暴力比喩。日本語の「散財」より動的(風で吹き飛ばす)、無責任さが強調される。boring split(つまらない配分)は現代英語の財政語彙、合理性を「つまらなさ」で表現する自虐ジョーク。pure indulgenceは「純粋な道楽」、罪悪感込みの娯楽表現、宗教用語(indulgence=贖宥状)が経済語彙化。", category: 'opinion', month: '2026-05' },
+    { daySlot: 19, japanese: '節約モード', english: [
+        "tightening the belt",
+        "I'm tighten' the belt this month",
+        "I'm in serious tightening-the-belt mode this month",
+        "tightening the belt. that's where I'm at. I'm cookin' all my meals. takin' the bus instead of cabs. unsubscribed from 4 streamin' services. brought my coffee from home. these little things add up. by month-end I'll have saved 200 bucks just by sayin' no to the small stuff."
+    ], context: "tightening the beltは「ベルトを締める」=「節約する」、19世紀英語の慣用句、戦時の食料配給文化由来。日本語にも「ベルトを締める」が並行して存在し、興味深い言語的偶然。saying no to the small stuffは現代英語の財政哲学、小額支出の累積効果を強調する。compound effect思考(累積効果)は現代英語のfinancial wisdom語彙、複利の概念を生活全般に応用する。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 19, japanese: '株上がった', english: [
+        "stock's up",
+        "my stock's up, finally",
+        "my stock is finally up after weeks of being down",
+        "my stock's up. finally. it's been red for like 6 weeks. I almost sold last Tuesday. I'm so glad I didn't. now it's green and I'm a genius. or I just got lucky and timed somethin' I had no business timin'. either way, today I'm a market wizard. tomorrow I'll probably be crushed again. enjoy the moment."
+    ], context: "redとgreenは株式チャートの色(下落=赤、上昇=緑)、英語の金融文化用語。日本語の株式市場では赤=上昇、緑=下落で逆。文化的な色の意味の差。market wizardは皮肉表現「マーケットの魔法使い」、短期的成功を誇張する英語のジョーク。had no business timingは「タイミングを取る権利がない」=「タイミング読みする立場でない」、自己客観化の英語の構文。", category: 'reaction', month: '2026-05' },
+    { daySlot: 19, japanese: '損した', english: [
+        "took an L",
+        "yeah, I took an L on that one",
+        "I took a pretty bad loss on that investment, lesson learned",
+        "I took an L on that one. don't even wanna talk about it. went in too aggressive, didn't do enough research, panicked when it dipped. textbook beginner mistake. lost about 15%. could've been worse. lessons cost money sometimes. I'm chalkin' it up to tuition. won't make the same mistake twice."
+    ], context: "took an Lは「敗北を取った」=「負けた」、Lはloss(敗北)の頭文字、ヒップホップ・スポーツ文化由来の英語スラング(2010年代)、SNSで一般化。chalking it up to tuitionは「授業料として記録する」=「損失を学習費とみなす」、教育費比喩で失敗を正当化する英語の構造。日本語の「授業料」と並行表現だが、英語のchalk it upは記録動作を含む。", category: 'reaction', month: '2026-05' },
+    { daySlot: 19, japanese: '家計簿付ける', english: [
+        "tracking spending",
+        "I'm tracking every dollar this month",
+        "I'm tracking every single dollar this month, see where it all goes",
+        "I'm trackin' every dollar this month. every single one. coffee, lunch, train, books. all of it goin' in the spreadsheet. I bet I'm spendin' way more than I think on stupid things. food, mostly. I'll know by month-end. then I can make real decisions. you can't optimize what you don't measure."
+    ], context: "you can't optimize what you don't measureは現代英語のbusiness/data culture格言、Peter Drucker由来とされる経営論の決まり文句、生活全般に拡張される。日本語の「測れないものは管理できない」と並行表現だが、英語のほうが頻度が高くself-improvement契約として機能する。tracking every dollarは英語のbudgeting文化の典型的行動、完璧主義的金銭管理。", category: 'opinion', month: '2026-05' },
+    { daySlot: 19, japanese: '副業始める', english: [
+        "starting a side hustle",
+        "I'm starting a side hustle this summer",
+        "I'm starting a side hustle this summer, I need extra income",
+        "I'm startin' a side hustle. nothin' crazy. just somethin' to make 500 bucks a month on the side. maybe freelance writin'. maybe dog walkin'. maybe sellin' stuff online. I haven't decided. but I want a second income stream. one job feels too risky in this economy. diversify income like you diversify investments."
+    ], context: "side hustleは現代英語のgig economy語彙、本業外の副収入活動を指す若者文化用語(2010年代に普及)。日本語の「副業」と機能同一だが、英語のside hustleは積極性・自営業精神を強調する。diversify income like investmentsは投資理論の生活応用、リスク分散思考が経済全般に拡大する英語の合理性志向。日本語の「副業」より entrepreneurial(起業家的)響き。", category: 'opinion', month: '2026-05' },
+    { daySlot: 19, japanese: '老後不安', english: [
+        "worried about retirement",
+        "I'm honestly worried about retirement",
+        "I'm honestly really worried about retirement, the math is scary",
+        "I'm worried about retirement. I ran the numbers. they're not good. with my current savings rate, I won't have enough to retire at 65. I'd have to work till 75. or live on a quarter of what I make now. neither sounds appealing. I gotta save more. or earn more. or both. starting now."
+    ], context: "ran the numbersは「数字を走らせた」=「計算した」、ビジネス・金融用語の日常化、英語のdata-driven decision making文化。retirement anxietyは現代英語のfinancial wellness語彙、老後資金問題を心理学的に名付けた21世紀の表現。日本語の「老後不安」より具体的(60s/70sの年齢、savings rateの数値化)、英語のほうが定量的。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 20: 投資・将来 ──
+    { daySlot: 20, japanese: '投資勉強中', english: [
+        "learning about investing",
+        "I'm learnin' about investing now",
+        "I'm finally taking the time to learn about investing properly",
+        "I'm learnin' about investin'. it's a lot. there are a million strategies. growth stocks, value stocks, ETFs, bonds, REITs, crypto, options. I've been readin' a book a week and watchin' videos and the more I learn, the more I realize I don't know. but at least now I know I'm ignorant. that's progress."
+    ], context: "growth vs value stocks、ETF、REIT、optionsは現代英語の金融商品語彙の基本セット、retail investor culture(個人投資家文化)で必須語彙(2010年代以降)。日本語にも輸入されたが、英語のほうが日常会話で頻出。Socratic ignorance(知っていることが少ないと知ること)は哲学概念、英語のintellectual humilityとして自己評価に使われる。", category: 'opinion', month: '2026-05' },
+    { daySlot: 20, japanese: 'インデックス派', english: [
+        "I'm an index investor",
+        "I'm an index investor through and through",
+        "I'm strictly an index investor, I don't pick individual stocks",
+        "I'm an index investor. Bogle was right. you can't beat the market consistently. so don't try. just buy the whole market. low fees. boring strategy. but it works. boring beats fancy 9 times out of 10. I'll take boring and rich over fancy and broke any day."
+    ], context: "Bogleは Vanguardの創設者John Bogle、index fund(インデックスファンド)の生みの親、英語のretail investor文化の聖人。boring beats fancyは現代英語の投資哲学スローガン、退屈な戦略の優位性を強調する。日本語の「インデックス派」より哲学的・人物崇拝的。boring and rich over fancy and brokeは英語の対句構文、形容詞対比でwisdom要約する英語の修辞法。", category: 'opinion', month: '2026-05' },
+    { daySlot: 20, japanese: '不動産買う', english: [
+        "buying property",
+        "I'm thinkin' about buyin' property",
+        "I'm thinking about buying property, but the timing seems brutal",
+        "I'm thinkin' about buyin' property. the timing's brutal. interest rates are high. prices are high. it's the worst combination. my parents bought their place in the 80s for a fraction. and they say work hard. work hard doesn't fix this market. but I'd rather own than rent forever. eventually I gotta jump in."
+    ], context: "interest ratesは「金利」、現代英語の経済語彙の基本。aspirational real estate(願望的不動産)は現代英語のmillennial語彙、住宅取得困難を世代論で語る現象。日本語の「家を買う」より社会経済的analyzed(分析的)。jump inは「飛び込む」、市場参入を物理動作で表現する英語の比喩、日本語の「参入する」より身体的。", category: 'opinion', month: '2026-05' },
+    { daySlot: 20, japanese: 'ローン組む', english: [
+        "takin' out a loan",
+        "I'm takin' out a loan for this",
+        "I'm gonna have to take out a loan, no way around it",
+        "I'm takin' out a loan. there's no other way. I can't pay cash for this. and even if I could, it'd wipe out my savings. so I'm gonna pay 5% interest for 30 years. that's the cost of bein' a homeowner. some people argue rentin' is smarter. probably true. but I want a place that's mine. I'll pay the premium for that."
+    ], context: "take out a loanは「ローンを取り出す」=「借入する」、英語の金融取引動詞句。premium for ownershipは現代英語の経済用語、所有のコスト概念を経済学の「プレミアム」で語る合理化。日本語の「ローン組む」より金融工学的、abstract conceptを取引として表現する。homeowner identityは英語のmiddle class文化の重要なアイデンティティマーカー。", category: 'opinion', month: '2026-05' },
+    { daySlot: 20, japanese: 'NISA満額', english: [
+        "maxed out my retirement",
+        "I maxed out my retirement contributions",
+        "I just maxed out my retirement contributions for the year",
+        "I just maxed out my retirement account for the year. that's tax-advantaged money workin' for me until I'm 65. set it and forget it. dollar-cost averagin' across the year. by the time I'm thinkin' about retirement, this money'll have compounded into somethin' real. boring. effective. that's my whole strategy."
+    ], context: "max out the accountは英語の現代財政語彙、税優遇枠の上限利用を指す。tax-advantagedは「税優遇された」、英語の合成形容詞で金融制度を名付ける。set it and forget itは「設定して忘れる」、テレビショッピング由来のフレーズが投資哲学に流用された英語の構造。dollar-cost averagingは投資手法名、日本語に「ドルコスト平均法」として輸入。compoundは「複利化する」、Einsteinの引用と共に英語financial wisdomで頻出。", category: 'reaction', month: '2026-05' },
+    { daySlot: 20, japanese: '将来不安', english: [
+        "stressed about the future",
+        "I'm just stressed about the future in general",
+        "I'm just generally stressed about the future, the world's a lot",
+        "I'm stressed about the future. just generally. economy's weird. AI's takin' jobs. climate's changin'. politics is chaos. I'm tryin' to plan for retirement in a world that won't look anythin' like the world my parents retired into. it's hard to know what to prepare for. I'm just doin' my best with the information I have."
+    ], context: "the world's a lotは現代英語の若者語彙、世界の複雑性を「量」で表現する省略形(2020年代)。a lot形容詞用法は新しい英語、「too much」より中立的。AI taking jobs / climate change / political chaosは現代英語の不安語彙のセット、generational anxietyの典型。日本語の「不安」より具体的・項目別、英語は不安源を分類して語る分析志向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 20, japanese: '貯金額目標', english: [
+        "savings goal",
+        "I have a real savings goal this year",
+        "I have a real specific savings goal for this year, six months of expenses",
+        "I have a savings goal this year. 6 months of expenses. that's the emergency fund target. about 20K USD. by December. it's aggressive but doable if I cut some lifestyle stuff. I'm trackin' the progress monthly. visual progress bar in my notes app. small motivator but it works. seein' the bar fill up is satisfyin'."
+    ], context: "emergency fundは現代英語のpersonal finance語彙、3-6か月の生活費を緊急時用に貯金する米国の標準アドバイス、Dave Ramsey由来。日本語にも「緊急資金」が輸入されたが、英語のほうが文化的に確立した概念。progress barはコンピュータ用語が日常感情管理に流用された現代英語の比喩、視覚化された進歩を心理満足に変換する。", category: 'opinion', month: '2026-05' },
+    { daySlot: 20, japanese: '保険見直す', english: [
+        "reviewing my insurance",
+        "I'm reviewing my insurance this month",
+        "I'm reviewing all my insurance policies this month, hopefully save some money",
+        "I'm reviewin' my insurance. all of it. health, auto, renter's, life. I'm 90% sure I'm overpayin'. I haven't shopped around in 4 years. rates change. companies change. there might be a better deal out there. I'm gonna get 3 quotes for each and switch if I can save 15% or more. it's adult homework but it pays."
+    ], context: "shopping aroundは「あちこち買い物する」=「比較検討する」、英語のconsumer culture標語、retail動詞句が金融商品比較に流用される。getting quotesは「見積もりを取る」、ビジネス用語の日常化、英語の rational consumer culture。adult homeworkは「大人の宿題」、責任ある活動を学校用語で揶揄するmillennial slang(2010年代)、日本語の「大人の責任」より自虐的・幼児退行的。", category: 'opinion', month: '2026-05' },
+    { daySlot: 20, japanese: '転職検討', english: [
+        "thinking about switching jobs",
+        "I'm thinkin' about switchin' jobs",
+        "I'm seriously thinking about switching jobs, the money's better elsewhere",
+        "I'm thinkin' about switchin' jobs. recruiter reached out. salary's 30% higher. work seems similar. the only thing keepin' me here is the people. and that's a real thing. but it's also not enough at some point. I'm not gonna make a decision yet. but I'm gonna take the meeting. listen. learn. then decide."
+    ], context: "switching jobsは英語のcareer change語彙、employment as transactional choiceの現代観。日本語の「転職」より動的(switch=切り替え動作)、所属を機械的に切り替える感覚。recruiter文化はアメリカのプロフェッショナルcareer cultureの重要な要素、headhuntingが日常化した英語社会。take the meeting / listen / learn / decideは英語の段階的意思決定法、行動を分解して語る合理性志向。", category: 'opinion', month: '2026-05' },
+    { daySlot: 20, japanese: '夢で買う', english: [
+        "buying my dream",
+        "I'm finally buying my dream item",
+        "I'm finally buying the thing I've been dreaming about for years",
+        "I'm buyin' the thing. you know the thing. I've been talkin' about it for 3 years. savin' for it for 2. and finally I have enough. it's stupid expensive. it's not practical. but it's been on my mind every day. I'm gonna own it. I'm gonna use it. and I'm gonna feel weird about the money for about a week, and then I'll forget it and just enjoy the thing."
+    ], context: "the thingは英語の言語学的「特定無名」表現、文脈で共有される「あれ」を曖昧名詞化する英語の構文。日本語の「あれ」「それ」と並行構造。stupid expensiveは現代英語の合成形容詞、stupid+adjは形容詞強化のmillennial slang(2010年代)で、日本語の「めっちゃ高い」より知的に自虐的。delayed gratificationは心理学用語の日常化、長期計画の達成感を心理学概念で正当化する英語の現代教養。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 21: 家族 ──
+    { daySlot: 21, japanese: '実家に電話', english: [
+        "calling home",
+        "callin' home tonight, been a while",
+        "I'm callin' home tonight, it's been way too long",
+        "I'm callin' home tonight. it's been like 3 weeks. I know. bad daughter. but life happens. I'll do the regular check-in. ask Mom how she's been. ask Dad about the garden. listen to the same stories I've heard before. and I'll feel better after. I always feel better after. I should call more. I won't, but I should."
+    ], context: "calling homeは英語の家族語彙、距離を持つ親子関係の標準動詞句。アメリカ英語のdormitory/college文化、子どもが実家を離れる文化が背景。bad daughterは「悪い娘」、家族義務の自虐的アイデンティティ、ジョーク化された罪悪感。日本語の「親不孝」より軽量化された英語の自己批評、check-inは「定期確認」のビジネス用語が家族関係に流用された現代英語。", category: 'reaction', month: '2026-05' },
+    { daySlot: 21, japanese: '親も歳取った', english: [
+        "parents are getting older",
+        "my parents are gettin' older, it hits different",
+        "I'm noticing my parents are getting older and it hits different now",
+        "my parents are gettin' older. it's somethin' I started noticin' the last few years. they move slower. they ask me to repeat things. they take longer to recover from minor stuff. it sneaks up on you. one day they're invincible parents. the next they're aging humans. and I have to start thinkin' about that. it's heavy."
+    ], context: "hits different / sneaks up on youは現代英語の感情表現、影響を物理動作で表現する。生活感覚の現代化を示す英語の比喩。日本語の「歳取った」より時間的・物理的(slow down, recover)な観察、英語のほうが具体的な行動変化を分解して語る。invincible parents to aging humansは認識の転換を二項化する英語の構文、shift in perceptionの言語化。", category: 'opinion', month: '2026-05' },
+    { daySlot: 21, japanese: '兄弟仲良し', english: [
+        "tight with my sibling",
+        "me and my sister are tight",
+        "me and my sister have always been really tight, she's my best friend",
+        "me and my sister are tight. always have been. we fought like crazy as kids. then in our 20s we became friends. now we text every day. we know each other's lives. she calls me out on my BS. I call her out on hers. that kind of relationship is rare and I don't take it for granted. she's my best friend, full stop."
+    ], context: "tightは「きつい」=「親密な」、relationship緊密度を物理的close-fitで表現する英語の比喩。call out on BSは「BSを指摘する」、frank feedback文化の動詞句、現代英語の親密さの定義。don't take for grantedは「当たり前と思わない」、感謝の心理を言語化する英語の構文、grateful living philosophy。日本語の「ありがたい」と並行表現だが、英語のほうが意識的・能動的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 21, japanese: '家族集合', english: [
+        "family gathering",
+        "we got a family gatherin' Sunday",
+        "we have a family gathering on Sunday, the whole crew",
+        "family gatherin' Sunday. the whole crew. parents, siblings, cousins, the works. it's gonna be loud. it's gonna be chaotic. somebody's gonna start an argument about politics. somebody else's gonna get drunk. there'll be drama. but also love. food. memories. these don't happen often, so I show up. it's worth the noise."
+    ], context: "family gatheringは英語のholiday/celebration語彙、Thanksgiving/Christmas文化由来。the works(全部)は英語の慣用句「全部入り」、ハンバーガーの注文用語が日常化した。chaotic家族集会は英語の現代家族論の典型的フレーミング、family drama as inevitable theme。worth the noiseは「騒音の代償あり」、社交コストを音響的に表現する英語の比喩。日本語の「賑やか」より具体的にネガポジ混在を示す。", category: 'reaction', month: '2026-05' },
+    { daySlot: 21, japanese: '実家ご飯', english: [
+        "mom's cooking",
+        "nothin' beats mom's cookin'",
+        "honestly nothing beats my mom's cooking, I've been spoiled my whole life",
+        "nothin' beats mom's cookin'. I've tried every restaurant. tried recreatin' her recipes. cooked with the same ingredients. somethin's always missin'. it's the years of practice. it's the love. it's the muscle memory. I miss her food more than I miss bein' a kid. and that's sayin' somethin'."
+    ], context: "nothing beats Xは「Xに勝るものなし」、英語の優越性表現の構文、ボクシング・スポーツ用語のbeatの拡張使用。muscle memoryは「筋肉の記憶」=「身体習慣」、神経科学・スポーツ用語が料理に流用された英語の比喩、身体に蓄積された技能を物理化する。spoiledは「甘やかされた」=「贅沢に育った」、家族文化の英語語彙、感謝と自虐の混在。", category: 'reaction', month: '2026-05' },
+    { daySlot: 21, japanese: '甥っ子の成長', english: [
+        "nephew is growing fast",
+        "my nephew is growin' so fast",
+        "my nephew is growing so fast, I can't keep up with how big he is",
+        "my nephew is growin' so fast. I saw him three months ago and he was a baby. now he's walkin'. talkin'. has personality. has opinions. recognizes me. it freaks me out. time moves different around kids. they grow in time-lapse and we age in slow motion. it's gonna keep happenin'. I'm gonna be old before I notice."
+    ], context: "time-lapse vs slow motionは映画用語の対比比喩、子供の成長と大人の老化を映像技法で対立させる英語の現代修辞。日本語の「あっという間に大きくなる」より具体的・映像的。freak me outは「(私を)パニックにさせる」、現代英語の感情強調動詞、ネガ感情を引き起こす対象を主体化する。日本語の「驚く」より能動的・他動詞的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 21, japanese: '結婚記念日', english: [
+        "anniversary",
+        "anniversary's comin' up",
+        "our anniversary is coming up next week, I gotta plan something",
+        "our anniversary's comin' up. number 5. that's a real number. crystal anniversary, I think? I should plan somethin'. she'll say I don't have to. she means I have to. that's how marriage works. fancy dinner. small gift. somethin' thoughtful. I have like a week to figure it out. I'll figure it out. I always do. eventually."
+    ], context: "anniversary numberingは英語の文化習慣、年数ごとに素材(crystal=5周年、wood=5周年など)を割り当てる。アメリカ英語の伝統。she means I have toは英語の「言葉と意図の乖離」を指摘するjoke、女性・男性の間接コミュニケーションを揶揄する現代英語の jokes。日本語にも「言わなくても分かれよ」があるが、英語のmeans I have toはmore analytic(分析的)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 21, japanese: '父の趣味', english: [
+        "dad's hobby",
+        "Dad's gettin' into a new hobby",
+        "Dad has gotten really into woodworking lately, who knew",
+        "Dad's gotten into woodworkin' in retirement. who would've guessed. the man who couldn't change a lightbulb my whole childhood is now buildin' tables. he sends me photos every week. they're gettin' progressively more impressive. I'm proud of him. and weirded out. people are full of surprises, I guess. especially after they retire."
+    ], context: "people are full of surprisesは英語の慣用句「人は驚きに満ちる」、人物の不可解さを哲学的に表現する。retirement hobby文化はアメリカの典型的lifestyle topic、職業人生後の自己発見を社会的物語化する英語の構造。weirded outは「奇妙にされた」=「困惑した」、現代英語の感情動詞、外部刺激による内的変化を受動形で表現する。日本語の「困惑」より物理的・他動的。", category: 'opinion', month: '2026-05' },
+    { daySlot: 21, japanese: '母の日プレゼント', english: [
+        "mother's day gift",
+        "I gotta find a mother's day gift",
+        "I really need to figure out a mother's day gift, the day's almost here",
+        "Mother's Day gift. I've procrastinated. it's Sunday. I have 5 days. she'll say she doesn't need anythin'. she'll mean it. she also wants somethin'. that's the paradox. flowers are easy but lazy. a thoughtful card means more. I'm gonna do flowers AND a card. covers all bases. she'll cry. that's the goal."
+    ], context: "covers all basesは「全ての塁をカバーする」、野球用語が問題対処に流用された英語の比喩。日本語の「網羅する」より具体的(野球場のbase)。Mother's Day cultureはアメリカで19世紀末確立した社会的祝日、感謝の儀式化、英語のfamily ritual語彙。she'll cry. that's the goalは現代英語の感情を「目標」化するジョーク、合理化された家族儀礼の自虐的表現。", category: 'reaction', month: '2026-05' },
+    { daySlot: 21, japanese: '帰省したい', english: [
+        "wanna go home",
+        "I wanna go home, it's been too long",
+        "I want to go home for a visit soon, it's been way too long",
+        "I want to go home. for a visit. it's been like 8 months. that's too long. I miss the smell of the house. I miss the way the light comes in the kitchen. I miss bein' a kid for a weekend. I'm gonna book a flight. summer's comin'. I'll find a long weekend. it'll be just enough."
+    ], context: "going homeは英語の文化的に重要なフレーズ、childhood homeを「真の家」とする概念、modern English文化の心理的二重住居感(現在の家vs実家)。just enoughは「ちょうど十分」、英語の量的判断、minimal sufficiencyを称揚する哲学的構文。日本語の「ちょうどいい」と並行表現だが、英語のjust enoughはoptimization文化の語彙。", category: 'request', month: '2026-05' },
+
+    // ── Day 22: 子育て・教育 ──
+    { daySlot: 22, japanese: '子供寝てない', english: [
+        "kid won't sleep",
+        "the kid will not sleep tonight",
+        "the kid is refusing to go to sleep tonight, what is happening",
+        "the kid will not sleep. it's 10 PM. she should've been out two hours ago. she's runnin' around the house in pajamas. I've read 3 books. I've sang songs. I've turned the lights off. she's energized. why. why now. tomorrow's a school day. she's gonna be miserable. I'm gonna be more miserable. somebody help."
+    ], context: "out cold(寝ている)は英語の身体状態描写の頻出語彙、意識喪失を温度比喩(cold=動かない)で表現する。energized vs miserableは英語の感情対比構文、子育ての矛盾(子供の元気=親の疲労)を直接対立させる。日本語の「寝ない」より状態の積極性(running around、refusing)、英語の子供は能動的主体として描かれる傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 22, japanese: '反抗期始まった', english: [
+        "kid's hitting that phase",
+        "yep, kid's hittin' that phase",
+        "yep, looks like the kid is hitting that rebellious phase early",
+        "the kid's hittin' the phase. you know the phase. eye-rolls. dramatic sighs. 'whatever's. doors slammin'. I asked her to clean her room and got 20 minutes of attitude. and she's only 11. this is supposed to start at 13. we're in for a long ride. I'm gonna pick my battles. some things matter, most don't."
+    ], context: "the phase / hitting the phaseは英語の発達心理学用語の日常化、子供の発達段階を「フェーズ」と命名する英語の科学的志向。eye-rolls / dramatic sighsは英語のteen behavior語彙、子供の表現を行動分類する。pick my battlesは戦略用語「戦いを選ぶ」=「重要な戦いだけ戦う」、英語のparenting wisdomの定型句、軍事比喩で子育ての疲労を合理化する。", category: 'opinion', month: '2026-05' },
+    { daySlot: 22, japanese: '宿題見る', english: [
+        "helping with homework",
+        "helpin' with homework, learnin' as I go",
+        "I'm helping with homework and basically relearning everything myself",
+        "I'm helpin' with homework. fractions. apparently I forgot how to do fractions. I'm sittin' next to my 10-year-old, googlin' how to add fractions with different denominators, pretendin' I know what I'm doin'. she's not fooled. she knows I'm strugglin'. but at least we're strugglin' together. solidarity through math."
+    ], context: "googling how to do Xは現代英語の学習・問題解決の動詞句、ブランド動詞化(Google→to google)。pretendin' I know what I'm doin'は英語の「fake it till you make it」文化の自虐版、子育ての知識限界を笑いに変える。solidarity through Xは「Xを通じた連帯」、社会運動用語(solidarity)の家族関係への流用、英語の現代parenting語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 22, japanese: '習い事多い', english: [
+        "too many activities",
+        "the kid's got too many activities",
+        "the kid has way too many extracurriculars, he's exhausted",
+        "the kid's got too many activities. soccer Mondays, piano Tuesdays, chess Wednesdays, tutorin' Thursdays. and we wonder why he's tired all the time. somethin's gotta give. he asked me to drop chess. I said yes immediately. less is more, it turns out. kids need free time. they need to be bored. I forget that."
+    ], context: "extracurricularsは英語の「課外活動」、学校教育語彙のformal vocabulary。something's gotta giveは英語の慣用句「何かが折れる」、限界突破前の選択強制を表現する。less is moreはミース・ファン・デル・ローエの建築原則、minimalism(20世紀)の格言が日常哲学化した英語のwisdom literature。日本語にも輸入されたが、英語のほうが頻度が高い。", category: 'opinion', month: '2026-05' },
+    { daySlot: 22, japanese: 'スマホ与えるか', english: [
+        "should we get them a phone",
+        "should we even give the kid a phone yet",
+        "we're debating whether to give the kid a phone yet, all his friends have one",
+        "we're debatin' whether to give him a phone. all his friends have them. that's the social pressure. but he's 11. and phones at that age destroy attention spans. cause anxiety. expose them to garbage. but also they need to communicate. coordinate with friends. learn to use technology responsibly. there's no easy answer. parenting is just hard tradeoffs all the way down."
+    ], context: "all the way downは哲学概念「亀の上に亀」(turtles all the way down)由来、再帰的構造を表す英語の比喩、複雑性の無限後退を表現する。social pressureは現代英語の社会心理用語、行動選択の外的影響を分析する。modern parenting dilemmaは英語の現代育児問題の定型カテゴリー、テクノロジーvs子供保護の二項対立を構造化する。", category: 'opinion', month: '2026-05' },
+    { daySlot: 22, japanese: '保育園遅刻', english: [
+        "late for daycare",
+        "we're late for daycare again",
+        "we are running so late for daycare drop-off, classic Tuesday",
+        "we're late for daycare. again. somebody refused to put on socks for 8 minutes. somebody else couldn't find their backpack. somebody had a meltdown about which juice box. mornings with kids are a logistics nightmare. by the time we walk through that daycare door I've already worked my hardest hour of the day."
+    ], context: "logistics nightmareは英語のbusiness/military用語の家庭流用、子育ての複雑性をlogisticsで表現する英語の現代parenting語彙。meltdownは原子炉用語(炉心溶融)の感情比喩への流用(20世紀後半)、子供の感情爆発を物理現象で表現する英語の比喩。日本語の「キレる」より破壊的・大規模な誇張、英語の感情表現の物理性。", category: 'reaction', month: '2026-05' },
+    { daySlot: 22, japanese: '子供の友達', english: [
+        "kid's bringing a friend over",
+        "kid's bringin' a friend over after school",
+        "the kid is bringing a friend over after school today, gotta clean up",
+        "the kid's bringin' a friend over. I gotta clean up. and have snacks. and pretend like the apartment always looks like this. these are the moments where I miss bein' single and messy. now I have to stage a normal household. the friend's parents are gonna pick him up later and I have to seem like a competent adult. fakin' it as usual."
+    ], context: "stage X(舞台化する)は演劇用語「舞台にする」、家庭の社交を演出として捉える英語の比喩。faking itは現代英語の頻出スラング、誠実さvs社交的演技の対立、impostor syndromeと並ぶself-doubt語彙。日本語の「ふりをする」より自意識的・自虐的。competent adultは「有能な大人」、自己評価のメタ視点、成人性をスキルセットで定義する英語のidentity construction。", category: 'reaction', month: '2026-05' },
+    { daySlot: 22, japanese: '誕生日パーティー', english: [
+        "birthday party",
+        "birthday party plannin' is a lot",
+        "planning the kid's birthday party is honestly so much work",
+        "birthday party plannin' is a lot. I'm doin' invitations, food, decorations, entertainment, return favors. it's basically a small wedding. and the kid won't remember half of it. and the parents are gonna judge every detail. and I'm gonna pretend I'm enjoyin' the process. by Sunday this is over. that's what I'm holdin' onto."
+    ], context: "small weddingはbirthday partyの誇張比喩、結婚式の労力で誕生日会の労力を測る英語のジョーク、modern parenting cultureの過剰主義への自虐。return favorsは英語の社交儀礼語彙、出席者へのお礼袋(goody bag)、アメリカのbirthday party文化の特殊な習慣、日本語にもなじみつつあるが、英語のほうが社会的に確立。holding onto Xは「Xにしがみつく」、感情的・心理的支えを物理的把持で表現する英語の比喩。", category: 'reaction', month: '2026-05' },
+    { daySlot: 22, japanese: '進路相談', english: [
+        "having the talk",
+        "we had the talk about college",
+        "we had the college talk last night, big conversation",
+        "we had the college talk. she wants to study art. her grades are great. could go anywhere. but art? in this economy? we had to be honest. we'll support whatever she chooses. but we also had to bring up the practicalities. money. job market. backup plans. she got defensive. we got firm. eventually we ended in a place she can think about. these conversations are part of growin' her up."
+    ], context: "the talkは英語の家族会話の専用語彙、特定の重要トピック(性教育、進路、人生選択)を「the talk」と特定化する英語の構造。日本語の「話」より特殊化された会話。grown her up(子育てする)はraise(動物・植物の育成)とparent(親する)の現代スラング、人を能動的に「育てる」感覚を強調する英語の構文。", category: 'opinion', month: '2026-05' },
+    { daySlot: 22, japanese: '子供成長早い', english: [
+        "growing up too fast",
+        "they're growin' up too fast",
+        "they really are growing up way too fast, I can't believe it",
+        "they're growin' up too fast. I blink and a year passes. I look at old photos and remember when she was tiny. when he could barely talk. when neither of them slept through the night. all that's gone. they're little humans now. with personalities. with opinions. soon they'll be teens. then adults. and I'll wonder where the time went. classic parent feelings."
+    ], context: "growing up too fastは英語の親世代の鉄板表現、子供の成長と親の時間感覚の乖離を言語化した英語の感傷的フレーズ。classic parent feelingsは現代英語のメタ感情、自分の感情を「典型的な親の感情」とカテゴリー化する自己客観化、millennial parenting cultureの自意識的傾向。日本語の「親心」より分析的、感情を観察対象として扱う。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 23: 学校・勉強 ──
+    { daySlot: 23, japanese: '勉強したくない', english: [
+        "can't study",
+        "I just can't study right now",
+        "I cannot bring myself to study right now, brain refuses",
+        "I cannot study right now. I open the book. I read the same paragraph 4 times. nothin' goes in. brain's on strike. there's no way I'm makin' progress like this. I'm gonna take a 30-minute break, eat somethin', come back fresh. forcin' it now is just gonna waste an hour and make me hate the material more."
+    ], context: "brain's on strikeは「脳がストライキ中」、労働運動用語(strike)で認知不能を表現する英語の比喩、脳を労働者として擬人化する英語の現代スラング。go in(頭に入る)は英語の知識習得の動詞句、知識を物理的容器(脳)に入れる比喩。日本語の「頭に入らない」と並行表現だが、英語のgo inは能動的な侵入動作を含む。", category: 'reaction', month: '2026-05' },
+    { daySlot: 23, japanese: 'プレゼン緊張', english: [
+        "nervous about the presentation",
+        "I'm nervous about this presentation tomorrow",
+        "I'm nervous about the presentation tomorrow, big stakes",
+        "I'm nervous about the presentation. it's tomorrow. 30 people in the room. half of them senior leadership. I've practiced 4 times. I know my material cold. but the moment I get up there my voice does this thing where it gets quieter. and faster. I gotta breathe. slow it down. own the room. fake confidence till real confidence shows up."
+    ], context: "know it coldは「冷たいほど知ってる」=「完璧に習得」、温度比喩で習熟度を表す英語の慣用句。20世紀英語のスラング。own the roomは「部屋を所有する」=「会場を支配する」、ビジネスプレゼン文化の英語語彙、空間的支配で精神的優位を表現する。fake X till real X shows upは「fake it till you make it」の進化形、自己肯定哲学の英語の現代格言。", category: 'reaction', month: '2026-05' },
+    { daySlot: 23, japanese: '試験近い', english: [
+        "test is coming up",
+        "the test is comin' up fast",
+        "the test is coming up next week and I am not ready",
+        "the test is comin' up. next Wednesday. and I'm not ready. I've been ignorin' it. tellin' myself I have time. but now I have 5 days, including 2 weekend days, to learn 6 chapters. that's about 1 chapter per day. doable but tight. no more procrastinatin'. study session starts now. coffee in hand. focus mode on. let's go."
+    ], context: "coming up(近づいてくる)は英語の時間語彙、未来事象を空間移動として表現する。focus modeは現代英語のproductivity語彙、心理状態を「モード」と命名する英語の機械的世界観。スマホのfocus modeから日常表現へ。日本語の「集中する」より状態の制度化(モード)。procrastinatingは現代英語の心理学用語の動詞化、自己分析の語彙が日常会話に流入。", category: 'reaction', month: '2026-05' },
+    { daySlot: 23, japanese: '授業眠い', english: [
+        "lecture is killing me",
+        "this lecture is straight-up killing me",
+        "this lecture is killing me, I cannot stay awake",
+        "this lecture is killin' me. the professor's monotone. the room's warm. lunch was heavy. all the conditions for a nap. I'm fightin' it. but my eyelids are heavy. I keep zonin' out, snappin' back, missin' chunks of material. I'm gonna have to borrow notes from someone. or rewatch the recordin'. or both. I should've slept more last night."
+    ], context: "killing meは現代英語の感情強調動詞、第三者(対象)が話者を「殺す」と擬人化する英語の比喩。日本語の「死ぬほど眠い」と機能同一だが、英語のkillingは加害者(他者)としての対象を強調する。zoning out / snapping backは英語の意識変動の動詞句、注意力を空間移動として表現する英語の現代心理学的語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 23, japanese: 'ノート取れない', english: [
+        "can't keep up taking notes",
+        "I can't keep up taking notes",
+        "I cannot keep up with taking notes, the professor's talking too fast",
+        "I cannot keep up takin' notes. she's talkin' too fast. I'm tryin' to write, listen, and process simultaneously and I can't do all three. I'm pickin' two. usually listen and process. notes are gonna be incomplete. I'll fill in the gaps from the recordin'. or from a classmate. or from the textbook. multi-source reconstruction."
+    ], context: "keeping upは「ペースに追いつく」、教室・スポーツ・人生の追跡比喩、英語のparalleled motion語彙。multi-source reconstructionは情報科学用語の学習への流用、欠損情報を複数源から復元する戦略を表現する英語の現代学習語彙。日本語の「補完する」より systematic(体系的)な響き、英語のほうが情報処理を技術的に語る傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 23, japanese: '質問できない', english: [
+        "afraid to ask",
+        "I'm too afraid to ask in class",
+        "I'm honestly too afraid to ask the question in class",
+        "I'm too afraid to ask. I have a question. it's a real question. probably half the class has the same question. but raisin' my hand in front of 50 people and admittin' I don't understand somethin' feels like exposure. I'll figure it out after class. or I'll Google it. classic shy student move. should change that."
+    ], context: "exposureは「露出」、心理学・社会学用語が日常感情に流用される英語の語彙、個人の弱点が公衆に晒される感覚を表現する。social anxiety文化の現代英語語彙。classic Y move / classic Z personは現代英語の自己分類、行動を「典型」と名付けて自己客観化する英語のidentity awareness。日本語の「あるある」と機能近いが、英語は個人化(my move)、日本語は集団化(あるある)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 23, japanese: '友達と勉強', english: [
+        "study group",
+        "doin' a study group tonight",
+        "we're doing a study group tonight, hopefully we actually study",
+        "we're doin' a study group tonight. ostensibly. realistically half of it'll be socializin'. but the other half'll be productive. that's how study groups go. you spend 20 minutes catchin' up, 30 minutes actually studyin', 10 minutes complainin' about how much there is to do. repeat for 4 hours. somehow it works. somehow we learn."
+    ], context: "ostensibly vs realisticallyは英語の対比副詞、表向きの理由vs実際を意識的に対比する英語の修辞。学術語彙が日常スラング化した例。study groupは英語のcollege/high school文化の重要な学習語彙。日本語にも輸入されたが、英語のほうが社会的役割が大きい。how X goesは「Xはこうなるもの」、英語の経験的知識の構文、reality acknowledgement。", category: 'opinion', month: '2026-05' },
+    { daySlot: 23, japanese: '集中ゾーン入れない', english: [
+        "lost the motivation",
+        "I lost the motivation for this",
+        "I have completely lost the motivation for this assignment",
+        "I lost the motivation. for this assignment. for school in general some days. I started this with passion. now I'm just goin' through the motions. it happens. burnout's real. doesn't mean I'm gonna quit. just means I'm gonna power through and trust that the motivation comes back. it always does. eventually."
+    ], context: "burnoutは「燃え尽き症候群」、20世紀後半の心理学用語が大衆語化、英語の現代mental health語彙の中核。going through the motionsは「動作だけしてる」=「形式的にやる」、機械的・無感情の行動を運動表現で示す英語の比喩。日本語の「形だけやる」と並行表現だが、英語のmotionsは身体動作を強調、機械的な無心を表現する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 23, japanese: '提出ボタン押した', english: [
+        "finally turned it in",
+        "I finally turned in that paper",
+        "I finally turned in that paper, what a relief",
+        "I finally turned it in. 6 weeks of research. 4 drafts. 3 rewrites. one all-nighter. and now it's gone. submitted. I'm not lookin' at it again. I don't care what grade I get. I just care that it's done. tonight I'm celebratin'. tomorrow there's already another assignment startin'. school never stops. but tonight, I rest."
+    ], context: "turn it inは「(課題を)提出する」、英語のschool/work culture動詞句、物理的な提出動作を含む語彙。digital提出にも比喩的に使われる。celebrate Xは現代英語の感情管理戦略、達成を儀式化する英語の積極的肯定文化。日本語の「お祝い」と並行表現だが、英語のほうが日常頻度が高く、small winsを祝う文化が確立している。", category: 'reaction', month: '2026-05' },
+    { daySlot: 23, japanese: '結果待ち', english: [
+        "waiting on results",
+        "I'm waitin' on results",
+        "I'm just waiting on the results now, hope it went well",
+        "I'm waitin' on results. that's the worst part. you do the work. you submit it. and then there's this gap. days. sometimes weeks. you sit and wonder. did I do enough? did I miss somethin' obvious? eventually you forget about it for a few minutes. then you remember. anxiety cycle. there's nothin' to do but wait."
+    ], context: "waiting on(待ってる)は英語の「待機状態」、未来結果への依存を空間的(on=上)位置で表現する英語の特殊な前置詞使用。anxiety cycleは現代英語のmental health語彙、不安の周期性を病理化する科学的視点。日本語の「不安」より分析的・パターン化された言語化、英語のほうがmental statesをcyclic eventsとして語る傾向が強い。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 24: 旅行 ──
+    { daySlot: 24, japanese: '旅行計画中', english: [
+        "planning a trip",
+        "I'm plannin' a trip for summer",
+        "I'm in the middle of planning a trip for summer, hyped",
+        "I'm plannin' a trip. summer. I've been savin' for it. I've got the dates locked. just need to figure out the destination, flights, hotels, daily itinerary. the plannin' is half the fun. I love spreadsheets. I love Google Maps. I love readin' too many travel blogs. by the time I actually go, I'll know the city better than locals. that's the plan."
+    ], context: "planning is half the funは「計画は楽しみの半分」、英語の旅行・購入文化のスローガン、anticipation(期待)を hedonic experienceとして強調する。日本語の「計画も楽しみ」と並行表現だが、英語のほうがhedonic adaptation theoryの心理学的背景を持つ。loving spreadsheetsは現代英語のpersonality marker、データ志向を自己アイデンティティ化する英語のtech-savvy文化。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: 'ホテル決めた', english: [
+        "booked the hotel",
+        "I booked the hotel, that's done",
+        "I just booked the hotel, that's one thing off the list",
+        "I booked the hotel. that's one less thing. it's not the cheapest. it's not the fanciest. it's a place with good reviews, good location, and a price I can stomach. that's the trifecta. I read 40 reviews. I compared 12 options. I made a decision. now I just hope it's good when we get there. travel anxiety: half the trip's stress is in the booking process."
+    ], context: "trifectaは「三冠」、競馬用語(3着以内予想)が「三要素揃い」の英語の比喩へ。日本語に等価語がない、英語のスポーツ語彙の日常化の例。stomach the priceは「値段を胃で消化する」=「価格を受け入れる」、感情負担を消化器官で表現する英語の身体性、不快を物理化する比喩。日本語の「飲み込む」と機能近いが、英語のstomachはmore visceral(内臓的)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: '荷造り苦手', english: [
+        "packing is the worst",
+        "packing is honestly the worst part",
+        "packing is honestly the worst part of any trip, hate it",
+        "packin' is the worst. I always over-pack. I always under-pack. somehow simultaneously. I bring 3 sweaters I won't wear and forget my toothbrush. I have a list. I follow the list. I still mess it up. every trip I tell myself I'll learn from this. and every trip, I don't. minimalism is the goal. excess is the reality."
+    ], context: "the worstは現代英語の最上級評価、否定的感情の単純強調、millennial slang(2010年代)で広く使用される。over-pack vs under-packは英語の対比動詞、過剰と過少を同一文脈で並列する英語の修辞。minimalism is the goal, excess is the realityは英語の自己矛盾を哲学命題化する構文、aspirational vs actualの対比を意識化する現代英語の self-awareness。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: '空港着いた', english: [
+        "made it to the airport",
+        "OK, made it to the airport",
+        "alright, made it to the airport with time to spare",
+        "made it to the airport. with time to spare. that's a personal first. usually I'm sprintin' through security with 10 minutes to gate close. today I got here 90 minutes early. I have time to grab coffee. read for a bit. ease into the trip. this is the way to do it. why didn't I do this every time. ah well. learnin' as I go."
+    ], context: "with time to spareは「余分な時間あり」、英語の時間管理の慣用句、安全マージンを「予備時間」として概念化する。personal firstは「個人的初」、自己記録への自己ジョーク、自分の癖を客観化するself-aware humor。learning as I goは「動きながら学ぶ」、英語のexperiential learning語彙、計画より実践を称揚する英語のpragmatism。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: 'フライト遅延', english: [
+        "flight's delayed",
+        "the flight got delayed",
+        "the flight's delayed by two hours, of course",
+        "the flight's delayed. 2 hours. of course. there's always somethin'. mechanical issue, they said. that's vague. I'm gonna sit in this terminal for 2 more hours. I'll probably eat overpriced food. read a magazine I won't remember. pretend I'm productive on my laptop. travel days are 80% waiting and 20% flyin'. it's just how it works."
+    ], context: "of courseは皮肉強調「もちろん」=「予想通り」、英語の現代negative humor、悪い状況の必然性を皮肉に肯定する。日本語の「やっぱり」と機能同一だが、英語のof courseは knowing tone(達観)を強調する。80/20 ruleはParetoの法則、ビジネス用語が日常時間管理に流用される英語の数値的表現、現実を比率で語る英語の合理性。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: '言葉通じない', english: [
+        "language barrier",
+        "the language barrier's real",
+        "the language barrier is honestly making this trip way harder",
+        "the language barrier is real. I've got a translator app. I've got pre-written phrases. I'm still strugglin'. you can plan all you want. when you're standin' there pointin' and miming and the person's lookin' at you blankly, all the planning goes out the window. somehow we always figure it out though. humans are resourceful."
+    ], context: "language barrierは英語の旅行・国際関係用語の標準語、言語的障害を「壁」として物理化する英語の比喩。translator appは現代英語のtravel語彙、Google Translate以降の文化的標準。pointing and mimingは「指差してジェスチャーする」、非言語コミュニケーションの動詞句、英語の旅行anecdoteで頻出する人類学的観察。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: '迷子になる', english: [
+        "got lost",
+        "we got lost in the city",
+        "we got pretty lost trying to find this restaurant, ended up somewhere completely different",
+        "we got lost. tryin' to find that restaurant. we ended up wanderin' down side streets. into neighborhoods we didn't plan to see. and somehow it became the best part of the day. saw a bakery we wouldn't have found. found a small park with kids playin'. accidental discovery. the best travel happens when the plan breaks."
+    ], context: "accidental discoveryは「偶発的発見」、英語の旅行哲学のキーフレーズ、serendipity文化を称揚する英語の現代旅行論。the plan breaksは計画の崩壊を「破壊」で表現、日本語の「狂う」より物理的・暴力的。英語の旅行語彙はplanned vs unplanned(計画vs偶然)を対比して語る傾向が強く、unplannedを称揚する20世紀後半以降のbackpacker culture由来。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: '現地飯うまい', english: [
+        "local food slaps",
+        "the local food here straight-up slaps",
+        "the local food here is genuinely incredible, way better than back home",
+        "the local food here slaps. I had this thing today, I don't even know what to call it. some kind of stew with a bread that wasn't quite bread. all I know is it was perfect. and it cost less than my coffee back home. food on its own is worth the trip. I'm gonna gain 5 pounds and I'm not even gonna feel bad about it."
+    ], context: "slapsは現代英語のスラング(2020年代)、「すごく良い」を激しい音響動詞で表現する若者語、料理・音楽の称賛で頻出。日本語の「うまい」より暴力的・物理的な誇張。worth the trip(旅行する価値あり)は英語の旅行評価の決まり文句、経験を経済的価値で測る英語の合理性志向。日本語の「来てよかった」より transactional(取引的)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: 'お土産買いすぎ', english: [
+        "too many souvenirs",
+        "I bought way too many souvenirs",
+        "I bought way too many souvenirs, my luggage is gonna be over weight",
+        "I bought too many souvenirs. my suitcase is gonna explode. I have things for my parents, my sister, my partner, my coworkers, my downstairs neighbor who waters my plants. and a few things for me. mostly food and small things, but it adds up. I'm gonna pay an overweight bag fee. it's worth it. these things make the trip last longer."
+    ], context: "things make the trip last longerは英語の旅行哲学、souvenirを記憶の物理的延長として概念化する。memory anchoring文化、心理学用語が日常化した。overweight bag feeは現代英語のtravel語彙、経済的罰金を行為の代償として価格化する英語の経済的世界観。日本語の「お土産」より具体的な物量・コスト計算を含む英語の合理性。", category: 'reaction', month: '2026-05' },
+    { daySlot: 24, japanese: '帰りたくない', english: [
+        "don't wanna go home",
+        "I don't wanna go home",
+        "I genuinely don't want to go home, this place feels good",
+        "I don't wanna go home. life here is slower. people sit at cafes and just talk. nobody's checkin' their phones every 30 seconds. food takes time. walks are aimless. I could live like this. for a while at least. I know I'd miss home eventually. but right now? right now I'm pretendin' I live here permanently."
+    ], context: "permanent fantasy in temporary placesは現代英語の旅行心理の典型的フレーミング、travel as temporary escapeを称揚する英語の現代旅行論。日本語の「ずっといたい」より分析的・哲学的、英語のほうがlife as alternativeとして他文化を選択肢化する傾向。pace of life difference(生活のペース差)は英語のcultural observation語彙の核心。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 25: 5月の行事 ──
+    { daySlot: 25, japanese: 'GW満喫', english: [
+        "Golden Week was a vibe",
+        "Golden Week was honestly a vibe this year",
+        "Golden Week was honestly such a vibe this year, did everything I wanted",
+        "Golden Week was a vibe. I did nothin' productive. I slept in. I ate well. I saw friends. I read. I watched TV. I went on one short trip. I was bored a few times and I let myself be bored. that's the rarest luxury. unstructured boredom. a week where I wasn't optimizin' for anythin'. just bein'. then it ended. and it's back to grindin'."
+    ], context: "vibeは現代英語の感情・雰囲気の万能名詞、20世紀後半のスラングが2010年代に大衆化、Z世代の必須語彙。日本語の「雰囲気」と機能近いが、英語のvibeはより主観的・感情的・ポジティブ寄り。grindingは「研磨・労働」、ビジネス・スポーツ用語が日常仕事の苦痛を表現する英語の現代スラング、capitalism criticの含意を持つ。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: '5月病で動けない', english: [
+        "stuck in the May slump",
+        "I'm stuck in this whole May slump thing",
+        "I'm stuck in this May slump and I can't seem to shake it",
+        "I'm in a slump. the May thing. that post-Golden Week energy crash. I knew it was comin'. I'm still in it. I'm goin' through the motions at work. I'm not motivated for personal projects. weekends feel weird. I know it'll pass. probably mid-June I'll suddenly have energy again. for now I'm just maintainin'. surviving."
+    ], context: "slumpは「沈下」=「不調期」、スポーツ用語(野球選手の調子の落ち込み)が大衆化した英語の頻出語彙。日本語にも「スランプ」が輸入されている。post-Golden Week energy crashは「黄金週間後のエネルギー暴落」、心理現象を経済比喩(crash=暴落)で表現する英語の比喩。日本語の「5月病」より分析的、英語は心理状態を経済現象として語る。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: 'こいのぼり見かけた', english: [
+        "saw the carp banners",
+        "saw a bunch of carp banners on my walk",
+        "I saw a bunch of carp banners on my walk this morning, classic May",
+        "saw a bunch of carp banners on my walk. swayin' in the wind. blue and red ones. a kid stoppin' to point at them. it's classic May in Japan. I always find them charmin'. there's somethin' about a tradition that's just visual decoration with meaning. nobody's questionin' why these fish are flyin'. they just are. and they're beautiful."
+    ], context: "carp banners(こいのぼり)は日本特有の文化要素、英語に等価語がなく直訳的に説明される。tradition as visual decoration with meaningは英語のcultural anthropology語彙、文化要素を「意味付き装飾」と分析する英語の知的距離化。日本語の「鯉のぼり」より外部視点的な記述、英語の文化観察の典型的フレーミング。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: '母の日忘れた', english: [
+        "missed mother's day",
+        "I forgot it was Mother's Day",
+        "I cannot believe I forgot it was Mother's Day, son of the year award",
+        "I forgot Mother's Day. son of the year award. I called her late afternoon to ask about somethin' completely unrelated. she answered. asked if I knew. I didn't. she laughed. I felt awful. flowers are bein' delivered tomorrow. I'm tellin' her now. she's pretendin' it's fine. it is fine. but I'm still gonna make it up to her."
+    ], context: "son of the year award(年度最優秀息子賞)は皮肉ジョーク、英語のaward文化(賞)を皮肉に流用する自虐スラング。日本語の「最低の息子」より儀式的・公式的な皮肉構造。making it up to herは「埋め合わせる」、英語の関係修復語彙、apology+compensationを動詞句で表現する英語の合理化された謝罪文化。日本語の「埋め合わせ」と並行表現。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: '潮干狩り', english: [
+        "shellfish gathering",
+        "we went shellfish gathering at the beach",
+        "we went shellfish gathering at the beach, it was harder than it looked",
+        "we went shellfish gatherin'. classic May activity. I had this image of pickin' clams off the sand like fruit. reality: kneelin' in mud, diggin' with a small rake, gettin' wet, gettin' tired. but also: super satisfyin' when you find a good one. came home with a bag full and made dinner from it. surprisingly fulfillin'."
+    ], context: "shellfish gathering(潮干狩り)は日本特有の春活動、英語に正確な等価表現がなく、説明的フレーズで翻訳される。fruit-picking metaphorは英語の食料収集の文化的フレーミング(strawberry pickingなどの果物狩り)、shellfish gatheringを既知の活動に類比する英語の認知戦略。日本語より文化的距離を意識した英語の現実主義的描写。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: '田植え見学', english: [
+        "watching them plant rice",
+        "we went to watch them plant rice",
+        "we went to watch them plant rice, it's beautiful in a quiet way",
+        "we went to watch the rice plantin'. there's somethin' about it. the fields are flooded. mirror flat. they reflect the sky. then the workers go through plantin' tiny green shoots in rows. it's been done this way for thousands of years. it's not flashy. it's just beautiful. quiet beauty. that's the best kind."
+    ], context: "rice planting(田植え)は日本の文化的活動、英語に正確な等価語がない。quiet beauty / loud beautyは英語の美学カテゴリー、感覚的強度で美を分類する。日本語の「侘び寂び」と機能近いが、英語のquiet beautyは音響比喩、日本語は哲学概念。文化的美学を英語のsensory metaphor(感覚比喩)で表現する翻訳の癖。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: '藤棚すごい', english: [
+        "the wisteria is wild",
+        "the wisteria is wild this year",
+        "the wisteria this year is honestly wild, looks like a fairytale",
+        "the wisteria's wild this year. the trellis is just dripping with purple. I went to that famous garden, the one with the old tree. there was a line. I stood in it. it was worth it. the smell was sweet. the color was unreal. for 20 minutes I forgot my phone existed. that's the test of beauty: it makes you forget your phone."
+    ], context: "wildは「野生の」=「すごい」、現代英語のスラング、感情強度の形容詞、20世紀後半から大衆化。makes you forget your phoneは現代英語の感動の現代的測定基準、注意経済(attention economy)時代の感動評価。日本語の「圧倒される」より具体的・現代的、英語のほうがdigital age contextを反映する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: '新緑きれい', english: [
+        "the green is unreal",
+        "the spring green is unreal right now",
+        "the spring green is honestly unreal right now, you can almost taste it",
+        "the spring green is unreal. that bright, fresh, almost neon green that only happens for like 3 weeks a year. it makes everythin' feel alive. I'm walkin' to work and noticin' trees I've never noticed before. the city looks different. I take photos but they don't capture it. you have to be there. nature's got somethin'."
+    ], context: "unrealは現代英語のスラング、否定接頭辞un+realで「現実離れした素晴らしさ」を表現する形容詞、20世紀後半のアメリカ英語から大衆化。almost taste itは共感覚的表現、視覚を味覚に翻訳する英語の感覚混合の比喩。日本語の「目に染みる」と並行的だが、英語のtasteは食欲的・身体的でより immediate(直接的)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: '運動会楽しみ', english: [
+        "looking forward to sports day",
+        "I'm lookin' forward to sports day",
+        "I'm honestly looking forward to the kid's sports day this Saturday",
+        "I'm lookin' forward to sports day. the kid's. it's Saturday. she's been practicin' for weeks. doin' that running thing. doin' that dance. I'm gonna film everythin'. embarrass her in 15 years with the footage. that's the long game of parenthood: archivin' the cute stuff for future ammunition. all in love, of course."
+    ], context: "the long gameはチェス用語「長期戦」、戦略思考を時間軸で語る英語の比喩。future ammunitionは「将来の弾薬」、軍事用語を家族関係(冗談)に流用する英語の比喩、皮肉化された家族愛の表現。日本語の「将来のネタ」より具体的・暴力的なジョーク、英語の家族ユーモアの特徴的フレーミング。", category: 'reaction', month: '2026-05' },
+    { daySlot: 25, japanese: 'BBQ準備', english: [
+        "BBQ this weekend",
+        "we're firin' up the BBQ this weekend",
+        "we're firing up the BBQ this Saturday, full setup",
+        "we're firin' up the BBQ this weekend. full setup. I bought too much meat. I bought too much beer. I bought too much everythin'. that's how BBQs work. you over-prepare and somehow run out. neighbors are comin'. friends are comin'. it's gonna be loud. it's gonna be smoky. it's gonna smell up my clothes for days. worth it."
+    ], context: "firing upは「火を起こす」=「準備開始」、機械・エンジンの語彙(rev up the engine)が娯楽活動に流用された英語の比喩。日本語の「準備する」より動的・物理的(firing=点火)。worth itは英語のtransactional decision語彙、コスト感を「価値」で正当化する現代英語の合理化、20世紀後半のconsumer culture由来の頻出フレーズ。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 26: 5月の自然 ──
+    { daySlot: 26, japanese: '青空最高', english: [
+        "blue sky perfection",
+        "the blue sky today is perfection",
+        "the blue sky today is honestly perfection, no filter needed",
+        "the blue sky today is perfection. no filter. no cloud. just deep, saturated blue from horizon to horizon. you don't get many of these days a year. I'm walkin' slower. I'm lookin' up more. I'm rememberin' that the world is beautiful when you're not starin' at a screen. small reminder. necessary one."
+    ], context: "no filter neededは「フィルター不要」、Instagram語彙が日常評価に流用された現代英語、写真編集文化が現実評価語彙化した21世紀の例。saturated blueは「飽和した青」、画像処理用語(saturation)が自然描写に流入した英語の現代語彙。日本語の「青空」より科学的・写真的な描写、英語のほうがdigital aesthetic vocabularyが豊富。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: '蛙鳴き始めた', english: [
+        "frogs are out",
+        "the frogs are officially out",
+        "the frogs are officially out at night, sounds like summer's coming",
+        "the frogs are out. I went to bed last night and the chorus was startin'. that low, rhythmic croakin' from the rice fields nearby. it means summer's comin'. it means the rainy season's comin'. it means a lot of things. I find it weirdly comforting. some sounds are seasonal markers. frogs, cicadas, crickets. they tell time better than calendars."
+    ], context: "the chorusは「合唱」、音楽用語が動物群の集合音響に流用された英語の比喩、frog chorus、bird chorusなど標準的な使用。seasonal markersは「季節指標」、生態学用語が日常感覚の語彙化、自然の周期性を「目印」と命名する英語の構造。日本語の「季語」より科学的、英語のほうが ecological(生態学的)語彙を日常会話で使う傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: '初夏の風心地いい', english: [
+        "early summer breeze",
+        "this early summer breeze hits different",
+        "this early summer breeze is honestly hitting different today",
+        "this early summer breeze hits different. it's not hot yet. it's not cold anymore. the air just moves through the trees and it's perfect. I'm sittin' on the balcony with a book. the wind keeps liftin' the pages. I'm not even mad. these are the rare days where the weather does most of the work. I'm just along for the ride."
+    ], context: "hits differentは現代英語のスラング(2010年代後半)、感覚体験の特異性を強調する若者語、感情の質的差異を物理動作(hit)で表現する。along for the rideは「乗車してる」=「成り行きに任せる」、車・船の比喩で受動性を表現する英語の慣用句、19世紀英語のスラング。日本語の「流れに任せる」と並行表現だが、英語は物理的乗車を強調する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: 'バラ咲いてる', english: [
+        "roses are blooming",
+        "the roses are bloomin' all over",
+        "the roses are blooming all over the neighborhood, it's gorgeous",
+        "the roses are bloomin' everywhere. the corner garden, the walk along the river, the wild ones near the train station. red, pink, white, that orange one I always forget the name of. I notice them because I'm not in a rush right now. usually I'd walk past. today I stopped. smelled one. felt like a different person for 5 seconds."
+    ], context: "felt like a different personは英語の感情の自己観察語彙、瞬間的変化を「別人格」化して表現する英語の構文、self-reflective humorの典型例。stop and smell the rosesは英語の慣用句「立ち止まってバラを嗅ぐ」=「人生を楽しむ」、20世紀英語の格言。日本語の「花を愛でる」より具体的・身体的(stop, smell)、英語の身体動作中心の生活哲学。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: '紫外線強い', english: [
+        "UV is no joke",
+        "the UV is no joke today",
+        "the UV is no joke today, slathering on sunscreen",
+        "UV's no joke today. forecast said high. I checked. it's not lyin'. you can feel it. that immediate burn on the back of your neck. I'm slatherin' on sunscreen. I'm wearin' a hat. I'm walkin' on the shady side of the street. sun protection isn't optional in May anymore. climate change made spring more intense. it is what it is."
+    ], context: "no jokeは現代英語の強調表現、危険・困難を「冗談ではない」と否定で強調する英語の現代スラング。slathering on(べたべた塗る)は英語の頻出動詞、過剰な塗布を表現する英語の身体的語彙。it is what it isは現代英語の運命論スラング(2010年代)、変えられない現実を受容する哲学的諦観、日本語の「仕方ない」と機能同一だが、英語は同義反復構文(it is what it is)で美しく強調する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: '虫増えた', english: [
+        "bugs are back",
+        "the bugs are officially back",
+        "the bugs are officially back, mosquitoes are everywhere now",
+        "the bugs are back. mosquitoes specifically. one bit me last night while I was readin' on the couch. I have a welt on my arm. summer's officially startin'. I gotta dig out the citronella. set up the screens. start the war. mosquitoes vs me. it's a yearly thing. they win usually. but I put up a fight."
+    ], context: "the warは「戦争」、軍事用語の家庭害虫対策への流用、英語の現代日常スラング。citronellaは天然虫除けハーブ、英語のwellness culture語彙。put up a fightは「戦いを挑む」、抵抗の慣用句、たとえ負けても抵抗する姿勢を称揚する英語の修辞、underdog cultureの語彙。日本語の「対抗する」より敗北の覚悟を含む英語の戦闘比喩。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: '緑が眩しい', english: [
+        "the green is hitting hard",
+        "the green is hitting really hard right now",
+        "the green outside is hitting really hard right now, almost too bright",
+        "the green is hittin' hard. so bright it's almost too much. I forgot how much green there is when the trees fully leaf out. winter has me trained to expect bare branches. then May happens and the world turns into a bowl of salad. it's almost overwhelming. that's a weird thing to say about beauty but it's true."
+    ], context: "hitting hardは現代英語のスラング、感情・感覚の強度を物理動作で表現する若者語、2010年代後半の流行表現。bowl of saladは「サラダのボウル」、植物の豊かさを食物比喩で表現する英語のジョーク、自然を食欲化する英語の現代修辞。日本語の「緑が溢れる」より具体的・食欲的、英語のほうがbody/food語彙が日常感覚に流入する傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: '花粉やっと終わり', english: [
+        "pollen finally calmed down",
+        "the pollen finally calmed down",
+        "the pollen has finally calmed down, my eyes are no longer attacking me",
+        "the pollen finally calmed down. for a month I was sneezin' constantly. eyes itchin'. nose runnin'. now suddenly today I noticed: I'm not havin' symptoms. spring allergies are over. summer allergies haven't started. there's a 2-week window of breathing through your nose like a normal person. I'm savorin' it."
+    ], context: "calmed downは「鎮まった」、感情語彙が花粉症などの自然現象に流用された英語の比喩、花粉を擬人化(怒っていた→落ち着いた)する英語の構造。breathing through your nose like a normal personは「普通の人のように鼻呼吸する」、当たり前を「普通の人」と命名する英語の自虐ジョーク。日本語の「楽になった」より身体機能を意識化した英語の精密な観察。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: '夏野菜出てきた', english: [
+        "summer vegetables are out",
+        "the summer veggies are showin' up",
+        "the summer vegetables are showing up at the farmers market, finally",
+        "the summer veggies are showin' up. tomatoes, cucumbers, eggplants, peppers. the actual good ones. not the sad winter imports. these are local, in-season, and they taste like vegetables again. I'm gonna make a salad. just a salad. tomatoes. olive oil. salt. that's it. when ingredients are this good you don't need recipes."
+    ], context: "in-seasonは「旬の」、料理・農業の英語の重要な品質語彙、20世紀後半のlocavore movement(地産地消運動)で大衆化。sad winter importsは「悲しい冬の輸入品」、農産物を擬人化(感情を持つ)する英語の現代食文化批評、グローバル流通システムへの皮肉を含む。日本語の「輸入野菜」より感情的・批評的、英語のほうがfood ethics語彙が発達している。", category: 'reaction', month: '2026-05' },
+    { daySlot: 26, japanese: '夕方が長い', english: [
+        "long evenings",
+        "the evenings are long now",
+        "the evenings are getting nice and long now, love it",
+        "the evenings are gettin' long now. it's 7 PM and the sun's still up. that golden light. that hour where everythin' looks better than it should. I'm walkin' home from work and instead of dreadin' the dark, I'm enjoyin' the sky. summer's the best for this. those long, soft evenings. they're nature's gift for survivin' winter."
+    ], context: "the golden hourは写真・映画用語、日没前の特殊な照明時間を指す。20世紀後半に映像専門用語から日常英語化、Instagram文化(2010年代以降)で定着。nature's giftは「自然の贈り物」、英語の自然観の擬人化、自然を能動的な与え主として表現する英語の宗教的・スピリチュアル語彙。日本語の「自然の恵み」と並行表現だが、英語のほうが直接的に gift(贈与)として概念化する。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 27: 梅雨入り前 ──
+    { daySlot: 27, japanese: '湿気がきた', english: [
+        "humidity's here",
+        "the humidity has arrived",
+        "the humidity is officially here, I can feel it in my bones",
+        "the humidity's here. I woke up this mornin' and the air was different. heavier. thicker. you can feel it on your skin even before you go outside. it's the precursor. the rainy season's a few weeks out. for now we're in this weird transitional weather where it's warm and damp and everythin' smells like dirt. summer's almost here."
+    ], context: "in my bonesは「骨で感じる」、身体感覚を骨格(深い・確実)で表現する英語の慣用句、感覚の確実性を骨で隠喩する。日本語の「肌で感じる」と並行表現だが、英語のbonesは皮膚より深い感覚。precursorは「先駆け」、医学・科学用語(化学反応の前駆体)が自然観察に流用された英語の知的語彙。日本語の「前触れ」より科学的、英語のほうがlatinate vocabulary(ラテン語起源)が日常使用される。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: '髪の毛広がる', english: [
+        "hair's frizzing",
+        "my hair is frizzin' out of control",
+        "my hair is straight up frizzing in this humidity, no fixing it",
+        "my hair is frizzin'. completely uncontrollable. I styled it this mornin'. by 10 AM it was its own creature. I gave up. I'm wearin' a hat for the rest of the day. some battles aren't worth fightin'. humidity always wins. you can spend an hour gettin' your hair right and the moment you step outside it doesn't matter."
+    ], context: "frizzinは「縮れる」、英語のhair texture語彙、髪の質感を物理現象として表現する。its own creatureは「独自の生き物」、無生物(髪)を擬人化(独立した意志を持つ存在)する英語の現代スラング、対象の制御不能を皮肉に表現する。日本語の「広がる」より暴力的・能動的(creature=生物)、英語の現代修辞は身体の各部分を独立した主体として描く傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: '傘必要', english: [
+        "need an umbrella",
+        "I need an umbrella for the rest of the week",
+        "I'm gonna need an umbrella for the rest of this week, forecast is grim",
+        "I'm gonna need an umbrella all week. forecast's grim. rain Thursday, Friday, Saturday, Sunday. then more rain. I keep losing umbrellas. I leave them on trains. in restaurants. at people's houses. by the end of summer I'll have bought 6 of them. that's just the umbrella life cycle. start a new collection every June."
+    ], context: "forecast's grimは「予報が暗い」、英語の感情形容詞(grim=陰鬱)を天気予報に流用する英語の比喩、無生物を感情化する。lifecycleは生物学用語「ライフサイクル」、消費財に流用された英語の現代スラング、物の使用・消失パターンを生物学的に表現する。日本語の「使い捨て」より複雑、英語のほうが消費物の人生(lifecycle)を語る傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: 'カビ警戒', english: [
+        "watching for mold",
+        "I'm watching for mold this season",
+        "I'm watching for mold like a hawk this season, especially in the bathroom",
+        "I'm watchin' for mold. like a hawk. especially in the bathroom. last year I missed the early signs and ended up scrubbing for hours in July. this year I'm proactive. I'm runnin' the dehumidifier. I'm wipin' down surfaces. I'm openin' windows when the rain breaks. mold is patient. you have to be more patient than the mold."
+    ], context: "like a hawkは「鷹のように」、動物比喩で警戒の鋭さを表現する英語の慣用句。proactiveは「事前的」、ビジネス用語(reactive vs proactive)が日常戦略に流用された英語の現代スラング、計画的行動を概念化する。more patient than the moldは英語の対抗関係の構文、敵(mold)を擬人化して耐久戦の戦略を語る英語の比喩、家事を戦略的活動化する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: '紫陽花咲き始め', english: [
+        "hydrangeas budding",
+        "the hydrangeas are starting to bud",
+        "the hydrangeas are starting to bud, can't wait for them to pop",
+        "the hydrangeas are buddin'. tiny purple and blue dots all over the bushes. in two weeks they'll be the full clusters. that's my favorite thing about June. you go for a walk and there are these massive bursts of color in everyone's gardens. it makes the rainy season more bearable. the rain's annoying but the hydrangeas need it to thrive."
+    ], context: "popは「ポンと弾ける」、英語の現代スラング(2000年代)、視覚的・感覚的な突然の出現を表現する。flowers popping、colors poppingなど、自然描写の頻出語彙。more bearableは「より耐えられる」、英語のbear(耐える)動詞句、苦痛との交渉的関係を表現する。日本語の「マシ」より能動的(耐えるという行為)、英語のほうがactive coping(能動的対処)を強調する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: '靴濡れる', english: [
+        "wet shoes",
+        "wet shoes are the worst",
+        "wet shoes are honestly the worst, can't shake the feeling all day",
+        "wet shoes are the worst. you step in one puddle and the whole day is ruined. wet socks. squishy walking. that distinct smell. by mid-afternoon I'm contemplating the shoe situation. should I go to the bathroom and try the hand dryer trick? should I just suffer? I just suffer. one of the small daily tortures of urban life in the rainy season."
+    ], context: "the worstは現代英語の最上級スラング、否定的評価の単純強調、20世紀後半英語の頻出表現。daily torturesは「日常の拷問」、軍事・残虐用語が日常不快に流用された英語の比喩、日本語の「日常の苦」より暴力的・誇張的。urban lifeは「都市生活」、英語の社会人類学的語彙、生活様式を都市/田舎で対比する英語の意識構造。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: '梅仕事の準備', english: [
+        "prepping plums",
+        "I'm prepping for plum season",
+        "I'm prepping all my jars for plum season, gonna be a project",
+        "I'm preppin' for plum season. all my jars are washed and sterilized. I bought the salt. I bought the shochu. I'm gonna make umeshu and umeboshi this year. it's a project. takes weeks. but every winter when I open a jar that I made, it's the best feelin'. like findin' summer in the middle of January. worth the work."
+    ], context: "preppingは「prepare」の動詞短縮、現代英語の口語化、料理・教育文化での頻出語彙。finding summer in the middle of Januaryは英語の感情的時間旅行の比喩、保存食を「凍結された季節」として表現する英語の食文化詩学。日本語の「夏を閉じ込める」と並行表現だが、英語のfindingは能動的発見、日本語の閉じ込めは保存的、行為の方向性が異なる。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: '部屋干し', english: [
+        "drying clothes inside",
+        "I'm drying clothes inside again",
+        "I'm drying clothes inside again, the apartment smells weird",
+        "dryin' clothes inside again. and the apartment smells weird. that distinct damp-laundry smell. nothin' helps. I've tried scented laundry sheets. air purifiers. the dehumidifier on full blast. it's just a thing you accept in the rainy season. or you go to the laundromat. but the laundromat costs money. and the apartment smell is free."
+    ], context: "free smellは皮肉ジョーク、不快な無料を経済比喩で正当化する英語の現代スラング、コスト交換の論理を日常生活に適用する。日本語の「タダ」より分析的、英語は経済モデル(free vs paid)を生活評価に投影する傾向。rainy season as inevitable contextは英語の梅雨観、通年の特定期間を「受容すべき季節」として概念化する英語の文化的時間意識、日本語の「梅雨」より外来的視点。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: '空が暗い', english: [
+        "sky's gloomy",
+        "the sky is so gloomy today",
+        "the sky is so gloomy today, total mood killer",
+        "the sky's gloomy. total mood killer. it's been overcast for like 4 days. no sunshine. no shadows. just flat gray. and you can feel it in your mood. there's a real connection between weather and brain chemistry. they call it seasonal affective disorder. I just call it Tuesday in May."
+    ], context: "mood killerは「気分殺し」、現代英語のスラング、影響源を擬人化(殺人者)する英語のジョーク。seasonal affective disorder(SAD、季節性情動障害)は精神医学用語の大衆化、20世紀末以降の英語の現代mental health語彙の重要例。日本語にも輸入されたが頻度は英語のほうが高く、生活感情の医学化(medicalization)が英語社会の特徴的傾向。", category: 'reaction', month: '2026-05' },
+    { daySlot: 27, japanese: '気圧やられた', english: [
+        "barometric pressure",
+        "the pressure changes are gettin' me",
+        "the barometric pressure changes are honestly getting to me today",
+        "the barometric pressure's gettin' me. I get headaches when the weather shifts. before storms. after storms. anytime the pressure drops. I always thought it was a myth. then I got older and started feelin' it. now I check the pressure forecast as much as the temperature forecast. it's a real thing. thanks, climate, for makin' me feel old."
+    ], context: "barometric pressureは英語の気象学用語の日常化、近年(2010年代以降)に大衆mental health語彙化、頭痛との関連を医学的に語る英語の現代健康文化。日本語の「気象病」「気圧病」と並行表現、両言語で同時期に大衆化した興味深い言語現象。getting to meは「(私を)悩ませる」、外部刺激を擬人化(到達する)する英語の構文、感情の他動的(他者から来る)表現。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 28: 人間関係 ──
+    { daySlot: 28, japanese: '友達と疎遠', english: [
+        "drifted apart",
+        "we kinda drifted apart over the years",
+        "we just kind of drifted apart over the years, no fight or anything",
+        "we drifted apart. no fight. no big moment. just slowly stopped textin'. then weeks became months. then we both moved. then we both got busy. now I see her stories and I think about reachin' out and I don't. and she probably does the same thing. friendships die quietly. that's the saddest part. they don't end with a bang."
+    ], context: "drifted apartは「漂って離れた」、海・川の比喩で関係性の自然消失を表現する英語の慣用句、19世紀英語の航海語彙が人間関係に流用された例。end with a bang vs end with a whimperは英語の終末の二項対立、T.S.Eliot『The Hollow Men』の引用「世界はバンではなくウィンパーで終わる」、英語文学の格言が日常哲学化した例。日本語の「自然消滅」より文学的。", category: 'opinion', month: '2026-05' },
+    { daySlot: 28, japanese: '信用できない', english: [
+        "can't trust them",
+        "I can't trust them after that",
+        "I genuinely cannot trust them anymore after what happened",
+        "I can't trust them. not anymore. somethin' happened a few months ago. they did somethin' that revealed who they really are. I can be friendly. I can be polite. but I'm not goin' deep with them again. once trust is broken, it's broken. it can be rebuilt sometimes. but I don't think this one can. that ship has sailed."
+    ], context: "that ship has sailedは「あの船はもう出航した」、19世紀英語の航海慣用句、機会・関係の不可逆性を船の出航で表現する英語の比喩。日本語の「もう手遅れ」より具体的・物理的(船の動き)。going deepは現代英語のintimacy語彙、関係性の深さを空間的(浅い・深い)に表現する英語の構造、relationship depth metaphorは現代心理学用語の流入。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 28, japanese: '誤解された', english: [
+        "got misunderstood",
+        "I think I got misunderstood",
+        "I think I was completely misunderstood in that conversation",
+        "I think I got misunderstood. or I phrased somethin' poorly. probably both. the conversation got tense. I don't think I said anythin' wrong but somehow it landed wrong. now there's this weird tension. I'm gonna circle back tomorrow. clarify what I meant. give them a chance to explain what they heard. communication's hard. people hear things you didn't say."
+    ], context: "got misunderstoodは「(私が)誤解された」、英語の受動構文の発展形、自己が誤解の主体ではなく対象として表現される心理的距離化。circle backはビジネス英語「戻る」=「再度話し合う」、循環運動で対話の継続を表現する英語の現代spatial metaphor。日本語の「話し直す」より動的・幾何学的(円を描く)、英語のtask managementの語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 28, japanese: '関係修復', english: [
+        "patching it up",
+        "we're patchin' things up slowly",
+        "we're slowly patching things up, it's gonna take time",
+        "we're patchin' things up. slowly. it's not gonna happen overnight. last week we had coffee. it was awkward. yesterday she texted somethin' light. I responded. we're testin' the water. step by step. relationships need maintenance just like cars do. ignore them and they break. work on them and they last."
+    ], context: "patching it upは「継ぎ当てる」、修繕用語(衣服・船体の修理)が関係修復に流用された英語の慣用句、19世紀英語のスラング。like cars doは英語の機械比喩で関係性を表現する現代スラング、日常物のmaintenance哲学を人間関係に適用する英語のpragmatic relationship language。日本語の「直す」より物理的・機械的、英語のほうが関係をシステム化する傾向。", category: 'opinion', month: '2026-05' },
+    { daySlot: 28, japanese: '本音言えない', english: [
+        "can't say what I really think",
+        "I can't say what I really think with them",
+        "I can't say what I really think with them, it's not safe",
+        "I can't say what I really think with them. not safely. not without consequence. so I keep it surface. I'm friendly. I'm polite. I'm vague. and I save the real stuff for the few people who can handle it. it's not lyin'. it's just curatin'. relationship math: full honesty isn't possible with everybody. that's not a flaw. that's just reality."
+    ], context: "curatingは「キュレーションする」=「選別する」、美術館用語(curator=学芸員)が日常情報選別に流用された英語の現代スラング、SNS時代以降に大衆化。relationship mathは「関係の数学」、抽象的人間関係を計算可能なシステムとして表現する英語の現代修辞、日本語の「人間関係」より分析的・合理化された英語の関係論。", category: 'opinion', month: '2026-05' },
+    { daySlot: 28, japanese: '距離置く', english: [
+        "taking some space",
+        "I'm takin' some space from them",
+        "I'm taking some space from them for now, it's been intense",
+        "I'm takin' some space. it's been intense lately. they need a lot. and I have my own stuff. I told them I'd be less available for a few weeks. they took it personally. I'm not surprised. but it had to be said. I can't be everyone's everythin'. self-preservation's not selfishness. it's basic. you can't pour from an empty cup."
+    ], context: "taking spaceは「空間を取る」=「距離を置く」、現代英語の心理学・関係性語彙、relationship dynamics文化の頻出フレーズ(2010年代以降)。you can't pour from an empty cupは英語の self-care movement格言、自分を満たす前に他者を満たせないという比喩、容器・液体メタファーで個人エネルギーを表現する英語のwellness culture。日本語の「自分を大事に」より具体的(cup, pour)。", category: 'shutdown', month: '2026-05' },
+    { daySlot: 28, japanese: '気を使い疲れた', english: [
+        "exhausted from peoplein'",
+        "I'm exhausted from all the people-ing",
+        "I'm exhausted from all the social stuff this week, need a break",
+        "I'm exhausted from people-ing. all the meetings, the social events, the small talks, the navigatin' personalities. it adds up. I need a quiet weekend. just me and my plants and my book. I'm not antisocial. I'm just a battery that drains in social settings and recharges in solitude. introvert math. it's real."
+    ], context: "people-ingは現代英語の動詞化スラング、名詞people→動詞people-ingで「人付き合いする行為」を一語化する英語の言語遊び(2010年代以降)、Z世代の創造的言語使用。social batteryは「社交電池」、人間を電池として表現する英語の現代スラング、社交エネルギーを定量化する英語のintroversion文化、心理学の大衆化が言語に反映された現代英語の特徴。", category: 'reaction', month: '2026-05' },
+    { daySlot: 28, japanese: '人脈作り辛い', english: [
+        "networking is rough",
+        "networkin' is honestly so rough",
+        "networking events are honestly so exhausting, I can't stand them",
+        "networkin' is rough. I went to one last week. I stood in a corner with a glass of wine. talked to 3 people. exchanged business cards. forgot all of their names by morning. it's a transactional dance and I'm bad at it. but you have to do it sometimes. opportunities come from unexpected connections. I keep showin' up even when I hate it."
+    ], context: "transactional danceは「取引的ダンス」、社交を経済取引と舞踊の二重比喩で表現する英語の現代スラング、人間関係の経済化を批評する英語の文化批評語彙。日本語の「人脈作り」より分析的・皮肉的、英語のほうが社交を business transactionとして概念化する傾向、Yiddish由来のmenschenkenntnis(人物観察)文化を含む。", category: 'reaction', month: '2026-05' },
+    { daySlot: 28, japanese: '気が合う', english: [
+        "we click",
+        "we just click",
+        "I don't know, we just click, the conversation flows so naturally",
+        "we just click. it's hard to explain. it's that thing where I don't have to translate. I say somethin' weird, she gets the joke immediately. she says somethin' I half-understand and we end up findin' depth in it. with most people I have to explain context. with her, the context is shared. those friendships are rare. you don't make many of them in a lifetime."
+    ], context: "we clickは「カチッとはまる」、機械音(click)による感覚的相性を表現する英語の慣用句、20世紀英語のスラング、relationship chemistryの代表的英語表現。日本語の「ウマが合う」と並行表現だが、英語のclickは機械的・物理的、日本語の「ウマ」は動物的、文化の比喩源が異なる興味深い対比。", category: 'reaction', month: '2026-05' },
+    { daySlot: 28, japanese: '感謝伝える', english: [
+        "expressing gratitude",
+        "I gotta express gratitude more",
+        "I really need to express gratitude more often, I forget to say thanks",
+        "I gotta express gratitude more. I'm thinkin' all these grateful thoughts and never sayin' them out loud. I appreciate my friends. I notice my partner's small gestures. I'm grateful for my parents. but if I don't tell them, they don't know. I'm gonna make a habit of it. one thank-you a day. minimum. small thing, big impact."
+    ], context: "expressing gratitudeは現代英語のwellness culture語彙、感謝を「表現する」儀式化、心理学のpositive psychology(2000年代以降)が大衆化した英語の現代mental health語彙。one thank-you a day, minimumは英語のhabit formation文化(Atomic Habitsなど)の典型表現、行動を定量化・最小単位化する英語の現代self-improvement語彙。", category: 'opinion', month: '2026-05' },
+
+    // ── Day 29: 大人の現実 ──
+    { daySlot: 29, japanese: '時間が早い', english: [
+        "time is flying",
+        "time's flyin' lately",
+        "time has been flying lately, where did the year go",
+        "time's flyin'. it's already May. I haven't done half the things I planned for this year. I haven't called my mom enough. I haven't read enough books. I haven't been to the gym enough. and yet here we are, almost halfway through the year. I gotta slow down. or speed up. or somethin'. just be present, maybe. that's the real answer."
+    ], context: "be presentは現代英語のmindfulness movement(2000年代以降)語彙、瞑想・心理学から日常哲学化した英語の格言。日本語の「今を生きる」と並行表現だが、英語のbe presentはより instructive(指示的)、行動指針として機能する。time is flyingは英語の慣用句、時間の知覚加速を航空動作で表現する英語の比喩、ラテン語tempus fugit(時は飛ぶ)の翻訳。", category: 'reaction', month: '2026-05' },
+    { daySlot: 29, japanese: '体力なくなった', english: [
+        "energy not what it used to be",
+        "my energy is not what it used to be",
+        "my energy is honestly not what it used to be in my 20s",
+        "my energy ain't what it used to be. in my 20s I could pull all-nighters and bounce back the next day. now I lose 4 hours of sleep and I'm useless for 3 days. one beer hits harder than 5 used to. one workout takes longer to recover from. age is real. I'm not old. but I'm not young either. and the body knows it before the brain does."
+    ], context: "ain'tは英語の口語化された否定形、いneverと共に米国南部・労働階級英語から大衆化、若者語彙でも頻出。bounce back(立ち直る)はゴム・ボールの比喩、回復力を弾性で表現する英語のresilience語彙。pull all-nightersは「徹夜する」、英語の学生・労働文化の慣用句、引っ張る動作で持続を表現する。日本語の「徹夜」より動詞的(pulling=引っ張る行為)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 29, japanese: '責任重い', english: [
+        "responsibility weighs",
+        "the responsibility weighs on me",
+        "the responsibility honestly weighs on me sometimes, it's a lot",
+        "the responsibility weighs on me. I have a team now. people depend on me. my parents are aging and need more help. my partner has expectations. my friends need their friend. and I'm here, tryin' to be all those things, while also bein' a person. some days the weight feels manageable. some days it doesn't. either way, you carry it. that's adulthood."
+    ], context: "weighs onは「(重みが)圧す」、英語の感情語彙、抽象負担を物理重量で表現する英語の比喩。日本語の「重荷」と並行表現だが、英語のweighs onは持続的・継続的圧迫、日本語の「重荷」は静的・物体的、感覚の違い。adulthoodは「大人時代」、20世紀後半に新造された英語名詞、childhood、adolescenceに続くライフステージ語彙、英語の現代社会学的時間区分。", category: 'reaction', month: '2026-05' },
+    { daySlot: 29, japanese: '転職悩む', english: [
+        "torn about jobs",
+        "I'm torn about whether to switch jobs",
+        "I'm seriously torn about whether to switch jobs, big decision",
+        "I'm torn. on the job thing. there's a real opportunity. better pay. better title. on paper it's a no-brainer. but I love the people I work with now. and the new place is unknown. trade-offs. it's all trade-offs. I'm gonna sleep on it for two weeks. then I'm gonna decide. and whatever I decide will be the right answer because it's the only one I'll have."
+    ], context: "tornは「引き裂かれた」、感情的二項対立を物理的破断で表現する英語の慣用句、シェイクスピア時代から続く文学英語の流入。on paperは「紙の上では」、抽象計算と現実の対比を文書化で表現する英語の慣用句、ビジネス英語の典型的フレーム。it's the only one I'll haveは現代英語の運命論スラング、選択を一意化する哲学的諦観、20世紀英語の existentialism(実存主義)由来の語彙。", category: 'reaction', month: '2026-05' },
+    { daySlot: 29, japanese: '老後どうする', english: [
+        "anxious about the future",
+        "I'm anxious about the future these days",
+        "I'm honestly anxious about the future these days, lots happening",
+        "I'm anxious about the future. economy, jobs, health, relationships, retirement, climate, geopolitics. there's a lot. and I'm one person. I can only control so much. but also if I don't think about it, things get worse. so I think about it. I plan. I worry. I do my best with the variables I can influence. and I try not to spiral on the ones I can't. that's the work of bein' an adult."
+    ], context: "spiralは「螺旋状」、現代英語のmental health語彙、不安の悪化サイクルを螺旋運動で表現する。geopoliticsは「地政学」、20世紀政治学用語が日常英語化、現代英語のニュース語彙。the work of being an adultは「大人であることの仕事」、生存を労働として概念化する現代英語のmillennial語彙、日本語の「大人になる」より分析的・労働的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 29, japanese: '結婚プレッシャー', english: [
+        "marriage pressure",
+        "the marriage pressure is real",
+        "the marriage pressure from family is real and exhausting",
+        "the marriage pressure's real. every family event somebody asks. when are you gettin' married. when are you havin' kids. and I always smile and say not yet. but inside I'm tired of explainin' that timeline isn't a one-size-fits-all. some people aren't ready. some people don't want it. some people are happy alone. all of that's valid. but try explainin' that to my aunt."
+    ], context: "one-size-fits-allは「フリーサイズ」、衣服販売語彙が一般化した英語の慣用句、20世紀後半の英語の頻出フレーズ、画一的解決策への批判用語。validは「有効な」、論理学・コンピュータ科学用語が現代心理学・人間関係語彙に流入、感情・選択の正当性を肯定する英語のvalidation文化。日本語の「OK」より制度的・公式的な認証ニュアンス。", category: 'reaction', month: '2026-05' },
+    { daySlot: 29, japanese: '夢諦めた', english: [
+        "let the dream go",
+        "I had to let the dream go",
+        "I had to let the dream go a few years ago, it was the right call",
+        "I let the dream go. a few years ago. I wanted to be a musician. I had the talent. I didn't have the timing or the luck or the network. I gave it 5 years. it didn't take off. and one day I just decided I was done. it broke me for about 6 months. then I got over it. I have a normal job now. I miss music. I'm OK. givin' up isn't always failure. sometimes it's wisdom."
+    ], context: "let X goは「Xを手放す」、感情的・象徴的解放の英語の慣用句、心理セラピー文化(2000年代以降)で大衆化。giving up isn't always failureは英語の現代self-help格言、放棄を価値中立化する哲学、quit lit(辞め文学)文化由来。日本語の「諦める」より能動的(let go=能動的解放)、英語のほうがagencyを強調する。", category: 'opinion', month: '2026-05' },
+    { daySlot: 29, japanese: '体メンテ', english: [
+        "body maintenance",
+        "I gotta start doin' body maintenance",
+        "I really need to start doing actual body maintenance now",
+        "I gotta start doin' body maintenance. real maintenance. annual physical. dentist twice a year. eye doctor. dermatologist. I've been ignorin' this stuff. and the longer I ignore it, the worse it gets. I'm in my 30s. preventive care matters now. it's not optional anymore. one Saturday a month for the rest of my life is the cost. cheap insurance."
+    ], context: "preventive careは「予防医療」、医学・公衆衛生用語が個人健康文化に流入した英語の現代語彙、アメリカ医療保険文化の重要概念。body maintenanceは「身体メンテナンス」、機械保守用語の身体への流用、人間を機械として扱う英語の現代健康観。日本語の「体のケア」より工学的・機械的、英語のほうが maintenance(保守)語彙を多用する傾向。", category: 'opinion', month: '2026-05' },
+    { daySlot: 29, japanese: '同窓会近い', english: [
+        "reunion coming up",
+        "the high school reunion is comin' up",
+        "the high school reunion is coming up and I have mixed feelings about it",
+        "the reunion's comin' up. high school. mixed feelings. on one hand: curious. who's still around. who became somebody. who didn't change at all. on the other hand: anxiety. comparin' lives. the unspoken success ranking. I'm gonna go. probably. for an hour. then leave early. that way I get the curiosity satisfied without committing to the awkwardness."
+    ], context: "the unspoken success rankingは「言われない成功ランキング」、英語の社会比較心理学用語の口語化、社会的階層の暗黙評価を語彙化する。日本語にも「マウンティング文化」があるが、英語のunspoken rankingはより微妙・暗黙的、英語のほうが社会観察の心理学的精度が高い。strategic departureは現代英語の社交戦略語彙、退場を戦術的に計画する英語のsocial strategy文化。", category: 'reaction', month: '2026-05' },
+    { daySlot: 29, japanese: '人生これでいい', english: [
+        "life's pretty good actually",
+        "honestly, life's pretty good actually",
+        "honestly, life is pretty good actually, I have nothing major to complain about",
+        "honestly? life's pretty good. I have a stable job. I have people I love. I have a roof. I have enough money to eat what I want most days. I'm not famous. I'm not rich. I'm not livin' my dream career. but I'm content. and contentment is underrated. people chase happiness like it's a destination. it's not. it's just bein' okay with where you are. I'm okay. that's enough."
+    ], context: "contentment is underratedは現代英語のpositive psychology格言、満足を「過小評価された」と肯定する英語の現代哲学スローガン、Stoicism(ストア哲学)の現代復興語彙。日本語の「足るを知る」と機能近いが、英語のunderratedは市場価値評価語彙、感情を商品化する英語の現代修辞。happiness as destination vs Beingは英語の存在論的対比、20世紀後半のexistential psychology由来。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 30: 夏に向けて ──
+    { daySlot: 30, japanese: '夏服出した', english: [
+        "switched out the wardrobe",
+        "I switched out the wardrobe for summer",
+        "I finally switched out the wardrobe for summer, took all afternoon",
+        "I switched out the wardrobe. all afternoon. winter clothes back in storage. summer clothes back in rotation. I forgot half the things I owned. there were shirts I haven't seen in 10 months. some I'm gonna wear immediately. some I'm puttin' in the donate pile. seasonal wardrobe rotation: an underrated form of self-discovery. you remember things about yourself you forgot."
+    ], context: "switched outは「入れ替えた」、英語の動詞句、交換動作で季節転換を表現する。in rotation(回転中)は野球用語の流用、循環的使用を表す英語の比喩、日常物の循環を機械的に語る英語の現代スラング。self-discoveryは英語の心理学・自己啓発語彙、日常活動を「自己発見」として概念化する英語のintrospective(内省的)文化、日本語の「自分を知る」より能動的・発見的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 30, japanese: '日焼け止め塗る', english: [
+        "applying sunscreen",
+        "I'm applying sunscreen religiously now",
+        "I'm applying sunscreen religiously now, my dermatologist would be proud",
+        "I'm applyin' sunscreen religiously. SPF 50. every mornin'. before I put on makeup. before I leave the house. I missed it for years and now I'm seein' the cost. those tiny sun spots. that uneven tone. you can't undo years of sun damage. but you can prevent the next 30 years of it. it's the slowest investment. you won't see returns for decades. but future you will be grateful."
+    ], context: "religiouslyは「宗教的に」=「習慣的に」、宗教用語の世俗化、日常習慣を信仰的厳格性で表現する英語の現代スラング。slowest investmentは「最も遅い投資」、金融用語の身体・健康への流用、英語のhealth as wealth文化、preventive care thinkingを経済比喩で表現する英語の現代健康論。日本語の「予防」より戦略的・経済的、英語の長期投資思考。", category: 'reaction', month: '2026-05' },
+    { daySlot: 30, japanese: '夏の旅行', english: [
+        "summer trip",
+        "summer trip's bookin' soon",
+        "I'm booking the summer trip soon, can't wait",
+        "I'm bookin' the summer trip soon. it's somethin' I look forward to all year. that one big trip. usually with friends. usually somewhere warm. usually places we've never been. it's not just a vacation. it's the thing that makes the rest of the year bearable. somethin' to plan for. dream about. work for. then experience. then have memories from. trips are time investments."
+    ], context: "the thing that makes the rest of the year bearableは英語の希望語彙、特定イベントに年間幸福を集中させる英語の現代心理学的言語化。日本語の「楽しみ」より具体的・分析的、英語のほうが快楽分配を構造化する。trips as time investmentsは経済用語の幸福研究への流入、experiential investment(体験投資)の英語のhappiness economics語彙、現代英語の生活経済学。", category: 'opinion', month: '2026-05' },
+    { daySlot: 30, japanese: 'プール開き', english: [
+        "pools are opening",
+        "the pools are openin' this weekend",
+        "the pools are opening this weekend, first swim of the season",
+        "the pools are openin' this weekend. first swim of the season. I'm goin' early before the crowds. lap swim is the goal. I haven't been in the water in 6 months. I'm gonna feel weak. I'm gonna get tired fast. but the chlorine smell, the rhythm of strokes, the way the world disappears when your face is underwater. that's somethin' I missed. summer's officially startin'."
+    ], context: "first X of the seasonは英語の季節儀礼語彙、初体験を「公式」化する英語の構文、アメリカ・スポーツ文化由来。lap swimは英語の専門スポーツ用語、競技的・運動的水泳の標準語彙、日本語の「水泳」より具体的(lap=往復一周)。world disappearsは英語の感覚的没入の比喩、瞑想・没頭体験の現代英語語彙、日本語の「没入」より dramatic(劇的)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 30, japanese: '蚊が出た', english: [
+        "first mosquito sighting",
+        "first mosquito sightin' of the year",
+        "I just had my first mosquito sighting of the year, here we go",
+        "first mosquito of the year. saw one in the hallway last night. didn't get me. but I know what it means. the war's startin'. soon I'll be findin' bites I don't remember gettin'. I'll be sleepin' under a sheet even when it's hot. I'll be slappin' my own ear in the middle of the night. summer's tax. you take the heat, you take the bugs. it's all part of it."
+    ], context: "summer's taxは「夏の税金」、季節の代償を経済比喩で表現する英語のジョーク、quality of life as transaction(生活質を取引で語る)英語の現代修辞。bug season as warは戦争比喩で害虫対策を表現する英語の現代スラング、日常活動を戦闘化する英語の比喩文化、 cope through humor(ユーモアで対処)の英語の特徴。", category: 'reaction', month: '2026-05' },
+    { daySlot: 30, japanese: 'クーラーつけた', english: [
+        "AC is on",
+        "the AC is officially on",
+        "the AC is officially on for the season, no going back now",
+        "the AC's on. officially. it's been 3 days of mid-80s and tonight I cracked. flipped the switch. felt the cold air. immediate relief. and immediate guilt about the electric bill. but I needed it. I'm a person of my time. I'm not gonna sweat through summer in 1985 conditions. AC's a luxury that became a necessity. I'm not apologizin' for it."
+    ], context: "I'm not apologizing for itは「謝らない」、英語の現代self-acceptance スローガン、社会期待への反論として確立した英語のフレーズ(2010年代以降)。luxury became necessityは「贅沢が必需に」、英語の社会経済学用語、生活水準のratchet effect(後戻り不能)を表現する英語の現代スラング、quality of life evolution語彙。日本語の「もう無くては困る」より分析的・歴史的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 30, japanese: '体型気になる', english: [
+        "self-conscious about body",
+        "I'm self-conscious about my body again",
+        "I'm getting self-conscious about my body again with summer coming",
+        "I'm gettin' self-conscious. summer's comin'. shorts season. tank top season. swim season. and I'm not in the shape I want to be in. I'm gonna start hittin' the gym harder. eat cleaner. but also: my body is my body. it does its job. it gets me through life. I don't have to be ashamed of it. easy to say. harder to feel. work in progress."
+    ], context: "self-consciousは英語の心理学・実存主義用語、19世紀から大衆化、現代mental health語彙の中核。my body is my bodyは英語のbody positivity movement(2010年代以降)の格言、自己肯定のtautology(同義反復)で固有性を強調する英語の現代修辞。work in progressは「進行中の作品」、芸術・建築用語の自己への流用、人間を未完成プロジェクトとして語る英語の現代心理学的アイデンティティ表現。", category: 'reaction', month: '2026-05' },
+    { daySlot: 30, japanese: 'フェス予約', english: [
+        "festival tickets",
+        "festival tickets are bookin' fast",
+        "festival tickets for the summer are booking up fast, gotta jump on it",
+        "festival tickets are goin' fast. summer lineup just dropped. the headliner's amazing. I gotta lock my tickets in. I'm goin' with the same crew as last year. it's a tradition now. 3 days of music, sunburn, weird food, sleepin' in tents. it sounds awful and it's the best weekend of the year. that paradox of festival life. you suffer for joy. it's worth it."
+    ], context: "lineup just droppedは「ラインナップが落ちた」=「発表された」、音楽・エンタメ用語、商品リリースの動詞drop使用、ヒップホップ文化由来(2000年代)の英語スラング、若者文化の標準語。you suffer for joyは現代英語の paradox 構文、矛盾的快楽体験を一文で表現する英語の修辞、生体肯定哲学(joi de vivre)の英語版。日本語の「苦しいけど楽しい」より文学的・哲学的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 30, japanese: '梅雨支度', english: [
+        "rainy season prep",
+        "I'm prepping for the rainy season",
+        "I'm prepping for the rainy season, getting ahead of it this year",
+        "I'm preppin' for the rainy season. for once I'm gettin' ahead of it. rain boots: out of storage. rain jacket: hung by the door. waterproof bag for my laptop: bought. spare umbrellas at home, work, in my bag. dehumidifier: cleaned and ready. last year I wasn't prepared and it was miserable. this year I'm gonna be the smug person walkin' through downpours feelin' fine."
+    ], context: "getting ahead of itは「先回りする」、英語の現代proactive culture語彙、計画性を時間軸で表現する英語の慣用句、ビジネス用語の日常化(20世紀後半)。the smug personは「したり顔の人」、英語の自己評価の自虐ジョーク、自分を社会タイプ(person)として客観化する現代英語のidentity humor。日本語の「ドヤ顔」と並行表現だが、英語のsmugは形容詞、感情を性格特性化する。", category: 'reaction', month: '2026-05' },
+    { daySlot: 30, japanese: '夏待ち遠しい', english: [
+        "ready for summer",
+        "I'm so ready for summer",
+        "I am so ready for summer, just bring it on already",
+        "I'm so ready for summer. for the heat. for the long days. for swimmin'. for grillin'. for bein' outside. for sandals. for not havin' to put on 4 layers every time I leave the house. I love every season but summer is the season where life feels easiest. or maybe it's just the season where I feel most like myself. either way, bring it on. I'm here for it."
+    ], context: "bring it onは「持って来い」、英語の挑戦受諾の慣用句、20世紀後半のスポーツ・コンテスト文化由来、確信に満ちた肯定の英語スラング。I'm here for itは現代英語のスラング(2010年代以降)、共感・同意・歓迎を一語化する若者語、SNS文化由来の頻出表現。日本語の「楽しみ」より能動的・対峙的(挑戦して来い)、英語のほうが confrontational(対峙的)な肯定の構造。", category: 'reaction', month: '2026-05' },
+
+    // ── Day 31: 月末 ──
+    { daySlot: 31, japanese: '5月終わり', english: [
+        "May is wrappin' up",
+        "I can't believe May is wrappin' up",
+        "I can't believe May is officially wrapping up, where did it go",
+        "May's wrappin' up. I can't believe it. it feels like yesterday I was crammin' for Golden Week. now we're at the end of the month. June starts Tuesday. and June means summer. June means rain. June means the year's halfway done somehow. I'm gonna take this weekend slow. close out the month with intention. then dive into June with whatever energy I've got left."
+    ], context: "wrapping upは「包み終わる」、英語の慣用句、終了動作を物理的な包装で表現する英語の比喩。ビジネス用語(meeting wrap-up)の日常流入。close out / dive into the next monthは英語の時間語彙、月境界を物理的境界として概念化する英語の現代スラング、time as space(時間=空間)の英語の比喩文化。日本語の「月末」「月初」より動的・身体的(close、dive)。", category: 'reaction', month: '2026-05' },
+    { daySlot: 31, japanese: '今月振り返る', english: [
+        "looking back on the month",
+        "lookin' back on the month",
+        "let me actually look back on the month, gotta do the monthly review",
+        "lookin' back on the month. I had goals. I hit some. I missed others. I had plans. I executed on most. I started 3 projects. I finished 1. I read 2 books. I worked out 14 times. I called my mom 3 times. I spent more than I budgeted. the spreadsheet doesn't lie. some wins. some losses. mostly: I showed up. that counts for somethin'. tomorrow June starts. let's keep showin' up."
+    ], context: "monthly reviewは現代英語のproductivity culture用語、自己進歩の定期的評価、Atomic Habits, Getting Things Doneなどbusiness self-helpの典型的実践語彙。showing upは現代英語のsuccess philosophy格言「とにかく現れること」、Woody Allenの引用「人生の80%は現れることだ」由来、行動論の英語の現代スローガン。日本語の「現れる」より哲学的・倫理的。", category: 'opinion', month: '2026-05' },
+    { daySlot: 31, japanese: '来月の準備', english: [
+        "prepping for next month",
+        "I'm prepping for next month already",
+        "I'm already prepping for next month, momentum matters",
+        "I'm preppin' for June already. settin' goals. plannin' the calendar. blockin' time for the things that matter. it's not productivity porn. it's just basic. if I don't plan, the month gets eaten by other people's priorities. I need to be the architect of my own time. otherwise I'm just renovatin' someone else's house. metaphors. I'm tired. let me just plan the month."
+    ], context: "productivity pornは現代英語のスラング、生産性を「ポルノ化」と批評する英語の若者語、productivity culture自身への自虐的フレーミング(2010年代以降)。architect of my own timeは「自分の時間の建築家」、ビジネス・建築語彙が個人時間管理に流入する英語の比喩、人生を建築プロジェクトとして語る現代英語の生活哲学、日本語の「自分の時間」より構築的・能動的。", category: 'opinion', month: '2026-05' },
+    { daySlot: 31, japanese: '今月のお金', english: [
+        "monthly budget check",
+        "doin' the monthly budget check",
+        "I'm doing the monthly budget check, see what damage I did",
+        "I'm doin' the monthly budget check. honest assessment time. I overspent on dining out. I underspent on groceries because I dined out too much. I hit my savings goal. barely. credit card has more on it than I want but it's manageable. next month I'm gonna actually cook. cookin' is cheaper than eatin' out. but eatin' out is faster. trade-offs. always trade-offs. that's the constant."
+    ], context: "honest assessment timeは英語のreflective practice語彙、自己評価を儀式化する現代英語のself-awareness文化。trade-offs as constantは英語のlife philosophy格言、生活の本質を経済学用語(trade-off)で要約する英語の現代知的修辞、Marshall economicsの大衆化。日本語の「あちら立てれば」より分析的・経済学的、英語の生活経済化の典型例。", category: 'opinion', month: '2026-05' },
+    { daySlot: 31, japanese: '目標達成感', english: [
+        "feeling accomplished",
+        "I'm feelin' accomplished this month",
+        "I'm honestly feeling accomplished this month, hit some real goals",
+        "I'm feelin' accomplished. I hit two real goals this month. I finished that side project I'd been workin' on for 6 weeks. I started runnin' regularly. those aren't massive achievements. they're small. but they're real. I built somethin'. I built a habit. and that's what compounds. one small win a month, sustained, becomes 12 wins a year. then years of wins. that's how a life happens."
+    ], context: "feeling accomplishedは英語の self-evaluation語彙、達成感を感情として直接命名する英語の構文。small wins compoundは現代英語のsuccess philosophy格言、複利思考(compound interest)の生活全般応用、アトミック・ハビット文化の典型表現。a life happensは現代英語のrealist philosophy語彙、人生を能動主体ではなく結果現象として表現する英語の現代修辞、日本語の「人生が形作られる」より受動的・現象的。", category: 'reaction', month: '2026-05' },
+    { daySlot: 31, japanese: '5月の写真整理', english: [
+        "organizing May photos",
+        "I'm organizin' the May photos",
+        "I'm organizing all the May photos, lots of memories",
+        "I'm organizin' the May photos. it was a good month, photographically. Golden Week trip. that hike with my friend. the Mother's Day dinner. some random moments at the cafe. I deleted the bad ones. backed up the good ones. printed 4 to put up on the wall. there's somethin' meaningful about turnin' digital memories into physical ones. they exist more permanently when they're in the world."
+    ], context: "exist more permanentlyは現代英語の哲学的存在語彙、デジタルvs物理の存在論的対比を語る英語の現代修辞、digital age memorial cultureの典型的フレーム。日本語の「永く残る」より哲学的・形而上学的、英語のexist + adverb構文は存在の様態を細かく分節する英語の特徴。photo organizationは現代英語のlife admin語彙、デジタル時代の必須儀礼。", category: 'reaction', month: '2026-05' },
+    { daySlot: 31, japanese: '人間関係の変化', english: [
+        "relationship shifts",
+        "there were some relationship shifts this month",
+        "there have been some real relationship shifts this month, big ones",
+        "this month had some real relationship shifts. I got closer to one friend. I drifted from another. I had a hard talk with my partner that ended better than expected. I reconnected with someone I hadn't talked to in 2 years. these things move quietly. you don't notice them happenin' day to day. but at the end of a month you look back and the social map looks different than it did 4 weeks ago."
+    ], context: "social mapは「社会地図」、英語の現代社会学用語の日常化、人間関係を地理的・空間的に表現する英語の比喩。日本語の「人間関係」より構造的・分析的。relationship shiftsは「関係の移動」、地震学用語(tectonic shift)の人間関係への流用、英語の現代心理学・社会学語彙、関係を地質的に語る英語の現代スラング、日本語の「変化」より動的・地殻変動的。", category: 'opinion', month: '2026-05' },
+    { daySlot: 31, japanese: '健康チェック', english: [
+        "health check-in",
+        "doin' a health check-in",
+        "I'm doing a health check-in for the end of the month",
+        "doin' a health check-in. honestly. how do I feel? sleep: better than April. exercise: more consistent. nutrition: fine, not great. mental health: stable. stress: manageable. weight: stayed about the same. I'm not optimizin' for everythin'. I'm just keepin' the basics in line. that's enough for this season. some months you push. some months you maintain. May was a maintain month."
+    ], context: "check-inは「点検する」、現代英語の self-monitoring語彙、心理セラピー用語が日常自己管理に流入。push vs maintainは英語のathletic training用語(プッシュ期vs維持期)の生活全般応用、自己改善を運動科学的に語る現代英語の修辞。日本語の「無理しない」より体系的・段階的、英語のほうがperiodization(周期化)思考が日常化されている。", category: 'opinion', month: '2026-05' },
+    { daySlot: 31, japanese: '感謝伝える月末', english: [
+        "gratitude practice",
+        "doin' my month-end gratitude practice",
+        "I'm doing my month-end gratitude practice, helps so much",
+        "I'm doin' my month-end gratitude practice. just sit down. write down 5 things I'm grateful for from May. it sounds cheesy. it works. it shifts the lens. instead of focusin' on what didn't go well, I look at what did. my friend who showed up when I was strugglin'. that perfect spring afternoon. the meal I cooked that came out way better than expected. small things. real things. they accumulate."
+    ], context: "gratitude practiceは現代英語のpositive psychology(2000年代)の標準的実践語彙、感謝を「練習」として制度化する英語の現代mental health文化。it shifts the lensは「レンズを変える」、写真用語が認識心理に流入した英語の比喩、視点変化を物理的レンズ操作で表現する英語の現代スラング。日本語の「感謝する」より宗教的でなく、世俗化・科学化された英語の特徴。", category: 'opinion', month: '2026-05' },
+    { daySlot: 31, japanese: '6月もよろしく', english: [
+        "here's to June",
+        "here's to June, let's make it a good one",
+        "alright, here's to June, let's make it another good month",
+        "here's to June. raisin' an imaginary glass at this kitchen counter. May was good. May was hard. May was complicated. May was beautiful. May was 31 days of bein' alive and tryin'. June's gonna be the same probably. that's how it goes. you stack months on months on months and eventually you've lived a life. tonight I sleep. tomorrow it's June. let's go."
+    ], context: "here's toは「(Xに)乾杯」、英語の祝杯表現の慣用句、19世紀英語のtoasting culture由来、文字どおり杯を上げない時にも比喩的に使う。stack X on Yは「Xを積み重ねる」、建築・物流用語が時間に流入した英語の比喩、人生を物理的累積として表現する英語の現代スラング。日本語の「重ねる」と並行表現だが、英語のstackはより建築的・構造的、英語のlife as construction(人生=建設)の比喩文化。", category: 'reaction', month: '2026-05' },
+
+    // ── 2026-06 Day 9 (会話 5/9 から) ──
+    { daySlot: 9, japanese: "つねにえいえんにしぬまでしんでも疲れてる", english: [
+        "I am wrecked",
+        "I am wrecked, forever, like dead-and-still-tired wrecked",
+        "I am tired in this life, the next life, and probably the one after that too",
+        "tired in my bones, the next-life kind"
+    ], literal: "always, eternally, until I die, even after I die, tired", context: "エスカレーション梯子の極北。「疲れた」を言うのに、つねに→えいえん→しぬまで→しんでも、と4段階で梯子を登る。日本語は同じ意味を強度違いで重ねる文化。英語で同じノリを出すならforever, like dead-and-still-tired wreckedみたいに、forever→dead→still→wreckedと畳み掛ける。一語じゃ伝わらない疲労は、両言語とも積み重ねで殴る。", category: "reaction", month: "2026-06" },
+    { daySlot: 9, japanese: "なんだか本気を感じないんだよねえ", english: [
+        "feels half-baked",
+        "honestly? feels kinda half-baked",
+        "I am just not feeling the effort here, you know?",
+        "honestly the spark just isn't there"
+    ], literal: "somehow I cannot feel the real-deal-ness", context: "許可サンドイッチの教科書。「なんだか」でクッション、「本気を感じない」で本音、「だよねえ」でまたクッション。英語も同じく、honestlyやyou knowで前後を緩めて、I am just not feeling itで本音を真ん中に置く。両言語とも、批判は剥き出しじゃなく包んで渡す。日本語は文末助詞、英語は副詞・タグで同じ仕事をする。", category: "opinion", month: "2026-06" },
+    { daySlot: 9, japanese: "やってくださいいますぐ全部", english: [
+        "do it",
+        "just do it. all of it. now.",
+        "just do it -- all of it, right now, no questions",
+        "no notes, just ship it"
+    ], literal: "please do, right now, all", context: "レンガ積みの命令版。「やってください」「いますぐ」「全部」を句点なしで一気に積む。日本語は語順を崩して圧をかける。英語は逆に短い文を句点で叩き込む -- just do it. all of it. now. ピリオドで殴るリズム。日本語は流して圧、英語は切って圧。同じ「四の五の言わずやれ」を真逆の文構造で達成する。", category: "request", month: "2026-06" },
+    { daySlot: 9, japanese: "英語も薄っぺらいよね？そこも直すんだよ？", english: [
+        "fix that too, yeah?",
+        "the English is paper-thin too, right? you are fixing that too, yeah?",
+        "the English is paper-thin too, right? so you are fixing that too -- just so we are on the same page",
+        "the English needs work too, right"
+    ], literal: "the English is also thin, right? you also fix that, right?", context: "〜だよ？〜だよ？の二連。日本語の「〜だよ？」は確認の形をしているが実態は命令。「ですよね？」と同型で、相手にNOの選択肢を残さない。英語のtag question right?やyeah?が完全に同じ機能を持つ。質問の形をした指示、世界共通の生活の知恵。日本語は文末助詞で、英語は文末タグで、同じ「逃げ道を塞ぐ確認」を作る。", category: "request", month: "2026-06" },
+
+    // ── 2026-06 Day 1 (梅雨入り) ──
+    { daySlot: 1, japanese: 'なんか湿気やばくない？', english: [
+        "it's humid",
+        "the air is soup today",
+        "the air is straight up soup today, I can feel it sticking to me",
+        "you could wring out the air"
+    ], context: "「湿気やばい」は日本人の必修語。英語はit's humidが教科書だけど、ネイティブはthe air is soupみたいに比喩で殴る。スープ、湿った毛布、湯気の出る歩道。湿気という抽象を物質に変換する。日本語は「ジメジメ」「ムシムシ」の擬態語で攻める。両言語とも、湿度という見えないやつを感覚に変換して伝える文化。", category: 'reaction', month: '2026-06' },
+    { daySlot: 1, japanese: '傘どこやったっけ', english: [
+        "where's my umbrella",
+        "okay where did I put my umbrella",
+        "okay where the hell did I put my umbrella, I had it like yesterday",
+        "of course it's gone the day I need it"
+    ], context: "「〜やったっけ」は記憶を辿る独り言。英語のwhere'd I put XやI had it yesterdayが同じ機能。日本語は「っけ」一個で「過去の自分への問い」を作るが、英語は完全文でI had it yesterdayと過去形を使って同じことをやる。両言語とも記憶の輪郭をなぞるけど、日本語は終助詞、英語は時制で表現する。", category: 'filler', month: '2026-06' },
+    { daySlot: 1, japanese: '電車混みすぎ', english: [
+        "train's packed",
+        "the train was sardine city this morning",
+        "the train was sardine city this morning, I couldn't even reach my phone",
+        "we were stacked in like cordwood"
+    ], context: "「混みすぎ」は超直訳だとit's too crowdedだけど、ネイティブはsardine cityやpacked like sardinesで魚に例える。日本語の「すし詰め」と完全に同じ発想。寿司詰め=サーディン詰め、両言語が圧縮を魚で表現する偶然の一致。文化OSが食材の缶詰文化で共鳴する瞬間。", category: 'reaction', month: '2026-06' },
+    { daySlot: 1, japanese: 'なんか頭重い', english: [
+        "my head feels heavy",
+        "my head's foggy as hell today",
+        "my head's foggy as hell today, like someone packed cotton in there",
+        "feels like a cloud parked on my head"
+    ], context: "「頭重い」を直訳するとheavy headだけど、英語ではfoggyやcottonの方が自然。日本語は「重い」と物理的重量で表現するが、英語は霧や綿で「不透明さ」「詰まり」を表現する。同じ低気圧頭痛を、片や重力で、片や視界で捉える比喩文化の差。」", category: 'reaction', month: '2026-06' },
+    { daySlot: 1, japanese: 'まあいっか', english: [
+        "whatever",
+        "eh, good enough",
+        "eh, good enough, I'm not dying on this hill",
+        "not the hill I'm dying on"
+    ], context: "「まあいっか」は諦めと許可が混ざった日本語の名句。英語のwhateverは投げやり、good enoughは合格判定、not dying on this hillは戦場比喩(死ぬ価値ない丘)。一つの日本語に対し英語は3つの違う比喩で同じ気分を表現する。日本語は曖昧の達人、英語は具体の達人。", category: 'filler', month: '2026-06' },
+    { daySlot: 1, japanese: 'コーヒー濃いめで', english: [
+        "make it strong",
+        "could I get that strong please",
+        "could I get that on the stronger side, please, I need it today",
+        "kick it up a notch please"
+    ], context: "「濃いめで」は注文の小技。英語ではstrong, on the stronger side, extra strongなど段階がある。日本語の「〜め」は便利な微調整スイッチ、英語にはこの軽い緩和形が薄い。代わりにpleaseやcould Iで丸める。日本語は形容詞をいじり、英語は構文をいじる。同じ「ちょっと多めに」を真逆のレイヤーで達成する。", category: 'request', month: '2026-06' },
+    { daySlot: 1, japanese: 'やる気でない', english: [
+        "I can't be bothered",
+        "I cannot be bothered today",
+        "I cannot be bothered to do anything today, like at all",
+        "running on empty today"
+    ], context: "「やる気でない」を直訳するとno motivationだけど、英語のネイティブはcan't be botheredをよく使う。「気にする手間を起こせない」の意味。日本語は気力(やる気)の欠如、英語は労力(bother)の拒否。同じ無気力を、日本語は内側のエネルギー、英語は外側の労働として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 1, japanese: '見たことある', english: [
+        "I've seen this",
+        "this rings a bell",
+        "this rings a bell, where do I know this from",
+        "this is giving me déjà vu"
+    ], context: "「見たことある」は完了経験。英語はI've seen itが直訳だが、ring a bellの方が「うっすら覚えがある」感を出せる。日本語は視覚動詞「見る」で記憶を示すが、英語は聴覚比喩「鐘が鳴る」で同じことを表す。記憶を視覚で捉える日本語、聴覚で捉える英語。比喩のチャンネルが違う。", category: 'reaction', month: '2026-06' },
+    { daySlot: 1, japanese: 'これ買おうかな', english: [
+        "should I get this",
+        "I might pick this up",
+        "I might pick this up, what do you think",
+        "I'm kinda eyeing this one"
+    ], context: "「〜かな」は迷い終助詞。英語はshould I, might, I'm thinking of, I'm on the fenceなど複数で同じ機能。日本語は「かな」一文字で迷い完結、英語は構文で組み立てる。日本語の経済性と英語の明示性の対比。買うか迷う瞬間ですら、両言語は違うルールで動く。", category: 'filler', month: '2026-06' },
+    { daySlot: 1, japanese: 'お疲れさま', english: [
+        "good work",
+        "nice work today, take it easy",
+        "nice work today, get home safe, take it easy tonight",
+        "good hustle today"
+    ], context: "「お疲れさま」は英語に存在しない労いの呪文。直訳のyou must be tiredは不自然。代わりにnice work, take it easy, see you tomorrowなどに分解される。日本語は1フレーズで「労い+別れ+感謝」を圧縮するが、英語は別々の言葉に分けて言う。日本語の集約性、英語の分散性。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 2 ──
+    { daySlot: 2, japanese: '雨やばい', english: [
+        "it's pouring",
+        "it's coming down sideways out there",
+        "it's coming down sideways out there, the umbrella is useless",
+        "the sky just opened up"
+    ], context: "「雨やばい」のやばいは強度副詞。英語はit's pouring, bucketing, coming down sidewaysなど多様。日本語の「やばい」一語で強度・驚き・嫌悪を全部担うが、英語は雨の動詞(pour, bucket, come down)で同じ仕事をする。日本語は形容詞、英語は動詞で強度を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 2, japanese: 'なんか面倒くさい', english: [
+        "I can't even",
+        "ugh, this is too much effort",
+        "ugh, this is too much effort, I do not have the bandwidth",
+        "ugh, what a drag"
+    ], context: "「面倒くさい」は日本語の名作。英語はa pain, too much effort, can't be botheredなど複数で対応。bandwidthはIT用語の比喩流用で「処理能力」の意。日本語は「面倒+くさい(臭い)」で嫌悪感を音で出すが、英語はpain(痛み)やeffort(労力)で表現する。臭覚 vs 触覚の比喩文化差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 2, japanese: '言い忘れてた', english: [
+        "I forgot to mention",
+        "oh, slipped my mind",
+        "oh, slipped my mind, but I needed to tell you something",
+        "totally blanked on this"
+    ], context: "「言い忘れてた」は責任を主体に置く。英語はI forgotが直訳だが、slipped my mindは「心から滑り落ちた」で記憶を主体にする。日本語は私が忘れた、英語は記憶が逃げた。責任の所在が言語で逆転する瞬間。文化OSの自己観の違いが浮き彫りになる。", category: 'filler', month: '2026-06' },
+    { daySlot: 2, japanese: 'それマジで助かった', english: [
+        "you saved me",
+        "you are a lifesaver, seriously",
+        "you are a lifesaver, seriously, I owe you one",
+        "you bailed me out big time"
+    ], context: "「助かった」は直訳you helped meだが、英語のネイティブはyou're a lifesaverで救命比喩を使う。日本語は受動「助けられた」を能動化、英語は相手に「救命具」のラベルを貼る。日本語は結果報告、英語は相手の属性化。感謝の運び方が真逆。", category: 'reaction', month: '2026-06' },
+    { daySlot: 2, japanese: '別になんでもいい', english: [
+        "whatever works",
+        "honestly, I'm down for whatever",
+        "honestly, I'm down for whatever, you pick",
+        "dealer's choice on this one"
+    ], context: "「別になんでもいい」は決定権放棄。英語はI'm down for whateverやyou pickが自然。日本語の「別に」は否定の前置きで距離を取る、英語のhonestlyは正直の前置きで距離を縮める。同じ「どっちでもいい」の前に、日本語は壁を置き、英語は橋をかける。", category: 'opinion', month: '2026-06' },
+    { daySlot: 2, japanese: '考えとく', english: [
+        "I'll think about it",
+        "let me sit with it",
+        "let me sit with it for a bit and get back to you",
+        "let me chew on it"
+    ], context: "「考えとく」はやんわり保留、たまにやんわり拒否。英語のI'll think about itは似た機能、let me sit with itは「一緒に座る」=熟考の比喩。日本語の「とく」は「〜しておく」の口語縮約で予備動作を示す。英語のlet me Xは許可構文で同じ「保留」を許可フレームで運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 2, japanese: 'やっぱそうだよね', english: [
+        "yeah, figured",
+        "called it, knew that was coming",
+        "called it, I knew that was gonna happen",
+        "saw that one coming"
+    ], context: "「やっぱ」は予想的中の終助詞。英語のcalled itは「呼んだ=予測した」の野球由来俗語。日本語は事後の確認、英語は事前の宣言を持ち出す。同じ「思った通り」を、日本語は感想として、英語は実績として運ぶ。文化OSが過去の予測責任に違う重みを置く。", category: 'reaction', month: '2026-06' },
+    { daySlot: 2, japanese: 'うわ、しまった', english: [
+        "oh crap",
+        "shoot, that's on me",
+        "shoot, that one's on me, I messed up",
+        "yeah, my bad on that"
+    ], context: "「しまった」は瞬時の自責。英語のshoot, crap, my badなど短語が並ぶ。on meは「私の上に」=責任の所在を物理化する英語の表現。日本語は感情の出力、英語は責任の地図化。同じ失敗を、日本語は声で、英語は座標で表す。", category: 'reaction', month: '2026-06' },
+    { daySlot: 2, japanese: 'お腹すいた', english: [
+        "I'm hungry",
+        "I'm starving over here",
+        "I'm absolutely starving, I could eat a whole pizza",
+        "I could eat a horse"
+    ], context: "「お腹すいた」を直訳するとmy stomach is emptyだが、英語はI'm hungryで主語を私にする。さらに強度を上げるとstarving(餓死しそう)で誇張する。日本語は身体部位を主語にし、英語は人全体を主語にする。同じ空腹を、片や臓器、片や人格として表す。", category: 'reaction', month: '2026-06' },
+    { daySlot: 2, japanese: 'もう寝る', english: [
+        "I'm out",
+        "I'm calling it, going to bed",
+        "I'm calling it, I'm going to bed before I fall over",
+        "I'm tapping out for the night"
+    ], context: "「もう寝る」の宣言。英語のI'm callin itは「コール=試合終了宣言」のスポーツ比喩。日本語は事実の予告、英語は終了の宣告。日本語は静かに退出、英語は審判のように終わりを告げる。同じ就寝予告でも、退場の作法が違う。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 3 ──
+    { daySlot: 3, japanese: '紫陽花きれいだったよ', english: [
+        "hydrangeas were pretty",
+        "the hydrangeas are popping right now",
+        "the hydrangeas are popping right now, you should see them",
+        "the hydrangeas were showing off"
+    ], context: "「きれいだった」をbeautiful wereじゃなくpoppingにする。poppingは「弾けるように咲く」=色が爆発する感じ。日本語の「きれい」は静的、英語のpoppingは動的。同じ満開を、日本語は完成された美、英語は進行中のエネルギーとして捉える。文化OSの美意識の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 3, japanese: 'カフェ行かない？', english: [
+        "wanna grab coffee",
+        "wanna swing by a cafe",
+        "wanna swing by a cafe and just chill for a bit",
+        "wanna duck into a cafe"
+    ], context: "「行かない？」否定疑問で誘う。英語のwanna Xや shall weが対応。swing byは「立ち寄る」のカジュアル動詞、振り子比喩で軽さを出す。日本語は否定形で控えめに誘い、英語は動詞のカジュアル度で同じ軽さを出す。誘いの軽量化方法が言語ごとに違う。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 3, japanese: 'ねむい', english: [
+        "I'm sleepy",
+        "I am dragging today",
+        "I am dragging today, my body did not sign up for this",
+        "I'm running on fumes"
+    ], context: "「ねむい」を直訳するとsleepyだが、英語のdraggingは「足を引きずる」=体が重い眠気を表現する。日本語は意識(眠さ)を主体に、英語は身体(引きずる)を主体に表現する。同じ眠気を、片や意識の状態、片や行動の様態で運ぶ。比喩のレイヤーが違う。", category: 'reaction', month: '2026-06' },
+    { daySlot: 3, japanese: '最近どう？', english: [
+        "how's life",
+        "what have you been up to",
+        "what have you been up to, it's been a minute",
+        "long time no talk, what's new"
+    ], context: "「最近どう？」を直訳するとhow are you recentlyだが、ネイティブはwhat have you been up toを使う。日本語は状態を聞き、英語は活動を聞く。日本語の「どう？」は曖昧質問、英語のbeen up toは具体的近況。同じ挨拶を、片やオープンエンド、片や活動内容で運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 3, japanese: 'ちょっとそれは違うと思う', english: [
+        "I disagree",
+        "I'm gonna push back on that",
+        "I'm gonna push back on that, I see it differently",
+        "gonna have to disagree on that one"
+    ], context: "「ちょっと違うと思う」は反対の柔らか化。英語のpush back onは「押し返す」、レスリング比喩。日本語は副詞「ちょっと」で衝突を緩和、英語は身体動作で逆に対立を明示化する。日本語は反対を消し、英語は反対を演じる。両言語の議論文化の根本的な差。", category: 'opinion', month: '2026-06' },
+    { daySlot: 3, japanese: '何時に集合？', english: [
+        "what time",
+        "when are we meeting up",
+        "when are we meeting up and where exactly",
+        "what's the meet-up time"
+    ], context: "「集合」は日本語の独特な集団動詞。英語にmeet upはあるけど、ニュアンスは「合流」。日本語の集合は学校の朝礼から来てる軍隊語、英語のmeet upはカジュアル平場。同じ「集まる」でも、日本語は上下構造、英語は水平構造を背景に持つ。", category: 'request', month: '2026-06' },
+    { daySlot: 3, japanese: 'ちょっと考えさせて', english: [
+        "let me think",
+        "give me a sec to think",
+        "give me a sec to think, I don't want to half-answer",
+        "give me a beat"
+    ], context: "「考えさせて」は使役受動の許可形。英語のlet me Xも全く同じ構文。両言語が珍しく一致する瞬間。ただし日本語は「させてください」と最大丁寧、英語のlet meはカジュアル。同じ構文でも丁寧度のデフォルト位置が違う。", category: 'request', month: '2026-06' },
+    { daySlot: 3, japanese: 'なんか元気でない', english: [
+        "I'm off today",
+        "I'm not feeling like myself",
+        "I'm not feeling like myself today, can't put my finger on it",
+        "I'm just off today"
+    ], context: "「元気でない」をI'm not energeticと直訳すると不自然。ネイティブはnot feeling like myselfで自己同一性を借りる。日本語は気力の欠如、英語は自分らしさの欠如として表現する。同じ不調を、日本語はエネルギー語彙、英語はアイデンティティ語彙で運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 3, japanese: 'びっくりした', english: [
+        "that scared me",
+        "you scared the daylights out of me",
+        "you scared the living daylights out of me, do not do that",
+        "you nearly gave me a heart attack"
+    ], context: "「びっくりした」を直訳するとI was surprised。英語のscare the daylights out of someoneは「日光を叩き出す」=魂が抜けるほど驚かす、17世紀英語由来の古い表現。日本語は驚きを内側で受け止め、英語は魂を外に出す形で表現する。同じ驚愕の出口が真逆。", category: 'reaction', month: '2026-06' },
+    { daySlot: 3, japanese: 'またあとで', english: [
+        "later",
+        "catch you later",
+        "catch you later, gotta run for now",
+        "talk soon"
+    ], context: "「またあとで」は別れの軽量化。英語のcatch you laterは「あとで捕まえる」=狩猟比喩。日本語は時間軸を仄めかし、英語は動作で再会を予告する。日本語は静かに別れ、英語は動詞で別れを動かす。別れの作法の言語差。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 4 ──
+    { daySlot: 4, japanese: '寝坊した', english: [
+        "I overslept",
+        "I slept through my alarm",
+        "I slept through my alarm and woke up in a panic",
+        "I crashed straight through the alarm"
+    ], context: "「寝坊した」を直訳するとI slept lateだが、英語のslept through my alarmは「アラームを貫いて寝た」=アラームを音として認識せず突き抜けた状態。日本語は時間の超過、英語は音への無反応として失敗を語る。同じ寝坊を、片や時計、片や聴覚の失敗として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 4, japanese: 'マジで腹立つ', english: [
+        "this pisses me off",
+        "this is grinding my gears",
+        "this is really grinding my gears, I can't even",
+        "this is really getting under my skin"
+    ], context: "「腹立つ」は腹部に怒りを置く日本語の身体比喩。英語のgrind one's gearsは「歯車をすり減らす」=機械比喩。日本語は内臓、英語は機械で苛立ちを表現する。同じ怒りを、片や生体、片や工業として表す。文化OSが身体観と機械観で分岐する瞬間。", category: 'reaction', month: '2026-06' },
+    { daySlot: 4, japanese: 'ちょっと聞いてもいい？', english: [
+        "can I ask",
+        "real quick, can I ask you something",
+        "real quick, can I ask you something, won't take long",
+        "quick question if you've got a sec"
+    ], context: "「ちょっと」は時間の緩衝材。英語のreal quickが同じ機能、「ほんとに早く」と所要時間を予告して負担感を消す。日本語は副詞、英語は副詞句で同じ仕事をする。両言語とも、依頼前の時間予告で相手の警戒を解く。共通の社会的潤滑技術。", category: 'request', month: '2026-06' },
+    { daySlot: 4, japanese: 'なんかつまらない', english: [
+        "this is dull",
+        "this is kind of a snooze",
+        "this is kind of a snooze, I'm not engaged",
+        "this is putting me to sleep"
+    ], context: "「つまらない」を直訳するとboringだが、ネイティブはsnoozeを名詞化して「居眠り誘発物」と呼ぶ。日本語は感情(つまらない)、英語は機能(眠らせるもの)で評価する。同じ退屈を、片や主観、片やオブジェクトの属性として表現する。文化OSの評価軸の差。", category: 'opinion', month: '2026-06' },
+    { daySlot: 4, japanese: 'まあそうかもね', english: [
+        "maybe",
+        "fair point, could be",
+        "fair point, you might be onto something",
+        "yeah, there's something to that"
+    ], context: "「まあそうかも」は半同意。英語のfair pointは「公正な指摘」、相手の論理を認める英語の譲歩定型句。日本語は「まあ」で距離を取り「かも」で確信を下げる二重ガード、英語はfair pointで一気に相手の土俵に入る。譲歩の作法が日英で対照的。", category: 'opinion', month: '2026-06' },
+    { daySlot: 4, japanese: '電車間に合わない', english: [
+        "won't make the train",
+        "I'm not gonna make this train",
+        "I'm not gonna make this train, I see it pulling in already",
+        "the train's leaving without me"
+    ], context: "「間に合わない」は否定可能形。英語のmake the trainは「電車を作る=間に合う」の慣用句、makeが「達成」の意味を運ぶ。日本語は時間との「合致」、英語は対象との「製造」で間に合いを表現する。makeの汎用性が際立つ瞬間、英語の超抽象動詞文化。", category: 'reaction', month: '2026-06' },
+    { daySlot: 4, japanese: 'うわ、メール返してない', english: [
+        "ugh, didn't reply",
+        "shoot, I never wrote that email back",
+        "shoot, I never wrote that email back, it's been sitting in my drafts for days",
+        "yikes, that reply has been ghosting"
+    ], context: "「返してない」は完了否定。英語のnever wrote backは「書き返さなかった」、現在完了の代用としてneverをよく使う口語。日本語は時制を曖昧に「てない」で表し、英語はneverで強い完了否定を出す。同じ「未返信」を、片や状態、片や歴史的事実として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 4, japanese: 'もう少し詳しく聞かせて', english: [
+        "tell me more",
+        "walk me through it",
+        "walk me through it, I want the whole picture",
+        "give me the long version"
+    ], context: "「詳しく聞かせて」を直訳するとtell me in detailだが、ネイティブはwalk me through itで「歩いて案内して」と道案内比喩を使う。日本語は情報密度を要求、英語は時間的な歩行を要求する。同じ詳細説明を、日本語は量、英語はプロセスとして表現する。", category: 'request', month: '2026-06' },
+    { daySlot: 4, japanese: 'まあ、いっか、もういい', english: [
+        "forget it",
+        "you know what, drop it",
+        "you know what, drop it, it's not worth the energy",
+        "let it go, not worth it"
+    ], context: "「もういい」は打ち切り宣言。英語のforget itやdrop itは「忘れろ」「落とせ」と命令形で議論を終わらせる。日本語は形容詞「いい」で会話を閉じ、英語は命令動詞で物理的に切る。同じ打ち切りを、日本語は評価、英語は動作で運ぶ。", category: 'shutdown', month: '2026-06' },
+    { daySlot: 4, japanese: 'なんか足重い', english: [
+        "legs are heavy",
+        "my legs feel like cinderblocks today",
+        "my legs feel like cinderblocks today, every step is work",
+        "my legs are concrete today"
+    ], context: "「足重い」を直訳するとheavy legsだが、英語のcinderblocksは「コンクリートブロック」=具体的な重い物質。日本語は形容詞、英語は素材比喩で重さを表す。同じ脚の疲労を、片や感覚、片や建材として運ぶ。具体化レベルが言語で違う。", category: 'reaction', month: '2026-06' },
+
+    // ── 2026-06 Day 5 ──
+    { daySlot: 5, japanese: '今日いい天気', english: [
+        "nice day",
+        "the sky is doing the most today",
+        "the sky is doing the most today, look at it",
+        "the weather is showing off"
+    ], context: "「いい天気」を直訳するとnice weatherだが、ネイティブはthe sky is doing the mostみたいに空を擬人化する。doing the mostは「やりすぎ」=全力表現の最近の俗語。日本語は天候の評価、英語は空の演技として表現する。空を主体化する英語の擬人化文化。", category: 'reaction', month: '2026-06' },
+    { daySlot: 5, japanese: 'なんか調子いい', english: [
+        "I feel good",
+        "I'm running on all cylinders today",
+        "I'm running on all cylinders today, everything is clicking",
+        "I'm firing on all cylinders"
+    ], context: "「調子いい」を直訳するとmy condition is goodだが、英語のrunning on all cylindersは「全シリンダー稼働中」=自動車エンジン比喩。日本語は内的状態、英語は機械の稼働として好調を表す。同じ好調を、片や感覚、片やエンジン回転数で運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 5, japanese: '気が利くね', english: [
+        "thoughtful",
+        "you really thought of everything",
+        "you really thought of everything, I appreciate that",
+        "you don't miss a trick"
+    ], context: "「気が利く」は日本語の独自概念、「気=spirit」が「利く=function well」する状態。英語はthoughtful, considerate, on the ball など複数で対応。日本語は気のメタ機能を1語で表現、英語は具体的属性で評価する。気概念の翻訳難度が示す文化OSの差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 5, japanese: 'これおすすめだよ', english: [
+        "try this",
+        "you've gotta try this",
+        "you've gotta try this, I'm telling you, you'll love it",
+        "you've gotta give this a shot"
+    ], context: "「おすすめ」を直訳するとI recommendだが、ネイティブは弱く感じる。you've gotta try thisで「強要に近い推薦」が自然。日本語の謙抑的「おすすめ」と英語の押しの強い「ぜひやれ」が同じ機能を持つ。日本語は控えめに勧め、英語は半ば命令で勧める。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 5, japanese: 'なんか集中できない', english: [
+        "I can't focus",
+        "my brain is bouncing around today",
+        "my brain is bouncing around today, can't settle",
+        "my head is all over the place"
+    ], context: "「集中できない」を直訳するとI can't concentrateだが、英語のbouncing aroundは「あちこち跳ねる」=ボール比喩。日本語は能力の否定、英語は脳の物理運動として表現する。同じ散漫を、片や否定形、片や跳躍動詞で運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 5, japanese: 'ちょっと相談したい', english: [
+        "can we talk",
+        "I want to run something by you",
+        "I want to run something by you when you have a sec",
+        "got a sec to bounce something off you"
+    ], context: "「相談したい」を直訳するとI want to consultだが堅い。英語のrun something by youは「あなたの横を走らせる」=チェックのために通過させる比喩。日本語は議論依頼、英語は検閲通過の依頼として表現する。比喩の方向が真逆。", category: 'request', month: '2026-06' },
+    { daySlot: 5, japanese: 'うーん、微妙', english: [
+        "ehhh, iffy",
+        "I'm on the fence about this",
+        "I'm on the fence about this, can't say yes, can't say no",
+        "the jury's still out on this"
+    ], context: "「微妙」は日本語の名作曖昧語。英語のon the fenceは「フェンスの上」=決め切れない両側状態の比喩。日本語は曖昧そのものを1語で表し、英語は具体的な物理位置で示す。日本語は抽象、英語は風景として迷いを運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 5, japanese: 'なんとなくわかった', english: [
+        "kinda got it",
+        "I think I'm tracking",
+        "I think I'm tracking, mostly",
+        "I think I'm following"
+    ], context: "「なんとなく」は曖昧理解の達人表現。英語のtrackingは「追跡している」=狩猟比喩。日本語は感覚の薄さ、英語は追跡の進捗として理解を表現する。同じ「ぼんやり分かった」を、片や感覚副詞、片や狩猟動詞で運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 5, japanese: 'またあした', english: [
+        "see ya tomorrow",
+        "alright, catch you tomorrow",
+        "alright, catch you tomorrow, take it easy tonight",
+        "catch you tomorrow"
+    ], context: "「またあした」は英語のsee you tomorrowが直訳。日本語は副詞「また」=再会の予告、英語は動詞see/catchで再会動作を予約する。日本語は時間軸で別れ、英語は動作で別れる。連日会う関係性の確認の作法が言語ごとに違う。", category: 'shutdown', month: '2026-06' },
+    { daySlot: 5, japanese: 'なんか胃が痛い', english: [
+        "stomach hurts",
+        "my stomach is in knots today",
+        "my stomach is in knots today, something I ate",
+        "my gut is acting up"
+    ], context: "「胃が痛い」を直訳するとstomach hurtsだが、英語のin knotsは「結ばれた」=結び目比喩で内臓のねじれを表す。日本語は痛みの局在、英語は形状の歪みとして同じ症状を運ぶ。比喩のメディアが片や痛覚、片や形状で違う。", category: 'reaction', month: '2026-06' },
+
+    // ── 2026-06 Day 6 ──
+    { daySlot: 6, japanese: 'のど痛い', english: [
+        "throat hurts",
+        "my throat is killing me",
+        "my throat is killing me, like sandpaper in there",
+        "my throat is on fire"
+    ], context: "「痛い」を直訳するとhurtsだが、英語のkilling meは「殺している」=痛みの誇張定型句。日本語は痛みの存在、英語は痛みの致死性を主張する。同じ喉痛を、片や状態、片や被害として表現する。文化OSの誇張許容度の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 6, japanese: 'ちょっと無理かも', english: [
+        "I can't do it",
+        "I don't think I can swing that",
+        "I don't think I can swing that, sorry",
+        "I'm gonna have to take a rain check"
+    ], context: "「ちょっと無理」は柔らかい拒否。英語のswing itは「振り回せる=何とかできる」のスポーツ比喩(野球バット)。日本語は副詞ちょっとで距離を縮めて断る、英語は動詞swingで「動かす力」を否定する。両言語とも、拒否を物理動作の不能で表す傾向がある。", category: 'reaction', month: '2026-06' },
+    { daySlot: 6, japanese: '気持ちわかるよ', english: [
+        "I get it",
+        "I feel you on that one",
+        "I feel you on that one, been there myself",
+        "I've been in your shoes"
+    ], context: "「気持ちわかる」を直訳するとI understand your feelingだが堅い。英語のI feel youは「私もあなたを感じる」、共感の直接表現。日本語は理解(分かる)、英語は同調(feel)で共感を運ぶ。同じ思いやりを、片や認知、片や感情として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 6, japanese: 'なんかワクワクする', english: [
+        "I'm excited",
+        "I've got butterflies",
+        "I've got butterflies about this, in a good way",
+        "I'm getting hyped about this"
+    ], context: "「ワクワク」は擬態語の名作。英語のbutterfliesは「腹の中の蝶」=胃が舞う感覚を昆虫で表す。日本語は擬態語で内的振動を、英語は身体内の生物比喩で表現する。両言語とも、興奮を腹部の感覚として捉えるが、表現手段は擬態語 vs 比喩で対照的。", category: 'reaction', month: '2026-06' },
+    { daySlot: 6, japanese: '値段見て驚いた', english: [
+        "the price shocked me",
+        "I almost dropped my phone at the price",
+        "I almost dropped my phone when I saw the price tag",
+        "the price tag knocked the wind out of me"
+    ], context: "「驚いた」を直訳するとI was surprisedだが、英語のalmost dropped my phoneは「携帯を落としかけた」=身体反応で驚きを示す慣用的誇張。日本語は感情を直接、英語は身体動作で驚きを物語る。同じショックを、片や心、片や落下動作で表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 6, japanese: 'もうちょっと安くならない？', english: [
+        "any cheaper",
+        "is there any wiggle room on the price",
+        "is there any wiggle room on the price, even a little",
+        "any chance you can cut me a deal"
+    ], context: "「もうちょっと安く」は値段交渉の必修。英語のwiggle roomは「揺らす空間=融通の余地」、物理的隙間の比喩。日本語は副詞「もう、ちょっと」で距離を縮める、英語は名詞room(部屋・余地)で空間化する。値引き交渉の構文化が言語で違う。", category: 'request', month: '2026-06' },
+    { daySlot: 6, japanese: 'たまにはいいよね', english: [
+        "every now and then is fine",
+        "treat yourself once in a while",
+        "treat yourself once in a while, you've earned it",
+        "you've gotta live a little"
+    ], context: "「たまには」は頻度の許可。英語のonce in a whileやevery now and thenが同等。treat yourselfは「自分を扱う=甘やかす」、現代英語のセルフケア文化用語。日本語は頻度副詞で控えめに許可、英語は動詞treatで「自分への施し」として概念化する。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 6, japanese: 'うわ、それは無いわ', english: [
+        "no, just no",
+        "yeah no, that's a hard pass",
+        "yeah no, that's a hard pass from me",
+        "yeah no, that's a deal-breaker"
+    ], context: "「無いわ」は強い拒絶の名作。英語のhard passは「強い見送り」、ポーカー由来の言い回し。yeah noは矛盾肯否で「肯定の形を借りた否定」を作る現代スラング。日本語の「無い」は存在否定で拒絶、英語のpassは順番放棄で同じ意味を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 6, japanese: 'ちょっとだけ寝る', english: [
+        "quick nap",
+        "I'm taking a power nap",
+        "I'm taking a power nap, twenty minutes max",
+        "I'm crashing for twenty"
+    ], context: "「ちょっとだけ寝る」は短時間睡眠の宣言。英語のpower napは「動力仮眠」=効率仮眠のビジネス語、80年代以降の現代造語。日本語は時間の少なさ、英語は機能の強化として仮眠を表現する。同じ短い睡眠を、片や量、片や性能として運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 6, japanese: 'もう帰ろ', english: [
+        "let's head home",
+        "let's call it and head home",
+        "let's call it and head home, I'm wiped",
+        "let's bounce"
+    ], context: "「もう帰ろ」は会のお開き宣言。英語のcall itは「(試合)終了宣言」、call it a night/dayの省略形。日本語は方向動詞「帰る」、英語は判断動詞「call(宣言する)」で終わりを示す。終了の権限を片や方向、片や宣言として表現する。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 7 ──
+    { daySlot: 7, japanese: 'ガッツリ食べたい', english: [
+        "I'm starving",
+        "I want a real meal",
+        "I want a real meal, not a snack situation",
+        "I want something that fights back"
+    ], context: "「ガッツリ」は擬態語の食欲版。英語に直訳がない。real mealやproper mealで「ちゃんとした食事」と概念で代用する。日本語の擬態語の豊富さに英語は概念詞で対抗する。同じ食欲の強度を、片や音、片や本物性で表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 7, japanese: 'なんか飲みたい気分', english: [
+        "I could drink",
+        "I'm in the mood to grab a drink",
+        "I'm in the mood to grab a drink, you down?",
+        "I could murder a beer right now"
+    ], context: "「気分」を直訳するとmoodだが、in the mood toで「〜したい気分の中にいる」と空間化する。日本語は気分を内面の状態、英語は気分を入る場所として表現する。文化OSが感情を内的状態か空間かで分岐する瞬間。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 7, japanese: 'ちゃんと聞いて', english: [
+        "listen",
+        "I need you to actually hear this",
+        "I need you to actually hear this, not half-listen",
+        "really lock in for a sec"
+    ], context: "「ちゃんと」は副詞の真剣化スイッチ。英語のactuallyやfor realが対応。listenではなくhearを使うのは、listenが聴く動作、hearが受信する結果を意味する。日本語は副詞、英語は動詞選択で「真剣に聞く」を区別する。両言語の聴覚動詞の使い分けの差。", category: 'request', month: '2026-06' },
+    { daySlot: 7, japanese: 'なんでこうなった', english: [
+        "how did this happen",
+        "how did we get here",
+        "how did we get here, like really",
+        "how did the wheels come off"
+    ], context: "「こうなった」は結果状態。英語のhow did we get hereは「ここに辿り着いた」=空間移動として因果を表現する。日本語は変化の状態、英語は移動の軌跡として原因を辿る。同じ事態を、片や変化、片や旅行として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 7, japanese: 'なんかすごい好き', english: [
+        "I really like it",
+        "I'm low-key obsessed with this",
+        "I'm low-key obsessed with this, not even gonna lie",
+        "I'm hooked, not gonna lie"
+    ], context: "「すごい好き」を直訳するとI really likeだが弱い。低key obsessedは「控えめに執着」=逆説的強調、現代英語のZ世代スラング。日本語は副詞「すごい」で度合いを盛る、英語はlow-key(控えめ)+obsessed(執着)で同じ熱量を逆説で運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 7, japanese: 'ちょっと余裕ない', english: [
+        "I don't have time",
+        "I don't have the bandwidth right now",
+        "I don't have the bandwidth right now, I'm maxed",
+        "I'm spread thin right now"
+    ], context: "「余裕ない」を直訳するとno marginだが、英語のbandwidthはIT用語の比喩流用、処理能力の余地。日本語は空間「余裕」、英語は帯域幅で同じ「余り」を表現する。日本語は物理的隙間、英語はデジタル容量。比喩のメディア時代差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 7, japanese: 'すごい人だね', english: [
+        "amazing person",
+        "they are something else",
+        "they are something else, in the best way",
+        "they're in a league of their own"
+    ], context: "「すごい人」を直訳するとamazing personだが、英語のsomething elseは「他のもの」=分類不能の褒め言葉。日本語は度合いの強調、英語はカテゴリ離脱として人を称える。同じ感嘆を、片や程度、片や唯一性として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 7, japanese: 'お、いいじゃん', english: [
+        "oh, nice",
+        "oh, that's a vibe",
+        "oh, that's a vibe, I like where this is going",
+        "oh, I'm here for that"
+    ], context: "「いいじゃん」は軽い称賛の終助詞「じゃん」。英語のthat's a vibeは「それは雰囲気」=現代俗語、Z世代の肯定マーカー。日本語は終助詞で軽さを出し、英語はvibe(雰囲気)という抽象名詞で肯定する。両言語とも、軽い称賛に独特な短いトークン文化を持つ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 7, japanese: 'うわ、頭真っ白', english: [
+        "my mind is blank",
+        "I'm drawing a blank right now",
+        "I'm drawing a blank right now, like total whiteout",
+        "I'm completely blanking"
+    ], context: "「頭真っ白」を直訳するとmy head is whiteだが、英語のdraw a blankは「白を引く=ハズレを引く」、宝くじ由来。日本語は色「白」で空白状態、英語は動作「引く」で同じことを表現する。日本語は静的、英語は動的に空白を描く。", category: 'reaction', month: '2026-06' },
+    { daySlot: 7, japanese: 'もう少しで終わる', english: [
+        "almost done",
+        "I'm in the home stretch",
+        "I'm in the home stretch, just a bit more",
+        "I'm in the final stretch"
+    ], context: "「もう少し」は時間副詞句。英語のhome stretchは「家への直線」=競馬の最終直線比喩。日本語は時間「少し」、英語は競争のレーン位置で終盤を示す。日本語は量、英語は地理として進捗を運ぶ。文化OSの進捗観の差。", category: 'reaction', month: '2026-06' },
+
+    // ── 2026-06 Day 8 ──
+    { daySlot: 8, japanese: 'なんか落ち込んでる', english: [
+        "I'm down",
+        "I'm in a bit of a funk",
+        "I'm in a bit of a funk today, can't shake it",
+        "I'm just under a little cloud today"
+    ], context: "「落ち込む」は方向動詞、下に行く比喩。英語のfunkは「悪臭、憂鬱」、ジャズ由来の現代俗語。日本語は方向で抑鬱を、英語は雰囲気の悪さで表現する。同じ気分の低下を、片や下方向、片や臭気で運ぶ。比喩の感覚モダリティの差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 8, japanese: '元気だして', english: [
+        "cheer up",
+        "hang in there, you got this",
+        "hang in there, you got this, this part won't last forever",
+        "chin up, you'll get through this"
+    ], context: "「元気だして」を直訳するとtake out energyだが、英語のhang in thereは「そこにしがみつけ」=綱渡り比喩。日本語はエネルギーの出力、英語は位置の維持として励ます。同じ慰めを、片やエネルギー、片や持ちこたえ動作として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 8, japanese: 'まあまあかな', english: [
+        "okay I guess",
+        "it's been so-so honestly",
+        "it's been so-so honestly, not bad, not great",
+        "it's been pretty middle-of-the-road"
+    ], context: "「まあまあ」は中間評価の名作。英語のso-soが直訳、middle of the roadは「道の真ん中」=中庸の比喩。日本語は副詞反復、英語は道路位置で同じ「中間」を表す。両言語とも中間に独自の表現を持つが、片や音、片や空間で運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 8, japanese: 'なんでそんなに優しいの', english: [
+        "why so kind",
+        "why are you being this sweet to me",
+        "why are you being this sweet to me right now",
+        "what did I do to deserve this"
+    ], context: "「優しい」を直訳するとkindだが、英語のsweetは「甘い=人柄が優しい」、味覚の人格化。日本語は性質の優しさ、英語は味覚で人柄を表現する。同じ優しさを、片や抽象、片や味で運ぶ。文化OSが感覚モダリティで分岐する瞬間。", category: 'reaction', month: '2026-06' },
+    { daySlot: 8, japanese: 'もうやめときな', english: [
+        "stop already",
+        "you need to walk away from this one",
+        "you need to walk away from this one, seriously",
+        "just cut your losses on this one"
+    ], context: "「やめときな」は親しい忠告。英語のwalk awayは「歩いて離れる」=身体動作で諦めを示す。日本語は動詞「やめる」、英語は移動動詞walkで「諦め」を物理化する。同じ忠告を、片や行動の停止、片や場所の離脱として運ぶ。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 8, japanese: 'もう少し詳しく言うと', english: [
+        "to be specific",
+        "to break it down",
+        "to break it down a bit, here's what I mean",
+        "let me unpack that a bit"
+    ], context: "「詳しく言うと」は説明前置き。英語のbreak it downは「分解する」=パーツ化の比喩。日本語は副詞句「詳しく」、英語は動詞break downで「砕いて出す」と動作化する。同じ詳細化を、片や量、片や分解動作として運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 8, japanese: 'もう疲れた、ほんとに', english: [
+        "I'm done",
+        "I am running on fumes",
+        "I am running on fumes at this point, no joke",
+        "I'm absolutely cooked"
+    ], context: "「疲れた、ほんとに」は二重強調。英語のrunning on fumesは「ガソリンの蒸気で走る」=ガス欠寸前比喩。日本語は副詞「ほんとに」で強調、英語は車両比喩で枯渇を示す。同じ疲労を、片や副詞、片やエンジン状態で運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 8, japanese: 'おもしろい話して', english: [
+        "tell me something good",
+        "give me something to laugh about",
+        "give me something to laugh about, I need it today",
+        "hit me with something fun"
+    ], context: "「おもしろい話して」を直訳するとtell me funny storyだが、英語のgive me something to laugh aboutは「笑える何かをくれ」と要求が抽象化される。日本語は内容指定、英語は機能指定で同じ要求を運ぶ。指定の粒度が言語で違う。", category: 'request', month: '2026-06' },
+    { daySlot: 8, japanese: 'まあそんなもんでしょ', english: [
+        "sounds about right",
+        "yeah that tracks",
+        "yeah that tracks, sounds about right",
+        "yeah, par for the course"
+    ], context: "「そんなもんでしょ」は諦念の達観。英語のthat tracksは「追跡が合う=辻褄が合う」、現代Z世代俗語。日本語は形容詞「もん」で物事の本質を指し、英語は動詞trackで論理の整合を示す。同じ「想定内」を、片や本質論、片や論理整合として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 8, japanese: 'ありがとね、マジで', english: [
+        "thanks, truly",
+        "seriously, I appreciate that",
+        "seriously, I appreciate that, more than you know",
+        "I owe you one, big time"
+    ], context: "「マジで」は感謝の強化副詞。英語のseriouslyやtrulyが対応。more than you knowは「あなたが知る以上に」=感謝の不可知化、英語の定型表現。日本語は形容動詞、英語は副詞句で感謝の深さを盛る。両言語とも、感謝には独自の強度ブースターを持つ。", category: 'reaction', month: '2026-06' },
+
+    // ── 2026-06 Day 9 (続き) ──
+    { daySlot: 9, japanese: 'ほんとそれな', english: [
+        "exactly",
+        "that's literally what I'm saying",
+        "that's literally what I'm saying, finally someone gets it",
+        "you took the words right out of my mouth"
+    ], context: "「それな」は強い同意の現代俗語。英語のthat's literally what I'm sayingが完全一致、若い世代の同意表現。日本語は指示代名詞「それ」+終助詞「な」で短く、英語はliterallyと完全文で長く同じ機能を運ぶ。同意の経済性が言語で対照的。", category: 'reaction', month: '2026-06' },
+    { daySlot: 9, japanese: 'もうほっといて', english: [
+        "leave me alone",
+        "just let me be for a bit",
+        "just let me be for a bit, I need space",
+        "give me some breathing room"
+    ], context: "「ほっといて」は放置依頼。英語のlet me beは「在らせて」=存在の許可。leave me aloneより柔らかい。日本語は使役放置、英語は存在許可で同じ「干渉するな」を表す。両言語とも、放置を能動依頼の形にする共通点を持つ。", category: 'request', month: '2026-06' },
+    { daySlot: 9, japanese: 'ちゃんとしたい', english: [
+        "I want to do it right",
+        "I want to do this the right way",
+        "I want to do this the right way, not cut corners",
+        "I want to do this by the book"
+    ], context: "「ちゃんと」は副詞の真剣化トリガー。英語のthe right wayやnot cut cornersで対応。cut cornersは「角を切る=手抜き」、運転由来。日本語は副詞、英語は動詞句で「真っ当」を表す。両言語とも近道と本道の対比を持つが、概念化の仕方が違う。", category: 'opinion', month: '2026-06' },
+    { daySlot: 9, japanese: 'なんでもいいから言って', english: [
+        "just say it",
+        "give me anything, I'm flying blind here",
+        "give me anything, I'm flying blind here without your input",
+        "throw me a bone here"
+    ], context: "「なんでもいいから」は範囲開放の依頼。英語のflying blindは「盲目飛行」=情報なしで進む、航空比喩。日本語は条件無化、英語は情報欠如の身体化として表現する。同じ「何か言って」を、片や条件、片や状況描写として運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 9, japanese: 'いやでもさ', english: [
+        "yeah but",
+        "I hear you, but",
+        "I hear you, but here's where I'm stuck",
+        "fair point, but hear me out"
+    ], context: "「いやでもさ」は反論前置きの三段ガード。英語のI hear you, butが同じ機能、最初に同意を仮装してから反論する。日本語は否定+逆接+終助詞で三層、英語は聴覚動詞+逆接で二層。両言語とも、反論前のクッション文化を共有する。", category: 'opinion', month: '2026-06' },
+    { daySlot: 9, japanese: 'ま、いっか、寝るわ', english: [
+        "whatever, sleeping",
+        "alright, I'm tapping out for tonight",
+        "alright, I'm tapping out for tonight, picking it up tomorrow",
+        "alright, throwing in the towel"
+    ], context: "「寝るわ」の終助詞「わ」は男性的決断、関西では男女共用。英語のtapping outは「(レスリングで)降参の合図」=動作の俗語化。日本語は終助詞で軽い決断、英語はレスリング動作で「敗北の合図」として就寝を表す。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 10 ──
+    { daySlot: 10, japanese: '梅雨入りしたんだって', english: [
+        "rainy season started",
+        "rainy season is officially here",
+        "rainy season is officially here, here we go",
+        "rainy season is officially on the clock"
+    ], context: "「梅雨」は日本固有の気象概念。英語にrainy seasonはあるが季節区分として弱い。here we goは「行くぞ」=覚悟の定型句。日本語は名詞「梅雨入り」で季節転換を、英語はherewe goで気持ちの切り替えを示す。同じ季節到来を、片や事実、片や心構えで運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 10, japanese: 'なんか肩こりひどい', english: [
+        "my shoulders hurt",
+        "my shoulders are tight as hell",
+        "my shoulders are tight as hell, like rocks back there",
+        "my shoulders are in absolute knots"
+    ], context: "「肩こり」は日本人の必修語。英語にこの概念が薄く、tight shoulders, stiff shoulders, knots in my shouldersなどに分解される。日本語は「こり」一語で慢性肩痛を表す、英語は形容詞や名詞で個別現象として表現する。文化OSの身体観・身体語彙の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 10, japanese: 'やる気スイッチ入った', english: [
+        "I'm fired up",
+        "the switch finally flipped",
+        "the switch finally flipped, I'm in the zone",
+        "the gears are finally turning"
+    ], context: "「スイッチ入った」は身体内の機械比喩。英語のthe switch flippedやin the zoneが対応。in the zoneは「ゾーンに入った」=スポーツ心理学由来。日本語はスイッチ(オンオフ)、英語はゾーン(空間)で集中を表現する。比喩の構造が片や二進法、片や空間。", category: 'reaction', month: '2026-06' },
+    { daySlot: 10, japanese: 'まだ全然終わらない', english: [
+        "not even close",
+        "I'm nowhere near done",
+        "I'm nowhere near done, this is gonna take a while",
+        "I'm not even close to wrapping this up"
+    ], context: "「全然終わらない」は副詞「全然」+否定。英語のnowhere near doneは「終わりの近くにない」=距離化。日本語は副詞で否定強化、英語は空間表現で距離を出す。同じ「未達」を、片や量、片や距離として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 10, japanese: 'ちょっと冷蔵庫見てきて', english: [
+        "check the fridge",
+        "can you peek in the fridge for me",
+        "can you peek in the fridge for me, see what we've got",
+        "do me a favor, peek in the fridge"
+    ], context: "「見てきて」は移動+動作の依頼。英語のpeek inは「覗き込む」=軽い動作の動詞。日本語は移動+視覚の連結、英語は動詞peek一語で「軽く中を見る」を表す。同じ依頼を、片や複合、片や単一動詞で運ぶ。動作の粒度の差。", category: 'request', month: '2026-06' },
+    { daySlot: 10, japanese: 'なんかちょっと感動した', english: [
+        "I'm touched",
+        "that hit me in a soft spot",
+        "that hit me in a soft spot, I wasn't expecting it",
+        "that one tugged at me a little"
+    ], context: "「感動」をI was movedと直訳できるが、英語のhit me in a soft spotは「柔らかい場所を打った」=身体内の弱点比喩。日本語は感情移動、英語は局所打撃で感動を表す。同じ感動を、片や全身、片や急所として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 10, japanese: '思ってたのと違う', english: [
+        "not what I expected",
+        "this isn't what I had in mind",
+        "this isn't what I had in mind, gonna be honest",
+        "this didn't quite match the picture"
+    ], context: "「思ってたのと違う」は期待乖離の名作。英語のnot what I had in mindは「頭の中にあったものと違う」=空間化。日本語は思考、英語は精神空間で期待を表す。両言語とも、内的予測のズレを表現するが、英語はin mindで空間を借りる。", category: 'opinion', month: '2026-06' },
+    { daySlot: 10, japanese: 'やっと終わった', english: [
+        "finally done",
+        "finally, I can breathe",
+        "finally, I can breathe again, that's over",
+        "I can finally exhale"
+    ], context: "「やっと」は完了の感慨副詞。英語のfinally I can breatheは「やっと呼吸できる」=息止めから解放の身体化。日本語は副詞で時間達成、英語は呼吸動詞で解放感を運ぶ。同じ完了を、片や時間達成、片や生理回復として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 10, japanese: 'うちで作る方がうまい', english: [
+        "homemade beats it",
+        "honestly, mine at home is better",
+        "honestly, mine at home is better, no contest",
+        "mine at home blows this away"
+    ], context: "「うちで作る方がうまい」は誇り混じりの否定評価。英語のno contestは「勝負にならない」=競技用語の流用。日本語は比較形「方が」、英語は競技比喩で同じ「圧勝」を表す。日本語は構文比較、英語はスポーツ比喩で味を競争化する。", category: 'opinion', month: '2026-06' },
+    { daySlot: 10, japanese: 'ちょっと外行こう', english: [
+        "let's go out",
+        "let's get out of the house for a bit",
+        "let's get out of the house for a bit, anywhere",
+        "let's pop out for a bit"
+    ], context: "「外行こう」は移動提案。英語のget out of the houseは「家から出る」=分離動詞句で外出を表す。日本語は方向動詞、英語は離脱動詞で同じ「外へ」を運ぶ。両言語の外出表現の構文差、日本語は到達、英語は分離として動作を運ぶ。", category: 'suggestion', month: '2026-06' },
+
+    // ── 2026-06 Day 11 ──
+    { daySlot: 11, japanese: 'ねえ、聞いてる？', english: [
+        "you listening",
+        "hey, are you with me",
+        "hey, are you with me right now",
+        "are you still with me"
+    ], context: "「聞いてる？」は注意の確認。英語のyou with meは「私と一緒にいる？」=空間化された注意。日本語は聴覚動詞、英語は空間共有で注意を確認する。同じ「聞いてる？」を、片や聴覚、片や同行として運ぶ。文化OSの注意観の差。", category: 'request', month: '2026-06' },
+    { daySlot: 11, japanese: 'もう少し具体的に', english: [
+        "more specific",
+        "give me a concrete example",
+        "give me a concrete example, I'm not seeing it",
+        "paint me a picture"
+    ], context: "「具体的に」を直訳するとspecificallyだが、英語のconcreteは「コンクリート」=建材比喩で具体性を表す。日本語は抽象/具体の対比、英語は流動/固体の対比として概念化する。同じ「ハッキリ」を、片や概念、片や物質として運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 11, japanese: 'やる気あるの？', english: [
+        "you care",
+        "are you even invested in this",
+        "are you even invested in this, like at all",
+        "are you actually all-in on this"
+    ], context: "「やる気あるの？」は強い問い詰め。英語のinvestedは「投資された」=金融比喩、関心を金銭化する英語の現代スラング。日本語は気力存在、英語は投資完了として関心を表す。同じ「真剣？」を、片や内面、片や経済として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 11, japanese: '別にいいけど', english: [
+        "okay, whatever",
+        "fine by me, I guess",
+        "fine by me, I guess, do what you want",
+        "your call, no skin off my back"
+    ], context: "「別にいい」は無関心の名作。英語のfine by meは「私の方では大丈夫」=空間化された許可。日本語は副詞「別に」で距離、英語はby meで自分の方の範疇を明示する。同じ「どうでも」を、片や距離化、片や領分化として運ぶ。", category: 'shutdown', month: '2026-06' },
+    { daySlot: 11, japanese: 'なんか不安', english: [
+        "I'm uneasy",
+        "I've got a weird feeling about this",
+        "I've got a weird feeling about this, can't explain it",
+        "I've got a knot in my stomach about this"
+    ], context: "「不安」を直訳するとanxietyだが、英語のweird feelingやvibeは「変な感じ」=日常語化された予感。日本語は心理状態名詞、英語は感覚の質で予感を表す。同じ漠然とした不安を、片や状態、片や感覚として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 11, japanese: 'もう一回お願い', english: [
+        "one more time",
+        "could you run that by me again",
+        "could you run that by me again, didn't catch it",
+        "one more time, I missed that"
+    ], context: "「もう一回」は反復依頼。英語のrun that by me againは「もう一度横を走らせて」=チェック比喩。日本語は時間副詞「もう一回」、英語は動詞run byで「通過させる」と動作化する。同じ反復依頼を、片や時間、片や動作で表す。", category: 'request', month: '2026-06' },
+    { daySlot: 11, japanese: 'なるほどね', english: [
+        "I see",
+        "ah, that makes sense now",
+        "ah, that makes sense now, you should've led with that",
+        "okay, the penny just dropped"
+    ], context: "「なるほど」は理解の感嘆詞。英語のah, that makes senseが対応、makes senseは「意味を作る」=理解の達成動詞。日本語は到達感嘆詞、英語は完了動詞で理解を表す。同じ「腑に落ちる」を、片や瞬間、片やプロセスとして運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 11, japanese: 'これ意外と難しいね', english: [
+        "harder than it looks",
+        "this is trickier than I expected",
+        "this is trickier than I expected, deceptively",
+        "this is harder than it looks"
+    ], context: "「意外と」は予期外副詞。英語のdeceptivelyは「欺くように」=見かけによらないの副詞。日本語は予測逸脱、英語は意図的欺きとして「意外」を表す。同じ意外性を、片や予想、片や欺瞞として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 11, japanese: 'もう少し声大きく', english: [
+        "louder please",
+        "can you bump up the volume",
+        "can you bump up the volume a bit, I'm losing you",
+        "crank it up a notch"
+    ], context: "「声大きく」を直訳するとspeak loudlyだが、英語のbump up the volumeは「音量を押し上げる」=機器操作の動詞句。日本語は形容詞「大きく」、英語は機械操作で同じ依頼を表す。日本語は声の属性、英語は機械の操作として運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 11, japanese: '今日はもうおしまい', english: [
+        "I'm done for today",
+        "alright, that's a wrap for me",
+        "alright, that's a wrap for me, see everyone tomorrow",
+        "I'm clocking out for the day"
+    ], context: "「おしまい」は終了の名詞化。英語のthat's a wrapは「巻きました」=映画撮影の終了宣言。日本語は終了名詞、英語は撮影動詞wrapで完了を表す。同じ終わりを、片や名詞、片や映像現場の専門語で運ぶ。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 12 ──
+    { daySlot: 12, japanese: '雨やんでよかった', english: [
+        "rain's gone",
+        "thank god the rain let up",
+        "thank god the rain let up, I needed that break",
+        "the rain finally tapped out"
+    ], context: "「やんでよかった」は安堵の名作。英語のlet upは「緩める=止まる」、雨専用の自動詞句。日本語は動詞「やむ」、英語はlet upで「緩和」を運ぶ。日本語は停止、英語は緩和として雨の終わりを表現する。同じ事象を、片や離散、片や連続として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 12, japanese: 'これマジで便利', english: [
+        "this is handy",
+        "this is a game changer",
+        "this is a legit game changer, no exaggeration",
+        "this is a total lifesaver"
+    ], context: "「便利」をconvenientと直訳できるが、game changerは「ゲームを変えるもの」=スポーツ比喩で革新を運ぶ。日本語は実用性、英語は変化のインパクトとして便利さを表す。同じ「便利」を、片や用途、片や戦略として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 12, japanese: 'これ全部覚えるの？', english: [
+        "memorize all this",
+        "we have to learn all of this",
+        "we have to learn all of this, are you serious",
+        "we're learning all this, for real"
+    ], context: "「覚えるの？」は終助詞「の」の確認的疑問。英語のare you seriousやfor realが同じ衝撃確認の機能。日本語は終助詞、英語は形容詞で同じ「マジ？」を表す。両言語とも、信じがたい量への反応に特定の確認構文を持つ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 12, japanese: 'なんとなく察した', english: [
+        "I figured",
+        "I picked up on it",
+        "I picked up on it, didn't need anyone to spell it out",
+        "I read between the lines"
+    ], context: "「察した」は日本語の独自概念。英語のpick up on itは「拾い上げた」=情報を物質化して受信する比喩。日本語は感覚動詞「察する」、英語は手の動作pick upで同じ「気づいた」を表す。日本語は内的感受、英語は外的取得として察知を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 12, japanese: 'ちょっと一回まとめさせて', english: [
+        "let me recap",
+        "let me bring this all together",
+        "let me bring this all together, I want to make sure I've got it",
+        "let me play this back"
+    ], context: "「まとめさせて」は使役受動の整理依頼。英語のbring it all togetherは「全部を持ってきて一緒にする」=物理的集約の比喩。日本語は抽象動詞「まとめる」、英語は移動+結合で「整理」を表す。同じ整理を、片や抽象、片や物理動作として運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 12, japanese: 'なんか気が抜けた', english: [
+        "I'm drained",
+        "the air just went out of me",
+        "the air just went out of me, can't focus anymore",
+        "I'm running on empty"
+    ], context: "「気が抜けた」は気の流出。英語のair went out of meは「空気が私から出た」=風船の比喩。日本語は気(エネルギー)、英語は空気として枯渇を表す。両言語とも、気力を流体として概念化するが、媒体が「気」と「空気」で違う。", category: 'reaction', month: '2026-06' },
+    { daySlot: 12, japanese: 'なんかいいことあった？', english: [
+        "good news",
+        "you look like something good happened",
+        "you look like something good happened, spill it",
+        "you've got that look, what's up"
+    ], context: "「いいことあった？」は明るい問いかけ。英語のspill itは「こぼせ」=秘密を液体化して放出を促す比喩。日本語は質問形、英語は命令で「教えて」を運ぶ。同じ好奇心を、片や疑問、片や命令として運ぶ。日本語は控えめ、英語は催促が強い。", category: 'reaction', month: '2026-06' },
+    { daySlot: 12, japanese: 'まあ気にしないで', english: [
+        "don't worry",
+        "don't sweat it",
+        "don't sweat it, water under the bridge",
+        "shake it off, no big deal"
+    ], context: "「気にしないで」を直訳するとdon't mindだが、英語のdon't sweat itは「汗をかくな」=身体反応の禁止比喩。water under the bridgeは「橋の下の水」=流れ去ったもの。日本語は精神依頼、英語は身体や水の比喩で同じ「忘れて」を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 12, japanese: 'えっ、まじで？嘘でしょ', english: [
+        "what, no way",
+        "wait what, you're kidding me",
+        "wait what, you're kidding me right now",
+        "no way, get out of here"
+    ], context: "「嘘でしょ」は驚きの否定形。英語のyou're kidding meは「冗談言ってる」=同じ機能。日本語は嘘を疑い、英語は冗談を疑う。両言語とも、驚きを「相手の発言の虚構性」を疑う形で表す。同じ衝撃を、片や嘘、片や冗談として捉える。", category: 'reaction', month: '2026-06' },
+    { daySlot: 12, japanese: 'はいはい、わかったわかった', english: [
+        "okay okay",
+        "alright alright, I hear you",
+        "alright alright, I hear you, I get it",
+        "yeah yeah, message received"
+    ], context: "「はいはい」は二重肯定の倦怠表現。英語のalright alrightが同じ機能。両言語とも肯定の反復で「もう十分わかった、しつこい」を表す。日本語は肯定詞、英語は了解詞の反復で同じ「うんざり同意」を運ぶ。反復のニュアンス機能は普遍的。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 13 ──
+    { daySlot: 13, japanese: '昼寝したい', english: [
+        "I need a nap",
+        "I could use a quick nap",
+        "I could use a quick nap, even fifteen minutes",
+        "I need to crash for a bit"
+    ], context: "「昼寝」は日本語の独立概念。英語のnapが対応するが、英語のnapは時間帯を問わない。日本語の「昼」は時間帯指定、英語のnapは持続時間の短さを指す。同じ仮眠を、日本語は時刻、英語は時間量で分類する。文化OSの時間分類の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 13, japanese: 'これさっき言った気がする', english: [
+        "did I say this",
+        "I feel like I just said this",
+        "I feel like I just said this two minutes ago",
+        "I swear we just covered this"
+    ], context: "「気がする」は曖昧な確信。英語のI feel like Xが同じ機能。両言語とも「気/feel」で確信度を下げる。日本語は終止「気がする」で文を構造化、英語はfeel like+完全文で同じことを表す。確信度の下げ方が言語の構文機能と接続する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 13, japanese: 'もうこれは無理ゲー', english: [
+        "this is impossible",
+        "this isn't a problem, it's a wall",
+        "this isn't a problem, it's a wall, full stop",
+        "this thing's a brick wall"
+    ], context: "「無理ゲー」はゲーム由来俗語、攻略不能。英語のwallは「壁=突破不能」、登山由来の比喩。日本語はゲーム文化、英語は登山文化で「不可能」を表す。同じ詰みを、片やビデオゲーム、片や物理障壁として運ぶ。比喩のジャンル差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 13, japanese: 'ちょっと意見聞きたい', english: [
+        "your thoughts",
+        "what's your read on this",
+        "what's your read on this, just curious",
+        "what's your gut say on this"
+    ], context: "「意見」をopinionと直訳できるが、英語のreadは「読み取り」=理解の認知動詞。日本語は名詞opinion、英語は動詞readで「解釈」を表す。同じ意見を、片や所有物、片や読解結果として運ぶ。文化OSの意見の捉え方の差。", category: 'request', month: '2026-06' },
+    { daySlot: 13, japanese: 'マジで意味わかんない', english: [
+        "makes no sense",
+        "I can't wrap my head around this",
+        "I can't wrap my head around this, like at all",
+        "this is going way over my head"
+    ], context: "「意味わかんない」を直訳するとI don't understandだが、英語のwrap my head around itは「頭で包む」=理解の物理化。日本語は意味の認知否定、英語は頭の包囲不能で表現する。同じ困惑を、片や認知、片や物理動作として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 13, japanese: '言い方キツくない？', english: [
+        "kinda harsh",
+        "that was a bit much, don't you think",
+        "that was a bit much, don't you think, the way you said it",
+        "that came in a little hot"
+    ], context: "「キツい」は強度形容詞、批判される言い方。英語のa bit muchは「ちょっと多すぎ」=量化された過剰表現。日本語は強度、英語は量で「キツさ」を表す。同じ「言い過ぎ」を、片や形容詞、片や量副詞句として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 13, japanese: 'ま、こんなもんでしょ', english: [
+        "good enough",
+        "yeah, that's about as good as it gets",
+        "yeah, that's about as good as it gets, for now",
+        "good enough for government work"
+    ], context: "「こんなもん」は妥協的評価。英語のas good as it getsは「これ以上にならない」=上限到達。日本語は近似指示「こんな」、英語は最大値表現で同じ「これくらい」を運ぶ。同じ妥協を、片や近似、片や限界として表す。", category: 'opinion', month: '2026-06' },
+    { daySlot: 13, japanese: 'なんか飽きた', english: [
+        "I'm bored",
+        "I'm over this",
+        "I'm over this, need to switch it up",
+        "I'm done with this"
+    ], context: "「飽きた」は飽和の感覚。英語のI'm over itは「乗り越えた」=空間化された飽き。日本語は内的飽和、英語は通過完了として表す。同じ飽きを、片や状態到達、片や時間的通過として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 13, japanese: 'やっぱ天才だな', english: [
+        "you're a genius",
+        "you really are built different",
+        "you really are built different, no one else thinks like that",
+        "you're operating on a different level"
+    ], context: "「天才」を直訳するとgeniusだが、英語のbuilt differentは「構造が違う」=建築比喩。日本語は能力カテゴリ、英語は構造差として表す。同じ称賛を、片や生得、片や構造として運ぶ。built differentはZ世代俗語、新しい英語の比喩。", category: 'opinion', month: '2026-06' },
+    { daySlot: 13, japanese: 'おやすみ', english: [
+        "good night",
+        "alright, night",
+        "alright, night, sleep well",
+        "sleep tight"
+    ], context: "「おやすみ」は休息の名詞化、敬語接頭「お」+「休み」。英語のgood nightは「良い夜を」=時間帯への祝福。日本語は休息対象、英語は時間帯を祝う。同じ就寝挨拶を、片や休息、片や時間として運ぶ。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 14 ──
+    { daySlot: 14, japanese: '今日マジでだるい', english: [
+        "I am sluggish",
+        "I'm moving in slow motion today",
+        "I'm moving in slow motion today, can't pick it up",
+        "everything feels like wading through mud"
+    ], context: "「だるい」を直訳するとheavy or tiredだが、英語のslow motionは「スローモーション」=映像表現で身体動作を遅く描く。日本語は内的状態、英語は映像比喩で動作を表す。同じ怠さを、片や状態、片や映像速度として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 14, japanese: 'ちょっと前向きに考えよう', english: [
+        "stay positive",
+        "let's flip the script",
+        "let's flip the script and look at this differently",
+        "let's look on the bright side"
+    ], context: "「前向きに」を直訳するとpositivelyだが、英語のflip the scriptは「台本を裏返す」=映画用語の比喩で視点転換を表す。日本語は方向(前)、英語は反転動作で楽観化を表す。同じ前向きを、片や方向、片や反転として運ぶ。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 14, japanese: 'ねえ、これ何？', english: [
+        "what's this",
+        "what is this thing",
+        "what is this thing, where did it come from",
+        "what on earth is this thing"
+    ], context: "「これ何？」は短い疑問。英語のwhat is this thingは「これは何のもの？」と質問が長くなる。日本語は省略の達人、英語は完全文の達人。同じ「何？」を、片や2字、片や4語で表す。経済性の言語差。", category: 'request', month: '2026-06' },
+    { daySlot: 14, japanese: 'やっと晴れた', english: [
+        "finally sunny",
+        "the sun decided to show up",
+        "the sun decided to show up, finally",
+        "the sun finally clocked in"
+    ], context: "「やっと晴れた」は安堵の天候表現。英語のsun decided to show upは「太陽が現れる決断をした」=擬人化。日本語は時間達成、英語は太陽の意志として晴れを表す。同じ晴天を、片や時間、片や擬人化された決断として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 14, japanese: 'ちょっと違う気がする', english: [
+        "feels off",
+        "something's not sitting right",
+        "something's not sitting right with me on this one",
+        "something feels a hair off"
+    ], context: "「違う気がする」は直感的反対。英語のsitting rightは「正しく座っている」=身体化された違和感。日本語は気の方向、英語は座位の正しさで違和を表す。同じ違和感を、片や気、片や座姿勢として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 14, japanese: 'すごい助かった、ありがとう', english: [
+        "thanks so much",
+        "you came through big time",
+        "you came through big time, I really appreciate it",
+        "you really came through, thanks"
+    ], context: "「すごい助かった」は強い感謝。英語のcame through big timeは「大きく通り抜けてきた」=野球由来、勝負どころで貢献する意。日本語は度合い副詞、英語は通過動詞+程度副詞で同じ感謝を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 14, japanese: 'もう待てない', english: [
+        "can't wait",
+        "I'm done waiting on this",
+        "I'm done waiting on this, gonna move forward",
+        "I'm not holding my breath anymore"
+    ], context: "「もう待てない」を直訳するとcan't wait anymoreだが、英語のI'm done waitingは「待つことが終わった」=動作の完了として待ちを終わらせる。日本語は能力の否定、英語は動作の完了として表す。同じ忍耐限界を、片や否定、片や完了で運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 14, japanese: 'なんか変な夢みた', english: [
+        "weird dream",
+        "I had the strangest dream",
+        "I had the strangest dream, can't shake it",
+        "had a real trip of a dream"
+    ], context: "「変な夢」を直訳するとweird dreamだが、英語のstrangestで最上級を使うと「過去最高に変」と強調される。日本語は形容詞「変」で簡潔、英語は最上級で印象の強さを誇張する。同じ夢を、片や属性、片や順位として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 14, japanese: 'えっと、なんだっけ', english: [
+        "uh, what was it",
+        "hold on, what was I saying",
+        "hold on, what was I saying, lost my train of thought",
+        "wait, I lost the thread"
+    ], context: "「なんだっけ」は記憶探索の終助詞「っけ」。英語のtrain of thoughtは「思考の列車」=思考を連結車両として表す。日本語は終助詞で記憶手探り、英語は列車比喩で思考の連続性を表す。同じ「思い出せない」を、片や記憶、片や列車として運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 14, japanese: 'お先に失礼します', english: [
+        "leaving now",
+        "I'm heading out, see you tomorrow",
+        "I'm heading out, see you tomorrow, take care",
+        "I'm taking off for the day"
+    ], context: "「お先に」は日本語の独自挨拶、先に帰る詫び。英語にはこの概念がなく、heading outで代替する。日本語は集団残留への配慮、英語は個人行動の予告。同じ退社を、日本語は集団意識、英語は個人主義として運ぶ。文化OSの根本差。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 15 ──
+    { daySlot: 15, japanese: 'もう半年経った', english: [
+        "half the year gone",
+        "we're already halfway through the year",
+        "we're already halfway through the year, that flew by",
+        "half the year just went up in smoke"
+    ], context: "「半年経った」は時間経過の感慨。英語のhalfway throughは「半分を通過」=空間化された時間。日本語は経過動詞「経つ」、英語は通過副詞で時間を表す。日本語は時間を流れ、英語は時間を距離として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 15, japanese: '今年の目標どうなった', english: [
+        "year goals",
+        "how are my New Year's resolutions doing",
+        "how are my New Year's resolutions doing, asking for a friend",
+        "where am I on those resolutions"
+    ], context: "「目標」を直訳するとgoalだが、英語のresolutionsは「決意」=新年の伝統的な誓い。asking for a friendは「友達のために聞いてる」=自分のことを他人事化する俗語。日本語は目標、英語は誓いとして同じ計画を運ぶ。文化OSの新年儀礼の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 15, japanese: '父の日忘れてた', english: [
+        "forgot father's day",
+        "shoot, totally spaced on Father's Day",
+        "shoot, totally spaced on Father's Day, gotta scramble",
+        "Father's Day completely slipped my mind"
+    ], context: "「忘れてた」は完了否定。英語のspaced onは「空間に飛んだ」=注意の宇宙化、現代俗語。日本語は記憶喪失、英語は注意の宇宙旅行で同じ「失念」を表す。同じ忘却を、片や記憶、片や宇宙比喩として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 15, japanese: '走り回ってた', english: [
+        "I was busy",
+        "I was running around all day",
+        "I was running around all day, didn't sit down once",
+        "I was on my feet all day"
+    ], context: "「走り回る」は身体動詞の比喩。英語のrunning aroundが完全一致、両言語が「走る+回る」で多忙を表現する。日本語は擬態的、英語は実態的に近いが、意味機能は同じ。両言語が同じ比喩を独立に発明した例。", category: 'reaction', month: '2026-06' },
+    { daySlot: 15, japanese: 'いいねそれ', english: [
+        "nice",
+        "I'm into that idea",
+        "I'm into that idea, let's run with it",
+        "now we're talking"
+    ], context: "「いいね」を直訳するとit's goodだが、英語のI'm into itは「中に入っている」=空間化された関心。日本語は評価形容詞、英語は方向前置詞で同じ「いい」を運ぶ。同じ肯定を、片や形容詞、片や空間として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 15, japanese: 'ちょっと小腹すいた', english: [
+        "kinda hungry",
+        "I could go for a little something",
+        "I could go for a little something, nothing huge",
+        "I could use a little nibble"
+    ], context: "「小腹」は日本語の独特概念、満腹未満の空腹。英語のkinda hungryは「ちょっと空腹」と量で表す。日本語は腹部の段階(腹/小腹/満腹)、英語は形容詞の度合いで分類する。文化OSの空腹分類の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 15, japanese: '前から思ってたんだけど', english: [
+        "I've been thinking",
+        "I've been meaning to bring this up",
+        "I've been meaning to bring this up for a while",
+        "this has been on my mind a while"
+    ], context: "「前から思ってた」は時間継続の前置き。英語のbeen meaning toは「ずっと意図していた」=完了進行形。日本語は時間副詞、英語は完了進行で「持ち越し」を表す。同じ「ずっと言いたかった」を、片や副詞、片や時制として運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 15, japanese: 'もうちょっと早く言ってよ', english: [
+        "tell me sooner",
+        "could've used a heads up earlier",
+        "could've used a heads up earlier on this one",
+        "a little advance notice next time"
+    ], context: "「もうちょっと早く」は時間の比較依頼。英語のheads upは「頭上注意」=軍事由来、事前警告。日本語は時間副詞、英語は名詞heads upで「予告」を表す。日本語は時間軸、英語は注意喚起として「前もって」を運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 15, japanese: 'いやーまいったね', english: [
+        "wow, tough one",
+        "yeah, that's a rough one",
+        "yeah, that's a rough one, no way around it",
+        "yeah, that's a tough spot"
+    ], context: "「まいった」は降参の名作。英語のtough oneやrough oneは「厳しいやつ」=形容詞名詞化。日本語は動詞「参った」で敗北を、英語は形容詞で困難を表す。同じ「困った」を、片や敗北、片や属性として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 15, japanese: 'もうほんと寝る', english: [
+        "I'm out",
+        "okay I'm actually going to bed now",
+        "okay I'm actually going to bed now, no more stalling",
+        "okay, lights out for real this time"
+    ], context: "「ほんと寝る」は意志強調。英語のactuallyが同じ機能、宣言を強化する。stallingは「滞留=ぐずる」、機械停止由来。日本語は副詞「ほんと」、英語はactuallyで決意の真剣度を上げる。両言語とも、宣言の信頼度を副詞で上げる文化。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 16 ──
+    { daySlot: 16, japanese: 'ちょっと予定変更', english: [
+        "change of plans",
+        "small change of plans on my end",
+        "small change of plans on my end, nothing major",
+        "small tweak to the plan"
+    ], context: "「予定変更」は名詞句。英語のchange of plansが直訳的に同じ。on my endは「私の側で」=空間化された当事者。日本語は変更内容、英語は当事者の領分を明示する。同じ変更通知を、片や内容、片や帰属として運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 16, japanese: 'なるほど、そういうことか', english: [
+        "ah, I see",
+        "okay, now it clicks",
+        "okay, now it clicks, that's the missing piece",
+        "ah, now the dots connect"
+    ], context: "「そういうことか」は理解到達の感嘆。英語のclickは「カチッと音がする」=機械的接続音、理解の擬音化。日本語は指示文「そういうこと」、英語は擬音「click」で同じ「合点」を表す。日本語は意味、英語は音で理解を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 16, japanese: 'ちょっと連絡してみる', english: [
+        "I'll reach out",
+        "let me ping them and see",
+        "let me ping them and see what they say",
+        "let me shoot them a quick text"
+    ], context: "「連絡してみる」を直訳するとI'll contactだが、英語のpingは「ピン送信」=IT用語の流用。reach outは「手を伸ばす」=身体動作の比喩。日本語は機能動詞、英語はIT用語と身体動詞で同じ連絡を表す。比喩のテクノロジー時代差。", category: 'request', month: '2026-06' },
+    { daySlot: 16, japanese: '逆にそれがいいかも', english: [
+        "actually that's good",
+        "you know what, that might be the move",
+        "you know what, that might be the move, the opposite of what I thought",
+        "actually flipping it might work"
+    ], context: "「逆に」は転換接続詞。英語のthe moveは「動き=正解の選択」、現代俗語。日本語は方向逆転、英語は動作の選択として「逆転肯定」を表す。同じ「むしろ」を、片や方向、片や動作として運ぶ。Z世代の英語が動作を解として概念化する文化。", category: 'opinion', month: '2026-06' },
+    { daySlot: 16, japanese: 'なんかちょっと遅刻しそう', english: [
+        "I'll be late",
+        "I'm running a little behind",
+        "I'm running a little behind, just a heads up",
+        "I might be cutting it close"
+    ], context: "「遅刻しそう」は予告。英語のrunning behindは「後ろを走っている」=競走比喩。日本語は遅刻の予告、英語は競走順位として「遅れ」を表す。同じ遅刻予告を、片や時刻、片や競走として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 16, japanese: 'もう全然平気', english: [
+        "I'm fine now",
+        "totally good, all healed up",
+        "totally good, all healed up, no worries",
+        "I'm back to a hundred percent"
+    ], context: "「全然平気」は副詞+形容詞の強い肯定。英語のtotally goodが同じ機能、totallyは「完全に」=度合い副詞。両言語とも、「全く問題ない」を強度副詞で運ぶ。日本語は副詞「全然」、英語は副詞totallyで同じ働きをする。", category: 'reaction', month: '2026-06' },
+    { daySlot: 16, japanese: 'まだまだだな自分', english: [
+        "long way to go",
+        "I've got a lot to learn",
+        "I've got a lot to learn, that's the takeaway",
+        "still plenty of room to grow"
+    ], context: "「まだまだ」は不十分の反復。英語のa lot to learnは「学ぶことが多い」=量化。日本語は反復副詞、英語は量副詞で同じ「未熟」を運ぶ。日本語は時間軸、英語は学習量として未達を表す。", category: 'opinion', month: '2026-06' },
+    { daySlot: 16, japanese: 'もう少し冷静になろう', english: [
+        "calm down",
+        "let's take a breath here",
+        "let's take a breath here, slow it down",
+        "let's pump the brakes here"
+    ], context: "「冷静に」を直訳するとcalmlyだが、英語のtake a breathは「息を吸う」=身体動作で冷静化を促す。日本語は温度比喩(冷)、英語は呼吸動作で同じ「落ち着く」を表す。同じ鎮静を、片や温度、片や呼吸として運ぶ。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 16, japanese: 'ちょっと用事あるから', english: [
+        "got stuff to do",
+        "I gotta handle something real quick",
+        "I gotta handle something real quick, be back later",
+        "I've got an errand to knock out"
+    ], context: "「用事」は日本語の名詞、未定義の予定。英語のsomethingやstuffで対応、汎用名詞で同じ機能。handleは「扱う」=処理動詞。日本語は名詞、英語は動詞で同じ「やることがある」を運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 16, japanese: 'またね、気をつけて', english: [
+        "bye, be safe",
+        "alright, get home safe",
+        "alright, get home safe, text me when you're in",
+        "later, watch yourself out there"
+    ], context: "「気をつけて」は別れの心配定型句。英語のget home safeは「安全に家に着け」=動詞+形容詞。日本語は注意喚起、英語は到着動詞で同じ「無事に」を運ぶ。日本語は注意、英語は到着結果として安全を表す。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 17 ──
+    { daySlot: 17, japanese: '今日は気分転換したい', english: [
+        "I need a break",
+        "I want to switch things up today",
+        "I want to switch things up today, get out of my head",
+        "I need to shake things up"
+    ], context: "「気分転換」は日本語の独自概念。英語のswitch things upは「色々を切り替える」=多変数の動作化。日本語は気分(内面)の転換、英語は外界の切り替えとして表現する。同じリフレッシュを、片や内、片や外として運ぶ。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 17, japanese: 'なんか集中力切れた', english: [
+        "I'm losing focus",
+        "my brain just tapped out",
+        "my brain just tapped out, I'm done thinking today",
+        "my focus just left the building"
+    ], context: "「切れた」は集中力の物理化。英語のtapped outは「(レスリングで)降参の合図」=動作俗語。日本語は紐の切断比喩、英語はレスリング降参で同じ「ギブアップ」を表す。両言語とも、限界を物理動作で表現するが、媒体が違う。", category: 'reaction', month: '2026-06' },
+    { daySlot: 17, japanese: 'もうそろそろ帰る時間', english: [
+        "time to go",
+        "it's about that time, heading home",
+        "it's about that time, heading home soon",
+        "about time I head out"
+    ], context: "「そろそろ」は時間接近副詞。英語のit's about that timeは「その時間くらい」=空間+時間の曖昧表現。日本語は近接副詞、英語は指示代名詞that timeで同じ「もう少しで」を運ぶ。両言語の時間表現の曖昧さの構造差。", category: 'shutdown', month: '2026-06' },
+    { daySlot: 17, japanese: 'なんかこう、上手く言えない', english: [
+        "can't put it in words",
+        "I can't find the right words",
+        "I can't find the right words for what I mean",
+        "the words aren't coming together"
+    ], context: "「上手く言えない」は表現困難。英語のcan't find the right wordsは「正しい言葉を見つけられない」=語を発見対象として表す。日本語は能力否定、英語は探索失敗で同じ「言語化困難」を運ぶ。両言語とも、内面と言語の隔たりを表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 17, japanese: 'もうこれ何度目', english: [
+        "again, really",
+        "what is this, the fifth time",
+        "what is this, the fifth time we're doing this",
+        "broken record, this thing"
+    ], context: "「何度目」は反復回数の疑問。英語のwhat is this, the fifth timeは「これは5回目？」=皮肉な数値化。日本語は疑問副詞「何度」、英語は数詞でしらじらしく具体化する。同じ「もう何回目だ」を、片や疑問、片や疑問+具体数として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 17, japanese: 'ちょっとだけ手伝って', english: [
+        "give me a hand",
+        "can you lend me a hand real quick",
+        "can you lend me a hand real quick, won't take long",
+        "throw me a hand real quick"
+    ], context: "「手伝って」は身体部位の依頼。英語のlend a handは「手を貸す」=完全に同じ比喩。両言語とも、援助を「手の貸借」で表現する珍しい一致。文化OSが身体部位を借用可能なリソースとして概念化する共通点。", category: 'request', month: '2026-06' },
+    { daySlot: 17, japanese: 'なんかぼーっとしてた', english: [
+        "I spaced out",
+        "I just zoned out for a sec",
+        "I just zoned out for a sec, sorry, what were we saying",
+        "I was on autopilot"
+    ], context: "「ぼーっと」は擬態語、無意識状態。英語のzoned outは「ゾーンから出た」=空間化された意識離脱、spaced outは「宇宙化」。日本語は擬態語で表現、英語は空間動詞で同じ放心を運ぶ。両言語が「意識の不在」を独自手段で表す。", category: 'reaction', month: '2026-06' },
+    { daySlot: 17, japanese: 'まあとりあえずやってみる', english: [
+        "I'll try",
+        "let me just take a swing at it",
+        "let me just take a swing at it, see what happens",
+        "let me just dive in and see"
+    ], context: "「とりあえず」は仮の着手副詞。英語のtake a swing at itは「振りかかる」=野球バット比喩。日本語は時間的暫定、英語は身体動作で着手を表す。同じ「とにかくやる」を、片や時間、片や動作として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 17, japanese: 'ねえこれどう思う？', english: [
+        "what do you think",
+        "what's your take on this",
+        "what's your take on this, real talk",
+        "give it to me straight, what do you think"
+    ], context: "「どう思う？」は意見確認。英語のwhat's your takeは「あなたの取り方」=認知動詞takeの名詞化。real talkは「本気の話」、率直さを要請する俗語。日本語は思考、英語は受け取りとして同じ「意見」を運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 17, japanese: 'お風呂はいる', english: [
+        "I'm taking a bath",
+        "I'm gonna hop in the bath",
+        "I'm gonna hop in the bath, decompress for a bit",
+        "I'm soaking in the tub"
+    ], context: "「お風呂はいる」は日常宣言。英語のhop in the bathは「お風呂に飛び込む」=軽い動作動詞hop。日本語は方向動詞「入る」、英語は軽量動詞hopで同じ入浴を表す。日本語は方向、英語は身軽さで動作を運ぶ。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 18 ──
+    { daySlot: 18, japanese: 'なんかすごい眠い', english: [
+        "I'm out of it",
+        "my eyelids are made of lead",
+        "my eyelids are made of lead today, no exaggeration",
+        "I cannot keep my eyes open"
+    ], context: "「眠い」を直訳するとsleepyだが、英語のeyelids made of leadは「鉛の瞼」=金属比喩で重さを表現する文学的表現。日本語は感覚、英語は素材として眠気を表す。同じ眠気を、片や形容詞、片や金属としての瞼で運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 18, japanese: 'これはちょっとびっくり', english: [
+        "didn't see that coming",
+        "yeah, that caught me off guard",
+        "yeah, that caught me off guard, didn't expect it",
+        "that came out of left field"
+    ], context: "「びっくり」を直訳するとsurprisedだが、caught off guardは「警戒を外して捕まえる」=守衛比喩。日本語は擬態語、英語は身体的防御の解除として驚きを表す。同じ意外を、片や音、片や守備動作として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 18, japanese: 'ちゃんと考えてから言って', english: [
+        "think first",
+        "take a second before you speak",
+        "take a second before you speak, please",
+        "filter before you fire"
+    ], context: "「ちゃんと考えてから言って」は順序の指示。英語のtake a second before you speakは「話す前に少し取れ」=時間取得動詞take。日本語は副詞+時系列、英語はtake+前置詞句で同じ「先に考えろ」を運ぶ。両言語の時系列指示の構文化。", category: 'request', month: '2026-06' },
+    { daySlot: 18, japanese: 'まあ気長に待つわ', english: [
+        "I'll wait",
+        "I'll be patient about it",
+        "I'll be patient about it, no rush from my side",
+        "I'm in no rush, take your time"
+    ], context: "「気長」は日本語の独特概念、気持ちの長さ。英語のpatientが対応するが、英語のpatientは「我慢強い」=耐性。日本語は気の長さ、英語は耐性として忍耐を表す。同じ待つ姿勢を、片や気の時間、片や耐性として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 18, japanese: 'なんかすごい良い人', english: [
+        "such a good person",
+        "they're just genuinely a good person",
+        "they're just genuinely a good person, the real deal",
+        "they're the real deal"
+    ], context: "「すごい良い人」を直訳するとvery good personだが、英語のreal dealは「本物の取引」=偽物との対比。日本語は度合い強調、英語は本物性の主張として人柄を表す。同じ称賛を、片や強度、片や本物性として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 18, japanese: 'ちょっと頭冷やしてくる', english: [
+        "I need air",
+        "I'm gonna step outside, cool off",
+        "I'm gonna step outside, cool off for a minute",
+        "let me step outside and decompress"
+    ], context: "「頭冷やす」は身体比喩、頭部の温度。英語のcool offは「冷ます」=同じ温度比喩。両言語が「冷却=鎮静」の比喩を独立に発明した珍しい一致。日本語は頭部、英語は全身に温度を当てる。比喩の対象は違うが原理は同じ。", category: 'request', month: '2026-06' },
+    { daySlot: 18, japanese: 'まあ仕方ないよ', english: [
+        "it is what it is",
+        "yeah, what can you do",
+        "yeah, what can you do, that's just how it goes",
+        "it is what it is"
+    ], context: "「仕方ない」は日本語の名作諦念。英語のit is what it isは「それはそれだ」=同語反復で受容を表す現代俗語。日本語は方法の不在、英語は同語反復で諦めを運ぶ。両言語とも、諦念を独自の構文化で表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 18, japanese: 'なんか急に思いついた', english: [
+        "I just had an idea",
+        "wait, something just hit me",
+        "wait, something just hit me, listen to this",
+        "a lightbulb just went off"
+    ], context: "「思いついた」を直訳するとI thought of itだが、英語のsomething hit meは「何かが私を打った」=身体的衝撃として着想を表す。日本語は思考の到達、英語は外部からの衝突として閃きを運ぶ。同じ着想を、片や内、片や外として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 18, japanese: '結局どうするの？', english: [
+        "so what now",
+        "so where does that leave us",
+        "so where does that leave us, decision time",
+        "so what's the play here"
+    ], context: "「結局」は最終結論副詞。英語のwhere does that leave usは「それは私たちをどこに残す？」=空間化された結末。日本語は時間軸での結末、英語は空間配置として結論を表す。同じ「で結論は？」を、片や時間、片や場所として運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 18, japanese: 'もう寝るしかない', english: [
+        "gotta sleep",
+        "I have no choice but to sleep at this point",
+        "I have no choice but to sleep at this point, body's done",
+        "there's nothing left in the tank"
+    ], context: "「しかない」は選択不能の強い諦め。英語のhave no choice but Xが完全一致、選択肢を否定して残った一つを示す構文。日本語は否定+「しか」、英語はhave no choice but toで同じ「他に道なし」を運ぶ。両言語の選択不能構文の対応。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 19 ──
+    { daySlot: 19, japanese: 'なんか部屋散らかってる', english: [
+        "place is a mess",
+        "this place looks like a tornado hit it",
+        "this place looks like a tornado hit it, where do I start",
+        "this place got hit by a bomb"
+    ], context: "「散らかる」を直訳するとmessyだが、英語のtornado hit itは「竜巻が当たった」=自然災害比喩で散乱を表す。日本語は状態形容詞、英語は災害の結果として乱雑を表現する。比喩のスケールが片や静、片や災害級で対照的。", category: 'reaction', month: '2026-06' },
+    { daySlot: 19, japanese: 'ちょっと頑張った', english: [
+        "I tried",
+        "I gave it a real shot",
+        "I gave it a real shot, hope it shows",
+        "I actually put in the work"
+    ], context: "「頑張った」を直訳するとI worked hardだが、英語のgave it a shotは「一発撃った」=銃比喩、挑戦の動作化。日本語は努力動詞、英語は射撃動詞で同じ「やってみた」を運ぶ。同じ挑戦を、片や努力、片や発射として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 19, japanese: 'これマジで美味しい', english: [
+        "this is amazing",
+        "this is hitting different",
+        "this is hitting different, what is in this",
+        "this is next-level good"
+    ], context: "「美味しい」を直訳するとdeliciousだが、英語のhitting differentは「違うように当たる」=Z世代俗語、既存と質的に違うことを示す。日本語は形容詞、英語は副詞句で「特別」を表す。同じ美味を、片や属性、片や効果として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 19, japanese: 'もう少し詳しく説明して', english: [
+        "more detail",
+        "can you flesh that out a bit",
+        "can you flesh that out a bit, the framework is there but I need meat",
+        "give me the meat on the bones"
+    ], context: "「詳しく」を直訳するとin detailだが、英語のflesh it outは「肉を付ける」=骨格に肉を付ける比喩。日本語は副詞、英語は身体比喩で「詳細化」を表す。同じ「具体化」を、片や副詞、片や肉付け動作として運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 19, japanese: 'お、ちょうど良いタイミング', english: [
+        "perfect timing",
+        "right on cue, glad you're here",
+        "right on cue, glad you're here, was just thinking about you",
+        "well, speak of the devil"
+    ], context: "「ちょうど良い」は完璧なタイミング。英語のright on cueは「合図通り」=演劇用語の流用、舞台の出演タイミング。日本語は時間の良さ、英語は演劇的合図として「ベスト到着」を表す。文化OSの時間意識の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 19, japanese: 'なんかむなしい', english: [
+        "I feel empty",
+        "I just feel kind of hollow today",
+        "I just feel kind of hollow today, can't quite name it",
+        "feeling kind of empty today"
+    ], context: "「むなしい」を直訳するとemptyだが、英語のhollowは「中空」=容器の比喩。日本語は形容詞「むなしい」、英語は素材hollowで同じ虚無を表す。両言語とも、感情を中身の有無として表現するが、空間化の方法が違う。", category: 'reaction', month: '2026-06' },
+    { daySlot: 19, japanese: 'マジでそれな', english: [
+        "exactly",
+        "you're speaking my language",
+        "you're speaking my language, finally someone said it",
+        "you nailed it"
+    ], context: "「マジでそれな」は強い同意。英語のspeaking my languageは「私の言語を話している」=言語比喩で同調を表す。日本語は終助詞「な」、英語は言語比喩で同じ「分かる」を運ぶ。両言語の同意の構文化の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 19, japanese: 'もうちょっと整理してから', english: [
+        "let me sort this out",
+        "let me get my thoughts in order first",
+        "let me get my thoughts in order first, then I'll explain",
+        "let me get my ducks in a row"
+    ], context: "「整理」を直訳するとorganizeだが、英語のget thoughts in orderは「思考を順序に置く」=列車比喩。日本語は名詞「整理」、英語は順序の物理化で同じ機能を表す。同じ整理を、片や抽象、片や空間配置として運ぶ。", category: 'filler', month: '2026-06' },
+    { daySlot: 19, japanese: 'ちょっと無理しすぎた', english: [
+        "I overdid it",
+        "yeah, I pushed too hard this week",
+        "yeah, I pushed too hard this week, paying for it now",
+        "I burned the candle at both ends"
+    ], context: "「無理しすぎた」は過剰の自覚。英語のpushed too hardは「強く押しすぎた」=身体動作で過剰を表す。日本語は否定形「無理」+過剰副詞、英語は動詞push+程度副詞で同じ「やり過ぎ」を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 19, japanese: '今日はもう何もしない', english: [
+        "doing nothing",
+        "today is officially a rest day",
+        "today is officially a rest day, declared it myself",
+        "today is a do-nothing day"
+    ], context: "「何もしない」は活動否定。英語のrest dayは「休息日」=スポーツ用語の生活化。日本語は動作否定、英語は時間カテゴリで「休む」を表す。同じ休息を、片や行動、片や時間種別として運ぶ。文化OSの休息観の差。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 20 ──
+    { daySlot: 20, japanese: 'なんか頭重い、雨のせいかな', english: [
+        "rain headache",
+        "I think the pressure is getting to me",
+        "I think the pressure is getting to me, low-pressure headache",
+        "the weather's messing with my head"
+    ], context: "「雨のせい」は気象由来。英語のpressure getting to meは「気圧が私に来ている」=擬人化された天気。日本語は原因帰属「せい」、英語は接近動詞getting toで影響を表す。同じ気象頭痛を、片や責任、片や接近として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 20, japanese: 'またそれかよ', english: [
+        "not again",
+        "are we doing this again",
+        "are we doing this again, like really",
+        "here we go again"
+    ], context: "「またかよ」は反復への疲労。英語のare we doing this againは「これをまた？」=共同行動として表現。日本語は単独反復、英語は共同反復として「またか」を表す。同じ反復苛立ちを、片や個人、片や集団として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 20, japanese: 'なんとなくわかる気がする', english: [
+        "I think I get it",
+        "I'm starting to see what you mean",
+        "I'm starting to see what you mean, slowly",
+        "the picture's getting clearer"
+    ], context: "「なんとなく」は曖昧理解。英語のstarting to seeは「見え始めている」=視覚動詞で進行中の理解を表す。日本語は副詞「なんとなく」、英語は進行形で理解の途中を表現する。両言語とも理解の段階性を持つが、表現が静/動で違う。", category: 'reaction', month: '2026-06' },
+    { daySlot: 20, japanese: 'なんか急に予定キャンセル', english: [
+        "plans got canceled",
+        "they bailed on me last minute",
+        "they bailed on me last minute, plans dead",
+        "they pulled the plug last second"
+    ], context: "「キャンセル」を直訳するとcancelだが、英語のbailは「保釈金=逃げる」、刑務所由来の俗語で「ドタキャン」を表す。日本語は機能語、英語は俗語で同じキャンセルを運ぶ。文化OSの語源差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 20, japanese: 'なんで言ってくれなかったの', english: [
+        "why didn't you say",
+        "why am I just hearing about this now",
+        "why am I just hearing about this now, like genuinely",
+        "why am I out of the loop on this"
+    ], context: "「言ってくれなかった」は受益動詞「くれる」+否定。英語のwhy am I just hearing about this nowは「私はなぜ今これを聞いているのか」=聴覚動詞で同じ機能を表す。日本語は与え方向、英語は受け取り側として情報共有の遅れを表現する。", category: 'opinion', month: '2026-06' },
+    { daySlot: 20, japanese: 'なんとなく嫌な予感', english: [
+        "bad feeling",
+        "I've got a bad feeling about this",
+        "I've got a bad feeling about this, can't shake it",
+        "my spider senses are tingling"
+    ], context: "「嫌な予感」を直訳するとbad premonitionだが、英語のbad feelingは「悪い感じ」=日常化された予感。gut thingは「腹の感覚」=直感の臓器化。日本語は感情予感、英語は身体内部として直感を表す。同じ予感を、片や感情、片や臓器として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 20, japanese: 'もう全部嫌になった', english: [
+        "I'm done with everything",
+        "I'm just over all of it today",
+        "I'm just over all of it today, everything",
+        "I've had it up to here with everything"
+    ], context: "「全部嫌」は全否定。英語のI'm over all of itは「全部を乗り越えた」=空間化された飽き。日本語は感情形容詞「嫌」、英語は通過動詞overで同じ「うんざり」を表す。日本語は感情、英語は時間/空間として全否定を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 20, japanese: 'ちょっと話聞いて', english: [
+        "I need to vent",
+        "can I just vent for a minute",
+        "can I just vent for a minute, don't need advice",
+        "let me get this off my chest"
+    ], context: "「話聞いて」は依頼の名作。英語のventは「換気」=蒸気を放出する比喩、感情の発散用語。日本語は聴覚動詞、英語は換気動詞で同じ「話を聞いて」を表す。文化OSの感情処理の差。日本語は受信、英語は放出として愚痴を運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 20, japanese: 'ちょっと笑った', english: [
+        "had me laughing",
+        "okay that actually got a laugh",
+        "okay that actually got a laugh out of me",
+        "okay, you got me to crack a smile"
+    ], context: "「笑った」を直訳するとI laughedだが、英語のgot a laugh out of meは「私から笑いを引き出した」=笑いを抽出物として表す。日本語は能動「笑う」、英語は受動「引き出される」として同じ笑いを表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 20, japanese: 'もう今日は終わり', english: [
+        "I'm done for the day",
+        "today is officially closed",
+        "today is officially closed for business",
+        "closing up shop for the night"
+    ], context: "「終わり」は完結宣言。英語のclosed for businessは「営業終了」=店舗用語で日々の終わりを表す。日本語は時間の終了、英語は商業活動の終了として「終わり」を表す。同じ終了を、片や時間、片や商業として運ぶ。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 21 ──
+    { daySlot: 21, japanese: 'なんか体だるい', english: [
+        "body's heavy",
+        "I feel like garbage today",
+        "I feel like garbage today, honestly",
+        "I feel like a sack of bricks"
+    ], context: "「だるい」は身体感覚。英語のfeel like garbageは「ゴミのように感じる」=自己物体化の比喩。日本語は形容詞、英語はゴミとの同一化として不調を表す。日本語は内的状態、英語は物体化として身体を表現する。極端な誇張文化。", category: 'reaction', month: '2026-06' },
+    { daySlot: 21, japanese: 'なんかワクワクしてきた', english: [
+        "I'm getting excited",
+        "okay, I'm starting to get hyped",
+        "okay, I'm starting to get hyped about this",
+        "I'm coming around on this"
+    ], context: "「ワクワクしてきた」は感情の漸進。英語のhypedは「興奮した」=メディア用語hypeから派生。日本語は擬態語+変化動詞、英語は形容詞hypedで興奮を表す。同じ昂揚を、片や音、片や程度として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 21, japanese: 'やっぱり違うかも', english: [
+        "actually, never mind",
+        "you know what, I'm rethinking it",
+        "you know what, I'm rethinking it, hold on",
+        "I'm having second thoughts"
+    ], context: "「やっぱり違うかも」は撤回宣言。英語のyou know whatは「あのね」=前置きで撤回を始める。日本語は副詞「やっぱり」、英語は注意喚起句で同じ「考え直し」を運ぶ。両言語とも、撤回には独自の前置きを持つ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 21, japanese: 'これマジで欲しかったやつ', english: [
+        "I wanted this",
+        "this is exactly what I've been looking for",
+        "this is exactly what I've been looking for, finally",
+        "this is exactly what hit the spot"
+    ], context: "「欲しかったやつ」は対象指示。英語のbeen looking forは「ずっと探している」=完了進行で持続的探索を表す。日本語は所有願望、英語は探索動作として「これだ」を運ぶ。同じ発見を、片や願望成就、片や探索完了として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 21, japanese: 'なんでそうなるの', english: [
+        "how though",
+        "wait, how does that lead to that",
+        "wait, how does that lead to that, walk me through",
+        "I'm losing you, walk it back"
+    ], context: "「なんでそうなる」は因果の問い詰め。英語のhow does that lead to thatは「それがそれにどう繋がるのか」=動詞leadで因果を物理化。日本語は理由副詞、英語は導入動詞で同じ「どうしてそうなる」を運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 21, japanese: 'ちょっと買い物行ってくる', english: [
+        "going shopping",
+        "I'm gonna make a quick store run",
+        "I'm gonna make a quick store run, need anything",
+        "popping out for a quick grocery run"
+    ], context: "「行ってくる」は移動往復の名詞句。英語のstore runは「店への走行」=走る比喩で買い物を動作化。日本語は方向動詞2つ(行く+来る)で往復を、英語はrunで動作の素早さを表す。文化OSの移動表現の差。", category: 'filler', month: '2026-06' },
+    { daySlot: 21, japanese: 'ま、無理しないでね', english: [
+        "take it easy",
+        "don't push yourself too hard, alright",
+        "don't push yourself too hard, alright, you've got time",
+        "easy does it, don't run yourself ragged"
+    ], context: "「無理しないで」は依頼の名作。英語のtake it easyは「ゆっくり取れ」=動作の緩和。don't push too hardは「強く押すな」=身体動作。日本語は動詞「無理する」を否定、英語は緩和動詞や押すなで同じ気遣いを表す。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 21, japanese: '昨日寝れなかった', english: [
+        "couldn't sleep",
+        "I tossed and turned all night",
+        "I tossed and turned all night, barely got any sleep",
+        "I barely caught any sleep last night"
+    ], context: "「寝れなかった」を直訳するとcouldn't sleepだが、英語のtossed and turnedは「投げて回った」=寝返りの動作化。日本語は能力否定、英語は身体動作で同じ不眠を表す。同じ睡眠失敗を、片や状態、片や動作として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 21, japanese: 'なんかちょっと寒い', english: [
+        "kinda cold",
+        "is it just me or is it chilly in here",
+        "is it just me or is it chilly in here, suddenly",
+        "is the chill just me"
+    ], context: "「ちょっと寒い」は控えめな苦情。英語のis it just me or Xは「私だけかな、それとも」=共感確認の前置き。日本語は副詞「ちょっと」で衝突回避、英語は共感確認構文で同じ「自己中心化の回避」を運ぶ。両言語の控えめさの構文差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 21, japanese: 'もうあかんわ寝る', english: [
+        "I'm cooked, bed",
+        "yeah I'm gonna call it, going to bed",
+        "yeah I'm gonna call it, going to bed before I fall over",
+        "I'm toast, calling it"
+    ], context: "「あかん」は関西弁の名作、不可能を表す。英語のI'm cookedは「焼かれた」=料理比喩で疲弊を表す。日本語の方言、英語の現代スラング、両言語とも独自の口語層を持つ。同じ「もうダメ」を、片や方言、片や調理として運ぶ。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 22 ──
+    { daySlot: 22, japanese: 'ちゃんと寝た？', english: [
+        "did you sleep",
+        "you actually sleep last night",
+        "you actually sleep last night or what",
+        "you get any real shut-eye"
+    ], context: "「ちゃんと寝た？」は健康確認。英語のactually sleepは「本当に寝た？」=副詞actuallyで真偽を問う。日本語は副詞「ちゃんと」、英語はactuallyで同じ「ほんとに？」を運ぶ。両言語の副詞による真偽強化の構文化。", category: 'request', month: '2026-06' },
+    { daySlot: 22, japanese: 'ちょっと頑張ってみる', english: [
+        "I'll give it a go",
+        "alright, I'm gonna take a crack at this",
+        "alright, I'm gonna take a crack at this, see what happens",
+        "let me give it a fair shake"
+    ], context: "「頑張ってみる」は試行の動詞句。英語のtake a crack at itは「ヒビを入れる」=亀裂比喩、挑戦の動作化。日本語は努力試行、英語は破壊試行で同じ「やってみる」を表す。比喩の方向が片や努力、片や破壊で対照的。", category: 'opinion', month: '2026-06' },
+    { daySlot: 22, japanese: 'なんか妙に静か', english: [
+        "weirdly quiet",
+        "it's eerily quiet in here",
+        "it's eerily quiet in here, almost too quiet",
+        "it's quiet, too quiet"
+    ], context: "「妙に」は不気味な副詞。英語のeerilyは「不気味に」=直訳。almost too quietは「ほとんど静かすぎる」=映画的予兆表現。日本語は副詞、英語は副詞+映画的構文で「不気味な静寂」を運ぶ。両言語とも、不自然な静寂を表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 22, japanese: 'ねえ、ちょっと贅沢しよ', english: [
+        "let's splurge",
+        "let's treat ourselves tonight",
+        "let's treat ourselves tonight, we've earned it",
+        "let's go all out tonight"
+    ], context: "「贅沢」を直訳するとluxuryだが堅い。英語のtreat ourselvesは「自分たちを扱う」=自己への施し動詞。日本語は名詞「贅沢」、英語は動詞treatで同じ「ちょっと豪華に」を運ぶ。両言語の「自分への報酬」概念の運び方が違う。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 22, japanese: 'なんかすごい眠れる', english: [
+        "I'm sleeping great",
+        "I've been sleeping like a rock lately",
+        "I've been sleeping like a rock lately, no idea why",
+        "I've been sleeping like a baby"
+    ], context: "「すごい眠れる」を直訳するとI can sleep wellだが、英語のlike a rockは「岩のように」=比喩で深い眠りを表す。日本語は副詞、英語は比喩で同じ「ぐっすり」を運ぶ。両言語の睡眠の質を、片や強度、片や物質として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 22, japanese: 'やっぱり予感的中', english: [
+        "I called it",
+        "knew that was gonna happen",
+        "knew that was gonna happen, said it last week",
+        "called it from a mile off"
+    ], context: "「予感的中」は予測実現の名詞句。英語のknew it would happenは「起こることを知っていた」=完了形で予測を強化。日本語は名詞中心、英語は時制で同じ「思った通り」を運ぶ。両言語とも、予測責任を強調する構文を持つ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 22, japanese: 'もうちょっと頑張れたかも', english: [
+        "could've done more",
+        "I think I had more in the tank",
+        "I think I had more in the tank, didn't use it",
+        "I left some on the table"
+    ], context: "「もうちょっと頑張れた」は反省の名作。英語のmore in the tankは「タンクにもっとあった」=ガソリンタンク比喩。日本語は副詞+可能形、英語は車両比喩で同じ「余力があった」を運ぶ。同じ反省を、片や時間、片や容量として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 22, japanese: 'いったん落ち着こう', english: [
+        "let's calm down",
+        "everyone take a breath, regroup",
+        "everyone take a breath, regroup, we're getting ahead of ourselves",
+        "let's hit pause for a sec"
+    ], context: "「いったん」は時間的中断副詞。英語のregroupは「再集結」=軍事用語の流用、混乱からの再編。日本語は副詞「いったん」、英語は動詞regroupで同じ「一旦止めて」を運ぶ。日本語は時間、英語は集団動作として中断を表す。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 22, japanese: 'もう絶対無理', english: [
+        "absolutely not",
+        "yeah, that's a no from me",
+        "yeah, that's a no from me, no way around it",
+        "yeah, that's a hard no"
+    ], context: "「絶対無理」は強い拒絶。英語のthat's a no from meは「それは私からのNO」=オーディション番組由来の現代俗語。日本語は副詞「絶対」+「無理」、英語はthat's a no from meで同じ拒絶を運ぶ。両言語の拒絶表現の文化的進化。", category: 'reaction', month: '2026-06' },
+    { daySlot: 22, japanese: 'ありがとう、また明日', english: [
+        "thanks, tomorrow",
+        "thanks, see you tomorrow",
+        "thanks, see you tomorrow, take it easy tonight",
+        "appreciate it, see you tomorrow"
+    ], context: "「また明日」は別れの定型句。英語のsee you tomorrowが直訳。両言語が「再会の予告」を同じ構文で運ぶ珍しい一致。take it easyは「ゆっくりやれ」=身体労り。日本語は時間軸、英語は時間軸+労りの組み合わせで別れを構造化する。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 23 ──
+    { daySlot: 23, japanese: 'なんか今日ついてる', english: [
+        "lucky day",
+        "everything is just clicking today",
+        "everything is just clicking today, weirdly",
+        "today's got my back"
+    ], context: "「ついてる」は幸運の動詞化。英語のclickingは「カチカチ合っている」=機械的な噛み合い。日本語は運の到来、英語は機械の調整として「ツイてる」を表す。同じ幸運を、片や運勢、片や機械の調和として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 23, japanese: 'マジで眠れない', english: [
+        "I can't sleep",
+        "my brain refuses to shut off",
+        "my brain refuses to shut off, full insomnia mode",
+        "my brain refuses to power down"
+    ], context: "「眠れない」は能力否定。英語のbrain refuses to shut offは「脳がオフを拒否する」=擬人化された脳。日本語は能力否定、英語は脳の意志として不眠を表す。同じ不眠を、片や能力、片や脳の反抗として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 23, japanese: 'ちょっと聞いてくれる？', english: [
+        "got a sec",
+        "do you have a minute, I want to share something",
+        "do you have a minute, I want to share something with you",
+        "got a minute for me"
+    ], context: "「聞いてくれる？」は受益動詞「くれる」の依頼。英語のdo you have a minuteは「1分ある？」=時間借用の問い。日本語は与え方向、英語は時間の所有確認として同じ機能を運ぶ。文化OSの依頼の方向性の差。", category: 'request', month: '2026-06' },
+    { daySlot: 23, japanese: 'なんとなく不機嫌', english: [
+        "I'm grumpy",
+        "I'm in a mood today, can't help it",
+        "I'm in a mood today, can't help it, sorry",
+        "I woke up on the wrong side of the bed"
+    ], context: "「不機嫌」は気の状態。英語のin a moodは「ムードの中に」=空間化された気分。日本語は機嫌の否定、英語は気分空間の中として不機嫌を表す。同じ不機嫌を、片や状態、片や空間として運ぶ。空間化が英語の癖。", category: 'reaction', month: '2026-06' },
+    { daySlot: 23, japanese: 'ちょっと相談乗ってくれない？', english: [
+        "got a moment",
+        "could I pick your brain about something",
+        "could I pick your brain about something for a few",
+        "mind if I pick your brain"
+    ], context: "「相談乗って」は身体動詞「乗る」の比喩。英語のpick your brainは「脳を摘み取る」=精神の物理化、知識を果実化する比喩。日本語は乗船、英語は果実摘みで「相談」を表す。両言語とも相談を独特な身体比喩で運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 23, japanese: 'なんとなく予想してた', english: [
+        "kinda saw it coming",
+        "I had a hunch this would happen",
+        "I had a hunch this would happen, just a feeling",
+        "had a feeling that was coming"
+    ], context: "「予想してた」を直訳するとI expected itだが、英語のhad a hunchは「ハンチを持つ」=直感の名詞化。日本語は予測動詞、英語は直感名詞で同じ「予感」を運ぶ。両言語が予感を表現する構文の対比。", category: 'reaction', month: '2026-06' },
+    { daySlot: 23, japanese: 'ちょっとそれ違くない？', english: [
+        "wait, that's wrong",
+        "hold up, I think you've got that backwards",
+        "hold up, I think you've got that backwards, double check",
+        "wait, isn't that backwards"
+    ], context: "「違くない？」は若者語法、形容詞「違う」+「ない」。英語のgot that backwardsは「逆に取った」=方向反転動詞。日本語は形容詞活用、英語は動詞+方向副詞で同じ「逆だよ」を運ぶ。両言語の若者語法の構文化。", category: 'opinion', month: '2026-06' },
+    { daySlot: 23, japanese: 'なんとなくテンション上がってきた', english: [
+        "getting hyped",
+        "I'm starting to feel the energy now",
+        "I'm starting to feel the energy now, this could be fun",
+        "I'm starting to catch the vibe"
+    ], context: "「テンション上がる」は和製英語、英語のtensionとは別。英語のenergyやvibeで対応。日本語は外来語の独自進化、英語は本来語で同じ「気分高揚」を表す。同じ昂揚を、片や擬似英語、片や本来語として運ぶ。和製英語の独自進化の証拠。", category: 'reaction', month: '2026-06' },
+    { daySlot: 23, japanese: 'やっぱお前すげえな', english: [
+        "you're amazing",
+        "you really are something else",
+        "you really are something else, the way you handled that",
+        "you're built different"
+    ], context: "「すげえ」は男性的称賛。英語のsomething elseは「別格」の意。日本語は短い感嘆詞、英語は完全文で同じ称賛を表す。両言語とも、最高級の褒めには独自の構文を持つ。日本語は擬音化、英語は分類超越として表す。", category: 'opinion', month: '2026-06' },
+    { daySlot: 23, japanese: 'もうそろそろ寝るかな', english: [
+        "thinking of sleeping",
+        "alright, I might call it a night",
+        "alright, I might call it a night, getting late",
+        "about time I hit the sack"
+    ], context: "「かな」は迷い終助詞。英語のmightは「かもしれない」=助動詞で同じ機能。両言語とも、就寝決定の曖昧化を文末で行う。日本語は終助詞、英語は助動詞で同じ「そろそろ寝ようかな」を運ぶ。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 24 ──
+    { daySlot: 24, japanese: 'なんか時間早すぎ', english: [
+        "time is flying",
+        "where did the day go",
+        "where did the day go, it just disappeared",
+        "the day just slipped away"
+    ], context: "「時間早すぎ」は時間流速の感嘆。英語のwhere did the day goは「日はどこに行った？」=擬人化された時間の消失。日本語は速度形容詞、英語は移動動詞で同じ「時間が早い」を運ぶ。両言語の時間の物体化の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 24, japanese: 'ちょっと整理させて', english: [
+        "let me sort this",
+        "give me a minute to wrap my head around it",
+        "give me a minute to wrap my head around it, it's a lot",
+        "let me sort through this"
+    ], context: "「整理させて」は使役受動。英語のwrap my head around itは「頭を巻きつける」=理解の物理化。日本語は整理動詞、英語は巻く動作で同じ「整理」を表す。日本語は抽象、英語は身体動作として理解を運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 24, japanese: 'うわー、それは無理ゲー', english: [
+        "no way that's possible",
+        "yeah, that's a bridge too far",
+        "yeah, that's a bridge too far for me",
+        "yeah, that's not in the cards"
+    ], context: "「無理ゲー」はゲーム由来俗語。英語のa bridge too farは「遠すぎる橋」=軍事用語の流用、第二次大戦由来。日本語はゲーム文化、英語は戦争史で「不可能」を表す。比喩のジャンルが両言語で違う。同じ「無理」を、片やゲーム、片や戦史として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 24, japanese: 'なんか嬉しい', english: [
+        "feels good",
+        "this just made my whole day",
+        "this just made my whole day, I needed that",
+        "that just made my whole day"
+    ], context: "「嬉しい」を直訳するとhappyだが弱い。英語のmade my dayは「私の日を作った」=日全体の構築動詞。日本語は感情形容詞、英語は日付の構築として喜びを表す。同じ喜びを、片や感情、片や時間構築として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 24, japanese: 'ちょっとそれヤバすぎ', english: [
+        "that's wild",
+        "that is genuinely off the charts",
+        "that is genuinely off the charts, what is happening",
+        "that's off the charts"
+    ], context: "「ヤバすぎ」は強度過剰の俗語。英語のoff the chartsは「グラフ外」=測定不能の比喩。日本語は形容詞「ヤバ」+副詞「すぎ」、英語は空間比喩「グラフ外」で同じ「常軌を逸する」を運ぶ。両言語の極端表現の言語化方法の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 24, japanese: 'まあ気が向いたらね', english: [
+        "if I feel like it",
+        "no promises, depends on the day",
+        "no promises, depends on the day, you know me",
+        "if the mood strikes me"
+    ], context: "「気が向いたら」は気の方向。英語のif I feel like itは「もしそう感じたら」=感情の方向化。日本語は気の擬人化、英語は感情の意志として「気分次第」を表す。両言語とも、気分を能動主体として表現するが、メディアが違う。", category: 'opinion', month: '2026-06' },
+    { daySlot: 24, japanese: 'これいつから？', english: [
+        "since when",
+        "wait, when did this start",
+        "wait, when did this start, how did I miss it",
+        "how long has this been a thing"
+    ], context: "「いつから？」は時間起点の問い。英語のsince whenは「いつから？」=完全一致の構文。両言語が同じ前置詞構造を持つ稀有な一致。日本語は終助詞、英語は前置詞句で同じ機能を運ぶ。", category: 'request', month: '2026-06' },
+    { daySlot: 24, japanese: 'もう一回見直そう', english: [
+        "let's review",
+        "let's take another pass at this",
+        "let's take another pass at this, fresh eyes",
+        "let's give it another once-over"
+    ], context: "「見直す」は複合動詞「見る+直す」。英語のtake another passは「もう一度通過する」=航空用語の流用。日本語は視覚動詞の複合、英語は通過動詞の反復で同じ「再確認」を表す。文化OSの確認動作の差。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 24, japanese: 'ちょっと驚いた', english: [
+        "kind of surprised",
+        "didn't expect that, gonna be honest",
+        "didn't expect that, gonna be honest, took me a second",
+        "you caught me off guard there"
+    ], context: "「驚いた」を直訳するとI was surprisedだが、英語のdidn't expect thatは「予想していなかった」=予測動詞の否定。日本語は感情動詞、英語は予測動詞で同じ驚きを表す。同じ意外を、片や感情、片や予測失敗として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 24, japanese: 'お疲れさま、また明日ね', english: [
+        "good work, tomorrow",
+        "good work today, see you tomorrow",
+        "good work today, see you tomorrow, sleep well",
+        "nice work, see you in the morning"
+    ], context: "「お疲れさま、また明日」は退社の二重定型句。英語のgood work, see you tomorrowで対応。日本語は労り+再会予告、英語も同じ構造。両言語の退社挨拶が機能的に同じ。文化OSの「労いの挨拶」が普遍化される例。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 25 ──
+    { daySlot: 25, japanese: '気づいたら金曜', english: [
+        "it's Friday already",
+        "wait, it's Friday already",
+        "wait, it's Friday already, what",
+        "Friday snuck up on me"
+    ], context: "「気づいたら」は突然認知の副詞句。英語のwait, it's Friday alreadyは「待って、もう金曜？」=驚き構文。日本語は到達動詞、英語は中断詞waitで同じ「いつの間に」を表す。両言語の時間認知の構文化の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 25, japanese: '今週末ゆっくりしたい', english: [
+        "low key weekend",
+        "I want a chill weekend, nothing planned",
+        "I want a chill weekend, nothing planned, just being",
+        "I'm planning to do absolutely nothing"
+    ], context: "「ゆっくり」は擬態語、緩慢の音。英語のchillは「冷たい=リラックス」=温度比喩の現代俗語。日本語は擬態語、英語は温度の比喩で同じ「のんびり」を運ぶ。同じ休暇を、片や速度、片や温度として表す。", category: 'opinion', month: '2026-06' },
+    { daySlot: 25, japanese: 'ちょっと外の空気吸いたい', english: [
+        "need fresh air",
+        "I need to get some fresh air",
+        "I need to get some fresh air, been inside too long",
+        "I need to step out and breathe"
+    ], context: "「外の空気吸いたい」は身体的欲求。英語のfresh airも完全一致、両言語とも「新鮮な空気」=外気を物質化する。同じ「換気欲求」を、両言語が同じ構造で表現する珍しい一致。普遍的な身体感覚の言語化。", category: 'request', month: '2026-06' },
+    { daySlot: 25, japanese: 'ねえ、それやめときな', english: [
+        "don't do that",
+        "yeah, I wouldn't go down that road",
+        "yeah, I wouldn't go down that road if I were you",
+        "trust me, don't go there"
+    ], context: "「やめときな」は親しい忠告。英語のgo down that roadは「その道を進む」=道路比喩で行動を表す。日本語は否定命令、英語は条件文+移動動詞で同じ忠告を運ぶ。同じ「やめとけ」を、片や直接、片や条件付きとして表現する。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 25, japanese: 'なんでも肯定する人嫌い', english: [
+        "yes-men suck",
+        "I can't stand people who just agree with everything",
+        "I can't stand people who just agree with everything, it's exhausting",
+        "yes-people drive me up the wall"
+    ], context: "「肯定する人」を直訳するとagreeing personだが、英語のyes-menは「イエスマン」=従順者の名詞化、20世紀ビジネス英語由来。日本語は動詞句、英語は名詞で同じ「お追従屋」を表す。両言語の批判的人物像の名詞化の差。", category: 'opinion', month: '2026-06' },
+    { daySlot: 25, japanese: 'なんか元気貰った', english: [
+        "I feel recharged",
+        "talking to you recharged my battery",
+        "talking to you recharged my battery, thanks for that",
+        "you really refilled my tank"
+    ], context: "「元気貰った」は元気の受領。英語のrechargeは「再充電」=電池比喩。日本語は気の譲渡、英語は電気の充填として元気を表す。文化OSが「元気」を片や気、片や電気として概念化する。エネルギーのメディア化の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 25, japanese: 'マジで人生楽しい', english: [
+        "life is good",
+        "life is honestly pretty good right now",
+        "life is honestly pretty good right now, not gonna lie",
+        "honestly, life is treating me well"
+    ], context: "「人生楽しい」は人生評価。英語のnot gonna lieは「嘘つかないけど」=自己暴露の前置き。日本語は形容詞「楽しい」、英語は副詞句+形容詞で同じ「悪くない」を運ぶ。日本語は直接、英語は緩衝として人生評価を表現する。", category: 'opinion', month: '2026-06' },
+    { daySlot: 25, japanese: 'なんか体すごい軽い', english: [
+        "I feel light",
+        "I feel light on my feet today",
+        "I feel light on my feet today, like nothing weighing me down",
+        "I've got a spring in my step"
+    ], context: "「軽い」を直訳するとlightだが、英語のlight on my feetは「足が軽い」=ダンス比喩。日本語は形容詞、英語は身体部位+形容詞で同じ「軽快」を表す。両言語が「軽さ」を身体感覚として運ぶが、英語は足を強調する文化的傾向。", category: 'reaction', month: '2026-06' },
+    { daySlot: 25, japanese: 'なんとなくウケる', english: [
+        "kinda funny",
+        "okay that's actually kinda funny",
+        "okay that's actually kinda funny, didn't expect that",
+        "that actually cracked me up"
+    ], context: "「ウケる」は受容動詞の俗語化、笑いの受信。英語のkinda funnyは「ちょっと面白い」=形容詞+程度副詞。日本語は受容動詞、英語は度合い形容詞で同じ「笑える」を運ぶ。比喩の感覚モダリティが片や受信、片や属性。", category: 'reaction', month: '2026-06' },
+    { daySlot: 25, japanese: '寝る前にちょっと読書', english: [
+        "reading before bed",
+        "doing some reading before I crash",
+        "doing some reading before I crash, decompress",
+        "winding down with a book"
+    ], context: "「ちょっと読書」は時間限定の動作。英語のwind downは「巻き戻す」=時計の発条比喩、緊張緩和を表す。日本語は副詞「ちょっと」、英語は動詞句wind downで同じ「就寝前の鎮静」を運ぶ。文化OSの時計比喩の影響。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 26 ──
+    { daySlot: 26, japanese: 'おっ、いい風吹いてる', english: [
+        "nice breeze",
+        "there's actually a nice breeze right now",
+        "there's actually a nice breeze right now, didn't expect that",
+        "got a sweet little breeze going"
+    ], context: "「いい風」を直訳するとgood windだが弱い。英語のnice breezeは「微風」=軽い風の専用語。日本語は形容詞+風、英語は分類された風(breeze, gust, gale)で表す。風の語彙が細分化された英語と、強度のみの日本語の対比。", category: 'reaction', month: '2026-06' },
+    { daySlot: 26, japanese: 'やっぱ朝が一番調子いい', english: [
+        "mornings are best",
+        "I'm definitely a morning person",
+        "I'm definitely a morning person, brain's sharpest before noon",
+        "I do my best work before noon"
+    ], context: "「朝が一番」は時間帯のランク付け。英語のmorning personは「朝型人間」=人格分類。日本語は時間帯の優位、英語は人物カテゴリで同じ「朝型」を表す。日本語は時間中心、英語は人物中心の分類文化。", category: 'opinion', month: '2026-06' },
+    { daySlot: 26, japanese: 'ちょっと買い物頼んでいい？', english: [
+        "can you grab something",
+        "can you pick up a few things for me",
+        "can you pick up a few things for me on your way",
+        "mind grabbing a few things for me"
+    ], context: "「頼んでいい？」は依頼の許可形。英語のcan you pick upは「拾う」=身体動作で買い物を表す。日本語は依頼動詞「頼む」、英語は身体動詞pick upで同じ機能を運ぶ。日本語は抽象、英語は物理動作として依頼を表現する。", category: 'request', month: '2026-06' },
+    { daySlot: 26, japanese: 'やっぱ自分で作った方がうまい', english: [
+        "homemade wins",
+        "honestly, nothing beats homemade",
+        "honestly, nothing beats homemade, every time",
+        "homemade beats it every time"
+    ], context: "「自分で作った方が」は比較構文。英語のnothing beats Xは「何もXを打ち負かさない」=競争比喩の最大級。日本語は比較形「方が」、英語は否定+競争動詞で同じ「最高」を運ぶ。両言語の最上級表現の構文差。", category: 'opinion', month: '2026-06' },
+    { daySlot: 26, japanese: 'なんか急に思い出した', english: [
+        "just remembered",
+        "wait, that just clicked for me",
+        "wait, that just clicked for me, the thing I was forgetting",
+        "wait, it just came back to me"
+    ], context: "「思い出した」を直訳するとI rememberedだが、英語のjust clicked for meは「カチッと音がした」=機械音で理解の到達を表す。日本語は記憶動詞、英語は擬音で同じ閃きを運ぶ。両言語が「思い出し」を片や記憶、片や機械音として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 26, japanese: 'やっぱそうきたか', english: [
+        "knew it",
+        "yeah, called that one",
+        "yeah, called that one, saw it from a mile away",
+        "knew that one was coming"
+    ], context: "「そうきたか」は予測実現の感嘆。英語のsaw it from a mile awayは「1マイル先から見えた」=距離比喩。日本語は到達動詞「くる」、英語は距離+視覚で「明白な予測」を表す。同じ予見を、片や到達、片や距離として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 26, japanese: 'ちょっとつまらない', english: [
+        "kinda boring",
+        "I'm not really feeling it",
+        "I'm not really feeling it, gonna be honest",
+        "this isn't really doing it for me"
+    ], context: "「つまらない」を直訳するとboringだが、英語のnot feeling itは「それを感じていない」=感覚動詞feelで関心を表す。日本語は感情形容詞、英語は感覚動詞で同じ「ピンとこない」を運ぶ。日本語は属性、英語は感受として退屈を表現する。", category: 'opinion', month: '2026-06' },
+    { daySlot: 26, japanese: 'うわ、それ知らんかった', english: [
+        "didn't know that",
+        "wait, I had no idea about that",
+        "wait, I had no idea about that, mind blown",
+        "that's news to me"
+    ], context: "「知らんかった」は関西弁的否定。英語のhad no ideaは「考えがなかった」=完了形否定。mind blownは「脳を吹き飛ばされた」=爆発比喩。日本語は知識否定、英語は思考の不在として無知を表す。両言語の方言・俗語層の対応。", category: 'reaction', month: '2026-06' },
+    { daySlot: 26, japanese: 'なんかいい感じ', english: [
+        "feels right",
+        "this is coming together nicely",
+        "this is coming together nicely, gonna let it ride",
+        "everything's falling into place"
+    ], context: "「いい感じ」は曖昧な肯定。英語のcoming together nicelyは「綺麗にまとまっている」=結合動詞。日本語は感覚形容詞、英語は進行形+副詞で同じ「順調」を表す。日本語は静的、英語は動的に「いい感じ」を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 26, japanese: 'もう今日は終わりにしよう', english: [
+        "calling it",
+        "alright, that's enough for one day",
+        "alright, that's enough for one day, time to switch off",
+        "let's call it a day"
+    ], context: "「終わりにしよう」は終了提案。英語のswitch offは「電源を切る」=機械操作の流用。日本語は名詞「終わり」+動作化、英語は電気スイッチの比喩で同じ終了を運ぶ。文化OSが「終わり」を片や時間、片や機械操作として概念化する。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 27 ──
+    { daySlot: 27, japanese: 'なんとなく動きたい', english: [
+        "I wanna move",
+        "I'm feeling restless, gotta move",
+        "I'm feeling restless, gotta move, can't sit still",
+        "I've got ants in my pants"
+    ], context: "「動きたい」は身体欲求。英語のrestlessは「休めない」=否定形容詞で同じ「じっとできない」を表す。日本語は動詞願望、英語は形容詞で同じ「動きたい」を運ぶ。両言語とも、運動欲求を独自の品詞で表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 27, japanese: 'なんで急に', english: [
+        "why now",
+        "why is this coming up now of all times",
+        "why is this coming up now of all times, like why today",
+        "why pick today of all days"
+    ], context: "「なんで急に」は唐突への不満。英語のof all timesは「全ての時の中で」=最悪のタイミング指定。日本語は時間副詞「急に」、英語は前置詞句で同じ「よりによって今」を運ぶ。両言語の「タイミング非難」の構文化の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 27, japanese: 'やっぱお前最高', english: [
+        "you're the best",
+        "you really are the best, no contest",
+        "you really are the best, no contest, hands down",
+        "you're a class apart"
+    ], context: "「最高」は最上級。英語のhands downは「手を下ろして=楽勝」=競争用語、勝者が手を下げる動作。日本語は単純最上級、英語は競争比喩+身体動作で「圧倒的」を表す。同じ称賛を、片や属性、片や勝負として運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 27, japanese: 'なんか気持ちわかる', english: [
+        "I get that",
+        "I feel that on a deep level",
+        "I feel that on a deep level, been there myself",
+        "I've walked that road myself"
+    ], context: "「気持ちわかる」は共感。英語のfeel that on a deep levelは「深いレベルで感じる」=共感の深度化。日本語は理解動詞、英語は感情動詞+深度副詞で同じ共感を表す。文化OSの共感の表現精度の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 27, japanese: 'なんか集中力切れた', english: [
+        "I'm fried",
+        "my brain just tapped out for the day",
+        "my brain just tapped out for the day, can't push further",
+        "I'm completely fried"
+    ], context: "「集中力切れた」は機能の停止。英語のfriedは「揚げられた」=料理比喩で脳の疲弊を表す。日本語は能力切断、英語は調理状態として「疲弊」を運ぶ。両言語の脳疲労の比喩の差。日本語は機械、英語は料理として表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 27, japanese: 'ちょっと話変えていい？', english: [
+        "change topic",
+        "can we shift gears for a sec",
+        "can we shift gears for a sec, different subject",
+        "can we pivot for a sec"
+    ], context: "「話変える」を直訳するとchange topicだが、英語のshift gearsは「ギアを切り替える」=車運転比喩。日本語は名詞「話」の変化、英語は機械操作で同じ「話題転換」を表す。文化OSの会話運転の差。", category: 'request', month: '2026-06' },
+    { daySlot: 27, japanese: 'マジでありがとう、本当に', english: [
+        "thanks so much",
+        "I genuinely cannot thank you enough",
+        "I genuinely cannot thank you enough, you came through",
+        "I can't thank you enough, really"
+    ], context: "「本当に」は感謝強化副詞。英語のcannot thank you enoughは「十分感謝できない」=感謝の不可能化、最大級の表現。日本語は副詞反復、英語は否定+程度副詞で「感謝表現の限界突破」を表す。", category: 'reaction', month: '2026-06' },
+    { daySlot: 27, japanese: 'もう少し時間ほしい', english: [
+        "need more time",
+        "I just need a little more time on this",
+        "I just need a little more time on this, almost there",
+        "I just need a little more runway"
+    ], context: "「時間ほしい」は時間の所有要求。英語のneed more time on thisは「これにもっと時間が必要」=対象+前置詞onで指定。日本語は所有願望、英語は必要+前置詞句で同じ「時間追加」を運ぶ。両言語の時間表現の構文差。", category: 'request', month: '2026-06' },
+    { daySlot: 27, japanese: 'ねえこれ食べてみて', english: [
+        "try this",
+        "you've gotta taste this, real quick",
+        "you've gotta taste this, real quick, trust me",
+        "you've gotta try a bite of this"
+    ], context: "「食べてみて」は使役+試行。英語のyou've gotta taste thisは「あなたは味わわなきゃ」=義務動詞gottaで強い勧め。日本語は試行依頼、英語は義務勧めで同じ「食べて」を表す。両言語の食事勧めの強度の差。", category: 'request', month: '2026-06' },
+    { daySlot: 27, japanese: 'お先に寝るね', english: [
+        "going to bed first",
+        "I'm heading to bed, see you in the morning",
+        "I'm heading to bed, see you in the morning, you stay up if you want",
+        "I'm crashing first, see you tomorrow"
+    ], context: "「お先に」は集団退出の定型句。英語のheading to bed first/before youで対応するが、日本語ほど形式化されていない。日本語は集団意識を反映、英語は単純な行動予告。文化OSの集団感覚の差が就寝挨拶でも現れる。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 28 ──
+    { daySlot: 28, japanese: 'ねえ、最近どう？元気？', english: [
+        "how have you been",
+        "how have you been lately, all good",
+        "how have you been lately, all good on your end",
+        "how's life been treating you"
+    ], context: "「最近どう？元気？」は二重質問。英語のhow have you beenは完了進行で「ずっとどう？」を表す。日本語は時間副詞+短い問い、英語は時制で持続的安否を確認する。両言語の挨拶の時間幅の差。", category: 'filler', month: '2026-06' },
+    { daySlot: 28, japanese: 'ちょっと相談あるんだけど', english: [
+        "I need advice",
+        "got something I want to talk through with you",
+        "got something I want to talk through with you, if you have time",
+        "want to run something by you"
+    ], context: "「相談ある」は依頼前置き。英語のtalk it throughは「通して話す」=過程として議論を表現する句動詞。日本語は名詞「相談」、英語は動詞句で同じ「相談」を運ぶ。両言語の議論動詞の差。", category: 'request', month: '2026-06' },
+    { daySlot: 28, japanese: 'なんか今日忙しすぎ', english: [
+        "swamped today",
+        "I am drowning today, no other word for it",
+        "I am drowning today, no other word for it, every minute booked",
+        "I'm slammed today, total chaos"
+    ], context: "「忙しすぎ」を直訳するとtoo busyだが、英語のdrowningは「溺れる」=水中比喩、swampedは「湿地」=泥沼比喩。日本語は度合い形容詞、英語は水関連の比喩で同じ「忙殺」を運ぶ。両言語の多忙表現のイメージの違い。", category: 'reaction', month: '2026-06' },
+    { daySlot: 28, japanese: 'ねえ、なんかにおう', english: [
+        "smells weird",
+        "do you smell that, what is that",
+        "do you smell that, what is that, where is it coming from",
+        "you catch a whiff of that"
+    ], context: "「におう」は嗅覚動詞。英語のdo you smell thatは「あれを嗅ぐ？」=他者確認の構文。日本語は単一動詞、英語は確認質問で同じ嗅覚を共有する。両言語の嗅覚表現の構文差、日本語は事実、英語は確認として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 28, japanese: 'なんかすごい暇', english: [
+        "totally bored",
+        "I have nothing to do and it's killing me",
+        "I have nothing to do and it's killing me a little",
+        "I'm climbing the walls over here"
+    ], context: "「暇」は時間の空白。英語のkilling meは「殺している」=苦痛比喩で退屈を表現する。日本語は名詞「暇」、英語は動詞「殺す」で同じ退屈を表す。両言語の暇の表現方法の差、日本語は状態、英語は動作として運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 28, japanese: 'やっぱり寝るのが一番', english: [
+        "sleep wins",
+        "sleep beats everything, every time",
+        "sleep beats everything, every time, no contest",
+        "nothing beats a good night's sleep"
+    ], context: "「一番」は最上級副詞。英語のbeats everythingは「全てを打ち負かす」=競争比喩で最上を表現する。日本語は順位、英語は競争として「一番」を運ぶ。両言語の最上級の構文化、日本語は数値、英語は競争として表す。", category: 'opinion', month: '2026-06' },
+    { daySlot: 28, japanese: 'ちょっと聞いてくれる？マジな話', english: [
+        "real talk",
+        "I need to talk to you about something serious",
+        "I need to talk to you about something serious, can we step away",
+        "got a sec, no joking around"
+    ], context: "「マジな話」は真剣化マーカー。英語のreal talkは「本気の話」=同じ機能の俗語。日本語は形容詞「マジな」、英語は形容詞realで「本気度」を強調する。両言語が「真剣化」を独自の俗語で運ぶ文化的並行進化。", category: 'request', month: '2026-06' },
+    { daySlot: 28, japanese: 'なんか気が散る', english: [
+        "I'm distracted",
+        "my mind keeps wandering off",
+        "my mind keeps wandering off, can't keep it on track",
+        "my mind keeps drifting off"
+    ], context: "「気が散る」は気の分散。英語のmind wanderingは「心がさまよう」=擬人化された心、放浪比喩。日本語は気の物理化、英語は心の擬人化で同じ「散漫」を運ぶ。両言語が「集中欠如」を独自の比喩で表現する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 28, japanese: 'もう答え出てる気がする', english: [
+        "I think you know",
+        "you already know the answer, deep down",
+        "you already know the answer, deep down, you just don't like it",
+        "deep down you already know"
+    ], context: "「答え出てる」は結論の所在。英語のdeep downは「深いところで」=空間化された内面。日本語は完了形「出てる」、英語は深度副詞で同じ「内心知ってる」を表す。両言語の内面の地理化の差。", category: 'opinion', month: '2026-06' },
+    { daySlot: 28, japanese: 'はい、もう寝ます', english: [
+        "okay, bed",
+        "alright, that is officially my bedtime",
+        "alright, that is officially my bedtime, see everyone tomorrow",
+        "alright, off to bed I go"
+    ], context: "「もう寝ます」は丁寧形の宣言。英語のofficially my bedtimeは「公式に寝る時間」=制度化された時間。日本語は丁寧助動詞「ます」、英語は副詞officiallyで同じ「公式宣言」を表す。両言語の儀式化の構文差。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 29 ──
+    { daySlot: 29, japanese: '6月もそろそろ終わる', english: [
+        "June is almost over",
+        "we're already at the end of June",
+        "we're already at the end of June, somehow",
+        "June is winding down"
+    ], context: "「そろそろ終わる」は時間接近+終了。英語のend of Juneは「6月の終わり」=空間化された月。日本語は時間副詞「そろそろ」、英語は位置名詞endで同じ「もうすぐ」を運ぶ。両言語の月末表現の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 29, japanese: 'なんとなく振り返ってみよう', english: [
+        "let's reflect",
+        "let's take a look back at the month",
+        "let's take a look back at the month, what worked",
+        "let's take stock of the month"
+    ], context: "「振り返る」は身体動詞、後方視。英語のlook backは「後ろを見る」=完全に同じ比喩。両言語が「過去確認」を「後ろを見る」で表現する稀有な一致。文化OSが時間軸を片や流れ、片や後方として概念化する偶然の重なり。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 29, japanese: '今月よくやったわ', english: [
+        "I did well this month",
+        "I gotta give myself credit for this month",
+        "I gotta give myself credit for this month, that was a lot",
+        "I'll give myself a pat on the back"
+    ], context: "「よくやった」は自己評価。英語のgive myself creditは「自分にクレジットを与える」=金融用語の流用。日本語は副詞+動詞、英語は名詞credit+動詞で同じ「自己評価」を運ぶ。文化OSの自己肯定の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 29, japanese: '今月の目標達成した', english: [
+        "I hit my goal",
+        "I crushed my goal for the month",
+        "I crushed my goal for the month, feels good",
+        "I knocked the goal out of the park"
+    ], context: "「達成」を直訳するとachieveだが、英語のcrushed itは「叩き潰した」=圧倒的達成の俗語。hit my goalは「目標を打った」=射撃比喩。日本語は名詞「達成」、英語は破壊動詞で同じ「やり遂げた」を運ぶ。", category: 'reaction', month: '2026-06' },
+    { daySlot: 29, japanese: '来月もこの調子で', english: [
+        "keep it going",
+        "let's keep this momentum into next month",
+        "let's keep this momentum into next month, don't lose it",
+        "let's ride this wave into next month"
+    ], context: "「この調子で」は維持の指示。英語のmomentumは「勢い」=物理学用語の流用。日本語は調子(身体感覚)、英語は運動量で同じ「勢い」を運ぶ。文化OSのエネルギー概念の差。日本語は感覚、英語は物理として勢いを表現する。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 29, japanese: 'なんか疲れたな今月', english: [
+        "this month wiped me out",
+        "this month really took it out of me",
+        "this month really took it out of me, ready for the next",
+        "this month really wrung me out"
+    ], context: "「疲れた」を直訳するとtiredだが、英語のtook it out of meは「私から取り出した」=エネルギー抽出の比喩。日本語は単純疲労、英語は抽出比喩で同じ消耗を表す。両言語が疲労を片や蓄積、片や流出として概念化する。", category: 'reaction', month: '2026-06' },
+    { daySlot: 29, japanese: 'もう一回確認してみて', english: [
+        "double check",
+        "can you give that one more look",
+        "can you give that one more look, just to be safe",
+        "give it another look just to be safe"
+    ], context: "「もう一回」は反復副詞句。英語のone more lookは「もう一度の視覚」=名詞化された視覚動作。日本語は数詞+量詞、英語は数詞+名詞で同じ「再確認」を運ぶ。両言語の反復構文の品詞差。", category: 'request', month: '2026-06' },
+    { daySlot: 29, japanese: 'なんとなく余裕でてきた', english: [
+        "I have bandwidth now",
+        "I'm starting to feel some breathing room",
+        "I'm starting to feel some breathing room, finally",
+        "I've got room to breathe again"
+    ], context: "「余裕でてきた」は余裕の出現。英語のbreathing roomは「呼吸の余地」=空間化された休息。日本語は余裕の出現、英語は呼吸空間として「ゆとり」を運ぶ。両言語の「余裕」の空間化、日本語は心の余裕、英語は身体の呼吸空間。", category: 'reaction', month: '2026-06' },
+    { daySlot: 29, japanese: 'これからもよろしく', english: [
+        "looking forward to it",
+        "here's to many more like this one",
+        "here's to many more like this one going forward",
+        "looking forward to more of this"
+    ], context: "「よろしく」は日本語の独自概念、未来関係の確認。英語にこの定型がなく、looking forwardやhere's toで代替する。日本語は関係維持、英語は時間期待として未来関係を表す。文化OSの関係性意識の差。", category: 'opinion', month: '2026-06' },
+    { daySlot: 29, japanese: 'おやすみ、また明日', english: [
+        "good night",
+        "good night, sleep well, see you tomorrow",
+        "good night, sleep well, see you tomorrow morning",
+        "night, see you bright and early"
+    ], context: "「おやすみ、また明日」は別れの二重定型句。英語のgood night, see you tomorrowも同じ構造。両言語とも、就寝挨拶を労り+再会予告の二段組みで構造化する。文化OSの「日常の儀礼」の並行進化。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-06 Day 30 ──
+    { daySlot: 30, japanese: '6月最終日', english: [
+        "last day of June",
+        "alright, last day of June",
+        "alright, last day of June, half the year done",
+        "we're at the finish line of June"
+    ], context: "「最終日」は時間範囲の終端。英語のlast day ofは「〜の最後の日」=前置詞ofで所属を表す。日本語は名詞「最終日」、英語は形容詞+前置詞句で同じ機能を運ぶ。両言語の月末表現の構文差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 30, japanese: '7月もよろしく', english: [
+        "here's to July",
+        "here's to July, fresh slate",
+        "here's to July, fresh slate, let's do this",
+        "here's to a fresh start in July"
+    ], context: "「よろしく」は関係維持の挨拶。英語のhere's to Xは「Xに乾杯」=祝杯比喩。日本語は関係性、英語は祝杯として月の始まりを表す。両言語の月替わり挨拶の文化的構造化の差。", category: 'reaction', month: '2026-06' },
+    { daySlot: 30, japanese: '今月で一番嬉しかったこと', english: [
+        "best moment this month",
+        "what was the highlight of the month for you",
+        "what was the highlight of the month for you, anything stand out",
+        "what stood out for you this month"
+    ], context: "「一番嬉しかったこと」は最上級+完了感情。英語のhighlightは「ハイライト」=照明用語の流用、注目点を強調する語。日本語は感情最上級、英語は照明比喩で同じ「ベスト」を運ぶ。文化OSの記憶記録の差。", category: 'request', month: '2026-06' },
+    { daySlot: 30, japanese: 'うーん、なんだろう、たくさん', english: [
+        "uh, lots",
+        "hmm, hard to pick just one honestly",
+        "hmm, hard to pick just one honestly, a lot of good stuff happened",
+        "honestly, way too many to pick one"
+    ], context: "「うーん、なんだろう」は思考時間の音化。英語のhmmが同じ機能。両言語が思考プロセスを擬音で表現する一致。日本語はうーん、英語はhmmで同じ「考え中」を運ぶ。普遍的な思考の音化文化。", category: 'reaction', month: '2026-06' },
+    { daySlot: 30, japanese: 'なんとなく成長を感じた月', english: [
+        "I grew this month",
+        "this month felt like I leveled up a bit",
+        "this month felt like I leveled up a bit, in small ways",
+        "I leveled up in small ways"
+    ], context: "「成長」を直訳するとgrowthだが、英語のleveled upは「レベルが上がった」=ゲーム用語の流用、現代俗語。日本語は身体成長、英語はゲーム的進歩で同じ「成長」を表す。文化OSのメディア時代差、ゲーム比喩が英語に深く流入。", category: 'opinion', month: '2026-06' },
+    { daySlot: 30, japanese: 'ちょっと反省点もあった', english: [
+        "some regrets too",
+        "there were some things I could've done better",
+        "there were some things I could've done better, gotta be honest",
+        "had a few things to work on too"
+    ], context: "「反省点」は日本語の独自概念、自己批判の名詞化。英語のregretsは「後悔」=感情名詞。日本語は反省の項目化、英語は感情として表す。文化OSの自己批判の構造化の差。日本語は分析、英語は感情として失敗を運ぶ。", category: 'opinion', month: '2026-06' },
+    { daySlot: 30, japanese: 'なんかこのまま続けたい', english: [
+        "want to keep going",
+        "I want to keep this rhythm into next month",
+        "I want to keep this rhythm into next month, not break it",
+        "I want to ride this groove forward"
+    ], context: "「このまま」は現状維持。英語のkeep this rhythmは「リズムを保つ」=音楽比喩で生活リズムを表す。日本語は副詞「このまま」、英語は音楽用語で同じ「現状継続」を運ぶ。両言語の維持表現の比喩差。", category: 'opinion', month: '2026-06' },
+    { daySlot: 30, japanese: '今夜は祝杯', english: [
+        "tonight we celebrate",
+        "tonight calls for a drink, end of month vibes",
+        "tonight calls for a drink, end of month vibes, low key",
+        "tonight calls for a toast"
+    ], context: "「祝杯」は名詞化された祝賀。英語のtonight calls for a drinkは「今夜は飲み物を呼ぶ」=擬人化された夜。日本語は名詞、英語は擬人化動詞で同じ「祝杯」を運ぶ。文化OSの「飲酒で区切る」の普遍性、構文化の差。", category: 'suggestion', month: '2026-06' },
+    { daySlot: 30, japanese: 'ありがとう、6月', english: [
+        "thanks, June",
+        "thank you, June, you were a lot",
+        "thank you, June, you were a lot but we made it",
+        "thanks for the ride, June"
+    ], context: "「ありがとう、6月」は擬人化された月。英語のthank you, Juneも同じ擬人化構造。両言語が月を擬人化して感謝する珍しい並行表現。日本語は短い感謝、英語は丁寧な感謝で同じ「月への謝辞」を運ぶ。文化OSの擬人化の一致。", category: 'reaction', month: '2026-06' },
+    { daySlot: 30, japanese: 'おやすみ6月、また来年', english: [
+        "good night June",
+        "good night June, see you next year",
+        "good night June, see you next year, same time",
+        "good night June, catch you next year"
+    ], context: "「また来年」は時間軸の年単位。英語のsee you next year, same timeは「来年同じ時間に」=時間予約の比喩。日本語は再会予告、英語は予約構文で同じ「来年また」を運ぶ。両言語の時間サイクルの言語化の差。", category: 'shutdown', month: '2026-06' },
+
+    // ── 2026-07 Day 1 (仕事・職場のひとこと) ──
+    { daySlot: 1, japanese: 'それ俺の仕事じゃないし', english: [
+        "not my job",
+        "that's honestly not my job",
+        "I'll help once, but that is not my job to begin with",
+        "not in my lane"
+    ], context: "「〜じゃないし」の突き放しは終助詞「し」で運ぶ。英語はthat's not my jobと主語that'sを立てて完全文にする。日本語は「し」で理由を匂わせて終えるが、英語は主語＋be動詞で言い切る。終助詞のニュアンスを骨格で組み直すのが英語。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 1, japanese: 'とりあえずやっとくわ', english: [
+        "I'll just handle it",
+        "I'll just take care of it for now",
+        "let me just knock it out so we can move on",
+        "on it, consider it done"
+    ], context: "「とりあえず」はjustやfor nowが拾う。knock it outは「殴り倒す＝サッと片付ける」句動詞で、面倒を物理的に倒す絵。日本語は副詞でぼかすが、英語は小語＋句動詞で勢いを出す。音とメタファーの合わせ技。", category: 'request', month: '2026-07' },
+    { daySlot: 1, japanese: 'もう手一杯', english: [
+        "I'm swamped",
+        "I'm completely swamped right now",
+        "I've got way too much on my plate to take that on",
+        "drowning over here"
+    ], context: "「手一杯」を英語は皿(plate)に乗せる。on my plate=やることが皿に山盛り、swamped=沼にハマって動けない。日本語は手で表すが英語は容量を物理イメージで殴る。メタファーで忙しさを絵にするのが英語の癖。", category: 'reaction', month: '2026-07' },
+    { daySlot: 1, japanese: 'まあなんとかなるっしょ', english: [
+        "it'll be fine",
+        "it'll work out, it usually does",
+        "we'll figure it out, it always comes together somehow",
+        "we'll be fine, trust"
+    ], context: "主語のない「なんとかなる」を英語はitで埋める。it'll work out、we'll figure it out。日本語は誰がどうするか言わずに済むが、英語は主語が必須だからダミーのitやweを必ず置く。骨格として主語を立てる発想。", category: 'reaction', month: '2026-07' },
+    { daySlot: 1, japanese: 'それ確認しときますね', english: [
+        "I'll check",
+        "let me double-check that for you",
+        "I'll look into it and get back to you by end of day",
+        "on it, I'll confirm"
+    ], context: "「〜しときますね」の柔らかさはletで作る。let me check=「確認させて」と許可を取る形でへりくだる。日本語は「ね」で軽くするが、英語はlet meで主語を相手に渡す姿勢を見せる。会話武器のへりくだり。", category: 'request', month: '2026-07' },
+    { daySlot: 1, japanese: 'それな', english: [
+        "exactly",
+        "right? that's exactly it",
+        "no, that's exactly what I was thinking the whole time",
+        "literally, same"
+    ], context: "「それな」の同意は英語ではrightやexactlyで返す。日本語は「それ」と指示語だけで共感を運ぶが、英語はthat's exactly itと主語＋be動詞で「それがまさにそれ」と完全文化する。指示語一発を骨格で組む差。", category: 'reaction', month: '2026-07' },
+    { daySlot: 1, japanese: '今ちょっと無理', english: [
+        "can't right now",
+        "I really can't right now",
+        "I'd love to but I genuinely cannot get to it right now",
+        "swamped, not today"
+    ], context: "「ちょっと無理」のちょっとは遠慮で、本気の拒否。英語はcan't right nowと時間を切って断る。reallyやgenuinelyを足すと本気度が乗る。日本語の「ちょっと」で和らげる代わりに英語は時間の限定で逃げ道を残す。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 1, japanese: 'マジで助かった', english: [
+        "huge help",
+        "that was a huge help, seriously",
+        "you really saved me there, I owe you one",
+        "lifesaver, thank you"
+    ], context: "「助かった」を英語は人を主語にしてyou saved meと言う。日本語は自分が助かった受け身視点、英語は相手が救った能動視点。lifesaverは「命を救う人」というメタファー。視点が自分→相手にひっくり返る骨格の差。", category: 'reaction', month: '2026-07' },
+    { daySlot: 1, japanese: 'え、それ聞いてないんだけど', english: [
+        "first I'm hearing of it",
+        "wait, this is the first I'm hearing of this",
+        "nobody told me, this is honestly the first I'm hearing about it",
+        "news to me"
+    ], context: "「聞いてない」を英語はnews to meやfirst I'm hearingと言う。日本語は受け身(聞いていない)、英語は「俺にとって初耳のニュース」と情報を主語に立てる。受け身を能動の情報イメージに変換するメタファー寄りの言い回し。", category: 'reaction', month: '2026-07' },
+    { daySlot: 1, japanese: 'ま、いっか', english: [
+        "whatever",
+        "eh, whatever works",
+        "you know what, it's fine, let's just move on",
+        "meh, good enough"
+    ], context: "「いっか」の諦めはwhateverやit's fineが拾う。eh、you know whatの間投詞が「ま」の脱力を音で再現する。日本語は「か」の終助詞一個で投げるが、英語はwhateverという小語＋フィラーで同じ温度を出す。音とフィラーの仕事。", category: 'filler', month: '2026-07' },
+
+    // ── 2026-07 Day 2 (食事・外食・店での会話) ──
+    { daySlot: 2, japanese: 'とりあえずビール', english: [
+        "beer to start",
+        "let's just start with a beer",
+        "can we get a couple beers to start while we look at the menu?",
+        "beers first, decide later"
+    ], context: "「とりあえず」をto startで運ぶのが英語。日本語は「とりあえず」だけで開始の合図になるが、英語はstart with〜と動詞で順番を明示する。let's justのjustが「ひとまず」の軽さを足す。小語justと動詞startの合わせ技。", category: 'request', month: '2026-07' },
+    { daySlot: 2, japanese: 'これめっちゃ美味い', english: [
+        "this is so good",
+        "okay this is actually so good",
+        "I'm not even exaggerating, this might be the best thing here",
+        "this slaps"
+    ], context: "「めっちゃ」をsoやactuallyで運ぶ。actuallyは「(期待してなかったけど)意外と」の含み。this slapsは「これが殴ってくる＝強烈にうまい」スラングのメタファー。日本語の強調副詞を英語は小語＋比喩で立体化する。", category: 'reaction', month: '2026-07' },
+    { daySlot: 2, japanese: 'お会計お願いします', english: [
+        "check, please",
+        "could we get the check, please?",
+        "whenever you get a chance, could we grab the check?",
+        "we're good, just the bill"
+    ], context: "「お願いします」の依頼を英語はcould we get〜と疑問文で組む。do-supportならぬcould疑問が丁寧の正体。日本語は「お願いします」と平叙で頼めるが、英語は疑問形にするほど丁寧になる。骨格としての依頼=疑問。", category: 'request', month: '2026-07' },
+    { daySlot: 2, japanese: 'なんでもいいよ', english: [
+        "anything's fine",
+        "honestly, anything works for me",
+        "I'm not picky, whatever you're feeling is good with me",
+        "you pick, I'm easy"
+    ], context: "「なんでもいい」を英語はanything worksやI'm easyと言う。worksは「(それで)機能する＝OK」の万能動詞。I'm easyは自分を主語に「俺はこだわらない人間」と性格で答える。日本語は対象、英語は自分を主語に立てる骨格差。", category: 'reaction', month: '2026-07' },
+    { daySlot: 2, japanese: 'もうお腹いっぱい', english: [
+        "I'm stuffed",
+        "okay I'm completely stuffed",
+        "I can't eat another bite, I'm absolutely stuffed",
+        "done, so full"
+    ], context: "「お腹いっぱい」を英語はstuffed(詰め込まれた)と受動の比喩で言う。fullは「満タン」、stuffedは「ぎゅう詰め」とメタファーの強度が違う。日本語はお腹を主語にするが英語はI'm fullと人を主語に状態化する。", category: 'reaction', month: '2026-07' },
+    { daySlot: 2, japanese: 'これシェアしよ', english: [
+        "let's share",
+        "wanna just split this?",
+        "let's get one and split it, that way we can try more stuff",
+        "split it, yeah?"
+    ], context: "「シェアしよ」の誘いはlet's/wannaで作る。wannaはwant toの圧縮音で、くだけた誘いの定番。splitは「割る＝分け合う」句動詞。yeah?の付加で「だよね？」の確認を足す。音の圧縮と会話武器のタグの合わせ技。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 2, japanese: 'ちょっと待って、決められん', english: [
+        "give me a sec",
+        "hold on, I can't decide",
+        "give me a second, there's way too many good options here",
+        "ugh, can't pick"
+    ], context: "「ちょっと待って」をgive me a secやhold onで言う。secはsecondの省略で口語のテンポ。日本語は「待って」と動詞一個だが、英語はgive me=「俺に(時間を)くれ」と授与の骨格で組む。動詞giveの万能さが効く。", category: 'filler', month: '2026-07' },
+    { daySlot: 2, japanese: 'それ俺も頼も', english: [
+        "I'll get that too",
+        "oh, I'll have that too",
+        "that looks good, I'll go with the same thing",
+        "same for me"
+    ], context: "「俺も」をsame for meやme tooで運ぶ。注文ではI'll have/getと未来willで「俺もそれにする」と意思を表す。日本語は「も」一文字で同調するが、英語は主語I＋willで自分の選択として言い直す。骨格に主語と意思動詞が要る。", category: 'request', month: '2026-07' },
+    { daySlot: 2, japanese: 'ここ当たりだったね', english: [
+        "good call",
+        "honestly, great pick",
+        "this place was a great call, we're definitely coming back",
+        "solid choice, yeah?"
+    ], context: "「当たり」を英語はgood callやgreat pickと言う。callは「判断・読み」のメタファーで、店選びを賭けの読みに例える。日本語は「当たり」と結果で言うが、英語はcall=決断した行為を褒める。視点が結果→選択行為に移る。", category: 'reaction', month: '2026-07' },
+    { daySlot: 2, japanese: '次行こ次', english: [
+        "next spot",
+        "alright, let's hit the next place",
+        "we're done here, let's go find somewhere else for one more",
+        "onto the next, come on"
+    ], context: "「次行こ」をlet's hit the next placeと言う。hitは「(店に)突っ込む＝行く」の句動詞的メタファーで勢いがある。日本語は「行こ」と方向だけだが、英語はlet's＋動詞で誰が何をするか組む。動詞hitの躍動感が梯子の空気を出す。", category: 'suggestion', month: '2026-07' },
+
+    // ── 2026-07 Day 3 (お金・買い物) ──
+    { daySlot: 3, japanese: '今月マジ金ない', english: [
+        "I'm broke",
+        "I'm so broke this month",
+        "I am completely broke until payday, I can't spend a thing",
+        "wallet's empty, fr"
+    ], context: "「金ない」を英語はbroke(壊れた)と形容詞で言う。財布が割れて中身ゼロというメタファー。日本語は「金がない」と物の不在で言うが、英語はI'm brokeと人を主語に「俺が壊れてる状態」と表す。所有→状態への視点移動。", category: 'reaction', month: '2026-07' },
+    { daySlot: 3, japanese: 'それ高すぎ', english: [
+        "way too pricey",
+        "that's honestly way too expensive",
+        "no way, that's not worth that kind of money at all",
+        "hard pass, too much"
+    ], context: "「高すぎ」のすぎはway tooで運ぶ。wayは「はるかに」と程度を増幅する小語。日本語は「すぎ」の接尾辞一個でやり過ぎを表すが、英語はway too〜と副詞を重ねる。tooだけより強い、wayの追い焚きが効く。", category: 'reaction', month: '2026-07' },
+    { daySlot: 3, japanese: 'ちょっと考えるわ', english: [
+        "I'll think about it",
+        "let me think about it for a bit",
+        "I'm gonna sit on it for a day before I decide anything",
+        "gimme a day on that"
+    ], context: "「考える」を英語はsit on it(寝かせる)とも言う。決断を尻に敷いて温める比喩。gonnaはgoing toの圧縮音。日本語は「考える」と頭の動作だが、英語はsit on=物理的に置いておく絵で先延ばしを表す。音とメタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 3, japanese: 'これ無駄遣いかな', english: [
+        "kind of a waste?",
+        "this might be kind of a waste of money",
+        "I feel like I'm just throwing money away on stuff I don't need",
+        "do I even need this, though"
+    ], context: "「無駄遣い」を英語はthrowing money awayと投げ捨てる絵で言う。お金を物理的にゴミ箱に放る比喩。kind ofの小語が「かな」のためらいを拾う。though一語で「とはいえ」を末尾に足す。小語とメタファーで迷いを表現。", category: 'opinion', month: '2026-07' },
+    { daySlot: 3, japanese: 'それ絶対元取れるって', english: [
+        "totally worth it",
+        "trust me, it pays for itself",
+        "you'll use it so much it'll basically pay for itself in a month",
+        "worth every yen, swear"
+    ], context: "「元取れる」を英語はpay for itselfと言う。物が自分でお金を稼いで元を返す擬人化のメタファー。日本語は「元を取る」と人がやる行為だが、英語はit pays=物が主語で勝手に払い戻す。物に人格を持たせる文化OS。", category: 'opinion', month: '2026-07' },
+    { daySlot: 3, japanese: '割り勘でいい？', english: [
+        "split it?",
+        "wanna just split it evenly?",
+        "let's just split it down the middle, way easier than calculating",
+        "even split, cool?"
+    ], context: "「割り勘」をsplitやsplit it down the middleで言う。真ん中で真っ二つに割る比喩。cool?のタグで「いい？」の確認を足す。日本語は「でいい？」と終助詞で同意を求めるが、英語は文末タグcool?/yeah?で同じ役を担う。", category: 'request', month: '2026-07' },
+    { daySlot: 3, japanese: 'ポイント貯まってきた', english: [
+        "points are stacking up",
+        "my points are really stacking up",
+        "I've been racking up points and I can almost get something free",
+        "points piling up nicely"
+    ], context: "「貯まる」を英語はstack up/rack upと言う。stackは積み上がる、rackは掻き集めるメタファー。日本語はポイントが主語で自然に増えるが、英語もpoints are stacking upと物を主語にできる。句動詞upが増加の方向を示す。", category: 'reaction', month: '2026-07' },
+    { daySlot: 3, japanese: 'やっぱ買うのやめた', english: [
+        "I'll pass",
+        "actually, I think I'll pass on it",
+        "you know what, I changed my mind, I don't really need it",
+        "nah, leaving it"
+    ], context: "「やめた」を英語はpassやchanged my mindで言う。passは「(順番を)見送る」のメタファー、自分を主語に意思の変更を述べる。actuallyやyou know whatが「やっぱ」の翻意を拾う。小語が心変わりのタイミングを音で運ぶ。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 3, japanese: 'セールまで待つわ', english: [
+        "I'll wait for the sale",
+        "I'm just gonna wait for it to go on sale",
+        "no point buying now, it'll be way cheaper on sale next month",
+        "holding out for the sale"
+    ], context: "「待つ」を英語はwait for/hold outで言う。hold outは「持ちこたえる＝我慢して待つ」の句動詞。go on saleは「セールに乗る」と物が主語の言い回し。日本語は人が待つだけだが、英語は物が値下がるイベントを主語にもできる。", category: 'reaction', month: '2026-07' },
+    { daySlot: 3, japanese: 'ちょっと贅沢しちゃお', english: [
+        "let's treat ourselves",
+        "let's just treat ourselves for once",
+        "we work hard, we deserve to splurge a little today",
+        "treat-yourself mode, on"
+    ], context: "「贅沢する」を英語はtreat yourselfやsplurgeと言う。treatは「自分を客としてもてなす」擬人化、splurgeは「ドバッと使う」の擬音的メタファー。日本語は「贅沢」と状態名詞だが、英語は動詞で自分を甘やかす行為にする。", category: 'suggestion', month: '2026-07' },
+
+    // ── 2026-07 Day 4 (友達・人間関係) ──
+    { daySlot: 4, japanese: '久しぶりすぎ', english: [
+        "it's been forever",
+        "dude, it's been forever",
+        "I can't believe how long it's been, we really need to do this more",
+        "way too long, man"
+    ], context: "「久しぶり」を英語はit's been foreverと言う。時間を主語にしたダミーit＋現在完了。foreverは誇張の比喩で「永遠」。日本語は名詞「久しぶり」で済むが、英語はit's been〜と時間の経過を完全文で組む。骨格としてのダミーit。", category: 'reaction', month: '2026-07' },
+    { daySlot: 4, japanese: 'それは草', english: [
+        "that's hilarious",
+        "no, that's actually hilarious",
+        "I cannot stop laughing, that is genuinely the funniest thing",
+        "I'm dying, lmao"
+    ], context: "「草」をhilariousやI'm dyingで言う。I'm dyingは「笑いすぎて死ぬ」の誇張メタファーで草と同じ発想。日本語は「草(笑の象形)」で済むが、英語はthat's〜と主語を立てて感想を完全文にする。指示語的反応を骨格化。", category: 'reaction', month: '2026-07' },
+    { daySlot: 4, japanese: 'まあ気持ちはわかる', english: [
+        "I get it",
+        "I mean, I get where you're coming from",
+        "I totally see your point, even if I'd handle it differently",
+        "fair, I feel that"
+    ], context: "「気持ちわかる」を英語はI get itやwhere you're coming fromと言う。「どこから来てるか分かる」=相手の出発点を辿る空間メタファー。I meanのフィラーが「まあ」を拾う。小語I meanと比喩の合わせ技で共感を運ぶ。", category: 'reaction', month: '2026-07' },
+    { daySlot: 4, japanese: 'それは違うくない？', english: [
+        "isn't that off, though?",
+        "I mean, isn't that kind of off though?",
+        "I don't know, that doesn't really sit right with me honestly",
+        "nah, that's not it"
+    ], context: "「違うくない？」の確認=やんわり反論はタグ的なthough?で締める。isn't that〜?と否定疑問で「〜じゃない？」を作るのが英語の骨格。doesn't sit right=「しっくり座らない」の身体メタファー。会話武器のタグと比喩。", category: 'opinion', month: '2026-07' },
+    { daySlot: 4, japanese: 'また連絡するわ', english: [
+        "I'll hit you up",
+        "I'll hit you up later this week",
+        "let's definitely catch up soon, I'll text you to set something up",
+        "hit you up soon"
+    ], context: "「連絡する」を英語はhit you upと言う。「お前に当てる＝連絡する」の句動詞メタファー。catch upは「(離れた近況に)追いつく」絵。日本語は「連絡」と漠然だが、英語は動詞句で連絡の動作を具体的な物理イメージにする。", category: 'request', month: '2026-07' },
+    { daySlot: 4, japanese: 'なんか最近そっけないな', english: [
+        "they've been kind of distant",
+        "they've been kind of distant lately",
+        "I don't know, they've been giving me really short replies recently",
+        "feels off lately, honestly"
+    ], context: "「そっけない」を英語はdistant(距離がある)と言う。心の冷たさを物理的な距離のメタファーで表す。kind ofの小語が「なんか」のぼかしを拾う。日本語は態度を直接言うが、英語は距離の比喩でクッションを入れる。小語と比喩。", category: 'opinion', month: '2026-07' },
+    { daySlot: 4, japanese: '無理しなくていいよ', english: [
+        "no pressure",
+        "seriously, no pressure at all",
+        "don't force yourself, I totally get it if you're not up for it",
+        "all good, no rush"
+    ], context: "「無理しないで」を英語はno pressureと言う。圧力(pressure)を物理的になしにする比喩。don't force yourself=「自分を押すな」の身体イメージ。日本語は「無理」と抽象だが、英語は圧力や力で具体化する。メタファーの直球。", category: 'reaction', month: '2026-07' },
+    { daySlot: 4, japanese: 'それ前も言ってたよね', english: [
+        "you said that before, right?",
+        "wait, you mentioned that before, right?",
+        "didn't you tell me the exact same thing last time we hung out?",
+        "heard that one already, yeah?"
+    ], context: "「言ってたよね」の確認はright?/yeah?のタグで締める。didn't you〜?の否定疑問も「〜だよね」を作る。日本語は「よね」一語で確認するが、英語は文末タグや否定疑問という別パーツで担う。確認=タグの会話武器。", category: 'reaction', month: '2026-07' },
+    { daySlot: 4, japanese: 'まあ人それぞれだよね', english: [
+        "to each their own",
+        "I mean, to each their own, right?",
+        "everyone's different, there's no point arguing about it really",
+        "different strokes, you know"
+    ], context: "「人それぞれ」を英語はto each their ownという固定句で言う。「各自に各自のものを」という古い言い回し。different strokes(for different folks)も同義の慣用句。日本語の達観をそのまま訳さず、英語は定型句で受ける文化OS。", category: 'opinion', month: '2026-07' },
+    { daySlot: 4, japanese: '今度ゆっくり話そ', english: [
+        "let's catch up properly",
+        "let's catch up properly sometime soon",
+        "we should grab a drink and actually catch up, not just texting",
+        "real talk soon, yeah?"
+    ], context: "「ゆっくり話す」を英語はcatch up properlyと言う。catch upは近況に追いつく句動詞、properly=「ちゃんと」の小語で深い会話を示す。日本語は「ゆっくり」と速度で表すが、英語は追いつく比喩＋副詞で質を表す。", category: 'suggestion', month: '2026-07' },
+
+    // ── 2026-07 Day 5 (スマホ・ネット・SNS) ──
+    { daySlot: 5, japanese: '通知うざい', english: [
+        "notifications are killing me",
+        "these notifications are killing me",
+        "my phone won't stop buzzing, I'm turning all of this off",
+        "muting everything, done"
+    ], context: "「うざい」を英語はkilling meと言う。通知が自分を殺してくるという誇張の擬人化メタファー。日本語は「うざい」と形容詞だが、英語はnotifications are killing meと物を主語に立てて攻撃させる。物に主語と動作を持たせる骨格。", category: 'reaction', month: '2026-07' },
+    { daySlot: 5, japanese: 'ちょっとスマホ見すぎた', english: [
+        "too much screen time",
+        "I've had way too much screen time today",
+        "I just lost two hours scrolling and I have no idea what I even saw",
+        "phone's glued to my hand"
+    ], context: "「見すぎた」を英語はscroll(指で流す)やglued(糊付け)で言う。glued to my handは手にスマホが接着された比喩。lost two hoursは時間を物のように失う。日本語は「見る」だが英語は具体動作scrollと物理比喩で描く。", category: 'reaction', month: '2026-07' },
+    { daySlot: 5, japanese: '既読つけて返してない', english: [
+        "I left them on read",
+        "I left them on read by accident",
+        "I saw it and just totally forgot to reply, that's so bad of me",
+        "read it, never replied, oops"
+    ], context: "「既読スルー」を英語はleave on readと言う。「読んだ状態に放置する」句動詞leave＋on read。日本語は「既読つけて返さない」と二動作だが、英語はleave on readで一塊の句動詞にする。状態に置き去る動詞leaveの使い方。", category: 'reaction', month: '2026-07' },
+    { daySlot: 5, japanese: 'それバズってたやつ', english: [
+        "that's the one that blew up",
+        "oh, that's the post that blew up",
+        "that's the video everyone was sharing, it got like a million views",
+        "yeah, that went viral"
+    ], context: "「バズる」を英語はblow upやgo viralと言う。blow up=爆発する、viral=ウイルスのように広がるメタファー。日本語の「バズる」も英語viralの輸入。that's the one that〜と関係詞で「〜したやつ」を後ろから組む骨格。", category: 'reaction', month: '2026-07' },
+    { daySlot: 5, japanese: 'あとで見るわ', english: [
+        "I'll watch it later",
+        "I'll get to it later, I promise",
+        "I'm gonna save it and actually watch it when I have time",
+        "saving it for later"
+    ], context: "「あとで」を英語はlaterやget to itで言う。get to it=「それに辿り着く＝手をつける」の万能動詞get。gonnaはgoing toの圧縮音。日本語は「あとで見る」だが英語はsave＋get toと動詞を分けて意思を見せる。動詞getの広さ。", category: 'reaction', month: '2026-07' },
+    { daySlot: 5, japanese: '充電やばい', english: [
+        "my battery's dying",
+        "my battery is dying, give me a sec",
+        "I'm down to five percent, I need to find a charger fast",
+        "phone's about to die"
+    ], context: "「充電やばい」を英語はbattery's dyingと言う。電池が死にかけるという擬人化メタファー。日本語は「やばい」で状況を丸めるが、英語はbattery is dying/about to dieと物を主語にして死を当てる。物に命を与える文化OS。", category: 'reaction', month: '2026-07' },
+    { daySlot: 5, japanese: 'スクショ送るね', english: [
+        "I'll send you a screenshot",
+        "hold on, I'll screenshot it for you",
+        "let me grab a screenshot and send it so you can see what I mean",
+        "screenshotting it now"
+    ], context: "「スクショ」を英語はscreenshotと名詞でも動詞でも使う。I'll screenshot itと動詞化するのが英語の癖。grabは「サッと掴む＝撮る」の万能動詞。日本語は「送る」と運ぶ動作だが、英語は撮る動作screenshot自体を動詞にする。", category: 'request', month: '2026-07' },
+    { daySlot: 5, japanese: 'フォロー外そうかな', english: [
+        "thinking of unfollowing",
+        "I'm kind of thinking of unfollowing them",
+        "their posts have just been annoying lately, might unfollow honestly",
+        "unfollow incoming, maybe"
+    ], context: "「フォロー外す」を英語はunfollowと一語で言う。接頭辞un-で動作を反転させる英語の造語力。kind ofの小語が「かな」の迷いを拾う。日本語は「外す」と物理動作だが、英語はfollowにunを足して関係の解除を一語化する。", category: 'opinion', month: '2026-07' },
+    { daySlot: 5, japanese: 'これ詐欺っぽくない？', english: [
+        "this looks like a scam, right?",
+        "wait, doesn't this look like a scam?",
+        "I'm pretty sure this is a phishing link, do not click on that",
+        "smells like a scam, yeah?"
+    ], context: "「詐欺っぽい」を英語はlooks like/smells like a scamと言う。smells like=「臭う＝怪しい」の嗅覚メタファー。right?/doesn't this〜?のタグや否定疑問で「〜じゃない？」を作る。会話武器のタグと感覚の比喩の合わせ技。", category: 'opinion', month: '2026-07' },
+    { daySlot: 5, japanese: 'ちょっとデジタルデトックスする', english: [
+        "doing a digital detox",
+        "I'm gonna do a little digital detox",
+        "I need to log off for a few days, my brain is completely fried",
+        "going offline for a bit"
+    ], context: "「デトックス」やfriedで言う。brain is fried=「脳が揚がってる＝燃え尽きた」の料理メタファー。log offは「ログを切る＝離れる」句動詞。日本語は「デトックス」と借用語だが英語は離脱動作log offや燃え尽き比喩で具体化する。", category: 'suggestion', month: '2026-07' },
+
+    // ── 2026-07 Day 6 (疲れ・眠い・体力) ──
+    { daySlot: 6, japanese: 'もう限界', english: [
+        "I'm done",
+        "I'm completely done for today",
+        "I've got nothing left in the tank, I'm calling it",
+        "running on empty"
+    ], context: "「限界」をI'm doneで言う。doneは「焼き上がった＝もう完了」の調理メタファー。nothing left in the tankは車のガス欠で、体＝エンジン。英語は気力切れを燃料や調理の物理イメージで描く。日本語の「限界」は抽象、英語は具体。メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 6, japanese: 'クタクタ', english: [
+        "I'm wiped",
+        "I'm totally wiped out",
+        "I'm so wiped I can barely keep my eyes open",
+        "drained, no joke"
+    ], context: "「クタクタ」はwiped。wipe(拭き取る)+outで「自分が拭き消された」絵。日本語の擬態語は音、英語は動詞の物理メタファーで疲れを出す。drainedも「水が抜けた」イメージ。同じ疲れでも英語は必ず具体的な絵にする。メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 6, japanese: '眠すぎる', english: [
+        "I'm so sleepy",
+        "I can barely keep my eyes open",
+        "I keep nodding off, I really need to lie down",
+        "fading fast"
+    ], context: "「眠い」を状態じゃなく動作で出すのが英語。keep my eyes openやnodding off(コクッと落ちる)で体の挙動を描く。日本語は「眠い」一語で済むが、英語は主語I+動詞で体が何してるかを必ず言う。骨格＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 6, japanese: '今日はもう寝る', english: [
+        "I'm gonna crash",
+        "I'm just gonna crash early tonight",
+        "I'm calling it a night, I can't keep my eyes open anymore",
+        "early night for me"
+    ], context: "「寝る」をcrashで言う。crash(衝突)=ベッドに倒れ込む勢い。gonnaはgoing toの音の省略で、口だと必ずこうなる。call it a nightは「今夜はこれで打ち止め」の定型。寝るだけで英語はこんなに物理的。音＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 6, japanese: '体力がもたない', english: [
+        "I can't keep up",
+        "I just can't keep up anymore",
+        "My body can't keep up with what my schedule wants from me",
+        "out of gas"
+    ], context: "「体力がもたない」はkeep up(ついていく)で出す。日本語は「体力」という名詞が主役、英語はI can't keep upと動詞で動きを描く。My bodyを主語にして体を擬人化するのも英語っぽい。骨格＋文化OS(擬人化)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 6, japanese: 'だるい', english: [
+        "I feel sluggish",
+        "I just feel so sluggish today",
+        "I've got zero energy, everything feels like a chore",
+        "heavy, kind of off"
+    ], context: "「だるい」はsluggish。slug(ナメクジ)から来た「のろい」形容詞で、体が重い感覚を生き物に例える。日本語の「だるい」は感覚そのもの、英語は必ずfeel+形容詞の骨格に乗せる。kind ofは「なんか」のぼかし小語。小語＋骨格。", category: 'reaction', month: '2026-07' },
+    { daySlot: 6, japanese: '寝たりない', english: [
+        "I didn't sleep enough",
+        "I'm running on like four hours of sleep",
+        "I barely slept, I'm dragging myself around all day",
+        "way underslept"
+    ], context: "「寝たりない」をrunning on (four hours)で言う。run on=その燃料で動いてる、で睡眠を燃料扱い。日本語は「足りない」と量を否定、英語は「何時間で走ってる」と稼働状態で出す。dragging myselfは体を引きずるメタファー。メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 6, japanese: 'ちょっと休ませて', english: [
+        "Let me rest",
+        "Let me just sit for a sec",
+        "Can you give me five minutes? I need to catch my breath",
+        "just need a breather"
+    ], context: "「休ませて」はLet me rest。日本語の「〜させて」の許可ニュアンスがlet meにそのまま乗る。catch my breath(息をつかまえる)は休憩の定番メタファー。breatherも「ひと息」。頼みは命令形letで軽く出すのが英語。会話武器(hedge)＋request。", category: 'request', month: '2026-07' },
+    { daySlot: 6, japanese: '今日は無理しない', english: [
+        "I'm taking it easy",
+        "I'm just taking it easy today",
+        "I'm not pushing myself today, I'll deal with the rest tomorrow",
+        "going slow on purpose"
+    ], context: "「無理しない」はtake it easy。take(取る)の万能動詞でeasyを掴む形。日本語は「無理しない」と否定だが、英語はtake it easyと肯定で「楽を選ぶ」と言う。push myselfも「自分を押す」体の絵。動詞＋メタファー。", category: 'opinion', month: '2026-07' },
+    { daySlot: 6, japanese: '正直しんどい', english: [
+        "Honestly, I'm beat",
+        "Not gonna lie, I'm pretty beat",
+        "I'm not gonna lie, I'm completely beat and just want to lie down",
+        "wiped, honestly"
+    ], context: "「正直しんどい」のnot gonna lie(嘘じゃなく)は会話の前置き武器。日本語の「正直」をそのまま会話のクッションにする。beatは「叩きのめされた」過去分詞で疲労のメタファー。本音を言う前に一枚かますのが英語の会話術。会話武器(filler)。", category: 'filler', month: '2026-07' },
+
+    // ── 2026-07 Day 7 (予定・約束・スケジュール) ──
+    { daySlot: 7, japanese: '予定ある？', english: [
+        "You free?",
+        "Are you free this weekend?",
+        "Do you have anything going on, or are you around?",
+        "you around?"
+    ], context: "「予定ある？」をYou free?で出す。日本語は「予定」という名詞で聞くが、英語はfree(空いてる)という状態を主語youで聞く。疑問でもdoを省いてYou free?と上げ調子で済むのが口語。going onは「進行中の事」のメタファー。骨格＋音。", category: 'request', month: '2026-07' },
+    { daySlot: 7, japanese: '空けとくね', english: [
+        "I'll keep it open",
+        "I'll keep that day open for you",
+        "I'll block off the afternoon so we can hang",
+        "it's all yours"
+    ], context: "「空けとく」はkeep it open。日本語の「空ける」を、英語は「openの状態をkeepする」と保持の動詞で出す。block offは「枠を確保する」予定管理の定番句動詞。時間を物理的な枠として扱うのが英語。動詞＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 7, japanese: 'リスケしていい？', english: [
+        "Can we reschedule?",
+        "Can we push it to next week?",
+        "Something came up, can we move it to another day?",
+        "maybe bump it?"
+    ], context: "「リスケ」はpush(押す)やmove(動かす)で出す。予定を物体みたいに前後にずらす感覚。Something came up(何かが出てきた)は理由をぼかす定型句で、主語をsomethingにして自分のせいにしない。文化OS＋動詞。", category: 'request', month: '2026-07' },
+    { daySlot: 7, japanese: '何時にする？', english: [
+        "What time works?",
+        "What time works for you?",
+        "Does two o'clock work, or is later better?",
+        "you pick the time"
+    ], context: "「何時にする？」をWhat time works?で出す。日本語は人が「する」が主語、英語はtimeが「works(うまくいく)」と時間を擬人化して主語にする。これが英語の確認の型。worksは「都合が合う」の鉄板動詞。文化OS(擬人化)。", category: 'request', month: '2026-07' },
+    { daySlot: 7, japanese: '忘れてた', english: [
+        "It slipped my mind",
+        "Sorry, it totally slipped my mind",
+        "I completely forgot, it just slipped my mind with everything going on",
+        "blanked on it"
+    ], context: "「忘れてた」をslip my mind(心から滑り落ちた)で出す。日本語は「忘れた」と自分が主語、英語はitを主語にして「予定の方が勝手に滑った」とする。自分のミスを物のせいにする英語の逃げ方。骨格(dummy)＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 7, japanese: 'たぶん行ける', english: [
+        "I should be able to make it",
+        "Yeah, I should be able to make it",
+        "I'm pretty sure I can make it, but let me double-check first",
+        "probably good"
+    ], context: "「行ける」はmake it。make(作る)の万能動詞で「たどり着く・間に合う」を表す。日本語の「行く」より英語はmake itで「やり遂げる」感を込める。should beは「たぶん」のぼかし。確約を避けるhedge。動詞＋会話武器。", category: 'reaction', month: '2026-07' },
+    { daySlot: 7, japanese: '予定詰まってる', english: [
+        "I'm slammed",
+        "My week is totally slammed",
+        "I'm completely booked this week, I barely have a free hour",
+        "back-to-back all day"
+    ], context: "「詰まってる」はslammed(叩きつけられた)やbooked(予約で埋まった)。日本語の「詰まる」を、英語は殴られる・本のページが埋まるメタファーで出す。back-to-backは予定が背中合わせに連続する絵。多忙を全部物理イメージに。メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 7, japanese: 'ドタキャンごめん', english: [
+        "Sorry for bailing",
+        "Sorry for bailing last minute",
+        "I'm so sorry to bail on you like this at the last minute",
+        "my bad, total flake"
+    ], context: "「ドタキャン」はbail(船から水をかき出す→逃げる)。約束から飛び降りるイメージの句動詞。last minute(最後の一分)で「土壇場」を時間で言う。flakeは「すぐ予定を反故にする人」。約束破りも英語は動作の絵で出す。動詞＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 7, japanese: 'また連絡するね', english: [
+        "I'll text you",
+        "I'll text you the details later",
+        "Let me check my schedule and I'll get back to you tonight",
+        "talk soon"
+    ], context: "「連絡する」を具体動詞textで出すのが英語。日本語は「連絡」と抽象だが、英語はtext/call/messageと手段を名指す。get back to you(あなたに戻る)は「折り返す」の定番句動詞。連絡＝物理的に相手に戻る絵。動詞＋骨格。", category: 'reaction', month: '2026-07' },
+    { daySlot: 7, japanese: 'とりあえず仮で入れとく', english: [
+        "Let's pencil it in",
+        "Let's just pencil it in for now",
+        "I'll pencil you in for Friday, but we can move it if something comes up",
+        "tentative for now"
+    ], context: "「仮で入れる」はpencil in。鉛筆=消せる、だから「仮予約」。日本語の「仮」のニュアンスを筆記具のメタファーで出す英語が秀逸。for nowは「とりあえず」の定番小語。確定はペン、仮は鉛筆という文化。メタファー＋小語。", category: 'suggestion', month: '2026-07' },
+
+    // ── 2026-07 Day 8 (文句・グチ・イライラ) ──
+    { daySlot: 8, japanese: 'もううんざり', english: [
+        "I'm fed up",
+        "I'm so fed up with this",
+        "I'm completely fed up, I can't deal with this anymore",
+        "over it, done"
+    ], context: "「うんざり」はfed up。feed(食わせる)の過去分詞で「もう食わされすぎて満腹」のメタファー。over itは「その上を越えた＝もう超えた」感覚。日本語の「うんざり」は感情そのもの、英語は満腹や通過の物理イメージで出す。メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 8, japanese: 'マジでイライラする', english: [
+        "It's so annoying",
+        "This is really getting on my nerves",
+        "It's driving me up the wall, I can't focus on anything",
+        "ugh, so irritating"
+    ], context: "「イライラ」はget on my nerves(神経の上に乗る)やdrive me up the wall(壁まで追い上げる)。日本語の擬態語を、英語は神経や壁を使った物理イメージで出す。主語はitやthisで「物の方が自分をイラつかせる」とする。文化OS＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 8, japanese: 'なんでいつもこうなる', english: [
+        "Why does this always happen?",
+        "Why does this always happen to me?",
+        "Why is it that every single time, things end up going wrong like this?",
+        "of course it does"
+    ], context: "「なんでこうなる」は疑問にdo-supportが要る。Why does this happen?とdoesを足すのが英語の骨格。日本語は語尾だけで疑問になるが英語は助動詞が必須。of course it doesは皮肉の決め台詞。骨格(do-support)＋会話武器。", category: 'reaction', month: '2026-07' },
+    { daySlot: 8, japanese: 'ありえないんだけど', english: [
+        "This is unbelievable",
+        "This is actually unbelievable",
+        "I can't believe this is happening, it makes no sense at all",
+        "no way, seriously?"
+    ], context: "「ありえない」はunbelievable。日本語は「ありえ・ない」と存在を否定、英語はbelieve(信じる)を否定して「信じられない」と認知で出す。actuallyは「マジで」の強調小語。事の有無じゃなく信じる側で語るのが英語。小語＋骨格。", category: 'reaction', month: '2026-07' },
+    { daySlot: 8, japanese: '何回言わせるの', english: [
+        "How many times do I have to say it?",
+        "How many times do I have to say this?",
+        "Seriously, how many times do I have to tell you the same thing?",
+        "I've said this before"
+    ], context: "「言わせるの」を英語はhave to say(言わなきゃならない)と自分主語で出す。日本語の「させる」使役が、英語ではI have toの義務に化ける。視点が相手から自分へ移るのが面白い。do I have toの語順も骨格の肝。骨格＋文化OS。", category: 'reaction', month: '2026-07' },
+    { daySlot: 8, japanese: 'もう知らない', english: [
+        "I'm done dealing with this",
+        "I'm done dealing with all of it",
+        "Whatever, I'm just gonna let them figure it out themselves",
+        "not my problem"
+    ], context: "「もう知らない」をI'm doneやnot my problemで出す。日本語は「知らない」と認知を切る、英語は「もう関与しない・俺の問題じゃない」と所有で線を引く。deal withは「対処する」の句動詞。突き放しも英語は所有と対処で語る。動詞＋shutdown。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 8, japanese: 'いい加減にして', english: [
+        "Give it a rest",
+        "Come on, give it a rest",
+        "That's enough, can you please just give it a rest?",
+        "knock it off"
+    ], context: "「いい加減にして」はgive it a rest(それに休みを与えろ)やknock it off(叩いて止めろ)。日本語の抽象的な制止を、英語は休みを「与える」物の授受や、叩いて止める動作で出す。命令形で直接ぶつけるのが英語流。動詞＋shutdown。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 8, japanese: '聞いてんの？', english: [
+        "Are you even listening?",
+        "Are you even listening to me?",
+        "Did you hear a single word I just said, or what?",
+        "hello? earth to you"
+    ], context: "「聞いてんの？」のevenが効く。Are you even listening?で「そもそも聞いてすらいるのか」と皮肉を込める。日本語の苛立ちの「の？」をevenが担う。疑問はareの倒置で作る骨格。earth to youは決まり文句。小語＋骨格。", category: 'reaction', month: '2026-07' },
+    { daySlot: 8, japanese: 'は？意味わからん', english: [
+        "Wait, what?",
+        "Hold on, that makes no sense",
+        "I'm sorry, that doesn't make any sense to me at all",
+        "huh? lost me"
+    ], context: "「意味わからん」はmake sense(意味をなす)を否定する。日本語は「わからない」と自分の理解で言うが、英語はitやthatを主語に「それが意味をなさない」と物のせいにする。lost meは「俺を置いてった」迷子メタファー。文化OS＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 8, japanese: 'もういい', english: [
+        "Forget it",
+        "You know what, forget it",
+        "Never mind, it's not even worth talking about anymore",
+        "drop it"
+    ], context: "「もういい」はForget it。日本語は「いい」と肯定の形で諦めるが、英語は「忘れろ」と命令で打ち切る。drop it(落とせ)は話題を手放すメタファー。会話を切る時は英語は動作の命令で締める。You know whatは前置きの小語。動詞＋shutdown。", category: 'shutdown', month: '2026-07' },
+
+    // ── 2026-07 Day 9 (賛成・同意・相槌) ──
+    { daySlot: 9, japanese: 'それな', english: [
+        "Right?",
+        "Right, exactly",
+        "Yeah, that's exactly what I was thinking too",
+        "literally same"
+    ], context: "「それな」はRight?のタグで出す。日本語の共感の一語を、英語は語尾を上げるタグ疑問で「だよね？」と返す。exactlyは「まさに」の同意強調。same(同じ)で「俺も」を一語に圧縮。相槌は英語だとタグと一語で軽快に。会話武器(tag)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 9, japanese: 'たしかに', english: [
+        "Good point",
+        "Yeah, that's a good point",
+        "You know, that's actually a really good point, I hadn't thought of that",
+        "fair enough"
+    ], context: "「たしかに」はGood point。日本語は「確か」と真偽で同意、英語は相手の発言をpoint(論点)という物として「いい点だ」と評価する。fair enough(十分公平)は渋々の納得。同意も英語は相手の言葉を物扱いして褒める。文化OS＋小語。", category: 'reaction', month: '2026-07' },
+    { daySlot: 9, japanese: 'わかるわー', english: [
+        "I feel you",
+        "Oh, I totally feel you",
+        "I know exactly what you mean, I've been there myself",
+        "been there"
+    ], context: "「わかる」をI feel youで出す。日本語は「分かる」と理解だが、英語は「あなたを感じる」と感情で寄り添う。been there(そこに行った)は「俺も経験した」の場所メタファー。共感は英語だと感覚と経験の場所で語る。メタファー＋会話武器。", category: 'reaction', month: '2026-07' },
+    { daySlot: 9, japanese: 'だよね', english: [
+        "Yeah, totally",
+        "Yeah, I totally agree",
+        "That's so true, I was thinking the exact same thing",
+        "for real"
+    ], context: "「だよね」はYeah, totally。日本語の語尾の同意を、英語はYeahの後にtotallyを足して温度を上げる。totallyは「完全に」の強調小語で、口語の相槌に必ず出る。for realは「マジで」。同意は副詞の盛りで熱量を出すのが英語。小語。", category: 'reaction', month: '2026-07' },
+    { daySlot: 9, japanese: 'まあそうだね', english: [
+        "I guess so",
+        "Yeah, I guess so",
+        "I mean, I suppose you're right, when you put it that way",
+        "kind of, yeah"
+    ], context: "「まあそうだね」のI guessが渋々感を出す。guess(推測)で「断言はしないけど」とぼかす。I meanは「ていうか」の前置き小語。日本語の「まあ」のあいまいさを、英語はguessとkind ofのhedgeで再現する。会話武器(hedge)＋小語。", category: 'reaction', month: '2026-07' },
+    { daySlot: 9, japanese: '完全同意', english: [
+        "Couldn't agree more",
+        "I couldn't agree more",
+        "Honestly, I could not agree with you more on that",
+        "one hundred percent"
+    ], context: "「完全同意」はCouldn't agree more(これ以上同意できない)。日本語は「完全に」と程度を足すが、英語は「これ以上は無理＝最大」と否定で最上級を作る。この裏返しの発想が英語的。one hundred percentも数字で全肯定。骨格＋メタファー。", category: 'opinion', month: '2026-07' },
+    { daySlot: 9, japanese: 'まさにそれ', english: [
+        "That's exactly it",
+        "Yeah, that's exactly it",
+        "That is exactly what I've been trying to say this whole time",
+        "nailed it"
+    ], context: "「まさにそれ」はThat's exactly it。日本語の指示語「それ」をthat's itと骨格に乗せる。nailed it(釘を打ち込んだ)は「ドンピシャ言い当てた」メタファー。的中を釘打ちで出すのが英語。dummyのitが効いてる。骨格＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 9, japanese: 'いいね、それ', english: [
+        "I like that",
+        "Yeah, I like that idea",
+        "Oh, I really like that, let's go with it",
+        "I'm into it"
+    ], context: "「いいね、それ」はI like that。日本語は「いい」と評価を投げるが、英語は必ずI(主語)+like(動詞)+that(目的語)のSVOで「俺がそれを好む」と形にする。go with(一緒に行く)は採用の句動詞。賛成も主語必須が英語。骨格＋動詞。", category: 'reaction', month: '2026-07' },
+    { daySlot: 9, japanese: 'うんうん、で？', english: [
+        "Right, and then?",
+        "Yeah, and then what?",
+        "Okay, I'm with you, so what happened after that?",
+        "go on"
+    ], context: "「うんうん、で？」の相槌をRight, and then?で出す。日本語は「で？」一語で続きを促すが、英語はand then(それから)と接続詞を足して話を引き出す。I'm with you(一緒にいる)は「ついていけてる」の相槌。go onは「続けて」。骨格＋会話武器。", category: 'filler', month: '2026-07' },
+    { daySlot: 9, japanese: 'たしかにそれはある', english: [
+        "Yeah, there's that",
+        "I mean, yeah, there's that",
+        "Well, that's a fair point, there's definitely some truth to that",
+        "true, true"
+    ], context: "「それはある」はthere's that。日本語の「ある」をdummy thereの存在構文で出す。英語は「そういう側面が存在する」とthere構文で認める。I meanは前置きの小語。部分的な同意もthereの骨格でさらっと。骨格(there)＋小語。", category: 'reaction', month: '2026-07' },
+
+    // ── 2026-07 Day 10 (断る・拒否・パス) ──
+    { daySlot: 10, japanese: '今日はやめとく', english: [
+        "I'll pass",
+        "I think I'll pass today",
+        "I'm gonna sit this one out, maybe next time",
+        "not tonight"
+    ], context: "「やめとく」はpass(通り過ぎる)やsit out(座って参加しない)。日本語の「やめる」を、英語はカードを見送る・席に座ったままという動作の句動詞で出す。next time(次回)で角を立てない。断りも英語は動作の絵で軽く。動詞＋shutdown。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 10, japanese: 'ちょっと無理かな', english: [
+        "I don't think I can",
+        "Yeah, I don't think I can make it",
+        "I'd love to, but I really don't think I can swing it this time",
+        "can't, sorry"
+    ], context: "「無理かな」はI don't think I can。日本語は「無理」と直接だが、英語はI don't think(思わない)と一枚クッションを置いて柔らかく断る。I'd love toは「行きたいけど」の前置きhedge。swing it(うまくやりくる)も口語。会話武器(hedge)。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 10, japanese: '気が乗らない', english: [
+        "I'm not feeling it",
+        "I'm just not feeling it today",
+        "I'm not really in the mood for it right now, to be honest",
+        "not really up for it"
+    ], context: "「気が乗らない」はnot feeling it。日本語は「気」が乗る・乗らないと気を主語にするが、英語はI'm not feeling itと自分がitを感じてないとする。up for it(それに向かう気)も乗り気の句動詞。気分は英語だと自分が感じる対象。メタファー＋動詞。", category: 'reaction', month: '2026-07' },
+    { daySlot: 10, japanese: 'やんわり断りたい', english: [
+        "I'll have to pass on that",
+        "I'm gonna have to pass on that one",
+        "That sounds great, but I'm gonna have to take a rain check this time",
+        "maybe another time"
+    ], context: "「やんわり断る」はhave to pass(パスせざるを得ない)。have toで「俺のせいじゃなく仕方なく」を演出する英語の逃げ。That sounds greatと一度褒めてからbutで返すのが定石。rain checkは「次回への振替券」の定番。会話武器(hedge)＋動詞。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 10, japanese: 'それはちょっと…', english: [
+        "Eh, I don't know about that",
+        "Hmm, I'm not so sure about that",
+        "I don't know, that's kind of pushing it for me, to be honest",
+        "yeah, no"
+    ], context: "「それはちょっと」はI don't know about that。日本語は語尾を濁すが、英語はI don't knowと不確かさを前面に出して婉曲に拒否する。pushing it(押しすぎ)は「やりすぎ」のメタファー。yeah, noは「いやそれは無し」の口語定番。会話武器(hedge)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 10, japanese: '今はいい', english: [
+        "I'm good",
+        "Nah, I'm good for now",
+        "I'm all set, thanks though, maybe later",
+        "all good, thanks"
+    ], context: "「今はいい」はI'm good。日本語の「いい」が断りなのと同じで、英語もI'm good(俺は足りてる)で「結構です」を出す。all setは「準備万端＝もう要らない」。thoughは文末で「でもね」と感謝を添える小語。同意のいいと断りのいいを使い分け。小語。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 10, japanese: 'パスで', english: [
+        "Hard pass",
+        "Yeah, that's a hard pass for me",
+        "I'm gonna have to give that one a hard pass, not my thing",
+        "I'll sit this out"
+    ], context: "「パスで」はhard pass。passに hard(固い)を足して「絶対無理」と強める。日本語の「パス」がそのまま英語でも通じるが、強度はhard/softで足す。not my thing(俺の物じゃない)は「趣味じゃない」の所有メタファー。文化OS＋小語。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 10, japanese: '誘ってくれて嬉しいけど', english: [
+        "Thanks for the invite, but",
+        "I really appreciate the invite, but",
+        "I appreciate you thinking of me, but I just can't make it this time",
+        "thanks though"
+    ], context: "「誘ってくれて嬉しいけど」はappreciate the inviteで出す。日本語の「嬉しい」を、英語はappreciate(価値を認める)と感謝の動詞で出す。thinking of me(俺を思ってくれた)も定番。butの前に必ず感謝を置く断りの作法。動詞＋会話武器。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 10, japanese: 'また今度ね', english: [
+        "Rain check?",
+        "Can I take a rain check?",
+        "Let's do it another time, I promise I'll make it next round",
+        "next time for sure"
+    ], context: "「また今度」はrain check。元は試合中止時の振替券で、断りつつ「次は行く」と含ませる定番メタファー。日本語の「また今度」の社交辞令的やわらかさにぴったり。next round(次の回)も口語。延期を券のメタファーで出すのが英語。メタファー。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 10, japanese: '勘弁して', english: [
+        "Please, not that",
+        "Oh come on, give me a break",
+        "Come on, cut me some slack here, I really can't take on more",
+        "spare me"
+    ], context: "「勘弁して」はgive me a break(休みをくれ)やcut me some slack(ロープを緩めて)。日本語の懇願を、英語は休憩や張ったロープを緩めるメタファーで出す。take on(引き受ける)も句動詞。負担を物理的な張りで表すのが英語。メタファー＋動詞。", category: 'request', month: '2026-07' },
+
+    // ── 2026-07 Day 11 (頼む・お願いする) ──
+    { daySlot: 11, japanese: 'ちょっと手伝って', english: [
+        "give me a hand",
+        "could you give me a hand real quick",
+        "any chance you could help me out with this for a sec",
+        "throw me a hand here"
+    ], context: "「手伝って」はgive me a hand。手を「与える」物の受け渡しメタファー。help me outのoutは「困りから引っ張り出す」句動詞ニュアンス。日本語は動詞一語、英語は手という物や句動詞で立体化する。メタファー＋句動詞。", category: 'request', month: '2026-07' },
+    { daySlot: 11, japanese: 'これお願いできる？', english: [
+        "can you do this",
+        "could you take care of this for me",
+        "would you mind handling this one, I'm swamped",
+        "this one's yours, yeah?"
+    ], context: "依頼の丁寧さは助動詞の階段で出す。can<could<would you mindの順に下がるほど丁寧。日本語は「〜できる？」「〜してもらえる？」と動詞を盛るが、英語は助動詞を替えて温度調整する。骨格＝助動詞の選択が敬意。", category: 'request', month: '2026-07' },
+    { daySlot: 11, japanese: 'ついでにこれも頼んでいい？', english: [
+        "while you're at it",
+        "could you grab this too while you're at it",
+        "since you're already on it, mind doing this one as well",
+        "and this one too, if you can"
+    ], context: "「ついでに」はwhile you're at it。「あなたがそこに居る間に」と相手の状態を空間で描く。日本語は副詞一個で済むが、英語はwhile節で状況をまるごと建てる。骨格＝接続節で文脈を抱える発想。", category: 'request', month: '2026-07' },
+    { daySlot: 11, japanese: '無理ならいいんだけど', english: [
+        "no worries if not",
+        "totally fine if you can't",
+        "if you're busy just say so, no pressure at all",
+        "no biggie either way"
+    ], context: "断りやすくする保険がno pressure / no worries if not。英語は頼んだ後に逃げ道を言葉で明示するのが礼儀。日本語の「無理ならいい」と同じ気遣いだが、定型句として用意されてる。会話武器＝ヘッジで圧を抜く。", category: 'request', month: '2026-07' },
+    { daySlot: 11, japanese: '悪いんだけどさ', english: [
+        "sorry to bug you",
+        "hey, sorry to bother you but",
+        "I hate to ask but could you do me a quick favor",
+        "real quick, sorry"
+    ], context: "前置きのbug youは「虫みたいにまとわりつく」擬人化メタファー。do me a favorのfavorは「親切」という物を一個もらうイメージ。日本語の「悪いんだけど」を、虫や物の授受で立体化する。メタファー＋文化OS。", category: 'request', month: '2026-07' },
+    { daySlot: 11, japanese: 'ちょっと聞いていい？', english: [
+        "can I ask you something",
+        "quick question for you",
+        "mind if I pick your brain for a second",
+        "got a sec?"
+    ], context: "pick your brainは「脳をつつく」物理メタファー。知恵を物として取り出す発想。日本語の「聞いていい？」が英語では脳をいじる絵になる。あとgot a secは Have you got の have が音で消えた圧縮。メタファー＋音。", category: 'request', month: '2026-07' },
+    { daySlot: 11, japanese: '代わりにやっといて', english: [
+        "cover for me",
+        "can you cover this for me",
+        "could you take over this part while I'm out",
+        "you got this one?"
+    ], context: "cover / take overは句動詞で「肩代わり」を表す。coverは「覆う」、take overは「引き取り上へ」と動きで描く。日本語は「代わりに」副詞だが、英語は句動詞の方向感で誰が何を引き受けるか示す。動詞＝句動詞の威力。", category: 'request', month: '2026-07' },
+    { daySlot: 11, japanese: 'みんなに聞いといて', english: [
+        "ask around",
+        "can you ask around about it",
+        "just check with a few people and see what they think",
+        "float it to the team"
+    ], context: "ask aroundのaroundは「周囲をぐるっと」聞いて回る軌跡。floatは「案を浮かべる」メタファー。日本語の「みんなに」を、英語はaroundの空間移動で表す。一語の副詞句動詞で行動範囲を描くのがミソ。動詞＋メタファー。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 11, japanese: 'これ確認しといてくれる？', english: [
+        "double-check this",
+        "can you double-check this for me",
+        "could you just look this over before I send it out",
+        "give it a once-over, yeah?"
+    ], context: "「確認して」はdouble-check / look over / once-over。lookにoverを足して「上をなめる様に見る」、once-overは「一回ざっと」という名詞化。日本語の動詞一語を、英語は句動詞や名詞句で粒度を出す。動詞＋小語over。", category: 'request', month: '2026-07' },
+    { daySlot: 11, japanese: 'やっぱ自分でやるわ', english: [
+        "never mind, I'll do it",
+        "actually, I'll just handle it myself",
+        "you know what, don't worry about it, I got it",
+        "scratch that, my bad"
+    ], context: "撤回はnever mind / scratch that。scratch thatは「それを線で消す」物理メタファー。actuallyは前言撤回の合図、I got itは I have got it の圧縮。日本語の「やっぱ」一語を英語は複数の小語で組む。小語＋音。", category: 'shutdown', month: '2026-07' },
+    // ── 2026-07 Day 12 (提案・誘う) ──
+    { daySlot: 12, japanese: 'ご飯でも行こうよ', english: [
+        "let's grab food",
+        "wanna grab a bite later",
+        "we should go get something to eat one of these days",
+        "food sometime?"
+    ], context: "誘いの定番はgrab。「掴む」だが「軽くサッと食う」の決まり文句。wannaはwant toの音圧縮。日本語の「行こうよ」勧誘を、英語はgrabの軽さで気負わせず誘う。動詞のニュアンス＋音。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 12, japanese: 'こうしたらどう？', english: [
+        "how about this",
+        "what if we did it this way",
+        "maybe we could try doing it like this instead",
+        "or we just do this"
+    ], context: "提案はhow about / what if。what ifは「もし〜だったら」と仮定法で柔らかく投げる。日本語の「どう？」は終助詞一個だが、英語は仮定の節で「あくまで一案」と距離を取る。骨格＝仮定法のクッション。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 12, japanese: '気が向いたらおいでよ', english: [
+        "swing by if you want",
+        "feel free to drop by sometime",
+        "come over whenever you feel like it, no need to plan",
+        "you're always welcome"
+    ], context: "swing by / drop byは「ふらっと寄る」句動詞。byに「通りすがり」感がある。feel free toは「自由に感じて」=遠慮するなの定型。日本語の「気が向いたら」を、英語は自由を許可する言い回しで包む。動詞＋文化OS。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 12, japanese: 'みんなで集まろうよ', english: [
+        "let's all get together",
+        "we should hang out sometime soon",
+        "why don't we all meet up and catch up properly",
+        "get the gang together?"
+    ], context: "get together / meet upは句動詞で「集まる」を動きで描く。hang outは「ぶら下がってだらける」=つるむ。日本語の「集まろう」一語を、英語はtogether/up/outの方向小語で空気感まで変える。動詞＋小語。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 12, japanese: '今度いつ空いてる？', english: [
+        "when are you free",
+        "you got any time this week",
+        "when works for you, I'm pretty flexible on my end",
+        "what's your schedule like?"
+    ], context: "when works for youは「いつがあなたに機能する？」と時間を主語にする擬人化。日本語の「空いてる？」は人主体だが、英語は時間や予定を主語に立てる。骨格＝無生物主語で物事を動かす発想。文化OS＝擬人化。", category: 'request', month: '2026-07' },
+    { daySlot: 12, japanese: 'のんびりしようよ', english: [
+        "let's just chill",
+        "we should just take it easy today",
+        "honestly let's do nothing and just relax for once",
+        "no plans, just hang"
+    ], context: "take it easyは「それを楽に取れ」、itは状況の漠然ダミー。chillは「冷やす」から「まったり」へ転じた音。日本語の「のんびり」副詞を、英語は動詞+ダミーit や俗語で出す。骨格＝ダミーit＋音。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 12, japanese: '試しにやってみない？', english: [
+        "wanna give it a shot",
+        "let's just give it a try",
+        "we could test it out and see how it goes, no harm done",
+        "worth a shot, right?"
+    ], context: "give it a shot/tryは「一発撃つ・一回試す」を物の授与で描く。test outのoutは「外に出して試す」句動詞。日本語の「試しに」副詞が、英語ではshotという弾やa tryという物に化ける。メタファー＋句動詞。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 12, japanese: '気晴らしに出かけよう', english: [
+        "let's get out for a bit",
+        "we should get out of the house for a while",
+        "come on, let's go somewhere and clear our heads a little",
+        "fresh air, let's go"
+    ], context: "clear our headsは「頭を片付ける」掃除メタファー。get outは句動詞で「外へ抜ける」。日本語の「気晴らし」抽象名詞を、英語は頭を物理的に空にする絵で表す。メタファー＋句動詞。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 12, japanese: 'ノリで決めよう', english: [
+        "let's just wing it",
+        "we can figure it out as we go",
+        "honestly let's not plan anything and just see what happens",
+        "play it by ear?"
+    ], context: "wing it / play it by earは「即興でやる」イディオム。play by earは楽譜なしで耳頼り、win*itは翼で飛ぶ。日本語の「ノリで」を英語はダミーit＋イディオムで表す。itが指す中身は曖昧でいい。骨格＝ダミーit。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 12, japanese: 'いつでもいいよ', english: [
+        "whenever works",
+        "any time is fine with me",
+        "I'm easy, you pick whatever day suits you best",
+        "you call it"
+    ], context: "I'm easyは「私は楽な人間=何でもOK」の決まり文句。you call itは「あなたが判定を呼べ」=任せる。日本語の「いつでもいい」を、英語は自分の性格や審判メタファーで言う。会話武器＋メタファー。", category: 'reaction', month: '2026-07' },
+    // ── 2026-07 Day 13 (感情・気持ちを言う) ──
+    { daySlot: 13, japanese: 'マジで嬉しい', english: [
+        "I'm so happy",
+        "this honestly makes my day",
+        "you have no idea how much this means to me right now",
+        "made my whole week"
+    ], context: "makes my dayは「私の一日を作る」=最高の出来事という使役メタファー。出来事を主語に立てて自分を喜ばせる構図。日本語の「嬉しい」は自分が主語だが、英語は出来事を主語に擬人化する。文化OS＝無生物主語。", category: 'reaction', month: '2026-07' },
+    { daySlot: 13, japanese: 'もう限界かも', english: [
+        "I'm done",
+        "I think I've hit my limit",
+        "honestly I'm running on empty, I can't keep going like this",
+        "I'm spent"
+    ], context: "running on emptyは車の燃料計メタファー。I'm spentは「使い果たされた」受動。日本語の「限界」名詞を、英語は燃料切れや消費済みの物理イメージで出す。メタファーで疲労を体外化する発想。", category: 'reaction', month: '2026-07' },
+    { daySlot: 13, japanese: 'なんかモヤモヤする', english: [
+        "something feels off",
+        "I just can't shake this feeling",
+        "I don't know, something about it is kind of bugging me",
+        "it's just nagging at me"
+    ], context: "feels offのoffは「正常からズレてる」小語。can't shakeは「振り払えない」、bug meは「虫が苛む」擬人化。日本語の「モヤモヤ」擬態語を、英語はoffや虫メタファーで具体化する。小語＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 13, japanese: 'ちょっと傷ついた', english: [
+        "that kind of hurt",
+        "that stung a little, honestly",
+        "I mean, that was kind of a low blow, not gonna lie",
+        "ouch, that one landed"
+    ], context: "stungは「刺された」、that landedは「一撃が着弾した」物理メタファー。kind ofは「ちょっと」のヘッジ小語。日本語の「傷ついた」を、英語は刺す・着弾する物理動作で描く。メタファー＋小語kind of。", category: 'reaction', month: '2026-07' },
+    { daySlot: 13, japanese: 'ほっとした', english: [
+        "what a relief",
+        "okay, I can finally breathe",
+        "honestly I was so worried, glad that's over with",
+        "phew, dodged that one"
+    ], context: "can breatheは「やっと息できる」身体メタファー、dodgedは「かわした」回避動作。日本語の「ほっと」擬態語を、英語は呼吸や回避の動きで出す。glad that's overのoverは「終わって上を越えた」小語。メタファー＋小語。", category: 'reaction', month: '2026-07' },
+    { daySlot: 13, japanese: 'テンション上がる', english: [
+        "I'm so pumped",
+        "I'm really hyped about this",
+        "I cannot wait, this is gonna be so good, I can feel it",
+        "let's gooo"
+    ], context: "pumpedは「空気を注入された」、hypedは「煽られた」受動メタファー。日本語の「テンション上がる」は和製英語で通じない。英語は身体に圧やエネルギーを入れられた絵で出す。gonnaは音圧縮。メタファー＋音。", category: 'reaction', month: '2026-07' },
+    { daySlot: 13, japanese: 'なんか寂しいな', english: [
+        "it feels kind of empty",
+        "it's a little quiet without them around",
+        "I don't know, the place just feels different when you're gone",
+        "kinda miss this"
+    ], context: "the place feels emptyは場所を主語にする擬人化。日本語の「寂しい」は人の感情だが、英語は場所や空間を主語にして感情を風景に投影する。without them aroundのaroundは存在の小語。文化OS＝無生物主語。", category: 'reaction', month: '2026-07' },
+    { daySlot: 13, japanese: 'イライラする', english: [
+        "this is so annoying",
+        "it's really getting on my nerves",
+        "I'm trying to stay calm but this is really testing my patience",
+        "ugh, it's grinding on me"
+    ], context: "get on my nervesは「神経の上に乗る」、testing my patienceは「忍耐を試験する」擬人化メタファー。日本語の「イライラ」擬態語を、英語は神経や忍耐を主語/対象にした物理動作で描く。メタファー＋擬人化。", category: 'reaction', month: '2026-07' },
+    { daySlot: 13, japanese: '別にどうでもいい', english: [
+        "I don't really care",
+        "honestly it makes no difference to me",
+        "do whatever you want, it's not like it matters to me anyway",
+        "couldn't care less"
+    ], context: "couldn't care lessは「これ以上気にしようがない=最高に無関心」の定型。it doesn't matterのitはダミー主語。日本語の「どうでもいい」を、英語は仮定法やダミーitで突き放す。骨格＝ダミーit＋会話武器。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 13, japanese: 'なんとも言えない気分', english: [
+        "I have mixed feelings",
+        "I don't really know how to feel about it",
+        "part of me is glad but part of me is kind of sad, you know",
+        "it's complicated"
+    ], context: "mixed feelingsは感情を「混ざった物」と捉える物質メタファー。part of me … part of meは自分を分割して語る構文。日本語の「なんとも言えない」を、英語は感情を分けたり混ぜたりして表す。メタファー＋骨格の構文。", category: 'reaction', month: '2026-07' },
+    // ── 2026-07 Day 14 (失敗・ミス・言い訳) ──
+    { daySlot: 14, japanese: 'やらかした', english: [
+        "I messed up",
+        "yeah, I really messed up this time",
+        "okay that was completely my fault, I dropped the ball on this one",
+        "I blew it"
+    ], context: "mess upのupは「ぐちゃぐちゃに完了」、drop the ballは「ボールを落とす=ミス」野球メタファー。日本語の「やらかした」一語を、英語は句動詞やスポーツ比喩で立体化する。動詞＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 14, japanese: 'うっかり忘れてた', english: [
+        "it totally slipped my mind",
+        "sorry, it completely slipped my mind",
+        "I meant to do it but it just slipped my mind, my bad",
+        "it slipped right past me"
+    ], context: "slipped my mindは「記憶から滑り落ちた」物理メタファー。日本語は「私が忘れた」と自分が主語だが、英語はitが主語で「向こうが勝手に滑った」と責任を逃がす。文化OS＝無生物主語で言い訳を作る。", category: 'reaction', month: '2026-07' },
+    { daySlot: 14, japanese: 'わざとじゃないって', english: [
+        "I didn't mean to",
+        "I swear I didn't do it on purpose",
+        "come on, it was an accident, I would never do that on purpose",
+        "totally unintentional"
+    ], context: "didn't mean toは「そう意図してなかった」、on purposeは「目的の上で=故意」。日本語の「わざと」副詞を、英語はmean(意図する)とpurpose(目的)の対比で出す。骨格＝意図の有無を動詞で明示する。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 14, japanese: 'まあそういう日もあるよ', english: [
+        "it happens",
+        "hey, we all have those days",
+        "don't beat yourself up, everyone messes up once in a while",
+        "happens to the best of us"
+    ], context: "it happensは「そういうことは起こる」とダミーit主語で慰める定型。beat yourself upは「自分を殴る」=自責の句動詞メタファー。日本語の「そういう日もある」を、英語はitの一般化とupで包む。骨格ダミーit＋句動詞。", category: 'reaction', month: '2026-07' },
+    { daySlot: 14, japanese: '完全に油断してた', english: [
+        "I let my guard down",
+        "yeah, I totally let my guard down there",
+        "I got too comfortable and that's exactly when it went wrong",
+        "should've seen it coming"
+    ], context: "let my guard downは「ガードを下げる」ボクシングメタファー。should've seen it comingは「来るのが見えてしかるべきだった」と完了助動詞で後悔。日本語の「油断」を、英語は構えの上下と予見の助動詞で出す。メタファー＋骨格。", category: 'reaction', month: '2026-07' },
+    { daySlot: 14, japanese: 'なんとかするよ', english: [
+        "I'll figure it out",
+        "don't worry, I'll sort it out",
+        "give me a bit and I'll work something out, I always do",
+        "I got this"
+    ], context: "figure out / sort out / work outは句動詞で「解決する」を方向小語outで描く。outは「もつれを外へ解く」イメージ。日本語の「なんとかする」漠然動詞を、英語は3種の句動詞で言い分ける。動詞＝句動詞の使い分け。", category: 'reaction', month: '2026-07' },
+    { daySlot: 14, japanese: '言い訳になっちゃうけど', english: [
+        "not to make excuses, but",
+        "I know this sounds like an excuse, but",
+        "I'm not trying to make excuses here, but there was a lot going on",
+        "for what it's worth"
+    ], context: "前置きのnot to … but は先回りで予防線を張る定型。for what it's worthは「価値がある分だけ言うと」=控えめ前置き。日本語の「言い訳になるけど」を、英語は否定の前置き句で先手を打つ。会話武器＝ヘッジ。", category: 'filler', month: '2026-07' },
+    { daySlot: 14, japanese: 'もう一回やり直すわ', english: [
+        "let me redo it",
+        "I'll just start over from scratch",
+        "okay forget that, let me take another crack at it",
+        "round two"
+    ], context: "from scratchは「引っかき傷=ゼロ地点から」のイディオム、take a crack atは「一撃食らわす=挑戦」。start overのoverは「最初から越え直す」小語。日本語の「やり直す」を、英語はscratchやcrackの物理比喩で。メタファー＋小語。", category: 'reaction', month: '2026-07' },
+    { daySlot: 14, japanese: 'タイミング悪かっただけ', english: [
+        "it was just bad timing",
+        "honestly it was just a bad time, that's all",
+        "nothing wrong with the idea, the timing just happened to be off",
+        "wrong place, wrong time"
+    ], context: "timing was offのoffは「ズレてる」小語。it was bad timingはitダミー主語で原因を時に押し付ける。日本語の「タイミング悪い」を、英語は無生物主語＋offで「自分のせいじゃない」構図にする。骨格ダミーit＋小語off。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 14, japanese: 'ごめん完全に俺のせい', english: [
+        "that's on me",
+        "yeah, that one's totally on me",
+        "no excuses, I take full responsibility for this whole thing",
+        "my bad, all me"
+    ], context: "that's on meは「それは私の上に乗ってる=責任は俺」前置詞onで責任を物理的に背負う。日本語の「俺のせい」を、英語はonという小語ひとつで「肩に乗る」絵にする。小語＋メタファーで責任を体に乗せる発想。", category: 'reaction', month: '2026-07' },
+    // ── 2026-07 Day 15 (家・家事・暮らし) ──
+    { daySlot: 15, japanese: 'ちょっと片付けないと', english: [
+        "I gotta tidy up",
+        "I should clean this place up a bit",
+        "this place is a mess, I really need to get it sorted",
+        "time to declutter"
+    ], context: "tidy up / clean upのupは「完了・きれいに仕上げる」小語。gottaはhave got toの音圧縮。日本語の「片付ける」一語を、英語は動詞+upで「やり切る」感を足す。upは終わりまで持っていく合図。小語up＋音。", category: 'reaction', month: '2026-07' },
+    { daySlot: 15, japanese: 'ゴミ出しといて', english: [
+        "take out the trash",
+        "can you take the trash out for me",
+        "could you take the trash out before you leave this morning",
+        "trash needs to go out"
+    ], context: "take outは句動詞で「外へ持ち出す」。目的語が代名詞ならtake it outと割り込ませる語順がキモ。日本語の「出す」一語を、英語はtake+outで方向を明示する。動詞＝句動詞＋語順ルール。", category: 'request', month: '2026-07' },
+    { daySlot: 15, japanese: '洗濯物溜まってる', english: [
+        "the laundry's piling up",
+        "I've got a ton of laundry to do",
+        "the laundry has been piling up all week and I keep ignoring it",
+        "mountain of laundry"
+    ], context: "piling upは「山積みになる」、mountain of laundryは洗濯物を山に見立てる物量メタファー。日本語の「溜まってる」を、英語は積み上がる・山という物理イメージで出す。家事の憂鬱を景色にする発想。メタファー＋小語up。", category: 'reaction', month: '2026-07' },
+    { daySlot: 15, japanese: '電気つけっぱなしだよ', english: [
+        "you left the light on",
+        "hey, the light's still on in there",
+        "you left the lights on again, that's like the third time today",
+        "lights are on"
+    ], context: "left the light onは「点いた状態で放置した」、onは「作動中」を表す小語。日本語の「つけっぱなし」一語を、英語はleave + on で「ある状態のまま離れる」と分解する。骨格＝leave+状態の構文＋小語on。", category: 'reaction', month: '2026-07' },
+    { daySlot: 15, japanese: '冷蔵庫空っぽじゃん', english: [
+        "the fridge is empty",
+        "there's basically nothing in the fridge",
+        "okay we're completely out of food, I need to do a grocery run",
+        "we're out of everything"
+    ], context: "there's nothing in the fridgeのthereは存在を示すダミー主語。out ofは「在庫が尽きた」小語句。日本語は「空っぽ」と状態を言うが、英語はthere構文や「out of(切れてる)」で在庫を語る。骨格ダミーthere＋小語out of。", category: 'reaction', month: '2026-07' },
+    { daySlot: 15, japanese: 'あとで皿洗うわ', english: [
+        "I'll do the dishes later",
+        "I'll get to the dishes in a bit",
+        "leave them in the sink, I'll deal with them after dinner",
+        "dishes can wait"
+    ], context: "do the dishesは「皿をする」=洗うの定型、deal withは句動詞で「対処する」。dishes can waitは皿を主語にした擬人化。日本語の「洗う」を、英語はdo/deal withや「皿が待てる」で表す。動詞＋擬人化。", category: 'reaction', month: '2026-07' },
+    { daySlot: 15, japanese: 'ちょっと模様替えしたい', english: [
+        "I wanna move things around",
+        "I feel like rearranging the room a bit",
+        "I'm kind of in the mood to switch up the whole layout in here",
+        "time for a change"
+    ], context: "move things aroundのaroundは「あちこち動かす」軌跡、switch upのupは「がらっと変える」。in the mood toは「〜したい気分」の定型。日本語の「模様替え」名詞を、英語は動詞+方向小語で動作に砕く。動詞＋小語。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 15, japanese: '掃除機かけといて', english: [
+        "run the vacuum",
+        "can you vacuum the living room",
+        "could you give the floor a quick vacuum before they get here",
+        "floor needs a vacuum"
+    ], context: "vacuumは名詞が動詞化して「掃除機をかける」。日本語は「掃除機をかける」と道具+動詞だが、英語は道具名そのものを動詞にする。give it a vacuumは「一回かける」を物の授与で表す。骨格＝名詞の動詞化。", category: 'request', month: '2026-07' },
+    { daySlot: 15, japanese: 'なんか家が落ち着く', english: [
+        "home just feels right",
+        "there's no place like home, honestly",
+        "I don't know, being home just makes everything feel okay again",
+        "good to be home"
+    ], context: "home makes everything feel okayは家を主語にする擬人化。there's no place like homeはダミーthere構文の定型。日本語の「落ち着く」自分の感覚を、英語は家を主語に立てて語る。文化OS＝無生物主語＋骨格there。", category: 'reaction', month: '2026-07' },
+    { daySlot: 15, japanese: 'もう寝る準備しよ', english: [
+        "let's wind down",
+        "I'm gonna start getting ready for bed",
+        "I think I'll wind down soon, it's been a long one today",
+        "calling it a night"
+    ], context: "wind downは「ゼンマイを緩める」=リラックスへ向かう句動詞メタファー、calling it a nightは「これを夜と呼ぶ=店じまい」の定型。日本語の「寝る準備」を、英語はゼンマイや判定の比喩で出す。メタファー＋句動詞。", category: 'suggestion', month: '2026-07' },
+
+    // ── 2026-07 Day 16 (通勤・移動・電車) ──
+    { daySlot: 16, japanese: '遅れそう', english: [
+        "I'm running late",
+        "I'm running a little late, sorry",
+        "I got held up so I'm gonna be like ten minutes behind",
+        "be there soon, promise"
+    ], context: "「遅れそう」はrunning late。lateを「走って向かってる最中」と進行形で出すのが英語。日本語は「遅れる」一語、英語はI'm running lateと主語＋進行形で「今まさに遅れつつある」を実況する。骨格＝主語と時制。", category: 'reaction', month: '2026-07' },
+    { daySlot: 16, japanese: '乗り過ごした', english: [
+        "I missed my stop",
+        "ugh, I just missed my stop",
+        "I was on my phone and completely blew past my station",
+        "one stop too far"
+    ], context: "「乗り過ごす」はmiss my stopやblow past。blow pastは「吹っ飛んで通過」する句動詞で勢いを出す。日本語は複合動詞「乗り＋過ごす」だが英語は句動詞で表す。動詞の作り方の違いが出るやつ。", category: 'reaction', month: '2026-07' },
+    { daySlot: 16, japanese: '満員すぎ', english: [
+        "it's packed",
+        "the train's totally packed",
+        "I literally couldn't even raise my arm in there",
+        "sardine mode, no joke"
+    ], context: "「満員」はpacked。packは「ぎゅう詰めにする」物理動作で、その受け身イメージを混雑に流用するメタファー。日本語の「満員」は満ちた状態を名詞で言うが、英語は詰め込まれた絵で見せる。抽象を物理で描く文化OS。", category: 'reaction', month: '2026-07' },
+    { daySlot: 16, japanese: 'ちょっと飛ばすわ', english: [
+        "I'm gonna run",
+        "okay I gotta run for this one",
+        "the doors are closing so I'm just gonna make a dash for it",
+        "go go go"
+    ], context: "「急ぐ」を英語はrun、make a dashと走る動詞で出す。gotta=have got to、gonna=going toの音圧縮も注目。日本語は「急ぐ」一語で済むが英語は具体的に走らせる。音のルールと動詞の体感差。", category: 'reaction', month: '2026-07' },
+    { daySlot: 16, japanese: 'また遅延かよ', english: [
+        "delayed again",
+        "of course it's delayed again",
+        "this line is delayed like every single morning, I swear",
+        "classic"
+    ], context: "「また遅延かよ」のうんざりはof course＋againで出す。皮肉のof courseが会話武器。日本語は「〜かよ」の終助詞で苛立ちを乗せるが、英語は語順と小語で温度を出す。終助詞がない分、of courseやI swearで補う。", category: 'reaction', month: '2026-07' },
+    { daySlot: 16, japanese: '座れたラッキー', english: [
+        "I got a seat",
+        "score, I actually got a seat",
+        "I grabbed the last open seat right before it filled up",
+        "small win"
+    ], context: "「座れた」はI got a seat。getは「手に入れる」万能動詞で、椅子も席もgetで掴む。grabは「ひっつかむ」物理動作の句動詞的使い。日本語は「座れる」可能形だが英語はget/grabで獲得イベントとして言う。get万能の感覚。", category: 'reaction', month: '2026-07' },
+    { daySlot: 16, japanese: 'この辺で降りる？', english: [
+        "should we get off here?",
+        "wanna get off at this stop?",
+        "I think it's faster if we just get off here and walk",
+        "this one or next?"
+    ], context: "「降りる？」はget off。乗り物から「離れて落ちる」句動詞で、電車・バス・自転車はget offが定番。wanna=want toの音圧縮も。日本語は「降りる」一語だが英語はget off/onで乗降を表す。句動詞の方向感。", category: 'request', month: '2026-07' },
+    { daySlot: 16, japanese: 'PASMO切れてた', english: [
+        "my card's empty",
+        "oh great, my card's out of money",
+        "I tapped at the gate and it just yelled at me, totally empty",
+        "gotta top it up"
+    ], context: "「チャージ切れ」はout of money、top it up（補充する）。topは「上まで満たす」句動詞。改札が鳴るのを「yelled at me（怒鳴られた）」と擬人化するのが英語らしい。文化OS＝モノを人みたいに喋らせる。", category: 'reaction', month: '2026-07' },
+    { daySlot: 16, japanese: 'まあ歩くか', english: [
+        "guess I'll walk",
+        "eh, I'll just walk it",
+        "it's only like fifteen minutes so I might as well walk",
+        "walking it is"
+    ], context: "「まあ歩くか」の諦め半分はguess＋just、might as well（どうせなら）で出す。justやmight as wellは「大したことない感」を足す小語。日本語の「まあ〜か」の脱力を、英語は小さい副詞で再現する。小語が温度調整。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 16, japanese: '反対方向乗ってた', english: [
+        "wrong direction",
+        "wait, I'm going the wrong way",
+        "I zoned out and ended up heading the complete opposite direction",
+        "rookie mistake"
+    ], context: "「やらかした」結果はend up（最終的に〜になる）句動詞で出す。zone out（ぼーっとする）も句動詞。日本語は「乗ってた」と単に過去形だが、英語はend upで「気づいたらそうなってた」のオチ感を作る。句動詞でオチをつける。", category: 'reaction', month: '2026-07' },
+
+    // ── 2026-07 Day 17 (仕事の締め切り・タスク・忙しさ) ──
+    { daySlot: 17, japanese: 'マジ忙しい', english: [
+        "I'm swamped",
+        "I'm completely swamped today",
+        "I've got like five things due and zero time to do them",
+        "buried, honestly"
+    ], context: "「忙しい」はswamped、buried。swampは「沼」、buryは「埋める」。仕事に沼って埋もれる絵で忙しさを出すメタファーが英語。日本語の「忙しい」は感情語だが、英語は物理的に動けない映像で表す。抽象を物理で描く。", category: 'reaction', month: '2026-07' },
+    { daySlot: 17, japanese: '締め切り今日だわ', english: [
+        "it's due today",
+        "oh no, this is due today",
+        "I totally forgot the deadline is literally end of day",
+        "no pressure, right"
+    ], context: "「締め切り」はdue（支払・提出の期限が来てる形容詞）。It's due todayと主語itを立てるのが骨格。日本語は「締め切り今日」と名詞並べでいけるが英語はit's due todayと主語＋be動詞が要る。ダミーit＝骨格の必須パーツ。", category: 'reaction', month: '2026-07' },
+    { daySlot: 17, japanese: '全然終わらん', english: [
+        "I can't keep up",
+        "I just can't keep up with all of this",
+        "no matter how much I do, the list just keeps getting longer",
+        "it never ends"
+    ], context: "「終わらない」はcan't keep up（追いつけない）、keep getting longer（伸び続ける）。keepは「〜し続ける」の動詞で進行のしつこさを出す。日本語は「終わらん」一語だが英語はkeep＋動詞で延々感を表現する。keepで継続を盛る。", category: 'reaction', month: '2026-07' },
+    { daySlot: 17, japanese: 'ちょっと手伝って', english: [
+        "can you help me out?",
+        "could you give me a hand with this?",
+        "I'm drowning here, any chance you could take a couple of these?",
+        "I owe you one"
+    ], context: "「手伝って」はhelp out、give a hand（手を貸す）。drowning（溺れてる）で忙しさをメタファー化。直接「手伝え」と言わずcould you〜?で柔らかく頼むのが会話武器。日本語の「手伝って」より英語は丁寧な枠が要る。hedgeで角を取る。", category: 'request', month: '2026-07' },
+    { daySlot: 17, japanese: '後回しにしてた', english: [
+        "I put it off",
+        "yeah I kept putting it off",
+        "I knew it was coming and I still pushed it back till the last minute",
+        "classic me"
+    ], context: "「後回し」はput off、push back。offやbackの方向で「先送り」を出す句動詞。日本語は「後回し」一語だが英語はput off/push backと方向小語で時間を動かす。句動詞の方向＝時間の操作。", category: 'reaction', month: '2026-07' },
+    { daySlot: 17, japanese: '無理ゲーだわ', english: [
+        "this is impossible",
+        "honestly this is just not doable",
+        "there's no way I'm finishing all of this by five, no chance",
+        "not happening"
+    ], context: "「無理」はnot doable、no way、not happening。there's no way＋that節で「あり得ない」を断言する直球。日本語の「無理ゲー」のノリを英語はno chance/not happeningで出す。ダミーthere＋directnessの文化OS。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 17, japanese: 'とりあえずこれ片付ける', english: [
+        "let me knock this out",
+        "I'm just gonna knock this one out first",
+        "if I can get this one off my plate I'll feel way better",
+        "one down"
+    ], context: "「片付ける」はknock out（一気に倒す）、off my plate（皿から下ろす＝担当から外す）。タスクを皿に乗った料理に見立てるメタファー。日本語の「片付ける」を英語は殴り倒す・皿から下ろす絵で出す。抽象を物理イメージで。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 17, japanese: 'ぶっちゃけ間に合わない', english: [
+        "not gonna lie, I won't make it",
+        "honestly I don't think I'll make the deadline",
+        "not gonna lie, there's no way this is done by Friday",
+        "just being real"
+    ], context: "「ぶっちゃけ」はnot gonna lie、honestly。前置きで本音宣言する会話武器。make it（間に合う）も覚えどころ。日本語の「ぶっちゃけ」と同じく英語も本音前に枕を置く。フィラー＋hedgeで切り出す型。", category: 'opinion', month: '2026-07' },
+    { daySlot: 17, japanese: 'もう今日は無理', english: [
+        "I'm done for today",
+        "okay, I'm calling it for today",
+        "my brain is completely fried, I'm clocking out",
+        "see you tomorrow"
+    ], context: "「もう無理」はI'm done、call it（切り上げる）、fried（脳が揚がった＝疲労）。callは「これで終わりと宣言する」用法。日本語の「今日は無理」を英語はdone/call it/friedと終了宣言＋疲労メタファーで出す。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 17, japanese: 'メール返さなきゃ', english: [
+        "I gotta reply to that",
+        "I really need to get back to them",
+        "I've got like thirty unread emails I keep ignoring",
+        "later me's problem"
+    ], context: "「返信する」はget back to（折り返す）句動詞。gotta=have got toの音圧縮。日本語は「返す」一語だが英語はget back toと方向で「相手のところへ戻す」絵にする。句動詞＋音圧縮のセット。", category: 'reaction', month: '2026-07' },
+
+    // ── 2026-07 Day 18 (食べ物の好み・注文・味) ──
+    { daySlot: 18, japanese: 'これ好きかも', english: [
+        "I kind of love this",
+        "honestly I'm into this",
+        "I didn't expect much but I'm actually really into this",
+        "didn't see that coming"
+    ], context: "「好きかも」はinto（ハマってる）、kind of（ちょっと）。intoは「中に入り込む」前置詞で、好きを「のめり込む」物理イメージにする。日本語の「かも」の控えめをkind ofで再現。小語＋メタファーの合わせ技。", category: 'opinion', month: '2026-07' },
+    { daySlot: 18, japanese: '辛いの苦手', english: [
+        "I can't do spicy",
+        "yeah I'm not great with spicy stuff",
+        "even a little kick and my whole mouth is on fire",
+        "mild for me"
+    ], context: "「苦手」はcan't do（こなせない）、not great with。doを「対処する」意味で使う骨格。on fire（火事＝激辛）はメタファー。日本語の「苦手」一語を英語はcan't do/not great withと処理能力の言い方にする。do-supportとメタファー。", category: 'opinion', month: '2026-07' },
+    { daySlot: 18, japanese: 'これにする', english: [
+        "I'll get this one",
+        "yeah I'll go with this",
+        "you know what, I'll just go with the usual",
+        "decided"
+    ], context: "「これにする」はI'll get、go with（これで行く）。getは注文を「手に入れる」、go withは「これと一緒に行く」選択の句動詞。日本語は「する」一語だが英語はget/go withで選ぶ動作を出す。getとgo withの選択語彙。", category: 'request', month: '2026-07' },
+    { daySlot: 18, japanese: 'めっちゃ美味い', english: [
+        "this slaps",
+        "okay this is so good",
+        "I don't even have words, this is unreal",
+        "chef's kiss"
+    ], context: "「めっちゃ美味い」はslaps（スラング）、unreal（非現実＝最高）。slapは「叩く」動詞で「ガツンとくる」スラング転用。日本語の「美味い」を英語は強調スラングで盛る。so＋形容詞の骨格も基本。スラングと強調の音。", category: 'reaction', month: '2026-07' },
+    { daySlot: 18, japanese: 'ちょっと味薄い', english: [
+        "it's kind of bland",
+        "hmm, it needs a little something",
+        "it's not bad but it's missing a bit of salt or something",
+        "needs more punch"
+    ], context: "「味薄い」はbland、needs something。it needs〜と料理を主語にして「足りないものを要求してる」と擬人化。日本語は「薄い」と自分目線だが英語はit needsとモノが欲しがる構図。確認＝命令に近い擬人化の文化OS。", category: 'opinion', month: '2026-07' },
+    { daySlot: 18, japanese: '取り分けよ', english: [
+        "let's split it",
+        "wanna just share these?",
+        "let's get a few things and split everything down the middle",
+        "family style"
+    ], context: "「取り分ける」はsplit、share。splitは「割る」物理動詞を割り勘・分け合いに流用するメタファー。日本語の「取り分ける」を英語はsplit/shareで「分割する」絵にする。Let's＋動詞の提案骨格も基本。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 18, japanese: 'お腹いっぱい', english: [
+        "I'm stuffed",
+        "okay I'm completely full",
+        "I literally cannot fit one more bite in",
+        "I'm done done"
+    ], context: "「満腹」はstuffed（詰め込まれた）、can't fit more（もう入らない）。stuffは「詰める」動詞で、自分を詰め物にされた状態に描くメタファー。日本語の「いっぱい」を英語は詰まった物理イメージで出す。抽象を物理で。", category: 'reaction', month: '2026-07' },
+    { daySlot: 18, japanese: 'なんか頼みすぎた', english: [
+        "we kind of over-ordered",
+        "I think we ordered way too much",
+        "our eyes were definitely bigger than our stomachs tonight",
+        "oops"
+    ], context: "「頼みすぎた」はover-order、order too much。over-は「し過ぎ」の接頭辞で動詞に貼る。eyes bigger than stomach（目が胃より大きい＝欲張り）は定番イディオム。日本語の「すぎた」を英語はover-や too muchで出す。", category: 'reaction', month: '2026-07' },
+    { daySlot: 18, japanese: '苦手なやつだ', english: [
+        "ah, not my thing",
+        "yeah this isn't really my thing",
+        "I mean it's fine, it's just not what I'd usually go for",
+        "to each their own"
+    ], context: "「苦手・好みじゃない」はnot my thing（自分のジャンルじゃない）。I meanで本音をやわらげる会話武器。日本語の「苦手なやつ」をnot my thingと所有形で「自分の領域外」と表す。I mean＋hedgeで角を立てない型。", category: 'opinion', month: '2026-07' },
+    { daySlot: 18, japanese: 'もう一杯いく？', english: [
+        "one more round?",
+        "you wanna grab another?",
+        "should we get one more or are we calling it here?",
+        "last one, swear"
+    ], context: "「もう一杯」はone more round、grab another。grabは「ひっ掴む」軽い注文動詞。round（一巡）で全員分の一杯を表す文化語。日本語の「いく？」をwanna grab〜?と誘いの句動詞にする。grabのカジュアルさが鍵。", category: 'request', month: '2026-07' },
+
+    // ── 2026-07 Day 19 (恋愛・デート・気になる人) ──
+    { daySlot: 19, japanese: 'なんか気になる', english: [
+        "I'm into them",
+        "I think I'm kind of into this person",
+        "I can't stop thinking about them, it's getting bad",
+        "uh oh"
+    ], context: "「気になる」はinto someone（その人にハマってる）。intoは「中に入り込む」前置詞で恋心を「のめり込む」物理イメージにする鉄板メタファー。日本語の「気になる」をbe into〜で「沼ってる」感に変える。前置詞が恋を運ぶ。", category: 'opinion', month: '2026-07' },
+    { daySlot: 19, japanese: '脈ありかな', english: [
+        "do they like me back?",
+        "I feel like maybe they're into me too",
+        "they keep texting first so I'm reading way too much into it",
+        "or am I delusional"
+    ], context: "「脈あり」はlike me back（向こうも好き）、into me too。read into（深読みする）句動詞も核心。日本語の「脈あり」を英語はlike me back/into me tooと相互の好意で具体化する。句動詞read intoで深読み感も。", category: 'opinion', month: '2026-07' },
+    { daySlot: 19, japanese: '今度ご飯行こ', english: [
+        "let's grab food sometime",
+        "wanna grab dinner sometime?",
+        "we should totally grab food one of these days, no pressure",
+        "I'm free this week"
+    ], context: "「ご飯行こ」はgrab food/dinner。grabは「軽くつかむ」で気軽な誘いの定番動詞。wanna=want toの音圧縮。日本語の「行こ」をwanna grab〜?と誘いの句動詞にする。grab＝肩肘張らないデート誘いの鍵。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 19, japanese: '緊張するわ', english: [
+        "I'm so nervous",
+        "honestly I'm a little nervous",
+        "my heart's racing and I haven't even said hi yet",
+        "why am I like this"
+    ], context: "「緊張」はnervous、heart racing（心臓レース中）。心臓が競走するメタファーで緊張を出す。why am I like this（なんで自分こうなの）は自虐の会話武器。日本語の「緊張する」を英語は身体の実況＋自虐で盛る。", category: 'reaction', month: '2026-07' },
+    { daySlot: 19, japanese: '既読つかない', english: [
+        "they haven't read it",
+        "ugh, they still haven't even opened it",
+        "I've been staring at my phone for an hour and nothing",
+        "the silence is loud"
+    ], context: "「既読つかない」はhaven't read it。完了形で「まだ読んでない継続状態」を出す骨格。the silence is loud（沈黙がうるさい）は逆説メタファー。日本語は「つかない」一語だが英語は現在完了で「ずっと未読」を表す。時制が効く。", category: 'reaction', month: '2026-07' },
+    { daySlot: 19, japanese: 'タイプかも', english: [
+        "kind of my type",
+        "yeah they're totally my type",
+        "honestly they check every single box for me",
+        "in trouble"
+    ], context: "「タイプ」はmy type、check the boxes（条件を全部満たす）。チェックリストにレ点が入る絵で理想一致を出すメタファー。日本語の「タイプかも」をkind ofでぼかしつつcheck boxesで具体化。小語＋イメージの合わせ技。", category: 'opinion', month: '2026-07' },
+    { daySlot: 19, japanese: 'フラれた', english: [
+        "I got turned down",
+        "yeah, they turned me down",
+        "I finally asked and they let me down pretty gently",
+        "it is what it is"
+    ], context: "「フラれた」はturn down（断る）、let down（がっかりさせる）。downの方向で「下げられた・落とされた」を出す句動詞。日本語の「フラれた」を英語はget turned downと受け身＋句動詞で表す。downが失恋の方向。", category: 'reaction', month: '2026-07' },
+    { daySlot: 19, japanese: '考えすぎかな', english: [
+        "am I overthinking?",
+        "I'm probably overthinking this",
+        "I keep replaying the whole thing in my head over and over",
+        "make it stop"
+    ], context: "「考えすぎ」はoverthink。over-接頭辞を動詞に貼って「し過ぎ」を作る。replay（頭で再生）は脳内をプレーヤー化するメタファー。日本語の「すぎ」を英語はover-で表す。am I 〜?の自問tag的フィラーも会話武器。", category: 'opinion', month: '2026-07' },
+    { daySlot: 19, japanese: 'いい感じだった', english: [
+        "it went really well",
+        "honestly it went super well",
+        "we talked for like three hours and it never got awkward",
+        "high hopes"
+    ], context: "「いい感じだった」はit went well。itを主語にデートを擬人化し「うまく進んだ」と言う骨格。go wellの句動詞も核心。日本語は「いい感じ」と状態名詞だが英語はit went wellと出来事を主語に立てて動かす。ダミーit＋go。", category: 'reaction', month: '2026-07' },
+    { daySlot: 19, japanese: '会いたいって言いづらい', english: [
+        "hard to say I miss them",
+        "I kind of wanna see them but it feels too forward",
+        "I keep typing 'I miss you' and then deleting it",
+        "send or no"
+    ], context: "「言いづらい」はhard to say、too forward（前のめりすぎ）。It's hard to〜のダミーit骨格に注目。日本語は「言いづらい」一語だが英語はit's hard to sayと主語itを立てる必要がある。骨格＝主語を埋めるダミーit。", category: 'opinion', month: '2026-07' },
+
+    // ── 2026-07 Day 20 (趣味・動画・ゲーム・娯楽) ──
+    { daySlot: 20, japanese: '一気見した', english: [
+        "I binged it",
+        "yeah I binged the whole thing",
+        "I told myself one episode and watched the entire season",
+        "no regrets"
+    ], context: "「一気見」はbinge（ドカ食い）。元は暴食の動詞を動画の一気見に転用するメタファー。日本語の「一気見」を英語はbingeと「がっつき」イメージで出す。one and done のつもりが全話、の自虐ノリも会話の味。", category: 'reaction', month: '2026-07' },
+    { daySlot: 20, japanese: 'ハマってる', english: [
+        "I'm hooked",
+        "honestly I'm completely hooked on this",
+        "I literally cannot put it down, it's all I do now",
+        "send help"
+    ], context: "「ハマってる」はhooked（釣り針に掛かった）。釣られて抜けられない物理イメージで中毒を出すメタファー。can't put it down（手放せない）も核心。日本語の「ハマる」を英語はhooked/can't put downと物理拘束で描く。", category: 'opinion', month: '2026-07' },
+    { daySlot: 20, japanese: 'これおすすめ', english: [
+        "you gotta watch this",
+        "you should totally check this out",
+        "if you've got a free evening this one's worth it, trust me",
+        "thank me later"
+    ], context: "「おすすめ」はcheck out（試しに見る）、you gotta（絶対〜すべき）。gotta=have got toの音圧縮。命令形you gotta watchで強く勧めるdirectness。日本語の「おすすめ」をyou gotta/should＋句動詞で出す。確認より命令寄り。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 20, japanese: 'クリアした', english: [
+        "I beat it",
+        "finally beat the game last night",
+        "took me like forty hours but I finally beat the final boss",
+        "felt amazing"
+    ], context: "「クリア」はbeat（打ち負かす）。ゲーム攻略を「敵を叩きのめす」動詞で出すのが英語。日本語のカタカナ「クリア」はclearと言わずbeat itが自然。和製英語の罠。動詞beatでゲーム攻略を表す感覚。", category: 'reaction', month: '2026-07' },
+    { daySlot: 20, japanese: '飽きてきた', english: [
+        "I'm kind of over it",
+        "yeah I'm getting bored of this",
+        "it was fun at first but now I'm just kind of over it",
+        "next"
+    ], context: "「飽きた」はover it（もう済んだ＝興味の外）。be over itで「乗り越えた・卒業した」感を出す句動詞。kind ofでやわらげる小語も。日本語の「飽きてきた」を英語はover it/getting boredで「気持ちが先に行った」絵にする。", category: 'opinion', month: '2026-07' },
+    { daySlot: 20, japanese: '課金しちゃった', english: [
+        "I spent money on it",
+        "ugh, I caved and spent money",
+        "I swore I wouldn't pay and then dropped twenty bucks on skins",
+        "weak, I know"
+    ], context: "「課金」はspend money、drop（金をポンと落とす）、cave（屈する）。dropは「落とす」を「ポンと払う」に転用するメタファー。日本語の「課金」を英語はspend/drop money on〜で出す。caveで「我慢に負けた」も会話武器。", category: 'reaction', month: '2026-07' },
+    { daySlot: 20, japanese: 'まだ途中', english: [
+        "I'm still on it",
+        "I'm only halfway through",
+        "no spoilers, I'm not even close to finishing it yet",
+        "don't say anything"
+    ], context: "「途中」はhalfway through、still on it。throughは「最後まで通り抜ける」前置詞で進捗を出す。no spoilers（ネタバレ禁止）の直球命令も文化OS。日本語の「途中」を英語はhalfway through/on itと位置で表す。", category: 'reaction', month: '2026-07' },
+    { daySlot: 20, japanese: 'みんなやってる', english: [
+        "everyone's playing it",
+        "everyone I know is playing this right now",
+        "my whole feed is people posting about this game nonstop",
+        "FOMO is real"
+    ], context: "「みんなやってる」はeveryone's playing。everyoneは単数扱いでisを取る骨格の注意点。FOMO（取り残される恐怖）はネット定番略語。日本語は主語を省けるが英語はeveryoneと主語を必ず立てる。骨格＝主語必須と単複。", category: 'reaction', month: '2026-07' },
+    { daySlot: 20, japanese: 'ちょっとやろ', english: [
+        "let's play a bit",
+        "wanna hop on for a bit?",
+        "I've got like an hour, wanna jump in for a couple of games?",
+        "one match, that's it"
+    ], context: "「ちょっとやろ」はhop on/jump in（オンラインに入る）。hop/jumpの跳ねる動詞でゲーム参加を出す句動詞。wanna=want toの音圧縮。日本語の「やろ」をwanna hop on?と誘いの句動詞にする。跳ねる動詞＝参加の感覚。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 20, japanese: '夜更かししちゃう', english: [
+        "I stay up too late",
+        "I always end up staying up way too late",
+        "I tell myself just one more episode and suddenly it's 3am",
+        "every night, no joke"
+    ], context: "「夜更かし」はstay up（起きたまま）、end up（結局〜になる）。upは「起き続ける」状態、end upは「気づいたらそうなる」オチの句動詞。日本語の「しちゃう」の不本意さを英語はend up＋ingで出す。句動詞でオチをつける型。", category: 'reaction', month: '2026-07' },
+
+    // ── 2026-07 Day 21 (体調・健康・調子) ──
+    { daySlot: 21, japanese: 'なんか調子悪い', english: [
+        "I feel off",
+        "I've been feeling kind of off today",
+        "nothing major, I just feel a little run down lately",
+        "just not myself"
+    ], context: "「調子悪い」はI feel off。offは「いつもの位置からズレてる」空間メタファーで不調を表す。kind ofは断定を弱める小語。日本語は「なんか」でぼかすが、英語はoffとkind ofで曖昧さを作る。メタファー＋小語。", category: 'reaction', month: '2026-07' },
+    { daySlot: 21, japanese: '風邪ひいたかも', english: [
+        "I think I'm getting sick",
+        "I might be coming down with something",
+        "feels like I'm catching a cold, my throat's been scratchy",
+        "I'm coming down with it"
+    ], context: "「風邪ひいたかも」はcome down with something。病気が上から「降りてくる」イメージの句動詞。日本語は「ひく」と引っ張るが、英語は病気が降ってくる方向。somethingでぼかすのも英語っぽい。句動詞＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 21, japanese: '寝不足でしんどい', english: [
+        "I'm running on no sleep",
+        "I'm so tired, I barely slept",
+        "I only got like three hours, I'm completely wiped",
+        "I'm running on empty"
+    ], context: "「寝不足」はrunning on no sleep。体を車に見立て、睡眠を燃料として「走ってる」と擬人化メタファー。empty=ガス欠。日本語は「不足」と量で言うが英語は走り続ける動きで表す。メタファー＋文化OS擬人化。", category: 'reaction', month: '2026-07' },
+    { daySlot: 21, japanese: '無理しないでね', english: [
+        "take it easy",
+        "make sure you take it easy, okay",
+        "don't push yourself too hard, the work can wait",
+        "rest up, seriously"
+    ], context: "「無理しないで」はtake it easy。easyを「取る」動詞takeで状態を選び取る発想。さらにokay?の確認タグで命令を和らげる。日本語の「ね」と同じく、命令を確認でくるむ会話武器。動詞take＋tag question。", category: 'request', month: '2026-07' },
+    { daySlot: 21, japanese: 'だいぶ良くなった', english: [
+        "I'm feeling a lot better",
+        "I'm pretty much back to normal now",
+        "still not a hundred percent, but I'm getting there",
+        "almost back to myself"
+    ], context: "「良くなった」はback to normal。回復を「元の場所に戻る」移動メタファーで表す。getting there=目的地へ向かってる途中。日本語は「良くなる」と質で言うが英語は位置で言う。メタファー＋骨格(進行形で過程)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 21, japanese: '頭痛が治らない', english: [
+        "this headache won't go away",
+        "my headache just won't go away",
+        "I've had this headache all day and it won't quit",
+        "it just keeps coming back"
+    ], context: "「治らない」はwon't go away。痛みを擬人化し「立ち去ってくれない」と表す。won'tは意志の否定で、まるで頭痛が居座る意志を持つよう。日本語は「治る」だが英語は痛みが去る。文化OS擬人化＋骨格(主語=headache)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 21, japanese: 'ちょっと休んだら？', english: [
+        "you should take a break",
+        "maybe you should sit down for a bit",
+        "why don't you lie down for a while, you look exhausted",
+        "go rest, I've got this"
+    ], context: "「休んだら？」はwhy don't you...?。直訳は「なぜしないの」だが、実は提案。否定疑問で柔らかく勧める英語の会話術。日本語は「〜たら？」と条件で投げる。why don'tは命令を質問で包む会話武器。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 21, japanese: '元気そうじゃん', english: [
+        "you look good",
+        "you're looking a lot better today",
+        "you seem way more like yourself, glad you're back",
+        "you're back on your feet"
+    ], context: "「元気そう」はlook good/seem better。「〜そう」は英語ではlook/seemで見た目から推測。back on your feet=また自分の足で立つ、回復のメタファー。日本語の様態をlook動詞で処理。動詞look＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 21, japanese: '無理して来なくていいよ', english: [
+        "don't come in if you're sick",
+        "seriously, don't force yourself to come in",
+        "if you're not feeling well, just stay home and rest, it's fine",
+        "stay home, no worries"
+    ], context: "「無理して来なくていい」はdon't force yourself。forceは「力で押す」動詞で、自分を押すイメージ。come inの句動詞で出勤を表す。it's fine/no worriesのhedgeで相手の罪悪感を消す会話武器。句動詞＋hedge。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 21, japanese: '最近ずっとだるい', english: [
+        "I've been so sluggish lately",
+        "I've just felt really drained these days",
+        "I don't know why, but I've had zero energy all week",
+        "I'm just dragging lately"
+    ], context: "「だるい」はdrained/dragging。drained=エネルギーが排水溝に流れ出たメタファー、dragging=重い体を引きずる動き。日本語の一語「だるい」を英語は具体的な物理イメージに変換。現在完了で「最近ずっと」も表現。メタファー＋骨格(現在完了)。", category: 'reaction', month: '2026-07' },
+
+    // ── 2026-07 Day 22 (時間・遅刻・急ぎ) ──
+    { daySlot: 22, japanese: 'ちょっと遅れる', english: [
+        "I'm running late",
+        "I'm running a few minutes late",
+        "sorry, I'm gonna be like ten minutes behind",
+        "I'm gonna be a bit late"
+    ], context: "「遅れる」はrunning late。時間に「遅れて走ってる」進行形メタファー。behind=後ろに位置するイメージで遅刻を表す。gonnaはgoing toの音声圧縮。日本語の「遅れる」を英語は走る動きと位置で表す。メタファー＋音。", category: 'reaction', month: '2026-07' },
+    { daySlot: 22, japanese: '急いでるんだ', english: [
+        "I'm in a hurry",
+        "sorry, I'm kind of in a rush right now",
+        "I really gotta run, I'm late for something",
+        "I gotta dash"
+    ], context: "「急いでる」はin a hurry/in a rush。急ぎを「中に入ってる」状態として前置詞inで表す箱メタファー。gotta=got toの音声圧縮で「〜しなきゃ」。日本語は動詞だが英語は状態の箱。小語kind of＋音gotta。", category: 'reaction', month: '2026-07' },
+    { daySlot: 22, japanese: 'もう時間ないよ', english: [
+        "we're out of time",
+        "we're pretty much out of time",
+        "we don't have much time left, we gotta wrap this up",
+        "time's basically up"
+    ], context: "「時間ない」はout of time。時間を容器の中身に見立て「使い切って外に出た」メタファー。weで自分を含め一緒感を出す文化OS。wrap up=包んで終える句動詞。日本語は「ない」と存在で言うが英語は容器の中身。メタファー＋句動詞。", category: 'reaction', month: '2026-07' },
+    { daySlot: 22, japanese: '間に合う？', english: [
+        "are we gonna make it?",
+        "do you think we'll make it in time?",
+        "if we leave now, can we still make the train?",
+        "we good on time?"
+    ], context: "「間に合う」はmake it。漠然とした成功をmake itで表す英語の万能動詞。日本語は「合う」だが英語は「作り出す」発想。we good?は省略形のカジュアル疑問で会話武器。動詞make＋骨格(疑問文)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 22, japanese: 'ごめん待たせた', english: [
+        "sorry I kept you waiting",
+        "sorry, did you wait long?",
+        "I'm so sorry, traffic was insane and I couldn't get here faster",
+        "sorry for the wait"
+    ], context: "「待たせた」はkept you waiting。keep+人+ingで「人を〜の状態に保つ」使役。日本語は「待た・せる」と使役助動詞だが英語はkeepで状態維持。youを目的語に置く骨格が必須。動詞keep＋骨格(SVOC)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 22, japanese: '時間に余裕ある', english: [
+        "we've got plenty of time",
+        "we have time, no rush",
+        "relax, the meeting isn't for another hour, we're fine",
+        "we've got time to spare"
+    ], context: "「余裕ある」はhave time/time to spare。spare=余らせる動詞で「使い切らずに残る時間」。have gotは口語のhave。no rushのhedgeで相手を落ち着かせる。日本語の「余裕」を英語は所有haveと残りspareで表す。動詞have＋hedge。", category: 'reaction', month: '2026-07' },
+    { daySlot: 22, japanese: '早めに出ようか', english: [
+        "let's head out early",
+        "we should probably leave a little early",
+        "let's give ourselves extra time so we don't have to rush",
+        "let's get going soon"
+    ], context: "「出よう」はhead out。headを動詞にして「頭をその方向に向ける=向かう」句動詞。let'sで一緒に提案する文化OS。give ourselves time=自分たちに時間を与える擬人的発想。句動詞head out＋suggestion。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 22, japanese: 'まだ全然大丈夫', english: [
+        "we're totally fine",
+        "we've still got loads of time",
+        "honestly, don't worry, we're way ahead of schedule",
+        "plenty of time, chill"
+    ], context: "「全然大丈夫」はtotally fine。日本語の「全然〜大丈夫」をtotallyで強調。ahead of schedule=予定より前にいる位置メタファー。honestlyのfillerで本音感を足す。日本語の「全然」をtotally/wayの強調語で。小語honestly＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 22, japanese: '時間どんどん過ぎる', english: [
+        "time is flying by",
+        "time just keeps slipping away",
+        "I don't know where the time went, it's already late",
+        "time really flew"
+    ], context: "「過ぎる」はfly by/slip away。時間を擬人化し「飛んでいく」「滑り去る」と動かす。日本語は「過ぎる」と淡々だが英語は時間に翼や足を与える。where the time went=時間が行った先を問う発想。文化OS擬人化＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 22, japanese: 'ギリギリだったね', english: [
+        "that was close",
+        "wow, we just barely made it",
+        "we got there with like two minutes to spare, that was cutting it close",
+        "talk about cutting it close"
+    ], context: "「ギリギリ」はcutting it close/barely made it。closeで距離の近さ=時間の余裕のなさを表す。cut it close=接近して切る、際どさのメタファー。barelyの小語で「かろうじて」。日本語の「ギリギリ」を空間の近さで。メタファー＋小語barely。", category: 'reaction', month: '2026-07' },
+
+    // ── 2026-07 Day 23 (評価・感想・レビュー) ──
+    { daySlot: 23, japanese: 'めっちゃ良かった', english: [
+        "it was so good",
+        "honestly, it was really good",
+        "I went in with low expectations but it totally blew me away",
+        "it was amazing"
+    ], context: "「めっちゃ良かった」はso good/blew me away。blow away=吹き飛ばす句動詞で感動を表す。日本語は「良い」を「めっちゃ」で強めるだけだが英語はblew me awayで物理的に飛ばされる。honestlyのfillerで本音感。句動詞＋小語。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: 'まあまあかな', english: [
+        "it was okay",
+        "it was alright, nothing special",
+        "I mean, it wasn't bad, but I probably wouldn't go again",
+        "kind of meh"
+    ], context: "「まあまあ」はokay/meh。I meanのfillerで言い訳を挟みながら本音を出す会話術。kind ofで断定を弱める小語。日本語の「まあまあ」の曖昧さを英語はI mean+kind ofのhedge連打で再現。小語kind of＋filler I mean。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: '期待しすぎた', english: [
+        "I expected too much",
+        "I think I hyped it up too much in my head",
+        "everyone said it was great, so maybe my expectations were just too high",
+        "it didn't live up to the hype"
+    ], context: "「期待しすぎた」はlive up to the hype。期待という基準に「届く=up to」かどうかの上下メタファー。hype=煽りの名詞。日本語は「しすぎ」と程度だが英語は基準への到達で測る。メタファー＋句動詞live up to。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: '思ったより良かった', english: [
+        "it was better than I expected",
+        "it was actually way better than I thought",
+        "I wasn't expecting much, but it really surprised me",
+        "pleasantly surprised"
+    ], context: "「思ったより」はbetter than I expected。比較級+thanで予想という基準と比べる骨格。actuallyの小語で「意外にも」のニュアンス。日本語は「より」一語だが英語はthanで比較対象を明示。骨格(比較級)＋小語actually。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: '正直微妙だった', english: [
+        "it was kind of underwhelming",
+        "honestly, it was a bit of a letdown",
+        "not gonna lie, I was kind of disappointed after all the buzz",
+        "it fell flat"
+    ], context: "「微妙」はunderwhelming/letdown。let down=気持ちを下ろす句動詞で失望。fall flat=平らに落ちる、盛り上がり不足のメタファー。not gonna lieの会話武器で本音前置き。日本語の「微妙」を句動詞とメタファーで。会話武器＋メタファー。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: '人それぞれだよね', english: [
+        "it's not for everyone",
+        "I get why people like it, but it's not my thing",
+        "different people like different things, so it really just depends on you",
+        "to each their own"
+    ], context: "「人それぞれ」はto each their own/not for everyone。not my thing=自分のモノじゃない、所有メタファーで好みを表す。日本語は「それぞれ」と曖昧だが英語はit depends/my thingで個別化。慣用句＋メタファー(my thing)。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: 'もう一回見たい', english: [
+        "I want to watch it again",
+        "I'd totally watch that again",
+        "it's the kind of thing you pick up new stuff every time you see it",
+        "I could rewatch it"
+    ], context: "「もう一回見たい」はwatch it again。pick up=拾い上げる句動詞で「新しい発見をする」。the kind of thing that...で説明する骨格。日本語は「見たい」だが英語は条件法'd watchで控えめに願望。句動詞pick up＋骨格(関係詞)。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: 'おすすめしないかな', english: [
+        "I wouldn't really recommend it",
+        "honestly, I'd probably skip it",
+        "I mean, if you have nothing else to do, sure, but I wouldn't go out of your way",
+        "I'd pass on it"
+    ], context: "「おすすめしない」はwouldn't recommend。wouldで断定を避け控えめに。go out of your way=自分の道から外れる、わざわざするメタファー。pass on=やり過ごす句動詞。日本語の「かな」をwouldで再現。骨格(would)＋メタファー。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: '最初はイマイチだった', english: [
+        "it started kind of slow",
+        "it was kind of slow at first, honestly",
+        "the beginning dragged a bit, but it really picked up halfway through",
+        "slow start, strong finish"
+    ], context: "「イマイチ」はslow/dragged。drag=引きずる動詞で退屈さ、pick up=拾い上げる句動詞で盛り返し。日本語の「イマイチ」をテンポの遅速メタファーで表す。at firstの時間枠も明示。メタファー＋句動詞pick up。", category: 'opinion', month: '2026-07' },
+    { daySlot: 23, japanese: 'ハマっちゃった', english: [
+        "I'm hooked",
+        "I'm totally hooked on it now",
+        "I told myself just one episode, and now I've watched the whole season",
+        "I can't stop"
+    ], context: "「ハマる」はhooked。釣り針hookに引っかかったメタファーで中毒を表す。be hooked on...で対象を示す。日本語は「ハマる」と落ちる動きだが英語は針に掛かる受け身。totallyで強調。メタファー＋骨格(受動態be hooked)。", category: 'reaction', month: '2026-07' },
+
+    // ── 2026-07 Day 24 (迷い・決断) ──
+    { daySlot: 24, japanese: 'どうしようかな', english: [
+        "I'm not sure",
+        "I'm kind of torn right now",
+        "I keep going back and forth, I really can't make up my mind",
+        "I can't decide"
+    ], context: "「どうしようかな」はtorn/can't make up my mind。torn=引き裂かれる、二択の間で割れる身体メタファー。make up=作り上げる句動詞で「決心する」。go back and forth=行ったり来たり。日本語の「かな」を迷いのメタファーで。メタファー＋句動詞make up。", category: 'filler', month: '2026-07' },
+    { daySlot: 24, japanese: 'どっちでもいい', english: [
+        "either way works",
+        "honestly, either one's fine with me",
+        "I really don't have a preference, you pick whatever you want",
+        "I'm easy"
+    ], context: "「どっちでもいい」はeither way works/I'm easy。wayを主語にして「どっちの道も機能する」骨格。I'm easy=自分が手のかからない人、態度メタファー。日本語は「いい」だが英語はworksと機能で表す。骨格(無生物主語)＋メタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 24, japanese: 'やっぱやめとく', english: [
+        "actually, never mind",
+        "you know what, I'll pass",
+        "I was gonna go, but actually I think I'll just stay in tonight",
+        "I changed my mind"
+    ], context: "「やっぱやめとく」はactually, never mind。actuallyの小語が「やっぱり」の前言撤回を担う最重要ワード。you know whatは決断前置きの会話武器。change my mind=心を変える、心を物として扱う。小語actually＋会話武器。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 24, japanese: '決めた', english: [
+        "I've decided",
+        "okay, I've made up my mind",
+        "alright, I'm going for it, no more second-guessing",
+        "decision made"
+    ], context: "「決めた」はmade up my mind。make up one's mindで「心を組み立てる=決心」句動詞。go for it=それに向かって行く、行動の決断メタファー。日本語は完了の「た」だが英語は現在完了've madeで結果を残す。句動詞＋骨格(現在完了)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 24, japanese: 'まだ迷ってる', english: [
+        "I'm still on the fence",
+        "I'm still kind of unsure about it",
+        "I keep flip-flopping, part of me wants to and part of me doesn't",
+        "still up in the air"
+    ], context: "「迷ってる」はon the fence/up in the air。fenceの上に座って両側に降りられない、宙ぶらりんの空間メタファー。flip-flop=パタパタ翻る句動詞。part of me...で自分を分割する文化OS。メタファー＋文化OS(self分割)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 24, japanese: 'とりあえずやってみる', english: [
+        "I'll just give it a shot",
+        "I figure I'll give it a try",
+        "I have no idea if it'll work, but I might as well just go for it",
+        "let's just try it"
+    ], context: "「やってみる」はgive it a shot/a try。挑戦を「一発撃つ」shotのメタファーでgive。might as well=どうせなら、消極的決断の会話術。日本語の「とりあえず」をjustとmight as wellで。動詞give＋会話武器might as well。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 24, japanese: '考えとくわ', english: [
+        "I'll think about it",
+        "let me think it over",
+        "I can't give you an answer right now, let me sleep on it",
+        "give me some time"
+    ], context: "「考えとく」はthink it over/sleep on it。over=隅々まで考える句動詞。sleep on it=一晩寝かせる、決断を熟成させる慣用メタファー。日本語の「とく(おく)」の保留をlet me/I'llの先送りで。句動詞think over＋慣用句。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 24, japanese: 'もう後戻りできない', english: [
+        "there's no going back",
+        "well, no turning back now",
+        "I already signed the papers, so I'm committed whether I like it or not",
+        "too late to back out"
+    ], context: "「後戻りできない」はno going back/no turning back。後ろへの移動の不可能を空間メタファーで。back out=後ろに退く句動詞で「手を引く」。there's構文のダミー主語も骨格ポイント。日本語の「戻る」を空間で。骨格(there's)＋句動詞back out。", category: 'reaction', month: '2026-07' },
+    { daySlot: 24, japanese: '直感で決めた', english: [
+        "I just went with my gut",
+        "I kind of just trusted my gut",
+        "I couldn't explain why, I just had a feeling it was the right call",
+        "gut decision"
+    ], context: "「直感」はgut。直感を腸gutに宿るものとする身体メタファー。go with=それに従う句動詞。the right call=正しい判定、審判メタファー。日本語は「直感」と頭で言うが英語は腹で感じる。メタファー(gut)＋句動詞go with。", category: 'opinion', month: '2026-07' },
+    { daySlot: 24, japanese: 'どっちもアリだよね', english: [
+        "both could work",
+        "honestly, you can't really go wrong either way",
+        "they each have their pros and cons, so it just comes down to what you prefer",
+        "either one's solid"
+    ], context: "「どっちもアリ」はcan't go wrong/both could work。go wrong=間違った方へ進む句動詞、その否定で「ハズレなし」。comes down to=最終的に〜に落ち着く、結論メタファー。日本語の「アリ」をcouldの可能性で。句動詞go wrong＋メタファーcome down to。", category: 'opinion', month: '2026-07' },
+
+    // ── 2026-07 Day 25 (噂・情報・会話のネタ) ──
+    { daySlot: 25, japanese: 'なんか聞いた？', english: [
+        "did you hear?",
+        "hey, did you hear about it?",
+        "I don't know if it's true, but did you hear what happened?",
+        "you hear the news?"
+    ], context: "「なんか聞いた？」はdid you hear?。do-supportのdidが疑問を作る骨格。aboutで話題を導く。日本語は「聞いた？」と動詞だけで成立するが英語は主語youと助動詞didが必須。骨格(do-support)＋骨格(主語必須)。", category: 'filler', month: '2026-07' },
+    { daySlot: 25, japanese: 'これ内緒なんだけど', english: [
+        "don't tell anyone, but",
+        "okay, keep this between us",
+        "you didn't hear this from me, but apparently they're splitting up",
+        "this stays between us"
+    ], context: "「内緒だけど」はkeep this between us。秘密を二人の「間」に閉じ込める空間メタファー。you didn't hear this from me=俺から聞いてないことにして、責任回避の会話武器。apparentlyで伝聞をhedge。メタファー＋会話武器。", category: 'filler', month: '2026-07' },
+    { daySlot: 25, japanese: 'うわさで聞いた', english: [
+        "I heard a rumor",
+        "I heard through the grapevine",
+        "someone told me, but I have no idea if there's any truth to it",
+        "word is going around"
+    ], context: "「うわさで」はthrough the grapevine。情報がブドウのツルを伝って広がる伝聞メタファー。word is going around=言葉が出回る、噂の擬人化。日本語は「うわさ」一語だが英語はツルや動き回る言葉で表す。慣用メタファー＋擬人化。", category: 'reaction', month: '2026-07' },
+    { daySlot: 25, japanese: 'マジで？', english: [
+        "no way",
+        "wait, are you serious?",
+        "no way, there's absolutely no way that's true",
+        "you're kidding"
+    ], context: "「マジで？」はno way/are you serious?。no way=「そんな道はない」と可能性を空間で否定する反応定番。you're kidding=冗談言ってるんだろ、疑いの会話武器。日本語の「マジで」を信じられなさのメタファーで。メタファー＋会話武器。", category: 'reaction', month: '2026-07' },
+    { daySlot: 25, japanese: 'まあ噂だけどね', english: [
+        "but it's just a rumor",
+        "I mean, it's just a rumor though",
+        "take it with a grain of salt, you know how people talk",
+        "could be nothing"
+    ], context: "「噂だけど」はjust a rumor though。文末thoughが「だけど」のニュアンスを担う小語。take it with a grain of salt=塩ひとつまみで受け取る=話半分に、の慣用メタファー。justで軽さを足す。小語though＋慣用メタファー。", category: 'filler', month: '2026-07' },
+    { daySlot: 25, japanese: 'みんな言ってるよ', english: [
+        "everyone's saying it",
+        "that's what everyone's saying",
+        "I'm not the only one who thinks so, pretty much everyone's talking about it",
+        "it's all anyone talks about"
+    ], context: "「みんな言ってる」はeveryone's saying it。everyoneは単数扱いでis、英語の集合名詞の骨格。that's what...の関係詞構文で「それがみんなの言ってること」と名詞化。日本語の「みんな」をeveryoneの単数で。骨格(単数扱い)＋骨格(関係詞)。", category: 'opinion', month: '2026-07' },
+    { daySlot: 25, japanese: 'それ初耳', english: [
+        "that's news to me",
+        "huh, that's the first I'm hearing of it",
+        "really? nobody told me anything about that",
+        "first I've heard"
+    ], context: "「初耳」はnews to me/first I'm hearing。情報を「自分にとってのニュース」と所有的に表す。first I'm hearing=初めて聞いてる進行形の慣用句。日本語は「耳」だが英語はnewsと聞く動作で。慣用句＋骨格(進行形)。", category: 'reaction', month: '2026-07' },
+    { daySlot: 25, japanese: 'どこで聞いたの？', english: [
+        "where'd you hear that?",
+        "wait, where did you hear that?",
+        "who told you that? I haven't heard anything about it",
+        "says who?"
+    ], context: "「どこで聞いたの？」はwhere'd you hear that?。where didの音声圧縮where'd。says who?=誰が言ってる、出所を問う省略会話武器。日本語は「聞いた」だが英語はwhere/whoの疑問詞で情報源を特定。音(where'd)＋会話武器。", category: 'filler', month: '2026-07' },
+    { daySlot: 25, japanese: 'たぶんガセだよ', english: [
+        "it's probably fake",
+        "honestly, that sounds made up",
+        "I wouldn't believe everything you hear, that's probably just a rumor",
+        "sounds bogus"
+    ], context: "「ガセ」はfake/made up。make up=でっち上げる句動詞の受動でmade up。sounds...は「〜に聞こえる」とsound動詞で印象を述べる骨格。probablyのhedgeで断定を避ける。日本語の「ガセ」を句動詞とsoundで。句動詞make up＋骨格(sound)。", category: 'opinion', month: '2026-07' },
+    { daySlot: 25, japanese: 'まあそういうこともあるよ', english: [
+        "stuff like that happens",
+        "I mean, that kind of thing happens",
+        "honestly, you hear stories like that all the time, it's nothing new",
+        "happens more than you think"
+    ], context: "「そういうこともある」はstuff like that happens。漠然をstuff/that kind of thingでぼかす小語。happenを無生物主語で立てる骨格。I meanのfillerで切り出す。日本語の「こと」をstuff/thingの曖昧名詞で。小語＋骨格(無生物主語happen)。", category: 'opinion', month: '2026-07' },
+
+    // ── 2026-07 Day 26 (性格・人柄の話) ──
+    { daySlot: 26, japanese: 'あいつ意外といいやつ', english: [
+        "he's actually a good guy",
+        "he's actually a pretty solid guy",
+        "I had him all wrong, turns out he's a genuinely good dude",
+        "good guy, who knew"
+    ], context: "「意外と」はactuallyが拾う。actuallyは相手や自分の思い込みをひっくり返す方向転換シグナル。日本語の「意外と」は新情報、英語のactuallyは既存の見方の修正。ベクトルが逆なのが面白い。小語の核心。", category: 'opinion', month: '2026-07' },
+    { daySlot: 26, japanese: 'マジ性格いいよね', english: [
+        "she's so sweet",
+        "she's genuinely such a kind person",
+        "honestly she's got one of the kindest hearts I know",
+        "good soul, that one"
+    ], context: "「性格いい」をnice一語で済まさず、sweet/kind/warmと中身で殴る。日本語は「性格」という器を褒めるが、英語は中身の質を名指しする。heartやsoulで人柄を物として掴むのがメタファー。", category: 'reaction', month: '2026-07' },
+    { daySlot: 26, japanese: 'あの人とは合わないわ', english: [
+        "we don't really click",
+        "I just don't get along with her",
+        "we've never really clicked, it's nobody's fault, just chemistry",
+        "not my kind of person"
+    ], context: "「合わない」はget along with か click。clickはカチッとハマる物理イメージで、相性を機械の噛み合わせとして捉えるメタファー。日本語の「合う」も実は似てるけど、英語のclickは音まで含むのが強い。", category: 'opinion', month: '2026-07' },
+    { daySlot: 26, japanese: 'けっこう頑固だよね', english: [
+        "he's pretty stubborn",
+        "yeah he can be really set in his ways",
+        "once he decides something there's no moving him, total brick wall",
+        "won't budge, that guy"
+    ], context: "頑固はstubbornだが、set in his ways(やり方に固まってる)やbrick wall(壁)で人を物として描くのが英語流。日本語は性格を形容詞で言うが、英語は動かない物体に喩える。擬物化メタファーの典型。", category: 'opinion', month: '2026-07' },
+    { daySlot: 26, japanese: 'すげー気が利く', english: [
+        "she's so thoughtful",
+        "she always thinks one step ahead",
+        "she notices stuff before you even ask, super considerate",
+        "always on it"
+    ], context: "「気が利く」はthoughtful/considerate。日本語は「気」という見えない何かが利く擬人化だが、英語はthink ahead(先を考える)と頭の動作で表す。気→思考プロセスへの翻訳。文化OSの違い。", category: 'reaction', month: '2026-07' },
+    { daySlot: 26, japanese: 'ちょっと天然だよね', english: [
+        "she's a bit of an airhead",
+        "she's kind of a space cadet sometimes",
+        "she just lives in her own little world, it's honestly endearing",
+        "off in space, lovingly"
+    ], context: "「天然」はそのまま訳せない。airhead(空気の頭)やspace cadetで頭が宙に浮いてる物理イメージにする。日本語の「天然」は自然体の意味だが、英語は中身が空っぽという別メタファーで攻める。", category: 'opinion', month: '2026-07' },
+    { daySlot: 26, japanese: '見た目と違って優しい', english: [
+        "he's a softie, actually",
+        "he looks tough but he's a total teddy bear",
+        "scary face, but the guy would do anything for you",
+        "all bark, no bite"
+    ], context: "ギャップ萌えはteddy bearやsoftieで柔らかい物に喩える。all bark no bite(吠えるだけで噛まない)は犬の擬物化慣用句。日本語は「見た目と違って」と並べるが、英語は一個のイメージに凝縮する。", category: 'opinion', month: '2026-07' },
+    { daySlot: 26, japanese: 'ノリがいい人', english: [
+        "she's a lot of fun",
+        "she's always up for anything",
+        "you suggest something crazy and she's already in, no hesitation",
+        "always game"
+    ], context: "「ノリがいい」はup for anything か game。gameは形容詞で「乗り気」。日本語の「ノリ」は雰囲気だが、英語はup(上向き)やgame(参加態勢)と方向や姿勢で捉える。小語が人柄を運ぶ。", category: 'reaction', month: '2026-07' },
+    { daySlot: 26, japanese: '裏表ある感じ', english: [
+        "she's kind of two-faced",
+        "she acts different depending on who's around",
+        "sweet to your face, totally different story behind your back",
+        "fake-ish, that one"
+    ], context: "「裏表」はtwo-faced(顔が二つ)。behind your back(背中の後ろ)で陰口を空間で表す。日本語は「裏表」と平面で言うが、英語は顔の数や背後という3D空間で描く。身体メタファーの差。", category: 'opinion', month: '2026-07' },
+    { daySlot: 26, japanese: '結局いい人なんだよな', english: [
+        "deep down he's a good guy",
+        "at the end of the day, he means well",
+        "say what you want, but his heart's in the right place",
+        "good egg, really"
+    ], context: "「結局」はat the end of the dayかdeep down(奥深く)。heart's in the right place(心が正しい位置にある)は人柄を空間配置で語る慣用句。日本語の「結局」は時間軸、英語は深さや位置で本質に潜る。", category: 'opinion', month: '2026-07' },
+
+    // ── 2026-07 Day 27 (お金の使い方・節約・浪費) ──
+    { daySlot: 27, japanese: '金欠なんだよね', english: [
+        "I'm broke",
+        "I'm pretty broke right now",
+        "I'm completely tapped out till payday, can't spend a thing",
+        "wallet's empty"
+    ], context: "「金欠」はbroke。brokenの省略で、自分が壊れた=金が回らないというメタファー。日本語は「欠ける」と量の不足で言うが、英語は機能停止した機械みたいに自分を扱う。擬物化の名作。", category: 'opinion', month: '2026-07' },
+    { daySlot: 27, japanese: '無駄遣いしすぎた', english: [
+        "I blew way too much",
+        "I blew a ton of cash this month",
+        "I have no idea where all my money went, just gone",
+        "spent like an idiot"
+    ], context: "「無駄遣い」はblow money。blowは吹き飛ばす=金が煙みたいに消えるメタファー。日本語の「無駄」は評価語だが、英語のblowは消失という動きで表す。動詞一個で浪費を絵にする。", category: 'opinion', month: '2026-07' },
+    { daySlot: 27, japanese: 'けっこう節約してる', english: [
+        "I'm cutting back",
+        "I'm trying to cut back on spending",
+        "I've been watching every yen lately, even skipping coffee",
+        "saving mode, on"
+    ], context: "「節約」はcut back(切り戻す)かsave。cut backは支出を物理的に切り詰めるイメージ。watch(見張る)で金を擬人化して監視する。日本語の「節約」は抽象だが、英語は切る・見張ると動作にする。", category: 'opinion', month: '2026-07' },
+    { daySlot: 27, japanese: 'それ高すぎでしょ', english: [
+        "that's a rip-off",
+        "that's way too expensive",
+        "no way that's worth it, they're totally overcharging",
+        "highway robbery"
+    ], context: "「高すぎ」はrip-off(剥ぎ取り)。highway robbery(追い剥ぎ)は値段が泥棒並みという擬人化慣用句。日本語は「高い」と量で言うが、英語は売り手を泥棒扱いして感情を盛る。文化OSのdirectness。", category: 'reaction', month: '2026-07' },
+    { daySlot: 27, japanese: 'つい買っちゃった', english: [
+        "I caved and bought it",
+        "I couldn't resist, I just bought it",
+        "I told myself no like five times and bought it anyway",
+        "weak, I know"
+    ], context: "「つい」はcave(屈する)かcouldn't resist。caveは洞窟が崩れる=意志が崩壊するメタファー。日本語の「つい」は無意識を表す副詞だが、英語は崩れる・抵抗できないと意志の敗北を動詞化する。", category: 'reaction', month: '2026-07' },
+    { daySlot: 27, japanese: 'コスパ悪いわ', english: [
+        "it's not worth it",
+        "it's just not worth the money",
+        "for what you pay you get basically nothing, bad deal",
+        "waste of money"
+    ], context: "コスパは英語にズバリ無い。worth it(価値がある)かbad dealで言う。worthは価値を重さみたいに量る感覚。日本語の和製英語「コスパ」を直訳せず、価値の天秤で考えるのが英語。骨格の再構築。", category: 'opinion', month: '2026-07' },
+    { daySlot: 27, japanese: 'お金貯まらない', english: [
+        "I can't save to save my life",
+        "I just can't seem to save money",
+        "money comes in and it's gone before I even blink",
+        "zero savings, always"
+    ], context: "save to save my life(命がけでも貯められない)は誇張慣用句。money comes in/goes out で金を出入りする液体や来客みたいに擬人化。日本語の「貯まらない」は状態、英語は金が動く主体になる。", category: 'opinion', month: '2026-07' },
+    { daySlot: 27, japanese: '今月ピンチ', english: [
+        "money's tight this month",
+        "things are pretty tight right now",
+        "I'm stretching every paycheck just to make it to the end of the month",
+        "barely scraping by"
+    ], context: "「ピンチ」はtight(きつい)かscrape by。tightは紐が締まる、stretch(伸ばす)は金を伸ばして足す物理イメージ。日本語の和製英語「ピンチ」を捨てて、締まる・伸ばすと体感に落とす。", category: 'opinion', month: '2026-07' },
+    { daySlot: 27, japanese: 'ケチだよね', english: [
+        "he's so cheap",
+        "he's kind of a tightwad",
+        "he won't even split the bill evenly, counts every coin",
+        "stingy, that one"
+    ], context: "ケチはcheapかtightwad(きつく丸めた束)。tightは財布を固く締めるイメージで「お金=出さない人」を表す。日本語は「ケチ」一語だが、英語はtight/cheap/stingyと締め具合で描き分ける。", category: 'opinion', month: '2026-07' },
+    { daySlot: 27, japanese: 'ちょっと贅沢しよ', english: [
+        "let's treat ourselves",
+        "let's splurge a little tonight",
+        "we've been good all month, we've earned one nice dinner",
+        "live a little"
+    ], context: "「贅沢」はtreat yourselfかsplurge。treatは自分を客としてもてなす擬人化、splurgeはバシャっと使う擬音的動詞。日本語は「贅沢する」と名詞動詞だが、英語は自分を甘やかす行為にする。文化OS=self as second person。", category: 'suggestion', month: '2026-07' },
+
+    // ── 2026-07 Day 28 (職場の人間関係・上司・同僚) ──
+    { daySlot: 28, japanese: '上司がうざい', english: [
+        "my boss is a pain",
+        "my boss is honestly such a pain",
+        "he micromanages every little thing I do, drives me nuts",
+        "boss is the worst"
+    ], context: "「うざい」はa pain(痛み)かdrives me nuts(狂わせる)。driveは相手が自分を運転して狂気へ向かわせる擬人化。日本語の「うざい」は主観の不快だが、英語は相手を行為の主体として責める。文化OSのdirectness。", category: 'reaction', month: '2026-07' },
+    { daySlot: 28, japanese: 'あの先輩尊敬してる', english: [
+        "I really look up to her",
+        "I genuinely look up to her at work",
+        "she handles pressure so well, I want to be like that one day",
+        "total role model"
+    ], context: "「尊敬する」はlook up to(見上げる)。respectより日常はlook up toで、相手を物理的に上に置くメタファー。日本語の「尊敬」は心の態度だが、英語は視線の方向で上下を作る。空間が感情を運ぶ。", category: 'opinion', month: '2026-07' },
+    { daySlot: 28, japanese: '同僚とうまくやってる', english: [
+        "I get along with my coworkers",
+        "I get along pretty well with everyone at work",
+        "no drama on my team, we actually have each other's backs",
+        "good crew, honestly"
+    ], context: "「うまくやる」はget along with。have each other's backs(互いの背中を守る)は仲間意識を物理的守備で言う慣用句。日本語の「うまく」は曖昧だが、英語はalongやbackと方向や位置で関係を描く。", category: 'opinion', month: '2026-07' },
+    { daySlot: 28, japanese: '仕事押し付けられた', english: [
+        "I got dumped with extra work",
+        "they dumped all the extra work on me",
+        "everyone bailed and somehow it all landed on my desk",
+        "stuck with it again"
+    ], context: "「押し付ける」はdump on(ぶちまける)かland on(着地する)。仕事を物として人の上に落とすメタファー。日本語の「押し付け」は圧力だが、英語は投げる・落ちると重力で表す。phrasal verbの妙。", category: 'reaction', month: '2026-07' },
+    { daySlot: 28, japanese: '空気読めない人だよね', english: [
+        "he can't read the room",
+        "he really can't read the room",
+        "everyone's clearly done and he keeps going, totally oblivious",
+        "clueless, that guy"
+    ], context: "「空気読めない」はread the room(部屋を読む)。日本語の「空気」を英語はroom(その場の雰囲気)に置き換えて読む対象を空間化。気→部屋への翻訳が肝。直訳air を読むは通じない。文化OSの差。", category: 'opinion', month: '2026-07' },
+    { daySlot: 28, japanese: 'ミスっちゃった', english: [
+        "I messed up",
+        "yeah, I messed up at work today",
+        "I sent the email to the wrong client, total disaster",
+        "my bad, big time"
+    ], context: "「ミスる」はmess up(散らかす)。messは散乱状態で、失敗を物が乱れた状態として捉えるメタファー。日本語の和製「ミス」を捨ててmess upに。phrasal verbで失敗を片付けられない状態に絵にする。", category: 'reaction', month: '2026-07' },
+    { daySlot: 28, japanese: '報告しといたほうがいいよ', english: [
+        "you should give him a heads-up",
+        "you should probably give the boss a heads-up",
+        "better to flag it now than have him find out the hard way later",
+        "loop him in"
+    ], context: "「報告」はheads-up(頭を上げて警戒)かloop in(輪に入れる)。情報共有を「輪に巻き込む」物理イメージで表す。日本語の「報告」は上下の義務だが、英語はloop=横の共有。組織観の差が出る。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 28, japanese: '上司に怒られた', english: [
+        "I got chewed out",
+        "my boss chewed me out today",
+        "she tore into me in front of everyone, kind of brutal",
+        "got yelled at, ugh"
+    ], context: "「怒られる」はchew out(噛みちぎる)かtear into(引き裂く)。叱責を肉食動物の攻撃に喩える激しいメタファー。日本語は「怒られる」と受け身一語、英語は噛む・裂くと暴力的動詞で痛みを盛る。", category: 'reaction', month: '2026-07' },
+    { daySlot: 28, japanese: '辞めたいって言ってた', english: [
+        "she said she wants to quit",
+        "she's been saying she wants to quit",
+        "she's pretty much done, just waiting for the right time to bounce",
+        "she's out, soon"
+    ], context: "「辞める」はquitかbounce(跳ねて去る)。boounceはスラングで「ずらかる」。日本語の「辞めたいと言ってた」は引用の入れ子だが、英語はsaid she wants toと時制を二重に管理する。骨格=時制の階層。", category: 'opinion', month: '2026-07' },
+    { daySlot: 28, japanese: 'まあ仕事だからね', english: [
+        "it's just work",
+        "eh, it's just a job at the end of the day",
+        "I'm not gonna lose sleep over it, it pays the bills and that's it",
+        "it is what it is"
+    ], context: "「仕事だから」はit's just a job。it is what it is(あるがままだ)は諦めの定番慣用句。pays the bills(請求書を払う)で仕事を金の道具に割り切る。日本語の「だから」の含みを英語はjustとit isで処理。会話武器の諦観。", category: 'shutdown', month: '2026-07' },
+
+    // ── 2026-07 Day 29 (自己嫌悪・反省・後悔) ──
+    { daySlot: 29, japanese: 'ほんと自分が嫌になる', english: [
+        "I'm so disappointed in myself",
+        "honestly I'm just disappointed in myself",
+        "I keep making the same mistake and I should know better by now",
+        "I hate this about me"
+    ], context: "「自分が嫌」はdisappointed in myself。in myselfで自分を他人みたいに評価する文化OS=self as second person。日本語は「自分が嫌」と一体だが、英語は自分を観察対象に分裂させて責める。視点の二重化。", category: 'reaction', month: '2026-07' },
+    { daySlot: 29, japanese: 'やらかした', english: [
+        "I really screwed up",
+        "okay I really screwed up this time",
+        "I had one job and I completely dropped the ball",
+        "what was I thinking"
+    ], context: "「やらかす」はscrew upかdrop the ball(ボールを落とす)。野球の落球メタファーで責任放棄を絵にする。日本語の「やらかす」は曖昧な失敗だが、英語はscrew(ねじを締め損なう)と具体動作で表す。", category: 'reaction', month: '2026-07' },
+    { daySlot: 29, japanese: 'あんなこと言わなきゃよかった', english: [
+        "I shouldn't have said that",
+        "I really shouldn't have said that to her",
+        "I'd give anything to take those words back, they just slipped out",
+        "wish I'd kept my mouth shut"
+    ], context: "後悔はshould have(すべきだった)で過去の反実仮想を組む骨格。take it back(取り戻す)で言葉を物として回収する。日本語は「よかった」で願望、英語はshould've+過去分詞で時制を遡る。仮定法の核。", category: 'reaction', month: '2026-07' },
+    { daySlot: 29, japanese: 'なんであんなことしたんだろ', english: [
+        "why did I even do that",
+        "I don't even know why I did that",
+        "looking back, I can't believe I let it get to that point",
+        "what got into me"
+    ], context: "what got into me(何が自分に入ったのか)は理性喪失を「何かが入った」擬人化で表す慣用句。日本語の「なんで」は素の疑問だが、英語は外部の力に憑かれた言い回しで責任を少しずらす。文化OSの逃げ道。", category: 'reaction', month: '2026-07' },
+    { daySlot: 29, japanese: 'また同じ失敗してる', english: [
+        "I keep doing the same thing",
+        "I keep making the exact same mistake",
+        "you'd think I'd learn by now, but here I am doing it again",
+        "round and round I go"
+    ], context: "「また」はkeep -ing で継続を表す骨格。you'd think I'd learn(学ぶと思うだろ)は自分への皮肉を仮定法で言う高度技。日本語は「また」一語で繰り返しを示すが、英語はkeepと進行形で動き続ける感を出す。", category: 'reaction', month: '2026-07' },
+    { daySlot: 29, japanese: '反省してる', english: [
+        "I feel terrible about it",
+        "I honestly feel really bad about how I handled it",
+        "I've been replaying it in my head all day, I owe her an apology",
+        "lesson learned, painfully"
+    ], context: "「反省」にズバリの一語は無い。feel bad aboutかlearn a lesson。replay in my head(頭で再生)は記憶を映像として回す擬物化。日本語の「反省」は内省の儀式だが、英語は感情と学びに分解して言う。", category: 'opinion', month: '2026-07' },
+    { daySlot: 29, japanese: '自分に甘いんだよな', english: [
+        "I go too easy on myself",
+        "I'm honestly way too easy on myself",
+        "I always find an excuse, I never actually hold myself accountable",
+        "no discipline, me"
+    ], context: "「甘い」はgo easy on(手加減する)。on myselfで自分を裁く相手と裁かれる側に分ける文化OS。hold accountable(責任を負わせる)も自分を被告にする。日本語の「甘い」を英語は審判メタファーで描く。", category: 'opinion', month: '2026-07' },
+    { daySlot: 29, japanese: '考えすぎなのはわかってる', english: [
+        "I know I'm overthinking it",
+        "I know, I know, I'm totally overthinking this",
+        "my brain just won't let it go, I keep spinning on it",
+        "in my head too much"
+    ], context: "「考えすぎ」はoverthink(過剰に考える)。spin on it(回り続ける)で思考を空回りする車輪に喩える。won't let it go(手放さない)も脳を擬人化。日本語の「すぎ」をover-接頭辞で量化するのが英語の骨格。", category: 'opinion', month: '2026-07' },
+    { daySlot: 29, japanese: 'もっとちゃんとすればよかった', english: [
+        "I should have tried harder",
+        "I really should have put in more effort",
+        "if I'd just taken it seriously from the start, none of this would've happened",
+        "too late now"
+    ], context: "if I'd + 過去完了 で過去の反実仮想。none of this would've happened(何も起きなかった)は仮定法過去完了で「ありえた別の過去」を組む英語の高度骨格。日本語の「すれば」一語が英語では時制の二段重ねになる。", category: 'reaction', month: '2026-07' },
+    { daySlot: 29, japanese: 'もういいや、切り替える', english: [
+        "whatever, moving on",
+        "you know what, I'm just moving on",
+        "I can't change it now so there's no point beating myself up over it",
+        "done dwelling"
+    ], context: "「切り替える」はmove on(前へ進む)。beat myself up(自分を殴る)は自責を物理的暴力で表す慣用句。日本語の「切り替える」は方向転換だが、英語はon=前進の方向感で立ち直りを示す。会話武器の前向き定番。", category: 'shutdown', month: '2026-07' },
+
+    // ── 2026-07 Day 30 (励まし・応援・なぐさめ) ──
+    { daySlot: 30, japanese: '大丈夫だって', english: [
+        "you'll be fine",
+        "trust me, you're gonna be fine",
+        "you've handled way worse than this, you've totally got this",
+        "no worries, really"
+    ], context: "「大丈夫」はyou'll be fineと未来形で言う。日本語の「大丈夫」は現状肯定だが、英語は未来を約束する骨格に変わる。you've got thisは「これを掴んでる」=制御してる擬物化。励ましは時制で前を向かせる。", category: 'reaction', month: '2026-07' },
+    { daySlot: 30, japanese: '気にすんな', english: [
+        "don't sweat it",
+        "seriously, don't even worry about it",
+        "it's really not a big deal, nobody's gonna remember this tomorrow",
+        "let it go"
+    ], context: "「気にすんな」はdon't sweat it。汗をかくな=焦るなと身体反応で表す擬物化。命令形で相手を直接動かす文化OSのdirectness。日本語の「気にする」を英語はsweatやworryと体や感情の動詞に落とす。", category: 'reaction', month: '2026-07' },
+    { daySlot: 30, japanese: 'よく頑張ったよ', english: [
+        "you did great",
+        "you really did an amazing job",
+        "I know how hard that was for you, and you pulled it off",
+        "proud of you"
+    ], context: "「頑張った」に直訳は無い。did greatかpull it off(やってのける)。pull offは難事を引き抜く物理イメージ。日本語の「頑張る」は過程の称賛だが、英語は結果のgreatや達成のpull offで褒める。視点が違う。", category: 'reaction', month: '2026-07' },
+    { daySlot: 30, japanese: '無理しないで', english: [
+        "don't push yourself",
+        "please don't push yourself too hard",
+        "it's okay to take a break, you don't have to do everything at once",
+        "go easy, okay"
+    ], context: "「無理しない」はdon't push yourself。自分を押す=擬人化で自分を二人称扱いする文化OS。日本語の「無理」は限界超過だが、英語はpush(押す)と物理動作で過負荷を表す。go easyも力加減のメタファー。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 30, japanese: 'きっとうまくいくよ', english: [
+        "it'll all work out",
+        "honestly, it's all gonna work out",
+        "things have a way of falling into place, just give it time",
+        "you'll see"
+    ], context: "「うまくいく」はwork out(うまく機能する)かfall into place(あるべき所に収まる)。物事を勝手に動く機械や落ち着く物として擬人化。日本語の「いく」を英語はworkやfallと自動詞の動きで未来に投げる。", category: 'reaction', month: '2026-07' },
+    { daySlot: 30, japanese: 'いつでも話聞くよ', english: [
+        "I'm here for you",
+        "you know I'm always here if you need to talk",
+        "anytime, day or night, you can just call me and vent",
+        "I've got you"
+    ], context: "I'm here for youは英語の励まし定番。I've got youは「掴んでる」=支えてるの擬物化。vent(ガス抜き)で愚痴を圧力解放に喩える。日本語の「話聞く」を英語は存在(here)と把持(got)で表す。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 30, japanese: 'あんま落ち込むなよ', english: [
+        "don't be too hard on yourself",
+        "hey, don't be so hard on yourself",
+        "you're doing the best you can, that's all anyone can ask",
+        "chin up"
+    ], context: "「落ち込む」はbe down だが励ましはdon't be hard on yourself(自分に厳しくするな)。chin up(顎を上げろ)は姿勢で気分を上げる身体メタファー命令。日本語の「落ち込む」を英語は審判と姿勢で扱う。", category: 'reaction', month: '2026-07' },
+    { daySlot: 30, japanese: '応援してるから', english: [
+        "I'm rooting for you",
+        "you know I'm totally rooting for you",
+        "whatever you decide, I've got your back the whole way",
+        "go get 'em"
+    ], context: "「応援」はroot for(根を張って支持)かhave your back(背中を守る)。日本語の「応援」は声援だが、英語は根や背中と身体・植物のメタファーで支える。go get 'emは命令形で背中を押す会話武器。", category: 'reaction', month: '2026-07' },
+    { daySlot: 30, japanese: 'みんな同じだよ', english: [
+        "you're not alone in this",
+        "trust me, everyone goes through this",
+        "literally everybody feels this way at some point, you're so normal",
+        "we've all been there"
+    ], context: "「みんな同じ」はwe've all been there(全員そこにいた)。been thereで経験を場所として共有する空間メタファー。日本語の「同じ」は状態の一致だが、英語は同じ場所を通った旅人として連帯を表す。", category: 'reaction', month: '2026-07' },
+    { daySlot: 30, japanese: '一歩ずつでいいよ', english: [
+        "just take it one step at a time",
+        "honestly, just one step at a time",
+        "you don't have to figure it all out today, small wins count too",
+        "slow and steady"
+    ], context: "「一歩ずつ」はone step at a time。slow and steady(ゆっくり着実に)はウサギとカメ由来の慣用句。small winsで小さな勝利を積む。日本語の「ずつ」を英語はat a timeと時間の区切りで表す。励ましの定番骨格。", category: 'suggestion', month: '2026-07' },
+
+    // ── 2026-07 Day 31 (雑談・つなぎ・フィラー) ──
+    { daySlot: 31, japanese: 'ていうかさ', english: [
+        "I mean",
+        "I mean, here's the thing",
+        "okay so actually, the real point I wanted to make was this",
+        "anyway, my point is"
+    ], context: "「ていうか」はI meanやactuallyで話を引き戻すフィラー。意味は変えず話し手の方向だけ修正する小語。日本語は「ていうか」で話題を上書きするが、英語はI meanで言い直しの合図を出す。会話の潤滑油＝小語。", category: 'filler', month: '2026-07' },
+    { daySlot: 31, japanese: 'なんていうか', english: [
+        "how do I put this",
+        "how do I put this, like",
+        "it's hard to explain, but you know what I'm trying to say",
+        "what's the word"
+    ], context: "「なんていうか」はhow do I put this(どう言えばいいか)。put(置く)で言葉を物として配置するメタファー。日本語は表現の探しを「いうか」で示すが、英語はput thisと言葉を物体として動かす。フィラーの王道。", category: 'filler', month: '2026-07' },
+    { daySlot: 31, japanese: 'まあそうだよね', english: [
+        "yeah, fair enough",
+        "yeah no, that's fair",
+        "I mean, I can't really argue with that, you've got a point",
+        "true, true"
+    ], context: "「まあそうだよね」はfair enough(十分公平)。yeah no は同意の定番で、英語独特のyes/no重ねフィラー。日本語の「まあ」の譲歩を英語はfairやyou've got a pointで相手の論を物として認める。会話武器。", category: 'reaction', month: '2026-07' },
+    { daySlot: 31, japanese: 'えーっと、なんだっけ', english: [
+        "uh, what was it",
+        "hold on, what was I gonna say",
+        "it was right on the tip of my tongue, give me a sec",
+        "it'll come to me"
+    ], context: "tip of my tongue(舌の先)は思い出せそうで出ない定番慣用句。言葉を口の物理的位置で表す擬物化。日本語の「なんだっけ」を英語は舌先という身体部位で描く。gonna sayは音の圧縮、会話の素フィラー。", category: 'filler', month: '2026-07' },
+    { daySlot: 31, japanese: 'ま、いっか', english: [
+        "eh, whatever",
+        "ah well, whatever works",
+        "doesn't really matter either way, let's just go with it",
+        "it's fine, it's fine"
+    ], context: "「ま、いっか」はwhateverかit's fine。whateverは判断の打ち切りフィラーで諦めと軽さを同時に運ぶ。日本語の「いっか」の投げやり感を英語はwhateverやeither wayで方向を放棄して表す。shutdown系の小語。", category: 'shutdown', month: '2026-07' },
+    { daySlot: 31, japanese: 'で、どうなったの', english: [
+        "so what happened",
+        "wait, so then what happened",
+        "okay you can't just stop there, I need to know how it ended",
+        "and then"
+    ], context: "「で」はsoで話を前へ転がすつなぎ語。soは前の話を受けて次を促す方向の小語。日本語の「で」は接続だが、英語のsoは因果と継続を両方運ぶ。and thenは時系列を繋ぐ素のフィラー。会話のギア。", category: 'filler', month: '2026-07' },
+    { daySlot: 31, japanese: 'それな', english: [
+        "right",
+        "right, exactly",
+        "no but literally, that's exactly what I've been saying",
+        "facts"
+    ], context: "「それな」はrightかexactlyかfacts。一語で全力同意を表す会話武器。日本語の「それな」のノリを英語はfacts(事実だ)やliterallyで強調する。短い相槌ほど通じると距離が縮まる小語の極み。", category: 'reaction', month: '2026-07' },
+    { daySlot: 31, japanese: 'まあとりあえず', english: [
+        "anyway, for now",
+        "anyway, let's just go with this for now",
+        "we can figure out the rest later, let's just get started",
+        "first things first"
+    ], context: "「とりあえず」はfor nowかfirst things first。日本語の便利語「とりあえず」を英語は時間(for now)か優先順位(first)に分けて表す。anywayは脱線から戻すフィラー。一語が英語では概念ごとに分岐する。", category: 'suggestion', month: '2026-07' },
+    { daySlot: 31, japanese: 'いや、ほんとそれ', english: [
+        "no, seriously",
+        "no but seriously though",
+        "I'm not even joking, that is exactly how I feel about it",
+        "for real"
+    ], context: "「いや、ほんとそれ」はno seriously。否定のnoが逆に強い肯定を出す英語の癖。thoughを文末に置いて余韻を残す小語。日本語の「いや」を英語はnoで受けつつ意味は全肯定。会話武器のひっくり返し技。", category: 'reaction', month: '2026-07' },
+    { daySlot: 31, japanese: 'そろそろ行かなきゃ', english: [
+        "I should get going",
+        "alright, I should probably get going",
+        "this was fun but I really need to head out before it gets late",
+        "gotta run"
+    ], context: "「行かなきゃ」はget goingかgotta run。gottaはgot toの圧縮音で、義務を口語で軽く言う。head out(頭を外へ)で出発を方向で表す。日本語の「なきゃ」をgottaの音とget goingの動きで自然に締める。", category: 'shutdown', month: '2026-07' },
+
+
 ];
+
+const GOROKU_SEEDS_AUG: GorokuSeed[] = [
+    // ============ AUGUST 2026-08 — 将来を見据える月 ============
+    // Days 1-5 今の現実 / 6-12 未来の選択肢 / 13-17 金の設計 / 18-24 計画と実行 / 25-31 心の置き所
+
+    // ── 2026-08 Day 1 (現状のくすぶり・このままでいいのか) ──
+    { daySlot: 1, japanese: 'このままでいいのかな', english: [
+        "is this it?",
+        "is this really all there is?",
+        "I keep asking myself, is this really all there is?",
+        "that's it?"
+    ], context: "日本語は「〜のかな」でふわっと自問するけど、英語はIs this it?とたった3語で人生丸ごとをitって代名詞一個に押し込めて突きつける。悩みが深いほど英語は短くなるっていう逆転現象。長いモヤモヤを短い疑問文で殴るのが英語流。", category: 'filler', month: '2026-08' },
+    { daySlot: 1, japanese: '毎日同じことの繰り返しだわ', english: [
+        "same old, same old",
+        "it's the same thing every single day",
+        "every day is just rinse and repeat at this point",
+        "stuck on repeat"
+    ], context: "英語のrinse and repeatはシャンプーのボトルに書いてある「すすいで繰り返す」って説明書きが人生の比喩に昇格したやつ。日本語は「繰り返し」って名詞で淡々と言うけど、英語は日用品のラベルで自虐する。人生がシャンプーの裏面って、悲しいけど笑える。", category: 'reaction', month: '2026-08' },
+    { daySlot: 1, japanese: '正直、くすぶってるわ俺', english: [
+        "I'm stuck",
+        "I'm just kind of stuck in a rut",
+        "I feel like I've been stuck in the same rut for years now",
+        "spinning my wheels"
+    ], literal: 'I am smoldering', context: "直訳のsmoldering(くすぶる)は英語だと色気ムンムンの意味になって事故る。実際はstuck in a rut、荷馬車の轍(rut)にタイヤがハマって抜けない絵で言う。日本語は消えかけの火、英語は泥道のわだち。同じ停滞でも日本は火事場で英語は悪路。", category: 'reaction', month: '2026-08' },
+    { daySlot: 1, japanese: 'なんか、何かが違うんだよな', english: [
+        "something's off",
+        "something about this just feels off",
+        "I can't put my finger on it, but something is definitely off",
+        "this ain't it"
+    ], context: "offは「本来の位置からズレてる」で、スイッチにも味にも人生にも使える万能語。日本語の「違うんだよな」の「な」が持つモヤモヤは、can't put my finger on it(指で押さえられない)で表す。違和感って、英語だと逃げ回る虫みたいな扱いをされてる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 1, japanese: 'あれはもう飼い殺しだよ', english: [
+        "kept on a leash",
+        "they're keeping me on a leash here",
+        "they pay me just enough to make sure I never leave",
+        "golden handcuffs"
+    ], literal: 'keeping me as a pet until I die', context: "直訳したらペット虐待の通報案件になる日本語代表。英語はgolden handcuffs(金の手錠)で、待遇が良すぎて逃げられない状態を手錠で言う。日本は家畜の絵、英語は囚人の絵。どっちにしろ自由はない。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 1, japanese: '俺なんて歯車の一個だし', english: [
+        "just a cog",
+        "I'm just a cog in the machine",
+        "I'm one small cog in a machine that would not even notice me gone",
+        "totally replaceable"
+    ], context: "これは珍しく日英で絵が完全一致してて、cog in the machineがそのまま通じる。産業革命を通った国同士、労働者の絶望は歯車で共有済みってこと。違いはjustの位置で、英語は文頭でI'm justと「しょせん」を先に宣言してから歯車になる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 1, japanese: '最近ワクワクしなくなったんだよ', english: [
+        "the spark's gone",
+        "I just don't get excited anymore",
+        "nothing about this job gets me excited anymore, and that scares me",
+        "dead inside"
+    ], context: "英語はsparkが消えたと火花で言う。恋愛の冷め方も仕事の冷め方も全部spark任せ。日本語の「ワクワク」はオノマトペで胸の動きを表すけど、英語は着火装置の故障として報告する。dead insideまで行くともうゾンビ宣言。", category: 'reaction', month: '2026-08' },
+    { daySlot: 1, japanese: '日曜の夜が一番キツいんだわ', english: [
+        "Sunday nights hit hard",
+        "Sunday nights are the worst part of my week",
+        "the Sunday scaries kick in around six and ruin the whole evening",
+        "Sunday scaries"
+    ], context: "英語にはSunday scariesって正式名称みたいなスラングがある。サザエさん症候群の英語版で、月曜への恐怖(scaries)が日曜の夕方に襲ってくる現象。日本はアニメの名前で呼んで、英語はお化けの複数形で呼ぶ。どの国も日曜の夜は病んでる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 1, japanese: '完全に惰性で生きてるわ', english: [
+        "just coasting",
+        "I'm just coasting through life right now",
+        "I've been living on autopilot so long I forgot who's supposed to be flying",
+        "on autopilot"
+    ], context: "coastは坂道でエンジンを切って惰性で下ること。日本語の「惰性」は物理用語の流用だけど、英語はcoasting(運転)かautopilot(飛行機)で、乗り物の操作放棄として描く。誰も操縦してない人生、墜ちる前に気づきたい。", category: 'opinion', month: '2026-08' },
+    { daySlot: 1, japanese: '胸に手を当てたらさ、もう答え出てるんだよ', english: [
+        "deep down I know",
+        "deep down I already know the answer",
+        "if I'm honest with myself, I've known the answer for a while now",
+        "I already know"
+    ], literal: 'put a hand on my chest and the answer is already there', context: "日本語は胸に手を当てるって身体の動作で良心を呼び出すけど、英語はdeep down(心の奥底)って深度で言う。表面の言い訳の下に本音が沈んでる、水深のイメージ。手を当てる場所じゃなくて、掘る深さの問題になるのが英語。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 2 (辞めたい・脱サラの本音) ──
+    { daySlot: 2, japanese: 'マジで辞めてえわ', english: [
+        "I'm so done",
+        "I seriously want to quit this job",
+        "I swear I'm one bad Monday away from walking out for good",
+        "so done with this place"
+    ], context: "doneは元々「調理済み」で、俺はもう焼き上がった、これ以上焼いたら焦げるって意味。日本語は「辞めてえ」と願望で言うけど、英語はI'm doneと完了した状態で宣言する。まだ辞めてないのにもう終わってることにするのが英語の圧。", category: 'reaction', month: '2026-08' },
+    { daySlot: 2, japanese: '辞める辞める詐欺になってるわ俺', english: [
+        "all talk",
+        "I keep saying I'll quit and never do",
+        "at this point my big resignation speech is a rerun everyone has seen",
+        "the boy who cried quit"
+    ], literal: 'I have become a quit-quit scam', context: "英語にはthe boy who cried wolf(狼少年)って寓話の型があって、wolfをquitに差し替えるだけで詐欺感が伝わる。日本語は「詐欺」って犯罪名で自分を裁くけど、英語は童話の登場人物に降格させる。騙してるというより、もう誰も信じてないってオチ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 2, japanese: 'あと何年これやるんだって話よ', english: [
+        "how many more years?",
+        "how much longer am I supposed to do this?",
+        "am I seriously going to be doing this exact same thing at 60?",
+        "twenty more years of this?"
+    ], context: "日本語は「やるんだ」って自分へのツッコミで終わるけど、英語はsupposed toを入れて「誰が決めた予定だよ」って被害者面を足す。at 60って数字を入れると絶望が急に具体化する。未来を数字で殴るのは英語の得意技。", category: 'filler', month: '2026-08' },
+    { daySlot: 2, japanese: '辞め時、完全に見失ったな', english: [
+        "missed my exit",
+        "I totally missed my window to quit",
+        "there was a perfect time to leave and I drove right past it",
+        "missed the off-ramp"
+    ], context: "英語のwindow(窓)は「チャンスの開いてる期間」で、閉まる前に飛べなかったって言い方をする。もう一個が高速道路のexitで、降り損ねてそのまま何年も走ってる絵。日本語の「見失う」は視力の問題だけど、英語だと運転ミスになる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 2, japanese: '上司見てると未来が見えるんだよな', english: [
+        "he's my future",
+        "my boss is basically me in ten years",
+        "I look at my boss and see exactly where this road ends",
+        "that's me in ten years"
+    ], context: "日本語は「未来が見える」って超能力っぽく言うけど、英語はme in ten yearsと年数で具体化する。where this road ends(この道の終点)は、キャリアを一本道として見る英語の癖。終点があの上司なら、カーナビなら即リルートする場面。", category: 'reaction', month: '2026-08' },
+    { daySlot: 2, japanese: '安定っていう名の檻だよあれは', english: [
+        "a comfy cage",
+        "stability is just a cage with better food",
+        "this job is a cage, it's just a really comfortable one",
+        "gilded cage"
+    ], literal: 'a cage named stability', context: "英語には昔からgilded cage(金メッキの籠)って表現があって、豪華だけど自由がない状態の定番。日本語は「〜っていう名の」で名前詐欺を告発する構文だけど、英語は籠の材質を豪華にする方向で皮肉る。餌が良いと鳥は逃げない、って話。", category: 'opinion', month: '2026-08' },
+    { daySlot: 2, japanese: '給料って麻酔だよな', english: [
+        "payday numbs it",
+        "the paycheck is basically anesthesia",
+        "every payday numbs the pain just enough to keep me from quitting",
+        "paid to stay numb"
+    ], literal: 'my salary is anesthesia', context: "numbは「感覚がなくなる」で、寒さで指がnumbになるのと同じ単語を心にも使う。日本語の「麻酔」は病院の比喩だけど、英語のnumbは日常語だから比喩の敷居が低い。毎月25日にモルヒネが振り込まれる人生、そりゃ辞められない。", category: 'opinion', month: '2026-08' },
+    { daySlot: 2, japanese: '履歴書に書けるもんが何もねえ', english: [
+        "my resume's empty",
+        "I've got nothing to put on a resume",
+        "twenty years of hard work and somehow nothing to show on paper",
+        "nothing to show"
+    ], context: "英語はnothing to show for itって決まり文句で、「頑張った証拠物件がない」ってニュアンス。showは法廷で証拠を提示する感じの単語。日本語は「書けない」と筆が止まる絵だけど、英語は見せる物がない、つまり手ぶらで面接に行く絵。", category: 'reaction', month: '2026-08' },
+    { daySlot: 2, japanese: '円満退社とか無理だから', english: [
+        "no clean exit",
+        "there's no such thing as a clean exit",
+        "no matter how nicely I quit, somebody is going to take it personally",
+        "bridges burn either way"
+    ], context: "英語の退職比喩の定番はburn bridges(橋を焼く)で、戻る道を焼き払うイメージ。円満退社みたいなきれいな四字熟語は英語に薄くて、leave on good termsって長めに言うしかない。橋は焼くか焼かないかの二択で、円満って選択肢が最初からない。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 2, japanese: '辞表を懐に入れて働いてるようなもんよ', english: [
+        "resignation letter's ready",
+        "I keep my resignation letter locked and loaded",
+        "I've mentally written that resignation letter about a hundred times",
+        "one bad day from quitting"
+    ], literal: 'working with my resignation letter tucked inside my jacket', context: "locked and loadedは銃に弾を込めて後は撃つだけって軍隊スラング。日本語は懐に忍ばせる時代劇の間合いだけど、英語は武器扱いで携行する。辞表が刀か銃かの違いだけで、どっちの文化でも辞表は武器ってこと。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 3 (44歳・年齢と焦り) ──
+    { daySlot: 3, japanese: 'もう44だぜ、俺', english: [
+        "I'm 44, man",
+        "dude, I'm already 44 years old",
+        "I just turned 44, so whatever I'm doing, the clock is running",
+        "44 and counting"
+    ], context: "the clock is runningはスポーツの残り時間の言い方で、人生を試合時間で数える発想。日本語の「だぜ」が担当してる凄みは、英語だとmanやdudeの呼びかけで出す。年齢を言うだけなのに観客が必要なのが英語。", category: 'reaction', month: '2026-08' },
+    { daySlot: 3, japanese: 'もう若くはないんだよ、こっちは', english: [
+        "not young anymore",
+        "let's face it, I'm not young anymore",
+        "I'm not old yet, but I'm definitely not young anymore either",
+        "past the young part"
+    ], context: "let's face itは「現実と向き合おうぜ」って前置きで、痛い事実を言う前の予告ホームラン。日本語は「〜んだよ」で噛んで含めるけど、英語は聞き手と一緒に現実(it)と対面する体にする。事実を二人で見れば痛みは半分、って構文。", category: 'opinion', month: '2026-08' },
+    { daySlot: 3, japanese: '今始めないと一生やらないんだよな、こういうのは', english: [
+        "now or never",
+        "if I don't start now, I never will",
+        "it's now or never, and honestly never is looking way too comfortable",
+        "start now or shut up"
+    ], context: "now or neverは英語の決断フレーズの王様で、時間を「今」か「無」の二択に割る。日本語は「一生やらない」って未来の自分を予言するけど、英語はneverって副詞一発で人生全部を消す。neverの方が短いのに射程が長い。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 3, japanese: '同期はもう部長だってよ', english: [
+        "he made director",
+        "guys who started with me are directors now",
+        "the guys who joined the same year as me are all directors already",
+        "everyone's lapping me"
+    ], context: "「同期」って一語が英語に存在しなくて、guys who started with meって説明文になる。新卒一括採用の文化がないから、同じ年に入った仲間って概念自体が薄い。lapは周回遅れにするって陸上用語で、英語の焦りはトラック競技で表現される。", category: 'reaction', month: '2026-08' },
+    { daySlot: 3, japanese: '年齢は言い訳にならんけどさ', english: [
+        "age is no excuse",
+        "I know age is a lame excuse",
+        "I know my age is not a real excuse, it just feels like one",
+        "but still, 44 though"
+    ], context: "lameは「足が不自由」から転じて「弱い、ダサい」で、言い訳の強度を評価する形容詞。日本語の「けどさ」の往生際の悪さは、thoughを文末にぽんと置くと再現できる。butで認めてthoughでゴネる、英語にも未練の文法はちゃんとある。", category: 'opinion', month: '2026-08' },
+    { daySlot: 3, japanese: '体感、時間が加速してんのよ', english: [
+        "time's speeding up",
+        "the years are flying by faster now",
+        "I blinked and somehow five whole years just disappeared on me",
+        "blink and it's gone"
+    ], context: "英語はtime flies(時が飛ぶ)が基本で、加速するとblink(まばたき)の間に年が消える。disappeared on meのonは「俺に被害が及んだ」って被害のon。時間が経っただけなのに、英語だと時間が俺に何かした加害者になる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 3, japanese: '人生の折り返し地点、もう過ぎたからな', english: [
+        "past halftime",
+        "I'm already past the halfway point",
+        "if life is a marathon, I'm well past the turnaround by now",
+        "second half now"
+    ], literal: 'I passed the turnaround point', context: "英語はhalftimeってスポーツの前半後半で人生を割る。日本語の折り返しはマラソンの絵で、実は日英どっちも競技場から比喩を持ってきてる。違いは英語のsecond halfに「逆転はここから」ってニュアンスが乗ること。後半からが本番って言い張れる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 3, japanese: '遅すぎるってことはない…はず', english: [
+        "never too late, right?",
+        "it's never too late... probably",
+        "they say it's never too late, and I really need that to be true",
+        "too late is a myth"
+    ], context: "they sayは「世間がそう言ってる」で、責任を世間に投げてから自分は祈る構文。日本語の「…はず」の不安は、英語だと文末のright?やprobablyで震えを出す。I need that to be trueは「真実であってくれ」って懇願で、信じてるというより縋ってる。", category: 'filler', month: '2026-08' },
+    { daySlot: 3, japanese: '10年前の俺に言ってやりてえよ', english: [
+        "note to past me",
+        "I'd love to slap some sense into 34-year-old me",
+        "if I could go back ten years, I'd tell myself to start immediately",
+        "dear past me"
+    ], context: "英語にはslap some sense into(叩いて正気を入れる)って物理で解決する言い回しがある。日本語は「言いたい」って会話で済ませるけど、英語は過去の自分をビンタする前提。dear past meは手紙の書き出しで、届かない宛先に書くから切ない。", category: 'reaction', month: '2026-08' },
+    { daySlot: 3, japanese: '焦りだけが空回りしてんだよな', english: [
+        "all panic, no progress",
+        "I'm panicking hard but going nowhere",
+        "I've got all this urgency and absolutely nothing to show for it",
+        "spinning, not moving"
+    ], literal: 'only my impatience is spinning with no traction', context: "空回りは英語だとspinning your wheels、ぬかるみでタイヤが空転する絵でほぼ直訳が通じる奇跡の一致。all panic, no progressみたいなall X, no Yは英語の悪口テンプレで、中身の不在を対句で刺す。焦ってる時ほど語呂が良くなるの、皮肉が効いてる。", category: 'reaction', month: '2026-08' },
+
+    // ── 2026-08 Day 4 (体力・健康は資本) ──
+    { daySlot: 4, japanese: '体が資本だからな、この仕事', english: [
+        "my body's my paycheck",
+        "this body is my only real asset",
+        "in my line of work, when the body breaks, the money stops",
+        "no body, no business"
+    ], literal: 'my body is my capital', context: "資本をそのままcapitalって訳すと経済学の講義が始まるので、英語はassetやpaycheckで生活に寄せる。in my line of work(俺の業種では)は現場仕事の枕詞。体を金融商品として語るのは日英共通だけど、英語の方が査定がシビア。", category: 'opinion', month: '2026-08' },
+    { daySlot: 4, japanese: '無理が利かなくなってきたわ', english: [
+        "can't push like before",
+        "I can't push through like I used to",
+        "back in the day I could power through anything, and now one all-nighter wrecks me",
+        "the warranty expired"
+    ], context: "「無理が利く」って便利な日本語は英語に一語がなくて、push throughやpower throughって突破系の動詞句で代用する。used toは「昔はそうだった」専用の型で、過去の栄光はこれ一つで語れる。warranty expired(保証期間切れ)は中年の体の定番ジョーク。", category: 'reaction', month: '2026-08' },
+    { daySlot: 4, japanese: '回復に2日かかるんだよ、最近', english: [
+        "two-day recovery",
+        "one late night costs me two days now",
+        "I go out drinking once and my body bills me for two full days",
+        "hangovers charge interest now"
+    ], context: "costやbillって金の動詞で体調を語るのが英語流で、夜更かしは支払い、二日酔いは請求書になる。日本語は「かかる」って時間の話だけど、英語は勘定の話にすり替える。利息(interest)まで付き出したら、もう体は闇金。", category: 'reaction', month: '2026-08' },
+    { daySlot: 4, japanese: '健康診断が怖いんだよな', english: [
+        "dreading my checkup",
+        "my annual checkup honestly scares me",
+        "I'm scared of what the blood test is going to say this year",
+        "the numbers know"
+    ], context: "dreadは「来るとわかってる嫌なこと」専用の怖がり動詞で、月曜と健診のためにある単語。英語はwhat the blood test is going to sayって、検査結果を喋る主体にする。数値が俺について証言してくる、完全に取り調べの構図。", category: 'reaction', month: '2026-08' },
+    { daySlot: 4, japanese: '膝が先に引退しそうなんだわ', english: [
+        "my knees quit first",
+        "my knees will retire before I do",
+        "at this rate my knees are putting in their notice before I ever do",
+        "knees gave notice"
+    ], context: "put in one's notice(退職届を出す)って会社員の手続き用語を膝にやらせるのが英語の遊び方。体のパーツを従業員扱いして、勝手に辞めていく設定にする。日本語の「引退しそう」と発想が同じで、これは日英で笑いのツボが一致してるパターン。", category: 'reaction', month: '2026-08' },
+    { daySlot: 4, japanese: '寝ないとマジで使い物にならん', english: [
+        "useless without sleep",
+        "I'm completely useless without a full night's sleep",
+        "if I don't sleep right, I'm basically a zombie the entire next day",
+        "sleep or zombie"
+    ], context: "uselessは道具に使う単語で、日本語の「使い物にならない」と完全に同じ発想。人間を工具箱の壊れたドライバー扱いする点で日英は仲間。そこにzombieを足すと歩く死体まで降格する。睡眠不足の語彙だけ妙に豊富なの、万国共通の悩みってこと。", category: 'opinion', month: '2026-08' },
+    { daySlot: 4, japanese: '今のうちに体作っとかないとな', english: [
+        "build the base now",
+        "I need to get in shape while I still can",
+        "if I'm changing my life at 44, this body has to be ready first",
+        "train now, thank me later"
+    ], context: "get in shapeのshapeは「形」で、英語は体調を形の良し悪しで語る。in shapeは形が整ってる、out of shapeは形が崩れてる。日本語の「体を作る」は建設っぽくて、英語は彫刻っぽい。thank me laterは未来の自分から感謝を前借りする言い方。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 4, japanese: '病気したら詰むからな、マジで', english: [
+        "one illness and I'm done",
+        "if I get sick, it's game over",
+        "one serious illness and this entire plan collapses overnight",
+        "checkmate by hospital"
+    ], literal: 'if I get sick, it is checkmate', context: "「詰む」は将棋の詰みで、英語ならチェスのcheckmateかゲームのgame over。盤上の比喩で人生の終了を宣言する癖は日英共通で、しかもどっちもゲーム由来。ただ英語のgame overはアーケードゲームの画面がそのまま口語になったやつで、歴史は将棋の方がだいぶ先輩。", category: 'opinion', month: '2026-08' },
+    { daySlot: 4, japanese: 'もう酒を減らすしかないんだよな', english: [
+        "gotta cut back",
+        "I've got no choice but to cut back on drinking",
+        "cutting back on booze is the one lever I can actually pull right now",
+        "the beer has to go"
+    ], context: "cut backは枝を切り戻す剪定の絵で、生活習慣を植木みたいに刈り込む言い方。日本語の「しかない」の追い込まれ感はno choice butで出す。the beer has to goのgoは「席を外してもらう」って解雇通告。ビールをクビにする日が来るとはな。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 4, japanese: 'メンテナンスも仕事のうちだろ', english: [
+        "maintenance is the job",
+        "taking care of myself is part of the job",
+        "I service my tools every week, so the guy holding them deserves the same",
+        "service the machine"
+    ], context: "英語のserviceは車や機械の定期点検で、体をserviceするって言うと自分を営業車扱いできる。日本語の「〜のうち」の範囲感覚はpart of the jobでそのまま行ける。道具は毎週磨くのに持ち主はノーメンテって、現場あるあるの矛盾。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 5 (家族・責任と自分の人生) ──
+    { daySlot: 5, japanese: '家族がいるから簡単じゃないんだよ', english: [
+        "it's not just me",
+        "with a family, it's not that simple",
+        "quitting sounds easy until you remember three people eat because of you",
+        "family changes the math"
+    ], context: "英語はchange the math(計算が変わる)って、決断をそろばんの話にする。日本語は「簡単じゃない」って難易度で語るけど、英語は変数が増えたって言い方をする。eat because of you(俺のおかげで飯を食ってる)は重いけど、これが一番リアルな計算式。", category: 'opinion', month: '2026-08' },
+    { daySlot: 5, japanese: '俺一人の人生じゃないしな', english: [
+        "not just my life",
+        "it's not only my life anymore",
+        "my choices stopped being just mine the day I got married",
+        "we're a package deal"
+    ], context: "package deal(セット販売)は商談用語で、俺を選んだら家族もついてくるって言い方。日本語の「じゃないし」の「し」が滲ませる諦めは、anymoreの「もう昔とは違う」感で拾う。人生が単品からセットメニューになった話。", category: 'opinion', month: '2026-08' },
+    { daySlot: 5, japanese: '嫁に相談するのが第一関門なんだわ', english: [
+        "boss fight: my wife",
+        "step one is getting my wife on board",
+        "none of this happens unless I survive the conversation with my wife first",
+        "the wife negotiation"
+    ], literal: 'talking to my wife is the first checkpoint', context: "get someone on board(船に乗せる)は「賛同を取り付ける」の定番で、計画を船に見立てて嫁を乗船させる絵。関門を直訳するとcheckpointだけど、体感的にはboss fight(ボス戦)の方が近い。最初のボスが最強なの、ゲームの定石に反してる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 5, japanese: '子どもには苦労させたくないんだよな', english: [
+        "not my kids",
+        "I don't want my kids paying for my choices",
+        "whatever risk I take, my kids should not be the ones who pay for it",
+        "keep the kids out of it"
+    ], context: "pay for(代償を払う)で、苦労を支払いに変換するのが英語。日本語の「苦労させる」は苦労がふわっと渡るけど、英語は請求書が誰に届くかって話にする。keep them out of itは揉め事から遠ざける言い方で、リスクを立入禁止区域にする。", category: 'opinion', month: '2026-08' },
+    { daySlot: 5, japanese: '親の顔もチラつくんだよな', english: [
+        "then, my parents' faces",
+        "my parents' faces keep popping into my head",
+        "every time I get close to deciding, I can already hear my dad",
+        "dad's voice kicks in"
+    ], literal: 'the faces of my parents flicker in and out', context: "pop into my headは考えが勝手に頭に飛び込んでくる言い方で、チラつくの不随意な感じに近い。日本語は顔が視覚でチラつくけど、英語だとI can hear my dadって音声に変わりがち。説教は見るものじゃなくて聞こえるもの、言われてみれば確かにそう。", category: 'reaction', month: '2026-08' },
+    { daySlot: 5, japanese: '家のローンって鎖だよな', english: [
+        "the mortgage owns me",
+        "a mortgage is basically a legal chain",
+        "the house was supposed to be the dream, and it turned into an anchor",
+        "house arrest with interest"
+    ], context: "mortgageの語源はフランス語の「死の誓約」で、単語からしてすでに重い。英語はown me(俺が所有されてる)って主客をひっくり返して、家を買ったはずが家に買われてる構図にする。利息付きの自宅軟禁(house arrest with interest)、うますぎて笑えない。", category: 'opinion', month: '2026-08' },
+    { daySlot: 5, japanese: 'でも背中は見せたいんだよ、子どもに', english: [
+        "want them to see me try",
+        "I want my kids to see their dad actually go for it",
+        "kids don't listen to lectures, they watch what their old man does",
+        "lead by doing"
+    ], literal: 'but I want to show them my back', context: "背中を見せるを直訳すると、英語ではturn my back on them(見捨てる)方向に誤爆する危険物。英語はlead by example、手本で正面から引っ張る言い方になる。日本の親父は背中で語り、英語の親父は行動で見せる。向いてる方向が逆なだけで、やってることは同じ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 5, japanese: '家族を言い訳にはしたくねえんだわ', english: [
+        "no hiding behind family",
+        "I refuse to hide behind my family",
+        "if I chicken out on this, that is on me, not on them",
+        "own it, don't outsource it"
+    ], context: "hide behind(後ろに隠れる)で、言い訳を盾のイメージで語るのが英語。chicken outはビビって降りるで、臆病者を鶏で言うのは万国共通っぽい。that's on meのonは責任の置き場所を示すonで、罪はどこかの上に載る物体って発想。家族の上に載せるな、俺の上に置け。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 5, japanese: '養うって言葉、重いよな', english: [
+        "heavy word, provider",
+        "the word 'provider' weighs a ton on me",
+        "it's one little word, provider, and suddenly there's a piano on my chest",
+        "heaviest word I know"
+    ], context: "英語のproviderは「供給する者」で、電力会社もネット回線も全部provider。家族を養う俺とWi-Fi売ってる会社が同じ単語なの、ちょっとだけ救われる。日本語の「養う」は口に食べ物を運ぶ絵が入ってて生々しい。weighs a tonは重さを実測値で盛る英語の定番。", category: 'reaction', month: '2026-08' },
+    { daySlot: 5, japanese: '巻き込む覚悟があるのかって話よ', english: [
+        "dragging them in",
+        "am I ready to drag them into this?",
+        "if I jump, the whole family jumps with me, and I have to own that",
+        "all in, all of us"
+    ], context: "drag inは嫌がる人を引きずり込む物理の絵で、巻き込むとほぼ同じ発想。ただ「覚悟」って一語が英語になくて、am I ready(準備できてるか)とcan I own it(引き受けられるか)に分解される。日本語は覚悟を胸に宿すけど、英語は準備の有無を点検する。精神論とチェックリストの違い。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 6 (海外移住・ベトナム構想) ──
+    { daySlot: 6, japanese: '海外もアリだよな', english: [
+        "why not abroad",
+        "honestly, moving abroad is on the table",
+        "I'm seriously starting to think living overseas could actually work",
+        "abroad's not crazy anymore"
+    ], context: "on the table=選択肢がテーブルに乗ってる状態。英語は「アリかナシか」を交渉のテーブルに物理的に並べるイメージで語る。日本語の「アリ」は有り無しの二択だが、英語は皿と一緒で机に置いてから考える。とりあえず乗せとけば正式な候補になるのが英語ルール。", category: 'opinion', month: '2026-08' },
+    { daySlot: 6, japanese: '日本にいる理由って何だっけ', english: [
+        "why am I even here",
+        "what's actually keeping me in Japan?",
+        "I honestly can't think of one solid reason I still live in Japan",
+        "remind me why I stay"
+    ], context: "keepは「引き留める」。英語は「何が俺をここに繋ぎ止めてるんだ」と、原因を縄みたいな物のせいにして聞く。日本語は「何だっけ」と自分の記憶に問い合わせるが、英語は縄の正体を探す。縄が見つからなかったら、もう出ていっていいってことになる。", category: 'filler', month: '2026-08' },
+    { daySlot: 6, japanese: 'ベトナムって家賃220ドルらしいぜ', english: [
+        "rent's 220 bucks",
+        "apparently rent in Vietnam is like 220 bucks",
+        "I heard you can rent a decent place in Vietnam for 220 bucks a month",
+        "220 a month, no joke"
+    ], context: "「らしい」はapparentlyかI heardの二択。likeを数字の前に置くと「〜くらい」のぼかしになる。bucksはドルの砕けた言い方で、dollarsと言うと急に銀行員っぽくなる。伝聞と概算をゆるく積むのが飲み屋の情報共有の型。", category: 'opinion', month: '2026-08' },
+    { daySlot: 6, japanese: '言葉の壁はもうない、AIあるし', english: [
+        "language barrier's dead",
+        "the language barrier's basically gone now",
+        "with AI in my pocket, the language barrier isn't really a thing anymore",
+        "AI killed the barrier"
+    ], context: "not a thing=「もう存在しない扱い」。英語は壁をdead、gone、killedと容赦なく殺しにいく。日本語は「もうない」と静かに消すが、英語は死亡宣告を出す。in my pocket=ポケットに入ってる=いつでも出せる武器、の言い方も便利。", category: 'opinion', month: '2026-08' },
+    { daySlot: 6, japanese: 'ビザどうすんの問題', english: [
+        "what about visas",
+        "yeah but what about the whole visa thing",
+        "the visa situation is the one part I still have to figure out",
+        "visas, that's the catch"
+    ], context: "the whole visa thing=「ビザ周りのあれこれ全部」を袋に詰めて投げる言い方。細部を知らなくてもthingで一括りにできるのが英語のずるさ。the catch=うまい話に必ずある引っかかり。釣り針のcatchで、家賃220ドルの餌の裏にある針がビザ。", category: 'reaction', month: '2026-08' },
+    { daySlot: 6, japanese: '一回下見に行くか', english: [
+        "let's scope it out",
+        "might as well go check the place out first",
+        "I should just fly over once and see it with my own eyes",
+        "recon trip, why not"
+    ], context: "scope it outのscopeは狙撃スコープ。下見を「スコープで覗く」と偵察行為にするのが英語。might as well=「どうせなら行っとくか」の腰の軽さを出す定番。日本語の「一回〜するか」の軽さはmight as wellでほぼ再現できる。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 6, japanese: '移住っていうか脱出', english: [
+        "it's an escape",
+        "it's less moving abroad, more breaking out",
+        "let's be honest, this isn't relocation, it's a jailbreak",
+        "call it what it is: escape"
+    ], literal: '引っ越しというより脱獄', context: "less A, more B=「AっていうかB」の言い直し構文。日本語の「〜っていうか」のノリがそのまま入る。jailbreakまで行くと今の生活=監獄と認めたことになる。call it what it is=「はっきり言おうぜ」と自分にツッコむ前置き。", category: 'opinion', month: '2026-08' },
+    { daySlot: 6, japanese: '向こうで暮らせる気しかしない', english: [
+        "I'd thrive there",
+        "I just know I'd do fine over there",
+        "something tells me I'd settle in over there like it's nothing",
+        "I'd fit right in"
+    ], context: "something tells me=「何かが俺に告げている」で根拠ゼロの確信を表す。日本語は「気しかしない」と自分の気のせいにするが、英語は謎のsomethingに責任を押しつける。外れても悪いのはsomething。fit right in=パズルのピースがはまる音まで聞こえる言い方。", category: 'reaction', month: '2026-08' },
+    { daySlot: 6, japanese: '日本は帰る場所にすればいい', english: [
+        "Japan's home base",
+        "Japan can just be the place I come back to",
+        "I don't have to live in Japan, I just have to be able to come back",
+        "keep Japan as backup"
+    ], context: "home base=野球のホームベース。英語は拠点を「得点するために戻ってくる場所」として語る。日本語の「帰る場所」は情緒だが、英語は戦略。住むと帰るを分けた瞬間、日本は義務じゃなくてセーブポイントになる。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 6, japanese: '円安がケツを叩いてくる', english: [
+        "the yen's pushing me",
+        "the weak yen is basically kicking me out",
+        "every time the yen drops, it feels like Japan is telling me to leave",
+        "the yen made the call"
+    ], literal: '弱い円が俺を蹴り出してくる', context: "英語は為替を完全に擬人化する。the yen is kicking me out=円が俺を国外に蹴り出す。日本語の「ケツを叩く」は応援寄りだが、英語のkick outは追い出し。made the call=決断を下したのは俺じゃなくて円、という責任転嫁までできる。", category: 'reaction', month: '2026-08' },
+
+    // ── 2026-08 Day 7 (生活コスト・物価の現実) ──
+    { daySlot: 7, japanese: '物価どんどん上がるな', english: [
+        "prices keep climbing",
+        "everything just keeps getting more expensive",
+        "prices go up every single time I walk into a store",
+        "nothing's cheap anymore"
+    ], context: "「どんどん」はkeep+ingで作る。keepは「やめない」なので、prices keep climbing=物価が登山をやめない。日本語は擬態語で勢いを出すが、英語は動詞の反復で殴る。climbを使うと物価が自分の足で山を登ってる絵になる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 7, japanese: '給料は上がらないのにな', english: [
+        "pay stays flat",
+        "meanwhile my paycheck hasn't moved an inch",
+        "prices climb every year and my salary just sits there watching",
+        "my raise? still loading"
+    ], context: "flat=横ばい。心電図が止まった時もflatなので、給料がflatは割と深刻な絵。my salary just sits there=給料がそこに座って見てるだけ、と擬人化して恨みを込める。meanwhile=「その一方で」の皮肉スイッチ。still loading=読み込み中のまま一生来ない昇給。", category: 'reaction', month: '2026-08' },
+    { daySlot: 7, japanese: '固定費を削るのが先', english: [
+        "cut the fixed costs",
+        "fixed costs are the first thing to go",
+        "before anything else, I'm slashing the bills that hit every month",
+        "trim the monthly bleed"
+    ], context: "英語は経費削減を刃物でやる。cut、slash、trim、全部切る系。日本語の「削る」も刃物だから珍しく絵が一致する。the first thing to go=真っ先に消えるもの。billsがhitする=請求書が毎月殴りに来る、という被害者目線も英語の定番。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 7, japanese: '家賃が一番デカい', english: [
+        "rent's the killer",
+        "rent is what's really eating me alive",
+        "at the end of the day, rent is the biggest chunk by far",
+        "rent eats everything"
+    ], context: "eat me alive=生きたまま食われる。英語は出費を捕食者にする。日本語は「デカい」とサイズで語るが、英語は「食われてる」と被害で語る。killer=一番効いてるやつ。chunk=塊で、給料という肉から一番デカくもぎ取られる部位が家賃。", category: 'opinion', month: '2026-08' },
+    { daySlot: 7, japanese: '月いくらあれば生きられる？', english: [
+        "what's the magic number",
+        "how much do I actually need a month?",
+        "what's the bare minimum I could actually live on per month?",
+        "monthly survival cost, go"
+    ], context: "live onのonが肝。「その金の上に乗って生活する」イメージで、live on 100,000 yen=10万円という床の上で暮らす。bare minimum=裸のギリギリ。magic number=それさえ分かれば全部決まる数字。人生の設計図がこの一問に懸かってる。", category: 'filler', month: '2026-08' },
+    { daySlot: 7, japanese: 'ランチ1500円の世界', english: [
+        "fifteen bucks for lunch",
+        "lunch is fifteen hundred yen now, seriously",
+        "we're living in a world where a basic lunch runs you 1,500 yen",
+        "lunch costs a small fortune"
+    ], context: "run youは「〜かかる」の口語。値段が人を追いかけて走ってくる動詞で、it'll run you 1,500 yen=1500円が走って取り立てに来る。a small fortune=ちょっとした財産。ランチに財産を払う時代、という誇張で笑うのが英語の愚痴の型。", category: 'reaction', month: '2026-08' },
+    { daySlot: 7, japanese: '向こうなら3分の1で暮らせる', english: [
+        "a third of the cost",
+        "over there my money goes three times further",
+        "the same lifestyle costs a third of what I pay here",
+        "same life, third the price"
+    ], context: "money goes further=金が遠くまで行く=長持ちする。英語は金を旅人として扱っていて、物価が安い国では同じ金がより遠くまで歩ける。日本語は「3分の1で暮らせる」と割り算するが、英語は金に旅をさせる。財布の中身が急に健脚になる国、ベトナム。", category: 'opinion', month: '2026-08' },
+    { daySlot: 7, japanese: '贅沢したいんじゃない、余裕が欲しい', english: [
+        "I want breathing room",
+        "it's not luxury I want, it's breathing room",
+        "I don't need fancy, I just want to stop doing math at the register",
+        "room to breathe, that's it"
+    ], context: "breathing room=息をするための空間。日本語の「余裕」は抽象的な概念だが、英語は肺で語る。金がないと息が詰まる、あると呼吸できる。レジ前で暗算をやめたいだけ、というのが一番リアルな「余裕」の定義かもしれない。", category: 'opinion', month: '2026-08' },
+    { daySlot: 7, japanese: '金の心配しない生活がしたい', english: [
+        "no more money stress",
+        "I just want money off my mind",
+        "I want a life where money isn't the first thing I think about",
+        "wake up, not worry"
+    ], context: "off my mind=頭の上から荷物を降ろす。英語は心配を「頭に載ってる物体」として扱うので、on my mind=載ってる、off my mind=降ろした。日本語は「心配しない」と行為をやめるが、英語は重量物を撤去する。朝起きて最初に考えるのが金じゃない生活、それだけ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 7, japanese: '生活水準は落とせない、場所を変える', english: [
+        "change the map, not the life",
+        "I'm not downgrading my life, I'm relocating it",
+        "instead of lowering my standards, I'll just move somewhere they're affordable",
+        "same standards, cheaper address"
+    ], context: "downgrade=プランのグレードを落とす。英語は生活水準を携帯の料金プランみたいに語る。relocate=引っ越しさせる。生活を落とすんじゃなくて、生活ごと安い土地に運ぶという発想の転換。変数は自分じゃなくて住所、という理系の解き方。", category: 'suggestion', month: '2026-08' },
+
+    // ── 2026-08 Day 8 (オンラインで稼ぐ・場所に縛られない) ──
+    { daySlot: 8, japanese: '場所に縛られたくない', english: [
+        "I hate being tied down",
+        "I don't want to be tied to one place",
+        "I refuse to let a single address decide how I live",
+        "no leash on me"
+    ], context: "tied to=縛られる。日英どっちも縄の絵で一致する珍しいやつ。leash=犬の散歩リード。no leash on me=俺にリードを付けるな、で通勤定期は首輪だったのかもしれない。refuseを使うと「嫌だ」が「拒否する」に格上げされて決意が出る。", category: 'opinion', month: '2026-08' },
+    { daySlot: 8, japanese: 'ネットさえあれば仕事になる', english: [
+        "wifi is my office",
+        "give me wifi and I can work",
+        "as long as I've got an internet connection, I'm in business",
+        "connection equals paycheck"
+    ], context: "give me X and Y=「XさえくれればYする」。日本語は「〜さえあれば」の条件文だが、英語は「くれ、そしたらやる」と取引に変える。I'm in business=「商売成立」の決まり文句で、文字通り商売の話でも使えて一粒で二度おいしい。", category: 'opinion', month: '2026-08' },
+    { daySlot: 8, japanese: '時間を切り売りするのはもう嫌だ', english: [
+        "done selling my hours",
+        "I'm done trading my time for money",
+        "I'm sick of swapping hours of my life for a fixed paycheck",
+        "my hours aren't for sale"
+    ], context: "trade time for money=時間と金の物々交換。日本語の「切り売り」は肉をスライスして売る絵だが、英語はtradeで淡々と交換所の絵になる。I'm done=「もう終わり」の宣言で、doneと言った瞬間から過去の話になる。not for sale=非売品の札を自分の時間に貼る。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 8, japanese: '寝てる間に稼ぐ仕組み', english: [
+        "earn while I sleep",
+        "I want money coming in while I sleep",
+        "the goal is building something that makes money while I'm out cold",
+        "my site works night shift"
+    ], context: "make money while you sleep=不労所得の定番フレーズ。out cold=気絶レベルの爆睡。money coming in=金が向こうから入ってくる、で主語が金になるのが肝。自分は寝てるので働くのは仕組みの方。サイトに夜勤させるという発想。", category: 'opinion', month: '2026-08' },
+    { daySlot: 8, japanese: 'パソコン一台でどこでも', english: [
+        "one laptop, anywhere",
+        "all I need is this one laptop",
+        "with just a laptop I could run everything from literally anywhere",
+        "my office fits in a backpack"
+    ], context: "fits in a backpack=オフィスがリュックに収まる。英語は働き方を物理サイズで語るのが好きで、会社が要らない自慢は「小ささ自慢」になる。run everything=全部を回す。runは会社経営でも機械でも「動かす」の万能動詞。", category: 'opinion', month: '2026-08' },
+    { daySlot: 8, japanese: '通勤ゼロの人生', english: [
+        "zero commute",
+        "imagine a life with zero commute",
+        "my dream is waking up and already being at work, no train involved",
+        "commute: cancelled"
+    ], literal: '通勤：中止', context: "imagine=「想像してみ」で相手を強制的に妄想に巻き込む前置き。no train involved=電車は一切関与していません、と事件の報告みたいに言うのが笑いどころ。cancelled=イベント中止の張り紙を通勤に貼る。満員電車は永久に中止でいい。", category: 'reaction', month: '2026-08' },
+    { daySlot: 8, japanese: 'オンラインで完結する仕事に寄せていく', english: [
+        "going full online",
+        "I'm steering my work toward fully online stuff",
+        "step by step, I'm shifting everything I do to work that lives online",
+        "if it needs an office, pass"
+    ], context: "steer=ハンドルを切る。英語はキャリアを運転で語るので、方向転換はぜんぶsteerかshift。日本語の「寄せていく」も車線変更の絵だから実は同じ運転席にいる。work that lives online=仕事がオンラインに住んでる、という言い方も英語っぽい擬人化。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 8, japanese: '働く場所と住む場所を分ける', english: [
+        "work here, live there",
+        "where I work and where I live don't have to match",
+        "I want to unbundle my job from my address once and for all",
+        "job in the cloud, me on a beach"
+    ], context: "unbundle=セット販売をバラすこと。仕事と住所は今まで抱き合わせ商品だったが、ネットのおかげで単品購入できるようになった。don't have to match=一致してる必要がない。once and for all=今回限りで永久に、のキメ台詞。", category: 'opinion', month: '2026-08' },
+    { daySlot: 8, japanese: 'リモートは交渉次第', english: [
+        "remote's negotiable",
+        "remote work is all about how you ask",
+        "half of getting remote work is just having the guts to bring it up",
+        "ask or stay commuting"
+    ], context: "bring it up=話題を持ち上げてテーブルに載せる。言い出す勇気のことをhaving the gutsと内臓で表すのが英語で、日本語の「腹を括る」と同じ場所を使ってる。negotiable=交渉の余地あり。値札にも使う単語で、働き方にも値札が付いてる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 8, japanese: 'デジタルノマドって胡散臭いけど憧れる', english: [
+        "sketchy but tempting",
+        "digital nomads seem sketchy, but I'm jealous",
+        "half of those digital nomads look like scammers, and I still want their life",
+        "scam vibes, dream life"
+    ], context: "sketchy=胡散臭い。線がスケッチみたいに曖昧=輪郭がはっきりしない奴、という絵。and I still want their life=「けど憧れる」の矛盾をbutじゃなくandで平然と繋ぐと、矛盾ごと認めてる感じが出る。人間の本音はだいたいandで繋がってる。", category: 'reaction', month: '2026-08' },
+
+    // ── 2026-08 Day 9 (副業・小商い) ──
+    { daySlot: 9, japanese: '副業から始めるのが現実的', english: [
+        "side hustle first",
+        "starting with a side hustle just makes sense",
+        "the realistic play is building something on the side before I jump",
+        "test the water first"
+    ], context: "side hustle=本業の横でがめつく動く仕事。hustleは元々「押し合いへし合い稼ぐ」の意味。on the side=皿の脇に添えるサラダと同じ言い方で、副業はメインの横の小鉢扱い。the play=作戦。スポーツの一手として人生を語るのが英語。", category: 'opinion', month: '2026-08' },
+    { daySlot: 9, japanese: '本業がある強み', english: [
+        "the day job's my safety net",
+        "having a day job is actually my edge",
+        "a steady paycheck means I can take risks without sweating",
+        "salary equals armor"
+    ], context: "safety net=サーカスの命綱の網。落ちても死なないから大技に挑める。edge=刃の縁で「優位性」。日本語の「強み」は筋力の絵だが、英語は刃物と網で語る。without sweating=汗をかかずに、で「ビビらずに」を体の反応で表すのも英語の癖。", category: 'opinion', month: '2026-08' },
+    { daySlot: 9, japanese: 'まず月5万作る', english: [
+        "first stop: 50k",
+        "step one is making an extra 50,000 yen a month",
+        "before dreaming big, I just want one steady 50k a month on the side",
+        "50k, then we talk"
+    ], context: "step one=一段目。日本語の「まず」を英語は番号で管理する。makeは金を「稼ぐ」より「作る」で、日本語の「5万作る」と完全一致する珍しいやつ。then we talk=「それができたら次の話な」と自分に言う突き放し。夢は5万円の向こう側。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 9, japanese: '小さく売ってみる', english: [
+        "start tiny",
+        "just put something small out there",
+        "I'll throw a small thing on the market and see what happens",
+        "sell first, polish later"
+    ], context: "put it out there=世に放り出す。thereは「世間」というぼんやりした場所で、とりあえずそこに置いてくる。日本語の「〜してみる」の試しはsee what happensで作る。sell first, polish later=売ってから磨け。完璧主義への英語からの説教。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 9, japanese: '趣味を金に変える', english: [
+        "monetize the hobby",
+        "time to turn this hobby into cash",
+        "if I'm spending hours on it anyway, it might as well pay me",
+        "make the hobby pay rent"
+    ], context: "make the hobby pay rent=趣味に家賃を払わせる。英語は趣味をタダ飯食ってる居候として扱って、働かせる発想をする。it might as well pay me=どうせ時間食うなら金くらい払え。時間泥棒の趣味を逆に雇用するのが英語の絵。", category: 'opinion', month: '2026-08' },
+    { daySlot: 9, japanese: '二足のわらじはキツいけど', english: [
+        "two jobs, one body",
+        "juggling two gigs is rough, not going to lie",
+        "working double duty is brutal, but it beats staying stuck",
+        "burning the candle at both ends"
+    ], literal: '二足のわらじ→ろうそくを両端から燃やす', context: "juggle=お手玉。日本語はわらじを二足履くが、英語は玉を落とさず回し続ける。burning the candle at both ends=ろうそくを両端から燃やす=無理して消耗する定番表現。it beats staying stuck=「詰んだままよりマシ」のbeatは比較の勝ち負け。", category: 'reaction', month: '2026-08' },
+    { daySlot: 9, japanese: '会社にバレない範囲で', english: [
+        "under the radar",
+        "keeping it under the company's radar",
+        "I'll grow this quietly where the company can't see it",
+        "what HR doesn't know"
+    ], context: "under the radar=レーダーに映らない低空飛行。会社を防空網扱いして、その下をこっそり飛ぶ絵。what HR doesn't know (won't hurt them)=「人事が知らないことは人事を傷つけない」の省略形で、日本語の「知らぬが仏」のオフィス版。", category: 'filler', month: '2026-08' },
+    { daySlot: 9, japanese: '副業が本業を超えたら勝ち', english: [
+        "flip the ratio, game over",
+        "the day the side gig out-earns the day job, I win",
+        "once my side income passes my salary, the whole game changes",
+        "side beats main, I'm out"
+    ], context: "out-earn=out-を頭に付けて「稼ぎで上回る」。英語はout-run、out-smartと何でもout-で競争動詞にできる。日本語は「超える」の一語だが、英語は種目ごとに勝ち方を作る。I'm out=勝ち逃げ退場の宣言。ポーカーのテーブルを立つ絵。", category: 'opinion', month: '2026-08' },
+    { daySlot: 9, japanese: '種まきの時期', english: [
+        "planting season",
+        "right now I'm just planting seeds",
+        "nothing's blooming yet, but this is the sowing part",
+        "seeds now, harvest later"
+    ], context: "plant seeds=英語もそのまま種まき。畑の比喩は日英で完全に一致する数少ないゾーンで、農業は万国共通の説得力がある。harvest=刈り取り。芽が出ない時期に腐らないための呪文で、収穫の日付だけは誰にも分からないのが玉に瑕。", category: 'filler', month: '2026-08' },
+    { daySlot: 9, japanese: '収入の柱を増やす', english: [
+        "more income streams",
+        "I need more than one income stream",
+        "one paycheck is one point of failure, so I'm adding streams",
+        "never just one tap"
+    ], literal: '収入の柱→収入の小川', context: "日本語は収入を柱(建築)で数えるが、英語はstream(小川)で数える。柱は折れたら家が潰れるが、小川は一本涸れても他が流れてる。point of failure=そこが壊れたら全部止まる箇所、というエンジニア用語を給料に使うと急に危機感が出る。", category: 'suggestion', month: '2026-08' },
+
+    // ── 2026-08 Day 10 (自分の商売を作る) ──
+    { daySlot: 10, japanese: '自分の商品を持ちたい', english: [
+        "I want my own product",
+        "I want something out there with my name on it",
+        "one day I want to sell something I actually built myself",
+        "my product, my rules"
+    ], context: "with my name on it=名前が刻んである状態。英語は所有をラベルと刻印で語る。日本語の「持つ」は手の中の絵だが、英語のout thereは世に放って名前だけ付いてる絵。手放してるのに自分の物、それが商品というやつ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 10, japanese: '雇われない働き方', english: [
+        "nobody's employee",
+        "I want to work for myself, not a boss",
+        "the end goal is a life where no one signs my paycheck but me",
+        "be my own boss"
+    ], context: "work for myself=自分のために働く。日本語は「雇われない」と否定形で言うが、英語はfor myselfと矛先を変えるだけで済ませる。sign my paycheck=給料の小切手にサインする人=お前の支配者。サインする手を自分の手に替える、それが独立の絵。", category: 'opinion', month: '2026-08' },
+    { daySlot: 10, japanese: '屋号だけはもう決めてある', english: [
+        "got the name already",
+        "the business name? already picked, obviously",
+        "I have zero customers but the company name has been ready for years",
+        "name first, business later"
+    ], context: "obviously=「当然だろ」の開き直り。順序が完全に逆なのを堂々と言うのが笑いどころで、英語はzero customers butと数字を先に出して自虐する。日本語の「だけは」の情けなさは、already picked, obviouslyのドヤ顔で再現できる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 10, japanese: '最初の客をどう取るか', english: [
+        "who buys first",
+        "the real question is landing customer number one",
+        "everything starts with figuring out how to get that first paying customer",
+        "first sale is the wall"
+    ], context: "land=魚を釣り上げて陸に揚げること。英語は客を獲物として釣る文化で、大口客はbig fish。customer number one=背番号1の客。payingを付けるのが大事で、タダで褒めてくれる友達は客にカウントされない。", category: 'opinion', month: '2026-08' },
+    { daySlot: 10, japanese: '安売りはしない', english: [
+        "no discounts",
+        "I'm not racing to the bottom",
+        "the moment you compete on price, you've already lost",
+        "cheap isn't my brand"
+    ], context: "race to the bottom=底辺への競争。値下げ合戦を「谷底に向かって全員で走るマラソン」に例える定番で、優勝賞品は貧乏。compete on price=価格の土俵で戦う。onは土俵の上に乗るイメージで、乗った時点で負けが決まってる土俵もある。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 10, japanese: '自分の名前で仕事する', english: [
+        "my name, my work",
+        "I want my name on the work, win or lose",
+        "no more hiding behind a company logo, it's my name up front now",
+        "no logo to hide behind"
+    ], context: "hide behind=後ろに隠れる。英語は会社のロゴを盾や衝立として絵にする。今までは失敗してもロゴが矢を受けてくれたが、独立したら生身。win or lose=勝っても負けても、を先に言っておくと覚悟の宣言になる。up front=一番前に晒す。", category: 'opinion', month: '2026-08' },
+    { daySlot: 10, japanese: '失敗しても経験は残る', english: [
+        "failure still pays",
+        "even if it flops, I keep the lessons",
+        "worst case I lose some money, but the experience doesn't get refunded",
+        "scars are receipts"
+    ], literal: '傷跡は領収書', context: "flop=バタッと倒れる音がそのまま「コケる」になった単語。experience doesn't get refunded=経験は返品不可、を良い意味で使う逆転。金は減るが経験は店側が回収できない。scars are receipts=傷跡が領収書=やった証拠は体に残る。", category: 'opinion', month: '2026-08' },
+    { daySlot: 10, japanese: '商売のタネはそこら中にある', english: [
+        "ideas are everywhere",
+        "business ideas are lying around everywhere",
+        "every annoying problem I run into is basically a product waiting to happen",
+        "problems are inventory"
+    ], context: "lying around=そこらに転がってる。英語もタネを「落ちてる物」として扱う。waiting to happen=起きるのを待ってる=時間の問題、で「イラつく問題は全部まだ生まれてない商品」という見方に変わる。ムカつくたびに在庫が増える人生。", category: 'opinion', month: '2026-08' },
+    { daySlot: 10, japanese: 'まず一人に売れれば十人に売れる', english: [
+        "one sale proves it",
+        "if one person pays, ten people will",
+        "get one stranger to pull out their wallet and the rest is just repetition",
+        "sell one, scale ten"
+    ], context: "stranger=赤の他人。友達が買うのはご祝儀、他人が買うのが証明、という区別を英語は一語でやる。pull out their wallet=財布を抜く動作で「買う」を絵にする。the rest is just repetition=残りは繰り返し作業、で二人目からは急に事務になる。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 10, japanese: '看板背負うってこういうことか', english: [
+        "it's all on me",
+        "so this is what having my name on the line feels like",
+        "when it's your own name on the line, every little thing suddenly matters",
+        "no one to blame now"
+    ], literal: '看板を背負う→名前が崖っぷちの線の上に乗る', context: "on the line=崖っぷちの線の上に名前が乗ってる状態。日本語は看板を背負う「重さ」で責任を語るが、英語は線の上の「落ちそうさ」で語る。同じ責任でも、重いか危ういかで絵が違う。no one to blame now=言い訳の在庫が切れた瞬間の台詞。", category: 'reaction', month: '2026-08' },
+
+    // ── 2026-08 Day 11 (AI時代を生き抜く) ──
+    { daySlot: 11, japanese: 'AIに食われる側になりたくない', english: [
+        "not getting replaced",
+        "I'm not getting replaced by a chatbot",
+        "I refuse to be the guy AI puts out of a job",
+        "not going out like that"
+    ], context: "日本語は「食われる」と食物連鎖で言うが、英語はreplaced=部品交換のイメージ。get replaced=取り替えられる、put out of a job=仕事から追い出される。英語は人間をパーツ扱いで語るから、食われるより地味に怖い。", category: 'opinion', month: '2026-08' },
+    { daySlot: 11, japanese: '食われる前に使う側に回る', english: [
+        "be the one driving",
+        "either you use AI or it uses you",
+        "I'd rather be the guy driving the thing than the guy under it",
+        "get in the driver's seat"
+    ], context: "英語は立場の話をすぐ運転席に持っていく。in the driver's seat=ハンドル握ってる側。日本語の「側に回る」は将棋の陣取りっぽいが、英語は乗り物で語る。轢かれる側か運転する側か、二択にすると急に話が早い。", category: 'opinion', month: '2026-08' },
+    { daySlot: 11, japanese: 'AIの先を行くしかない', english: [
+        "stay ahead of it",
+        "you've got to stay ahead of the curve",
+        "the only move left is staying one step ahead of the machines",
+        "outrun the robots"
+    ], context: "ahead of the curve=グラフの曲線の先。日本語は「先を行く」と道のイメージだが、英語はグラフの伸びで語る。しかもstay=居続ける。一回抜いて終わりじゃなく、走り続ける前提なのが英語の意地悪なとこ。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 11, japanese: '怖がってる場合じゃない', english: [
+        "no time for fear",
+        "being scared isn't going to pay the bills",
+        "we don't have the luxury of sitting here being scared of this stuff",
+        "scared money makes no money"
+    ], context: "英語は感情論を「それ、請求書払えんの?」で切り捨てる。pay the bills=生活費を払う、が万能の物差し。scared money makes no money=ビビった金は稼がない、という格言まである。怖さに家賃を払わせる発想。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 11, japanese: '月20ドルで未来が買えるんだぜ', english: [
+        "twenty bucks a month",
+        "twenty bucks a month buys you the future",
+        "best twenty bucks I spend every month, and it's not even close",
+        "cheapest superpower ever"
+    ], context: "buys you the future=金が主語になって未来を買ってくれる。日本語は人が買うが、英語は20 bucksを主語にして働かせる。金を主語にすると急にプレゼンが上手くなるのが英語の癖。", category: 'reaction', month: '2026-08' },
+    { daySlot: 11, japanese: '新しいもんにビビらない', english: [
+        "doesn't scare me",
+        "new stuff doesn't scare me anymore",
+        "I stopped being scared of new tech a long time ago",
+        "shiny and new? bring it"
+    ], context: "日本語は「俺がビビらない」だが、英語はnew stuff doesn't scare me=新しいもの側が主語で、あっちが俺を怖がらせられない、と矢印が逆。ビビるかどうかの責任を相手に押し付ける言い方。強がりの構造が最初から文法に入ってる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 11, japanese: '乗るしかない、この波に', english: [
+        "ride the wave",
+        "this wave, you ride it or you drown",
+        "you don't fight a wave this big, you surf it",
+        "surf it or sink"
+    ], context: "英語は波と来たら必ずsurfが出てくる。日本語の「しかない」を英語はor=さもなくば、の二択で言う。ride it or drown=乗るか溺れるか。逃げ道を文法ごと塞いでくるのが英語の締め方。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 11, japanese: 'AIは道具。問題は使い手', english: [
+        "it's just a tool",
+        "the tool's fine, the user's the problem",
+        "a hammer doesn't build the house, the guy holding it does",
+        "blame the carpenter, not the hammer"
+    ], context: "英語のたとえ話は大工道具が定番。blame the carpenter, not the hammer=悪いのは金槌じゃなく大工。うちの業界の話かってくらい馴染む。道具のせいにする奴は日英どっちの現場でも嫌われる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 11, japanese: '結局、手を動かした奴が勝つ', english: [
+        "builders win",
+        "the guy who actually builds stuff wins",
+        "talkers keep talking, builders keep winning, it's that simple",
+        "talk less, build more"
+    ], context: "英語は対句が大好物。talkers talk, builders build=喋る奴は喋り、作る奴は作る。日本語の「手を動かす」を英語はbuild=作る、と成果物ごと言う。手より完成品を見てるのが英語。", category: 'opinion', month: '2026-08' },
+    { daySlot: 11, japanese: '様子見してる間に置いていかれるぞ', english: [
+        "waiting is losing",
+        "wait and see is how you get left behind",
+        "while you're sitting on the fence, everyone else is already gone",
+        "snooze, you lose"
+    ], context: "sit on the fence=柵の上に座って決めない人。日本語の様子見は遠くから眺める絵だが、英語は柵の上で尻が痛いまま固まってる絵。snooze, you lose=居眠りした奴の負け、韻で殴る定番。", category: 'shutdown', month: '2026-08' },
+
+    // ── 2026-08 Day 12 (学び直し・スキル) ──
+    { daySlot: 12, japanese: '今さらだけど勉強が楽しい', english: [
+        "studying's actually fun",
+        "who knew studying could be this fun",
+        "forty-four years old and I'm actually enjoying homework, go figure",
+        "late bloomer, so what"
+    ], context: "go figure=「不思議なもんだよな」の投げ捨て。英語は文末にこれを置いて自分で自分にツッコむ。who knew=誰が知ってた=誰も知らんわ、も同じ自虐装置。44歳で宿題が楽しいは、英語だと先回りして笑いにできる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 12, japanese: '学び直しに遅いはない', english: [
+        "never too late",
+        "it's never too late to start over",
+        "best time to plant a tree was twenty years ago, second best is right now",
+        "better late than never"
+    ], context: "英語の定番は木を植える格言。日本語は「遅いはない」と否定で言うが、英語は「二番目にいいのは今」とランキング形式で言う。二位でいいなら今日からやれる、っていう逃げ道の作り方が上手い。", category: 'opinion', month: '2026-08' },
+    { daySlot: 12, japanese: '毎日ちょっとずつでいい', english: [
+        "little by little",
+        "a little bit every day adds up",
+        "I just chip away at it a little every single day",
+        "brick by brick"
+    ], context: "chip away=ノミで少しずつ削る、add up=足し算で積み上がる。日本語の「コツコツ」は音だが、英語は彫刻とレンガの絵で見せる。コツコツって擬音で済む日本語のほうが実は楽。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 12, japanese: '英語は武器になる', english: [
+        "English is a weapon",
+        "English is the cheapest weapon out there",
+        "English doubles the size of your world for the price of some effort",
+        "my secret weapon"
+    ], context: "weaponと言った直後にcheapest=一番安い、とコスパの話を始めるのが英語。doubles your world=世界が倍になる。武器屋なのに値札の話ばっかりしてくる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 12, japanese: '資格より実績だろ', english: [
+        "results over paper",
+        "nobody cares about the certificate, show your work",
+        "a pile of actual work beats a piece of paper every time",
+        "receipts over diplomas"
+    ], context: "receipts=レシート=証拠、のスラング。英語では「領収書見せろ」が「実績見せろ」になる。紙より紙って話だが、刷ってある内容が違う。show your work=学校のテストで途中式を書けの意味が、大人になると実績公開の意味になる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 12, japanese: '教わるより盗め', english: [
+        "steal the craft",
+        "you don't get taught, you steal it",
+        "the good stuff never gets taught, you watch the guy and steal it",
+        "watch and steal"
+    ], literal: 'steal it rather than be taught it', context: "職人の「技は盗め」は英語にもある。good artists copy, great artists steal=いい奴は真似る、すごい奴は盗む。教えてもらうのを待つ奴は日英どっちの現場でも一生下っ端。職人の掟は万国共通だった。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 12, japanese: 'インプットだけじゃ意味ない', english: [
+        "input's not enough",
+        "reading about it isn't the same as doing it",
+        "you can watch swimming videos all day, you still can't swim",
+        "less watching, more doing"
+    ], context: "英語は「意味ない」を理屈じゃなく絵で否定する。水泳の動画を一日中見ても泳げない、という一枚絵で終わり。日本語は結論を言い、英語は光景を見せる。プールサイドで詳しい奴、どこの国にもいる。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 12, japanese: '昨日の自分より一歩前へ', english: [
+        "beat yesterday's me",
+        "just beat yesterday's me, that's it",
+        "I'm not racing anybody else, just the guy I was yesterday",
+        "me versus yesterday's me"
+    ], context: "英語は比較相手をキャラとして立てる。yesterday's me=昨日の俺、が対戦相手として画面に出てくる。日本語の「一歩前へ」は距離の話だが、英語は勝敗の話にする。あいつ(昨日の俺)、毎日ちょっとずつ強くなるから厄介。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 12, japanese: '学んだことはすぐ使う', english: [
+        "use it right away",
+        "learn it today, use it today",
+        "if I don't use it the same day, it's gone by morning",
+        "use it or lose it"
+    ], context: "use it or lose it=使え、さもなくば失え。韻を踏んだ定番。英語は記憶を賞味期限で語る。gone by morning=朝には消えてる。頭の中の冷蔵庫、思ってるより保存が利かない。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 12, japanese: '知識は複利で効いてくる', english: [
+        "knowledge compounds",
+        "knowledge stacks up like compound interest",
+        "every little thing you learn starts paying interest down the road",
+        "brain gains compound"
+    ], context: "compound=複利で雪だるま式に増える。英語はpaying interest=利子を払ってくれる、と知識を銀行口座扱いする。brain gains=筋トレのgainsの流用で、脳も筋肉ってこと。預けた分しか増えないのも銀行と同じ。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 13 (軍資金・貯金) ──
+    { daySlot: 13, japanese: 'まず先立つものが要る', english: [
+        "money first",
+        "none of this works without cash",
+        "big dreams still need gas money",
+        "no dough, no go"
+    ], literal: 'the thing that must come first is needed', context: "日本語は金を「先立つもの」と遠回しに呼ぶが、英語はcashと即物的に言い切る。gas money=ガソリン代。夢も車も燃料がないと一歩も動かない。dough=パン生地=金のスラング、no dough no goで韻。", category: 'opinion', month: '2026-08' },
+    { daySlot: 13, japanese: '軍資金を貯めてる', english: [
+        "building my war chest",
+        "I'm stacking up my war chest",
+        "every single yen goes into the war chest for the big move",
+        "stacking ammo"
+    ], literal: 'saving military funds', context: "war chest=戦の資金箱。英語もそのまま軍事用語で、日本語の軍資金と完全に同じ発想。stacking=札を積む、ヒップホップ由来。どこの国も、金を貯める話になると急に戦争を始める。", category: 'opinion', month: '2026-08' },
+    { daySlot: 13, japanese: 'まず生活防衛資金だろ', english: [
+        "emergency fund first",
+        "rainy day fund before anything fancy",
+        "you build the safety net before you walk the tightrope",
+        "cushion first, then play"
+    ], context: "日本語は「防衛」と軍隊で言い、英語はrainy day fund=雨の日基金と天気で言う。safety net=サーカスの下の網。転ぶ前提で網を張っておくのが大人。網なしで綱渡りするのは勇気じゃなくてただの無計画。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 13, japanese: '貯金ゼロからのスタート', english: [
+        "starting from zero",
+        "starting from zero, nowhere to go but up",
+        "my bank account's a blank page, time to write something on it",
+        "zero to hero, hopefully"
+    ], context: "nowhere to go but up=もう上しかない=底の特権。英語はどん底を在庫みたいにポジティブ計上する。blank page=白紙、これから書けるという強がり。強がりに文法の型があるのが英語のいいところ。", category: 'reaction', month: '2026-08' },
+    { daySlot: 13, japanese: 'ボーナスは全部種銭', english: [
+        "all seed money",
+        "the whole bonus goes straight into seed money",
+        "I don't touch the bonus, every yen of it gets planted",
+        "plant it, don't spend it"
+    ], context: "種銭=seed money、日英で偶然おなじ農業メタファー。世界中どこでも金は種で、使ったら芽は出ない。gets planted=植えられる、と金を畑に埋める言い方。植えた翌日に掘り返す奴が一番多いのも万国共通。", category: 'opinion', month: '2026-08' },
+    { daySlot: 13, japanese: '使う金と守る金は分ける', english: [
+        "separate the buckets",
+        "spending money and saving money live in different houses",
+        "the second they mix, the saving money starts quietly disappearing",
+        "two wallets, no mixing"
+    ], context: "英語は金の管理をbuckets=バケツで語る。用途ごとにバケツを分けて、混ぜたら終わり。live in different houses=別居させる、と金を家族扱いするのも英語らしい。混ぜるな危険は洗剤だけの話じゃない。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 13, japanese: '金がないなら知恵を出せ', english: [
+        "broke means creative",
+        "no cash means you pay with brains",
+        "when the wallet's empty, the head has to work overtime",
+        "brains are free"
+    ], context: "pay with brains=脳で支払う。英語は知恵まで通貨として扱う。brains are free=脳みそはタダ、一番安い資本。財布が軽い日ほど頭が残業する仕組み、うちの会社より人事がしっかりしてる。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 13, japanese: '毎月コツコツ積み立てる', english: [
+        "steady stacking",
+        "same amount, same day, every month",
+        "it goes in automatically, boring on purpose, that's the whole trick",
+        "boring on purpose"
+    ], context: "boring on purpose=わざと退屈にする。英語は積立を「つまらなくすること」自体を戦略として言葉にする。automatically=自動で、は自分の意志力を最初から信用しない大人の設計。やる気に任せた貯金は全部消えた、実体験。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 13, japanese: 'へそくりも立派な戦略よ', english: [
+        "secret stash counts",
+        "a secret stash is a legit strategy",
+        "don't laugh at the sock drawer money, that's tactical reserves",
+        "shoebox savings, zero shame"
+    ], literal: 'belly-button savings', context: "へそくりを直訳するとbelly-button savings=へそ貯金。英語圏はsock drawer=靴下の引き出し、shoebox=靴箱に隠す。日本人は腹に隠し、あっちは足元に隠す。隠し場所に国民性が出る。", category: 'opinion', month: '2026-08' },
+    { daySlot: 13, japanese: '金は目的じゃなくて燃料', english: [
+        "money is fuel",
+        "money's not the goal, it's the gas",
+        "nobody drives around just to fill the tank, money's the same thing",
+        "fuel, not the finish line"
+    ], context: "fuel, not the finish line=燃料でありゴールじゃない、と頭の音を揃える英語の癖。満タンにするためだけに走る奴はいない、の一枚絵で目的と手段をひっくり返す。ガソリンスタンドに住むな、って話。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 14 (投資・資産の話) ──
+    { daySlot: 14, japanese: '銀行に置いとくだけじゃ増えない', english: [
+        "banks pay nothing",
+        "money sleeping in the bank stays asleep",
+        "leaving it all in savings is just watching it shrink politely",
+        "zero interest, literally"
+    ], context: "英語は金を人格化して、寝かせたり働かせたりする。sleeping money=寝てる金、は起こさない限り一生寝てる。shrink politely=礼儀正しく縮む=インフレの皮肉。日本の銀行の利子、礼儀正しすぎて存在を忘れる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 14, japanese: 'NISAくらいはやっとくか', english: [
+        "at least do NISA",
+        "the tax-free account is the bare minimum",
+        "skipping a free tax break is just leaving money on the table",
+        "free money, just take it"
+    ], context: "leave money on the table=テーブルに金を置き忘れる、ポーカー由来で「取れるものを取り損ねる」。日本語の「くらいはやっとく」という消極的最低ラインを、英語は置き忘れの絵で損として見せる。bare minimum=最低限、これすらやらないと英語では叱られる側。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 14, japanese: '一発逆転は狙わない', english: [
+        "no moonshots",
+        "I'm not swinging for the fences",
+        "get-rich-quick schemes are how you get poor even quicker",
+        "no lottery tickets"
+    ], context: "swing for the fences=フェンス超え狙いのフルスイング。moonshot=月まで飛ばす打球。英語はギャンブルの話をなぜか野球場でする。フルスイングは三振とセットだってことを、英語は野球で覚えてる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 14, japanese: '長期でコツコツやる', english: [
+        "long game",
+        "slow, boring, and long, that's the plan",
+        "time in the market beats timing the market, so they say",
+        "boring wins"
+    ], context: "time in the market beats timing the market=居座る時間がタイミング当てに勝つ。inとtimingで語呂遊びしながら正論を言う投資の格言。boring wins=退屈が勝つ、身も蓋もないが反論できない。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 14, japanese: '卵は一つのカゴに盛るなってな', english: [
+        "spread your eggs",
+        "don't put all your eggs in one basket",
+        "one basket drops and there goes breakfast, so spread them around",
+        "diversify or cry"
+    ], context: "これは英語のことわざが日本語に輸入されたやつで、直訳がそのまま通じる珍しいボーナスステージ。there goes breakfast=朝メシが消えた、と落とした後の絵まで見せるのが英語。diversify or cry=分散か号泣か。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 14, japanese: '暴落で狼狽売りだけはしない', english: [
+        "don't panic sell",
+        "when it crashes, sit on your hands",
+        "the market dips, you take a breath, and you do absolutely nothing",
+        "hold the line"
+    ], context: "sit on your hands=手の上に座る=物理的に手を出せなくする。英語は「何もしない」を体の姿勢で言う。狼狽売りはpanic selling、英語圏では「金持ちへの募金」と呼ばれる。募金するほど余裕ないんで座っとく。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 14, japanese: '自分に投資するのが一番利回りいい', english: [
+        "bet on yourself",
+        "the best returns come from betting on yourself",
+        "no index fund pays out like a new skill does",
+        "invest in the mirror"
+    ], context: "bet on yourself=自分に賭けろ。英語は自分を賭けの対象、つまり馬扱いする。invest in the mirror=鏡に投資しろ、で自分をモノとして突き放す言い方。この馬、44歳だがまだ走る。", category: 'opinion', month: '2026-08' },
+    { daySlot: 14, japanese: '複利は人類最大の発明らしいぜ', english: [
+        "compound interest, baby",
+        "apparently Einstein called compound interest the eighth wonder",
+        "compound interest is the closest thing to legal magic there is",
+        "math's only magic trick"
+    ], context: "eighth wonder of the world=世界八番目の不思議。アインシュタインが言ったとされるが本当かは怪しい。英語はそういう時apparently=らしいけど、を一言添えて責任回避する。日本語の「らしいぜ」と完全に同じ役割の保険。", category: 'filler', month: '2026-08' },
+    { daySlot: 14, japanese: 'リスク取らないのもリスクだから', english: [
+        "playing safe is risky",
+        "not taking any risk is its own gamble",
+        "standing still on a moving walkway means you're going backward",
+        "safe is the new risky"
+    ], context: "英語はこの理屈を空港の絵で言う。moving walkway=動く歩道の上で立ち止まれば、実質後退。日本語は理屈で説得し、英語は光景を見せて黙らせる。動く歩道、乗ってるだけで抜かされる時代になった。", category: 'opinion', month: '2026-08' },
+    { daySlot: 14, japanese: '億り人とかは夢のまた夢だわ', english: [
+        "millionaire? yeah right",
+        "a million bucks is a dream inside a dream",
+        "I'm not chasing millionaire status, I just want options",
+        "keep dreaming, buddy"
+    ], literal: 'a dream inside a dream', context: "夢のまた夢=a dream within a dreamはそのまま通じる上に、ポーの詩のタイトルでもある。億り人は英語に存在しないのでmillionaire statusと地位で言う。options=選択肢、が英語圏の金の本当の使い道。夢は二階建てより平屋がいい。", category: 'reaction', month: '2026-08' },
+
+    // ── 2026-08 Day 15 (収入源・キャッシュフロー) ──
+    { daySlot: 15, japanese: '収入源は多いほどいい', english: [
+        "more streams, please",
+        "the more income streams, the better I sleep",
+        "one paycheck is a tightrope, five streams is a bridge",
+        "streams over salary"
+    ], context: "英語は収入をstreams=小川で数える。金は水路を流れてくるものという発想。tightrope=綱渡りの綱、一本は綱渡りで五本束ねれば橋になる。眠りの深さが収入源の本数で決まるの、笑えないけど本当。", category: 'opinion', month: '2026-08' },
+    { daySlot: 15, japanese: '一本足打法は危ないって', english: [
+        "one leg, no balance",
+        "standing on one leg is asking to fall",
+        "if the one paycheck stops, the whole show stops, that's terrifying",
+        "don't stand on one leg"
+    ], literal: 'one-legged batting stance', context: "王さんの一本足打法は英語圏に通じないので、standing on one leg=片足立ちの絵だけ渡す。asking to fall=転ぶのを自分から頼んでる、と英語は自業自得を先に言う。日本語は野球で例え、英語は卵とカゴで例える。", category: 'opinion', month: '2026-08' },
+    { daySlot: 15, japanese: '給料以外の入金があると心が安定する', english: [
+        "side money is therapy",
+        "money that isn't salary does wonders for my head",
+        "even five bucks from a side thing calms me down more than payday",
+        "peace of mind, deposited"
+    ], context: "does wonders=驚くほど効く。英語は精神安定を薬の効能書きみたいに言う。peace of mind, deposited=心の平和、入金済み。給料日より500円の副収入のほうが効くの、金額じゃなくて出どころの問題。", category: 'reaction', month: '2026-08' },
+    { daySlot: 15, japanese: 'ストック型の収入が欲しい', english: [
+        "passive income, please",
+        "build it once, let it keep paying",
+        "I want stuff that earns while I'm asleep or out fishing",
+        "money on autopilot"
+    ], context: "日本語の「ストック型」はビジネス用語だが、英語の定番はearn while you sleep=寝てる間に稼ぐ。布団の中から経済を語るのが英語。build it once=一回作る、let it keep paying=あとは払わせ続ける。作る一回が地獄なのは言わない約束。", category: 'opinion', month: '2026-08' },
+    { daySlot: 15, japanese: 'まず金の流れを把握する', english: [
+        "know your cash flow",
+        "you can't fix what you don't track",
+        "watch where the money walks in and where it sneaks out",
+        "follow the money"
+    ], context: "follow the money=金を追え、刑事ドラマの決まり文句。英語は金の出入りを擬人化して、walk in=正面から入り、sneak out=裏口から抜き足で出て行く、と泥棒の動きで描く。うちの金、出て行く時だけ足音消すの上手い。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 15, japanese: '入りを増やすより先に出を締める', english: [
+        "cut the leaks",
+        "plugging leaks beats digging new wells",
+        "the easiest raise you'll ever get is cutting what you waste",
+        "tighten the faucet"
+    ], context: "英語は家計を配管で語る。plug the leaks=漏れを塞ぐ、tighten the faucet=蛇口を締める。easiest raise=一番楽な昇給は節約、という言い換えの一撃が英語らしい。上司に頭を下げずにもらえる唯一の昇給。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 15, japanese: '値段は自分で決める側になる', english: [
+        "set my own price",
+        "I want to be the one naming the price",
+        "employees take the price, owners set it, I know which side I want",
+        "price maker, not taker"
+    ], context: "price maker, not price taker=値決めする側、される側。経済用語のくせに響きがラップ。日本語の「側」を英語は-erで人にする。maker=作る人、taker=受け取る人。給料明細は20年taker側だった、そろそろ席替え。", category: 'opinion', month: '2026-08' },
+    { daySlot: 15, japanese: '不労所得って響きが甘美だよな', english: [
+        "music to my ears",
+        "the words passive income just sound delicious",
+        "say passive income out loud and tell me that doesn't sound like dessert",
+        "sweetest words in finance"
+    ], literal: 'no-labor income', context: "不労所得は直訳するとno-labor income=労働なし収入。英語のpassive income=受け身の収入、は労働の有無じゃなく態度で名付けてる。sounds delicious=美味しそうに聞こえる、と財テク用語をデザート扱いするのが英語の遊び方。響きだけ先に食ってる。", category: 'filler', month: '2026-08' },
+    { daySlot: 15, japanese: 'まず千円稼ぐのが一番難しい', english: [
+        "zero to one",
+        "the first thousand yen is the hardest money",
+        "going from zero to one is the whole battle, the rest is copy and paste",
+        "zero to one is everything"
+    ], context: "zero to one=ゼロから1、シリコンバレーの合言葉。英語は最初の一歩を数直線で語る。the rest is copy and paste=あとはコピペ、と2以降を雑に扱うのが気持ちいい。千円稼げた奴と稼げてない奴の間の川が一番深い。", category: 'opinion', month: '2026-08' },
+    { daySlot: 15, japanese: 'そろそろ金に働いてもらう', english: [
+        "make money work",
+        "let the money do the working for once",
+        "I've worked for money for twenty years, time to switch seats",
+        "money, clock in"
+    ], context: "make your money work for you=金を働かせろ、は英語の定番で、金を従業員として雇う発想。switch seats=席を替わる、20年労働者側に座ってたから今度は雇う側の席へ。money, clock in=金よ、タイムカード押せ。うちの新入社員、無口だけどよく働くらしい。", category: 'suggestion', month: '2026-08' },
+
+    // ── 2026-08 Day 16 (リスク・保険・逃げ道) ──
+    { daySlot: 16, japanese: '逃げ道は用意しとく', english: [
+        "always have an out",
+        "I always leave myself a way out",
+        "I go all in on the work, but I keep a back door open just in case",
+        "gotta have an out"
+    ], context: "逃げ道は英語だとan out、ポーカー用語で「まだ勝てる残り札」のこと。escape routeだと火事の避難訓練っぽくなるから、口語はhave an outが定番。逃げ=負けじゃなくて手札の一枚って扱いなのが英語の図太さ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 16, japanese: '退路を断つのはカッコいいけど無謀だろ', english: [
+        "bold but dumb",
+        "burning your boats sounds cool until it isn't",
+        "cutting off every retreat to force yourself forward looks brave, but honestly it's just reckless",
+        "that's not brave, that's broke"
+    ], literal: 'cut off the retreat path', context: "退路を断つは英語でburn the boats、船を焼く。コルテスが上陸後に自分の船を燃やした故事がそのまま慣用句になった。日本語は道を断つ、英語は乗り物を燃やす。どっちも後戻り不可だが、英語のほうが火力が高い。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 16, japanese: '最悪のシナリオを先に見とく', english: [
+        "worst case first",
+        "I game out the worst case before I start",
+        "before I jump, I walk through the absolute worst case so nothing can blindside me",
+        "stare the monster down first"
+    ], context: "game out=頭の中でシミュレーションを一周回すこと。英語はwhat's the worst that can happen?が決まり文句で、最悪を先に口に出して毒抜きする文化。日本語は「見とく」と眺めるだけだが、英語はplay outで実際に一回走らせる。脳内リハーサルまでやるのが英語流。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 16, japanese: '失っていい金額を先に決める', english: [
+        "set your loss limit",
+        "decide what you can afford to lose first",
+        "I set the number I'm okay losing before I put in a single yen",
+        "know your walk-away number"
+    ], context: "英語はnever bet what you can't afford to loseが親の遺言レベルの定番で、博打の世界の言い方がそのまま金の話の共通語。日本語は「失っていい」と許可の形だが、英語はaffordで財布の体力の話にする。気持ちじゃなくて残高で決めろってこと。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 16, japanese: '保険はかけすぎもダメだからな', english: [
+        "don't over-insure",
+        "too much insurance is its own trap",
+        "playing it too safe costs you as much as playing it reckless, just slower",
+        "safety can bleed you too"
+    ], context: "play it safe=安全運転で行く。英語は保険をかける行為をhedgeとも言って、語源は庭の生け垣。囲いすぎると自分が外に出られなくなる、って比喩がそのまま生きてる。守りすぎは緩やかな自滅、ってのは万国共通の財布の真理。", category: 'opinion', month: '2026-08' },
+    { daySlot: 16, japanese: '石橋叩きすぎて渡れない奴になるなよ', english: [
+        "stop overthinking it",
+        "quit testing the bridge and just cross it",
+        "if you keep double-checking everything forever, the chance walks off while you're still knocking",
+        "analysis paralysis, classic"
+    ], literal: 'tap the stone bridge so much you never cross it', context: "石橋を叩いて渡るは英語に橋が存在しなくて、look before you leapが一番近い。慎重すぎる奴はanalysis paralysisと韻を踏んで小馬鹿にされる。日本語は橋を叩く音で笑わせ、英語は韻でオチをつける。どの言語でも考えすぎは笑われる運命。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 16, japanese: 'リスクは減らすもんで、ゼロにするもんじゃない', english: [
+        "manage it, don't kill it",
+        "you manage risk, you don't erase it",
+        "zero risk doesn't exist anywhere, so the game is trimming it down to a size you can live with",
+        "zero risk is a fairy tale"
+    ], context: "英語はmanage riskで、リスクは倒す敵じゃなくて飼う犬って扱い。日本語の「減らす」は量の話だが、manageは付き合い方の話。ゼロリスクを探す奴にはthere's no such thingと即答が返ってくる。夢のない言語で助かる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 16, japanese: 'プランBどころかCまであるから', english: [
+        "got a plan C",
+        "I've got backup plans for my backup plans",
+        "plan A falls apart? Fine, I've got B, C, and half a D sitting in the drawer",
+        "the alphabet's on standby"
+    ], context: "プランBは英語からの直輸入だが、本場はbackup plan for my backup planと入れ子にして笑いにする。日本語はB、Cとアルファベットを進める律儀さ、英語は「予備の予備」と重ねて盛る。心配性も言い方次第で頼もしさに化ける。", category: 'reaction', month: '2026-08' },
+    { daySlot: 16, japanese: '攻めの撤退ラインを引いとく', english: [
+        "set the walk-away line",
+        "I decide my exit point before going in",
+        "retreat isn't losing if you drew the line yourself before the fight even started",
+        "quit on your own terms"
+    ], context: "撤退ラインは英語でwalk-away point、株ならstop-loss。損切りは負けじゃなく作戦のうち、って顔をした単語が揃ってる。日本語の「攻めの撤退」って矛盾っぽい響きは、英語だとquit on your own termsで綺麗に立つ。自分ルールで辞めるのは敗走じゃなく凱旋。", category: 'opinion', month: '2026-08' },
+    { daySlot: 16, japanese: '怖いのは準備不足だけなんだよ', english: [
+        "only fear being unprepared",
+        "the only scary thing is walking in blind",
+        "I'm not scared of failing, I'm scared of showing up with nothing in my pockets",
+        "unprepared is the horror movie"
+    ], context: "walk in blind=下調べゼロで突っ込むこと。英語は準備不足を「目が見えない」で表す。日本語は「不足」と量で言うが、英語はblindと感覚を潰して恐怖を描く。失敗より丸腰が怖い、ってのは現場上がりの共通言語。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 17 (値付け・売る・営業) ──
+    { daySlot: 17, japanese: 'タダでやるのはもう卒業', english: [
+        "no more freebies",
+        "I'm done working for free, done",
+        "I spent years doing favors for exposure, and exposure never paid a single bill",
+        "the free ride's over"
+    ], context: "タダ働きは英語でwork for exposure、「宣伝になるから」の無料案件を皮肉る決まり文句。exposureは日光と同じで浴びすぎると死ぬ、ってジョークまである。日本語は「卒業」と学校で辞めるが、英語はdoneと店じまいで終わらせる。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 17, japanese: '安売りは自分の首を絞めるだけ', english: [
+        "underpricing kills you",
+        "selling yourself cheap digs your own grave",
+        "every time you discount your work, you teach the customer that's all it's worth",
+        "race to the bottom"
+    ], literal: 'strangle your own neck', context: "首を絞めるは英語だとdig your own grave、自分の墓を掘る。日本語は絞殺、英語は埋葬と、死に方の趣味が違うだけで自滅の意味は同じ。値下げ合戦はrace to the bottomと呼ばれて、全員でゴールが地獄の徒競走扱いされる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 17, japanese: '値段に自信を乗せて言う', english: [
+        "own your price",
+        "say the price like you mean it",
+        "the number itself matters less than saying it straight without flinching or apologizing",
+        "no flinching at the invoice"
+    ], context: "own your priceは値段を「所有しろ」、つまり自分でつけた数字から目を逸らすなってこと。say it like you mean itは本気の顔で言え、の定番。日本語は自信を値段に乗せるが、英語は言い方そのものに込める。値段は数字じゃなく顔で売るらしい。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 17, japanese: '売り込むんじゃなくて選ばれる側になる', english: [
+        "attract, don't chase",
+        "I'd rather be chosen than be pushy",
+        "chasing clients smells desperate, but doing good work loudly makes them come knocking",
+        "let the work talk"
+    ], context: "売り込みはpushで、pushyと言われたら営業マンとして死刑宣告。逆は客が勝手に寄ってくるpull。日本語は「選ばれる」と受け身で品を保つが、英語はattractと自分が磁石になる。押すか引くか、恋愛と全く同じ理屈なのが笑える。", category: 'opinion', month: '2026-08' },
+    { daySlot: 17, japanese: '断られてからが営業だろ', english: [
+        "no is the start",
+        "the sale starts when they say no",
+        "anyone can take an order, but working with a no in the room is the actual job",
+        "first no, now we talk"
+    ], context: "英語の営業界にはthe sale begins when the customer says noって格言がそのままある。noを壁じゃなく開始のゴングにする発想は日米共通。日本語は「〜てからが」で本番を後ろにずらす言い方、英語はstartを堂々と文頭に置く。どっちも断られ慣れた奴の強がり。", category: 'opinion', month: '2026-08' },
+    { daySlot: 17, japanese: '相場より自分の価値で決める', english: [
+        "charge what I'm worth",
+        "I charge for my value, not the going rate",
+        "the market rate is what average people get, and I didn't spend twenty years to be average",
+        "average price is for average work"
+    ], context: "相場はgoing rate、「いま市場で動いてる値段」って言い方。英語はcharge what you're worthが決まり文句で、worthは体重計みたいに自分ごと乗って測る単語。日本語は相場と自分を並べて比べるが、英語はworthの一語に居直る。自己評価がそのまま商売道具になる国。", category: 'opinion', month: '2026-08' },
+    { daySlot: 17, japanese: '無料が一番高くつくんだよ', english: [
+        "free costs the most",
+        "nothing is more expensive than free",
+        "free clients eat your hours, kill your rate, and then complain the loudest",
+        "free is a scam"
+    ], context: "英語にはif you're not paying, you're the productって有名な台詞がある。タダの客ほど高くつくのはfree is the most expensive priceとそのまま言えてしまう。日本語の「高くつく」は後から請求が来る感じ、英語はexpensiveを最初から値札にする。無料の請求書は必ず遅れて届く。", category: 'opinion', month: '2026-08' },
+    { daySlot: 17, japanese: '買う理由をこっちで作ってやる', english: [
+        "give them a reason",
+        "make it easy for them to say yes",
+        "people don't buy products, they buy the excuse to buy, so I hand them the excuse",
+        "sell the yes"
+    ], context: "英語の営業はmake it easy to say yesが合言葉で、客の頭の中のハードルを下げる作業をそう呼ぶ。日本語は理由を「作ってやる」と職人が拵える感じ、英語はhand themと手渡しの宅配。買い物は理屈じゃなく言い訳、って身も蓋もない真実。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 17, japanese: '営業トークは嫌いだけど、誠実さは売れる', english: [
+        "honesty sells",
+        "I can't do sales talk, but honest sells",
+        "I'm terrible at the smooth pitch, so I just tell the truth and weirdly that closes deals",
+        "my pitch is no pitch"
+    ], context: "営業トークはsales pitch、球を投げ込む比喩。口が回る奴はsmooth talkerで、褒め言葉に見えて実はあまり信用されてない。英語圏でもhonesty sellsは本当で、下手な正直は上手い嘘に勝つ。喋りが苦手なのがそのまま営業資産になるオチ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 17, japanese: '請求書を出す手が震えた', english: [
+        "my hands were shaking",
+        "I nearly chickened out sending that invoice",
+        "I hovered over the send button on my first invoice like it was a bomb switch",
+        "invoice stage fright"
+    ], literal: 'my invoice-sending hand trembled', context: "chicken out=ビビって直前でやめること。英語ではビビりは鶏で表す決まり。hover over the buttonはボタンの上で指が固まって浮いてる状態で、送信できない夜の描写にぴったり。日本語は手の震え、英語は指の停止。初請求書は世界中で武者震いの儀式。", category: 'reaction', month: '2026-08' },
+
+    // ── 2026-08 Day 18 (計画を立てる・ロードマップ) ──
+    { daySlot: 18, japanese: '逆算で考えるんだよ', english: [
+        "work backwards",
+        "I start from the goal and work backwards",
+        "figure out where you want to land, then walk the path back to today",
+        "reverse-engineer the whole thing"
+    ], context: "逆算はwork backwards、英語は「後ろ向きに働く」とそのまま動作にする。Amazonの社内文化の合言葉としても有名。日本語の「逆算」は算数の匂いがするが、英語は歩く・働くの身体動作で言う。数字で考えるか体で考えるか、乗り物が違う。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 18, japanese: 'ゴールから線を引く', english: [
+        "start at the finish",
+        "pin the goal first, then connect the dots",
+        "stick the end date on the wall and draw the line back to this morning",
+        "finish line first"
+    ], context: "connect the dots=点と点を線で結ぶ、ジョブズのスピーチで擦り切れるほど有名になった言い方。日本語の「引く」は線を引く職人の手つき、英語はdotsをつなぐ子供の点つなぎ遊び。ゴールさえ先に打っておけば、あとは塗り絵と同じ。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 18, japanese: '計画は変わる前提で立てる', english: [
+        "plans will change",
+        "I plan knowing the plan will break",
+        "no plan survives contact with reality, so I build mine loose on purpose",
+        "written in pencil, not ink"
+    ], context: "英語にはno plan survives contact with the enemyって軍隊の格言があって、計画は敵に会った瞬間死ぬのが常識扱い。written in pencilは「鉛筆書き=いつでも消せる」の定番比喩。日本語は「前提で立てる」と保険をかけるが、英語は最初から筆記用具を変える。", category: 'opinion', month: '2026-08' },
+    { daySlot: 18, japanese: 'まず紙に全部書き出す', english: [
+        "brain dump first",
+        "get it out of your head onto paper",
+        "everything swirling in my head goes on paper first, ugly handwriting and all",
+        "dump it all out"
+    ], context: "brain dump=脳みそをゴミ出しみたいに全部ぶちまけること。英語は頭の中身をoutさせる方向の言語で、get it out of your headが決まり文句。日本語は「書き出す」と書く動作が主役だが、英語は出す動作が主役。ペンはただの蛇口。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 18, japanese: '期限のない目標はただの願望だから', english: [
+        "no deadline, no goal",
+        "a goal without a deadline is just a wish",
+        "if it doesn't have a date attached, it's not a plan, it's a letter to Santa",
+        "that's a wish, not a plan"
+    ], context: "英語ではa goal without a plan is just a wishが名言として出回ってる。deadlineの語源は監獄の「越えたら撃たれる線」で、期限の重みが物騒。日本語の「願望」は静かだが、英語はサンタへの手紙とまで馬鹿にする。夢は日付をつけた瞬間に仕事になる。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 18, japanese: '3年後の絵を描いとく', english: [
+        "picture year three",
+        "I paint the picture of me in three years",
+        "before any planning, I sit down and sketch what my life looks like three years out",
+        "future me, rough draft"
+    ], context: "英語もpaint a pictureで、絵を描く比喩が完全に一致する珍しい例。three years outのoutは「今から外へ3年分」って距離感で、未来を沖合いみたいに測る。日本語は絵を描き、英語は距離をoutで測る。未来はどっちの言語でも海の向こうにある。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 18, japanese: '今月やることまで落とし込む', english: [
+        "break it down",
+        "break the big goal into this month's moves",
+        "a three-year dream is useless until it turns into things I can do before payday",
+        "chunk it down"
+    ], context: "落とし込むはbreak it down、英語は上から下に「落とす」んじゃなく「砕く」。岩をハンマーで割って持てるサイズにするイメージ。日本語は液体を器に移す感じ、英語は固体を砕く感じ。夢は砕いて初めてポケットに入る。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 18, japanese: '完璧な計画より走りながら直すほう', english: [
+        "fix it on the run",
+        "start moving and adjust as you go",
+        "a rough plan in motion beats a perfect plan sitting in a notebook",
+        "build the plane while flying"
+    ], context: "英語にはbuilding the plane while flying itって狂った比喩があって、飛びながら飛行機を組み立てる=走りながら直すこと。adjust as you goも定番。日本語は「走る」だが英語は「飛ぶ」とスケールを一段盛る。完璧な計画はノートの中で綺麗に老いていく。", category: 'opinion', month: '2026-08' },
+    { daySlot: 18, japanese: '途中にマイルストーンを置いとく', english: [
+        "set checkpoints",
+        "drop checkpoints along the way to stay sane",
+        "long roads kill motivation, so I plant little flags every few weeks to hit",
+        "checkpoints, like a video game"
+    ], context: "milestoneは元々ローマ街道に一マイルごとに置かれた石のこと。英語はその石を二千年経った今もビジネスに置き続けてる。日本語はカタカナで輸入したが、感覚的にはゲームのセーブポイントが一番近い。要は長旅の途中で死なない工夫。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 18, japanese: '計画倒れの常習犯だけど、今回は違う', english: [
+        "this time is different",
+        "my plans usually die, but this one won't",
+        "I've buried a hundred grand plans, but this one has a heartbeat, I can tell",
+        "reformed plan-killer"
+    ], literal: 'a habitual offender of collapsed plans', context: "計画倒れは英語でthe plan fell through、床が抜けるfall throughで表す。常習犯はrepeat offenderで、前科者の警察用語をそのまま自虐に使える。this time is differentは投資の世界だと破滅フラグの名言扱いなのが笑いどころ。言った瞬間ちょっと不安になる。", category: 'reaction', month: '2026-08' },
+
+    // ── 2026-08 Day 19 (小さく始める・試す) ──
+    { daySlot: 19, japanese: 'まずは小さく始める', english: [
+        "start small",
+        "start tiny and let it grow",
+        "you don't open a restaurant on day one, you sell one plate of curry first",
+        "small bets only"
+    ], context: "start smallは英語もそのまま。small betsは掛け金少なめの博打用語で、シリコンバレーの合言葉になってる。日本語の「小さく」は謙虚の匂いがするが、英語のsmallは作戦の匂い。小ささは遠慮じゃなくて武器って顔をしてる。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 19, japanese: 'ごちゃごちゃ言う前にまずやってみる', english: [
+        "just try it",
+        "just give it a shot and see",
+        "thinking about it for another month teaches me nothing that one messy try wouldn't",
+        "wing it and learn"
+    ], context: "give it a shot=一発撃ってみる、射撃の比喩。英語は「試す」をshotやgoみたいに一回分の弾として数える。日本語の「みる」は様子見の目、英語は引き金の指。見てから撃つか、撃ってから見るか。英語はだいたい後者。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 19, japanese: 'テスト版として出してみる', english: [
+        "soft launch it",
+        "put out a test version and watch",
+        "ship the rough version quietly, watch what happens, and pretend it was the plan",
+        "call it a beta"
+    ], context: "soft launch=ひっそり開店。正式オープン前に常連だけで回す飲食店の言い方がITに輸入された。call it a betaは「ベータ版って言っとけば許される」という業界の免罪符。日本語の「試しに出す」の照れを、英語はbetaの四文字で制度化した。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 19, japanese: '完璧を待ってたら一生出せないぞ', english: [
+        "perfect never ships",
+        "wait for perfect and you wait forever",
+        "perfect is the excuse I used for three years to release absolutely nothing",
+        "done beats perfect"
+    ], context: "done is better than perfectはFacebookのオフィスの壁に書いてあった標語。shipは「出荷する」で、作品を世に出すことを船出に例える。日本語は「出せない」と可能形で嘆くが、英語はperfectを主語にして「あいつは永遠に出荷しない」と犯人扱いする。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 19, japanese: '60点で世に出しちゃう', english: [
+        "ship it at sixty",
+        "sixty percent done is good enough to ship",
+        "I push it out the door at sixty points and let the world grade the rest",
+        "C-minus and live"
+    ], literal: 'release it to the world at 60 points', context: "英語のgood enoughは妥協じゃなくて合格判定の言葉で、perfect is the enemy of goodって言い回しまである。成績で言えばCマイナスで提出する度胸。日本語は100点満点の減点文化だから60点が痛く聞こえるが、英語のship itは点数を見ずに船を出す。", category: 'opinion', month: '2026-08' },
+    { daySlot: 19, japanese: '反応を見てから直せばいい', english: [
+        "let feedback decide",
+        "put it out first, fix it after",
+        "the audience tells you what's broken way faster than your own staring does",
+        "the market is the editor"
+    ], context: "英語圏の合言葉はlaunch and iterate、出してから回す。feedbackは機械の「出力を入力に戻す」工学用語が日常語になったもの。日本語は反応を「見る」観察者だが、英語はfeedbackを食って動く機械扱い。世間は最強の無料添削サービス。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 19, japanese: '失敗のコストを下げとくんだよ', english: [
+        "make failing cheap",
+        "keep your failures small and cheap",
+        "I'm not avoiding failure, I'm just making sure each one costs pocket change",
+        "fail on a budget"
+    ], context: "fail cheapとfail fastはスタートアップの標語で、失敗を回数券みたいに安く買う発想。pocket change=小銭。日本語は失敗を「コスト」と経理の言葉にするが、英語はcheapと値札を貼って店頭に並べる。安い失敗は事故じゃなくて授業料。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 19, japanese: '趣味の延長から入るのが正解', english: [
+        "start from the hobby",
+        "start where the fun already is",
+        "the stuff I already do for free is the cheapest business idea I'll ever get",
+        "hobby with a cash register"
+    ], context: "英語では趣味と仕事の中間地帯をside hustleと呼ぶ。hustleは元々「がめつく稼ぐ」の俗語。日本語の「延長」はコードを伸ばす感じ、英語はhustleと足を動かす感じ。好きでやってたことにレジを置くだけ、が一番安い起業。", category: 'opinion', month: '2026-08' },
+    { daySlot: 19, japanese: '最初の一歩がいちばん重いんだよな', english: [
+        "step one is brutal",
+        "the first step weighs a ton",
+        "once I'm moving I'm fine, it's the standing start that nearly kills me every time",
+        "heaviest step of all"
+    ], literal: 'the first step is the heaviest', context: "英語にもthe first step is the hardestがそのままあって、千里の道も一歩からは英語圏でも引用の定番。日本語は「重い」と重量で言い、英語はhardestと硬さで言う。物理の科目が違うだけで、玄関で靴を履くまでが一番遠いのは全人類共通。", category: 'reaction', month: '2026-08' },
+    { daySlot: 19, japanese: 'やりながら覚えるタイプなんで', english: [
+        "I learn by doing",
+        "I figure it out as I go",
+        "manuals put me to sleep, so I just start breaking things until it makes sense",
+        "hands first, brain later"
+    ], context: "learn by doingは英語の教育論のど真ん中で、figure it out as I goは行き当たりばったりを堂々と言う決まり文句。日本語の「タイプなんで」は血液型みたいに自分を分類して許してもらう技だが、英語は分類せずにI learnと宣言する。開き直りの角度が違う。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 20 (続ける・習慣) ──
+    { daySlot: 20, japanese: '結局、続けた奴が勝つ', english: [
+        "last man standing wins",
+        "the one who keeps showing up wins",
+        "talent gets the applause, but the guy who never stops showing up gets the prize",
+        "consistency is the cheat code"
+    ], context: "show upは「その場に現れる」だけの意味なのに、成功哲学ではほぼ神の言葉。half of success is showing upって格言もある。日本語は「続ける」と線で考えるが、英語は毎回「現れる」と点の連続で数える。出席してる奴が優勝、って身も蓋もない。", category: 'opinion', month: '2026-08' },
+    { daySlot: 20, japanese: '三日坊主の常習犯です', english: [
+        "serial quitter",
+        "I'm a repeat offender at quitting early",
+        "my track record is three days of fire and then total radio silence",
+        "three days, then poof"
+    ], literal: 'a three-day monk', context: "三日坊主は出家して三日で還俗する坊さんの話で、英語に坊さんはいない。近いのはserial quitter、連続辞め魔。serialは連続殺人犯serial killerと同じ頭で、辞め癖を前科っぽく盛れる。日本語は坊主で笑わせ、英語は犯罪歴で笑わせる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 20, japanese: '習慣にしちゃえば勝ちなんだよ', english: [
+        "make it automatic",
+        "once it's a habit, you've already won",
+        "willpower runs out by Tuesday, but a habit runs on autopilot for free",
+        "autopilot is the goal"
+    ], context: "英語はmake it automatic、習慣化を自動運転にする言い方。autopilotは飛行機の自動操縦がそのまま日常語で、on autopilotと言えば何も考えず回ってる状態。日本語の「しちゃえば勝ち」の勝ち逃げ感は、英語だとyou've already wonと過去形で確定させる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 20, japanese: 'モチベーションには頼らない', english: [
+        "motivation is a liar",
+        "I don't wait around for motivation anymore",
+        "motivation shows up whenever it feels like it, so I built a system that doesn't care",
+        "systems over vibes"
+    ], context: "英語圏の筋トレ界隈ではmotivation is garbage、やる気はゴミとまで言い切る。discipline over motivationが合言葉。日本語は「頼らない」とやんわり距離を置くが、英語はmotivationを遅刻常習の同僚扱いして悪口を言う。来ない奴を待つな、が結論。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 20, japanese: '休むのはいいけど、やめない', english: [
+        "pause, don't quit",
+        "missing a day is fine, quitting is not",
+        "I skip days all the time, the only rule is I never skip twice in a row",
+        "never miss twice"
+    ], context: "英語の習慣術で有名なnever miss twiceは「二日連続でサボるな」のルール。一回のスキップは休憩、二回目から崩壊が始まるという理屈。日本語の「休んでもやめない」は精神論だが、英語は回数で線を引く。根性を数式にするのが英語圏の得意技。", category: 'opinion', month: '2026-08' },
+    { daySlot: 20, japanese: '毎日5分でもいいから', english: [
+        "five minutes counts",
+        "even five minutes a day still counts",
+        "five lousy minutes keeps the streak alive, and the streak is the whole game",
+        "show up for five"
+    ], context: "countは「数に入る」で、it still countsは「それでも有効」の決まり文句。streakは連勝記録のことで、継続日数をゲームのスコアにする文化。日本語は「でもいい」と許す言い方、英語はcountsと審判が旗を上げる言い方。5分は手抜きじゃなく出席扱い。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 20, japanese: '積み上げは裏切らないから', english: [
+        "the reps add up",
+        "the daily grind always pays you back",
+        "small daily deposits look like nothing until one day the balance is stupid",
+        "compound interest, but for effort"
+    ], context: "英語は積み上げをcompound interest、複利で例えるのが大好き。repsは筋トレの反復回数で、地味な繰り返しをrepsと呼ぶと急にアスリート感が出る。日本語の「裏切らない」は人間関係の言葉だが、英語は銀行と筋肉の言葉。信頼より利息。", category: 'opinion', month: '2026-08' },
+    { daySlot: 20, japanese: 'サボった自分を責めない', english: [
+        "skip the guilt trip",
+        "beating yourself up just burns more fuel",
+        "I missed a day, fine, the punishment is getting back to it, not hating myself",
+        "guilt is extra homework"
+    ], context: "beat yourself up=自分を殴る、自責の定番表現。guilt trip=罪悪感の旅で、くよくよをご丁寧に旅行扱いする。日本語は「責める」と裁判の言葉、英語は殴打と旅行の比喩。サボりの罰は反省文じゃなくて再開、これで話は終わり。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 20, japanese: '記録つけると続くんだよな', english: [
+        "track it, keep it",
+        "what gets tracked gets done, seriously",
+        "the calendar full of X marks shames me into showing up way better than willpower does",
+        "don't break the chain"
+    ], context: "don't break the chainはサインフェルドが広めたと言われる技で、やった日にバツ印をつけて鎖を切らさない話。what gets measured gets managedって経営の格言もある。日本語は「つけると続く」と因果をぼかすが、英語はchainと鎖で自分を縛る。記録魔の勝ち。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 20, japanese: '気づいたら1年続いてた、が理想', english: [
+        "a year, just like that",
+        "one day you look up and it's been a year",
+        "the dream is the habit going so quiet that the anniversary sneaks up on me",
+        "blink and it's a streak"
+    ], literal: 'before I noticed, a year had passed', context: "「気づいたら」は英語でbefore I knew itかone day you look up。look upは作業から顔を上げたら景色が変わってた、って絵がそのまま入ってる。日本語は気配で語り、英語は顔を上げる動作で語る。努力の理想形は、努力の顔をしてないこと。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 21 (踏ん切り・決断) ──
+    { daySlot: 21, japanese: '腹をくくった', english: [
+        "I'm all in",
+        "I've made up my mind, no going back",
+        "I've made my peace with it and now I'm going all in",
+        "committed, full stop"
+    ], literal: 'I tied up my belly', context: "日本語は腹で決めるが、英語はポーカーテーブルで決める。all in=チップ全部突っ込むことで、覚悟の絵がギャンブルなのが英語らしい。腹の中の話が、いつの間にか掛け金の話になってる。", category: 'reaction', month: '2026-08' },
+    { daySlot: 21, japanese: 'もう迷わない', english: [
+        "no more second-guessing",
+        "I'm done going back and forth on this",
+        "I've wasted enough time waffling, I'm done second-guessing myself",
+        "done wavering"
+    ], context: "迷うを英語はsecond-guess=自分の答えを二回目に疑う、と数える。waffleはワッフルじゃなくて、あっち行ったりこっち行ったりのフラフラ。日本語の「迷う」は霧の中だが、英語は自分で自分にダメ出しする絵。迷いの犯人を自分に設定するのが英語。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 21, japanese: '決めたら早い', english: [
+        "once I decide, I move",
+        "once I'm decided, I move fast",
+        "it takes me forever to decide, but once I do, I'm gone",
+        "decide slow, move fast"
+    ], context: "日本語は「決めたら早い」の四文字で済むが、英語はonce=一回そうなったら、で時間の折り目をはっきり付ける。前半でグダグダ、後半で消える、という二部構成にすると英語は気持ちよく流れる。I'm goneは「もういない」=出発済み。", category: 'opinion', month: '2026-08' },
+    { daySlot: 21, japanese: 'えいやで飛ぶ', english: [
+        "just send it",
+        "sometimes you just have to jump",
+        "you close your eyes, count to three, and jump",
+        "screw it, I'm jumping"
+    ], context: "「えいや」という掛け声そのものは英語に存在しない。代わりにjust send itというスノボ屋の言葉があって、考える前に体を投げろという意味。日本語は声で勢いをつけるが、英語は動詞で勢いをつける。掛け声の文化がない分、screw it=ええいままよ、が引き金役。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 21, japanese: '考えすぎて動けなくなるのが一番ダメ', english: [
+        "analysis paralysis",
+        "overthinking is how you end up doing nothing",
+        "the worst thing you can do is think yourself into standing still",
+        "paralysis by analysis"
+    ], context: "英語にはanalysis paralysisという韻を踏んだ定番があって、考えすぎ問題に名前が付いてる。think yourself into=考えることで自分をそこへ運ぶ、という言い方も英語独特で、考えが乗り物扱い。日本語は「考えすぎて動けない」と状態を説明するが、英語は病名を貼って終わり。", category: 'opinion', month: '2026-08' },
+    { daySlot: 21, japanese: '決断は体力があるうちに', english: [
+        "decide while you're fresh",
+        "make the big calls while you still have gas",
+        "big decisions burn energy, so make them before you're running on empty",
+        "decide early, decide fresh"
+    ], context: "英語は人間をガソリン車として扱う。have gas=燃料がある、running on empty=ガス欠走行。日本語の「体力」は体の話だが、英語は燃料計の話にすり替える。決断もガソリンで動くらしい。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 21, japanese: '迷ったら怖い方を選ぶ', english: [
+        "when in doubt, pick scary",
+        "if it scares you, that's the one",
+        "when I can't decide, I go with whichever option scares me more",
+        "fear means go"
+    ], context: "when in doubtは「迷ったら」の定番の型で、この後に自分ルールを続けるのが英語の様式美。that's the one=それが当たり、と怖い方を正解扱いする。日本語は「選ぶ」まで言うが、英語はthe oneと指させば選んだことになる。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 21, japanese: 'やらない後悔よりやる後悔', english: [
+        "regret doing, not wondering",
+        "I'd rather regret trying than regret wondering",
+        "you regret the things you didn't do way more than the things you did",
+        "no what-ifs for me"
+    ], context: "英語はwhat if=もしあの時、という妄想に名前を付けて、それを在庫として数える。no what-ifs=たられば在庫ゼロで生きる、という言い方。日本語は後悔を二種類並べて比べるが、英語はwonder=一生モヤモヤ考え続ける刑、のほうを恐がる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 21, japanese: '引き金は自分で引く', english: [
+        "I pull the trigger",
+        "nobody pulls the trigger for you",
+        "at the end of the day, you have to pull the trigger yourself",
+        "my call, my trigger"
+    ], context: "これは珍しく日英が完全一致。pull the trigger=決断する、で銃のイメージまで同じ。ただし英語はat the end of the day=結局のところ、を頭に乗せて説教の風格を出すのが好き。一致してるのに前置きだけ長いのが英語。", category: 'opinion', month: '2026-08' },
+    { daySlot: 21, japanese: '決めるってことは捨てるってこと', english: [
+        "deciding means cutting",
+        "every yes is a hundred nos",
+        "choosing one thing means killing off everything else, that's the deal",
+        "pick one, bury the rest"
+    ], context: "英語はyesとnoを数えられる物にする。every yes is a hundred nos=一個のハイは百個のイイエ、という在庫管理の発想。日本語の「捨てる」はゴミ箱行きだが、英語はkill offとかburyとか、選ばなかった選択肢をわざわざ殺して埋める。物騒な分、覚悟は伝わる。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 22 (見切り・撤退) ──
+    { daySlot: 22, japanese: '見切りをつける', english: [
+        "cutting my losses",
+        "I'm cutting my losses on this one",
+        "I gave it a fair shot, now it's time to cut my losses",
+        "calling it"
+    ], context: "日本語は見て切るが、英語は損を切る。cut my losses=損失をハサミで切り落とす、で最初から金勘定の絵。call it=試合終了を宣告する、は医者が臨終を告げるときの言い方でもあって、なかなか重い二文字。", category: 'reaction', month: '2026-08' },
+    { daySlot: 22, japanese: '損切りは早いほうがいい', english: [
+        "cut losses fast",
+        "the first loss is the cheapest loss",
+        "cutting your losses early always beats riding it down to zero",
+        "eat the small loss"
+    ], context: "相場の世界の英語がそのまま人生に使われる。ride it down=下がる株に乗ったまま地面まで行く、という絵。eat the loss=損を食う、で英語は損失を飲み込む食べ物扱いする。小盛りのうちに食っとけ、という話。", category: 'opinion', month: '2026-08' },
+    { daySlot: 22, japanese: 'サンクコストに引っ張られるな', english: [
+        "don't chase sunk costs",
+        "that money's gone either way, man",
+        "don't throw good money after bad just because you already spent some",
+        "sunk means sunk"
+    ], context: "英語にはthrow good money after bad=悪い金の後を良い金に追わせる、という昔からの言い回しがあって、サンクコストという横文字より先にこっちが庶民の言葉。goneの一言で「もう無い」を宣告できるのも英語の強さ。沈んだ物は沈んだまま、それだけの話。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 22, japanese: 'ダメなら畳む、それだけ', english: [
+        "if it fails, fold",
+        "if it doesn't work, I fold, simple",
+        "if the thing doesn't work, I shut it down and move on, no drama",
+        "fold and walk"
+    ], context: "店を畳むの「畳む」と、ポーカーで降りるfoldが、偶然どっちも折り畳む動作。日英で同じ絵なのはたまたまだが、英語のfoldは手札を伏せて次のゲームを待つ含みがある。no drama=騒がない、を最後に付けると大人の畳み方になる。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 22, japanese: '撤退は敗北じゃない', english: [
+        "retreating isn't losing",
+        "walking away isn't the same as losing",
+        "pulling out of something isn't defeat, it's choosing a better fight",
+        "a pivot, not a loss"
+    ], context: "英語のwalk away=歩いて去る、は負けて逃げるより自分の足で出て行く絵。そしてスタートアップ用語のpivot=方向転換、を使うと撤退が急にカッコよくなる。同じ行動でも名前を変えると勝ちに見えるのは万国共通の詐術。", category: 'opinion', month: '2026-08' },
+    { daySlot: 22, japanese: '粘りどころと引き際は別物', english: [
+        "grit has a limit",
+        "knowing when to quit is a skill too",
+        "there's a time to grind and a time to walk, and they're not the same",
+        "grind or fold, know which"
+    ], context: "英語はthere's a time to A and a time to B、という聖書由来の型で対比を作るのが好き。grindは石臼を挽く=地味にゴリゴリやること。日本語の「粘る」は納豆っぽい絵だが、英語は臼を回してる。どっちもしんどそうなのは同じ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 22, japanese: 'これ以上は傷が深くなる', english: [
+        "it only gets worse",
+        "the longer I stay, the deeper the hole",
+        "if I keep going, I'm just digging myself in deeper",
+        "stop digging"
+    ], context: "日本語は傷が深くなるが、英語は穴を掘る。英語にはfirst rule of holes=穴にハマったらまず掘るのをやめろ、という格言があって、失敗の続行をシャベル作業として描く。血が出てるか土まみれかの違いで、痛いのは一緒。", category: 'reaction', month: '2026-08' },
+    { daySlot: 22, japanese: '逃げるが勝ちってあるからな', english: [
+        "running away wins sometimes",
+        "sometimes running is the smart play",
+        "he who fights and runs away lives to fight another day",
+        "retreat and regroup"
+    ], literal: 'running away is the win', context: "英語にも昔からhe who fights and runs away lives to fight another day=逃げた奴は次も戦える、という詩があって、逃げ肯定は万国共通。smart play=賢い一手、で逃げをゲームの選択肢として扱う。日本語は勝ち負けで語り、英語は生き残りで語る。", category: 'opinion', month: '2026-08' },
+    { daySlot: 22, japanese: '白旗も戦略のうち', english: [
+        "surrender is a tactic",
+        "waving the white flag can be a power move",
+        "throwing in the towel at the right time is strategy, not weakness",
+        "tactical white flag"
+    ], context: "日本語の白旗は戦場だが、英語のthrow in the towel=タオルを投げ入れる、はボクシングのセコンドの動作。降参の絵が戦争からリングに変わる。power move=強者ムーブ、を付けると降参すら攻めに聞こえるのが英語のずるさ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 22, japanese: '次があるから引ける', english: [
+        "quit to play again",
+        "I can walk away because there's a next round",
+        "the only reason I can fold this hand is I know another one is coming",
+        "next hand's coming"
+    ], context: "英語は人生をカードゲームの連戦として語る。this hand=今回の手札、next round=次の勝負、で一回の失敗を一局扱いにする。日本語の「次がある」は漠然と未来だが、英語はディーラーがもう次を配り始めてる絵。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 23 (失敗したらどうする) ──
+    { daySlot: 23, japanese: '失敗しても死なない', english: [
+        "nobody dies",
+        "worst case, I fail, nobody dies",
+        "even if this whole thing blows up, it's not going to kill me",
+        "it's not fatal"
+    ], context: "英語はnobody dies=誰も死なない、と死人ゼロ報告で失敗の上限を切る。blow up=爆発する、で失敗を派手に描いてから、それでも死なないと落とす二段構え。日本語は「死なない」と自分の話だが、英語は現場全体の死者数で語るのが妙に事務的。", category: 'reaction', month: '2026-08' },
+    { daySlot: 23, japanese: '最悪バイトすればいい', english: [
+        "worst case, part-time job",
+        "worst case scenario, I flip burgers, so what",
+        "if it all falls apart, I can always pick up a part-time job somewhere",
+        "burger-flipping is my floor"
+    ], context: "英語で最底辺の仕事の代名詞はflip burgers=バーガーをひっくり返す。日本語の「バイト」は職種を言わないが、英語は具体的にパティを裏返させる。floor=底値、を使うと人生を株価みたいに語れて、底が決まってれば怖くないという理屈。", category: 'opinion', month: '2026-08' },
+    { daySlot: 23, japanese: '失敗は授業料', english: [
+        "tuition",
+        "that failure was just tuition money",
+        "every screw-up is tuition for a class they don't teach anywhere else",
+        "cheapest class I ever took"
+    ], context: "授業料とtuitionは珍しく日英で同じ発想。ただ英語はa class they don't teach anywhere else=どこにも開講してない授業、と学校ごと架空にして広げるのが好き。screw-up=やらかし、はネジを締め損なう絵で、失敗が工具箱から来てるのが英語らしい。", category: 'opinion', month: '2026-08' },
+    { daySlot: 23, japanese: '転んでもタダでは起きない', english: [
+        "never fall for free",
+        "if I'm going down, I'm grabbing something",
+        "even when I eat dirt, I make sure I get back up holding something",
+        "falling with benefits"
+    ], literal: 'even if I fall, I do not get up for free', context: "eat dirt=土を食う、が英語の「転ぶ」の下品バージョン。日本語はタダという料金の話だが、英語はgrab something=何か掴んで倒れろ、と手荷物の話にする。転倒を無料か有料かで語る日本語のほうが、実は相当な商売人。", category: 'opinion', month: '2026-08' },
+    { daySlot: 23, japanese: '笑い話になるまでがセット', english: [
+        "not done till it's funny",
+        "a failure isn't finished until it's a funny story",
+        "you haven't really processed a failure until you can tell it at a bar and get laughs",
+        "pain now, material later"
+    ], context: "英語にはcomedy is tragedy plus time=悲劇に時間を足すと喜劇、という古い公式があって、失敗の熟成を待つ文化は共通。material=ネタ、は芸人用語で、痛い目を将来の持ちネタとして仕入れ扱いする。バーで笑いが取れたら成仏、という査定基準。", category: 'opinion', month: '2026-08' },
+    { daySlot: 23, japanese: '失敗談のほうが人は聞く', english: [
+        "failure stories sell",
+        "nobody leans in for success stories",
+        "people scroll past your wins but they'll stop dead for your train wrecks",
+        "wins bore, wrecks draw"
+    ], context: "英語のtrain wreck=列車事故、は目を逸らせない大失敗の定番表現。lean in=身を乗り出す、stop dead=足がピタッと止まる、と英語は聞き手の体の動きで興味を測る。日本語は「聞く」で済ますが、英語は客の姿勢まで実況する。", category: 'opinion', month: '2026-08' },
+    { daySlot: 23, japanese: '恥は一瞬、後悔は一生', english: [
+        "shame fades, regret stays",
+        "embarrassment lasts a minute, regret lasts forever",
+        "you'll cringe for a week, but the regret from not trying follows you around for life",
+        "cringe now or cry later"
+    ], context: "英語のcringeは恥ずかしさで体が縮む動作そのもので、恥を顔じゃなく全身で表す。そしてregretはfollows you around=一生ストーカーしてくる、と人格を持たされる。日本語は時間の長さで比べるが、英語は後悔を尾行者にする。", category: 'opinion', month: '2026-08' },
+    { daySlot: 23, japanese: 'うまくいかない方法を一個見つけただけ', english: [
+        "found one way that fails",
+        "I just found one more way that doesn't work",
+        "that wasn't a failure, I just crossed one bad option off the list",
+        "very Edison of me"
+    ], context: "エジソンの「失敗じゃない、うまくいかない方法を一万通り見つけた」が英語圏では国民的言い訳として定着してる。cross off the list=リストから線で消す、で失敗を在庫整理に変換。人名を形容詞にするvery Edison of meみたいな遊びも英語の得意技。", category: 'reaction', month: '2026-08' },
+    { daySlot: 23, japanese: 'ダメだった、次', english: [
+        "didn't work, next",
+        "okay, that one's dead, moving on",
+        "that didn't work, so we're on to the next one already",
+        "okay, next"
+    ], context: "英語のnextはオーディションで審査員が叫ぶ一言で、不合格通知と次の呼び出しを同時にやる。that one's dead=あれは死んだ、と失敗案の死亡を先に確認してから進むのが英語の手順。日本語の「次」より、ちゃんと看取ってる分だけ律儀。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 23, japanese: '失敗って言うから重い、実験って言え', english: [
+        "call it an experiment",
+        "it's not failure, it's data",
+        "stop calling them failures, call them experiments and suddenly you're a scientist",
+        "rebrand it as science"
+    ], context: "英語のit's not A, it's B、は言い換えで現実を上書きする万能の型。data=データが取れた、と言えば失敗が成果物に化ける。rebrand=商品名を付け替える、はマーケ用語で、自分の人生に使うと急に他人事っぽく笑える。", category: 'suggestion', month: '2026-08' },
+
+    // ── 2026-08 Day 24 (巻き返し・再起) ──
+    { daySlot: 24, japanese: 'ここから巻き返す', english: [
+        "comeback time",
+        "this is where the comeback starts",
+        "everybody loves a comeback story, and mine starts right now",
+        "cue the comeback"
+    ], context: "英語のcomebackは巻き返しに専用の名詞があって、しかもcomeback story=復活劇として客が観たがる商品になってる。cue=そこで音楽スタート、の舞台用語を頭に付けると自分の人生に演出が入る。日本語は巻く動作、英語は帰ってくる動作。", category: 'reaction', month: '2026-08' },
+    { daySlot: 24, japanese: 'どん底なら上しかない', english: [
+        "only way is up",
+        "when you hit rock bottom, the only way is up",
+        "the nice thing about rock bottom is every direction from here is up",
+        "rock bottom, solid foundation"
+    ], context: "どん底は英語でrock bottom=岩盤の底。英語圏にはrock bottom became the solid foundation=どん底が土台になった、という有名な立ち直り話があって、底を地盤扱いする発想がある。日本語の底は暗い穴だが、英語の底は着工前の更地。", category: 'opinion', month: '2026-08' },
+    { daySlot: 24, japanese: '再起動する', english: [
+        "rebooting",
+        "I'm giving myself a hard reset",
+        "I'm shutting the whole thing down and rebooting from scratch",
+        "off and on again"
+    ], context: "英語は人間の不調もIT用語で処理する。hard reset=強制再起動、をそのまま自分に使えるし、have you tried turning it off and on again=一回切って入れ直した?というIT部門の定番ギャグが人生相談にも通じる。人間もだいたい再起動で直る。", category: 'reaction', month: '2026-08' },
+    { daySlot: 24, japanese: '一回リセットしてやり直す', english: [
+        "clean slate",
+        "wiping the slate and starting over",
+        "I'm hitting reset and running it back from square one",
+        "fresh save file"
+    ], context: "clean slate=石板を拭く、は黒板時代の名残で、英語のやり直しは板を消す絵。square one=すごろくの振り出し、run it back=もう一回頭から流す、とやり直し表現の在庫が異様に多い。それだけみんなやり直してるということ。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 24, japanese: '負けっぱなしでは終われない', english: [
+        "can't end like this",
+        "no way I'm going out on a loss",
+        "there's no version of this where the last chapter is me losing",
+        "not my final score"
+    ], context: "go out on a loss=負けのまま退場する、はスポーツ実況の言葉で、英語は引退試合の勝敗で人生を語る。there's no version of this=そういう筋書きの版は存在しない、と自分の人生を出版物扱いする言い方も英語独特。最終章の内容は著者が決める。", category: 'opinion', month: '2026-08' },
+    { daySlot: 24, japanese: '傷が浅いうちに立て直す', english: [
+        "fix it while it's small",
+        "a stitch in time saves nine",
+        "the trick is rebuilding while the damage is still shallow",
+        "stitch it early"
+    ], context: "英語の古い格言a stitch in time saves nine=今の一針が後の九針を省く。日本語は傷の深さで測るが、英語は縫い物の針数で測る。どっちも放置すると縫う量が増えるのは同じで、洋の東西を問わずみんな放置して痛い目を見てきた証拠。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 24, japanese: '昨日までの負けは今日の種銭', english: [
+        "losses are seed money",
+        "yesterday's losses are today's seed money",
+        "everything I lost up to now is just capital for the next run",
+        "loss today, stake tomorrow"
+    ], context: "種銭とseed moneyは日英でまさかの完全一致で、どっちも金を植えると増えるという農業の絵。英語はさらにthe next run=次の試行、とスタートアップ用語で回を重ねる前提にする。負けを経費じゃなく仕入れとして帳簿に付ける発想。", category: 'opinion', month: '2026-08' },
+    { daySlot: 24, japanese: '這い上がるのは得意なんだ', english: [
+        "climbing back is my thing",
+        "crawling back up is kind of my specialty",
+        "I've been knocked down enough times that getting back up is muscle memory",
+        "I bounce, it's what I do"
+    ], context: "muscle memory=体が勝手に覚えてる動き、で立ち直りを筋肉の反射にしてしまう。knocked down=殴り倒される、はボクシングの絵で、英語の挫折はだいたいリングの上で起きる。it's my thing=それが俺の芸、と得意技を軽く名乗るのも英語の型。", category: 'opinion', month: '2026-08' },
+    { daySlot: 24, japanese: '逆境のほうが燃えるタイプ', english: [
+        "I thrive on adversity",
+        "I do my best work with my back against the wall",
+        "honestly, I only really switch on when things get ugly",
+        "underdog mode, activated"
+    ], context: "日本語は燃えるが、英語はback against the wall=壁を背にして追い詰められた状態で語る。火の絵と壁際の絵、追い込まれ方の景色が違う。underdog=負け犬扱いの挑戦者、は英語圏で一番愛されるキャラで、名乗った瞬間に応援される得な言葉。", category: 'opinion', month: '2026-08' },
+    { daySlot: 24, japanese: '戻るんじゃない、作り直すんだ', english: [
+        "not back, rebuilt",
+        "I'm not going back, I'm building version two",
+        "this isn't a comeback to the old me, this is a whole new build",
+        "same guy, new build"
+    ], context: "英語はversion two、new buildとソフト開発の言葉で自分を語れる。日本語の「作り直す」は工作の絵だが、英語のbuildは仕様から違う別物を出荷する含み。旧バージョンには戻さない、アップデートじゃなくて新規開発、という宣言。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 25 (比較しない・自分の物差し) ──
+    { daySlot: 25, japanese: '人と比べない', english: [
+        "no comparing",
+        "I don't measure myself against other people",
+        "comparison is the thief of joy, so I stopped playing that game",
+        "not my scoreboard"
+    ], context: "英語にはcomparison is the thief of joy=比較は喜びの泥棒、という大統領の残した名言があって、比較に泥棒という人格を与えてる。measure against=他人を定規にして自分を測る、という言い方も英語で、日本語の「比べる」より測定器っぽい。泥棒には戸締まり、が英語の結論。", category: 'opinion', month: '2026-08' },
+    { daySlot: 25, japanese: '他人の芝生は見ない', english: [
+        "not looking at lawns",
+        "their grass isn't my problem",
+        "the grass is always greener over there, so I just stopped looking over the fence",
+        "blinders on"
+    ], context: "隣の芝生は日英共通のことわざで、しかも日本語は青い、英語はgreener=より緑。同じ芝を見て色の名前が違うのが地味に面白い。blinders=競走馬の遮眼帯、を付けると横を見ずに走る馬になれる。見なければ存在しない、が結論。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 25, japanese: 'SNSは他人のハイライト集', english: [
+        "it's all highlight reels",
+        "social media is everyone's highlight reel",
+        "you're comparing your behind-the-scenes to everybody else's highlight reel",
+        "reels aren't real"
+    ], context: "highlight reel=スポーツの好プレー集で、英語圏ではSNS批評の定番語。behind-the-scenes=舞台裏、との対比で、自分の楽屋と他人の本番を比べるなという構図を一文で作れる。reelとrealの発音がほぼ同じなのは英語の偶然の出来すぎ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 25, japanese: '自分の物差しで測る', english: [
+        "my own yardstick",
+        "I measure my life with my own yardstick",
+        "I decide what counts as winning, nobody else holds the ruler",
+        "I hold the ruler"
+    ], context: "物差しはyardstick=ヤール棒で、測る道具の発想は日英共通なのに単位が尺とヤードで違う。英語はwhat counts=何を得点として数えるか、とゲームの採点ルールの話にする。定規を誰が持つかで勝敗が決まるなら、持つ側に回るだけ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 25, japanese: 'マイペースが最強', english: [
+        "my pace wins",
+        "running at my own pace is the cheat code",
+        "going at my own speed looks slow until you notice I never stopped",
+        "slow and steady, baby"
+    ], context: "マイペースは実は和製英語で、そのままmy paceと言うと通じない。英語はat my own pace=自分自身のペースで、と言い直す必要がある。slow and steady wins the race=ウサギとカメの英語版があって、カメ推しは万国共通。cheat code=ゲームの裏技、で最強感を出す。", category: 'opinion', month: '2026-08' },
+    { daySlot: 25, japanese: '隣のレースは走らない', english: [
+        "not my race",
+        "I'm not running anybody else's race",
+        "the guy in the next lane is running a different race, so his time means nothing to me",
+        "run your own race"
+    ], context: "run your own race=自分のレースを走れ、は英語の定番の激励で、陸上のレーンの絵がそのまま人生に使われる。his time means nothing=あいつのタイムは無意味、と記録係の口調で切り捨てるのが英語流。種目が違えば順位表も別、という理屈。", category: 'opinion', month: '2026-08' },
+    { daySlot: 25, japanese: '昨日の自分がライバル', english: [
+        "me versus yesterday",
+        "the only guy I'm competing with is yesterday's me",
+        "my only rival is yesterday's version of me, and honestly he set the bar low",
+        "beat the old me"
+    ], context: "英語はyesterday's me=昨日版の俺、と自分をバージョン管理する。set the bar low=走り高跳びのバーを低く設定した、は英語のハードル表現で、昨日の自分が雑魚なら今日は楽勝という理屈が成立する。ライバル設定を自分内で完結させると他人が消える。", category: 'opinion', month: '2026-08' },
+    { daySlot: 25, japanese: '勝ち負けの土俵から降りる', english: [
+        "stepping off the ring",
+        "I'm just not playing the win-lose game anymore",
+        "you can't lose a game you walked away from",
+        "I left the ring"
+    ], literal: 'I step down from the sumo ring of winning and losing', context: "日本語は相撲の土俵だが、英語に土俵はないのでgame=ゲーム盤から降りる話になる。英語にはrat race=ネズミの競争、という出世レース用語もあって、降りる対象が土俵か回し車かの違い。参加してないゲームでは負けようがない、が英語の理屈。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 25, japanese: '羨ましいは行動のサイン', english: [
+        "envy is a signal",
+        "jealousy is just a to-do list item",
+        "when I catch myself being jealous, that's my gut telling me what to chase",
+        "envy equals homework"
+    ], context: "英語はcatch myself=やってる自分を現行犯逮捕する、と自分の感情を第三者目線で捕まえる。gut=内臓が教えてくれる、も英語の定番で、直感は頭じゃなく腹から来る扱い。羨ましさをto-doリストに書き写せば、感情が課題に変わる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 25, japanese: '俺は俺の道を行く', english: [
+        "my way",
+        "I'm walking my own road, period",
+        "everybody's got opinions, but this is my road and I'm the one walking it",
+        "my road, my rules"
+    ], context: "英語圏ではシナトラのMy Wayが人生賛歌の頂点で、my wayの二文字だけで「俺流で生き抜いた」まで背負える。period=以上、句点、を文末に置くと日本語の「以上」と同じ議論打ち切りの効果。道の所有権を主張したら、あとは歩くだけ。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 26 (成功の定義) ──
+    { daySlot: 26, japanese: '成功って何なんだろうな', english: [
+        "what even is success",
+        "what does success even mean, honestly",
+        "I keep asking myself what success actually looks like for me",
+        "define success, right?"
+    ], context: "「何だろうな」の遠い目はevenで出す。what is successだとテスト問題だが、evenを挟むと「そもそも論」の匂いになる。日本語は語尾の「な」でぼやくが、英語は真ん中に一語ぶち込んでぼやく。置き場所が違うだけで、おっさんのため息はどこの国も同じ。", category: 'filler', month: '2026-08' },
+    { daySlot: 26, japanese: 'やるって決めたことをやり遂げたら、それが成功だろ', english: [
+        "that's success to me",
+        "success is finishing what you set out to do",
+        "if you follow through on what you decided to do, that's success in my book",
+        "you finished? you won"
+    ], context: "「やろうと決めたこと」はset out to doで一発。set out=旅に出る感じで「やるぞと歩き出したこと」。それをfollow through=最後まで振り切る、で回収すれば成功の完成。in my book=「俺の辞書では」で、他人の定義なんか知らんという顔ができる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 26, japanese: '金持ち=成功ってわけじゃないから', english: [
+        "rich isn't success",
+        "money doesn't automatically make you successful",
+        "there are plenty of rich people who are miserable, so that math doesn't work",
+        "rich and miserable is a thing"
+    ], context: "「〜ってわけじゃない」はdoesn't automaticallyが近い。金から成功への自動変換を切る言い方。miserable=惨め、でrich and miserableはセットで使われる定番コンボ。英語圏にも金あるのに不幸な奴は掃いて捨てるほどいるらしい。安心した。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 26, japanese: '貧乏でも幸せなら勝ちだろ', english: [
+        "broke but happy wins",
+        "broke and happy still beats rich and miserable",
+        "if you're happy, you're winning, even if your wallet disagrees",
+        "happy counts as winning"
+    ], context: "「貧乏」はpoorよりbrokeが口語。poorは身分、brokeは「今すっからかん」の一時的な響きで自虐に使いやすい。beats=殴り勝つ、で比較を試合にするのが英語流。財布に反対されながら勝ち名乗りを上げる、それが人生。", category: 'opinion', month: '2026-08' },
+    { daySlot: 26, japanese: '他人の成功の型に自分をはめる必要ないから', english: [
+        "not my playbook",
+        "I'm not living by someone else's playbook",
+        "I don't have to squeeze myself into somebody else's version of success",
+        "their game, not mine"
+    ], context: "「型」はplaybook=作戦帳で表すのが今っぽい。他人の作戦帳どおりに動く義理はない、という言い方。squeeze into=無理やり押し込む、で窮屈さが絵になる。日本語の「はめる」と同じで、英語も型物のイメージで抵抗する。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 26, japanese: '成功は小さく数えたほうがいい', english: [
+        "count the small wins",
+        "you've got to count the small wins",
+        "if you only count the big wins, you'll go years without scoring",
+        "small wins add up"
+    ], context: "英語は成功を勝ち星で数える文化。win=一勝、small wins=地味な白星の積み重ね。でかい一発だけ待ってると何年も無得点、という理屈はスポーツ実況そのまま。add up=ちりも積もれば、で締めれば説教臭くならない。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 26, japanese: '成功の物差しは自分で作るもんだよ', english: [
+        "I set my own bar",
+        "you've got to measure success your own way",
+        "I stopped using other people's ruler to measure my life",
+        "my scoreboard, my rules"
+    ], context: "「物差し」はrulerでもいいがbar=合格ラインの高さが英語の定番。set the bar=そのラインを自分で置く。scoreboard=得点板まで持ち出すと「採点者は俺」宣言になる。人生の審判を外注しない、居酒屋で言うとちょっとかっこいい系。", category: 'opinion', month: '2026-08' },
+    { daySlot: 26, japanese: '別に有名になりたいわけじゃないんだよ', english: [
+        "fame's not the goal",
+        "I'm not in this to get famous",
+        "I don't need my name out there, I just want my life to work",
+        "who needs famous"
+    ], context: "「〜したいわけじゃない」はI'm not in this to〜が便利。in this=この勝負に参加してる理由、を否定する形。get my name out there=名前を世に出す、はSNS時代の定番表現。逆に言うと英語圏は名前を出したがる奴だらけってこと。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 26, japanese: '好きなことで食えたらもう上がりだろ', english: [
+        "that's the endgame",
+        "making a living doing what I love, that's the win",
+        "if I can pay the bills doing something I actually enjoy, game over, I won",
+        "do what you love, eat anyway"
+    ], context: "「食う」はmake a livingかpay the bills。日本語は飯で生活を語るが、英語は請求書で語る。endgame=最終局面、game over, I won=クリア宣言で、人生を盤面ごとゲーム扱いするのが英語の癖。双六の「上がり」と発想は同じ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 26, japanese: '成功かどうかより、納得できるかどうかだよ', english: [
+        "peace over success",
+        "I'd rather be at peace with it than look successful",
+        "at the end of the day, I just want to be able to live with my choices",
+        "no regrets beats trophies"
+    ], context: "「納得」にぴったりの英単語はなくて、live with my choices=自分の選択と同居できる、が一番近い。後悔との同居は無理だから納得しか道がない、という理屈。at the end of the day=結局のところ、は居酒屋の締めの一言に相当する万能枕。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 27 (不安との付き合い方) ──
+    { daySlot: 27, japanese: '不安って消えないんだよ、慣れるだけで', english: [
+        "fear doesn't leave",
+        "the fear never goes away, you just get used to it",
+        "anxiety doesn't disappear, you just learn to carry it better",
+        "you don't beat it, you befriend it"
+    ], context: "「慣れる」はget used toだが、carry it better=上手に担げるようになる、が英語らしい。不安を荷物扱いして、消すんじゃなく持ち方を覚える発想。befriend=友達になる、まで行くとちょっと悟りすぎだが酒の席なら許される。", category: 'opinion', month: '2026-08' },
+    { daySlot: 27, japanese: '不安は準備で殴るしかない', english: [
+        "prep kills fear",
+        "the only cure for worry is doing the homework",
+        "whenever I get anxious, I just prepare harder until it shuts up",
+        "outwork the worry"
+    ], context: "「殴る」を直訳でpunchすると通じない。英語はcure=治療薬か、outwork=作業量で上回る、で不安を処理する。until it shuts up=黙るまで、で不安をうるさい同居人扱いするのがミソ。準備という名の騒音対策。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 27, japanese: '考えても仕方ないことは考えない主義なんで', english: [
+        "can't control it, don't hold it",
+        "if I can't do anything about it, I don't think about it",
+        "I only spend brainpower on stuff I can actually change",
+        "not my department"
+    ], literal: 'not my department = それは俺の部署じゃない', context: "英語は悩みを「自分で動かせるか否か」で仕分けする。can't control it=管轄外、と割り切る言い方が山ほどある。not my departmentは会社のたらい回しの決まり文句で、それを自分の脳内に使う雑さが笑える。心配事も他部署に回せ。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 27, japanese: '夜中に考える不安って当てにならないから', english: [
+        "3am brain lies",
+        "never trust the thoughts you have at 3am",
+        "everything looks like the end of the world at night and fine by morning",
+        "sleep on it, it shrinks"
+    ], context: "英語圏では夜中の不安を3am thoughtsと呼ぶ。深夜3時の脳は嘘つき、という共通認識がある。sleep on it=一晩寝かせろ、は決断の定番だが、不安も寝かせると縮む。人類みんな夜にやられてる証拠の表現群。", category: 'opinion', month: '2026-08' },
+    { daySlot: 27, japanese: '動いてる間は不安とか忘れてるんだよな', english: [
+        "motion beats worry",
+        "when I'm moving, the worry can't catch me",
+        "staying busy is the cheapest therapy I know",
+        "too busy to panic"
+    ], context: "「動く」はmoveでもいいが、英語はstay busy=忙しくしておく、で心を守る。cheapest therapy=一番安い治療、は自虐込みの定番ジョーク。不安は止まってる奴から順に捕まえに来る。だから走る、それだけの話。", category: 'reaction', month: '2026-08' },
+    { daySlot: 27, japanese: '不安ゼロの奴のほうが逆にヤバいだろ', english: [
+        "zero fear is scary",
+        "anybody with zero worries scares me a little",
+        "if you're not nervous at all before a big move, you haven't thought it through",
+        "no nerves, no brain"
+    ], context: "「逆にヤバい」はscares meで返すと英語らしい。不安がない奴を見てこっちが不安になる、という主語の反転。think it through=最後まで考え抜く、をしてないから平気なだけ。ノーテンキとノープランは大体セット。", category: 'opinion', month: '2026-08' },
+    { daySlot: 27, japanese: '心配事の9割は起きないらしいぞ', english: [
+        "most worries never land",
+        "ninety percent of what you worry about never happens",
+        "I've survived a hundred percent of the disasters I imagined, because they never showed up",
+        "worry is bad fiction"
+    ], context: "英語には「想像した災害の生存率100%」という定番の言い回しがある。起きてないから当然100%、という屁理屈が効く。never showed up=すっぽかされた、で災害をドタキャン野郎扱い。心配とは当たらない天気予報である。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 27, japanese: 'ビビってるってことは本気ってことだから', english: [
+        "scared means serious",
+        "if it scares you, it probably matters",
+        "the nerves are just proof that I actually care about this one",
+        "good scared, not bad scared"
+    ], context: "英語にはgood scared=いい怖さ、という言い方がある。怖さに良い悪いがあるという発想が便利。proof that I care=本気の証拠、で震えを勲章に変換する。ビビってない挑戦は挑戦じゃなくてただの用事。", category: 'reaction', month: '2026-08' },
+    { daySlot: 27, japanese: '不安は消すんじゃなくて、連れて走るんだよ', english: [
+        "run with the fear",
+        "you don't wait for the fear to leave, you bring it along",
+        "I stopped waiting to feel ready and just started scared",
+        "do it scared"
+    ], context: "do it scared=ビビったまんまやれ、は英語圏の合言葉レベルの定番。readyを待つな、scaredのまま出発しろという乗り換え案内。start scared=怖いままスタートで助走ゼロ。不安は助手席に乗せとけば意外と静かにしてる。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 27, japanese: 'まあ、なるようにしかならんよ', english: [
+        "it'll sort itself out",
+        "whatever happens, happens",
+        "I've done what I can, the rest is out of my hands",
+        "que sera, sera"
+    ], literal: 'whatever happens, happens = 起きることは起きる', context: "「なるようになる」は同じ言葉を二回言って丸投げする。sort itself out=物事が勝手に片付く、で世界に仕事を任せる言い方。out of my hands=俺の手を離れた、は責任の返却窓口。人事を尽くしたら、あとは酒。", category: 'filler', month: '2026-08' },
+
+    // ── 2026-08 Day 28 (夢を口に出す) ──
+    { daySlot: 28, japanese: '夢って口に出した瞬間から動き出すんだよ', english: [
+        "say it, start it",
+        "the moment you say it out loud, it gets real",
+        "dreams start moving the second you tell somebody about them",
+        "speak it into existence"
+    ], context: "speak it into existence=言って存在させる、は英語圏の願掛け定番フレーズ。言霊とほぼ同じ発想が海の向こうにもある。get real=現実味を帯びる、で夢が実体化する感じ。人類、結局みんな口に出して自分を騙してる。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 28, japanese: '笑われてからが本番だから', english: [
+        "let them laugh",
+        "getting laughed at means the game just started",
+        "if nobody laughs at your dream, it's probably too small",
+        "laughter is the entry fee"
+    ], context: "英語には「笑われない夢は小さすぎる」という有名な理屈がある。デカい話ほど最初は冗談扱いされるのが仕様。entry fee=入場料、で嘲笑をチケット代に変換すると腹が立たない。笑い声はスタートの合図くらいに思っとけ。", category: 'opinion', month: '2026-08' },
+    { daySlot: 28, japanese: '言霊って、あると思うんだよな', english: [
+        "words have power",
+        "I honestly think words make things happen",
+        "call me superstitious, but saying it out loud changes something",
+        "words do work"
+    ], context: "call me superstitious=迷信って言われてもいいけど、は変なこと言う前の免罪符。先に自分でツッコんでおくと相手が笑えなくなる英語の技。words have power=言葉には力がある、はそのまんまで通じる。言霊、輸出可能。", category: 'opinion', month: '2026-08' },
+    { daySlot: 28, japanese: '先に宣言して自分を追い込むタイプなんで', english: [
+        "I box myself in",
+        "I announce it first so I can't back out",
+        "telling people my plans is how I burn the escape routes",
+        "no exits, only forward"
+    ], context: "「追い込む」はcan't back out=撤退不能にする、で表す。burn the escape routes=逃げ道を焼く、は背水の陣そのもの。英語も日本語も、結局自分を信用してないから外堀から埋める。宣言とは自分にかける保険じゃなくて枷。", category: 'opinion', month: '2026-08' },
+    { daySlot: 28, japanese: '夢はでかく、一歩は小さくでいいんだよ', english: [
+        "dream big, step small",
+        "big dream, tiny steps, that's the whole trick",
+        "you don't need a big move, you need a small one you'll actually take",
+        "baby steps to the moon"
+    ], context: "dream big=でかく夢見ろ、は英語の応援定番だが、そこにstep smallを足すと急に現実的になる。actually take=実際に踏み出せる、が肝で、踏めないデカい一歩に価値はない。月まで赤ちゃん歩き、時間はかかるが着く。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 28, japanese: '夢物語って言われても、別にいいんだよ', english: [
+        "call it a pipe dream",
+        "they can call it a pipe dream all they want",
+        "people can roll their eyes, I'm building it anyway",
+        "watch me"
+    ], literal: 'pipe dream = パイプの夢(アヘン窟由来の白昼夢)', context: "pipe dream=実現しない夢、の語源はアヘン窟のパイプという物騒な由来。all they want=好きなだけどうぞ、で悪口に許可を出す余裕の構え。watch me=まあ見てろ、は反論を一切せずに勝ち逃げする最短の二語。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 28, japanese: '口だけの奴で終わりたくないんだよ', english: [
+        "all talk? not me",
+        "I refuse to be the all-talk guy",
+        "plenty of guys talk a big game, I'd rather just show the receipts",
+        "receipts over promises"
+    ], literal: 'show the receipts = レシートを見せる=証拠を出す', context: "「口だけ」はall talkでそのまま通じる。talk a big game=でかい試合を語る、も同類の常套句。receipts=レシートはネットスラングで「動かぬ証拠」。言った分だけ領収書を切れ、という世知辛くも正しい世界。", category: 'opinion', month: '2026-08' },
+    { daySlot: 28, japanese: '夢の話を茶化さずに聞いてくれる相手って貴重だぞ', english: [
+        "find your believers",
+        "having someone who doesn't laugh at your plans is rare",
+        "keep the people who ask how it's going, not why you're bothering",
+        "guard those people"
+    ], context: "「茶化さない」はdoesn't laugh atで十分。英語らしいのはhowを聞く人とwhyを聞く人の仕分けで、進捗を聞く奴は味方、動機を疑う奴は塩。guard=護衛しろ、で人間関係を宝物扱いする。夢の話ができる飲み相手、一人いれば上等。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 28, japanese: '紙に書くと、なんか現実のほうから寄ってくるんだよ', english: [
+        "write it down",
+        "stuff I write down has a weird way of happening",
+        "a goal on paper stops being a wish and starts being a plan",
+        "ink makes it real"
+    ], context: "wishとplanの区別が英語は厳しい。頭の中にある間はwish=願い事、紙に落ちた瞬間plan=計画に昇格する。has a weird way of happening=なぜか実現しがち、で因果を説明せずに済ませる便利構文。書くだけタダ、やらない理由がない。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 28, japanese: '44歳が夢語っちゃ悪いかよ', english: [
+        "44 and dreaming",
+        "who says 44 is too old to dream",
+        "I'm 44 and just getting started, deal with it",
+        "late bloomer, still blooming"
+    ], literal: 'late bloomer = 遅咲きの花', context: "who says〜=誰が決めた、は年齢制限に噛みつく定番の入り。deal with it=文句あるなら慣れろ、で議論を打ち切る。late bloomer=遅咲きは英語で完全に褒め言葉。咲く時期が遅い花は、大体長く咲くことになってる。", category: 'shutdown', month: '2026-08' },
+
+    // ── 2026-08 Day 29 (5年後・10年後) ──
+    { daySlot: 29, japanese: 'で、5年後どこにいたいのよって話', english: [
+        "where in five years?",
+        "so where do you want to be in five years?",
+        "the question isn't where you are now, it's where you're headed",
+        "aim first, then walk"
+    ], context: "英語の面接名物where do you see yourself in five yearsのくだけ版。be=いる場所で人生を語るのは日英共通だが、英語はheaded=進行方向を必ず聞いてくる。現在地より進路。カーナビと同じで、向きが合ってれば遅くても着く。", category: 'filler', month: '2026-08' },
+    { daySlot: 29, japanese: '10年後の俺が今日の俺を見てると思うとサボれない', english: [
+        "future me is watching",
+        "future me is watching, so I can't slack today",
+        "I try to live in a way that ten-years-older me won't want to strangle me",
+        "make future me proud"
+    ], context: "future me=未来の俺、は英語で普通に一人の人格として扱われる。slack=サボる、をfuture meに監視させる自家製の見張りシステム。strangle=絞め殺す、はもちろん冗談だが、未来の自分が一番怖い債権者なのは本当。", category: 'opinion', month: '2026-08' },
+    { daySlot: 29, japanese: 'ゴールから逆算して今日やることを決めるんだよ', english: [
+        "count back from the goal",
+        "pick the ending, then count back to today",
+        "I pick the ending first, then figure out what today has to look like",
+        "reverse-engineer your life"
+    ], context: "「逆算」はwork backwards=後ろ向きに作業する、でそのまま。reverse-engineer=完成品をバラして作り方を割り出す、は工業用語を人生に転用した言い方。ゴールを先に決めない旅は、ただの徘徊である。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 29, japanese: '5年前の俺が今の俺見たらびっくりするだろうな', english: [
+        "past me would freak",
+        "five-years-ago me would not believe this",
+        "the guy I was five years ago would never guess where I'm standing now",
+        "past me, you're welcome"
+    ], literal: 'past me, you are welcome = 過去の俺、どういたしまして', context: "英語はpast me/future meと自分を時間軸で分裂させて会話する。would not believe this=信じないだろう、の仮定で成長を測る。過去の自分に「どういたしまして」を言うのは、感謝される前に恩を着せるスタイル。", category: 'reaction', month: '2026-08' },
+    { daySlot: 29, japanese: '10年なんてあっという間だぞ、マジで', english: [
+        "ten years flies",
+        "ten years goes by in a blink",
+        "the last ten years felt like two, so the next ten won't wait either",
+        "blink and it's gone"
+    ], context: "「あっという間」はin a blink=まばたき一回分。flyもgoも、英語は時間を勝手に動く生き物扱いする。won't wait=待ってくれない、で時間を薄情な同僚に変える。この10年が一瞬だった奴だけが、次の10年の速さを知っている。", category: 'opinion', month: '2026-08' },
+    { daySlot: 29, japanese: '今やってることは未来の自分への仕送りだから', english: [
+        "paying future me",
+        "everything I do now is a deposit for future me",
+        "today's work is basically a care package for the guy I'll be in ten years",
+        "future me eats first"
+    ], literal: 'care package = 実家から届く段ボール', context: "deposit=入金、で努力を貯金扱いするのが英語の癖。care package=親が学生に送る食い物の段ボールで、仕送りの感覚に一番近い。future me eats first=未来の俺が先に食う、は今の俺がちょっと我慢する宣言。健気か。", category: 'opinion', month: '2026-08' },
+    { daySlot: 29, japanese: '今日の積み重ねが5年後の景色を決めるんだよな', english: [
+        "today builds the view",
+        "what I stack up today decides the view in five years",
+        "five years from now is just today, repeated a couple thousand times",
+        "today times a thousand"
+    ], context: "stack up=積み上げる、は日本語の「積み重ね」と同じ工事現場の発想。today, repeated=今日の繰り返し、という掛け算で未来を説明するのが英語らしい割り切り。内装屋には染みる言い方。", category: 'opinion', month: '2026-08' },
+    { daySlot: 29, japanese: '未来の予測はできないけど、準備はできるから', english: [
+        "can't predict, can prepare",
+        "you can't predict the future, but you can pack for it",
+        "I have no idea what's coming, so I'm just building skills that travel",
+        "pack light, pack right"
+    ], context: "pack for it=未来のために荷造りする、で予測不能を旅支度に変える。skills that travel=どこでも通用する持ち運び可能なスキル、は移住を考える人間に刺さる言い方。天気は読めなくても傘は持てる。それが準備。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 29, japanese: '5年後も同じ愚痴言ってたら、それはもう終わりだろ', english: [
+        "same complaints, same life",
+        "if I'm still whining about the same stuff in five years, that's on me",
+        "complaining about the same thing for five years means you chose it",
+        "change it or own it"
+    ], context: "that's on me=それは俺の責任、は言い訳を自分で回収する潔い言い方。英語は長期の愚痴をchose it=自分で選んだ、と再分類してくる。5年同じ文句を言えるのは、ある意味その状況を気に入ってる証拠。耳が痛いが正論。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 29, japanese: '未来って選べるはずなんだよ、たぶん', english: [
+        "the future's a choice",
+        "the future is a choice, at least I hope so",
+        "I'd rather believe I'm steering this thing than just riding it",
+        "driver's seat, hopefully"
+    ], context: "steer=ハンドルを握る、ride=ただ乗ってる、の対比で人生の主導権を語るのが英語流。at least I hope so=そうだと思いたい、で断言を一段緩めるのは日本語の「はず、たぶん」と同じ弱気の保険。人類、未来には強気になりきれない。", category: 'opinion', month: '2026-08' },
+
+    // ── 2026-08 Day 30 (最終形・上がり) ──
+    { daySlot: 30, japanese: '結局、最終的にどうなりたいかなんだよな', english: [
+        "what's the end goal?",
+        "it all comes down to where you want to end up",
+        "everything gets easier once you know what the finish line looks like",
+        "know your finish line"
+    ], context: "come down to=突き詰めるとそこに落ちる、は議論の締めの定番。end up=最終的に行き着く、は途中経過を全部すっ飛ばす便利動詞。finish line=ゴールテープが見えてれば、途中の坂は全部ただの通過点になる。", category: 'opinion', month: '2026-08' },
+    { daySlot: 30, japanese: '上がりの形を先にイメージしとくんだよ', english: [
+        "picture the endgame",
+        "I keep a clear picture of what done looks like",
+        "if you can't picture your finish, you'll just keep running forever",
+        "begin with the end"
+    ], context: "what done looks like=完成形の見た目、は仕事でも人生でも使う言い回し。doneを名詞みたいに扱う雑さが英語らしい。keep running forever=永遠に走り続ける、はゴール設定しない奴への警告。上がりのない双六は、ただの苦行。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 30, japanese: '老後は海の見える家でのんびりやりたいんだよ', english: [
+        "ocean view, please",
+        "give me a little house with an ocean view",
+        "the dream is a small place by the sea and nowhere I have to be",
+        "sea, chair, done"
+    ], context: "nowhere I have to be=行かなきゃいけない場所がない、は英語の理想の老後の決まり文句。予定ゼロを財産として数える発想。give me〜=〜をくれ、は注文口調で夢を言うカジュアルさ。海と椅子、以上。完成された人生。", category: 'opinion', month: '2026-08' },
+    { daySlot: 30, japanese: '働かないんじゃなくて、選んで働くんだよ', english: [
+        "work by choice",
+        "I still want to work, just on my own terms",
+        "the goal isn't quitting work, it's getting to pick which work",
+        "boss of my own hours"
+    ], context: "on my own terms=自分の条件で、は独立志向の英語で一番出てくる句。termsは契約書の「条件」で、人生の契約書を自分で書き直すニュアンス。pick which work=どの仕事かを選ぶ、が引退よりよっぽど贅沢。選べる奴が一番強い。", category: 'opinion', month: '2026-08' },
+    { daySlot: 30, japanese: '悠々自適ってやつよ、憧れるだろ', english: [
+        "the easy life",
+        "living easy, answering to nobody",
+        "no alarm, no boss, no rush, that's the whole plan",
+        "life on airplane mode"
+    ], literal: 'life on airplane mode = 人生を機内モードに', context: "answering to nobody=誰にも報告しない、が悠々自適の核心。英語は自由を「無い物」で数える。no alarm, no boss, no rushと三連発する言い方が気持ちいい。機内モードの人生、通知ゼロ。着信は波の音だけ。", category: 'filler', month: '2026-08' },
+    { daySlot: 30, japanese: 'どうせなら畳の上で死にたいじゃん', english: [
+        "die in my own bed",
+        "I want to go peacefully, in my own bed",
+        "after all this running around, I'd like a quiet ending at home",
+        "home stretch, literally"
+    ], literal: '畳の上で死ぬ = die in my own bed (英語は畳がベッドに化ける)', context: "「畳の上で死ぬ」の英語版はdie in my own bed。畳がベッドに変わるだけで発想は完全に同じ。go=死ぬの婉曲で、軽く使える。home stretch=競馬の最終直線を文字どおり家で迎える駄洒落。人生の上がりは自宅がいい。", category: 'opinion', month: '2026-08' },
+    { daySlot: 30, japanese: '孫に自慢できる人生にしたいよな', english: [
+        "stories for the grandkids",
+        "I want a life worth telling the grandkids about",
+        "when the grandkids ask what I did, I want a good answer ready",
+        "earn the bragging rights"
+    ], literal: 'bragging rights = 自慢する権利', context: "worth telling=語る価値がある、で人生をネタとして査定する英語の癖。bragging rights=自慢権は、勝った者だけが得る公式な権利みたいな扱い。孫への土産は金より話。ジジイになった時の持ちネタを今仕込んでる最中。", category: 'opinion', month: '2026-08' },
+    { daySlot: 30, japanese: '最後に笑えてたら、それで勝ちだろ', english: [
+        "last laugh wins",
+        "whoever laughs last, laughs best",
+        "the scoreboard only matters at the final whistle",
+        "still smiling at the end"
+    ], literal: 'he who laughs last laughs best = 最後に笑う者が一番よく笑う', context: "「最後に笑う者が最も良く笑う」は英語の元祖ことわざで、日本語の「最後に笑えたら勝ち」はほぼ直輸入。final whistle=試合終了の笛、まで得点は確定しない。途中経過で騒ぐな、人生は後半戦から面白くなる仕様。", category: 'reaction', month: '2026-08' },
+    { daySlot: 30, japanese: '墓場まで金は持っていけないんだから', english: [
+        "can't take it with you",
+        "you can't take it with you when you go",
+        "no luggage racks on a hearse, so I might as well use the money now",
+        "spend it or lose it"
+    ], literal: 'no luggage racks on a hearse = 霊柩車に荷台はない', context: "you can't take it with you=あの世に持っていけない、は英語でも大定番の説教フレーズ。霊柩車に荷台はない、という身も蓋もないジョークまでセットである。might as well=どうせなら、で散財に理屈をつける。異論は認める。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 30, japanese: 'まあ、終わりよければ全部よしってことで', english: [
+        "all's well that ends well",
+        "if it ends well, the whole mess was worth it",
+        "a good ending forgives a lot of bad chapters",
+        "stick the landing"
+    ], literal: 'stick the landing = 着地をピタッと決める(体操用語)', context: "all's well that ends wellはシェイクスピアの芝居のタイトルがそのまま慣用句になったやつ。bad chapters=ひどい章、も良い結末が全部帳消しにする。stick the landing=体操の着地を決める。途中グダグダでも着地で拍手は取れる。", category: 'filler', month: '2026-08' },
+
+    // ── 2026-08 Day 31 (未来は今日から) ──
+    { daySlot: 31, japanese: '未来って、今日から始まってるんだよな', english: [
+        "the future starts now",
+        "the future doesn't start someday, it starts today",
+        "whatever I want to be in five years, the first day of it is today",
+        "day one is today"
+    ], context: "someday=いつか、は英語で「永遠に来ない日」の別名扱いされている。somedayとtodayを対決させる構文が定番で、勝つのはいつもtoday。day one=初日、を今日に設定した瞬間、未来はもう始業してる。遅刻すんな、俺。", category: 'opinion', month: '2026-08' },
+    { daySlot: 31, japanese: '今日が人生で一番若い日らしいぞ', english: [
+        "youngest I'll ever be",
+        "today is the youngest you'll ever be",
+        "I'm the oldest I've been and the youngest I'll ever be, so now works",
+        "no younger day coming"
+    ], context: "the youngest you'll ever be=これから先で一番若い、は英語でも中年の合言葉。一番老けてて一番若い、という矛盾したままの言い方が妙に効く。若返り待ちの計画は永遠に開始されない。だから今日、以上。", category: 'opinion', month: '2026-08' },
+    { daySlot: 31, japanese: '明日やろうは馬鹿野郎、って昔から言うだろ', english: [
+        "tomorrow is a trap",
+        "tomorrow is where plans go to die",
+        "every time I say I'll do it tomorrow, I'm lying and I know it",
+        "there is no tomorrow"
+    ], literal: 'tomorrow is where plans go to die = 明日は計画が死にに行く場所', context: "where plans go to die=計画が死にに行く場所、は英語の言い回しの型で、tomorrowを墓場扱いする。I'm lying and I know it=嘘だと自分でわかってる、の自白が笑いどころ。明日の俺は今日の俺より信用できない。実績がそう言ってる。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 31, japanese: '今やるか、一生やらないか、どっちかなんだよ', english: [
+        "now or never",
+        "it's now or never, and I know it",
+        "if I don't start now, I already know how this story ends",
+        "pick now"
+    ], context: "now or neverは英語でも歌のタイトルになるくらいの鉄板句で、二択の圧が強い。how this story ends=この物語の結末、は「やらない未来」がもう読めてるという諦めの先回り。結末を知ってる本を読み直す趣味はない。", category: 'opinion', month: '2026-08' },
+    { daySlot: 31, japanese: '未来を変えるのって、結局今日の30分なんだよ', english: [
+        "thirty minutes today",
+        "thirty minutes a day is what actually changes your life",
+        "nobody transforms overnight, they just protect thirty minutes a day",
+        "small daily, huge later"
+    ], context: "protect thirty minutes=30分を守り抜く、で時間を襲われる資産として扱う。overnight=一晩で、の変身は英語でも詐欺広告の常套句として嫌われている。毎日の30分は誰にも奪わせない。会議には奪われるけど。", category: 'suggestion', month: '2026-08' },
+    { daySlot: 31, japanese: '言い訳の在庫、もう切れたわ', english: [
+        "out of excuses",
+        "I've officially run out of excuses",
+        "I used up every excuse I had, so the only thing left is doing it",
+        "excuse tank: empty"
+    ], literal: 'run out of excuses = 言い訳の在庫切れ', context: "run out of=在庫が切れる、は牛乳にも言い訳にも同じように使える。英語は言い訳を消耗品として数える文化で、used up every excuse=全部使い切った、と棚卸しまでする。在庫ゼロの店に残る商品は、実行だけ。", category: 'reaction', month: '2026-08' },
+    { daySlot: 31, japanese: '動けば景色って変わるんだよ、ほんとに', english: [
+        "move and it changes",
+        "the view only changes when you move",
+        "one small move and suddenly the whole map looks different",
+        "sitting still shows nothing"
+    ], context: "view=景色を変える方法は移動だけ、という当たり前を英語は堂々と言う。the map looks different=地図の見え方が変わる、で一歩の価値を測る。座ってる限り窓の外は同じ。乗り物と人生の共通仕様である。", category: 'opinion', month: '2026-08' },
+    { daySlot: 31, japanese: '準備はもう十分だろ、どう考えても', english: [
+        "prep's done",
+        "I've prepared enough, and I know it",
+        "at some point studying the pool becomes avoiding the water",
+        "enough homework"
+    ], context: "studying the pool=プールの研究、はいつまでも飛び込まない奴への英語の皮肉。準備が逃避に化ける瞬間を見抜く言い方。enough=もう十分、は自分に言う時が一番難しい単語。辞書で一番重い6文字かもしれない。", category: 'shutdown', month: '2026-08' },
+    { daySlot: 31, japanese: 'あとはもう、やるだけなんだよな', english: [
+        "nothing left but doing",
+        "all that's left is to actually do it",
+        "the plan is finished, the excuses are gone, it's just me and the work now",
+        "just execution now"
+    ], context: "all that's left=残ってるのはそれだけ、で退路の消滅を静かに報告する。it's just me and the work=俺と作業だけ、はリングに二人きりの構図。計画も言い訳も退場して、残ったのがこの二人。逃げ場のない良い間合い。", category: 'filler', month: '2026-08' },
+    { daySlot: 31, japanese: 'よし、そろそろ始めるか', english: [
+        "alright, let's go",
+        "alright, time to get this thing started",
+        "enough talking about it, let's actually do this",
+        "here goes nothing"
+    ], literal: 'here goes nothing = ええい、ままよ(飛び込む直前の掛け声)', context: "here goes nothingは飛び込む直前の掛け声で、直訳すると意味不明だが「ダメ元で行くぞ」の音。let's goのalrightは自分への号令で、日本語の「よし」と役割が完全に同じ。掛け声だけは万国共通で、あとは飛ぶだけ。", category: 'reaction', month: '2026-08' },
+
+];
+
+// 9月分。1ファイルが大きくなりすぎるので5つに割ってある。
+// 中身の作り方は goroku-seed-september.ts の頭に書いた。
+import { GOROKU_SEP_A } from './goroku-seed-september';
+import { GOROKU_SEP_B } from './goroku-seed-september-b';
+import { GOROKU_SEP_C } from './goroku-seed-september-c';
+import { GOROKU_SEP_D } from './goroku-seed-september-d';
+import { GOROKU_SEP_E } from './goroku-seed-september-e';
+
+// 10月分。骨格の月。1日1骨格x10。作り方は goroku-seed-october.ts の頭に書いた。
+import { GOROKU_OCT_A } from './goroku-seed-october';
+import { GOROKU_OCT_B } from './goroku-seed-october-b';
+import { GOROKU_OCT_C } from './goroku-seed-october-c';
+import { GOROKU_OCT_D } from './goroku-seed-october-d';
+import { GOROKU_OCT_E } from './goroku-seed-october-e';
+
+export const GOROKU_SEEDS: GorokuSeed[] = [
+    ...GOROKU_SEEDS_BASE,
+    ...GOROKU_SEEDS_AUG,
+    ...GOROKU_SEP_A,
+    ...GOROKU_SEP_B,
+    ...GOROKU_SEP_C,
+    ...GOROKU_SEP_D,
+    ...GOROKU_SEP_E,
+    ...GOROKU_OCT_A,
+    ...GOROKU_OCT_B,
+    ...GOROKU_OCT_C,
+    ...GOROKU_OCT_D,
+    ...GOROKU_OCT_E,
+];
+

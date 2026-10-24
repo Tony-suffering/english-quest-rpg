@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/app/english/write/master/page.tsx
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
 /**
@@ -132,7 +129,7 @@ export default function WriteMasterPage() {
             {/* HEADER */}
             <div style={{ backgroundColor: '#fff', borderBottom: `1px solid ${LINE}`, padding: isMobile ? '16px' : '20px 32px' }}>
                 <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-                    <Link href="/english/write/days" style={{ textDecoration: 'none', color: SUB, fontSize: '12px', fontWeight: 700 }}>← ライトパス 30日に戻る</Link>
+                    <Link href="/english/write" style={{ textDecoration: 'none', color: SUB, fontSize: '12px', fontWeight: 700 }}>← ライトパス 30日に戻る</Link>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
                         <span style={{ fontFamily: 'Georgia, serif', fontSize: isMobile ? '22px' : '26px', fontWeight: 900, color: GOLD, letterSpacing: '0.5px' }}>EXPRESSION</span>
                         <span style={{ fontFamily: 'Georgia, serif', fontSize: isMobile ? '22px' : '26px', fontWeight: 900, color: INK, letterSpacing: '0.5px' }}>MASTER</span>

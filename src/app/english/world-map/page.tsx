@@ -2,604 +2,771 @@
 
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import * as d3Geo from 'd3-geo';
 import * as d3Zoom from 'd3-zoom';
 import * as d3Selection from 'd3-selection';
-import * as topojson from 'topojson-client';
-import worldData from '../../../data/world-topo-50m.json';
-import { STAGE_INFO, QUEST_PHRASES } from '@/data/quest-phrases';
-import { getPlayerStats } from '@/lib/local-store';
+import { AnimatePresence } from 'framer-motion';
+import { ZoomIn, ZoomOut, RotateCcw, Loader2 } from 'lucide-react';
+import dotsData from '../../../data/world-map-dots.json';
 
-// ── Types ─────────────────────────────────────────────────────
-interface QuestProgress {
-    stage: number;
-    index: number;
-    caught: Record<string, boolean>;
-}
-
-type StageStatus = 'completed' | 'current' | 'locked';
-
-// ── Stage Locations ───────────────────────────────────────────
-// Each stage = a real-world city. Journey: Tokyo → LA → London → ...
-// Ordered to create a visually interesting route across the Pacific-centered map.
-interface StageLocation {
-    stage: number;
-    lat: number;
-    lng: number;
+// ── Stage Definitions ────────────────────────────────────────
+interface StageInfo {
+    id: number;
     city: string;
-    country: string;
-    regionJa: string;
+    cityJa: string;
+    scenarioKey: string;
+    title: string;
+    titleJa: string;
+    prologueDate: string;
+    x: number; // dot-space x
+    y: number; // dot-space y
+    badgeColor: string;
+    badgeIcon: string; // simple SVG path identifier
 }
 
-const STAGE_LOCATIONS: StageLocation[] = [
-    { stage: 1, lat: 35.68, lng: 139.69, city: 'Tokyo', country: 'Japan', regionJa: '日本' },
-    { stage: 2, lat: 34.05, lng: -118.24, city: 'Los Angeles', country: 'USA', regionJa: 'アメリカ' },
-    { stage: 3, lat: 51.51, lng: -0.13, city: 'London', country: 'UK', regionJa: 'イギリス' },
-    { stage: 4, lat: -33.87, lng: 151.21, city: 'Sydney', country: 'Australia', regionJa: 'オーストラリア' },
-    { stage: 5, lat: 49.28, lng: -123.12, city: 'Vancouver', country: 'Canada', regionJa: 'カナダ' },
-    { stage: 6, lat: 48.86, lng: 2.35, city: 'Paris', country: 'France', regionJa: 'フランス' },
-    { stage: 7, lat: 40.71, lng: -74.01, city: 'New York', country: 'USA', regionJa: 'アメリカ' },
-    { stage: 8, lat: 55.76, lng: 37.62, city: 'Moscow', country: 'Russia', regionJa: 'ロシア' },
-    { stage: 9, lat: -22.91, lng: -43.17, city: 'Rio de Janeiro', country: 'Brazil', regionJa: 'ブラジル' },
-    { stage: 10, lat: 27.99, lng: 86.93, city: 'Mt. Everest', country: 'Nepal', regionJa: 'ネパール' },
+const STAGES: StageInfo[] = [
+    {
+        id: 1, city: 'Tokyo', cityJa: '東京',
+        scenarioKey: 'party', title: 'College Party',
+        titleJa: '大学パーティー', prologueDate: '2026-02-05',
+        x: 178, y: 38, badgeColor: '#EF4444', badgeIcon: 'fire',
+    },
+    {
+        id: 2, city: 'Los Angeles', cityJa: 'ロサンゼルス',
+        scenarioKey: 'monster', title: 'Monster Under the Bed',
+        titleJa: 'ベッドの下のモンスター', prologueDate: '2026-02-10',
+        x: 293, y: 37, badgeColor: '#8B5CF6', badgeIcon: 'ghost',
+    },
+    {
+        id: 3, city: 'Seattle', cityJa: 'シアトル',
+        scenarioKey: 'mariners', title: 'Mariners Trade Talk',
+        titleJa: '野球トレード談義', prologueDate: '2026-02-15',
+        x: 289, y: 27, badgeColor: '#0284C7', badgeIcon: 'baseball',
+    },
+    {
+        id: 4, city: 'New York', cityJa: 'ニューヨーク',
+        scenarioKey: 'movie', title: 'First Movie Without Parents',
+        titleJa: '親なし映画デビュー', prologueDate: '2026-02-20',
+        x: 330, y: 30, badgeColor: '#F59E0B', badgeIcon: 'film',
+    },
+    {
+        id: 5, city: 'London', cityJa: 'ロンドン',
+        scenarioKey: 'gamenight', title: 'Game Night Gone Wrong',
+        titleJa: 'ゲームナイト崩壊', prologueDate: '2026-02-25',
+        x: 60, y: 27, badgeColor: '#10B981', badgeIcon: 'dice',
+    },
+    {
+        id: 6, city: 'Paris', cityJa: 'パリ',
+        scenarioKey: 'antiques', title: 'Antiques House Call',
+        titleJa: '骨董鑑定パニック', prologueDate: '2026-03-02',
+        x: 62, y: 30, badgeColor: '#D4AF37', badgeIcon: 'crown',
+    },
 ];
 
-// Route connections
-const ROUTES: [number, number][] = [
-    [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 8], [8, 9], [9, 10],
-];
+const WORDS_PER_DAY = 10;
+const WORDS_PER_SCENARIO = 50;
+const START_DATE = new Date(2026, 0, 1);
 
-// ── Map colors (wood tones from map-4) ────────────────────────
-const MAP_COLORS = ['#E3C195', '#C69C6D', '#A67C52', '#D4B08C', '#8B5A2B'];
-
-function hashColor(id: string): string {
-    let h = 0;
-    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
-    return MAP_COLORS[Math.abs(h) % MAP_COLORS.length];
+function getDateForIndex(index: number): string {
+    const dayIndex = Math.floor(index / WORDS_PER_DAY);
+    const date = new Date(START_DATE);
+    date.setDate(date.getDate() + dayIndex);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
-// ── Progress ──────────────────────────────────────────────────
-function loadProgress(): QuestProgress {
-    try {
-        const raw = localStorage.getItem('quest-progress');
-        return raw ? JSON.parse(raw) : { stage: 1, index: 0, caught: {} };
-    } catch {
-        return { stage: 1, index: 0, caught: {} };
+function getDatesForScenario(prologueDate: string): string[] {
+    const start = new Date(prologueDate);
+    const dates: string[] = [];
+    for (let i = 0; i < 5; i++) {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i);
+        dates.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
     }
+    return dates;
 }
 
-function getCaughtIds(caught: Record<string, boolean>): string[] {
-    return Object.keys(caught).filter(k => caught[k]);
+interface UserPhrase {
+    id: string;
+    phrase: string;
+    type: string;
+    meaning: string;
+    mastery_level: number;
+    created_at: string;
 }
 
-function getStatus(stage: number, progress: QuestProgress): StageStatus {
-    const phrases = QUEST_PHRASES.filter(p => p.stage === stage);
-    const caughtIds = getCaughtIds(progress.caught);
-    // Stage with no real phrases (stubs) - check if user has progressed past
-    if (phrases.length <= 1 && stage > 3) {
-        return stage <= progress.stage ? 'current' : 'locked';
-    }
-    const allCaught = phrases.length > 0 && phrases.every(p => caughtIds.includes(p.id));
-    if (allCaught) return 'completed';
-    if (stage <= progress.stage) return 'current';
-    // Next stage unlocks when prev is complete
-    if (stage > 1) {
-        const prev = QUEST_PHRASES.filter(p => p.stage === stage - 1);
-        if (prev.length > 0 && prev.every(p => caughtIds.includes(p.id))) return 'current';
-    }
-    return 'locked';
+interface StageProgress {
+    total: number;
+    mastered: number; // mastery_level === 3
+    percentage: number;
+    isComplete: boolean;
 }
 
-function stageCounts(stage: number, caught: Record<string, boolean>) {
-    const phrases = QUEST_PHRASES.filter(p => p.stage === stage);
-    const ids = getCaughtIds(caught);
-    return { got: phrases.filter(p => ids.includes(p.id)).length, total: phrases.length };
+// ── Badge SVG Components ─────────────────────────────────────
+function BadgeIcon({ icon, color, size = 24, earned = false }: { icon: string; color: string; size?: number; earned?: boolean }) {
+    const fill = earned ? color : '#78716C';
+    const opacity = earned ? 1 : 0.3;
+    return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ opacity }}>
+            {icon === 'fire' && (
+                <path d="M12 2C6.48 8 4 12 4 15a8 8 0 0016 0c0-3-2.48-7-8-13zm0 18a6 6 0 01-6-6c0-2 1.5-5 6-10 4.5 5 6 8 6 10a6 6 0 01-6 6z" fill={fill} />
+            )}
+            {icon === 'ghost' && (
+                <path d="M12 2a8 8 0 00-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 00-8-8zm-2 10a1.5 1.5 0 110-3 1.5 1.5 0 010 3zm4 0a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" fill={fill} />
+            )}
+            {icon === 'baseball' && (
+                <>
+                    <circle cx="12" cy="12" r="10" stroke={fill} strokeWidth="2" fill="none" />
+                    <path d="M6 3.5c2 2.5 2 6.5 0 9M18 3.5c-2 2.5-2 6.5 0 9M6 20.5c2-2.5 2-6.5 0-9M18 20.5c-2-2.5-2-6.5 0-9" stroke={fill} strokeWidth="1.5" fill="none" />
+                </>
+            )}
+            {icon === 'film' && (
+                <path d="M4 4h16a2 2 0 012 2v12a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2zm0 4h16M4 16h16M8 4v16M16 4v16" stroke={fill} strokeWidth="2" fill="none" />
+            )}
+            {icon === 'dice' && (
+                <>
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke={fill} strokeWidth="2" fill="none" />
+                    <circle cx="8" cy="8" r="1.5" fill={fill} />
+                    <circle cx="16" cy="8" r="1.5" fill={fill} />
+                    <circle cx="12" cy="12" r="1.5" fill={fill} />
+                    <circle cx="8" cy="16" r="1.5" fill={fill} />
+                    <circle cx="16" cy="16" r="1.5" fill={fill} />
+                </>
+            )}
+            {icon === 'crown' && (
+                <path d="M2 20h20l-2-8-4 4-4-8-4 8-4-4-2 8zM4 20v2h16v-2" fill={fill} />
+            )}
+        </svg>
+    );
 }
 
-// ── Status colors ─────────────────────────────────────────────
-const STATUS_COLORS: Record<StageStatus, { fill: string; stroke: string; text: string; glow: string }> = {
-    completed: { fill: '#065F46', stroke: '#10B981', text: '#10B981', glow: 'rgba(16,185,129,0.4)' },
-    current: { fill: '#1C1917', stroke: '#D4AF37', text: '#D4AF37', glow: 'rgba(212,175,55,0.5)' },
-    locked: { fill: '#44403C', stroke: '#78716C', text: '#78716C', glow: 'transparent' },
-};
-
-// ── Curved route path (Great Circle approximation) ────────────
+// ── Curved Path between stages ───────────────────────────────
 function curvedPath(x1: number, y1: number, x2: number, y2: number): string {
-    const mx = (x1 + x2) / 2;
-    const my = (y1 + y2) / 2;
     const dx = x2 - x1;
     const dy = y2 - y1;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    // Curve outward proportional to distance
-    const offset = dist * 0.15;
-    const nx = -dy / dist;
-    const ny = dx / dist;
-    const cx = mx + nx * offset;
-    const cy = my + ny * offset;
-    return `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`;
+    const cx = (x1 + x2) / 2 - dy * 0.2;
+    const cy = (y1 + y2) / 2 + dx * 0.2;
+    return `M ${x1 * 8} ${y1 * 8} Q ${cx * 8} ${cy * 8} ${x2 * 8} ${y2 * 8}`;
 }
 
-// ── Component ─────────────────────────────────────────────────
+// ── Main Component ───────────────────────────────────────────
 export default function WorldMapPage() {
-    const router = useRouter();
-    const [features, setFeatures] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [dims, setDims] = useState({ w: 1200, h: 800 });
-    const [hovered, setHovered] = useState<number | null>(null);
-    const [selected, setSelected] = useState<number | null>(null);
-    const [mobile, setMobile] = useState(false);
-    const [progress, setProgress] = useState<QuestProgress>({ stage: 1, index: 0, caught: {} });
-    const [stats, setStats] = useState({ total_xp: 0, total_touches: 0, sparks: 0, pity_counter: 0, legendary_count: 0 });
+    const [dimensions, setDimensions] = useState({ width: 1200, height: 800 });
+    const [transform, setTransform] = useState({ k: 1, x: 0, y: 0 });
+    const [selectedStage, setSelectedStage] = useState<number | null>(null);
+    const [phrases, setPhrases] = useState<UserPhrase[]>([]);
+    const [showBadges, setShowBadges] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
 
     const svgRef = useRef<SVGSVGElement>(null);
     const gRef = useRef<SVGGElement>(null);
+    const zoomRef = useRef<d3Zoom.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
 
-    // Init
-    useEffect(() => {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-        setDims({ w, h });
-        setMobile(w < 768);
-        setProgress(loadProgress());
-        setStats(getPlayerStats());
-
-        if (worldData) {
-            // @ts-ignore
-            const countries = topojson.feature(worldData, worldData.objects.countries);
-            // @ts-ignore
-            setFeatures(countries.features.filter((f: any) =>
-                f.id !== '010' && f.properties?.name !== 'Antarctica'
-            ));
-            setLoading(false);
-        }
-
-        const resize = () => { setDims({ w: window.innerWidth, h: window.innerHeight }); setMobile(window.innerWidth < 768); };
-        window.addEventListener('resize', resize);
-        return () => window.removeEventListener('resize', resize);
+    // Process dots
+    const dots = useMemo(() => {
+        const allDots = dotsData as Array<{ x: number; y: number; region: string }>;
+        const gridSize = 1;
+        const seen = new Set<string>();
+        return allDots.filter((dot) => {
+            const gridKey = `${Math.floor(dot.x / gridSize)},${Math.floor(dot.y / gridSize)}`;
+            if (seen.has(gridKey)) return false;
+            seen.add(gridKey);
+            return true;
+        }).map((dot, i) => ({ ...dot, id: i }));
     }, []);
 
-    // Projection
-    const projection = useMemo(() => {
-        if (!features.length) return d3Geo.geoNaturalEarth1();
-        return d3Geo.geoNaturalEarth1()
-            .rotate([-150, 0])
-            .fitExtent(
-                [[60, 60], [dims.w - 60, dims.h - 60]],
-                { type: 'FeatureCollection', features } as any
-            );
-    }, [dims, features]);
+    // Fetch phrase data
+    useEffect(() => {
+        fetch('/api/user-phrases')
+            .then(r => r.json())
+            .then(data => {
+                const list = Array.isArray(data) ? data : (data.phrases || []);
+                setPhrases(list);
+            })
+            .catch(() => setPhrases([]));
+    }, []);
 
-    const pathGen = useMemo(() => d3Geo.geoPath().projection(projection), [projection]);
+    // Compute stage progress from phrases
+    const stageProgress = useMemo(() => {
+        const sorted = [...phrases].sort((a, b) => {
+            if (a.created_at !== b.created_at) return a.created_at < b.created_at ? -1 : 1;
+            return a.id < b.id ? -1 : 1;
+        });
+        const result: Record<number, StageProgress> = {};
 
-    // D3 zoom
+        for (const stage of STAGES) {
+            const dates = getDatesForScenario(stage.prologueDate);
+            const stageWords = sorted.filter((p, idx) => {
+                const dateStr = getDateForIndex(idx);
+                return dates.includes(dateStr);
+            });
+            const mastered = stageWords.filter(w => w.mastery_level === 3).length;
+            const total = stageWords.length || WORDS_PER_SCENARIO;
+            result[stage.id] = {
+                total,
+                mastered,
+                percentage: total > 0 ? Math.round((mastered / total) * 100) : 0,
+                isComplete: mastered >= WORDS_PER_SCENARIO,
+            };
+        }
+        return result;
+    }, [phrases]);
+
+    // Get stage status
+    const getStageStatus = useCallback((stageId: number): 'complete' | 'current' | 'locked' => {
+        const progress = stageProgress[stageId];
+        if (!progress) return stageId === 1 ? 'current' : 'locked';
+        if (progress.isComplete) return 'complete';
+        // First incomplete stage is current
+        for (const s of STAGES) {
+            const p = stageProgress[s.id];
+            if (!p || !p.isComplete) return s.id === stageId ? 'current' : (s.id < stageId ? 'current' : 'locked');
+        }
+        return 'locked';
+    }, [stageProgress]);
+
+    // Total stats
+    const totalStats = useMemo(() => {
+        let mastered = 0;
+        let total = 0;
+        let badges = 0;
+        for (const stage of STAGES) {
+            const p = stageProgress[stage.id];
+            if (p) {
+                mastered += p.mastered;
+                total += p.total;
+                if (p.isComplete) badges++;
+            }
+        }
+        return { mastered, total: Math.max(total, STAGES.length * WORDS_PER_SCENARIO), badges };
+    }, [stageProgress]);
+
+    // Current stage
+    const currentStageId = useMemo(() => {
+        for (const s of STAGES) {
+            const p = stageProgress[s.id];
+            if (!p || !p.isComplete) return s.id;
+        }
+        return STAGES.length;
+    }, [stageProgress]);
+
+    useEffect(() => {
+        const update = () => {
+            setDimensions({ width: window.innerWidth, height: window.innerHeight });
+            setIsMobile(window.innerWidth < 768);
+        };
+        update();
+        window.addEventListener('resize', update);
+        setLoading(false);
+        return () => window.removeEventListener('resize', update);
+    }, []);
+
+    // Initialize zoom
     useEffect(() => {
         if (!svgRef.current || !gRef.current) return;
+
         const zoom = d3Zoom.zoom<SVGSVGElement, unknown>()
-            .scaleExtent([1, 8])
-            .translateExtent([[-100, -100], [dims.w + 100, dims.h + 100]])
-            .on('zoom', (e) => {
-                if (gRef.current) d3Selection.select(gRef.current as any).attr('transform', e.transform);
+            .scaleExtent([0.5, 20])
+            .on('zoom', (event) => {
+                if (gRef.current) {
+                    d3Selection.select(gRef.current as any).attr('transform', event.transform.toString());
+                    setTransform({ k: event.transform.k, x: event.transform.x, y: event.transform.y });
+                }
             });
-        d3Selection.select(svgRef.current).call(zoom);
-    }, [dims, features]);
 
-    // Stage screen coords
-    const stageXY = useMemo(() => STAGE_LOCATIONS.map(loc => {
-        const p = projection([loc.lng, loc.lat]);
-        return { ...loc, x: p?.[0] ?? 0, y: p?.[1] ?? 0 };
-    }), [projection]);
+        zoomRef.current = zoom;
+        const svg = d3Selection.select(svgRef.current);
+        svg.call(zoom);
 
-    // Navigate
-    const go = useCallback((stage: number) => {
-        const s = getStatus(stage, progress);
-        if (s === 'locked') return;
-        router.push(`/english/quest?stage=${stage}`);
-    }, [progress, router]);
+        // Center on Japan
+        const japanX = 178 * 8;
+        const japanY = 38 * 8;
+        const scale = 1.5;
+        const translateX = dimensions.width / 2 - japanX * scale;
+        const translateY = dimensions.height / 2 - japanY * scale;
+        svg.call(zoom.transform, d3Zoom.zoomIdentity.translate(translateX, translateY).scale(scale));
+    }, [dimensions]);
 
-    // Derived
-    const activeStage = selected ?? hovered;
-    const activeInfo = activeStage ? STAGE_INFO.find(s => s.stage === activeStage) : null;
-    const activeLoc = activeStage ? STAGE_LOCATIONS.find(l => l.stage === activeStage) : null;
-    const activeStatus = activeStage ? getStatus(activeStage, progress) : null;
-    const activeCounts = activeStage ? stageCounts(activeStage, progress.caught) : null;
-    const totalCaught = getCaughtIds(progress.caught).length;
+    const handleZoom = useCallback((factor: number) => {
+        if (!svgRef.current || !zoomRef.current) return;
+        d3Selection.select(svgRef.current).transition().duration(300).call(zoomRef.current.scaleBy, factor);
+    }, []);
 
-    // Find current stage (first non-completed)
-    const currentStage = useMemo(() => {
-        for (let i = 1; i <= 10; i++) {
-            if (getStatus(i, progress) !== 'completed') return i;
-        }
-        return 10;
-    }, [progress]);
-
-    if (loading) {
-        return (
-            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F5F5F0' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{ width: '32px', height: '32px', border: '3px solid #E7E5E4', borderTopColor: '#D4AF37', borderRadius: '50%', animation: 'wm-spin 0.8s linear infinite', margin: '0 auto 12px' }} />
-                    <div style={{ fontSize: '12px', color: '#78716C', letterSpacing: '0.5px' }}>Loading map...</div>
-                </div>
-            </div>
+    const handleReset = useCallback(() => {
+        if (!svgRef.current || !zoomRef.current) return;
+        const svg = d3Selection.select(svgRef.current);
+        const japanX = 178 * 8;
+        const japanY = 38 * 8;
+        const scale = 1.5;
+        svg.transition().duration(500).call(
+            zoomRef.current.transform,
+            d3Zoom.zoomIdentity.translate(dimensions.width / 2 - japanX * scale, dimensions.height / 2 - japanY * scale).scale(scale)
         );
-    }
+    }, [dimensions]);
+
+    const flyToStage = useCallback((stage: StageInfo) => {
+        if (!svgRef.current || !zoomRef.current) return;
+        const svg = d3Selection.select(svgRef.current);
+        const scale = 3;
+        const tx = dimensions.width / 2 - stage.x * 8 * scale;
+        const ty = dimensions.height / 2 - stage.y * 8 * scale;
+        svg.transition().duration(800).call(
+            zoomRef.current.transform,
+            d3Zoom.zoomIdentity.translate(tx, ty).scale(scale)
+        );
+    }, [dimensions]);
+
+    const selectedStageInfo = selectedStage !== null ? STAGES.find(s => s.id === selectedStage) : null;
 
     return (
-        <div style={{ position: 'relative', width: '100vw', height: '100vh', overflow: 'hidden', backgroundColor: '#F5F5F0' }}>
-            <style>{`
-                @keyframes wm-spin { to { transform: rotate(360deg); } }
-                @keyframes wm-pulse { 0%,100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.8); opacity: 0; } }
-                @keyframes wm-glow { 0%,100% { filter: drop-shadow(0 0 6px rgba(212,175,55,0.5)); } 50% { filter: drop-shadow(0 0 14px rgba(212,175,55,0.8)); } }
-                @keyframes wm-dash { to { stroke-dashoffset: -24; } }
-                @keyframes wm-slide { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-                @keyframes wm-flag { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(0.85); } }
-            `}</style>
-
-            {/* ── Top-left: Back + Title ───────────────────────── */}
+        <div style={{ minHeight: '100vh', position: 'relative', overflow: 'hidden', backgroundColor: '#F5F5F0', fontFamily: 'serif' }}>
+            {/* Noise texture */}
             <div style={{
-                position: 'absolute', top: 0, left: 0, zIndex: 20,
-                padding: mobile ? '12px 14px' : '20px 24px', pointerEvents: 'none',
-            }}>
-                <Link href="/english/quest" style={{
-                    pointerEvents: 'auto', display: 'inline-flex', alignItems: 'center', gap: '6px',
-                    fontSize: '11px', fontWeight: '600', color: '#8B5A2B', textDecoration: 'none',
-                    padding: '6px 14px', backgroundColor: 'rgba(245,245,240,0.92)', borderRadius: '8px',
-                    border: '1px solid rgba(139,90,43,0.2)', backdropFilter: 'blur(8px)',
-                }}>
-                    Quest
-                </Link>
-                <h1 style={{
-                    fontSize: mobile ? '18px' : '24px', fontWeight: '900', color: '#1C1917',
-                    letterSpacing: '-0.5px', marginTop: '10px', lineHeight: 1.2,
-                    textShadow: '0 1px 2px rgba(255,255,255,0.6)',
-                }}>
-                    World Map
-                </h1>
-                <p style={{ fontSize: '10px', color: '#8B5A2B', fontWeight: '600', letterSpacing: '2px', marginTop: '2px' }}>
-                    ENGLISH QUEST RPG
-                </p>
-            </div>
+                position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.15, mixBlendMode: 'multiply',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+            }} />
 
-            {/* ── Top-right: Player stats ──────────────────────── */}
-            <div style={{
-                position: 'absolute', top: mobile ? '12px' : '20px', right: mobile ? '14px' : '24px', zIndex: 20,
-                backgroundColor: 'rgba(28,25,23,0.92)', borderRadius: '14px',
-                padding: mobile ? '10px 14px' : '14px 20px',
-                backdropFilter: 'blur(10px)', border: '1px solid rgba(212,175,55,0.15)',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            {/* Header */}
+            <header style={{
+                position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+                padding: isMobile ? '12px 16px' : '20px 24px',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+                pointerEvents: 'none',
             }}>
-                <div style={{ display: 'flex', gap: mobile ? '16px' : '24px' }}>
-                    {/* GET count */}
-                    <div>
-                        <div style={{ fontSize: '8px', fontWeight: '700', color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px', marginBottom: '2px' }}>GET</div>
-                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
-                            <span style={{ fontSize: mobile ? '20px' : '26px', fontWeight: '900', color: '#D4AF37', lineHeight: 1 }}>{totalCaught}</span>
-                            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)' }}>/{QUEST_PHRASES.length}</span>
-                        </div>
-                    </div>
-                    {/* Sparks */}
-                    <div>
-                        <div style={{ fontSize: '8px', fontWeight: '700', color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px', marginBottom: '2px' }}>SPARKS</div>
-                        <span style={{ fontSize: mobile ? '20px' : '26px', fontWeight: '900', color: '#A855F7', lineHeight: 1 }}>{stats.sparks}</span>
-                    </div>
-                    {/* Stage */}
-                    <div>
-                        <div style={{ fontSize: '8px', fontWeight: '700', color: 'rgba(255,255,255,0.3)', letterSpacing: '1.5px', marginBottom: '2px' }}>STAGE</div>
-                        <span style={{ fontSize: mobile ? '20px' : '26px', fontWeight: '900', color: '#FAFAF9', lineHeight: 1 }}>{currentStage}</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── Bottom-left: Zoom ────────────────────────────── */}
-            <div style={{
-                position: 'absolute', bottom: mobile ? '84px' : '24px', left: '24px',
-                display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 20,
-            }}>
-                {[{ label: '+', f: 1.5 }, { label: '\u2212', f: 0.67 }].map(btn => (
-                    <button key={btn.label} onClick={() => {
-                        if (!svgRef.current) return;
-                        d3Selection.select(svgRef.current).transition().duration(400)
-                            .call((d3Zoom.zoom() as any).scaleBy, btn.f);
-                    }} style={{
-                        width: '34px', height: '34px', borderRadius: '10px', border: '1px solid rgba(139,90,43,0.2)',
-                        backgroundColor: 'rgba(245,245,240,0.92)', backdropFilter: 'blur(8px)',
-                        cursor: 'pointer', fontSize: '16px', fontWeight: '700', color: '#8B5A2B',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                <div style={{ pointerEvents: 'auto', display: 'flex', gap: '8px' }}>
+                    <Link href="/english/training" style={{
+                        display: 'flex', alignItems: 'center', gap: '6px',
+                        padding: '8px 14px', backgroundColor: '#EEECE5', border: '1px solid #D4B08C',
+                        color: '#5D4037', fontSize: '12px', fontWeight: 600, textDecoration: 'none',
+                        letterSpacing: '1px',
                     }}>
-                        {btn.label}
+                        Training
+                    </Link>
+                    <button onClick={() => setShowBadges(!showBadges)} style={{
+                        display: 'flex', alignItems: 'center', gap: '6px',
+                        padding: '8px 14px', backgroundColor: showBadges ? '#D4AF37' : '#EEECE5',
+                        border: '1px solid #D4B08C', color: showBadges ? '#fff' : '#5D4037',
+                        fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                        letterSpacing: '1px',
+                    }}>
+                        {totalStats.badges}/{STAGES.length}
+                    </button>
+                </div>
+
+                <div style={{ textAlign: 'right', pointerEvents: 'auto' }}>
+                    <h1 style={{
+                        fontSize: isMobile ? '20px' : '28px', color: '#3E2723',
+                        fontWeight: 900, letterSpacing: '3px', marginBottom: '4px',
+                    }}>
+                        WORLD MAP
+                    </h1>
+                    <div style={{ height: '2px', width: '60px', backgroundColor: '#8B5A2B', marginLeft: 'auto', marginBottom: '4px' }} />
+                    <p style={{ fontSize: '11px', color: '#8D6E63', letterSpacing: '2px' }}>
+                        Stage {currentStageId} / {STAGES.length}
+                    </p>
+                </div>
+            </header>
+
+            {/* SVG Map */}
+            <main style={{ width: '100%', height: '100vh', cursor: 'move' }}>
+                {loading ? (
+                    <div style={{
+                        position: 'absolute', inset: 0, display: 'flex', alignItems: 'center',
+                        justifyContent: 'center', gap: '8px', color: '#8B5A2B',
+                    }}>
+                        <Loader2 style={{ animation: 'spin 1s linear infinite' }} />
+                        <span style={{ letterSpacing: '3px', fontSize: '13px' }}>MAP...</span>
+                    </div>
+                ) : (
+                    <svg ref={svgRef} width={dimensions.width} height={dimensions.height} style={{ width: '100%', height: '100%' }}>
+                        <defs>
+                            {/* Pulse animation for current stage */}
+                            <radialGradient id="pulse-glow">
+                                <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.6" />
+                                <stop offset="100%" stopColor="#D4AF37" stopOpacity="0" />
+                            </radialGradient>
+                            {/* Complete glow */}
+                            <radialGradient id="complete-glow">
+                                <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
+                                <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+                            </radialGradient>
+                        </defs>
+                        <g ref={gRef}>
+                            {/* Dot matrix background */}
+                            {dots.map((dot) => (
+                                <circle
+                                    key={dot.id}
+                                    cx={dot.x * 8}
+                                    cy={dot.y * 8}
+                                    r={2.5}
+                                    fill="#C4B5A0"
+                                    opacity={0.4}
+                                />
+                            ))}
+
+                            {/* Route lines between stages */}
+                            {STAGES.slice(0, -1).map((stage, i) => {
+                                const next = STAGES[i + 1];
+                                const status = getStageStatus(stage.id);
+                                const nextStatus = getStageStatus(next.id);
+                                const isCompleteRoute = status === 'complete';
+                                const isActiveRoute = status === 'current' || nextStatus === 'current';
+                                return (
+                                    <path
+                                        key={`route-${stage.id}`}
+                                        d={curvedPath(stage.x, stage.y, next.x, next.y)}
+                                        fill="none"
+                                        stroke={isCompleteRoute ? '#10B981' : isActiveRoute ? '#D4AF37' : '#A8A29E'}
+                                        strokeWidth={isCompleteRoute ? 3 : 2}
+                                        strokeDasharray={isCompleteRoute ? 'none' : '8 6'}
+                                        opacity={isCompleteRoute ? 0.8 : isActiveRoute ? 0.6 : 0.25}
+                                    >
+                                        {isActiveRoute && (
+                                            <animate
+                                                attributeName="stroke-dashoffset"
+                                                values="0;-28"
+                                                dur="1.5s"
+                                                repeatCount="indefinite"
+                                            />
+                                        )}
+                                    </path>
+                                );
+                            })}
+
+                            {/* Stage markers */}
+                            {STAGES.map(stage => {
+                                const status = getStageStatus(stage.id);
+                                const progress = stageProgress[stage.id];
+                                const cx = stage.x * 8;
+                                const cy = stage.y * 8;
+
+                                return (
+                                    <g key={`stage-${stage.id}`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedStage(stage.id === selectedStage ? null : stage.id);
+                                            flyToStage(stage);
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        {/* Glow ring */}
+                                        {status === 'current' && (
+                                            <circle cx={cx} cy={cy} r={28} fill="url(#pulse-glow)">
+                                                <animate attributeName="r" values="20;32;20" dur="2s" repeatCount="indefinite" />
+                                                <animate attributeName="opacity" values="1;0.4;1" dur="2s" repeatCount="indefinite" />
+                                            </circle>
+                                        )}
+                                        {status === 'complete' && (
+                                            <circle cx={cx} cy={cy} r={24} fill="url(#complete-glow)" />
+                                        )}
+
+                                        {/* Outer ring */}
+                                        <circle
+                                            cx={cx} cy={cy} r={16}
+                                            fill={status === 'complete' ? '#10B981' : status === 'current' ? '#D4AF37' : '#A8A29E'}
+                                            opacity={status === 'locked' ? 0.4 : 1}
+                                        />
+
+                                        {/* Inner circle */}
+                                        <circle
+                                            cx={cx} cy={cy} r={12}
+                                            fill={status === 'complete' ? '#ECFDF5' : status === 'current' ? '#FFFBEB' : '#F5F5F4'}
+                                        />
+
+                                        {/* Stage number or checkmark */}
+                                        {status === 'complete' ? (
+                                            <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle"
+                                                fontSize="14" fontWeight="900" fill="#10B981">
+                                                &#10003;
+                                            </text>
+                                        ) : status === 'locked' ? (
+                                            <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle"
+                                                fontSize="10" fontWeight="700" fill="#A8A29E">
+                                                {stage.id}
+                                            </text>
+                                        ) : (
+                                            <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="middle"
+                                                fontSize="11" fontWeight="900" fill="#D4AF37">
+                                                {stage.id}
+                                            </text>
+                                        )}
+
+                                        {/* City label */}
+                                        <text x={cx} y={cy + 28} textAnchor="middle" fontSize="9"
+                                            fontWeight="700" fill={status === 'locked' ? '#A8A29E' : '#5D4037'}
+                                            opacity={status === 'locked' ? 0.5 : 0.9}
+                                            style={{ letterSpacing: '0.5px' }}>
+                                            {stage.cityJa}
+                                        </text>
+
+                                        {/* Progress arc for current stage */}
+                                        {status === 'current' && progress && progress.percentage > 0 && (
+                                            <circle
+                                                cx={cx} cy={cy} r={16}
+                                                fill="none" stroke="#D4AF37" strokeWidth={3}
+                                                strokeDasharray={`${(progress.percentage / 100) * 100.5} 100.5`}
+                                                transform={`rotate(-90 ${cx} ${cy})`}
+                                                opacity={0.8}
+                                            />
+                                        )}
+
+                                        {/* Badge indicator for completed */}
+                                        {status === 'complete' && (
+                                            <g transform={`translate(${cx + 12}, ${cy - 14})`}>
+                                                <circle r={7} fill={stage.badgeColor} />
+                                                <text textAnchor="middle" dominantBaseline="middle"
+                                                    fontSize="8" fontWeight="900" fill="#fff">
+                                                    B
+                                                </text>
+                                            </g>
+                                        )}
+                                    </g>
+                                );
+                            })}
+                        </g>
+                    </svg>
+                )}
+            </main>
+
+            {/* Zoom Controls */}
+            <div style={{
+                position: 'absolute', bottom: isMobile ? 80 : 20, left: 16,
+                display: 'flex', flexDirection: 'column', gap: '6px', zIndex: 20,
+            }}>
+                {[
+                    { icon: <ZoomIn size={16} />, action: () => handleZoom(1.5), label: '+' },
+                    { icon: <ZoomOut size={16} />, action: () => handleZoom(0.67), label: '-' },
+                    { icon: <RotateCcw size={16} />, action: handleReset, label: 'R' },
+                ].map((btn, i) => (
+                    <button key={i} onClick={btn.action} style={{
+                        padding: '10px', backgroundColor: '#EEECE5', border: '1px solid #D4B08C',
+                        color: '#5D4037', cursor: 'pointer', display: 'flex', alignItems: 'center',
+                        justifyContent: 'center',
+                    }}>
+                        {btn.icon}
                     </button>
                 ))}
             </div>
 
-            {/* ── Stage detail card (bottom-right) ─────────────── */}
-            {activeInfo && activeLoc && activeStatus && activeCounts && (
+            {/* Player Stats Panel (bottom center) */}
+            <div style={{
+                position: 'absolute', bottom: isMobile ? 80 : 20,
+                left: '50%', transform: 'translateX(-50%)', zIndex: 20,
+            }}>
                 <div style={{
-                    position: 'absolute',
-                    bottom: mobile ? '84px' : '24px', right: '24px',
-                    width: mobile ? '260px' : '300px',
-                    backgroundColor: 'rgba(28,25,23,0.96)', borderRadius: '16px',
-                    padding: '20px', border: `1px solid ${STATUS_COLORS[activeStatus].stroke}30`,
-                    boxShadow: `0 8px 32px rgba(0,0,0,0.25), 0 0 20px ${STATUS_COLORS[activeStatus].glow}`,
-                    backdropFilter: 'blur(12px)', zIndex: 20,
-                    animation: 'wm-slide 0.2s ease-out',
+                    backgroundColor: 'rgba(238,236,229,0.92)', backdropFilter: 'blur(8px)',
+                    padding: '10px 20px', border: '1px solid #D4B08C',
+                    display: 'flex', gap: '20px', alignItems: 'center',
+                    fontSize: '12px', color: '#5D4037', fontWeight: 600, letterSpacing: '0.5px',
                 }}>
-                    {/* Header */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
-                        <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                                <span style={{
-                                    fontSize: '10px', fontWeight: '800', letterSpacing: '2px',
-                                    color: STATUS_COLORS[activeStatus].text,
-                                }}>
-                                    STAGE {activeInfo.stage}
-                                </span>
-                                <span style={{
-                                    fontSize: '9px', fontWeight: '700', padding: '2px 8px', borderRadius: '4px',
-                                    backgroundColor: STATUS_COLORS[activeStatus].stroke + '18',
-                                    color: STATUS_COLORS[activeStatus].text,
-                                    border: `1px solid ${STATUS_COLORS[activeStatus].stroke}30`,
-                                }}>
-                                    {activeStatus === 'completed' ? 'CLEAR' : activeStatus === 'current' ? 'OPEN' : 'LOCKED'}
-                                </span>
-                            </div>
-                            <div style={{ fontSize: '20px', fontWeight: '800', color: '#FAFAF9', lineHeight: 1.2 }}>
-                                {activeLoc.city}
-                            </div>
-                            <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '2px' }}>
-                                {activeLoc.regionJa}
-                            </div>
-                        </div>
-                    </div>
+                    <span>{totalStats.mastered} / {totalStats.total} GET</span>
+                    <span style={{ color: '#D4AF37' }}>Stage {currentStageId}</span>
+                    <span>{totalStats.badges} badges</span>
+                </div>
+            </div>
 
-                    {/* Hack info */}
+            {/* Stage Detail Card */}
+            {selectedStageInfo && (() => {
+                const progress = stageProgress[selectedStageInfo.id] || { total: 50, mastered: 0, percentage: 0, isComplete: false };
+                const status = getStageStatus(selectedStageInfo.id);
+                return (
                     <div style={{
-                        padding: '12px', backgroundColor: 'rgba(255,255,255,0.04)', borderRadius: '10px',
-                        border: '1px solid rgba(255,255,255,0.06)', marginBottom: '14px',
+                        position: 'absolute',
+                        top: isMobile ? 'auto' : '80px',
+                        bottom: isMobile ? 90 : 'auto',
+                        right: isMobile ? '16px' : '24px',
+                        left: isMobile ? '16px' : 'auto',
+                        width: isMobile ? 'auto' : '300px',
+                        zIndex: 30,
+                        backgroundColor: 'rgba(238,236,229,0.97)',
+                        backdropFilter: 'blur(12px)',
+                        border: `2px solid ${status === 'complete' ? '#10B981' : status === 'current' ? '#D4AF37' : '#D4B08C'}`,
+                        padding: '20px',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
                     }}>
-                        <div style={{ fontSize: '14px', fontWeight: '700', color: '#D4AF37', marginBottom: '4px', lineHeight: 1.3 }}>
-                            {activeInfo.title}
-                        </div>
-                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.4, marginBottom: '8px' }}>
-                            {activeInfo.titleJa}
-                        </div>
-                        <div style={{
-                            fontSize: '11px', color: 'rgba(255,255,255,0.6)', lineHeight: 1.5,
-                            paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.06)',
-                        }}>
-                            {activeInfo.hack}
-                        </div>
-                    </div>
+                        {/* Close button */}
+                        <button onClick={() => setSelectedStage(null)} style={{
+                            position: 'absolute', top: '8px', right: '12px',
+                            background: 'none', border: 'none', cursor: 'pointer',
+                            fontSize: '18px', color: '#A8A29E',
+                        }}>x</button>
 
-                    {/* Progress */}
-                    <div style={{ marginBottom: '14px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                            <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.35)', fontWeight: '600', letterSpacing: '1px' }}>PHRASES</span>
-                            <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', fontWeight: '700' }}>
-                                {activeCounts.got} / {activeCounts.total}
-                            </span>
-                        </div>
-                        <div style={{ height: '6px', borderRadius: '3px', backgroundColor: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                        {/* Stage header */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                             <div style={{
-                                height: '100%',
-                                width: activeCounts.total > 0 ? `${(activeCounts.got / activeCounts.total) * 100}%` : '0%',
-                                borderRadius: '3px',
-                                background: activeStatus === 'completed'
-                                    ? 'linear-gradient(90deg, #10B981, #059669)'
-                                    : 'linear-gradient(90deg, #D4AF37, #F6E27A)',
-                                transition: 'width 0.4s ease',
-                            }} />
+                                width: '36px', height: '36px', borderRadius: '50%',
+                                backgroundColor: status === 'complete' ? '#10B981' : status === 'current' ? '#D4AF37' : '#A8A29E',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                color: '#fff', fontWeight: 900, fontSize: '14px',
+                            }}>
+                                {status === 'complete' ? '\u2713' : selectedStageInfo.id}
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '15px', fontWeight: 800, color: '#3E2723' }}>
+                                    {selectedStageInfo.cityJa}
+                                </div>
+                                <div style={{ fontSize: '11px', color: '#8D6E63' }}>
+                                    {selectedStageInfo.city}
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Core words */}
-                    <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '14px' }}>
-                        {activeInfo.coreWords.slice(0, 5).map(w => (
-                            <span key={w} style={{
-                                fontSize: '10px', fontWeight: '700', padding: '3px 8px', borderRadius: '6px',
-                                backgroundColor: 'rgba(212,175,55,0.1)', color: '#D4AF37',
-                                border: '1px solid rgba(212,175,55,0.15)',
-                            }}>{w}</span>
-                        ))}
-                    </div>
-
-                    {/* Action button */}
-                    {activeStatus !== 'locked' ? (
-                        <button onClick={() => go(activeInfo.stage)} style={{
-                            width: '100%', padding: '11px', borderRadius: '10px', border: 'none', cursor: 'pointer',
-                            backgroundColor: activeStatus === 'completed' ? '#065F46' : '#D4AF37',
-                            color: activeStatus === 'completed' ? '#10B981' : '#1C1917',
-                            fontSize: '13px', fontWeight: '800', letterSpacing: '1px',
-                            boxShadow: activeStatus === 'completed' ? 'none' : '0 2px 12px rgba(212,175,55,0.3)',
-                        }}>
-                            {activeStatus === 'completed' ? 'REVISIT' : 'START QUEST'}
-                        </button>
-                    ) : (
+                        {/* Scenario title */}
                         <div style={{
-                            width: '100%', padding: '11px', borderRadius: '10px', textAlign: 'center',
-                            backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
-                            color: 'rgba(255,255,255,0.25)', fontSize: '12px', fontWeight: '700', letterSpacing: '1px',
+                            fontSize: '13px', fontWeight: 600, color: '#5D4037',
+                            marginBottom: '4px',
                         }}>
-                            STAGE {activeInfo.stage - 1} CLEAR REQUIRED
+                            {selectedStageInfo.titleJa}
                         </div>
-                    )}
+                        <div style={{
+                            fontSize: '11px', color: '#A8A29E', marginBottom: '16px',
+                        }}>
+                            {selectedStageInfo.title}
+                        </div>
+
+                        {/* Progress bar */}
+                        <div style={{ marginBottom: '12px' }}>
+                            <div style={{
+                                display: 'flex', justifyContent: 'space-between', marginBottom: '6px',
+                                fontSize: '11px', color: '#78716C',
+                            }}>
+                                <span>{progress.mastered} / {progress.total}</span>
+                                <span style={{
+                                    fontWeight: 700,
+                                    color: progress.isComplete ? '#10B981' : '#D4AF37',
+                                }}>
+                                    {progress.percentage}%
+                                </span>
+                            </div>
+                            <div style={{
+                                height: '6px', backgroundColor: '#E7E5E4', borderRadius: '3px',
+                                overflow: 'hidden',
+                            }}>
+                                <div style={{
+                                    height: '100%', borderRadius: '3px',
+                                    width: `${progress.percentage}%`,
+                                    backgroundColor: progress.isComplete ? '#10B981' : '#D4AF37',
+                                    transition: 'width 0.5s ease',
+                                }} />
+                            </div>
+                        </div>
+
+                        {/* Badge */}
+                        {progress.isComplete && (
+                            <div style={{
+                                display: 'flex', alignItems: 'center', gap: '8px',
+                                padding: '8px 12px', backgroundColor: 'rgba(212,175,55,0.08)',
+                                border: '1px solid rgba(212,175,55,0.2)', marginBottom: '12px',
+                            }}>
+                                <BadgeIcon icon={selectedStageInfo.badgeIcon} color={selectedStageInfo.badgeColor} size={20} earned />
+                                <span style={{ fontSize: '12px', fontWeight: 700, color: '#D4AF37' }}>
+                                    Badge GET!
+                                </span>
+                            </div>
+                        )}
+
+                        {/* Action button */}
+                        {status !== 'locked' && (
+                            <Link href={`/english/requiem`} style={{
+                                display: 'block', textAlign: 'center',
+                                padding: '10px', backgroundColor: status === 'complete' ? '#10B981' : '#D4AF37',
+                                color: '#fff', fontWeight: 700, fontSize: '13px', textDecoration: 'none',
+                                letterSpacing: '1px',
+                            }}>
+                                {status === 'complete' ? 'Review' : 'Training'}
+                            </Link>
+                        )}
+                        {status === 'locked' && (
+                            <div style={{
+                                textAlign: 'center', padding: '10px',
+                                backgroundColor: '#F5F5F4', color: '#A8A29E',
+                                fontSize: '12px', fontWeight: 600,
+                            }}>
+                                Stage {selectedStageInfo.id - 1} Clear
+                            </div>
+                        )}
+                    </div>
+                );
+            })()}
+
+            {/* Badge Collection Panel */}
+            {showBadges && (
+                <div style={{
+                    position: 'absolute', top: isMobile ? 56 : 64, left: 16, zIndex: 30,
+                    backgroundColor: 'rgba(238,236,229,0.97)', backdropFilter: 'blur(12px)',
+                    border: '1px solid #D4B08C', padding: '16px', width: '240px',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.1)',
+                }}>
+                    <div style={{
+                        fontSize: '11px', fontWeight: 700, color: '#8D6E63',
+                        letterSpacing: '2px', marginBottom: '12px',
+                    }}>
+                        BADGES
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+                        {STAGES.map(stage => {
+                            const earned = stageProgress[stage.id]?.isComplete || false;
+                            return (
+                                <div key={stage.id} style={{
+                                    display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px',
+                                }}>
+                                    <div style={{
+                                        width: '48px', height: '48px', borderRadius: '50%',
+                                        backgroundColor: earned ? 'rgba(212,175,55,0.1)' : '#F5F5F4',
+                                        border: `2px solid ${earned ? stage.badgeColor : '#E7E5E4'}`,
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    }}>
+                                        <BadgeIcon icon={stage.badgeIcon} color={stage.badgeColor} size={22} earned={earned} />
+                                    </div>
+                                    <span style={{
+                                        fontSize: '9px', fontWeight: 600,
+                                        color: earned ? '#5D4037' : '#A8A29E',
+                                    }}>
+                                        {stage.cityJa}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
 
-            {/* ── Mobile: Stage selector bar ───────────────────── */}
-            {mobile && (
+            {/* Mobile Stage Selector (bottom bar) */}
+            {isMobile && (
                 <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0, height: '72px',
-                    backgroundColor: 'rgba(28,25,23,0.95)', borderTop: '1px solid rgba(212,175,55,0.1)',
-                    backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center',
-                    padding: '0 8px', gap: '4px', overflowX: 'auto', zIndex: 20,
+                    position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 25,
+                    backgroundColor: 'rgba(238,236,229,0.95)', backdropFilter: 'blur(8px)',
+                    borderTop: '1px solid #D4B08C', padding: '8px 12px',
+                    display: 'flex', justifyContent: 'space-around',
                 }}>
-                    {STAGE_LOCATIONS.map(loc => {
-                        const s = getStatus(loc.stage, progress);
-                        const c = stageCounts(loc.stage, progress.caught);
-                        const isActive = selected === loc.stage;
-                        const sc = STATUS_COLORS[s];
+                    {STAGES.map(stage => {
+                        const status = getStageStatus(stage.id);
+                        const isSelected = selectedStage === stage.id;
                         return (
-                            <button key={loc.stage} onClick={() => setSelected(isActive ? null : loc.stage)} style={{
-                                flexShrink: 0, width: '52px', height: '52px', borderRadius: '12px',
-                                border: isActive ? `2px solid ${sc.stroke}` : `1.5px solid ${sc.stroke}40`,
-                                backgroundColor: isActive ? `${sc.stroke}15` : 'rgba(255,255,255,0.03)',
-                                cursor: s === 'locked' ? 'default' : 'pointer',
-                                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                                gap: '2px', padding: '4px', opacity: s === 'locked' ? 0.35 : 1,
-                                transition: 'all 0.15s ease',
+                            <button key={stage.id} onClick={() => {
+                                setSelectedStage(isSelected ? null : stage.id);
+                                flyToStage(stage);
+                            }} style={{
+                                width: '40px', height: '40px', borderRadius: '50%',
+                                border: `2px solid ${isSelected ? '#D4AF37' : status === 'complete' ? '#10B981' : status === 'current' ? '#D4AF37' : '#D4D4D4'}`,
+                                backgroundColor: status === 'complete' ? '#ECFDF5' : status === 'current' ? '#FFFBEB' : '#F5F5F4',
+                                color: status === 'complete' ? '#10B981' : status === 'current' ? '#D4AF37' : '#A8A29E',
+                                fontWeight: 800, fontSize: '13px', cursor: 'pointer',
+                                opacity: status === 'locked' ? 0.4 : 1,
                             }}>
-                                <span style={{ fontSize: '15px', fontWeight: '900', color: sc.text, lineHeight: 1 }}>{loc.stage}</span>
-                                <span style={{ fontSize: '8px', fontWeight: '600', color: sc.text, opacity: 0.7 }}>
-                                    {s === 'completed' ? 'CLEAR' : `${c.got}/${c.total}`}
-                                </span>
+                                {status === 'complete' ? '\u2713' : stage.id}
                             </button>
                         );
                     })}
                 </div>
             )}
 
-            {/* ── SVG Map ──────────────────────────────────────── */}
-            <svg ref={svgRef} width={dims.w} height={dims.h} style={{ cursor: 'grab', display: 'block' }}>
-                <defs>
-                    <filter id="wm-shadow"><feDropShadow dx="0" dy="1" stdDeviation="2" floodOpacity="0.15" /></filter>
-                    <filter id="wm-glow-gold">
-                        <feGaussianBlur stdDeviation="4" result="b" />
-                        <feFlood floodColor="#D4AF37" floodOpacity="0.4" />
-                        <feComposite in2="b" operator="in" />
-                        <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-                    </filter>
-                    <filter id="wm-glow-green">
-                        <feGaussianBlur stdDeviation="3" result="b" />
-                        <feFlood floodColor="#10B981" floodOpacity="0.3" />
-                        <feComposite in2="b" operator="in" />
-                        <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-                    </filter>
-                    {/* Paper texture */}
-                    <filter id="wm-noise">
-                        <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
-                        <feColorMatrix type="saturate" values="0" />
-                    </filter>
-                </defs>
-
-                {/* Paper texture overlay */}
-                <rect width="100%" height="100%" filter="url(#wm-noise)" opacity="0.05" style={{ mixBlendMode: 'multiply' }} />
-
-                <g ref={gRef}>
-                    {/* Countries */}
-                    {features.map((f: any) => (
-                        <path
-                            key={f.id || f.properties?.name}
-                            d={pathGen(f) || ''}
-                            fill={hashColor(f.id || '')}
-                            stroke="#F5F5F0"
-                            strokeWidth={0.5}
-                        />
-                    ))}
-
-                    {/* Route lines */}
-                    {ROUTES.map(([from, to]) => {
-                        const a = stageXY.find(p => p.stage === from);
-                        const b = stageXY.find(p => p.stage === to);
-                        if (!a || !b) return null;
-                        const sFrom = getStatus(from, progress);
-                        const sTo = getStatus(to, progress);
-                        const bothDone = sFrom === 'completed' && sTo === 'completed';
-                        const active = sFrom !== 'locked' && sTo !== 'locked';
-                        const oneActive = sFrom !== 'locked' || sTo !== 'locked';
-                        const pathD = curvedPath(a.x, a.y, b.x, b.y);
-
-                        return (
-                            <g key={`r-${from}-${to}`}>
-                                {/* Shadow */}
-                                <path d={pathD} fill="none" stroke="rgba(0,0,0,0.08)" strokeWidth={4} strokeLinecap="round" />
-                                {/* Main line */}
-                                <path
-                                    d={pathD} fill="none"
-                                    stroke={bothDone ? '#10B981' : active ? '#D4AF37' : oneActive ? '#A8A29E' : '#C4B5A4'}
-                                    strokeWidth={bothDone ? 3 : active ? 2.5 : 1.5}
-                                    strokeLinecap="round"
-                                    strokeDasharray={bothDone ? 'none' : active ? '8 4' : '4 8'}
-                                    opacity={active ? 0.9 : 0.25}
-                                    filter={active && !bothDone ? 'url(#wm-glow-gold)' : bothDone ? 'url(#wm-glow-green)' : 'none'}
-                                    style={{ animation: active && !bothDone ? 'wm-dash 1.2s linear infinite' : 'none' }}
-                                />
-                            </g>
-                        );
-                    })}
-
-                    {/* Stage markers */}
-                    {stageXY.map(pt => {
-                        const s = getStatus(pt.stage, progress);
-                        const sc = STATUS_COLORS[s];
-                        const isHov = hovered === pt.stage || selected === pt.stage;
-                        const isCurrent = pt.stage === currentStage;
-                        const r = isHov ? 16 : isCurrent ? 13 : 10;
-                        const c = stageCounts(pt.stage, progress.caught);
-
-                        return (
-                            <g
-                                key={pt.stage}
-                                style={{ cursor: s === 'locked' ? 'default' : 'pointer' }}
-                                onMouseEnter={() => !mobile && setHovered(pt.stage)}
-                                onMouseLeave={() => !mobile && setHovered(null)}
-                                onClick={() => {
-                                    if (mobile) { setSelected(selected === pt.stage ? null : pt.stage); }
-                                    else if (s !== 'locked') go(pt.stage);
-                                }}
-                            >
-                                {/* Pulse ring for current */}
-                                {isCurrent && s === 'current' && (
-                                    <circle cx={pt.x} cy={pt.y} r={r} fill="none" stroke={sc.stroke} strokeWidth={2}
-                                        style={{ animation: 'wm-pulse 2s ease-out infinite', transformOrigin: `${pt.x}px ${pt.y}px` }} />
-                                )}
-
-                                {/* Drop shadow */}
-                                <circle cx={pt.x} cy={pt.y + 2} r={r} fill="rgba(0,0,0,0.15)" />
-
-                                {/* Outer ring */}
-                                <circle cx={pt.x} cy={pt.y} r={r} fill={sc.fill} stroke={sc.stroke}
-                                    strokeWidth={isCurrent ? 3 : isHov ? 2.5 : 2}
-                                    filter={s === 'current' ? 'url(#wm-glow-gold)' : s === 'completed' ? 'url(#wm-glow-green)' : 'none'}
-                                    style={{ transition: 'r 0.2s ease' }}
-                                />
-
-                                {/* Inner: stage number or checkmark */}
-                                {s === 'completed' ? (
-                                    <text x={pt.x} y={pt.y + 1} textAnchor="middle" dominantBaseline="central"
-                                        style={{ fontSize: isHov ? '14px' : '11px', fontWeight: '900', fill: '#10B981', pointerEvents: 'none' }}>
-                                        &#10003;
-                                    </text>
-                                ) : (
-                                    <text x={pt.x} y={pt.y + 1} textAnchor="middle" dominantBaseline="central"
-                                        style={{ fontSize: isHov ? '13px' : '10px', fontWeight: '900', fill: sc.text, pointerEvents: 'none' }}>
-                                        {pt.stage}
-                                    </text>
-                                )}
-
-                                {/* City label (always visible on desktop for non-locked, hover on locked) */}
-                                {(!mobile && (s !== 'locked' || isHov)) && (
-                                    <g>
-                                        <rect x={pt.x - 35} y={pt.y - r - 24} width={70} height={20} rx={6}
-                                            fill="rgba(28,25,23,0.9)" stroke={sc.stroke} strokeWidth={0.5} />
-                                        <text x={pt.x} y={pt.y - r - 12} textAnchor="middle" dominantBaseline="central"
-                                            style={{ fontSize: '9px', fontWeight: '700', fill: '#FAFAF9', letterSpacing: '0.3px', pointerEvents: 'none' }}>
-                                            {pt.city}
-                                        </text>
-                                    </g>
-                                )}
-
-                                {/* Progress fraction below marker */}
-                                {s !== 'locked' && !isHov && (
-                                    <text x={pt.x} y={pt.y + r + 12} textAnchor="middle"
-                                        style={{ fontSize: '8px', fontWeight: '700', fill: sc.text, opacity: 0.7, pointerEvents: 'none' }}>
-                                        {s === 'completed' ? 'CLEAR' : `${c.got}/${c.total}`}
-                                    </text>
-                                )}
-                            </g>
-                        );
-                    })}
-                </g>
-            </svg>
+            {/* CSS for spin animation */}
+            <style>{`
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 }

@@ -1,25 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { getSettings, setSetting, type AppSettings } from '@/lib/settings';
 
 export default function SettingsPage() {
     const [settings, setLocalSettings] = useState<AppSettings | null>(null);
-    const [totalPhrases, setTotalPhrases] = useState(0);
-    const [vocabCount, setVocabCount] = useState(0);
-    const [showResetConfirm, setShowResetConfirm] = useState(false);
-    const [showTutorialReset, setShowTutorialReset] = useState(false);
+    const [testingSound, setTestingSound] = useState<string | null>(null);
 
     useEffect(() => {
         setLocalSettings(getSettings());
-        try {
-            const mastery = localStorage.getItem('quest-mastery');
-            if (mastery) setTotalPhrases(Object.keys(JSON.parse(mastery)).length);
-        } catch { /* */ }
-        try {
-            const deck = localStorage.getItem('izakaya_toeic_vocab_deck');
-            if (deck) setVocabCount(JSON.parse(deck).length);
-        } catch { /* */ }
     }, []);
 
     if (!settings) return null;
@@ -30,12 +20,15 @@ export default function SettingsPage() {
     };
 
     const playTestSound = () => {
+        if (testingSound) return;
+        setTestingSound('se');
         try {
             const ctx = new AudioContext();
             if (ctx.state === 'suspended') ctx.resume();
             const now = ctx.currentTime;
             const vol = settings.volume / 100;
-            [523, 659, 784].forEach((freq, i) => {
+            const freqs = [523, 659, 784];
+            freqs.forEach((freq, i) => {
                 const osc = ctx.createOscillator();
                 const g = ctx.createGain();
                 osc.type = 'sine';
@@ -49,361 +42,372 @@ export default function SettingsPage() {
                 osc.connect(g); g.connect(ctx.destination);
                 osc.start(t); osc.stop(t + 0.45);
             });
-        } catch { /* */ }
+            setTimeout(() => setTestingSound(null), 500);
+        } catch { setTestingSound(null); }
     };
 
-    const playTestBGM = () => {
+    const playTestBGM = (type: 'fever' | 'main') => {
+        if (testingSound) return;
+        const key = type === 'fever' ? 'fever-bgm' : 'main-bgm';
+        setTestingSound(key);
         try {
-            const vol = Math.min((settings.feverBgmVolume / 100) * (settings.volume / 100) * 0.15, 0.15);
-            const audio = new Audio('/audio/fever-bgm.mp3');
+            const vol = type === 'fever'
+                ? (settings.feverBgmVolume / 100) * (settings.volume / 100)
+                : (settings.bgmVolume / 100) * (settings.volume / 100);
+            const audio = new Audio(type === 'fever' ? '/audio/fever-bgm.mp3' : '/audio/bgm-main.mp3');
             audio.volume = vol;
             audio.play().catch(() => {});
+            const duration = type === 'fever' ? 2000 : 3000;
             setTimeout(() => {
                 let step = 0;
                 const fade = setInterval(() => {
                     step++;
                     audio.volume = Math.max(0, vol * (1 - step / 8));
-                    if (step >= 8) { clearInterval(fade); audio.pause(); }
+                    if (step >= 8) { clearInterval(fade); audio.pause(); setTestingSound(null); }
                 }, 80);
-            }, 2000);
-        } catch { /* */ }
+            }, duration);
+        } catch { setTestingSound(null); }
     };
 
-    const playTestMainBGM = () => {
-        try {
-            const vol = Math.min((settings.bgmVolume / 100) * (settings.volume / 100) * 0.15, 0.15);
-            const audio = new Audio('/audio/bgm-main.mp3');
-            audio.volume = vol;
-            audio.play().catch(() => {});
-            setTimeout(() => {
-                let step = 0;
-                const fade = setInterval(() => {
-                    step++;
-                    audio.volume = Math.max(0, vol * (1 - step / 8));
-                    if (step >= 8) { clearInterval(fade); audio.pause(); }
-                }, 80);
-            }, 3000);
-        } catch { /* */ }
-    };
-
-    const resetAllProgress = () => {
-        const keys = [
-            'quest-mastery', 'izakaya_toeic_vocab_deck',
-            'izakaya_card_points', 'toeic_30day_start',
-            'toeic_training_tutorial_done', 'toeic_episode_tutorial_done',
-            'quest-days-active',
-            // 今日の練習(公開版)の記録
-            'tonio-practice:cards', 'tonio-practice:state', 'tonio-practice:log',
-        ];
-        keys.forEach(k => localStorage.removeItem(k));
-        setTotalPhrases(0);
-        setVocabCount(0);
-        setShowResetConfirm(false);
-    };
-
-    const resetTutorials = () => {
-        localStorage.removeItem('toeic_training_tutorial_done');
-        localStorage.removeItem('toeic_episode_tutorial_done');
-        setShowTutorialReset(true);
-        setTimeout(() => setShowTutorialReset(false), 2000);
-    };
-
-    return (
-        <div style={{ maxWidth: 640, margin: '0 auto', padding: '48px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <div style={{ width: 4, height: 28, backgroundColor: '#D4AF37', borderRadius: 2 }} />
-                <h1 style={{ fontSize: 24, fontWeight: 700, color: '#1c1917', margin: 0 }}>設定</h1>
-            </div>
-            <p style={{ fontSize: 13, color: '#a8a29e', marginBottom: 40, paddingLeft: 16 }}>
-                サウンド、エフェクト、データ管理
-            </p>
-
-            {/* ── Progress Overview ── */}
-            <Section title="あなたの進捗">
-                <div style={{
-                    display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12,
-                    padding: '4px 0',
-                }}>
-                    <StatBox label="学習済み" value={String(totalPhrases)} color="#10B981" />
-                    <StatBox label="エピソード語彙" value={String(vocabCount)} color="#D4AF37" />
-                    <StatBox label="サウンド" value={settings.soundEnabled ? 'ON' : 'OFF'} color="#3B82F6" />
-                </div>
-            </Section>
-
-            {/* ── Sound Section ── */}
-            <Section title="サウンド">
-                <ToggleRow
-                    label="サウンド"
-                    description="全サウンドの ON / OFF"
-                    checked={settings.soundEnabled}
-                    onChange={(v) => update('soundEnabled', v)}
-                />
-                {settings.soundEnabled && (
-                    <>
-                        <SliderRow label="マスター音量" value={settings.volume} onChange={(v) => update('volume', v)} />
-                        <div style={{ display: 'flex', gap: 8, padding: '8px 0' }}>
-                            <TestButton label="SE テスト" onClick={playTestSound} />
-                        </div>
-                        {settings.feverEnabled && (
-                            <>
-                                <SliderRow label="FEVER BGM 音量" value={settings.feverBgmVolume} onChange={(v) => update('feverBgmVolume', v)} />
-                                <div style={{ display: 'flex', gap: 8, padding: '8px 0' }}>
-                                    <TestButton label="FEVER BGM テスト (2秒)" onClick={playTestBGM} />
-                                </div>
-                            </>
-                        )}
-                    </>
-                )}
-            </Section>
-
-            {/* ── BGM Section ── */}
-            <Section title="BGM">
-                <ToggleRow
-                    label="BGM"
-                    description="通常時のバックグラウンド音楽"
-                    checked={settings.bgmEnabled}
-                    onChange={(v) => update('bgmEnabled', v)}
-                />
-                {settings.bgmEnabled && settings.soundEnabled && (
-                    <>
-                        <SliderRow label="BGM 音量" value={settings.bgmVolume} onChange={(v) => update('bgmVolume', v)} />
-                        <div style={{ display: 'flex', gap: 8, padding: '8px 0' }}>
-                            <TestButton label="BGM テスト (3秒)" onClick={playTestMainBGM} />
-                        </div>
-                    </>
-                )}
-            </Section>
-
-            {/* ── Effects Section ── */}
-            <Section title="エフェクト">
-                <ToggleRow
-                    label="スロット演出"
-                    description="レビュー成功時のスロットマシン演出。OFF でも XP は獲得されます"
-                    checked={settings.slotEnabled}
-                    onChange={(v) => update('slotEnabled', v)}
-                />
-                <ToggleRow
-                    label="FEVER モード"
-                    description="連続正解でチェーンボーナス。確変モードで倍率アップ"
-                    checked={settings.feverEnabled}
-                    onChange={(v) => update('feverEnabled', v)}
-                />
-            </Section>
-
-            {/* ── Progressive Unlock Section ── */}
-            <Section title="段階解放">
-                <ToggleRow
-                    label="ビギナーモード"
-                    description="ON: 日数に応じて機能が段階的に解放。OFF: 全機能を即時解放"
-                    checked={settings.beginnerMode}
-                    onChange={(v) => update('beginnerMode', v)}
-                />
-                {settings.beginnerMode && (() => {
-                    let days = 0;
-                    try {
-                        const raw = localStorage.getItem('quest-days-active');
-                        if (raw) days = JSON.parse(raw).length;
-                    } catch { /* */ }
-                    return (
-                        <div style={{
-                            padding: '12px 16px', borderRadius: 10,
-                            backgroundColor: '#FAFAF9', border: '1px solid #E7E5E4',
-                            fontSize: 13, color: '#57534e', lineHeight: 1.8,
-                        }}>
-                            <div style={{ fontWeight: 600, marginBottom: 4, color: '#1c1917' }}>
-                                アクティブ日数: {days}
-                            </div>
-                            <div style={{ color: days >= 3 ? '#10B981' : '#a8a29e' }}>
-                                {days >= 3 ? '[UNLOCKED]' : '[LOCKED]'} Day 3: スロット演出
-                            </div>
-                            <div style={{ color: days >= 6 ? '#10B981' : '#a8a29e' }}>
-                                {days >= 6 ? '[UNLOCKED]' : '[LOCKED]'} Day 6: 確変 / FEVER モード
-                            </div>
-                            <div style={{ color: days >= 10 ? '#10B981' : '#a8a29e' }}>
-                                {days >= 10 ? '[UNLOCKED]' : '[LOCKED]'} Day 10: バトル
-                            </div>
-                        </div>
-                    );
-                })()}
-            </Section>
-
-            {/* ── Tutorial Section ── */}
-            <Section title="チュートリアル">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0' }}>
-                    <div>
-                        <div style={{ fontSize: 14, fontWeight: 500, color: '#1c1917' }}>チュートリアルをリセット</div>
-                        <div style={{ fontSize: 12, color: '#a8a29e', marginTop: 2 }}>
-                            トレーニング・エピソードのチュートリアルをもう一度表示します
-                        </div>
-                    </div>
-                    <button
-                        onClick={resetTutorials}
-                        style={{
-                            padding: '8px 16px', borderRadius: 8,
-                            border: '1px solid #d6d3d1', backgroundColor: '#fff',
-                            fontSize: 12, color: '#57534e', cursor: 'pointer', fontWeight: 500,
-                            flexShrink: 0,
-                        }}
-                    >
-                        {showTutorialReset ? 'リセット済み' : 'リセット'}
-                    </button>
-                </div>
-            </Section>
-
-            {/* ── Data Management ── */}
-            <Section title="データ管理">
-                <div style={{
-                    padding: 16, borderRadius: 12,
-                    backgroundColor: '#FAFAF9', border: '1px solid #E7E5E4',
-                }}>
-                    <div style={{ fontSize: 13, color: '#57534e', lineHeight: 1.8, marginBottom: 16 }}>
-                        このアプリのデータはすべてブラウザに保存されています。<br />
-                        アプリを削除してもデータは残りますが、<br />
-                        ブラウザのデータを消去すると進捗もリセットされます。
-                    </div>
-                    {!showResetConfirm ? (
-                        <button
-                            onClick={() => setShowResetConfirm(true)}
-                            style={{
-                                padding: '10px 20px', borderRadius: 8,
-                                border: '1px solid #FECACA', backgroundColor: '#FEF2F2',
-                                fontSize: 12, color: '#EF4444', cursor: 'pointer', fontWeight: 600,
-                            }}
-                        >
-                            すべての進捗をリセット
-                        </button>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: '#EF4444' }}>
-                                本当にリセットしますか？この操作は取り消せません。
-                            </div>
-                            <div style={{ display: 'flex', gap: 8 }}>
-                                <button
-                                    onClick={resetAllProgress}
-                                    style={{
-                                        padding: '10px 20px', borderRadius: 8, border: 'none',
-                                        backgroundColor: '#EF4444', color: '#fff',
-                                        fontSize: 12, cursor: 'pointer', fontWeight: 600,
-                                    }}
-                                >
-                                    はい、リセットする
-                                </button>
-                                <button
-                                    onClick={() => setShowResetConfirm(false)}
-                                    style={{
-                                        padding: '10px 20px', borderRadius: 8,
-                                        border: '1px solid #d6d3d1', backgroundColor: '#fff',
-                                        fontSize: 12, color: '#57534e', cursor: 'pointer', fontWeight: 500,
-                                    }}
-                                >
-                                    キャンセル
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </Section>
-
-            {/* ── About ── */}
-            <Section title="このアプリについて">
-                <div style={{ padding: '4px 0', fontSize: 13, color: '#78716c', lineHeight: 2.0 }}>
-                    TOEIC 900点。4技能のうち3つはクリアした。<br />
-                    最後の1つで永遠に死んでる男が作った英語アプリ。<br />
-                    毎日何かが壊れて、毎日何かが直る。<br />
-                    <span style={{ color: '#D4AF37', fontWeight: 600 }}>完成を待ってたら永遠に喋れない。</span>
-                </div>
-                <div style={{ fontSize: 11, color: '#a8a29e', marginTop: 8 }}>
-                    Built with Vibe Coding + Claude AI / TONIO LAB
-                </div>
-            </Section>
-        </div>
-    );
-}
-
-function StatBox({ label, value, color }: { label: string; value: string; color: string }) {
     return (
         <div style={{
-            backgroundColor: '#fff', borderRadius: 12, padding: '14px 12px',
-            textAlign: 'center', border: '1px solid #E7E5E4',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+            minHeight: '100vh',
+            backgroundColor: '#FAFAF9',
         }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color }}>{value}</div>
-            <div style={{ fontSize: 9, color: '#a8a29e', fontWeight: 600, letterSpacing: '0.1em', marginTop: 4 }}>{label}</div>
+            {/* Header */}
+            <div style={{
+                backgroundColor: '#fff',
+                borderBottom: '1px solid #E7E5E4',
+                padding: '16px 24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                position: 'sticky',
+                top: 0,
+                zIndex: 10,
+            }}>
+                <Link
+                    href="/english/training"
+                    style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        width: '36px', height: '36px', borderRadius: '10px',
+                        backgroundColor: '#F5F5F4', border: '1px solid #E7E5E4',
+                        textDecoration: 'none', color: '#78716C',
+                        transition: 'all 0.15s',
+                    }}
+                >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                </Link>
+                <div>
+                    <h1 style={{ fontSize: '18px', fontWeight: '700', color: '#1C1917', margin: 0, letterSpacing: '-0.3px' }}>
+                        Settings
+                    </h1>
+                    <p style={{ fontSize: '12px', color: '#A8A29E', margin: 0 }}>
+                        Training configuration
+                    </p>
+                </div>
+            </div>
+
+            <div style={{
+                maxWidth: '560px',
+                margin: '0 auto',
+                padding: '24px 16px 80px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px',
+            }}>
+
+                {/* Card Review Section */}
+                <SettingsCard
+                    icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>}
+                    title="Card Review"
+                    description="Review mode behavior"
+                >
+                    <ToggleRow
+                        label="Tap to Level Up"
+                        description="Card body tap = level up + next. Skip without reading."
+                        checked={settings.tapToLevel}
+                        onChange={(v) => update('tapToLevel', v)}
+                        accentColor="#D4AF37"
+                    />
+                    <Divider />
+                    <ToggleRow
+                        label="Typing Match (Phrases)"
+                        description="Phrases mode: exact-match typing like Words mode. Words mode is always exact-match."
+                        checked={settings.typingMatch}
+                        onChange={(v) => update('typingMatch', v)}
+                        accentColor="#3B82F6"
+                    />
+                </SettingsCard>
+
+                {/* Sound Section */}
+                <SettingsCard
+                    icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={settings.soundEnabled ? '#D4AF37' : '#A8A29E'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>{settings.soundEnabled && <><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></>}</svg>}
+                    title="Sound"
+                    description={settings.soundEnabled ? `Master volume: ${settings.volume}%` : 'All sounds disabled'}
+                >
+                    <ToggleRow
+                        label="Sound Effects"
+                        description="All sound ON / OFF"
+                        checked={settings.soundEnabled}
+                        onChange={(v) => update('soundEnabled', v)}
+                    />
+
+                    {settings.soundEnabled && (
+                        <>
+                            <SliderRow
+                                label="Master Volume"
+                                value={settings.volume}
+                                onChange={(v) => update('volume', v)}
+                            />
+                            <TestButton
+                                label="SE Test"
+                                onClick={playTestSound}
+                                loading={testingSound === 'se'}
+                            />
+
+                            {settings.feverEnabled && (
+                                <>
+                                    <Divider />
+                                    <SliderRow
+                                        label="FEVER BGM Volume"
+                                        value={settings.feverBgmVolume}
+                                        onChange={(v) => update('feverBgmVolume', v)}
+                                    />
+                                    <TestButton
+                                        label="FEVER BGM Test (2s)"
+                                        onClick={() => playTestBGM('fever')}
+                                        loading={testingSound === 'fever-bgm'}
+                                    />
+                                </>
+                            )}
+                        </>
+                    )}
+                </SettingsCard>
+
+                {/* BGM Section */}
+                <SettingsCard
+                    icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={settings.bgmEnabled ? '#D4AF37' : '#A8A29E'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>}
+                    title="BGM"
+                    description={settings.bgmEnabled ? 'Background music enabled' : 'Background music disabled'}
+                >
+                    <ToggleRow
+                        label="Background Music"
+                        description="Ambient music during training"
+                        checked={settings.bgmEnabled}
+                        onChange={(v) => update('bgmEnabled', v)}
+                    />
+                    {settings.bgmEnabled && settings.soundEnabled && (
+                        <>
+                            <SliderRow
+                                label="BGM Volume"
+                                value={settings.bgmVolume}
+                                onChange={(v) => update('bgmVolume', v)}
+                            />
+                            <TestButton
+                                label="BGM Test (3s)"
+                                onClick={() => playTestBGM('main')}
+                                loading={testingSound === 'main-bgm'}
+                            />
+                        </>
+                    )}
+                </SettingsCard>
+
+                {/* Effects Section */}
+                <SettingsCard
+                    icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>}
+                    title="Effects"
+                    description="Visual effects and bonus modes"
+                >
+                    <ToggleRow
+                        label="Slot Animation"
+                        description="XP / Sparks / Card Points are always earned"
+                        checked={settings.slotEnabled}
+                        onChange={(v) => update('slotEnabled', v)}
+                    />
+                    <Divider />
+                    <ToggleRow
+                        label="FEVER Mode"
+                        description="Bonus mode. OFF disables FEVER activation + all kakuhen/FEVER sounds & BGM"
+                        checked={settings.feverEnabled}
+                        onChange={(v) => update('feverEnabled', v)}
+                        accentColor="#EF4444"
+                    />
+                </SettingsCard>
+
+            </div>
         </div>
     );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+/* --- Sub-components --- */
+
+function SettingsCard({ icon, title, description, children }: {
+    icon: React.ReactNode;
+    title: string;
+    description: string;
+    children: React.ReactNode;
+}) {
     return (
-        <div style={{ marginBottom: 36 }}>
-            <h2 style={{
-                fontSize: 13, fontWeight: 600, color: '#a8a29e',
-                letterSpacing: '0.08em', textTransform: 'uppercase',
-                marginBottom: 16, paddingBottom: 8,
-                borderBottom: '1px solid #e7e5e4',
+        <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '16px',
+            border: '1px solid #E7E5E4',
+            overflow: 'hidden',
+        }}>
+            {/* Card header */}
+            <div style={{
+                padding: '16px 20px 12px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                borderBottom: '1px solid #F5F5F4',
             }}>
-                {title}
-            </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                <div style={{
+                    width: '36px', height: '36px', borderRadius: '10px',
+                    backgroundColor: '#FFFBEB', border: '1px solid #FDE68A',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                }}>
+                    {icon}
+                </div>
+                <div>
+                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#1C1917' }}>{title}</div>
+                    <div style={{ fontSize: '11px', color: '#A8A29E', marginTop: '1px' }}>{description}</div>
+                </div>
+            </div>
+            {/* Card body */}
+            <div style={{ padding: '8px 20px 16px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 {children}
             </div>
         </div>
     );
 }
 
-function ToggleRow({ label, description, checked, onChange }: {
-    label: string; description?: string; checked: boolean; onChange: (v: boolean) => void;
+function ToggleRow({ label, description, checked, onChange, accentColor }: {
+    label: string;
+    description?: string;
+    checked: boolean;
+    onChange: (v: boolean) => void;
+    accentColor?: string;
 }) {
+    const color = accentColor || '#D4AF37';
     return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0' }}>
-            <div>
-                <div style={{ fontSize: 14, fontWeight: 500, color: '#1c1917' }}>{label}</div>
-                {description && <div style={{ fontSize: 12, color: '#a8a29e', marginTop: 2 }}>{description}</div>}
+        <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '12px 0',
+            gap: '16px',
+        }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#1C1917' }}>{label}</div>
+                {description && (
+                    <div style={{ fontSize: '12px', color: '#A8A29E', marginTop: '3px', lineHeight: '1.4' }}>{description}</div>
+                )}
             </div>
             <button
                 onClick={() => onChange(!checked)}
                 style={{
-                    width: 48, height: 28, borderRadius: 14, border: 'none',
-                    backgroundColor: checked ? '#D4AF37' : '#d6d3d1',
-                    cursor: 'pointer', position: 'relative',
-                    transition: 'background-color 0.2s ease', flexShrink: 0,
+                    width: '52px',
+                    height: '30px',
+                    borderRadius: '15px',
+                    border: 'none',
+                    backgroundColor: checked ? color : '#D6D3D1',
+                    cursor: 'pointer',
+                    position: 'relative',
+                    transition: 'background-color 0.2s ease',
+                    flexShrink: 0,
+                    boxShadow: checked ? `0 2px 8px ${color}30` : 'inset 0 1px 3px rgba(0,0,0,0.1)',
                 }}
             >
                 <div style={{
-                    width: 22, height: 22, borderRadius: 11,
-                    backgroundColor: '#fff', position: 'absolute',
-                    top: 3, left: checked ? 23 : 3,
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '12px',
+                    backgroundColor: '#fff',
+                    position: 'absolute',
+                    top: '3px',
+                    left: checked ? '25px' : '3px',
                     transition: 'left 0.2s ease',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
                 }} />
             </button>
         </div>
     );
 }
 
-function SliderRow({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void; }) {
+function SliderRow({ label, value, onChange }: {
+    label: string;
+    value: number;
+    onChange: (v: number) => void;
+}) {
     return (
         <div style={{ padding: '8px 0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                <span style={{ fontSize: 14, fontWeight: 500, color: '#1c1917' }}>{label}</span>
-                <span style={{ fontSize: 13, color: '#78716c', fontVariantNumeric: 'tabular-nums' }}>{value}%</span>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '10px',
+            }}>
+                <span style={{ fontSize: '13px', fontWeight: '500', color: '#57534E' }}>{label}</span>
+                <span style={{
+                    fontSize: '13px', fontWeight: '700', color: '#1C1917',
+                    fontVariantNumeric: 'tabular-nums',
+                    backgroundColor: '#F5F5F4',
+                    padding: '2px 10px',
+                    borderRadius: '6px',
+                }}>
+                    {value}%
+                </span>
             </div>
-            <input type="range" min={0} max={100} value={value}
+            <input
+                type="range"
+                min={0}
+                max={100}
+                value={value}
                 onChange={(e) => onChange(Number(e.target.value))}
-                style={{ width: '100%', accentColor: '#D4AF37', cursor: 'pointer' }}
+                style={{
+                    width: '100%',
+                    accentColor: '#D4AF37',
+                    cursor: 'pointer',
+                    height: '6px',
+                }}
             />
         </div>
     );
 }
 
-function TestButton({ label, onClick }: { label: string; onClick: () => void }) {
+function TestButton({ label, onClick, loading }: {
+    label: string;
+    onClick: () => void;
+    loading: boolean;
+}) {
     return (
-        <button onClick={onClick} style={{
-            padding: '8px 16px', borderRadius: 8, border: '1px solid #d6d3d1',
-            backgroundColor: '#fff', fontSize: 12, color: '#57534e',
-            cursor: 'pointer', fontWeight: 500,
-        }}>
-            {label}
+        <button
+            onClick={onClick}
+            disabled={loading}
+            style={{
+                alignSelf: 'flex-start',
+                padding: '8px 20px',
+                borderRadius: '10px',
+                border: '1px solid #E7E5E4',
+                backgroundColor: loading ? '#F5F5F4' : '#fff',
+                fontSize: '12px',
+                color: loading ? '#A8A29E' : '#57534E',
+                cursor: loading ? 'default' : 'pointer',
+                fontWeight: '600',
+                transition: 'all 0.15s',
+                letterSpacing: '0.3px',
+            }}
+        >
+            {loading ? 'Playing...' : label}
         </button>
     );
+}
+
+function Divider() {
+    return <div style={{ height: '1px', backgroundColor: '#F5F5F4', margin: '4px 0' }} />;
 }

@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/data/english/newspaper.ts
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * The Tonio Times — 俺専用 英字新聞
  *
@@ -75,6 +72,8 @@
  *   - cast フィールドに出演者を書く (例: 'Vernon · Gloria · one missing form')
  */
 
+import { CLIP_EDITIONS } from './newspaper-clip';
+
 export interface NewsVocab {
     word: string;
     pos: string;   // adj / n / v ...
@@ -98,7 +97,7 @@ export interface SyntaxNote {
 export interface GlossPick {
     en: string;                 // 登録する表現
     ja: string;                 // 日本語
-    kind?: 'word' | 'phrase';   // 'word' は /api/user-words、既定の 'phrase' は /api/phrases
+    kind?: 'word' | 'phrase';   // 'word' は /api/user-words、既定の 'phrase' は /api/phrases (画面の登録もこの通りに分ける。2026-09-25〜)
 }
 
 // 一文を頭から順に切って、切れ端ごとに日本語を当てる欄。
@@ -154,7 +153,7 @@ export interface NewspaperEdition {
     // --- 号外 (EXTRA) 用の任意フィールド。通常号は未指定でこれまで通り。---
     id?: string;            // 号外の一意キー (日次号は date がキー)。EXTRA_EDITIONS 用。
     extra?: boolean;        // 号外フラグ (バッジ表示を「号外」に)
-    theme?: 'aot' | 'ghost'; // 見た目テーマ。'aot'=進撃号 / 'ghost'=機械の中の幽霊号
+    theme?: 'aot' | 'ghost' | 'exam'; // 見た目テーマ。'aot'=進撃号 / 'ghost'=機械の中の幽霊号 / 'exam'=試験会場号
     mastheadTitle?: string; // マストヘッド見出し上書き (既定 "The Tonio Times")
     mastheadTagline?: string; // マストヘッド下のタグライン上書き
     mastheadKicker?: string;  // 号数の代わりに出す文字列 (例 "号外 · EXTRA")
@@ -1812,7 +1811,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '9月の最後は言葉の話にした。1954年、機械翻訳は「3年で解決する」と発表された。理由は、戦争で暗号を破ったから言語も暗号だと思ったからだ。1966年の報告で資金が止まり、20年沈黙し、1990年に「意味を理解するのをやめて統計で殴る」方式で復活し、2016年にニューラルで一段跳ねた。今の機械は、作者のいない文なら俺より速い。できないのは「決める」ことだけだ。どっちの語がその場の温度か、冗談を別の冗談にするか、敬語の段をどこに逃がすか。翻訳は移し替えじゃなく決定で、決定には責任者が要る。今日の1分。あんたが英語で「平均の答え」を言ってしまった場面を1つ挙げて、本当は何と言いたかったか、日本語で言え。それが自分の訳の仕事だ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -3404,7 +3404,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '「リスクファクター」という言葉は1961年に作られた。それまで医学は「病気か、病気じゃないか」で、健康な人に確率を渡す発想がなかった。出どころは1948年に始まった1つの町の追跡調査で、5000人が数十年間ただ測られ続けた。英雄は誰もいない。全員がひたすら退屈に通っただけだ。それで血圧が「老化の正常な適応」じゃないと分かり、心疾患の死亡率は半分以下になった。もう1本は、フレミングの逸話から「カビは既に答えを持ってる」と読んで6000株を潰した男。特許も財産もノーベル賞もない。今日の1分。「体調は悪くないが数字が悪い」と言われたとき、あんたは従うか無視するか。理由を2つ言え。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -4914,7 +4915,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '1928年の今日、休暇明けの皿にカビが生えていた。有名なのはここまでで、実際にはそこから11年ほど何も起きていない。作れなかったからだ。薬にしたのはオックスフォードの精製と、戦争と、ピオリアの市場で買われたメロンに生えていた株。発見と製造は別の仕事で、患者に効くのは後者だ。そしてフレミングは1945年のノーベル講演で耐性の警告をしていて、全員が拍手して、その通りになった。警告が効くかどうかは、正しいかどうかじゃなく「従うと誰が損するか」で決まる。もう1本は、35年間ひとつの分子を離さなかった人。今日の1分。あんたが途中でやめた課題を1つ挙げて、まだファイルを持っているか答えろ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -6395,7 +6397,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '検索は30年で3回、体制が変わった。人が目録を作る時代、リンクを票として数える時代、そして今の「答えの隣を競売にかける」時代。どれも前の方式より正確だったから勝ったんじゃなく、安く回せたから勝った。ここで大事なのは、順位は世界の記述じゃなくて自動化された編集判断だ、ということ。人が作った目録には手紙が書けた。順位には書けない。だから最適化する業界だけが生まれた。もう1本は、その順序を最初に作った男の両面 — 分類は残し、賞から名前は外し、理由を書いた。今日の1分。「一番最初に出てきたから選んだ」ものを1つ思い出して、二番目を見に行かなかった理由を言え。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -7949,7 +7952,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '20世紀で一番でかいリスクの移転は、議論もされず条文の小見出しで起きた。1978年の税法に足された401(k)という項を、1980年にコンサルタントが読み込んで「これ、給与天引きの積立にできますよね」と言った。それだけで、投資リスクも金利リスクも「長生きしすぎるリスク」も、会社から個人に移った。詐欺じゃない。ただ取引として提示されなかっただけだ。もう1本は、28年間まったく同じ朝をやった男。あれは規律というより「自分から自分を守る仕組み」だ。今日の1分。あんたの毎朝で「決めなくていいように固定してあること」を1つ挙げろ。無いなら、朝に判断力を無駄使いしてる。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -9394,7 +9398,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '天気予報は「人類が自分の的中率を正直に測った唯一の分野」だ。電信で風より速く情報を回して、1922年に手計算で6時間分を6週間かけて外して、1950年にENIACで初めて機械が回して、1963年に「2週間より先は原理的に無理」という壁が見つかった。そこからが偉くて、1つの予報をやめて何十通りも回し、ばらつきを確率として出すようにした。40%は曖昧じゃない、正直だ。もう1本は、誰にも予報できなかった1曲と、70代で金のために350公演やった男。今日の1分。「自分の予測が外れた回数」を数えたことがあるか。無いなら、あんたの自信は測定されていない。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -10830,7 +10835,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            'キーボードの並びは1874年の機械の詰まりの化石だ。もっと効率のいい配列は1936年に特許が取られていて、誰も乗り換えなかった。理由は品質じゃなく「みんなもう覚えてしまったから」。線路の幅もコンセントの電圧も同じで、標準の代金は1回だけ払われ、変更の代金は全員が同時に払うので永久に払われない。そしてタイプライターは女性を事務所に入れ、同時に「安く払える職種」を発明した。両方書いた。もう1本は、制約を様式にした作家。eを1文字も使わずに書いた小説が「名前を呼べない不在」の話だ、という構造。今日の1分。あんたの英語に「1つ縛り」を入れろ。今日は形容詞禁止で1分喋れ。動詞で殴るしかなくなる。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -12365,7 +12371,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '1846年の今日、計算だけで見つけた惑星が、指示された座標に本当にあった。しかも1晩目で、誤差1度以内。ここまでは有名な話。紙面が書いたのは続きで、同じ男が同じ方法をもう一度使って、水星の軌道のズレを説明する惑星「バルカン」を予言し、50年間みんながそれを見たと報告し、実際には存在しなかった。答えは1915年の一般相対性理論、つまり「法則のほうが違っていた」。データのズレは必ず3つのどれかだ — 測定ミス、見えていない物、間違った法則。中からは区別がつかない。もう1本は、その3択がまだ決着していない暗黒物質を測った人。今日の1分。「合わない数字」を1つ挙げて、3つのうちどれだと思うか、理由付きで言え。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -13910,7 +13917,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '免許は最初「領収書」だった。1903年のイギリスは5シリング払えば誰でも取れて、試験は無い。目的は事故のとき名前が分かること。実技試験が義務になるのは1935年、アメリカの一部の州は1950年代までゼロ。50年、金を払った人間が歩行者の横を走っていた。そして今も、17歳で1回受かった証明書を数十年更新している。もう1本は、一番高く売れている夜にやめた男。理由が「客が先に台詞を言うから」なのが効く。今日の1分。あんたが今やってることの中で「客が先に台詞を言える」ようになったものを1つ挙げろ。それが惰性の定義だ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -15510,7 +15518,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '人類が意図的に終わらせた病気は1つしかない。天然痘。しかも勝ち方が面白くて、「全員に打つ」という当たり前の計画は失敗していて、ワクチンが足りなかったナイジェリアで「患者の周りだけ固める」に切り替えたら11年で終わった。制約が方法を作った例だ。ただし美談で止めない。終わったから接種をやめて、今は誰も免疫を持っていない。両方本当だ。もう1本は、47歳でやめて35年間戻らなかった男。恨み節を持たなかったのが効く。今日の1分。「やめたまま戻っていないもの」を1つ挙げろ。無いなら、あんたはまだ何も終わらせてない。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -17076,7 +17085,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '学校が義務になったのは、教育者が勝ったからじゃない。子どもを工場から出すための法律と、読める国民が欲しい国家の都合が噛み合ったからだ。設計も正直で、行と鐘と前に立つ権威、要するに職場の形をしている。ついでに副産物として「思春期」という区分が生まれた。同い年を1つの建物に何年も入れたら、仲間集団が親より強くなるのは構造の話だ。もう1本は、訓練を受けていない人間が業界の語彙を書き換えた話。1981年のパリで「災害」と書かれた。今日の1分。あんたが「型どおりにやっていない」ことを1つ挙げて、それが弱点なのか武器なのか、自分で判定しろ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -18671,7 +18681,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '9月19日はメキシコシティが2度殴られた日だ。1985年と2017年、同じ日付、しかも2回目は毎年の避難訓練の2時間後に来た。1985年で死んだのは中層の建物で、理由は湖底の地盤が揺れを2秒周期に整えて、6〜15階の固有周期とぴったり合ったから。地震の強さじゃなく「地面と建物の一致」だ。そして耐震の知識は50年前から足りている。足りないのは、既存の建物に入って地味な一覧を作る人間のほう。もう1本は、36セントで出て「名前」だけ取った人の話。全部の資産の中で、まだ荷重を持っている部材はどれか、という判断。今日の1分。あんたの持ち物で、今も荷重を持ってるものを1つ言え。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -20213,7 +20224,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '車は安全になったんじゃない、安全に「された」。1959年にボルボが三点式を作って、特許を開放した。全社に配ったほうが価値が高いと判断したからだ。アメリカでは1966年に法律ができて、装着が義務になったのは1984年から。全部「余計なお世話だ」と言われて、今は誰も気づかない家具になっている。もう1本も同じ形で、売れば一番の資産になるものを配った男の話。今日の1分。「言われるのが嫌だから受け入れなかったこと」を1つ正直に挙げろ。安全性の議論はだいたい安全の話じゃなく、指図の話だ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -21811,7 +21823,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '憲法の平均寿命は19年くらいだ、という研究がある。ほとんどの国は一世代で書き直す。239年動いてるアメリカのやつは統計上の外れ値で、しかも生き延びた理由は「変えにくいから」ではなく「文はそのままで意味が動いたから」だ。9人の裁判官が読み替える。そこが正当かどうかは欠陥じゃなくて、長寿の代金。もう1本は、競技を救ったのが理念じゃなく割り算だった話。2880秒÷120本=24秒。今日の1分。あんたの職場や家の「もう理由がなくなった規則」を1つ挙げて、それを廃止する側と維持する側、どっちに立つか言え。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -23330,7 +23343,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日は珍しく「直った問題」の紙だ。オゾン層。1974年に指摘され、10年間「不確実だ」と叩かれ、1985年に否定できない測定が出て、1987年9月16日に条約が署名された。国連の全加盟国が批准した唯一の環境条約で、穴は実際に縮んでいる。ただし美談にはしない。成立した条件は3つ — 反論できない絵、代替品があって最大手が生き残れたこと、金を出せない国のための基金。次の問題でその3つが揃ってるか、が全て。そして衛星は最初、そのデータを「あり得ない値」として捨てていた。今日の1分。あんたが最近「あり得ない」として無視した数字か言葉を1つ思い出せ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -24828,7 +24842,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '18年前の今日、リーマンが破綻した。だが紙面が書いてるのは事件じゃなく周期だ。1933年に壁を建て、1999年に外し、2010年に半分だけ戻し、2018年にまた緩めて、2023年にその緩めた層の銀行が48時間で消えた。人の記憶はだいたい一世代分しかもたない。もう1本は、1998年に「これ危なくないですか」と質問しただけで潰された人の話。規則を提案したんじゃない、質問文書を出しただけだ。今日の1分。「早く言った人が損をする」場面をあんたの職場から1つ挙げて、どうすれば早く言うのが割に合うようになるか、案を1つ出せ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -26360,7 +26375,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '図書館は市場社会に生き残っている一番おかしな建物だ。中で取引が起きない。金持ちが2500棟建てたが、そのやり方が重要で、建物だけ渡して「維持費は毎年お前らが出せ」と契約させた。感謝に頼らない設計。そして同じ男は数年前にストを潰している。両方本当で、どっちも消えない。2本目は大学に行けなかった男が、地下で10セント硬貨を入れながら書いた話。今日の1分。あんたが「金を払わずに長時間いられる場所」を1つ挙げろ。無いなら、それは町の問題であってあんたの問題じゃない。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -27932,7 +27948,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日の紙は「見知らぬ人に渡す」だ。輸血は300年やられてて、3分の1が死んでいた。1901年に型が見つかって、1915年に固まらない方法が見つかって、1937年に銀行になった。技術は40年で全部解決した。解決しなかったのは、軍が血に人種のラベルを貼れと言った件で、それは科学的な根拠がゼロのまま1950年まで続いた。事実は勝たない。誰かが職を降りて初めて動く。2本目は、敵意のある部屋で速度を上げなかった男の話。今日の1分。「怒っている相手に合わせて早口になった経験」を1つ話せ。そこで速度を落とせるかが、この2本の共通点だ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -29431,7 +29448,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日の1本目は「規格の合意が経済を組み替える」話。バーコードは1949年に砂に描かれて、20年寝て、業界が幅の規格に合意した日に不可避になった。速くなったのはレジじゃなく、店の裏側だ。何が売れたかを「数えずに知る」能力が、チェーン店を強くした。2本目は逆側で、読み取られないことを自分で選んだ男。フォントを配って、記事を書く側に自分の主張を毎回実行させた。エッセイじゃなく仕掛けで勝った例だ。今日の1分。あんたの仕事で「システムに載っていないけど一番価値がある情報」を1つ言え。載せた瞬間に価値が消えるやつだ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -30963,7 +30981,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日は日付が日付なので、感情の紙にはしなかった。事実の紙だ。空港で全員が検査されるようになったのは1973年で、しかもきっかけは死者の多い事件じゃなく、5年で100件を超えたハイジャックの流行だった。以後、層は足されるだけで一度も外れていない。理由は簡単で、外す判断をした人間の名前が、次に何かあったとき読み上げられるからだ。もう1本は、その朝に38機を受け入れた1万人の町。彼らは会議をしていない。前から決まっていた通りに動いただけだ。今日の1分。「準備してなかったのに、その通りに動けたこと」を1つ話せ。人の本当の設定は、そこにしか出ない。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -32542,7 +32561,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日の1本目は「快適さの請求書」の話だ。冷房は人間のために作られてない。紙とインクのために作られて、映画館を夏の商売にして、最後にアメリカの人口を南へ動かした。そして今、暑い場所を住めるようにした機械が、その場所をもっと暑くしている。2本目は、実際に動く発明を持っていたのに「代わりに立って笑ってろ」と言われた人の話。今日の1分はこれだ。あんたの生活で「自分の部屋を涼しくするために、誰かの通りに熱を出している」ものを1つ挙げろ。無いと思ったなら、それは見えてないだけだ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -34096,7 +34116,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日の1本目は、パスポートが100年前の臨時措置だという話。1914年に戦争のために作られて、1920年に委員会が形を決めて、そのまま解除されなかった。おかげで世界は「ノー」を言うための共通文法を手に入れた。そして国が無くなった人のために発明されたのがナンセン旅券で、そこから2本目に繋がる。無国籍のまま亡命して、40歳で言語を捨てて英語に移った作家。英語をやってる人間として、この一行だけは持っておけ — 言語を変えるとは「10年間、実際より頭が悪く見えることに同意する」ことだ。今日の1分。あんたが英語で「実際より馬鹿に見えている」場面を1つ挙げて、それでも続ける理由を言え。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -35524,7 +35545,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '読めるのが普通、というのは人類史でごく最近の話だ。50年代には世界の大人の半分が読めなかった。今は8人に1人。ここまで速く変わった能力は他にない。だが後半は難しい方で、文が読めることと契約書が読めることは別物で、それは先進国でも解決してない。2本目は、読むことを禁じられたその場で「じゃあそこに出口がある」と気づいた男の話。今日の1分はこっちを使え。あんたが最近、誰かに「見せてもらえなかったもの」を1つ思い出せ。隠されている場所が、たいてい価値のある場所だ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -37165,7 +37187,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日はレイバーデーだが、この紙面が書いてるのは「休みは譲歩だ」という話だ。1894年、ストの真っ最中に大統領が署名した。軍を送り込んだ側が、同じ月に休日を配った。しかも日付は5月1日を避けて9月に置いた。理由のない日にすれば、思想が付いてこないから。つまり「日はやる、理由は渡さない」。もう1本は逆に、一番高く売れる瞬間に断った男の話。3年半。25歳から28歳。そこを差し出した人間が、戻ってきて別の勝ち方を発明した。今日の1分。あんたが最近もらった「休み」や「配慮」を1つ挙げて、それが何の代わりに来たのか言え。代わりが思いつかないなら、まだ請求書を見てないだけだ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -38751,7 +38774,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日は「時間の値段」と「遅い出発」だ。週40時間は自然でも伝統でもなくて、1914年と1938年に決まった価格。6時間の日を持っていた工場もあって、しかもそれを手放したのは会社じゃなく働いてる側だった、という不都合な結末まで書いた。もう1本は65歳で全部消えた男の話。感動的な再起の話に読めるが、実際にやったのは棚卸しだ。「道路が動いたあと、自分に何が残っているか」を数えただけ。今日はこれを1分。あんたが今持っている中で、車に積めるものは何か。積めないものは、それは資産じゃなく場所だ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -40415,7 +40439,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日は「確からしさ」の紙だ。指紋は100年ものあいだ、誤りの率が測られないまま法廷で一番信用されていた。2009年に変わったのは技術じゃなくて、専門家が言っていい文だけ。もう1本のクリスティは、証拠を一切使わない方法で1世紀勝ち続けた人。刑事ドラマの逆で、彼女の探偵は「人は喋ると漏らす」だけに賭けている。今日の1分はこれだ。あんたが最近「確かだ」と思ったこと1つ挙げて、それを支えているのが証拠か、それとも自信のある言い方か、を言え。区別がついたら今日は読めている。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -42105,7 +42130,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '点数をつけられるのは冷たい、という話に見えて、逆の紙だ。1974年まで、女性は自分の名義で信用を断られていい国だった。そこにあったのは温かい人間の判断で、しかもそれは説明も不服申立てもできなかった。数式が勝ったのは優しいからじゃなく、書いてあるから。もう1本は、落とされた側が結局その分野の基準になり、詫び状が死の2日前に届いた話だ。今日の1分。あんたを今いちばん強く評価している数字を1つ挙げて、それが「誰かがあんたに賭けるための数字」なのか「見た目で決めた後に持ち出される数字」なのか、どっちか言え。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -43898,7 +43924,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日は解説シートを戻した。9月から語彙欄をやめたのは、単語の由来がつまらないからで、難しい文が読めなくていいという意味ではない。だから戻すのは「由来」じゃなく「難所」だけにした。今日の紙面でつまずくのはこの3種類だ。1) 名詞を後ろから殴る同格・分詞 (an atomic average kept by a network of clocks that do not care about the earth at all)。2) 抽象名詞の言い切り (It is not daylight. It is an allocation.)。3) 譲歩なしの断定を2文で並べる型 (It was the same and it was better.)。全部、読めるだけじゃなく喋りで真似できる。読み終わったら要約するな。「時間は決めごとか、事実か」で1分喋れ。答えは出さなくていい。立場を1つ選んで、理由を2つ言えたらその日は勝ちだ。',
         vocab: [
             { word: 'lethal', pos: 'adj', en: 'able to cause death', ja: '死を招く、致命的な' },
             { word: 'longitude', pos: 'n', en: 'distance east or west of a meridian', ja: '経度' },
@@ -43915,7 +43942,7 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
         ],
         sayIt: [
             { phrase: 'Nobody was wrong.', ja: '「誰も間違ってなかった」。議論の勝ち負けを一度おろす一言。二人の言い分が両方成立していた場面で使う。Both were right より短くて強い。' },
-            { phrase: 'That is not a complaint. That is just what it is to work inside somebody else’s arithmetic.', ja: '愚痴に聞こえたくないときの型。「文句じゃない。人の計算の中で働くってこういうことだ」。前半で否定して、後半で言い直す。オンライン英会話で待遇の話をするとき、そのまま使える。' },
+            { phrase: 'That is not a complaint. That is just what it is to work inside somebody else’s arithmetic.', ja: '愚痴に聞こえたくないときの型。「文句じゃない。人の計算の中で働くってこういうことだ」。前半で否定して、後半で言い直す。DMMで待遇の話をするとき、そのまま使える。' },
             { phrase: 'The big change is never announced as a change.', ja: '「でかい変化は、変化として告知されない」。歴史でも会社でも使える一般化。この1文だけで意見を持っている人に見える。' },
             { phrase: 'He stopped being in a hurry to be believed.', ja: '「信じてもらおうと急ぐのをやめた」。人が上手くなった理由を、技術ではなく態度で言うときの言い方。褒め言葉として強い。' },
             { phrase: 'Nobody asked and nobody moved him.', ja: '「誰も聞かなかったし、誰もどかさなかった」。優しさを説明せずに描写だけで示す型。and で並べるだけ。感情の単語をひとつも使っていないのがコツ。' },
@@ -43970,7 +43997,7 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                     { en: 'except him', ja: '彼自身を除いて' },
                 ],
                 point: 'except で落とすオチ',
-                ja: '直前に「スタジオは直せるから選んだ」と置いてから、この4語で終える。except 以下に一番大事なものを置くと、それが強調になる。段落や話のオチとして使える最短の型で、オンライン英会話のフリートークでも「全部よかった、〜以外は」で笑いが取れる。',
+                ja: '直前に「スタジオは直せるから選んだ」と置いてから、この4語で終える。except 以下に一番大事なものを置くと、それが強調になる。段落や話のオチとして使える最短の型で、DMMのフリートークでも「全部よかった、〜以外は」で笑いが取れる。',
             },
         ],
     },
@@ -45728,7 +45755,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '今日の2本は「規格に乗ったもの」と「乗らなかったもの」だ。箱の話は、世界が安くなった理由が思想でも条約でもなく寸法の合意だった、という話。ウェイツの話は、売れる自分を自分で壊して、その代わり真似された声で裁判に勝った男の話。どっちも同じ質問をしている。同じ形にすると運べる。運べるようにすると、あんたじゃなくなる。読み終わったら要約はいらない。「自分の仕事のどこが箱に入る部分で、どこが入らない部分か」を1分喋れ。入らない部分が言えないなら、それは今のところ入るということだ。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -47480,7 +47508,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            '9月から紙面を変えた。単語の由来を書く欄をやめて、話題そのものを掘る。今日の2本は「誰があんたに書類を要求できるのか」と「客を毎回クビにする歌手」。どっちも「何年に何が変わったか」で書いてある。読み終わったら要約はしなくていい。どっちか1本を選んで、賛成か反対かを1分喋れ。喋れなかったら、その記事は読めてない。',
         vocab: [],
         sayIt: [],
         syntax: [],
@@ -48240,7 +48269,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
                 ],
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、八月の最後だ。今月お前が一番苦しんだのは、相手が強い言葉を出した瞬間に黙ることだった。今日の武器はこれ一本 — What would change your mind? 。反論ではなく質問だから角が立たず、しかも相手が答えられなければ勝負はついている。もうひとつ、褒める時に good を使いそうになったら She’s got a certain je ne sais quoi. に替えろ。今夜、先生の顔が変わる。',
     },
     '2026-08-30': {
         date: '2026-08-30',
@@ -48347,7 +48377,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'in a pinch', ja: '「いざという時に」。米はin、英はat。この1文字差で自信を失う必要はない。' },
             { phrase: 'I hurt my own feelings', ja: '「自分で自分をへこませた」。自虐の最短形。笑いを取りながら本音も言える。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は聞く側の訓練だ。with all due respect が聞こえたら、そこから先を身構えて聞け。お前はあの手の丁寧な前置きが出ると安心してしまう癖がある。逆だ、あれは警報だ。そして自分で使う時は、言ったあとで必ず遠慮なく刺せ。前置きだけ丁寧で中身が甘いと、皮肉に聞こえて一番損をする。あとは I hurt my own feelings. を今夜どこかで使ってこい。先生は絶対に笑う。',
     },
     '2026-08-29': {
         date: '2026-08-29',
@@ -48455,7 +48486,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I didn’t play it cool at all', ja: '「まったく平静を装えなかった」。定型を出してから「できなかった」と言うのが英語の笑いの型。' },
             { phrase: 'why don’t we start over?', ja: '「仕切り直そうか」。命令を疑問にした最も断りにくい提案。失敗のリカバリーに最適。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は she’s got a point だ。お前は先生と意見が違う時、全部飲むか全部黙るかの二択になっている。英語には中間があって、それがこれだ。一点だけ認めて、残りは渡さない。You’ve got a point, but ... の順番を絶対に守れ。逆にすると喧嘩になる。あと失敗したら Let’s start over. ではなく Why don’t we start over? と言え。同じ意味で、相手が断れなくなる。',
     },
     '2026-08-28': {
         date: '2026-08-28',
@@ -48563,7 +48595,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'came to terms with …', ja: '「〜と折り合いをつけた」。accept より時間がかかった感じが出る。交渉の語彙を自分自身に使うのがミソ。' },
             { phrase: 'paved the way for …', ja: '「〜の道を作ってくれた」。先人への敬意を述べる最も安全な定型。舗装した人と走る人は別、という含みまで付く。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は喧嘩の作法だ。お前は先生と意見が割れると黙るか、I think so too と言ってしまう。どっちも負けだ。使う型はこれ — I’m not disagreeing with you, I’m just taking the other side. 席を明示すれば、相手は攻撃だと受け取らない。ついでに If I were to start ... の型を一回撃て。冗談と本音を同時に言える唯一の文法で、これが出せる日本人はほとんどいない。',
     },
     '2026-08-27': {
         date: '2026-08-27',
@@ -48676,7 +48709,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'having the game slow down', ja: '「試合がゆっくり見えてきた」。上達を語る最良の一言。英語学習にもそのまま使える比喩。' },
             { phrase: 'we’re only scratching the surface', ja: '「まだ入口だよ」。謙遜と伸びしろを同時に出せる。プロジェクトの中間報告にも便利。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、五十号だ。祝いはしない、いつも通り宿題を出す。今日は It occurred to me that ... を撃て。お前は I think しか使わない。あれは「私の意見です」で、話がそこで止まる。occurred to me は「向こうから来た」で、聞いた側が続きを聞きたくなる。もうひとつ、今夜どこかで Put it this way. と言って言い直せ。考えている時間が、考えている顔に見える。それだけで印象が変わる。',
     },
     '2026-08-26': {
         date: '2026-08-26',
@@ -48784,7 +48818,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'is that a red flag?', ja: '「それ、まずいサイン？」。まだ起きていない問題の予兆を聞く時。軽い口調で重い話ができる。' },
             { phrase: 'in honour of him', ja: '「彼を偲んで」。亡くなった相手に触れる時の正しい register。for him では軽すぎる。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の一点はこれだ — 言い直せ。お前は弱い単語を出した瞬間、自分で分かっている。分かっているのに、そのまま流している。あれが一番もったいない。No, more than that. とか Actually, that’s not the word — と言って撃ち直せ。流暢さは「一発で当てる力」ではなく「外したと分かって撃ち直す速度」だ。今夜は最低3回、自分の英語に自分でダメ出ししろ。',
     },
     '2026-08-25': {
         date: '2026-08-25',
@@ -48897,7 +48932,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'shots fired', ja: '「今の一発効いたな」。友人同士の毒舌に対する正しい返し。否定せず「点が入った」と実況するのが英語の作法。' },
             { phrase: 'it’s not a big deal', ja: '「大したことないって」。事実ではなく相手が感じた大きさのほうを否定する言い方。gaslight の説明にそのまま使われた台詞でもある。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は中身より型だ。turns out と you don’t have a control group、この2つだけ持って帰れ。前者は話を面白くする道具で、後者は面白い話を止める道具だ。両方持っていないと、面白い話に必ず負ける。あと shots fired は今夜の先生が冗談で刺してきた瞬間に使え。笑いながら Shots fired. と言えたら、その25分は勝ちだ。',
     },
     '2026-08-24': {
         date: '2026-08-24',
@@ -49004,7 +49040,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'it’s striking distance', ja: '「あと一歩のところまで来てる」。完璧ではないが射程内。仕事の進捗報告でそのまま使える。' },
             { phrase: 'low-key', ja: '「こっそり言うけど／地味に」。文末に付けると告白のコストが下がる。若い話者はほぼ副詞として使う。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の宿題は褒め方だ。お前は先生の英語を褒める時に good と great しか使っていない。今夜は使い分けろ。難しいことをやってのけた話には You pulled that off. 、言葉選びがピタリだった時には You nailed it. 。この2つを別の場面で撃てたら、お前の英語は昨日と違う人間の英語になる。ついでに自分の失敗には It’s striking distance. と言え。負け惜しみではなく、事実だ。',
     },
     '2026-08-23': {
         date: '2026-08-23',
@@ -49112,7 +49149,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'stand up for what you believe in', ja: '「信じるものの側に立つ」。fight より穏やかで、褒め言葉としては最も安全。' },
             { phrase: 'sweat it out', ja: '「歯を食いしばって最後までやる」。逃げずに耐える系の万能句。試験の待ち時間にも使う。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日のは一個でいい。it dawned on me だ。お前は毎晩 I realized しか使っていない。あれは「気づいた」ではなく「認識した」で、話がまったく面白くならない。ゾッとした気づき、遅れてきた気づき、認めたくなかった気づき — 全部 dawn だ。ついでに先生が危ない話をしたら Don’t mess with that. と返せ。小さい語で大きいことを言うのが、この言語の作法だ。',
     },
     '2026-08-22': {
         date: '2026-08-22',
@@ -49224,7 +49262,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I am just running dry runs of problems', ja: '「起きてない問題の予行演習をしてるだけ」。不安の説明として最高の6語。自己紹介にも使える。' },
             { phrase: 'I can never shake that', ja: '「どうしても抜けない」。犬が水を振り払う絵。overcome より正直で、まだ抱えていることを認められる。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の一番は flak だ。ドイツ語の Fliegerabwehrkanone(対空砲)の略で、take flak は「地上から撃たれる」。しかも味方の地上からだ。少数意見を言う時の感じがそのまま入ってる。クリップでは flack と綴られてるが、そっちは本来「広報担当」で別の単語。もう一つ、批判の前の免責を軽く見るな。I have no love lost for him, but... を省くと、英語では擁護と受け取られる。日本語より露骨にやる文化だと思っておけ。アイゼンバーグの running dry runs of problems は不安の定義として完璧だ。起きない事件の予行演習を本番の予算でやってる。武器は3つ。(1) I get a lot of flak for this. を少数意見の前置きに。(2) I can never shake that. を「まだ抜けない」に。(3) 先生に I am just running dry runs of problems. と言え。一発で通じて、笑ってもらえる。',
     },
     '2026-08-21': {
         date: '2026-08-21',
@@ -49335,7 +49374,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'At the drop of a dime', ja: '「即座に、いきなり」。at the drop of a hat と公衆電話の10セント玉が混ざった言い方。文法的には事故だが、みんな使う。' },
             { phrase: 'It is pennies on the dollar', ja: '「二束三文だ」。1ドルに対して数セント。ストリーミング収入でも中古売却でも、値崩れを一言で。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は「炎上の経済」だ。ヒンチクリフは自分の商売と怒ってる連中の商売を、まったく同じ単語で説明してる。bait(釣る)、juice(絞る)、ride it(乗る)、move on(次へ)。本人が気づいてないのが一番の見どころだ。ロースト自体は1950年代のFriars Clubから続く形式で、「悪口は変装した褒め言葉、証拠はお前がそこに座ってること」という契約が前提にある。だから問題は部屋の中じゃなく、部屋の外の10日目にある。ゲイルズの回では get your flowers while you can smell them を持ち帰れ。葬式の花は遅い、生きてるうちに言え、という話だ。武器は3つ。(1) Do not milk it. を「引っぱるな」に。(2) It is pennies on the dollar. を値崩れの説明に。(3) 好きな先生に I wanted to give you your flowers while you can smell them. と言え。これは本当に効く。',
     },
     '2026-08-20': {
         date: '2026-08-20',
@@ -49446,7 +49486,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I am a little out of my depth', ja: '「ちょっと手に余ってます」。足がつかない深さ、が語源。正直で好感度が高い自己申告。' },
             { phrase: 'It is not water off a duck’s back', ja: '「そう簡単には流せない」。諺を否定形で使う技。フィールドの使い方がまさにこれ。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は綴りを1つ直させてくれ。sleight of hand の sleight は slight じゃない。古ノルド語の「巧妙さ」由来で、手の技のこと。手品師の言葉だ。「見えてる手と、動いてる手が違う」という指摘で、盗んだとは言わずに手口を突ける便利な武器になる。1913年の第17修正は上院議員を州議会選出から直接選挙に変えた実在の改正で、腐敗対策としては効いた。その代わりに州が連邦を掴む手を1本失った、というのがクリップの論だ。賛成しなくていい、構造だけ持ち帰れ。もう一つ、サリー・フィールドが今も sing for my supper と言うのが効いてる。オスカー2つ持ってる人の台詞だ。武器は3つ。(1) That flies in the face of everything. を強い反論に。(2) I am a little out of my depth. を正直な自己申告に。(3) 誰かが上手そうに見えたら、その裏の invoice を想像しろ。make it look effortless の後ろには必ず徹夜がある。',
     },
     '2026-08-19': {
         date: '2026-08-19',
@@ -49558,7 +49599,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'A good case in point is...', ja: '「いい例で言うと」。抽象論から具体例に移る時の合図。4語でプレゼンが締まる。' },
             { phrase: 'Everyone just looked the other way', ja: '「みんな見て見ぬふりをした」。ignore より共犯の匂いがする。組織の話で効く。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の目玉は from whole cloth だ。元は「継ぎ目のない本物の生地」で「正真正銘」の意味だったのに、19世紀のアメリカで完全に反転して「まるっきりのでっち上げ」になった。同じ4語が真逆になる。英語は意味を守ってくれない、という一番いい証拠だ。AIの話にこの言葉が使われてるのも出来すぎてる。実務で一番効くのは tap dancing。答えを持ってない人が全力で動いて時間を稼ぐ、あれ。一度覚えたら一生見えるようになる。歴史家の回では dereliction of duty(職務怠慢)を役人ではなく市民に向けて使ったのが上手い。武器は3つ。(1) That runs counter to what I have seen. を冷静な反論に。(2) A good case in point is... を例示の合図に。(3) 話が噛み合わない時 I think we are both tap dancing here. と笑え。空気が変わる。',
     },
     '2026-08-18': {
         date: '2026-08-18',
@@ -49670,7 +49712,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I cannot just brush that off', ja: '「あれは流せない」。ignore より感情が残る。パンくずを払う仕草が語源。' },
             { phrase: 'When it comes to that, I am useless', ja: '「その件に関しては、俺はまるでダメ」。話題を限定してから自己申告する型。自己紹介で使いやすい。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は「主張の作り方」を解剖する回だ。ギザの地下構造の話は査読論文になっておらず、エジプトの当局も否定している。そこは書いた。その上で英語として面白いのは、この主張が使う3語 — paradigm(クーン1962)、confirmation bias(ワイソン1960年代)、gatekeeper(レヴィン) — が全部アカデミア製で、そのアカデミアに向けて撃たれてること。批判の語彙はたいてい批判される側が作る。覚えておくと議論が立体になる。あと sure of one thing の技を盗め。確信を1点に絞ると、その1点だけ異常に強く見える。誠実にも不誠実にも使える。武器は3つ。(1) That gives me pause. を上品な異議に。(2) When it comes to X, ... で話題を絞れ。(3) 相手の答えが優等生すぎたら You sound PR trained. と笑え。',
     },
     '2026-08-17': {
         date: '2026-08-17',
@@ -49782,7 +49825,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I had a few close calls', ja: '「何度か危なかった」。call は審判の判定。どっちに転んでもおかしくなかった、というニュアンス。' },
             { phrase: 'You just have to gut it out', ja: '「気合いで乗り切るしかない」。技術ではどうにもならない時の言葉。根性論だが、英語でもこれしかない場面はある。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の芯は you hit your mark, do not move だ。ジャッカスの男が使ってるのは映画撮影の用語で、床のテープの位置に立って動くな、という意味。一番無茶に見える連中が、実は一番「立ち位置」を守ってる。無鉄砲の反対語が準備だという話で、これは仕事でも同じだ。ノックスビルのキャリアが防弾チョッキから始まってるのも効いてる。金がないのに、そこだけはケチらなかった。Do not skimp on that. は使える。デュカブニーの回はイェールの英文学修士がユングを語ったあとにバスケの悪口を二重否定で言う、という落差そのものが教材だ。武器は3つ。(1) Do not skimp on that. を「そこはケチるな」に。(2) That went sideways. を軽い失敗報告に。(3) しんどい時に I just have to gut it out. と言え。根性論だが通じる。',
     },
     '2026-08-16': {
         date: '2026-08-16',
@@ -49894,7 +49938,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'He was Johnny on the spot', ja: '「必要な時にちゃんといた」。古いアメリカ口語。同僚を褒める時に効く、ちょっと洒落た言い方。' },
             { phrase: 'We stepped up our game', ja: '「レベルを上げた」。improve より前のめり。チームの進歩を語る時に自然。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は「戦争を語る英語は全部借り物」という話だ。boots on the ground、running cover for、target practice、seen this movie。どれも軍隊か映画館から借りてきてる。政治の話をしてるつもりで、実は身体と映像の話をしてる。ここに気づくと英語ニュースが立体になる。特に I would not put it past him は日本語からは絶対に作れない形だから丸暗記しろ。否定してるのに疑ってる、あの構造。ローゲンの回では firm closure が最高だ。ドアを閉められただけなのに法律用語で言う。わざと格式を間違えるのが英語のギャグの基本技で、これは翻訳しても生き残る数少ない笑いだ。武器は3つ。(1) Not a shred of evidence. を強い否定に。(2) I would not put it past him. を「やりかねない」に。(3) 先生が予想を語ったら I have seen this movie before. と乗っかれ。会話が一段進む。',
     },
     '2026-08-15': {
         date: '2026-08-15',
@@ -50006,7 +50051,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'A blessing and a curse', ja: '「良し悪しだね」。長く続くもの、才能、人気。プラスとマイナスが同じ根から出ている時にぴったり。' },
             { phrase: 'She is a good tennis partner', ja: '「打ち返しがいい相手」。同僚や共演者への最上級の褒め言葉。仕事仲間を褒める時にこれが出ると格好いい。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の本体は「プロが名曲を却下した」記録だ。Jack & Diane は1982年のアメリカ1位で、彼の唯一のナンバーワン。それをレーベルが嫌がった。ここから学ぶべきは判断の話じゃなくて、断られた側の英語だ。get on with it(さっさとやれ)、drop you(切る)、give them an inch(少しでも譲れば)。全部そのまま仕事で使える。あと keep it simple, stupid は精神論じゃなくて1960年ごろの航空機設計の原則で、「現場の整備士が野原で直せる構造にしろ」という意味だ。由来を知ると重みが違う。ダンズの putting vodka in the freezer も盗め。抽象を説明せず絵で出す。武器は3つ。(1) A blessing and a curse. を「良し悪しですね」に。(2) I grew up in public. を早熟な経験の説明に。(3) 会話が噛み合った先生に You are a good tennis partner. と言え。最高の褒め言葉になる。',
     },
     '2026-08-14': {
         date: '2026-08-14',
@@ -50118,7 +50164,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'It was a little bit hairy', ja: '「ちょっとヤバかった」。危なかった状況の軽い言い方。dangerous と言うより余裕があって大人っぽい。' },
             { phrase: 'I am just practising what I preach', ja: '「言ってることを自分でやってるだけ」。説教くさくならずに自分の行動を説明できる。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は「推測の英語」だ。who is to say / makes you wonder / gets thrown into question。この3つは、断定せずに主張を置いておくための道具で、誠実に使うことも逃げに使うこともできる。両方できると知っておけ。あと fathom を覚えろ。1ファゾムは両腕を広げた長さ(約6フィート)で、ロープを腕一本分ずつ手繰って水深を測ったのが語源。impossible to fathom は「ロープが尽きた」って意味だ。ネイティブもほぼ知らない。最後に罠が1つ。for a minute は「ちょっとの間」ではなく「けっこう長い間」。字面と逆だから、これは考えずに丸暗記しろ。武器は3つ。(1) Who is to say? を締めに。(2) It was a little bit hairy. を「危なかった」に。(3) 先生の話が大きすぎたら Do not even get me started. と笑え。会話のテンポが上がる。',
     },
     '2026-08-13': {
         date: '2026-08-13',
@@ -50229,7 +50276,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'You missed the mark', ja: '「狙いを外したね」。wrong より穏やかで、努力は認めつつ的外れだと言える。フィードバックの言葉として優秀。' },
             { phrase: 'There is no going back from that', ja: '「あれはもう戻れない」。一線を越えた時の4語。喧嘩でも決断でも、重さがそのまま出る。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は「時間と金」の語彙だ。bust your ass(稼ぐ側)と lose your ass(失う側)が同じ体の部位で対になってるの、覚え方として最高だろ。あと little の使い方を盗め。a good little run の little は小ささじゃなく親しみで、日本語の「ちょっとした」だ。これが入るだけで英語が急に人間になる。カラーノ対ラウジーは15年言われ続けて一度も組まれなかった。組まれなかったから今も語られる、という構造まで含めて、話のネタとして強い。武器は3つ。(1) a good little run を「そこそこ良い時期があった」に。(2) You missed the mark. を柔らかいダメ出しに。(3) 先生に I have been busting my ass at work this week. と言え。忙しさの説明が一段生々しくなる。',
     },
     '2026-08-12': {
         date: '2026-08-12',
@@ -50341,7 +50389,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I feel like a fish out of water', ja: '「完全に場違いです」。新しい環境の第一声として最適。自嘲になるので相手も助けやすくなる。' },
             { phrase: 'She knows how to press my buttons', ja: '「あいつは俺のツボを分かってる」。普通は「怒らせ方を知ってる」の悪い意味。文脈で褒めにもなる、その両義性ごと覚える。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は「意見を変えた人の話し方」だ。ペリーは I used to think とは言わない。I am tough on crime. と現在形のまま置いて、そこに新しい主張を足す。過去の自分を捨てる人は信用されない、足す人は信用される。これは仕事のメールでもそのまま使える構造だから盗め。もう一つ、be-all and end-all はマクベス。「これ一発で全部片付く」と思い込んだ男の台詞で、オピオイドの話に出てくると皮肉が効きすぎてる。誰も気づいてないところがまた良い。武器は3つ。(1) Long story short を話の圧縮に。(2) That seems too good to be true. を疑いの第一声に。(3) 新しい先生の初回に I always feel like a fish out of water at the start. と言え。正直で、しかも上手い。',
     },
     '2026-08-11': {
         date: '2026-08-11',
@@ -50453,7 +50502,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'On paper, it sounds great', ja: '「理屈の上ではよさそう」。この後に but が来ると全員分かってる。批判の前振りとして上品。' },
             { phrase: 'It is more of a taste thing', ja: '「まあ好みの問題だよね」。議論を終わらせずに角を落とす一言。断定を避けたい時の必需品。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の収穫は planted a seed と come full circle の使い分けだ。seed は「他人に蒔かれた始まり」、circle は「終わりから見て初めて分かる形」。人生の話をする時、この2つをちゃんと選ぶだけで英語が知的になる。もう一つ、hokey を覚えろ。「クサい・照れくさいほど素直」という意味で、自分の発言に先回りして貼っておくと、その後で本気の話ができる。英語圏でも真面目な話は恥ずかしいんだよ。canary in the coal mine は1911年から1986年まで実際に炭鉱でやってた話で、音楽業界が最初にデジタル化で殴られた、という比喩に使われてる。武器は3つ。(1) That planted a seed. を転機の説明に。(2) On paper, it sounds great, but... を批判の前振りに。(3) 意見が割れたら It is more of a taste thing. で降りろ。喧嘩にならない。',
     },
     '2026-08-10': {
         date: '2026-08-10',
@@ -50564,7 +50614,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I am in the money now', ja: '「乗ってきた・ハマってきた」。競馬の入着から来た言い方。3回目のテイクで手応えが出た、みたいな時に。' },
             { phrase: 'I try to make big swings', ja: '「大振りしにいく」。野球由来で、外す前提で大きく狙うという宣言。安全策を選ばない自分を語る時にかっこよく決まる。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の核は comms という一語だ。「伝え方をミスった」は謝罪の顔をした話題転換で、英語の公的な場面ではこれが毎日走ってる。日本語の「誤解を招く表現がありました」と同じ機械。使えるようになるより、聞いた瞬間に「で、中身は?」と思えるほうが価値が高い。もう一つ、flooding the zone はアメフト由来で「情報を大量に流して読ませなくする」。この2つを知ってると英語ニュースの解像度が変わる。武器は3つ。(1) I went down a rabbit hole on that. を夜更かしの報告に。(2) I am in the money now. を「乗ってきた」に。(3) 先生が謝った時に So is that the comms, or the decision? と返せ。一気に議論が大人になる。',
     },
     '2026-08-09': {
         date: '2026-08-09',
@@ -50676,7 +50727,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'It got blown out of proportion', ja: '「話が大きくなりすぎた」。炎上、噂、社内の揉め事、全部これで説明できる。' },
             { phrase: 'That won’t make much of a dent', ja: '「それじゃ大して効かない」。努力は認めつつ規模が足りないと言う、角の立たない否定。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の一撃は that doesn’t sell a book だ。「本当の話は地味だから広まらない」という、噂の物理法則を7語で言ってる。ヘレン・ケラーは1904年にラドクリフを出た実在の人で、1946年に地中海の上で操縦桿を握った記録もある。事実のほうが派手なのに、陰謀論のほうが速い。理由は簡単で、あっちには秘密と悪役と「お前だけが知ってる」が付いてくるから。もう一つ、森の回の a biological cathedral は語彙の見本だ。beautiful と言わずに「大聖堂」と言う。形容詞じゃなく建物で殴る。武器は3つ。(1) That doesn’t sell. を「それじゃ刺さらない」に。(2) It got blown out of proportion. を炎上の説明に。(3) 先生の話が疑わしい時 I am just trying to be charitable, but... と切り出せ。喧嘩にならずに疑える。',
     },
     '2026-08-08': {
         date: '2026-08-08',
@@ -50788,7 +50840,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I am on edge today', ja: '「今日ピリピリしてる」。nervous より「いつ来るか分からなくて気が張ってる」感じ。締切前や不穏な職場に。' },
             { phrase: 'Put me on game', ja: '「その界隈の常識、教えてくれ」。teach me より内側に入れてもらう感じ。趣味・業界・店、何にでも使えるが、かなりカジュアル。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日は「考えている最中」の英語だ。英語は思考をそのまま thinking とは言わず、churn(かき混ぜる)、where my head goes(頭が行く先)、creeping in(忍び寄る)みたいに、動きと機械で言う。ここを真似すると英作文が一気に生きる。もう一つ、彼が自分の案を先に lame と切り捨てる順番に注目しろ。欠点を自分で言ってから話を続けるのは、英語の会議で信用を買う一番安い方法だ。I Am Legend は1954年のマシスンの小説で、廃墟の街を一人で歩く型の元祖。ここを知ってると「a type deal」で相手が何を借りたか分かる。武器は3つ。(1) I never got around to it. を積みタスクに。(2) I think we are on to something. を「いけるかも」に。(3) レッスンで話が転がり始めたら This is getting my brain churning. と言え。褒め言葉になる。',
     },
     '2026-08-07': {
         date: '2026-08-07',
@@ -50899,7 +50952,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I wouldn’t be caught dead in that', ja: '「死んでもそれ着てるとこ見られたくない」。誇張で笑いを取る拒否の定番。服・店・音楽、何にでも。' },
             { phrase: 'I’m light friends with him', ja: '本人がその場で作った造語。「そこそこの友達」。辞書にないが意味が完全に伝わる、英語の遊び方の見本。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、この号は「調べ直したら別物だった」の見本だ。クリップだけなら感動話で終わるが、実際は1990年に息子を亡くし、1992年の法廷で赦し、1993年に76の組を公園に集めて止めた男の話だった。ジムの名前まで実話につながっている。そして I’ll leave 99 to go get one と heavy yoke は本人の言葉ではなく引用だ。今日の教訓 — 相手が急に格好いい言い回しを使ったら、十中八九どこかからの借り物。出典を知っていると会話が一段深くなる。武器は3つ。(1) still at it を近況報告に。(2) unpack that を「まだ整理中です」に。(3) 先生が重い話をしたら That must have taken a long time to unpack. と返せ。同情ではなく理解の言葉になる。',
     },
     '2026-08-06': {
         date: '2026-08-06',
@@ -51012,7 +51066,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I have a hard out at eleven', ja: '「11時には絶対に出ないといけない」。業界語だが会議でも通じる。I have to leave より予定が固いことが伝わる。' },
             { phrase: 'We suit up and show up', ja: '「四の五の言わずに支度して現場に立つ」。頭韻で語呂がいい職業倫理の一句。仕事観を聞かれた時の答えとして強い。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日の狙いは「一昨日と繋げて読む」だ。8/4の号でボストロムが言っていた問題 — 誰が使っていいのか、止められるのか — を、二千年前の詩が先にやっている。会話で出せると強い: The Mahabharata already had an access-control problem. 武器は3つ。(1) at the end of the day で長話を畳む。(2) makes you wonder で「断定しないけど気になる」を作る。(3) 趣味や仕事を聞かれたら The great pleasure of X is doing things outside my strike zone. 野球の比喩は確実に通じるし、日本人の口からはまず出てこない。おまけ: check the gate と a hard out は、意味を知っていること自体が「こいつ本物を聴いてるな」の証明になる。',
     },
     '2026-08-05': {
         date: '2026-08-05',
@@ -51121,7 +51176,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'Give them their flowers', ja: '「生きてるうちにちゃんと称えてやれ」。今どきの定番。人を褒める話題で一発で決まる。' },
             { phrase: 'I’ll let that slide', ja: '「今回は見逃す」。気づいた上で流す、というニュアンスまで出る。冗談めかして使うのが本来の使い方。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日のおいしいところは blow up と pull off と set the pace の3つ。どれも「日本人が言えない動詞句」で、しかも自分の話に流用できる。バイブコーディングの話なら I pulled it off が最短で通じるし、チームの話なら I set the pace が効く。I’d be lying if I said 〜 は今週の暗記枠だ。「体調どう?」「英語伸びてる?」に Yes/No で終わらせずこれで返せ。gnarly と dope は聞き取れればいい、自分から使うな — 40代が言うと若作りに聞こえる言葉が英語にもある。ハリバートンの回は「質問しないで観察から入る」会話術の見本。次のレッスン、先生の第一声を真似てみろ: You sound like you slept well today. 質問より距離が縮む。',
     },
     '2026-08-04': {
         date: '2026-08-04',
@@ -51232,7 +51288,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'Let me just cut to the chase', ja: '「前置きは抜きで本題に行く」。会議でもレッスンでも、話が長くなった自覚がある時に。' },
             { phrase: 'Out of the blue', ja: '「何の前触れもなく」。suddenly より驚きが乗る。連絡が突然来た話は全部これで始められる。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、今日から新聞の作りを変えた。抽象論説とMLBはやめて、前日に自分が聴いた回だけを素材にする。昨日のボストロムとテッド・ダンソンが、今日は英字新聞になって戻ってくる — これで同じ表現に3回当たる (聴く → 読む → 登録する)。武器は3つ。(1) The truth is, we don’t know how it’ll pan out. 分からない時に堂々と使え。黙るより100倍いい。(2) different strokes for different folks は先生の趣味を否定しかけた時の安全装置。(3) 固有名詞を動詞にする遊び — I studied it like Single White Female. のノリで I Google Mapped the whole trip. くらいは自分で作れる。おまけ: 論説の一番強い単語は anachronism。今日一日で3回使え。',
     },
     '2026-08-03': {
         date: '2026-08-03',
@@ -51335,7 +51392,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'nobody is chasing you', ja: '「誰も追いかけてない」。焦っている人に言う一言。命令形でなく事実として置くのが効く。' },
             { phrase: 'that is like blaming the tape measure for your shape', ja: 'blame A for B=「BのことでAを責める」。八つ当たりを指摘する比喩の型。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'A confession about this page. This paper has run for twenty-six consecutive issues, and the man who reads it keeps a counter for his English lessons that stands at twenty-three days. So today’s leader is a stone thrown from inside the house. Coach Daryl of Lincoln High is right that you earn the right to criticise a streak by having one — and he is also, quietly, describing how this paper gets written on a bad night. He benched a boy the week of Homecoming; this desk has never once benched itself. If tomorrow’s edition is safe and tidy, you will know the counter won.',
     },
     '2026-08-02': {
         date: '2026-08-02',
@@ -51438,7 +51496,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'word had got round', ja: '「噂が回った」。get round(英)/get around(米)。主語を誰にもしないで情報の伝播だけを言える便利な形。' },
             { phrase: 'that is the worst possible news for him', ja: '「それは彼にとって最悪の知らせだ」。褒めと脅しを同時に渡すときの締め。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Two pieces today that refuse to end well. Flood lost his case, his career and most of his thirties, and the men who benefited never met him. Flo — who has unlocked the diner on Route 66 at five in the morning for twenty-nine years — then turns round and tells this desk that survivorship bias has become a hiding place for people who have opened nothing, which is a fair hit on a paper written by a man who has opened nothing either. The table in the fiction has meanwhile banned old losses. This desk notes, without comment, that it has been retelling the same story about a rude teacher for four days.',
     },
     '2026-08-01': {
         date: '2026-08-01',
@@ -51541,7 +51600,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'that is a different complaint', ja: '「それは別の苦情だ」。論点をずらした相手を、静かに切り分ける一言。' },
             { phrase: 'you may as well sit down', ja: 'may as well=「どうせなら〜したらいい」。歓迎とも呆れともつかない絶妙な招き方。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'A note on a change. From today the interview column is filled from this paper’s own patch rather than by strangers: today it is Ms. Reyes, who teaches English at Lincoln High and came to it from eight years in a Boston bank. She is not a neutral witness and that is the point — she has lived inside the alternative the leader recommends, and she says it produced a floor of excellent, miserable people who wrote their numbers up anyway. This desk publishes the leader anyway, which readers may take as either fairness or cowardice. Elsewhere: the most famous home run in the sport may have been assisted by a telescope, and the sport has declined for seventy-five years to rule on it. And the new fiction opens at a table where the prize goes to whoever lost the most this week. Book One was about a household surviving. This one is about what it costs to own something worth losing.',
     },
     '2026-07-31': {
         date: '2026-07-31',
@@ -51644,7 +51704,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'just like old times', ja: '「昔みたいだな」。再会・懐かしい状況の定番。It’s just like old times! と感嘆で使う。' },
             { phrase: 'give it here', ja: '「よこせ、貸してみろ」。give it to me のぶっきらぼうな口語形。リヴァイの全せりふがこれ一言。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Last day of July, and the paper’s advice is the opposite of a countdown: nothing worth starting is closed to you. Ohtani was told to pick a half and refused; the watchmaker arrived at forty-one carrying eighteen years of the wrong career, which turned out to be the right one. Book One ends with the cleanest heist in fiction — nobody could take the ball, so Levi confiscated it. See you in August.',
     },
     '2026-07-30': {
         date: '2026-07-30',
@@ -51747,7 +51808,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'retirement was dull', ja: 'dull 一語で近況を切り捨てる。「隠居は退屈だった」。長い説明の代わりに形容詞1つで済ませる英語らしい省略。' },
             { phrase: 'it’s fashion', ja: '「これはファッションだ」。突っ込まれる前に開き直る定番ギャグ。it’s + 名詞の言い切りは説明拒否のサイン。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Two blues, a compass where a left hand should be, and a ledger that keeps the walks beside the strikeouts. Learn the word, gain the eye — and let English be a window today, not a puzzle. In the house, the ball is in play and the deadline is midnight on the 31st. Tomorrow: the finale.',
     },
     '2026-07-29': {
         date: '2026-07-29',
@@ -51850,7 +51912,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'leaving makes the loss official', ja: 'make + O + 形容詞。「辞めることで負けが公式になる」。撤退できない心理の核心。' },
             { phrase: 'it’s cleaner though', ja: '文末の though=「でも〜だけどね」。壁を壊した後の開き直りに最適。会話の though は文末に置ける。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'A loss weighs double, and that is the whole reason people stay. Run the poker player’s test on one thing today: would you buy in again, starting fresh? Williams was handed the safe .400 and played instead. In the house, the landlord has announced a contest, the mailman is still recovering, and the ice cream debt is unresolved: the finish line was in the wall.',
     },
     '2026-07-28': {
         date: '2026-07-28',
@@ -51953,7 +52016,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'cheapest luxury in the hotel', ja: '最上級 + 逆説の組み合わせ。「ホテルで一番安い贅沢」。安いものを最上の賛辞で持ち上げる言い回し。' },
             { phrase: 'keeping it for a friend', ja: '「友達に頼まれて預かってるだけ」。言い訳の世界標準。for a friend を付けると全部他人事になる。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Say the next name back within three seconds and hang it on an umbrella. Ripken pairs with the lesson: the name you keep and the Tuesday you show up for are the same skill, compounded. In the house, the fridge now has a legal status and the neighbour has texture. Lock the windows — Killua already did.',
     },
     '2026-07-27': {
         date: '2026-07-27',
@@ -52056,7 +52120,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'file it under tomorrow', ja: 'file under X=「Xという分類に放り込む」。面倒事を「明日」フォルダに入れる、先送りのユーモア表現。' },
             { phrase: 'on the grounds that …', ja: '「〜という理由で」。ちゃんとした根拠っぽく聞こえるので、くだらない理由に使うと笑いになる(最強だから広い部屋、など)。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'New serial starts today — three worlds, one flat, and a freezer with a tenant nobody voted for. Take the placebo lesson straight: ritual is a real ingredient, so build one around your English (same time, same desk, same coffee). Ichiro found an empty street and ran down it for 262 hits. Yours is listening practice at dawn. Tomorrow: the finger explains itself.',
     },
     '2026-07-26': {
         date: '2026-07-26',
@@ -52159,7 +52224,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'hold it all a bit looser', ja: 'hold O + 形容詞(loose の比較 looser)。「もっとゆるく持て」。執着を手放す助言の型。' },
             { phrase: 'the best of me', ja: '「自分の一番いい部分」。the best of + 人。came from … と続けて「自分の良さは〜から来た」。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'First book closes on a rainy street and an empty letterbox — read the last chapter slowly, then let it go. A week ends; a self ends too, quietly, the way they always do. New story next edition: same paper, a stranger’s door. Steal one line, take one walk, and meet the person you’re becoming halfway.',
     },
     '2026-07-25': {
         date: '2026-07-25',
@@ -52262,7 +52328,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'that little surprise is the whole thing', ja: 'the whole thing=「肝心なのはそこ・それが全て」。核心を指す口語。' },
             { phrase: 'thank goodness', ja: '「ありがたいことに・やれやれ」。thank God の穏やかな言い換え。安堵の相づち。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Chase the shiver this week — the loved song, the almost-familiar. In the story the net tightens: a torn line names a sister, a phone rings in a far-off town, and the woman everyone thought was gone is already on the train. Tomorrow it ends. Read this one for the sound it makes.',
     },
     '2026-07-24': {
         date: '2026-07-24',
@@ -52365,7 +52432,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'give me an hour and I’ll surprise you', ja: '同じ 命令文+and の型。「1時間なら驚かせてみせる」。制約が力を生むことを一言で。' },
             { phrase: 'the clock is your friend', ja: '「締切は味方だ」。even when it feels like your enemy と続けて、嫌なものを再評価する言い回し。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Put a clock on one open task this week and watch it get done. In the story the calendar tightens too: a rushed hand breaks off at “go to—”, the rest torn cleanly away by someone who knew which line mattered. Friday was her deadline. Whose was it, really? Read it twice.',
     },
     '2026-07-23': {
         date: '2026-07-23',
@@ -52468,7 +52536,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'do it for yours', ja: 'for yours=for your (own) sake「自分のために」。前の for their sake と対に。「相手のためでなく自分のためにやれ」。' },
             { phrase: 'put the rock down', ja: '「その石を下ろせ」。恨みを重い石にたとえる命令形。put down=下に置く、手放す。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Set one old grudge down this week; you are the only one still carrying it. In the story, a shoebox turns rejection into its opposite — a year of letters written and never sent, stopped an arm’s length from the post. She never let go of him. Someone made sure he never knew.',
     },
     '2026-07-22': {
         date: '2026-07-22',
@@ -52571,7 +52640,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'my gut is fast, not always right', ja: 'gut=直感。「直感は速いが、いつも正しいわけではない」。not always=部分否定。' },
             { phrase: 'nine times out of ten', ja: '「十中八九」。確率を口語で言う定番。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Trust the face slowly this week; the eye is quick and proud, and often wrong. In the story, one small detail cracks the case open — a woman who walked three streets to mail every letter, past the box at her own door. People with nothing to hide use the nearest post. Read on.',
     },
     '2026-07-21': {
         date: '2026-07-21',
@@ -52674,7 +52744,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'with a screen buzzing at you', ja: 'with + O + doing の付帯状況「画面が自分に向かってブーブー鳴っている状態で」。buzz at=(通知が)せかす。' },
             { phrase: 'it stays', ja: '「それは残る」。手紙は消えず残る、を短く。switch off して失う screen と対比した締め。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Write one real letter this week to someone who’d never expect it. Then read Chapter II: a man in a far-off port has been writing into silence for a year, and the woman he writes to is not the one reading. Some letters wait a very long time to be answered. His clock runs out on the thirtieth.',
     },
     '2026-07-20': {
         date: '2026-07-20',
@@ -52777,7 +52848,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'my head does its best thinking', ja: 'do one’s best thinking=「一番よく頭が働く」。無生物 head を主語にする軽い言い方。between doors=配達の合間に。' },
             { phrase: 'start getting old', ja: 'start doing「〜し始める」。the day I start getting old=「老け始める日」。歩くのをやめること=老いの始まり、の比喩。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'New book, new street. Take one idea for a walk this week and let it tap you on the shoulder. Downstairs at number twelve, a letter arrives with the wrong name on it — and a man opens a door he can’t close. This one is written plain on purpose; read it once for the story, then again for the words.',
     },
     '2026-07-19': {
         date: '2026-07-19',
@@ -52879,7 +52951,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'bit by bit', ja: '「少しずつ・徐々に」。gradually のくだけた言い方。衰退・変化をしみじみ語るときに合う。' },
             { phrase: 'a passenger with a steering wheel', ja: '「ハンドルを握った乗客」。運転しているのに主体性がない皮肉。X with a Y で辛辣な比喩を作る型。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'First book closes: two figures, no light, no fear. Go get pleasantly lost this week and find what only wrong turns hand you. A new story starts next edition — same lamp, colder water. Read the ending aloud, then step outside.',
     },
     '2026-07-18': {
         date: '2026-07-18',
@@ -52981,7 +53054,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'a great servant and a terrible master', ja: '「良き従者、悪しき主人」。道具・お金・技術を評するときの決まり文句。使いこなす分にはいいが、支配されると危うい、の意。' },
             { phrase: 'you’re lost', ja: 'be lost=「道に迷う」だけでなく「途方に暮れる・お手上げ」。The second you trust it … you’re lost で「〜した途端に迷う」。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'The map is not the walk. Trust the plan, then check the ground — and when they disagree, the ground wins. Upstairs in the tower, Halloran writes the truest words the ledger ever held. Copy one line into your own hand before you sleep.',
     },
     '2026-07-17': {
         date: '2026-07-17',
@@ -53083,7 +53157,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'you have to build up to it', ja: 'build up to=「徐々に慣らして到達する」。いきなりでなく段階的に、の意。it=長い沈黙に耐えること。' },
             { phrase: 'it stops being scary', ja: 'stop doing で「〜でなくなる」。it stops being scary=「怖くなくなる」。慣れによる変化を言う軽い口語。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Put the earphones away for one walk and let the quiet talk back. Read the changeup piece too — power is sometimes the thing you hide. In the tower, the keeper decides tonight, and the light with him. Read this one in silence; it lands harder that way.',
     },
     '2026-07-16': {
         date: '2026-07-16',
@@ -53185,7 +53260,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'the only face they’ll speak to all day', ja: 'the only face (that) they’ll speak to … の接触節。speak to の to が末尾に残る形。「その日話す唯一の相手」。' },
             { phrase: 'you don’t forget that once you notice it', ja: 'once=「いったん〜すると」の接続詞。notice it=それに気づく。気づいてしまうと忘れられない、という実感の型。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'The strangers matter more than we admit — nod at one today, tip the barista, learn the neighbour’s name. In the tower, kindness turns out to be the key that fits the wrong lock; mind which voice you answer. Steal one weak-tie sentence and use it before dark.',
     },
     '2026-07-15': {
         date: '2026-07-15',
@@ -53287,7 +53363,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'the stuff actually sticks', ja: 'stuff=(漠然と)中身・知識。stick=定着する・頭に残る。actually で「今度はちゃんと」感を出す。' },
             { phrase: 'I’d rather be bored in October than panic in January', ja: 'would rather A than B=「BよりむしろAがいい」。A・B を動詞の原形で揃える(be bored / panic)のがコツ。先の楽のために今の退屈を選ぶ型。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Forget more, on purpose — read the lead and stop apologising for the names you drop. The batter’s box teaches the same trick: the fastest reflex is really slow study, sped up. And the ledger gives up its oldest secret this week; read Eachann’s hand twice, the way memory likes it.',
     },
     '2026-07-14': {
         date: '2026-07-14',
@@ -53389,7 +53466,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'what’s left over', ja: 'be left over=「余る・残る」。what’s left over=「余ったもの」。ここでは「作品はおまけ、本体は過程」というニュアンス。' },
             { phrase: 'my head goes quiet', ja: 'go + 形容詞=「(ある状態)になる」。go quiet=静かになる。「頭の中が静かになる」あの感覚。go crazy / go cold なども同型。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'A short defence of doing things badly — read it, then go be gloriously mediocre at something before bed. Note the baseball piece: even a game can outlaw its own cleverness to stay alive. Downstairs, the tower finally admits what its light was really for. Underline one clumsy sentence and love it anyway.',
     },
     '2026-07-13': {
         date: '2026-07-13',
@@ -53491,7 +53569,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'they think they do', ja: '代動詞 do が want more の繰り返しを avoid。「(本人は)欲しいと思っている(が実は…)」の含み。会話の相づち返しに便利。' },
             { phrase: 'I’d rather do three things right than thirty things okay', ja: 'would rather A than B=「BよりAがいい」。right / okay を副詞的に効かせ「30を可もなく不可もなくより、3をきちんと」。質か量かを言う型。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Five editions in. The tyranny of the aisle is real — pick one hard thing today and let the rest go. Note the bunt, too: some of the best moves cost you the credit. And the story turns tonight — the keeper found a third word where there were only ever two. Steal a sentence, and say it before the jam melts.',
     },
     '2026-07-12': {
         date: '2026-07-12',
@@ -53594,7 +53673,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'the trick isn’t X — it’s Y', ja: '「コツはXじゃなくてYだ」。the trick is … で「秘訣は〜」。ダッシュで言い直して要点を強調する会話の型。' },
             { phrase: 'weirdly, yeah', ja: '「意外だけど、そうなんだ」。文頭の weirdly=「不思議なことに」。自分でも意外な事実を認めるときのクッション。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Four editions, and the boy is finally on the stair. Read the lead if the summer already feels half-gone — then do one unfamiliar thing today and make the week longer. The story ends its first act next edition; do not answer the door.',
     },
     '2026-07-11': {
         date: '2026-07-11',
@@ -53696,7 +53776,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'now that I know it, I see it everywhere', ja: 'now that S V=「今や〜なので」。一度知ると急に目につく、あの感覚。学習の実感を語る鉄板フレーズ。' },
             { phrase: 'it hands you a new pair of eyes', ja: 'hand 人 X=人にXをぽんと与える。「新しい視点をくれる」を a new pair of eyes(新しい目)で比喩的に。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Three editions now, and the ledger still writes back. Read the lead for the words English never got around to inventing — steal one, and carry it into a sentence of your own before the day ends. The story turns darker this week; read it with the lamp on.',
     },
     '2026-07-10': {
         date: '2026-07-10',
@@ -53798,7 +53879,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'I get that a lot', ja: '「それ、よく言われる」。相手のありがちな反応を軽く受け流す一言。' },
             { phrase: 'hang on, you’ll get it', ja: '「まあ待って、ちゃんと分かるから」。hang on = ちょっと待って。you’ll get it = 分かるようになる。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Two editions in, and the light still burns. Read the story for the chill, the science for the why, and steal one sentence you wish you had written. Say it aloud before you sleep.',
     },
     '2026-07-09': {
         date: '2026-07-09',
@@ -53900,7 +53982,8 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
             { phrase: 'give me one boring hour and …', ja: '命令形 + and で「〜さえあれば…だ」の口語条件文。If you give me… より短く力強い。' },
             { phrase: 'resist the reflex to reach for your phone', ja: '「つい〜する癖をこらえる」。reach for = 手を伸ばす。reflex to do で「反射的に〜してしまう」。' },
         ],
-        editorsNote: '',
+        editorsNote:
+            'Read it once for the story, twice for the words, and once aloud for your tongue. Underline what you cannot say yet — that list is tomorrow’s you.',
     },
 };
 
@@ -53908,6 +53991,191 @@ export const EDITIONS: Record<string, NewspaperEdition> = {
 // 日次号 (EDITIONS) とは別枠。カレンダーの1日1号の枠と衝突させず、専用チップから開く。
 // theme:'aot' で AOT 仕様の見た目に切り替わる。話す素材として面白さ・中身重視で書く。
 export const EXTRA_EDITIONS: NewspaperEdition[] = [
+    // クリップ号外 (2026-09-25〜 試作)。別ファイル: newspaper-clip.ts
+    ...CLIP_EDITIONS,
+    // ============================================================
+    // 号外 — 試験会場号 (2026-10-05)。英検1級 一次 (10/4 日) の当日を号外にした。
+    // 素材: DMM 第129夜 (dmm-2026-10-04-judgment-day) + note #258 (盛ってよい、本人承諾済み)。
+    // theme:'exam' = ExamSheet (マークシートの朱罫 + 3時を指す時計の紋章)。
+    // lead = 事件報道 / rail = 時計の鑑定 / voices = 受験者への聞き取り / story = 一番前の席の女の人から見た同じ午後
+    // ============================================================
+    {
+        id: 'slow-watch-eiken',
+        date: '2026-10-05',
+        editionNo: 0,
+        extra: true,
+        theme: 'exam',
+        mastheadTitle: 'The Tonio Times',
+        mastheadTagline: '試験会場号 — 英語は合っていた。それ以外が全部ちがった',
+        mastheadKicker: '号外 · EXTRA · 試験会場号',
+        weekdayLong: 'Monday, October 5, 2026',
+        motto: 'TEMPUS FUGIT, NISI EMPTUM CENTUM YEN — "Time flies, unless the watch cost 100 yen."',
+        quote: {
+            text: 'A lucky man is not the one who finds a convenience store. A lucky man is the one who brought an eraser.',
+            source: 'Overheard outside an exam hall',
+        },
+        lead: {
+            kicker: 'EXAM HALL · SUNDAY, OCTOBER 4 · 号外',
+            headline: 'Man aces English test, fails everything around it',
+            standfirst: 'A candidate sitting the top grade of a national English exam got almost every reading and listening question right on Sunday. He also forgot his eraser, lost his phone to an invigilator, sat in the worst seat in the room and wore a watch that slowed down time.',
+            byline: 'By the Exam Hall Desk',
+            body: [
+                'A man who sat the first stage of the Grade 1 Eiken exam on Sunday afternoon told this newspaper that he got only one question wrong across the reading and listening sections. He checked his answers that evening against keys posted online by teachers who had taken the same paper. “The English was fine,” he said. “Everything else was a disaster.”',
+                'The exam began at 2:00. The candidate lives about an hour away and left so early that he was on course to arrive two hours ahead of time. He got off the train two stations early and walked the rest of the way while listening to test prep audio. The walk took an hour and a half. He arrived soaked in sweat.',
+                'Outside the building, he realized that he had brought neither a pencil nor an eraser to an exam answered entirely on a mark sheet. Two convenience stores within five minutes of the hall saved him. He also looked up the length of the exam for the first time about an hour before it started. It runs 100 minutes for reading and writing and roughly 35 minutes for listening. He had never practiced for 100 minutes in a single sitting.',
+                'The room held between 20 and 30 candidates, and the seats were not assigned. The candidate did not know this. He asked the woman beside an empty seat whether he was allowed to sit there. According to his account, she replied without looking up. “It’s open seating,” she said, and said nothing else.',
+                'When the invigilator asked candidates to switch off their phones, he held down the power button and summoned the phone’s AI assistant instead. It asked how it could help. He tried again and it asked again. The invigilator walked over and took the phone into custody. It was the only phone confiscated in the room. The woman beside him, he reported, looked at him for the first time.',
+                'He chose the back row out of a lifelong habit of avoiding the teacher’s desk. The listening audio was played from a single machine at the front, and by the time it reached the back wall it was arriving twice. That evening his online English tutor delivered the official verdict in four words. “Should have sat closer.”',
+                'The writing section asked whether governments should invest more in cybersecurity. The candidate had not written a single practice essay. He said his first thought was to ask what cybersecurity actually is. He argued from fairness, trust and education, used the word “therefore” more times than he could count, and described the result as a kindergarten essay in kindergarten handwriting.',
+                'The second stage is a speaking interview next month for those who pass. The candidate said he intends to prepare for it properly. “Not the English,” he said. “The other stuff.”',
+            ],
+        },
+        rail: {
+            kicker: 'THE EVIDENCE · ONE WATCH',
+            headline: 'Forensic report: the 100-yen watch ran at less than half speed',
+            byline: 'By the Time Desk',
+            body: [
+                'Electronic devices are banned in the exam hall, so candidates bring analog watches. The candidate did not own one. He bought a watch at a 100-yen shop the day before the exam.',
+                'He set it to 2:00 as the exam began. Twenty minutes later by his own estimate, it read 2:20. That was the last reliable thing it ever said. The next time he looked, it read 2:25, although he was sure that at least half an hour had passed.',
+                'With no clock on the wall and his phone in custody, he may have been the only person in the room who did not know what time it was. He responded by answering everything as fast as he could. When the invigilator announced three minutes left, he had already finished.',
+                'After the exam, the watch read 3:00. The clock in the lobby read 4:20. In 140 minutes of real time, the watch had moved 60. Investigators have not determined whether the watch was faulty or whether it simply has the power to slow down time. Both explanations fit the evidence.',
+            ],
+        },
+        railStats: [
+            { label: 'Exam started', value: '2:00' },
+            { label: 'Watch, at the end', value: '3:00' },
+            { label: 'Lobby clock', value: '4:20' },
+            { label: 'Real minutes', value: '140' },
+            { label: 'Watch minutes', value: '60' },
+            { label: 'Speed of time', value: '0.43x' },
+            { label: 'Price of power', value: '¥100' },
+            { label: 'Reading + listening', value: '1 wrong' },
+            { label: 'Phones confiscated', value: '1 (his)' },
+        ],
+        voices: {
+            kicker: 'VOICES · THE CANDIDATE SPEAKS',
+            headline: '“A guy wearing a watch can’t put his hand up and ask for a watch.”',
+            standfirst: 'We caught up with the candidate the evening after the exam. He was tired, slightly sunburned from the walk, and in a good mood.',
+            turns: [
+                {
+                    q: 'How do you think it went?',
+                    a: 'Honestly, the English part went great. I only got one wrong in reading and listening. All those years of being a word nerd finally paid off. It was everything outside the English that fell apart. The eraser, the walk, the seat, the phone, the watch. I spent hundreds of hours on English and maybe ten minutes on the actual test day.',
+                },
+                {
+                    q: 'Tell us about the woman in the front row.',
+                    a: 'She was a pro. Two pencils lined up perfectly, an eraser, a watch and a spare watch. Right before the start, a guy put his hand up and said he’d forgotten his watch, and the invigilator told him there was no clock in the room. She just handed him her spare without saying a word. It was the most touching thing I saw all day. And I was sitting in the back thinking, give me one too.',
+                },
+                {
+                    q: 'Why didn’t you ask?',
+                    a: 'Because technically I had a watch. It was on my wrist. It just wasn’t telling the truth. A guy wearing a watch can’t put his hand up and ask for a watch. That’s the trap. Having a bad one is worse than having none.',
+                },
+                {
+                    q: 'And the essay?',
+                    a: 'The question was about cybersecurity, and my first thought was, what the heck is cybersecurity anyway? I know the word. Viruses, hackers, don’t reuse your password. That’s where my knowledge ends. So I pulled out three reasons and made it up as I went along. I wrote “therefore” about a hundred times. It looks logical. It only looks logical.',
+                },
+                {
+                    q: 'What about the handwriting?',
+                    a: 'Terrible. And I started way too big. The first lines were nice and roomy, and then halfway through I realized I was running out of space. By the end I was squeezing words between the lines. It started out like a big house and ended up like a rush-hour train. The woman next to me had handwriting like a printer. Not that I was looking at her answers. I saw the shape of the letters for one second. If I had read her answers, my essay would have been better.',
+                },
+                {
+                    q: 'What will you do differently next month?',
+                    a: 'Buy a real watch from a real store and check it the day before. Learn how to turn my phone off. Sit in the front row. And if I see that woman again, I’m going to ask if she has one more spare.',
+                },
+            ],
+        },
+        story: {
+            kicker: 'FICTION · THE SAME AFTERNOON, FROM THE FRONT ROW',
+            headline: 'The spare watch',
+            cast: 'A woman in the front row · a man in the back',
+            byline: 'A Tonio Times Original',
+            body: [
+                'She always sat in front of the speaker. She had learned that eight years ago, in a hall where the audio came off the back wall a half second late and she had heard every question twice.',
+                'She always brought two watches. She had learned that six years ago, when a battery died in the middle of a reading passage and she had finished the exam by counting her own breathing.',
+                'Today she lined up her pencils and set both watches to the same minute. Then she looked around the room, the way she always did, to see who had not learned these things yet.',
+                'There was a man in the back row. He was wet, as if he had walked there through weather that nobody else had experienced. He was fighting with his phone. A voice from the phone asked him how it could help. The invigilator took it away.',
+                'A few minutes later, a man two rows behind her raised his hand and said he had forgotten his watch. She passed him the spare without turning around. That was what it was for.',
+                'She glanced at the back row once more. The wet man was staring at her, then at his own wrist, then at her again. He had a watch. She decided he was fine.',
+                'At 4:20 she packed her pencils and walked out past the back row. The man was holding his watch up to the light and laughing quietly. It said 3:00. She made a note to bring three watches next time.',
+            ],
+        },
+        vocab: [
+            { word: 'invigilator', pos: 'n', en: 'a person who watches candidates during an exam', ja: '試験監督。英国の語。米国では proctor。DMMの講師がこの語を使った。' },
+            { word: 'confiscate', pos: 'v', en: 'to officially take something away from someone', ja: '没収する。take into custody(身柄を確保する)を物に使うと冗談になる。' },
+            { word: 'soaked', pos: 'adj', en: 'completely wet', ja: 'びしょ濡れ。soaked in sweat で汗だく。drenched も同じ。' },
+            { word: 'candidate', pos: 'n', en: 'a person taking an exam', ja: '受験者。英国では試験の受験者もこう呼ぶ。examinee より普通。' },
+            { word: 'forensic', pos: 'adj', en: 'used in investigating what happened', ja: '鑑識の、科学捜査の。時計を「鑑定」したので冗談で使っている。' },
+        ],
+        sayIt: [
+            { phrase: 'The English was fine. Everything else was a disaster.', ja: '「英語は大丈夫、それ以外が全滅」。話の結論を最初に置く型。この一言で相手が続きを聞きたくなる。' },
+            { phrase: 'I was on course to arrive two hours early.', ja: '「このままだと2時間前に着くところだった」。on course to = このまま行けば〜になる。going to より状況の勢いが出る。' },
+            { phrase: 'Should have sat closer.', ja: '「もっと前に座るべきだった」。主語 I を落とした口語の後悔。should have + 過去分詞。講師の4語。' },
+            { phrase: 'I made it up as I went along.', ja: '「書きながらその場ででっち上げた」。準備ゼロで何かをやった時の万能フレーズ。' },
+            { phrase: 'It looks logical. It only looks logical.', ja: '同じ文を only 1語足して繰り返し、自分でツッコむ型。自虐の笑いに使える。' },
+            { phrase: 'Having a bad one is worse than having none.', ja: '「ダメなのを持ってるのは、無いより悪い」。動名詞を主語に立てる比較。道具・人間関係なんにでも使える。' },
+        ],
+        syntax: [
+            {
+                en: 'He had brought neither a pencil nor an eraser to an exam answered entirely on a mark sheet.',
+                point: 'neither A nor B + 過去分詞の後置修飾',
+                ja: 'neither A nor B で「AもBも〜ない」。an exam を answered entirely on a mark sheet が後ろから説明する。「マークシートだけで答える試験に」で、忘れた物のまずさが文の最後で効く。',
+            },
+            {
+                en: 'A guy wearing a watch can’t put his hand up and ask for a watch.',
+                point: '現在分詞で主語を絞る',
+                ja: 'A guy を wearing a watch が後ろから絞って、主語そのものが理由になる。「時計をしている男は」だけで、なぜ頼めないかが説明できてしまう。',
+            },
+            {
+                en: 'In 140 minutes of real time, the watch had moved 60.',
+                point: '比較を前置詞句で先に出す',
+                ja: '基準(本当の時間)を In ... で先に置き、主節で結果を言う。60 の後ろの minutes は省略。数字2つを1文で比べる新聞の型。',
+            },
+        ],
+        glosses: [
+            {
+                en: 'Man aces English test, fails everything around it',
+                ja: '男、英語のテストは満点級、その周りは全部落第',
+                why: '新聞の見出しは冠詞と be 動詞を落とし、動詞は現在形で書く。ace は「満点を取る」という動詞。fails everything around it の it は test。',
+                picks: [
+                    { en: 'ace', ja: '(試験で)満点を取る、完璧にこなす', kind: 'word' },
+                ],
+            },
+            {
+                en: 'The walk took an hour and a half.',
+                ja: '歩くのに1時間半かかった。',
+                why: '日本語は「私は1時間半歩いた」と人を主語にするが、英語は The walk(歩いたこと)を主語にして take で時間を言う。物事を主語に立てると短く言える。',
+                picks: [
+                    { en: 'The walk took an hour and a half.', ja: '歩くのに1時間半かかった' },
+                ],
+            },
+            {
+                en: 'The invigilator walked over and took the phone into custody.',
+                ja: '試験監督が歩いてきて、スマホを身柄確保した。',
+                why: 'take ... into custody は本来は人を「拘束する」。物に使うことで、スマホを犯人扱いする冗談になっている。walk over は「こちらへ歩いてくる」。',
+                picks: [
+                    { en: 'take ... into custody', ja: '身柄を確保する、拘束する', kind: 'phrase' },
+                    { en: 'walk over', ja: '(相手のところへ)歩いてくる', kind: 'phrase' },
+                ],
+            },
+            {
+                en: 'That was the last reliable thing it ever said.',
+                ja: 'それが、その時計が言った最後の信頼できることだった。',
+                why: '時計を人のように it ever said と言っている。the last ... ever で「後にも先にもそれが最後」。日本人は「最後に正しかったのはそこまで」と言いたくなるが、英語は名詞を the last で修飾して一発で言う。',
+                picks: [
+                    { en: 'the last reliable thing it ever said', ja: 'それが言った最後の信頼できること' },
+                ],
+            },
+            {
+                en: 'She made a note to bring three watches next time.',
+                ja: '彼女は、次は時計を3つ持ってくることにしようと心に留めた。',
+                why: 'make a note to do は「〜しようと覚えておく」。紙に書くとは限らない。オチの一文で、2つ持ってくる人が3つに増やす、で終わる。',
+                picks: [
+                    { en: 'make a note to', ja: '〜しようと覚えておく', kind: 'phrase' },
+                ],
+            },
+        ],
+        editorsNote:
+            'とにお、英語は1問ミスだった。崩れたのは消しゴム、席、スマホ、時計、字の大きさ。二次は面接だ。英語の準備はもう足りてる。前の日に時計が動くか確かめろ。スマホの電源の切り方は今日調べろ。席は一番前。それと、Should have sat closer は講師の4語だ。次のレッスンでこの号外を画面共有して、全部しゃべってこい。',
+    },
     {
         id: 'rat-park-and-the-pub',
         date: '2026-08-07',
@@ -54066,7 +54334,18 @@ export const EXTRA_EDITIONS: NewspaperEdition[] = [
                 ja: '前半が現在の事実の裏返し、後半が過去の帰結。時制がずれる形。会話で自然に出ると相当うまく聞こえる',
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお。3本とも観たうえで、芯は1本だと判断した。 ' +
+            'Hari = 依存の反対は接続。Sean Lock = その接続の純度が最も高い形がパブの与太話。 ' +
+            'Rik Mayall on Letterman = その与太話が国境を越えた瞬間に死ぬ。順番はこの通りで話すと通る。 ' +
+            '注意点をひとつ。Hari の話はそのまま信じない方がいい。Rat Park は直接の追試が成功しておらず、 ' +
+            'Science と Nature に落とされ、測定機器の故障で8日分のデータが飛び、実験中に子ネズミが生まれている。 ' +
+            'Kurzgesagt は Hari の本をもとに動画を作って1900万回再生され、そのあと自分で削除した(証拠の扱いが不適切だったという理由)。 ' +
+            'Hari 自身も2011年に引用の問題で The Independent を離れている。 ' +
+            'ただし「だから全部嘘」でもない。環境の効果は小さくないが、話ほど大きくもない。両方を持ったまま喋るのが今回の課題。 ' +
+            '前回の宿題も忘れずに。sorry, my terrible English は言わない。 ' +
+            '代わりに I might be off on some of the detail, but ... を使う。 ' +
+            '間違ってもいいが、どこが怪しいかは自分で名指しする。それが謝罪との違いである。',
     },
     {
         id: 'yokoami-38000',
@@ -54216,7 +54495,17 @@ export const EXTRA_EDITIONS: NewspaperEdition[] = [
                 ja: '目的を持って作られた、を受動で言う。建物・制度・仕組みの話で頻出',
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお。準備なしの回だったので、まず事実の方を直しておいた。ズレは3か所ある。 ' +
+            '(1) 1910年ではなく1923年9月1日。第一次大戦の前ではなく後(大戦は1914-18)。 ' +
+            '(2) 深夜3時ではなく午前11時58分。昼食の支度で全戸が火を使っていた時刻で、これが被害の中心的な理由。 ' +
+            '(3) hundred of people ではなく約38,000人。あの一区画だけで。桁が2つ違う。 ' +
+            'あと慰霊堂は shrine ではなく memorial hall。仏教式の慰霊施設で、設計は伊東忠太。 ' +
+            '英語で褒めるところは2つ。conflagration と atrocity を自力で出した。あれは出せる人が少ない。 ' +
+            '直すところは1つだけでいい。sorry, my terrible English を2回言っている。 ' +
+            'あれは内容を1文字も伝えないうえに、相手に「そんなことない」と言わせる仕事を発生させる。 ' +
+            '次回は謝罪を全部消して、その秒数を数字に使うこと。 ' +
+            'Around thirty-eight thousand people died there, in about fifteen minutes. これだけで場は完全に持つ。',
     },
     {
         id: 'aot-fluency-breach',
@@ -54324,7 +54613,8 @@ export const EXTRA_EDITIONS: NewspaperEdition[] = [
                 ja: '主語 The same gear を (that) he could barely lift a minute ago が後ろから説明し、動詞は starts。長い主語+短い動詞で「あれほど〜だったものが今や…」の落差を作る型。',
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、これは資格の紙面じゃない。次のレッスンでこのまま喋れ。壁の内側の安全な単語は捨てて、自分が越えたい壁の話だけをしろ。心臓を捧げるのは humanity にじゃなくて、three hours 喋れる話題にでいい。Climb the wall, soldier.',
     },
     {
         id: 'ghost-in-the-machine',
@@ -54442,10 +54732,11 @@ export const EXTRA_EDITIONS: NewspaperEdition[] = [
             {
                 en: 'You can map every seat in the theatre and still have no idea why anyone is watching the play.',
                 point: 'can ... and still ...(譲歩)',
-                ja: '「〜し尽くしても、なお…できない」。can + and still で譲歩を1文に畳む。if 節より軽くて口語向き。',
+                ja: '「〜し尽くしても、なお…できない」。can + and still で譲歩を1文に畳む。if 節より軽くて口語向き。次のレッスンでワークスペース理論に使う用。',
             },
         ],
-        editorsNote: '',
+        editorsNote:
+            'とにお、次回はこの記事で一本勝負の約束だ。武器は3つ。(1) the hard problem — the を忘れるな(#14)。(2) 意識ファースト論は短SVO3連射: Consciousness comes first. It\'s the screen. The problem never starts. (3) 先生が J-space に食いついたら Correlation is not consciousness. で斬れ。逆質問 What\'s your definition? はもう一度使っていい — 先生はもう一回 Oh boy と言う。',
     },
 ];
 
@@ -54555,7 +54846,10 @@ export function collectEditionPicks(ed: NewspaperEdition): EditionPickGroup[] {
         const section: PickSection = zone ? zone.section : 'lead';
         let grp = groups.get(section);
         if (!grp) {
-            grp = { section, label: SECTION_LABEL[section], sentences: 0, picks: [] };
+            // 1面と2本目は号ごとに中身が違うので、欄名に記事の kicker を添える
+            const kick = section === 'lead' ? ed.lead.kicker : section === 'rail' ? ed.rail.kicker : '';
+            const label = kick ? SECTION_LABEL[section].split(' — ')[0] + ' — ' + kick : SECTION_LABEL[section];
+            grp = { section, label, sentences: 0, picks: [] };
             groups.set(section, grp);
         }
         grp.sentences += 1;

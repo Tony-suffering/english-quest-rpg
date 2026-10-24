@@ -19,12 +19,12 @@ export const TOKYO52_EP01_EXPRESSIONS: Tokyo52Expression[] = [
     // Yuki/Aya post-meeting, Rina serving Foreign Customer
     // ============================================================
     { expression: "don't beat yourself up", meaning: "そんなに自分を責めないで", meaningEn: "stop blaming yourself for a mistake", day: 1, speaker: "Aya", example: "It happens to everyone, OK? Don't beat yourself up." },
-    { expression: "my brain went blank", meaning: "頭が真っ白になった", meaningEn: "couldn't think of anything, total mental freeze", day: 1, speaker: "Yuki", example: "He was asking me about the delivery schedule and my brain went completely blank." },
+    { expression: "my brain went blank", meaning: "頭が真っ白になった", meaningEn: "couldn't think of anything, total mental freeze", day: 1, speaker: "Yuki", example: "He was askin' me about the delivery schedule and my brain went completely blank." },
     { expression: "I jumped in", meaning: "フォローに入った", meaningEn: "stepped in to help or take over", day: 1, speaker: "Aya", example: "The client didn't even seem bothered. I jumped in and --" },
     { expression: "I'm not mad at you", meaning: "あなたに怒ってるんじゃない", meaningEn: "clarifying that your frustration is not directed at them", day: 1, speaker: "Yuki", example: "I'm not mad at you. I'm mad at me." },
     { expression: "you wanna get coffee?", meaning: "コーヒー飲まない?", meaningEn: "casual invitation to get a drink together", day: 1, speaker: "Aya", example: "You wanna get coffee? There's a place right here." },
     { expression: "what can I get for you?", meaning: "何にしますか?", meaningEn: "standard friendly greeting from cafe/restaurant staff", day: 1, speaker: "Rina", example: "Hi! Welcome! What can I get for you guys today?" },
-    { expression: "coming right up", meaning: "すぐお作りしますね", meaningEn: "your order will be ready shortly (casual service phrase)", day: 1, speaker: "Rina", example: "Two iced lattes, coming right up!" },
+    { expression: "comin' right up", meaning: "すぐお作りしますね", meaningEn: "your order will be ready shortly (casual service phrase)", day: 1, speaker: "Rina", example: "Two iced lattes, comin' right up!" },
     { expression: "do you have a menu?", meaning: "メニューありますか?", meaningEn: "asking to see what's available to order", day: 1, speaker: "Foreign Customer", example: "Excuse me, hi -- do you have, like, a menu?" },
     { expression: "people go crazy for it", meaning: "みんなハマってる", meaningEn: "it's extremely popular, everyone loves it", day: 1, speaker: "Rina", example: "It's this hojicha latte. Super popular. People go crazy for it." },
     { expression: "great choice", meaning: "いい選択ですね", meaningEn: "affirming someone's decision enthusiastically", day: 1, speaker: "Rina", example: "Great choice! Hot or iced?" },
@@ -60,8 +60,8 @@ export const TOKYO52_EP01_EXPRESSIONS: Tokyo52Expression[] = [
     // ============================================================
     { expression: "you came back", meaning: "来たか", meaningEn: "acknowledging someone's return (understated)", day: 3, speaker: "Master Gondo", example: "You came back." },
     { expression: "is that OK?", meaning: "大丈夫ですか?", meaningEn: "checking if something is acceptable", day: 3, speaker: "Yuki", example: "Yeah. I -- yeah. Is that OK?" },
-    { expression: "I've been thinking about it all day", meaning: "今日ずっと考えてた", meaningEn: "something has occupied your mind nonstop", day: 3, speaker: "Yuki", example: "I've been thinking about it all day. At work, on the train, during lunch." },
-    { expression: "I couldn't stop thinking about it", meaning: "頭から離れなかった", meaningEn: "unable to get something out of your mind", day: 3, speaker: "Yuki", example: "I couldn't stop thinking about it. What did you mean?" },
+    { expression: "I've been thinkin' about it all day", meaning: "今日ずっと考えてた", meaningEn: "something has occupied your mind nonstop", day: 3, speaker: "Yuki", example: "I've been thinkin' about it all day. At work, on the train, during lunch." },
+    { expression: "I couldn't stop thinkin' about it", meaning: "頭から離れなかった", meaningEn: "unable to get something out of your mind", day: 3, speaker: "Yuki", example: "I couldn't stop thinkin' about it. What did you mean?" },
     { expression: "let me ask you something", meaning: "ひとつ聞いていいか", meaningEn: "requesting permission to pose a question (slightly serious tone)", day: 3, speaker: "Master Gondo", example: "Let me ask you something first." },
     { expression: "why do you want to speak English?", meaning: "なぜ英語を話したい?", meaningEn: "asking someone's core motivation", day: 3, speaker: "Master Gondo", example: "Why do you want to speak English?" },
     { expression: "it's part of my job", meaning: "仕事の一部なので", meaningEn: "explaining something as a work requirement", day: 3, speaker: "Yuki", example: "I need to be able to communicate. It's part of my job." },
@@ -100,7 +100,7 @@ export const TOKYO52_EP01_EXPRESSIONS: Tokyo52Expression[] = [
     // ============================================================
     { expression: "do you speak English?", meaning: "英語話せますか?", meaningEn: "asking a stranger if they can communicate in English", day: 5, speaker: "Tourist", example: "Excuse me? Sorry, do you speak English?" },
     { expression: "yes, a little", meaning: "はい、少しだけ", meaningEn: "modest response when asked about language ability", day: 5, speaker: "Yuki", example: "Yes. A little." },
-    { expression: "I've been walking around for like twenty minutes", meaning: "もう20分くらい歩いてる", meaningEn: "expressing frustration about being lost", day: 5, speaker: "Tourist", example: "I've been walking around for like twenty minutes and I keep ending up at the same 7-Eleven." },
+    { expression: "I've been walkin' around for like twenty minutes", meaning: "もう20分くらい歩いてる", meaningEn: "expressing frustration about being lost", day: 5, speaker: "Tourist", example: "I've been walkin' around for like twenty minutes and I keep ending up at the same 7-Eleven." },
     { expression: "you go straight", meaning: "まっすぐ行って", meaningEn: "basic direction-giving: continue forward", day: 5, speaker: "Yuki", example: "You go straight. That way. And then turn left at the big crossing." },
     { expression: "turn left at the big crossing", meaning: "大きい交差点を左", meaningEn: "giving a landmark-based direction", day: 5, speaker: "Yuki", example: "Turn left at the big crossing." },
     { expression: "and then you can see it", meaning: "そうすると見えます", meaningEn: "telling someone the destination will become visible", day: 5, speaker: "Yuki", example: "And then you can see it. The station. Maybe five minutes?" },

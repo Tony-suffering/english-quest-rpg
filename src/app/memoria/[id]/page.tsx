@@ -15,22 +15,28 @@ import { movieNightEntries } from '@/data/english/movie-night';
 import { gameNightEntries } from '@/data/english/game-night-chaos';
 import { antiquesHouseEntries } from '@/data/english/antiques-house';
 import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
-import { tokyo52Ep01Entries } from '@/data/english/tokyo52/ep01';
-import { tokyo52Ep02Entries } from '@/data/english/tokyo52/ep02';
+import { bbqNeighborhoodEntries } from '@/data/english/bbq-neighborhood';
+import { blockPartyChaosEntries } from '@/data/english/block-party-chaos';
+import { worstFirstDateEntries } from '@/data/english/worst-first-date';
 import { theJobEntries } from '@/data/english/365-the-job';
-import { SavedPhrasesStorage } from '@/lib/saved-phrases';
-import { charIcon } from '@/data/izakaya-toeic/characters';
-
-// Map speaker display names → charIcon IDs
-const SPEAKER_CHAR_ID: Record<string, string> = {
-    'Yuki': 'yuki',
-    'Master Gondo': 'master',
-    'Gondo': 'master',
-    'Takeshi': 'takeshi',
-    'Lisa': 'lisa',
-    'Kenji': 'kenji',
-    'Mina': 'mina',
-};
+import { tokyo52Ep01Entries } from '@/data/english/tokyo52/ep01';
+import { fridayNightLightsEntries } from '@/data/english/friday-night-lights';
+import { firstWeekJobEntries } from '@/data/english/first-week-job';
+import { shingekiMemoriaEntries } from '@/data/english/shingeki-memoria/ep01';
+import { homeInspectionEntries } from '@/data/english/home-inspection';
+import { thanksgivingDinnerEntries } from '@/data/english/thanksgiving-dinner';
+import { airportDelayEntries } from '@/data/english/airport-delay';
+import { erWaitingRoomEntries } from '@/data/english/er-waiting-room';
+import { dmvRenewalEntries } from '@/data/english/dmv-renewal';
+import { juryDutyEntries } from '@/data/english/jury-duty';
+import { campingTripEntries } from '@/data/english/camping-trip';
+import { roadTripEntries } from '@/data/english/road-trip';
+import { cruiseEntries } from '@/data/english/cruise';
+import { weddingEntries } from '@/data/english/wedding';
+import { losersTableEntries } from '@/data/english/losers-table';
+import { nightDocketEntries } from '@/data/english/night-docket';
+import { talentShowEntries } from '@/data/english/talent-show';
+import { addPhraseToTraining } from '@/lib/saved-phrases';
 
 type ThemeMode = 'dark' | 'light';
 type LineMode = 'sequential' | 'shuffle' | 'repeat-one';
@@ -65,7 +71,9 @@ const themes = {
 
 // Extract character name from "Name: dialogue" format (College Party entries)
 const extractSpeaker = (text: string): { name: string | null; dialogue: string; ttsText: string } => {
-    const match = text.match(/^([A-Z][a-zA-Z ]{0,20}):\s(.+)$/s);
+    // 名前に "." と "'" を許す ("Ms. Reyes", "Old Man Gus", "O'Brien")。
+    // 許さないと名前が取れず、話者が Takumi / Anya にフォールバックする。
+    const match = text.match(/^([A-Z][a-zA-Z .']{0,20}):\s(.+)$/s);
     if (match) {
         const dialogue = match[2];
         // Strip leading stage directions like "(texting)" or "(group text)" for TTS only
@@ -123,6 +131,16 @@ const CHARACTER_COLORS: Record<string, string> = {
     'Javi': '#F59E0B',
     'Earl': '#2563EB',
     'Dot': '#10B981',
+    // 365 English Master - The First Step
+    'Yuki': '#D4AF37',
+    'Master Gondo': '#78716C',
+    'Gondo': '#78716C',
+    'Takeshi': '#3B82F6',
+    'Lisa': '#EC4899',
+    'Kenji': '#92400E',
+    'Mina': '#8B5CF6',
+    // Shingeki × Memoria
+    'Erwin': '#7EA56B',
     // Antiques House Call
     'Uncle Ray': '#B45309',
     'Nadia': '#7C3AED',
@@ -130,18 +148,133 @@ const CHARACTER_COLORS: Record<string, string> = {
     'Aunt Margot': '#BE185D',
     'Cody': '#059669',
     'Pearl': '#9D174D',
-    // Tokyo 52 & 365
-    'Yuki': '#D4AF37',
-    'Aya': '#8B5CF6',
-    'Rina': '#10B981',
-    'Master Gondo': '#B45309',
-    'Gondo': '#B45309',
-    'Foreign Customer': '#3B82F6',
-    'Tourist': '#3B82F6',
-    'Takeshi': '#F59E0B',
-    'Lisa': '#EC4899',
-    'Kenji': '#06B6D4',
-    'Mina': '#A78BFA',
+    // First Week at the New Job
+    'Maya': '#EC4899',
+    'Mom': '#DB2777',
+    'Jen': '#10B981',
+    'Brad': '#78716C',
+    // Home Inspection
+    'Jenna': '#EC4899',
+    'Bob': '#78350F',
+    'Karen': '#10B981',
+    // Thanksgiving Dinner
+    'Grandma Lorraine': '#B45309',
+    'Rick': '#2563EB',
+    'Carol': '#DB2777',
+    'Aunt Pam': '#8B5CF6',
+    'Spencer': '#10B981',
+    'Brianna': '#F472B6',
+    'Uncle Lou': '#78716C',
+    'Grandpa Stan': '#D97706',
+    // Airport Delay
+    'Denise': '#0891B2',
+    'Reuben': '#1D4ED8',
+    'Hana': '#EC4899',
+    'Wendell': '#B45309',
+    'Simone': '#8B5CF6',
+    'Chad': '#EF4444',
+    'Captain Ortiz': '#475569',
+    'Diego': '#10B981',
+    // ER Waiting Room
+    'Nurse Tanya': '#0891B2',
+    'Dave': '#2563EB',
+    'Renata': '#EC4899',
+    'Walter': '#B45309',
+    'Destiny': '#8B5CF6',
+    'Little Mateo': '#34D399',
+    'Brody': '#F59E0B',
+    'Dr Osei': '#059669',
+    'Phil': '#78716C',
+    // The DMV
+    'Gloria': '#0891B2',
+    'Tony': '#2563EB',
+    'Brenda': '#8B5CF6',
+    'Kevin': '#F59E0B',
+    'Mr Okafor': '#059669',
+    'Patrice': '#EC4899',
+    'Vernon': '#B45309',
+    // Jury Duty
+    'Wanda': '#B45309',
+    'Trevor': '#2563EB',
+    'Aisha': '#0891B2',
+    'Doug': '#EF4444',
+    'Judge Halloran': '#475569',
+    'Bailiff Reyes': '#78716C',
+    'Mei': '#8B5CF6',
+    // The Camping Trip
+    'Hank': '#B45309',
+    'Sandra': '#DB2777',
+    'Logan': '#2563EB',
+    'Ruby': '#EC4899',
+    'Ranger Dawn': '#059669',
+    'Uncle Dale': '#78716C',
+    // The Great American Road Trip
+    'Walt': '#B45309',
+    'Roy': '#2563EB',
+    'Lori': '#DB2777',
+    'Paige': '#8B5CF6',
+    'Sam': '#10B981',
+    'Rhonda': '#0891B2',
+    'Flo': '#F59E0B',
+    'Ranger Kim': '#059669',
+    'Duke': '#78716C',
+    'Bud': '#92400E',
+    'Pat': '#7C3AED',
+    // The Honeymoon Cruise ('Kayla' already defined above)
+    'Ben': '#2563EB',
+    'Marv': '#B45309',
+    'Arlene': '#DB2777',
+    'Cheryl': '#8B5CF6',
+    'Julian': '#F59E0B',
+    'Andres': '#10B981',
+    'Captain Lund': '#475569',
+    'Tessa': '#0891B2',
+    // The Wedding Weekend (Yuki/Carol/Priya/Denise already defined above)
+    'Chris': '#2563EB',
+    'Emily': '#DB2777',
+    'Dan': '#B45309',
+    'Tyson': '#F59E0B',
+    'Uncle Rick': '#78716C',
+    'Nana Jo': '#059669',
+    // The Losers' Table (Marcus/Jenna/Cheryl/Devon/Hank/Grandpa Stan already defined above)
+    'Flo': '#B45309',
+    'Vernon': '#78716C',
+    'Wanda': '#8B5CF6',
+    'Reggie': '#EF4444',
+    'Ms. Reyes': '#DB2777',
+    'Walter': '#475569',
+    'Brody': '#F59E0B',
+    'Old Man Gus': '#57534E',
+    'Nurse Tanya': '#0891B2',
+    'Donna': '#EC4899',
+    'Tommy': '#059669',
+    'Bailiff Reyes': '#7C3AED',
+    'Patrice': '#0E7490',
+    'Principal Henderson': '#334155',
+    'Dave Boyd': '#C0392B',
+    // The Night Docket (Hank/Cheryl/Wanda/Marcus/Jenna/Bob/Karen/Dex/Nadia/Cody/Donna/Tommy/
+    // Reggie/Devon/Emma/Timmy/Greg/Sarah/Noah/Vernon/Flo/Bailiff Reyes は上で定義済み)
+    'Judge Halloran': '#475569',
+    'Mrs. Patterson': '#9D174D',
+    'Margot': '#BE185D',
+    'Ray': '#B45309',
+    'Tammy': '#DB2777',
+    'Bri': '#F472B6',
+    'Frank': '#D97706',
+    // The Talent Show (Julian/Paige/Reggie/Kenji/Hana/Diego/Wendell/Jake/Walt/Sam/Derek/Marv/Arlene/Duke/
+    // Emma/Timmy/Donna/Brianna/Devon/Grandpa Stan/Old Man Gus/Ms. Reyes/Principal Henderson/Judge Halloran/Ray は上で定義済み)
+    'Coach Daryl': '#B91C1C',
+    'Coach Vega': '#0E7490',
+    'Big Pete': '#92400E',
+    'Tasha': '#DB2777',
+    'Brandon Lee': '#CA8A04',
+    'Pastor Jim': '#4338CA',
+    'Leticia': '#7C3AED',
+    'Mr. Kowalski': '#57534E',
+    'Ken': '#0369A1',
+    'Sota': '#0EA5E9',
+    'Nate': '#EA580C',
+    'Chloe': '#BE185D',
 };
 
 export default function MemoriaDetailPage() {
@@ -435,7 +568,7 @@ export default function MemoriaDetailPage() {
                 tags: e.tags,
             }));
 
-            const tokyo52MemoriaEntries: MemoriaEntry[] = tokyo52Ep01Entries.map(e => ({
+            const bbqMemoriaEntries: MemoriaEntry[] = bbqNeighborhoodEntries.map(e => ({
                 id: e.id,
                 date: e.date,
                 title: e.title,
@@ -449,7 +582,21 @@ export default function MemoriaDetailPage() {
                 tags: e.tags,
             }));
 
-            const tokyo52Ep02MemoriaEntries: MemoriaEntry[] = tokyo52Ep02Entries.map(e => ({
+            const blockPartyMemoriaEntries: MemoriaEntry[] = blockPartyChaosEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const worstDateMemoriaEntries: MemoriaEntry[] = worstFirstDateEntries.map(e => ({
                 id: e.id,
                 date: e.date,
                 title: e.title,
@@ -477,7 +624,245 @@ export default function MemoriaDetailPage() {
                 tags: e.tags,
             }));
 
-            const all = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries, ...tokyo52MemoriaEntries, ...tokyo52Ep02MemoriaEntries, ...theJobMemoriaEntries, ...tangentMemoriaEntries].sort(
+            const tokyo52MemoriaEntries: MemoriaEntry[] = tokyo52Ep01Entries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const fridayNightMemoriaEntries: MemoriaEntry[] = fridayNightLightsEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const firstWeekMemoriaEntries: MemoriaEntry[] = firstWeekJobEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const shingekiEntries: MemoriaEntry[] = shingekiMemoriaEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const homeInspectionMemoriaEntries: MemoriaEntry[] = homeInspectionEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const thanksgivingMemoriaEntries: MemoriaEntry[] = thanksgivingDinnerEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const airportMemoriaEntries: MemoriaEntry[] = airportDelayEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const erMemoriaEntries: MemoriaEntry[] = erWaitingRoomEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const dmvMemoriaEntries: MemoriaEntry[] = dmvRenewalEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const juryMemoriaEntries: MemoriaEntry[] = juryDutyEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const campingMemoriaEntries: MemoriaEntry[] = campingTripEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const roadTripMemoriaEntries: MemoriaEntry[] = roadTripEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const cruiseMemoriaEntries: MemoriaEntry[] = cruiseEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const weddingMemoriaEntries: MemoriaEntry[] = weddingEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const losersTableMemoriaEntries: MemoriaEntry[] = losersTableEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const nightDocketMemoriaEntries: MemoriaEntry[] = nightDocketEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const talentShowMemoriaEntries: MemoriaEntry[] = talentShowEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const all = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries, ...bbqMemoriaEntries, ...blockPartyMemoriaEntries, ...worstDateMemoriaEntries, ...theJobMemoriaEntries, ...tokyo52MemoriaEntries, ...fridayNightMemoriaEntries, ...firstWeekMemoriaEntries, ...shingekiEntries, ...homeInspectionMemoriaEntries, ...thanksgivingMemoriaEntries, ...airportMemoriaEntries, ...erMemoriaEntries, ...dmvMemoriaEntries, ...juryMemoriaEntries, ...campingMemoriaEntries, ...roadTripMemoriaEntries, ...cruiseMemoriaEntries, ...weddingMemoriaEntries, ...losersTableMemoriaEntries, ...nightDocketMemoriaEntries, ...talentShowMemoriaEntries, ...tangentMemoriaEntries].sort(
                 (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
             );
             setAllEntries(all);
@@ -630,6 +1015,363 @@ export default function MemoriaDetailPage() {
                         tags: bucketListEntry.tags,
                     };
                 }
+            } else if (id.startsWith('bbq-')) {
+                const bbqEntry = bbqNeighborhoodEntries.find(e => e.id === id);
+                if (bbqEntry) {
+                    loadedEntry = {
+                        id,
+                        date: bbqEntry.date,
+                        title: bbqEntry.title,
+                        content: bbqEntry.content,
+                        conversation: bbqEntry.conversation,
+                        tone: bbqEntry.tone,
+                        series: bbqEntry.series,
+                        seriesTitle: bbqEntry.seriesTitle,
+                        createdAt: bbqEntry.createdAt,
+                        updatedAt: bbqEntry.updatedAt,
+                        tags: bbqEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('blockparty-')) {
+                const blockPartyEntry = blockPartyChaosEntries.find(e => e.id === id);
+                if (blockPartyEntry) {
+                    loadedEntry = {
+                        id,
+                        date: blockPartyEntry.date,
+                        title: blockPartyEntry.title,
+                        content: blockPartyEntry.content,
+                        conversation: blockPartyEntry.conversation,
+                        tone: blockPartyEntry.tone,
+                        series: blockPartyEntry.series,
+                        seriesTitle: blockPartyEntry.seriesTitle,
+                        createdAt: blockPartyEntry.createdAt,
+                        updatedAt: blockPartyEntry.updatedAt,
+                        tags: blockPartyEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('worstdate-')) {
+                const worstDateEntry = worstFirstDateEntries.find(e => e.id === id);
+                if (worstDateEntry) {
+                    loadedEntry = {
+                        id,
+                        date: worstDateEntry.date,
+                        title: worstDateEntry.title,
+                        content: worstDateEntry.content,
+                        conversation: worstDateEntry.conversation,
+                        tone: worstDateEntry.tone,
+                        series: worstDateEntry.series,
+                        seriesTitle: worstDateEntry.seriesTitle,
+                        createdAt: worstDateEntry.createdAt,
+                        updatedAt: worstDateEntry.updatedAt,
+                        tags: worstDateEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('365-ep01-')) {
+                const theJobEntry = theJobEntries.find(e => e.id === id);
+                if (theJobEntry) {
+                    loadedEntry = {
+                        id,
+                        date: theJobEntry.date,
+                        title: theJobEntry.title,
+                        content: theJobEntry.content,
+                        conversation: theJobEntry.conversation,
+                        tone: theJobEntry.tone,
+                        series: theJobEntry.series,
+                        seriesTitle: theJobEntry.seriesTitle,
+                        createdAt: theJobEntry.createdAt,
+                        updatedAt: theJobEntry.updatedAt,
+                        tags: theJobEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('tokyo52-')) {
+                const tokyo52Entry = tokyo52Ep01Entries.find(e => e.id === id);
+                if (tokyo52Entry) {
+                    loadedEntry = {
+                        id,
+                        date: tokyo52Entry.date,
+                        title: tokyo52Entry.title,
+                        content: tokyo52Entry.content,
+                        conversation: tokyo52Entry.conversation,
+                        tone: tokyo52Entry.tone,
+                        series: tokyo52Entry.series,
+                        seriesTitle: tokyo52Entry.seriesTitle,
+                        createdAt: tokyo52Entry.createdAt,
+                        updatedAt: tokyo52Entry.updatedAt,
+                        tags: tokyo52Entry.tags,
+                    };
+                }
+            } else if (id.startsWith('fridaynightlights-')) {
+                const fridayEntry = fridayNightLightsEntries.find(e => e.id === id);
+                if (fridayEntry) {
+                    loadedEntry = {
+                        id,
+                        date: fridayEntry.date,
+                        title: fridayEntry.title,
+                        content: fridayEntry.content,
+                        conversation: fridayEntry.conversation,
+                        tone: fridayEntry.tone,
+                        series: fridayEntry.series,
+                        seriesTitle: fridayEntry.seriesTitle,
+                        createdAt: fridayEntry.createdAt,
+                        updatedAt: fridayEntry.updatedAt,
+                        tags: fridayEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('firstweek-')) {
+                const firstWeekEntry = firstWeekJobEntries.find(e => e.id === id);
+                if (firstWeekEntry) {
+                    loadedEntry = {
+                        id,
+                        date: firstWeekEntry.date,
+                        title: firstWeekEntry.title,
+                        content: firstWeekEntry.content,
+                        conversation: firstWeekEntry.conversation,
+                        tone: firstWeekEntry.tone,
+                        series: firstWeekEntry.series,
+                        seriesTitle: firstWeekEntry.seriesTitle,
+                        createdAt: firstWeekEntry.createdAt,
+                        updatedAt: firstWeekEntry.updatedAt,
+                        tags: firstWeekEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('shingeki-')) {
+                const shingekiEntry = shingekiMemoriaEntries.find(e => e.id === id);
+                if (shingekiEntry) {
+                    loadedEntry = {
+                        id,
+                        date: shingekiEntry.date,
+                        title: shingekiEntry.title,
+                        content: shingekiEntry.content,
+                        conversation: shingekiEntry.conversation,
+                        tone: shingekiEntry.tone,
+                        series: shingekiEntry.series,
+                        seriesTitle: shingekiEntry.seriesTitle,
+                        createdAt: shingekiEntry.createdAt,
+                        updatedAt: shingekiEntry.updatedAt,
+                        tags: shingekiEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('homeinspection-')) {
+                const homeInspectionEntry = homeInspectionEntries.find(e => e.id === id);
+                if (homeInspectionEntry) {
+                    loadedEntry = {
+                        id,
+                        date: homeInspectionEntry.date,
+                        title: homeInspectionEntry.title,
+                        content: homeInspectionEntry.content,
+                        conversation: homeInspectionEntry.conversation,
+                        tone: homeInspectionEntry.tone,
+                        series: homeInspectionEntry.series,
+                        seriesTitle: homeInspectionEntry.seriesTitle,
+                        createdAt: homeInspectionEntry.createdAt,
+                        updatedAt: homeInspectionEntry.updatedAt,
+                        tags: homeInspectionEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('thanksgiving-')) {
+                const thanksgivingEntry = thanksgivingDinnerEntries.find(e => e.id === id);
+                if (thanksgivingEntry) {
+                    loadedEntry = {
+                        id,
+                        date: thanksgivingEntry.date,
+                        title: thanksgivingEntry.title,
+                        content: thanksgivingEntry.content,
+                        conversation: thanksgivingEntry.conversation,
+                        tone: thanksgivingEntry.tone,
+                        series: thanksgivingEntry.series,
+                        seriesTitle: thanksgivingEntry.seriesTitle,
+                        createdAt: thanksgivingEntry.createdAt,
+                        updatedAt: thanksgivingEntry.updatedAt,
+                        tags: thanksgivingEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('airport-')) {
+                const airportEntry = airportDelayEntries.find(e => e.id === id);
+                if (airportEntry) {
+                    loadedEntry = {
+                        id,
+                        date: airportEntry.date,
+                        title: airportEntry.title,
+                        content: airportEntry.content,
+                        conversation: airportEntry.conversation,
+                        tone: airportEntry.tone,
+                        series: airportEntry.series,
+                        seriesTitle: airportEntry.seriesTitle,
+                        createdAt: airportEntry.createdAt,
+                        updatedAt: airportEntry.updatedAt,
+                        tags: airportEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('er-')) {
+                const erEntry = erWaitingRoomEntries.find(e => e.id === id);
+                if (erEntry) {
+                    loadedEntry = {
+                        id,
+                        date: erEntry.date,
+                        title: erEntry.title,
+                        content: erEntry.content,
+                        conversation: erEntry.conversation,
+                        tone: erEntry.tone,
+                        series: erEntry.series,
+                        seriesTitle: erEntry.seriesTitle,
+                        createdAt: erEntry.createdAt,
+                        updatedAt: erEntry.updatedAt,
+                        tags: erEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('dmv-')) {
+                const dmvEntry = dmvRenewalEntries.find(e => e.id === id);
+                if (dmvEntry) {
+                    loadedEntry = {
+                        id,
+                        date: dmvEntry.date,
+                        title: dmvEntry.title,
+                        content: dmvEntry.content,
+                        conversation: dmvEntry.conversation,
+                        tone: dmvEntry.tone,
+                        series: dmvEntry.series,
+                        seriesTitle: dmvEntry.seriesTitle,
+                        createdAt: dmvEntry.createdAt,
+                        updatedAt: dmvEntry.updatedAt,
+                        tags: dmvEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('jury-')) {
+                const juryEntry = juryDutyEntries.find(e => e.id === id);
+                if (juryEntry) {
+                    loadedEntry = {
+                        id,
+                        date: juryEntry.date,
+                        title: juryEntry.title,
+                        content: juryEntry.content,
+                        conversation: juryEntry.conversation,
+                        tone: juryEntry.tone,
+                        series: juryEntry.series,
+                        seriesTitle: juryEntry.seriesTitle,
+                        createdAt: juryEntry.createdAt,
+                        updatedAt: juryEntry.updatedAt,
+                        tags: juryEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('camping-')) {
+                const campingEntry = campingTripEntries.find(e => e.id === id);
+                if (campingEntry) {
+                    loadedEntry = {
+                        id,
+                        date: campingEntry.date,
+                        title: campingEntry.title,
+                        content: campingEntry.content,
+                        conversation: campingEntry.conversation,
+                        tone: campingEntry.tone,
+                        series: campingEntry.series,
+                        seriesTitle: campingEntry.seriesTitle,
+                        createdAt: campingEntry.createdAt,
+                        updatedAt: campingEntry.updatedAt,
+                        tags: campingEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('roadtrip-')) {
+                const roadTripEntry = roadTripEntries.find(e => e.id === id);
+                if (roadTripEntry) {
+                    loadedEntry = {
+                        id,
+                        date: roadTripEntry.date,
+                        title: roadTripEntry.title,
+                        content: roadTripEntry.content,
+                        conversation: roadTripEntry.conversation,
+                        tone: roadTripEntry.tone,
+                        series: roadTripEntry.series,
+                        seriesTitle: roadTripEntry.seriesTitle,
+                        createdAt: roadTripEntry.createdAt,
+                        updatedAt: roadTripEntry.updatedAt,
+                        tags: roadTripEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('cruise-')) {
+                const cruiseEntry = cruiseEntries.find(e => e.id === id);
+                if (cruiseEntry) {
+                    loadedEntry = {
+                        id,
+                        date: cruiseEntry.date,
+                        title: cruiseEntry.title,
+                        content: cruiseEntry.content,
+                        conversation: cruiseEntry.conversation,
+                        tone: cruiseEntry.tone,
+                        series: cruiseEntry.series,
+                        seriesTitle: cruiseEntry.seriesTitle,
+                        createdAt: cruiseEntry.createdAt,
+                        updatedAt: cruiseEntry.updatedAt,
+                        tags: cruiseEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('wedding-')) {
+                const weddingEntry = weddingEntries.find(e => e.id === id);
+                if (weddingEntry) {
+                    loadedEntry = {
+                        id,
+                        date: weddingEntry.date,
+                        title: weddingEntry.title,
+                        content: weddingEntry.content,
+                        conversation: weddingEntry.conversation,
+                        tone: weddingEntry.tone,
+                        series: weddingEntry.series,
+                        seriesTitle: weddingEntry.seriesTitle,
+                        createdAt: weddingEntry.createdAt,
+                        updatedAt: weddingEntry.updatedAt,
+                        tags: weddingEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('losers-')) {
+                const losersEntry = losersTableEntries.find(e => e.id === id);
+                if (losersEntry) {
+                    loadedEntry = {
+                        id,
+                        date: losersEntry.date,
+                        title: losersEntry.title,
+                        content: losersEntry.content,
+                        conversation: losersEntry.conversation,
+                        tone: losersEntry.tone,
+                        series: losersEntry.series,
+                        seriesTitle: losersEntry.seriesTitle,
+                        createdAt: losersEntry.createdAt,
+                        updatedAt: losersEntry.updatedAt,
+                        tags: losersEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('docket-')) {
+                const docketEntry = nightDocketEntries.find(e => e.id === id);
+                if (docketEntry) {
+                    loadedEntry = {
+                        id,
+                        date: docketEntry.date,
+                        title: docketEntry.title,
+                        content: docketEntry.content,
+                        conversation: docketEntry.conversation,
+                        tone: docketEntry.tone,
+                        series: docketEntry.series,
+                        seriesTitle: docketEntry.seriesTitle,
+                        createdAt: docketEntry.createdAt,
+                        updatedAt: docketEntry.updatedAt,
+                        tags: docketEntry.tags,
+                    };
+                }
+            } else if (id.startsWith('talent-')) {
+                const talentEntry = talentShowEntries.find(e => e.id === id);
+                if (talentEntry) {
+                    loadedEntry = {
+                        id,
+                        date: talentEntry.date,
+                        title: talentEntry.title,
+                        content: talentEntry.content,
+                        conversation: talentEntry.conversation,
+                        tone: talentEntry.tone,
+                        series: talentEntry.series,
+                        seriesTitle: talentEntry.seriesTitle,
+                        createdAt: talentEntry.createdAt,
+                        updatedAt: talentEntry.updatedAt,
+                        tags: talentEntry.tags,
+                    };
+                }
             } else if (id.startsWith('tangent-')) {
                 const journalId = id.replace('tangent-', '');
                 const journalEntry = (journalEntries as any[]).find(e => e.id === journalId);
@@ -676,57 +1418,6 @@ export default function MemoriaDetailPage() {
                         createdAt: labEntry.conversationData.generatedAt,
                         updatedAt: labEntry.conversationData.generatedAt,
                         tags: [...labEntry.businessTags, ...labEntry.techTags],
-                    };
-                }
-            } else if (id.startsWith('365-ep01-')) {
-                const jobEntry = theJobEntries.find(e => e.id === id);
-                if (jobEntry) {
-                    loadedEntry = {
-                        id,
-                        date: jobEntry.date,
-                        title: jobEntry.title,
-                        content: jobEntry.content,
-                        conversation: jobEntry.conversation,
-                        tone: jobEntry.tone,
-                        series: jobEntry.series,
-                        seriesTitle: jobEntry.seriesTitle,
-                        createdAt: jobEntry.createdAt,
-                        updatedAt: jobEntry.updatedAt,
-                        tags: jobEntry.tags,
-                    };
-                }
-            } else if (id.startsWith('tokyo52-ep02-')) {
-                const t52Ep02Entry = tokyo52Ep02Entries.find(e => e.id === id);
-                if (t52Ep02Entry) {
-                    loadedEntry = {
-                        id,
-                        date: t52Ep02Entry.date,
-                        title: t52Ep02Entry.title,
-                        content: t52Ep02Entry.content,
-                        conversation: t52Ep02Entry.conversation,
-                        tone: t52Ep02Entry.tone,
-                        series: t52Ep02Entry.series,
-                        seriesTitle: t52Ep02Entry.seriesTitle,
-                        createdAt: t52Ep02Entry.createdAt,
-                        updatedAt: t52Ep02Entry.updatedAt,
-                        tags: t52Ep02Entry.tags,
-                    };
-                }
-            } else if (id.startsWith('tokyo52-')) {
-                const t52Entry = tokyo52Ep01Entries.find(e => e.id === id);
-                if (t52Entry) {
-                    loadedEntry = {
-                        id,
-                        date: t52Entry.date,
-                        title: t52Entry.title,
-                        content: t52Entry.content,
-                        conversation: t52Entry.conversation,
-                        tone: t52Entry.tone,
-                        series: t52Entry.series,
-                        seriesTitle: t52Entry.seriesTitle,
-                        createdAt: t52Entry.createdAt,
-                        updatedAt: t52Entry.updatedAt,
-                        tags: t52Entry.tags,
                     };
                 }
             } else {
@@ -783,11 +1474,7 @@ export default function MemoriaDetailPage() {
         }
     }, [entry, searchParams]);
 
-    // Load saved phrases
-    useEffect(() => {
-        const saved = SavedPhrasesStorage.getAll();
-        setSavedPhrases(new Set(saved.map(p => p.english)));
-    }, []);
+    // Tracks lines added to training this session (for the ✓ / ★ button state)
 
     const loadVoices = () => {
         const allVoices = window.speechSynthesis.getVoices();
@@ -1008,28 +1695,16 @@ export default function MemoriaDetailPage() {
         lineModeRef.current = nextMode;
     };
 
-    const toggleSavePhrase = (text: string, e: React.MouseEvent) => {
+    const addToTraining = async (text: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (savedPhrases.has(text)) {
-            const all = SavedPhrasesStorage.getAll();
-            const found = all.find(p => p.english === text);
-            if (found) SavedPhrasesStorage.remove(found.id);
-            setSavedPhrases(prev => {
-                const next = new Set(prev);
-                next.delete(text);
-                return next;
-            });
-        } else {
-            // Find matching Japanese line by index
-            const engLines = entry?.conversation?.english || [];
-            const jpLines = entry?.conversation?.japanese || [];
-            const lineIdx = engLines.findIndex(l => l.text === text);
-            const jpText = lineIdx >= 0 && jpLines[lineIdx] ? jpLines[lineIdx].text : undefined;
-            SavedPhrasesStorage.save({
-                english: text,
-                ...(jpText ? { japanese: jpText } : {}),
-                source: entry ? `Memoria: ${entry.title}` : 'Memoria',
-            });
+        if (savedPhrases.has(text)) return; // already added this session
+        // Find matching Japanese line by index
+        const engLines = entry?.conversation?.english || [];
+        const jpLines = entry?.conversation?.japanese || [];
+        const lineIdx = engLines.findIndex(l => l.text === text);
+        const jpText = lineIdx >= 0 && jpLines[lineIdx] ? jpLines[lineIdx].text : '';
+        const result = await addPhraseToTraining(text, jpText);
+        if (result !== 'error') {
             setSavedPhrases(prev => new Set(prev).add(text));
         }
     };
@@ -1135,13 +1810,10 @@ export default function MemoriaDetailPage() {
                 </button>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {savedPhrases.size > 0 && (
-                        <button
-                            onClick={() => router.push('/english/bookmarks')}
+                        <span
                             style={{
-                                background: 'none',
                                 border: `1px solid ${t.accent}`,
                                 color: t.accent,
-                                cursor: 'pointer',
                                 padding: '5px 10px',
                                 borderRadius: '6px',
                                 fontSize: '11px',
@@ -1149,10 +1821,11 @@ export default function MemoriaDetailPage() {
                                 alignItems: 'center',
                                 gap: '4px',
                             }}
+                            title="Added to training"
                         >
-                            <span>★</span>
+                            <span>&#10003;</span>
                             <span>{savedPhrases.size}</span>
-                        </button>
+                        </span>
                     )}
                     <button
                         onClick={toggleTheme}
@@ -1184,45 +1857,6 @@ export default function MemoriaDetailPage() {
                         {new Date(entry.date).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
                     </div>
                     <h1 style={{ fontSize: '24px', fontWeight: '700', lineHeight: '1.3', margin: 0 }}>{entry.title}</h1>
-                </div>
-
-                {/* Training CTA: guide note.com readers to training */}
-                <div style={{
-                    marginBottom: '20px',
-                    padding: '16px 20px',
-                    background: `linear-gradient(135deg, ${t.accent}15, ${t.accent}08)`,
-                    borderRadius: '14px',
-                    border: `1px solid ${t.accent}30`,
-                }}>
-                    <div style={{ fontSize: '13px', fontWeight: '700', color: t.accent, marginBottom: '8px', letterSpacing: '0.05em' }}>
-                        TRAINING MODE
-                    </div>
-                    <div style={{ fontSize: '13px', color: t.textSecondary, lineHeight: 1.9, marginBottom: '12px' }}>
-                        この会話に出てくるフレーズを毎日練習できます。<br />
-                        気になるフレーズをタップで保存 → トレーニングに追加。<br />
-                        カードを育ててLEGENDARYランクを目指そう。
-                    </div>
-                    <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        <a href="/english/training" style={{
-                            display: 'inline-block',
-                            padding: '8px 20px', borderRadius: '10px',
-                            background: t.accent, color: '#000',
-                            fontSize: '12px', fontWeight: '800',
-                            letterSpacing: '0.08em',
-                            textDecoration: 'none',
-                            boxShadow: `0 2px 12px ${t.accent}40`,
-                        }}>
-                            TRAINING
-                        </a>
-                        <span style={{
-                            display: 'inline-flex', alignItems: 'center',
-                            padding: '8px 14px', borderRadius: '10px',
-                            border: `1px solid ${t.borderLight}`,
-                            fontSize: '11px', color: t.textMuted,
-                        }}>
-                            会話をタップ → フレーズ保存
-                        </span>
-                    </div>
                 </div>
 
                 {/* Article Navigation */}
@@ -1343,9 +1977,7 @@ export default function MemoriaDetailPage() {
                                     <>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: speakerColor, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                                                {extracted?.name && SPEAKER_CHAR_ID[extracted.name] ? (
-                                                    <img src={charIcon(SPEAKER_CHAR_ID[extracted.name])} alt="" style={{ width: '20px', height: '20px', borderRadius: '50%', objectFit: 'cover' }} />
-                                                ) : extracted?.name ? (
+                                                {extracted?.name ? (
                                                     <div style={{
                                                         width: '20px',
                                                         height: '20px',
@@ -1383,19 +2015,20 @@ export default function MemoriaDetailPage() {
                                                         +Vocab
                                                     </button>
                                                     <button
-                                                        onClick={(e) => toggleSavePhrase(currentLine.text, e)}
+                                                        onClick={(e) => addToTraining(currentLine.text, e)}
                                                         style={{
                                                             background: savedPhrases.has(currentLine.text) ? t.accent : 'none',
                                                             border: `1px solid ${savedPhrases.has(currentLine.text) ? t.accent : t.borderLight}`,
-                                                            cursor: 'pointer',
+                                                            cursor: savedPhrases.has(currentLine.text) ? 'default' : 'pointer',
                                                             padding: '4px 8px',
                                                             borderRadius: '6px',
-                                                            fontSize: '14px',
-                                                            color: savedPhrases.has(currentLine.text) ? '#000' : t.textMuted,
+                                                            fontSize: '11px',
+                                                            fontWeight: 600,
+                                                            color: savedPhrases.has(currentLine.text) ? '#000' : t.accent,
                                                         }}
-                                                        title={savedPhrases.has(currentLine.text) ? 'Remove from saved' : 'Save phrase'}
+                                                        title={savedPhrases.has(currentLine.text) ? 'Added to training' : 'Add to training'}
                                                     >
-                                                        {savedPhrases.has(currentLine.text) ? '★' : '☆'}
+                                                        {savedPhrases.has(currentLine.text) ? '✓ Added' : '+ Training'}
                                                     </button>
                                                 </div>
                                             )}
@@ -1584,9 +2217,7 @@ export default function MemoriaDetailPage() {
                                         </div>
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: speakerColor, marginBottom: '4px', textTransform: 'uppercase' }}>
-                                                {extracted.name && SPEAKER_CHAR_ID[extracted.name] ? (
-                                                    <img src={charIcon(SPEAKER_CHAR_ID[extracted.name])} alt="" style={{ width: '16px', height: '16px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                                                ) : extracted.name ? (
+                                                {extracted.name ? (
                                                     <div style={{
                                                         width: '16px',
                                                         height: '16px',
@@ -1638,18 +2269,20 @@ export default function MemoriaDetailPage() {
                                             +Vocab
                                         </button>
                                         <button
-                                            onClick={(e) => toggleSavePhrase(line.text, e)}
+                                            onClick={(e) => addToTraining(line.text, e)}
                                             style={{
                                                 background: 'none',
                                                 border: 'none',
-                                                cursor: 'pointer',
+                                                cursor: savedPhrases.has(line.text) ? 'default' : 'pointer',
                                                 padding: '8px',
-                                                fontSize: '18px',
-                                                color: savedPhrases.has(line.text) ? '#FFD700' : t.textMuted,
+                                                fontSize: '11px',
+                                                fontWeight: 600,
+                                                whiteSpace: 'nowrap',
+                                                color: savedPhrases.has(line.text) ? '#10B981' : t.accent,
                                             }}
-                                            title={savedPhrases.has(line.text) ? 'Remove from saved' : 'Save phrase'}
+                                            title={savedPhrases.has(line.text) ? 'Added to training' : 'Add to training'}
                                         >
-                                            {savedPhrases.has(line.text) ? '★' : '☆'}
+                                            {savedPhrases.has(line.text) ? '✓ Added' : '+ Training'}
                                         </button>
                                     </div>
                                 );

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 
 // Curated wisdom quotes from journal entries
 const WISDOM_QUOTES = [
@@ -121,12 +120,9 @@ export default function RandomWisdom() {
                     <span className="text-stone-500 text-sm">
                         — {quote.source}
                     </span>
-                    <Link
-                        href={`/journal/${quote.entryId}`}
-                        className="text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors"
-                    >
-                        Read entry
-                    </Link>
+                    <span className="text-stone-400 text-sm">
+                        #{quote.entryId}
+                    </span>
                 </div>
             </div>
         </div>

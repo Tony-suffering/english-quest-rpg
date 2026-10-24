@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/data/english/write-counter-types.ts
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * WRITE COUNTER -- ライトパス30本の「裏」。各トピックの逆の立場の模範解答。
  *

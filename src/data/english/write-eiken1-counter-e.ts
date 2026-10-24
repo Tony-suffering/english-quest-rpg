@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/data/english/write-eiken1-counter-e.ts
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * WRITE COUNTER (e) -- day 25-30 の逆立場模範解答。
  * 表(write-eiken1.ts)と同じ普遍フレームを使い回し、反対側の最強の3理由で書く。

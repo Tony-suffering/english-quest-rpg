@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/data/english/write-eiken1-counter-b.ts
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * WRITE COUNTER B -- days 7-12。表(write-eiken1.ts)の逆の立場の模範解答。
  * 型は write-eiken1-toolkit.ts の普遍フレームを使い回す。

@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PPButton, PPPopup, usePPWordPicker } from '@/components/english/PPWordPicker';
 import { MOVIE_BY_DATE, GENRE_META, type HarvestMovie } from '@/data/english/harvest-movies';
-import { seedHarvestExpressions } from '@/data/english/harvest-expressions';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -70,44 +69,51 @@ function dateKey(year: number, month: number, day: number): string {
     return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-function loadExpressions(): HarvestExpression[] {
-    try {
-        const raw = localStorage.getItem('harvest-expressions');
-        return raw ? JSON.parse(raw) : [];
-    } catch { return []; }
-}
-
 // ---------------------------------------------------------------------------
 // Main Page
 // ---------------------------------------------------------------------------
 
 export default function HarvestPage() {
-    const [mounted, setMounted] = useState(false);
     const today = jstToday();
     const todayParts = today.split('-').map(Number);
     const [viewYear, setViewYear] = useState(todayParts[0]);
     const [viewMonth, setViewMonth] = useState(todayParts[1] - 1);
     const [selectedDay, setSelectedDay] = useState<number | null>(todayParts[2]);
     const [expressions, setExpressions] = useState<HarvestExpression[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [expandedId, setExpandedId] = useState<string | null>(null);
-    const [registered, setRegistered] = useState<Set<string>>(new Set<string>());
-
-    useEffect(() => {
-        setMounted(true);
-        seedHarvestExpressions();
-        setExpressions(loadExpressions());
+    const [registered, setRegistered] = useState<Set<string>>(() => {
         try {
             const s = localStorage.getItem('harvest-registered');
-            if (s) setRegistered(new Set<string>(JSON.parse(s)));
-        } catch {}
-    }, []);
+            return s ? new Set<string>(JSON.parse(s)) : new Set<string>();
+        } catch { return new Set<string>(); }
+    });
+    const [registeringId, setRegisteringId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!mounted) return;
         try { localStorage.setItem('harvest-registered', JSON.stringify([...registered])); } catch {}
-    }, [registered, mounted]);
+    }, [registered]);
 
     const { ppWordPicker, openPP, toggleWord, closePP, search } = usePPWordPicker();
+
+    // Fetch all
+    const fetchExpressions = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await fetch('/api/harvest?limit=500');
+            if (!res.ok) throw new Error(`Failed (${res.status})`);
+            const data = await res.json();
+            setExpressions(Array.isArray(data) ? data : (data.expressions || []));
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Failed to load');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => { fetchExpressions(); }, [fetchExpressions]);
 
     // Group by harvest_date
     const byDate = useMemo(() => {
@@ -149,28 +155,28 @@ export default function HarvestPage() {
         setSelectedDay(null);
     };
 
-    // Register to training via local-api interceptor
-    const [registeringId, setRegisteringId] = useState<string | null>(null);
+    // Register to training
     const handleRegister = useCallback(async (expr: HarvestExpression) => {
         setRegisteringId(expr.id);
         try {
-            const res = await fetch('/api/user-phrases', {
+            const dateStr = expr.harvest_date || expr.created_at?.slice(0, 10) || today;
+            const res = await fetch('/api/phrases', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    phrase: expr.expression,
-                    type: 'expression',
-                    meaning: expr.note || expr.context || expr.expression,
-                    source: expr.source_title || 'Movie Harvest',
+                    english: expr.expression,
+                    japanese: expr.note || expr.context || '',
+                    category: 'harvest',
+                    date: dateStr,
                 }),
             });
-            if (res.ok) {
+            if (res.ok || res.status === 200) {
                 setRegistered(prev => new Set(prev).add(expr.id));
             }
         } catch {} finally {
             setRegisteringId(null);
         }
-    }, []);
+    }, [today]);
 
     // -----------------------------------------------------------------------
     // Expression Card
@@ -354,8 +360,6 @@ export default function HarvestPage() {
     // -----------------------------------------------------------------------
     // Render
     // -----------------------------------------------------------------------
-    if (!mounted) return null;
-
     const monthLabel = new Date(viewYear, viewMonth).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
 
     return (
@@ -521,8 +525,30 @@ export default function HarvestPage() {
                     ))}
                 </div>
 
+                {loading && (
+                    <div style={{ textAlign: 'center', padding: '60px 0', color: '#A8A29E', fontSize: '14px' }}>
+                        Loading...
+                    </div>
+                )}
+
+                {error && !loading && (
+                    <div style={{
+                        textAlign: 'center', padding: '40px', backgroundColor: '#fff',
+                        borderRadius: '14px', border: '1px solid #E7E5E4',
+                    }}>
+                        <p style={{ color: '#991B1B', marginBottom: '12px' }}>{error}</p>
+                        <button onClick={fetchExpressions} style={{
+                            padding: '8px 20px', borderRadius: '10px', border: 'none',
+                            backgroundColor: ACCENT, color: '#fff',
+                            fontSize: '13px', fontWeight: '600', cursor: 'pointer',
+                        }}>
+                            Retry
+                        </button>
+                    </div>
+                )}
+
                 {/* Detail panel */}
-                {selectedDay && (
+                {!loading && !error && selectedDay && (
                     <div>
                         {/* Movie header */}
                         {selectedMovie && (

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getDailyContent, getAllDates, type DailyContent } from '@/data/daily-english';
-import { SavedPhrasesStorage } from '@/lib/saved-phrases';
+import { addPhraseToTraining } from '@/lib/saved-phrases';
 
 type ViewMode = 'discussion' | 'expressions';
 
@@ -68,10 +68,6 @@ export default function NativeDatePage() {
         const savedSpeed = localStorage.getItem('native_speed');
         if (savedSpeed) setSpeed(parseFloat(savedSpeed));
 
-        // Load saved phrases
-        const saved = SavedPhrasesStorage.getAll();
-        setSavedPhrases(new Set(saved.map(p => p.english)));
-
         // Load content
         const dates = getAllDates();
         setAllDates(dates);
@@ -112,23 +108,11 @@ export default function NativeDatePage() {
         currentIndexRef.current = currentIndex;
     }, [currentIndex]);
 
-    const toggleSavePhrase = (english: string, japanese: string, e: React.MouseEvent) => {
+    const toggleSavePhrase = async (english: string, japanese: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (savedPhrases.has(english)) {
-            const all = SavedPhrasesStorage.getAll();
-            const found = all.find(p => p.english === english);
-            if (found) SavedPhrasesStorage.remove(found.id);
-            setSavedPhrases(prev => {
-                const next = new Set(prev);
-                next.delete(english);
-                return next;
-            });
-        } else {
-            SavedPhrasesStorage.save({
-                english,
-                japanese,
-                source: `Native: ${content?.discussion.topic || dateParam}`,
-            });
+        if (savedPhrases.has(english)) return;
+        const result = await addPhraseToTraining(english, japanese, dateParam);
+        if (result !== 'error') {
             setSavedPhrases(prev => new Set(prev).add(english));
         }
     };
@@ -302,25 +286,21 @@ export default function NativeDatePage() {
                     &#8249; Native
                 </Link>
                 {savedCount > 0 && (
-                    <Link
-                        href="/english/bookmarks"
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            padding: '6px 12px',
-                            backgroundColor: 'transparent',
-                            border: `1px solid ${t.accent}`,
-                            borderRadius: '6px',
-                            color: t.accent,
-                            textDecoration: 'none',
-                            fontSize: '12px',
-                            fontWeight: '600'
-                        }}
-                    >
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '6px 12px',
+                        backgroundColor: 'transparent',
+                        border: `1px solid ${t.accent}`,
+                        borderRadius: '6px',
+                        color: t.accent,
+                        fontSize: '12px',
+                        fontWeight: '600'
+                    }}>
                         <span style={{ fontSize: '14px' }}>★</span>
                         <span>{savedCount}</span>
-                    </Link>
+                    </div>
                 )}
             </div>
 
@@ -630,6 +610,7 @@ export default function NativeDatePage() {
                                                 </button>
                                                 <button
                                                     onClick={(e) => toggleSavePhrase(line.text, '', e)}
+                                                    title={isSaved ? 'Added to training' : 'Add to training'}
                                                     style={{
                                                         background: 'none',
                                                         border: 'none',
@@ -715,6 +696,7 @@ export default function NativeDatePage() {
                                                     </button>
                                                     <button
                                                         onClick={(e) => toggleSavePhrase(phrase.en, phrase.ja, e)}
+                                                        title={isSaved ? 'Added to training' : 'Add to training'}
                                                         style={{
                                                             background: 'none',
                                                             border: 'none',
@@ -818,6 +800,7 @@ export default function NativeDatePage() {
                                                 </button>
                                                 <button
                                                     onClick={(e) => toggleSavePhrase(exp.english, exp.japanese, e)}
+                                                    title={isSaved ? 'Added to training' : 'Add to training'}
                                                     style={{
                                                         background: 'none',
                                                         border: 'none',

@@ -20,8 +20,8 @@ const HOVER_COLOR = '#10B981'; // Hover Color
 const TARGET_COLOR = '#F97316'; // Orange for Target (Softer than Red)
 
 const NAV_ITEMS = [
-    { label: 'Home', href: '/english/home', icon: ArrowLeft },
-    { label: 'World Map', href: '/english/world-map', icon: MapIcon },
+    { label: 'Dashboard', href: '/english/dashboard', icon: ArrowLeft },
+    { label: 'Map 4', href: '/english/world-map-4', icon: MapIcon },
 ];
 
 type ConqueredCountry = {

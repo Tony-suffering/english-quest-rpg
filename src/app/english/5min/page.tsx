@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { DAILY_LESSONS, type DailyLesson, type ConvoChoice } from '@/data/english/five-min-data';
+import { DAILY_LESSONS, type DailyLesson, type ConvoChoice } from '@/data/english/five-min-data-toniolab';
 
 // ── Colors ──────────────────────────────────────────────
 const GOLD = '#D4AF37';

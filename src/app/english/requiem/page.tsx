@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DAY_PROLOGUES } from '@/data/english/day-prologues';
+import { usePPWordPicker, PPButton, PPPopup } from '@/components/english/PPWordPicker';
 
 interface UserPhrase {
     id: string;
@@ -28,9 +29,264 @@ interface ScenarioConfig {
     memoriaId: string;
     dayLabels: string[];
     speakerColors: Record<string, string>;
+    days?: number; // number of days in the scenario (defaults to 5)
 }
 
 const SCENARIOS: ScenarioConfig[] = [
+    {
+        key: 'talent-show',
+        scenarioNum: '25',
+        prologueDate: '2026-08-03',
+        memoriaId: 'talent-day1',
+        dayLabels: [
+            'The Trumpet', 'The Complaint', 'The Calisthenics',
+            'The Lecture', 'The Bus',
+        ],
+        speakerColors: {
+            Julian: '#F59E0B', 'Principal Henderson': '#334155', 'Ms. Reyes': '#DB2777',
+            'Judge Halloran': '#475569', Ray: '#B45309', 'Old Man Gus': '#92400E',
+            'Brandon Lee': '#CA8A04', 'Big Pete': '#92400E', 'Coach Daryl': '#B91C1C',
+            'Coach Vega': '#0E7490', Tasha: '#DB2777', Paige: '#8B5CF6', Devon: '#10B981',
+            'Grandpa Stan': '#D97706', Donna: '#EC4899', Brianna: '#F472B6',
+            'Pastor Jim': '#4338CA', Leticia: '#7C3AED', Reggie: '#EF4444',
+            Kenji: '#06B6D4', Ken: '#0369A1', Sota: '#0EA5E9', Hana: '#EC4899',
+            Diego: '#10B981', Wendell: '#B45309', Jake: '#EF4444', Nate: '#EA580C',
+            Chloe: '#BE185D', 'Mr. Kowalski': '#57534E', Walt: '#B45309', Sam: '#10B981',
+            Emma: '#A78BFA', Timmy: '#60A5FA', Derek: '#10B981', Marv: '#B45309',
+            Arlene: '#DB2777', Duke: '#78716C',
+        },
+    },
+    {
+        key: 'night-docket',
+        scenarioNum: '24',
+        prologueDate: '2026-07-29',
+        memoriaId: 'docket-day1',
+        dayLabels: [
+            'The Brisket', 'The Brown Stain', 'The Painting',
+            'The Clipboard', 'The Monster',
+        ],
+        speakerColors: {
+            'Judge Halloran': '#475569', 'Bailiff Reyes': '#7C3AED', 'Dave Boyd': '#C0392B',
+            Hank: '#B8941E', Tammy: '#DB2777', Cheryl: '#A855F7', Wanda: '#8B5CF6',
+            Marcus: '#2563EB', Jenna: '#DB2777', 'Mrs. Patterson': '#9D174D',
+            Bob: '#78350F', Karen: '#10B981', Margot: '#BE185D', Dex: '#2563EB',
+            Ray: '#B45309', Pearl: '#9D174D', Nadia: '#7C3AED', Cody: '#059669',
+            Donna: '#EC4899', Tommy: '#059669', Reggie: '#EF4444', Devon: '#10B981',
+            Bri: '#F472B6', Emma: '#A78BFA', Timmy: '#60A5FA', Greg: '#6366F1',
+            Sarah: '#F472B6', Noah: '#34D399', Frank: '#D97706', Vernon: '#78716C',
+            Flo: '#B45309',
+        },
+    },
+    {
+        key: 'losers-table',
+        scenarioNum: '23',
+        prologueDate: '2026-07-24',
+        memoriaId: 'losers-day1',
+        dayLabels: [
+            'The House Rule', 'Two Men Who Are Not Asleep', 'Clipboard Night',
+            'The Protest Vote', 'The Night Nobody Lost Anything',
+        ],
+        speakerColors: {
+            Flo: '#B45309', Marcus: '#2563EB', Vernon: '#78716C', Wanda: '#8B5CF6',
+            Reggie: '#EF4444', 'Ms. Reyes': '#DB2777', 'Grandpa Stan': '#92400E',
+            Walter: '#475569', Brody: '#F59E0B', 'Old Man Gus': '#57534E',
+            'Nurse Tanya': '#0891B2', Hank: '#B8941E', Donna: '#EC4899',
+            Tommy: '#059669', 'Bailiff Reyes': '#7C3AED', Patrice: '#0E7490',
+            'Principal Henderson': '#334155', Jenna: '#DB2777', 'Dave Boyd': '#C0392B',
+            Devon: '#10B981', Cheryl: '#A855F7',
+        },
+    },
+    {
+        key: 'wedding',
+        scenarioNum: '22',
+        prologueDate: '2026-07-14',
+        memoriaId: 'wedding-day1',
+        days: 10,
+        dayLabels: [
+            'Meeting the Family', 'The Rehearsal', 'The Rehearsal Dinner', 'The Welcome Brunch', 'The Seating Chart',
+            'The Morning Of', 'The Ceremony', 'The Toasts', 'The Reception', 'The Farewell Brunch',
+        ],
+        speakerColors: {
+            Yuki: '#EC4899', Chris: '#2563EB', Emily: '#DB2777', Dan: '#B45309',
+            Carol: '#8B5CF6', Tyson: '#F59E0B', Priya: '#0891B2', Denise: '#475569',
+            'Uncle Rick': '#78716C', 'Nana Jo': '#059669',
+        },
+    },
+    {
+        key: 'cruise',
+        scenarioNum: '21',
+        prologueDate: '2026-07-04',
+        memoriaId: 'cruise-day1',
+        days: 10,
+        dayLabels: [
+            'Embarkation Day', 'The Buffet', 'The Pool Deck', 'The First Port', 'Formal Night',
+            'The Storm', 'The Talent Show', 'The Snorkel Trip', 'The Vow Renewal', 'Disembarkation',
+        ],
+        speakerColors: {
+            Ben: '#2563EB', Kayla: '#EC4899', Marv: '#B45309', Arlene: '#DB2777',
+            Cheryl: '#8B5CF6', Julian: '#F59E0B', Andres: '#10B981',
+            'Captain Lund': '#475569', Tessa: '#0891B2',
+        },
+    },
+    {
+        key: 'roadtrip',
+        scenarioNum: '20',
+        prologueDate: '2026-06-24',
+        memoriaId: 'roadtrip-day1',
+        days: 10,
+        dayLabels: [
+            'Leaving New Jersey', 'The Diner', 'The Big City', 'The Cornfields', 'The Faces & The Motel',
+            'Yellowstone', 'Stranded', 'Las Vegas', 'The Last Night', 'The Pacific',
+        ],
+        speakerColors: {
+            Walt: '#B45309', Roy: '#2563EB', Lori: '#DB2777', Paige: '#8B5CF6',
+            Sam: '#10B981', Rhonda: '#0891B2', Flo: '#F59E0B', 'Ranger Kim': '#059669',
+            Duke: '#78716C', Bud: '#92400E',
+        },
+    },
+    {
+        key: 'campingtrip',
+        scenarioNum: '19',
+        prologueDate: '2026-06-19',
+        memoriaId: 'camping-day1',
+        dayLabels: ['Setting Up Camp', 'The Hike', 'The Storm', 'The Bear', 'Breaking Camp'],
+        speakerColors: {
+            Hank: '#B45309', Sandra: '#DB2777', Logan: '#2563EB',
+            Ruby: '#EC4899', 'Ranger Dawn': '#059669', 'Uncle Dale': '#78716C',
+        },
+    },
+    {
+        key: 'juryduty',
+        scenarioNum: '18',
+        prologueDate: '2026-06-14',
+        memoriaId: 'jury-day1',
+        dayLabels: ['The Summons', 'Voir Dire', 'The Trial', 'The Deliberation', 'The Verdict'],
+        speakerColors: {
+            Wanda: '#B45309', Trevor: '#2563EB', Aisha: '#0891B2',
+            Doug: '#EF4444', 'Judge Halloran': '#475569', 'Bailiff Reyes': '#78716C',
+            Mei: '#8B5CF6',
+        },
+    },
+    {
+        key: 'dmv',
+        scenarioNum: '17',
+        prologueDate: '2026-06-09',
+        memoriaId: 'dmv-day1',
+        dayLabels: ['Take a Number', 'The Wrong Form', 'The Eye Test', 'The Road Test', 'Smile for the Camera'],
+        speakerColors: {
+            Gloria: '#0891B2', Tony: '#2563EB', Brenda: '#8B5CF6',
+            Kevin: '#F59E0B', 'Mr Okafor': '#059669', Patrice: '#EC4899',
+            Vernon: '#B45309',
+        },
+    },
+    {
+        key: 'emergencyroom',
+        scenarioNum: '16',
+        prologueDate: '2026-06-04',
+        memoriaId: 'er-day1',
+        dayLabels: ['The Triage', 'The Long Wait', 'Hour Four', 'Called Back', 'Discharged'],
+        speakerColors: {
+            'Nurse Tanya': '#0891B2', Dave: '#2563EB', Renata: '#EC4899',
+            Walter: '#B45309', Destiny: '#8B5CF6', 'Little Mateo': '#34D399',
+            Brody: '#F59E0B', 'Dr Osei': '#059669', Phil: '#78716C',
+        },
+    },
+    {
+        key: 'airport',
+        scenarioNum: '15',
+        prologueDate: '2026-05-30',
+        memoriaId: 'airport-day1',
+        dayLabels: ['The First Delay', 'Cancelled', 'Overnight at Gate B12', 'The Standby List', 'Finally Boarding'],
+        speakerColors: {
+            Denise: '#0891B2', Reuben: '#2563EB', Hana: '#EC4899',
+            Wendell: '#B45309', Simone: '#8B5CF6', Chad: '#EF4444',
+            'Captain Ortiz': '#475569', Diego: '#10B981',
+        },
+    },
+    {
+        key: 'thanksgiving',
+        scenarioNum: '14',
+        prologueDate: '2026-05-25',
+        memoriaId: 'thanksgiving-day1',
+        dayLabels: ['The Arrivals', 'The Kitchen', 'The Dinner Table', 'The Football & The Fallout', 'Leftovers & Goodbyes'],
+        speakerColors: {
+            'Grandma Lorraine': '#B45309', Rick: '#2563EB', Carol: '#DB2777',
+            'Aunt Pam': '#8B5CF6', Spencer: '#10B981', Brianna: '#F472B6',
+            'Uncle Lou': '#78716C', 'Grandpa Stan': '#D97706',
+        },
+    },
+    {
+        key: 'homeinspection',
+        scenarioNum: '13',
+        prologueDate: '2026-05-20',
+        memoriaId: 'homeinspection-day1',
+        dayLabels: ['The Basement', 'The Roof & HVAC', 'The Negotiation', 'The Termite Twist', 'Closing Day'],
+        speakerColors: {
+            Marcus: '#2563EB', Jenna: '#EC4899', Bob: '#78350F',
+            'Mrs. Patterson': '#7C3AED', Karen: '#10B981',
+        },
+    },
+    {
+        key: 'firstweek',
+        scenarioNum: '12',
+        prologueDate: '2026-05-15',
+        memoriaId: 'firstweek-day1',
+        dayLabels: ['The Offer Call', 'Outfit Crisis', 'Sunday Scaries', 'Day One', 'Day Two'],
+        speakerColors: {
+            Maya: '#EC4899', Mom: '#DB2777', Jess: '#F472B6',
+            Marcus: '#2563EB', Jen: '#10B981', Brad: '#78716C',
+        },
+    },
+    {
+        key: 'fridaynightlights',
+        scenarioNum: '11',
+        prologueDate: '2026-03-27',
+        memoriaId: 'fridaynightlights-day1',
+        dayLabels: ['Game Night', 'The Morning After', 'Quiet Reflection', 'Back to School', 'Practice Resumes'],
+        speakerColors: {
+            'Coach Daryl': '#B45309', Marcus: '#2563EB', Jamal: '#10B981',
+            Tasha: '#EC4899', 'Mr. Kowalski': '#78716C', Jenna: '#8B5CF6',
+            Devon: '#0891B2', 'Ms. Reyes': '#F59E0B', 'Principal Henderson': '#6366F1',
+            'Big Pete': '#D97706', 'Brandon Lee': '#EF4444', Maya: '#F472B6',
+            'Mrs. Calloway': '#DB2777', 'Coach Vega': '#059669',
+        },
+    },
+    {
+        key: 'worstdate',
+        scenarioNum: '10',
+        prologueDate: '2026-03-22',
+        memoriaId: 'worstdate-day1',
+        dayLabels: ['The Arrival', 'Dinner Disaster', 'The Great Escape', 'Curb Confessions', 'The Morning After'],
+        speakerColors: {
+            Jake: '#2563EB', Chloe: '#EC4899', Nate: '#F59E0B',
+            Sasha: '#8B5CF6', Marco: '#78716C', Lydia: '#10B981',
+        },
+    },
+    {
+        key: 'blockparty',
+        scenarioNum: '9',
+        prologueDate: '2026-03-17',
+        memoriaId: 'blockparty-day1',
+        dayLabels: ['The Setup', 'Peak Hours', 'The Power Outage', 'The Bounce House Incident', 'The Morning After'],
+        speakerColors: {
+            Donna: '#D97706', Marcus: '#2563EB', Leticia: '#8B5CF6',
+            Reggie: '#78716C', Bri: '#EC4899', Tommy: '#6366F1',
+            'Pastor Jim': '#059669', Keiko: '#0891B2',
+        },
+    },
+    {
+        key: 'bbq',
+        scenarioNum: '8',
+        prologueDate: '2026-03-12',
+        memoriaId: 'bbq-day1',
+        dayLabels: ['Arrivals', 'Grill Wars', 'Side Dish Battle', 'Beers & Truths', 'Sunset'],
+        speakerColors: {
+            'Big Dave': '#B45309', Tammy: '#EC4899', Ken: '#2563EB',
+            Yuko: '#0891B2', Sota: '#F59E0B', Hank: '#78716C',
+            Cheryl: '#DB2777', Tyler: '#6366F1', Brenda: '#10B981',
+            Captain: '#D97706',
+        },
+    },
     {
         key: 'bucketlist',
         scenarioNum: '7',
@@ -120,10 +376,10 @@ function getDateForIndex(index: number): string {
     return `${y}-${m}-${d}`;
 }
 
-function getDatesForScenario(prologueDate: string): string[] {
+function getDatesForScenario(prologueDate: string, days: number = 5): string[] {
     const start = new Date(prologueDate);
     const dates: string[] = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < days; i++) {
         const d = new Date(start);
         d.setDate(d.getDate() + i);
         const y = d.getFullYear();
@@ -134,10 +390,10 @@ function getDatesForScenario(prologueDate: string): string[] {
     return dates;
 }
 
-function formatDateRange(prologueDate: string): string {
+function formatDateRange(prologueDate: string, days: number = 5): string {
     const start = new Date(prologueDate);
     const end = new Date(start);
-    end.setDate(end.getDate() + 4);
+    end.setDate(end.getDate() + (days - 1));
     const sameMonth = start.getMonth() === end.getMonth();
     const startStr = `${start.toLocaleString('en-US', { month: 'short' })} ${start.getDate()}`;
     const endStr = sameMonth
@@ -170,6 +426,7 @@ export default function ScenarioHubPage() {
     const [clientToday, setClientToday] = useState<string>('');
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
     const [doneDays, setDoneDays] = useState<Set<string>>(new Set());
+    const { ppWordPicker, openPP, toggleWord, closePP, search: ppSearch } = usePPWordPicker();
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -238,7 +495,7 @@ export default function ScenarioHubPage() {
     const scenarioStats = useMemo(() => {
         const stats: Record<string, ScenarioStats> = {};
         for (const sc of SCENARIOS) {
-            const dates = getDatesForScenario(sc.prologueDate);
+            const dates = getDatesForScenario(sc.prologueDate, sc.days);
             let totalWords = 0;
             let mastered = 0;
             let inProgress = 0;
@@ -272,7 +529,7 @@ export default function ScenarioHubPage() {
     const scenarioForDate = useMemo(() => {
         const map: Record<string, string> = {};
         for (const sc of SCENARIOS) {
-            const dates = getDatesForScenario(sc.prologueDate);
+            const dates = getDatesForScenario(sc.prologueDate, sc.days);
             for (const d of dates) map[d] = sc.scenarioNum;
         }
         return map;
@@ -282,7 +539,7 @@ export default function ScenarioHubPage() {
         const map: Record<string, { title: string; dayLabel: string; dayNum: number; scenarioNum: string }> = {};
         for (const sc of SCENARIOS) {
             const prologue = DAY_PROLOGUES[sc.prologueDate];
-            const dates = getDatesForScenario(sc.prologueDate);
+            const dates = getDatesForScenario(sc.prologueDate, sc.days);
             for (let i = 0; i < dates.length; i++) {
                 map[dates[i]] = {
                     title: prologue?.title || '',
@@ -469,7 +726,7 @@ export default function ScenarioHubPage() {
                         margin: '8px 0 0',
                         letterSpacing: '0.3px',
                     }}>
-                        5-day story scenarios -- words, conversations, expressions
+                        Multi-day story scenarios -- words, conversations, expressions
                     </p>
                 </div>
 
@@ -513,7 +770,7 @@ export default function ScenarioHubPage() {
                                     color: '#a8a29e',
                                     letterSpacing: '0.3px',
                                 }}>
-                                    {formatDateRange(sc.prologueDate)}
+                                    {formatDateRange(sc.prologueDate, sc.days)}
                                 </span>
                             </div>
 
@@ -607,9 +864,9 @@ export default function ScenarioHubPage() {
 
                                 {/* Overall scenario progress */}
                                 {(() => {
-                                    const scenarioDates = getDatesForScenario(sc.prologueDate);
+                                    const scenarioDates = getDatesForScenario(sc.prologueDate, sc.days);
                                     const daysCleared = scenarioDates.filter(d => doneDays.has(d)).length;
-                                    const totalDays = 5;
+                                    const totalDays = sc.days ?? 5;
                                     const allClear = daysCleared === totalDays;
                                     return (
                                         <div style={{
@@ -691,7 +948,7 @@ export default function ScenarioHubPage() {
                                     marginBottom: '12px',
                                 }}>
                                     {stats.days.map((day, di) => {
-                                        const dayDate = getDatesForScenario(sc.prologueDate)[di];
+                                        const dayDate = getDatesForScenario(sc.prologueDate, sc.days)[di];
                                         const isComplete = doneDays.has(dayDate);
                                         return (
                                             <Link
@@ -1080,6 +1337,7 @@ export default function ScenarioHubPage() {
                                                         {w.meaning}
                                                     </div>
                                                 </div>
+                                                <PPButton onClick={() => openPP(w.id || `requiem-${wi}`, w.phrase)} />
                                                 <span style={{
                                                     fontSize: '11px',
                                                     fontWeight: '700',
@@ -1131,6 +1389,7 @@ export default function ScenarioHubPage() {
             )}
 
             </div>
+            {ppWordPicker && <PPPopup state={ppWordPicker} onToggle={toggleWord} onClose={closePP} onSearch={ppSearch} />}
         </div>
     );
 }

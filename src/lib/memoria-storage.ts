@@ -6,8 +6,7 @@ export class MemoriaStorage {
         try {
             const res = await fetch('/api/memoria/entries');
             if (!res.ok) return [];
-            const data = await res.json();
-            return Array.isArray(data) ? data : [];
+            return await res.json();
         } catch (error) {
             console.error('Failed to fetch entries:', error);
             return [];

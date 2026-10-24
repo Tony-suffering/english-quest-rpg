@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, useParams, notFound } from 'next/navigation';
 import { journalEntries } from '@/data/journal';
-import { SavedPhrasesStorage } from '@/lib/saved-phrases';
+import { addPhraseToTraining } from '@/lib/saved-phrases';
 
 export default function EnglishJournalDetailPage() {
     const router = useRouter();
@@ -332,12 +332,6 @@ export default function EnglishJournalDetailPage() {
         return () => { window.speechSynthesis.cancel(); stopProgress(); };
     }, []);
 
-    // Load saved phrases
-    useEffect(() => {
-        const saved = SavedPhrasesStorage.getAll();
-        setSavedPhrases(new Set(saved.map(p => p.english)));
-    }, []);
-
     // Load completion state
     useEffect(() => {
         if (id) {
@@ -355,26 +349,12 @@ export default function EnglishJournalDetailPage() {
         }
     };
 
-    // Toggle save phrase
-    const toggleSavePhrase = (text: string, japanese: string | null, e: React.MouseEvent) => {
+    // Add phrase to training (add-only)
+    const toggleSavePhrase = async (text: string, japanese: string | null, e: React.MouseEvent) => {
         e.stopPropagation();
-        if (savedPhrases.has(text)) {
-            const all = SavedPhrasesStorage.getAll();
-            const found = all.find(p => p.english === text);
-            if (found) SavedPhrasesStorage.remove(found.id);
-            setSavedPhrases(prev => {
-                const next = new Set(prev);
-                next.delete(text);
-                return next;
-            });
-        } else {
-            SavedPhrasesStorage.save({
-                english: text,
-                ...(japanese ? { japanese } : {}),
-                source: `Pro #${id}`,
-            });
-            setSavedPhrases(prev => new Set(prev).add(text));
-        }
+        if (savedPhrases.has(text)) return; // already added this session
+        const result = await addPhraseToTraining(text, japanese || '');
+        if (result !== 'error') setSavedPhrases(prev => new Set(prev).add(text));
     };
 
     const currentIsSaved = currentTrack ? savedPhrases.has(currentTrack.content) : false;
@@ -385,26 +365,6 @@ export default function EnglishJournalDetailPage() {
                 <Link href="/english/pro" style={{ color: '#78716C', textDecoration: 'none', fontSize: '13px' }}>
                     &#8249; Back to Pro
                 </Link>
-                {savedPhrases.size > 0 && (
-                    <button
-                        onClick={() => router.push('/english/bookmarks')}
-                        style={{
-                            background: 'none',
-                            border: '1px solid #D4AF37',
-                            color: '#D4AF37',
-                            cursor: 'pointer',
-                            padding: '6px 10px',
-                            borderRadius: '6px',
-                            fontSize: '11px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                        }}
-                    >
-                        <span>★</span>
-                        <span>{savedPhrases.size}</span>
-                    </button>
-                )}
             </div>
             <div style={{ textAlign: 'center', padding: '20px 24px 40px' }}>
                 {/* Article Navigation */}
@@ -545,7 +505,7 @@ export default function EnglishJournalDetailPage() {
                                         alignItems: 'center',
                                         gap: '4px',
                                     }}
-                                    title={currentIsSaved ? 'Remove from saved' : 'Save phrase'}
+                                    title={currentIsSaved ? 'Added to training' : 'Add to training'}
                                 >
                                     {currentIsSaved ? '★' : '☆'}
                                     <span style={{ fontSize: '11px', fontWeight: '600' }}>{currentIsSaved ? 'Saved' : 'Save'}</span>
@@ -640,7 +600,7 @@ export default function EnglishJournalDetailPage() {
                                         color: savedPhrases.has(track.content) ? '#D4AF37' : '#D6D3D1',
                                         flexShrink: 0,
                                     }}
-                                    title={savedPhrases.has(track.content) ? 'Remove from saved' : 'Save phrase'}
+                                    title={savedPhrases.has(track.content) ? 'Added to training' : 'Add to training'}
                                 >
                                     {savedPhrases.has(track.content) ? '★' : '☆'}
                                 </button>

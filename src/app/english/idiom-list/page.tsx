@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { usePPWordPicker, PPButton, PPPopup } from '@/components/english/PPWordPicker';
 
 interface UserPhrase {
     id: string;
@@ -22,6 +23,7 @@ export default function IdiomListPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [isMobile, setIsMobile] = useState(false);
+    const { ppWordPicker, openPP, toggleWord, closePP, search: ppSearch } = usePPWordPicker();
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -237,7 +239,7 @@ export default function IdiomListPage() {
                         {!isMobile && (
                             <div style={{
                                 display: 'grid',
-                                gridTemplateColumns: '52px 1fr 1fr 160px 72px',
+                                gridTemplateColumns: '52px 1fr 1fr 160px 72px 40px',
                                 padding: '12px 16px',
                                 backgroundColor: '#F5F5F4',
                                 borderBottom: '1px solid #E7E5E4',
@@ -252,6 +254,7 @@ export default function IdiomListPage() {
                                 <div>Meaning</div>
                                 <div>Paired Word</div>
                                 <div style={{ textAlign: 'right' }}>Day</div>
+                                <div>PP</div>
                             </div>
                         )}
 
@@ -261,7 +264,7 @@ export default function IdiomListPage() {
                                 key={entry.id}
                                 style={{
                                     display: isMobile ? 'flex' : 'grid',
-                                    gridTemplateColumns: isMobile ? undefined : '52px 1fr 1fr 160px 72px',
+                                    gridTemplateColumns: isMobile ? undefined : '52px 1fr 1fr 160px 72px 40px',
                                     flexDirection: isMobile ? 'column' : undefined,
                                     padding: isMobile ? '12px 16px' : '10px 16px',
                                     borderBottom: i < displayIdioms.length - 1 ? '1px solid #F5F5F4' : 'none',
@@ -306,6 +309,7 @@ export default function IdiomListPage() {
                                         }}>
                                             {entry.phrase}
                                         </div>
+                                        <PPButton onClick={() => openPP(entry.id, entry.review_idiom || entry.phrase)} style={{ alignSelf: 'flex-start', marginTop: '4px' }} />
                                     </>
                                 ) : (
                                     <>
@@ -348,6 +352,9 @@ export default function IdiomListPage() {
                                         }}>
                                             Day {entry.dayNumber}
                                         </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <PPButton onClick={() => openPP(entry.id, entry.review_idiom || entry.phrase)} />
+                                        </div>
                                     </>
                                 )}
                             </div>
@@ -368,6 +375,7 @@ export default function IdiomListPage() {
                     }
                 </div>
             </div>
+            {ppWordPicker && <PPPopup state={ppWordPicker} onToggle={toggleWord} onClose={closePP} onSearch={ppSearch} />}
         </div>
     );
 }

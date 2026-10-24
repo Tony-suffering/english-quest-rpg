@@ -15,9 +15,26 @@ import { gameNightEntries } from '@/data/english/game-night-chaos';
 import { antiquesHouseEntries } from '@/data/english/antiques-house';
 import { bucketListTripEntries } from '@/data/english/bucket-list-trip';
 import { bbqNeighborhoodEntries } from '@/data/english/bbq-neighborhood';
+import { blockPartyChaosEntries } from '@/data/english/block-party-chaos';
 import { theJobEntries } from '@/data/english/365-the-job';
 import { tokyo52Ep01Entries } from '@/data/english/tokyo52/ep01';
-import { tokyo52Ep02Entries } from '@/data/english/tokyo52/ep02';
+import { worstFirstDateEntries } from '@/data/english/worst-first-date';
+import { fridayNightLightsEntries } from '@/data/english/friday-night-lights';
+import { firstWeekJobEntries } from '@/data/english/first-week-job';
+import { homeInspectionEntries } from '@/data/english/home-inspection';
+import { shingekiMemoriaEntries } from '@/data/english/shingeki-memoria/ep01';
+import { thanksgivingDinnerEntries } from '@/data/english/thanksgiving-dinner';
+import { airportDelayEntries } from '@/data/english/airport-delay';
+import { erWaitingRoomEntries } from '@/data/english/er-waiting-room';
+import { dmvRenewalEntries } from '@/data/english/dmv-renewal';
+import { juryDutyEntries } from '@/data/english/jury-duty';
+import { campingTripEntries } from '@/data/english/camping-trip';
+import { roadTripEntries } from '@/data/english/road-trip';
+import { cruiseEntries } from '@/data/english/cruise';
+import { weddingEntries } from '@/data/english/wedding';
+import { losersTableEntries } from '@/data/english/losers-table';
+import { nightDocketEntries } from '@/data/english/night-docket';
+import { talentShowEntries } from '@/data/english/talent-show';
 
 export default function MemoriaPage() {
     const [entries, setEntries] = useState<MemoriaEntry[]>([]);
@@ -28,6 +45,15 @@ export default function MemoriaPage() {
     const [tabMode, setTabMode] = useState<'memoria' | 'tangent'>('memoria');
     const [tangentEntries, setTangentEntries] = useState<MemoriaEntry[]>([]);
     const [completedSet, setCompletedSet] = useState<Set<string>>(new Set());
+    const [clientToday, setClientToday] = useState<string>('');
+
+    useEffect(() => {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        setClientToday(`${y}-${m}-${dd}`);
+    }, []);
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -224,6 +250,20 @@ export default function MemoriaPage() {
                 tags: e.tags,
             }));
 
+            const blockPartyMemoriaEntries: MemoriaEntry[] = blockPartyChaosEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
             const theJobMemoriaEntries: MemoriaEntry[] = theJobEntries.map(e => ({
                 id: e.id,
                 date: e.date,
@@ -252,7 +292,7 @@ export default function MemoriaPage() {
                 tags: e.tags,
             }));
 
-            const tokyo52Ep02MemoriaEntries: MemoriaEntry[] = tokyo52Ep02Entries.map(e => ({
+            const worstDateMemoriaEntries: MemoriaEntry[] = worstFirstDateEntries.map(e => ({
                 id: e.id,
                 date: e.date,
                 title: e.title,
@@ -266,13 +306,258 @@ export default function MemoriaPage() {
                 tags: e.tags,
             }));
 
-            const allEntries = [...theJobMemoriaEntries, ...tokyo52MemoriaEntries, ...tokyo52Ep02MemoriaEntries];
+            const fridayNightMemoriaEntries: MemoriaEntry[] = fridayNightLightsEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const firstWeekMemoriaEntries: MemoriaEntry[] = firstWeekJobEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const homeInspectionMemoriaEntries: MemoriaEntry[] = homeInspectionEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const shingekiEntries: MemoriaEntry[] = shingekiMemoriaEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const thanksgivingMemoriaEntries: MemoriaEntry[] = thanksgivingDinnerEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const airportMemoriaEntries: MemoriaEntry[] = airportDelayEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const erMemoriaEntries: MemoriaEntry[] = erWaitingRoomEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const dmvMemoriaEntries: MemoriaEntry[] = dmvRenewalEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const juryMemoriaEntries: MemoriaEntry[] = juryDutyEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const campingMemoriaEntries: MemoriaEntry[] = campingTripEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const roadTripMemoriaEntries: MemoriaEntry[] = roadTripEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const cruiseMemoriaEntries: MemoriaEntry[] = cruiseEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const weddingMemoriaEntries: MemoriaEntry[] = weddingEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const losersTableMemoriaEntries: MemoriaEntry[] = losersTableEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const nightDocketMemoriaEntries: MemoriaEntry[] = nightDocketEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const talentShowMemoriaEntries: MemoriaEntry[] = talentShowEntries.map(e => ({
+                id: e.id,
+                date: e.date,
+                title: e.title,
+                content: e.content,
+                conversation: e.conversation,
+                tone: e.tone,
+                series: e.series,
+                seriesTitle: e.seriesTitle,
+                createdAt: e.createdAt,
+                updatedAt: e.updatedAt,
+                tags: e.tags,
+            }));
+
+            const allEntries = [...userEntries, ...journalMemoriaEntries, ...labMemoriaEntries, ...partyMemoriaEntries, ...monsterMemoriaEntries, ...marinersMemoriaEntries, ...skeletonMemoriaEntries, ...movieMemoriaEntries, ...gameNightMemoriaEntries, ...antiquesMemoriaEntries, ...bucketListMemoriaEntries, ...bbqMemoriaEntries, ...blockPartyMemoriaEntries, ...theJobMemoriaEntries, ...tokyo52MemoriaEntries, ...worstDateMemoriaEntries, ...fridayNightMemoriaEntries, ...firstWeekMemoriaEntries, ...homeInspectionMemoriaEntries, ...shingekiEntries, ...thanksgivingMemoriaEntries, ...airportMemoriaEntries, ...erMemoriaEntries, ...dmvMemoriaEntries, ...juryMemoriaEntries, ...campingMemoriaEntries, ...roadTripMemoriaEntries, ...cruiseMemoriaEntries, ...weddingMemoriaEntries, ...losersTableMemoriaEntries, ...nightDocketMemoriaEntries, ...talentShowMemoriaEntries];
             setEntries(allEntries);
-            setTangentEntries([]);
-            localStorage.setItem('memoria_total', String(allEntries.length));
+            setTangentEntries(tangentMemoriaEntries);
+            localStorage.setItem('memoria_total', String(allEntries.length + tangentMemoriaEntries.length));
         };
         loadEntries();
     }, []);
+
+    // Today's pick -- for "毎日続けられる" daily highlight
+    // Priority: today's entry > nearest upcoming within 7 days > null
+    const todaysPick = useMemo((): { entry: MemoriaEntry; label: '今日の1本' | '次の1本' } | null => {
+        if (!clientToday) return null;
+        const today = entries.filter(e => (e.date || '').split('T')[0] === clientToday);
+        if (today.length > 0) {
+            const pending = today.find(e => !completedSet.has(e.id));
+            return { entry: pending || today[0], label: '今日の1本' };
+        }
+        // Fallback: nearest upcoming within 7 days
+        const todayMs = new Date(clientToday).getTime();
+        const upcoming = entries
+            .map(e => ({ e, ms: new Date((e.date || '').split('T')[0]).getTime() }))
+            .filter(x => !isNaN(x.ms) && x.ms > todayMs && x.ms - todayMs <= 7 * 24 * 60 * 60 * 1000)
+            .sort((a, b) => a.ms - b.ms);
+        if (upcoming.length > 0) {
+            return { entry: upcoming[0].e, label: '次の1本' };
+        }
+        return null;
+    }, [entries, clientToday, completedSet]);
 
     // Group entries by date
     const entriesByDate = useMemo(() => {
@@ -565,6 +850,105 @@ export default function MemoriaPage() {
                 </button>
             </div>
             )}
+
+            {/* Today's Pick banner -- 毎日続けるための1本 */}
+            {tabMode === 'memoria' && todaysPick && (() => {
+                const pickDate = (todaysPick.entry.date || '').split('T')[0];
+                const dateLabel = pickDate ? `${new Date(pickDate).getMonth() + 1}/${new Date(pickDate).getDate()}` : '';
+                return (
+                <Link
+                    href={`/memoria/${todaysPick.entry.id}`}
+                    style={{ textDecoration: 'none', flexShrink: 0 }}
+                >
+                    <div style={{
+                        background: 'linear-gradient(135deg, #D4AF37 0%, #b8962e 100%)',
+                        padding: '14px 16px',
+                        borderBottom: '1px solid #b8962e',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '14px',
+                        cursor: 'pointer',
+                    }}>
+                        <div style={{
+                            width: '44px',
+                            height: '44px',
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(255,255,255,0.18)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
+                        }}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polygon points="5 3 19 12 5 21 5 3" fill="#fff" />
+                            </svg>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{
+                                fontSize: '10px',
+                                fontWeight: '700',
+                                color: 'rgba(255,255,255,0.85)',
+                                letterSpacing: '1px',
+                                marginBottom: '2px',
+                                display: 'flex',
+                                gap: '8px',
+                                alignItems: 'center',
+                            }}>
+                                <span>{todaysPick.label}</span>
+                                {todaysPick.label === '次の1本' && dateLabel && (
+                                    <span style={{ color: 'rgba(255,255,255,0.65)' }}>{dateLabel}</span>
+                                )}
+                            </div>
+                            <div style={{
+                                fontSize: '15px',
+                                fontWeight: '700',
+                                color: '#fff',
+                                lineHeight: '1.3',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                            }}>
+                                {todaysPick.entry.title}
+                            </div>
+                            {todaysPick.entry.seriesTitle && (
+                                <div style={{
+                                    fontSize: '11px',
+                                    color: 'rgba(255,255,255,0.75)',
+                                    marginTop: '2px',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                }}>
+                                    {todaysPick.entry.seriesTitle}
+                                </div>
+                            )}
+                        </div>
+                        {completedSet.has(todaysPick.entry.id) ? (
+                            <div style={{
+                                fontSize: '11px',
+                                fontWeight: '700',
+                                color: '#fff',
+                                backgroundColor: 'rgba(0,0,0,0.18)',
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                flexShrink: 0,
+                            }}>
+                                済
+                            </div>
+                        ) : (
+                            <div style={{
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                color: '#fff',
+                                flexShrink: 0,
+                            }}>
+                                開く &rsaquo;
+                            </div>
+                        )}
+                    </div>
+                </Link>
+                );
+            })()}
 
             {/* Main Content */}
             <div style={{

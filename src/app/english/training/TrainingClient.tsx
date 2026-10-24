@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useLayoutEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import VoiceRecorder from '@/components/VoiceRecorder';
 import { getSettings } from '@/lib/settings';
@@ -10,17 +10,24 @@ import {
     startFeverBGM, stopFeverBGM, playCardRankSound, playRankUpSound, playFeverChainHit,
     playImpactHit, playKakuhenEntry, playGpCoin, playStreakBreak,
 } from '@/lib/training-sounds';
-import { TOEIC_30DAY } from '@/data/izakaya-toeic/toeic-30day-content';
+import PuzzleBoard, { type GridMilestoneData } from '@/components/english/PuzzleBoard';
+import ReviewSlotPanel from '@/components/english/ReviewSlotPanel';
+import CardCorpusPanel, { CardChunkChips } from './CardCorpusPanel';
+import { QUEST_WORDS } from '@/data/english/quest-words';
+import { DAILY_LESSONS } from '@/data/english/five-min-data';
+import { gorokuToTrainingPhrases, loadProductMasteryAsTraining, syncTrainingToProduct, GOROKU_CATEGORIES } from '@/lib/goroku-phrase-adapter';
+import { lifeToTrainingPhrases, loadLifeMasteryAsTraining, saveLifeTrainingMastery, syncLifeTrainingToLifePage, LIFE_CATEGORIES } from '@/lib/life-phrase-adapter';
+import { loadClip, deleteClip, loadAllClipIds, loadAllClipMeta } from '@/lib/training-clips';
 import './training-animations.css';
 
-// 公開RPG: localhost:3004 or toniolab.com or Vercel preview or /my-training path
-const IS_PUBLIC = typeof window !== 'undefined' && (
-    window.location.port === '3004' ||
-    window.location.hostname.includes('toniolab') ||
-    window.location.hostname.includes('english-quest') ||
-    window.location.hostname.includes('vercel.app') ||
-    window.location.pathname.includes('/my-training')
-);
+// 3004 = 公開RPG。DBなし、quest-wordsの静的データで動く
+const IS_PUBLIC = typeof window !== 'undefined' && window.location.port === '3004';
+// /product/ = 語録310商品。goroku seedからPhrase[]を生成、product-storageと双方向同期
+const IS_GOROKU = typeof window !== 'undefined' && window.location.pathname.startsWith('/product/');
+// /english/life/training = Life 1000表現。life-phrasesの静的データで動く
+const IS_LIFE = typeof window !== 'undefined' && window.location.pathname.startsWith('/english/life/training');
+// DB不要モード（公開RPG or 語録310 or Life）
+const IS_LOCAL = IS_PUBLIC || IS_GOROKU || IS_LIFE;
 
 interface VoiceRecording {
     id: number;
@@ -53,6 +60,14 @@ interface Phrase {
     japanese: string;
     category: string;
     date: string;
+    transcript?: string | null;  // PP 書き起こし (任意、D1 phrases.transcript)
+    // Goroku extensions (populated when IS_GOROKU)
+    gorokuContext?: string;
+    gorokuLevels?: string[];    // [0]=short, [1]=attitude, [2]=full, [3]=monologue
+    gorokuLiteral?: string;
+    gorokuSlot?: string;        // swappable word in english[1]
+    gorokuSlotHints?: string[]; // replacement options
+    _viewLevel?: number;        // UI-only: current level being viewed (0-3)
 }
 
 interface PhraseLink {
@@ -62,22 +77,29 @@ interface PhraseLink {
 }
 
 type BaseMastery = 0 | 1 | 2 | 3 | 6;
-type ChakraLevel = 0 | 1 | 2 | 3;
+type ChakraLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-// 4 Evolution Stages: 種→芽→鍛→得
-// Levels 4-6 map to 3 (得) for backwards compatibility
+// 7 Evolution Stages — mid-tone gradients, display Lv.1-7
+// EGG(0) = untouched, no XP. 1 phrase EGG→MASTER = 100 XP total.
+// XP per step: 0, 5, 10, 15, 20, 20, 30 = 100
 const CHAKRA_CONFIG: Record<ChakraLevel, { name: string; ja: string; label: string; lv: number; color: string; bg: string; border: string; gradFrom: string; gradTo: string }> = {
-    0: { name: 'SEED', ja: '種', label: '種', lv: 0, color: '#B91C1C', bg: '#FEF2F2', border: '#F87171', gradFrom: '#F87171', gradTo: '#FECACA' },
-    1: { name: 'SPARK', ja: '芽', label: '芽', lv: 5, color: '#C2410C', bg: '#FFF7ED', border: '#FB923C', gradFrom: '#FB923C', gradTo: '#FED7AA' },
-    2: { name: 'FORGE', ja: '鍛', label: '鍛', lv: 10, color: '#A16207', bg: '#FEFCE8', border: '#FACC15', gradFrom: '#FACC15', gradTo: '#FEF08A' },
-    3: { name: 'OWN', ja: '得', label: '得', lv: 15, color: '#166534', bg: '#F0FDF4', border: '#4ADE80', gradFrom: '#4ADE80', gradTo: '#BBF7D0' },
+    0: { name: 'SEED', ja: '種', label: 'Lv.1 種', lv: 0, color: '#B91C1C', bg: '#FEF2F2', border: '#F87171', gradFrom: '#F87171', gradTo: '#FECACA' },
+    1: { name: 'SPARK', ja: '芽', label: 'Lv.2 芽', lv: 5, color: '#C2410C', bg: '#FFF7ED', border: '#FB923C', gradFrom: '#FB923C', gradTo: '#FED7AA' },
+    2: { name: 'FORGE', ja: '鍛', label: 'Lv.3 鍛', lv: 10, color: '#A16207', bg: '#FEFCE8', border: '#FACC15', gradFrom: '#FACC15', gradTo: '#FEF08A' },
+    3: { name: 'OWN', ja: '得', label: 'Lv.4 得', lv: 15, color: '#166534', bg: '#F0FDF4', border: '#4ADE80', gradFrom: '#4ADE80', gradTo: '#BBF7D0' },
+    4: { name: 'VOICE', ja: '声', label: 'Lv.5 声', lv: 20, color: '#1E40AF', bg: '#EFF6FF', border: '#60A5FA', gradFrom: '#60A5FA', gradTo: '#BFDBFE' },
+    5: { name: 'VISION', ja: '研', label: 'Lv.6 研', lv: 20, color: '#3730A3', bg: '#EEF2FF', border: '#818CF8', gradFrom: '#818CF8', gradTo: '#C7D2FE' },
+    6: { name: 'START', ja: '始', label: 'Lv.7 始', lv: 30, color: '#6B21A8', bg: '#FAF5FF', border: '#A855F7', gradFrom: '#A855F7', gradTo: '#DDD6FE' },
 };
 
-function getChakraLevel(baseMastery: number, _hasRecording?: boolean, _hasLink?: boolean): ChakraLevel {
+function getChakraLevel(baseMastery: number, hasRecording: boolean, hasLink: boolean): ChakraLevel {
+    if (baseMastery === 6) return 6;  // START (DB stored)
+    if (baseMastery >= 3 && hasRecording && hasLink) return 5;  // VISION
+    if (baseMastery >= 3 && hasRecording) return 4;  // VOICE
     return Math.min(baseMastery, 3) as ChakraLevel;
 }
 
-function getChakraInfo(baseMastery: number, hasRecording?: boolean, hasLink?: boolean) {
+function getChakraInfo(baseMastery: number, hasRecording: boolean, hasLink: boolean) {
     const level = getChakraLevel(baseMastery, hasRecording, hasLink);
     return { ...CHAKRA_CONFIG[level], level };
 }
@@ -296,14 +318,14 @@ function levelFromXP(totalXP: number): number {
 }
 
 function getTitleForLevel(lv: number): { title: string; titleEn: string; color: string } {
-    if (lv >= 100) return { title: '英会話マスター', titleEn: 'Master', color: '#D4AF37' };
-    if (lv >= 90) return { title: 'レジェンド', titleEn: 'Legend', color: '#7C3AED' };
-    if (lv >= 71) return { title: 'チャンピオン', titleEn: 'Champion', color: '#DC2626' };
-    if (lv >= 51) return { title: 'エリート', titleEn: 'Elite', color: '#EA580C' };
-    if (lv >= 31) return { title: 'エキスパート', titleEn: 'Expert', color: '#CA8A04' };
-    if (lv >= 16) return { title: 'バトラー', titleEn: 'Battler', color: '#16A34A' };
-    if (lv >= 6) return { title: 'コレクター', titleEn: 'Collector', color: '#2563EB' };
-    return { title: '新人トレーナー', titleEn: 'Rookie', color: '#78716C' };
+    if (lv >= 100) return { title: 'Master', titleEn: 'Master', color: '#D4AF37' };
+    if (lv >= 90) return { title: 'Legend', titleEn: 'Legend', color: '#7C3AED' };
+    if (lv >= 71) return { title: 'Champion', titleEn: 'Champion', color: '#DC2626' };
+    if (lv >= 51) return { title: 'Elite', titleEn: 'Elite', color: '#EA580C' };
+    if (lv >= 31) return { title: 'Expert', titleEn: 'Expert', color: '#CA8A04' };
+    if (lv >= 16) return { title: 'Battler', titleEn: 'Battler', color: '#16A34A' };
+    if (lv >= 6) return { title: 'Collector', titleEn: 'Collector', color: '#2563EB' };
+    return { title: 'Rookie', titleEn: 'Rookie', color: '#78716C' };
 }
 
 // Element colors imported from shared constants
@@ -317,14 +339,14 @@ const CATEGORY_COLORS = ELEMENT_CATEGORY_COLORS;
 // Ratios derived from original power curve: floor(4*(lv-1)^1.8) at key levels
 const DEFAULT_GOAL_XP = 1310;
 const MILESTONE_RATIOS = [
-    { ratio: 4 / 1310, title: '起動', color: '#78716C' },
-    { ratio: 28 / 1310, title: '準備OK', color: '#2563EB' },
-    { ratio: 72 / 1310, title: 'エンジン全開', color: '#16A34A' },
-    { ratio: 167 / 1310, title: 'ゾーン', color: '#CA8A04' },
-    { ratio: 351 / 1310, title: '無双', color: '#EA580C' },
-    { ratio: 588 / 1310, title: '覚醒', color: '#DC2626' },
-    { ratio: 873 / 1310, title: '鬼神', color: '#7C3AED' },
-    { ratio: 1, title: '本日の神', color: '#D4AF37' },
+    { ratio: 4 / 1310, title: 'IGNITION', color: '#78716C' },
+    { ratio: 28 / 1310, title: 'READY', color: '#2563EB' },
+    { ratio: 72 / 1310, title: 'FULL THROTTLE', color: '#16A34A' },
+    { ratio: 167 / 1310, title: 'IN THE ZONE', color: '#CA8A04' },
+    { ratio: 351 / 1310, title: 'UNSTOPPABLE', color: '#EA580C' },
+    { ratio: 588 / 1310, title: 'AWAKENED', color: '#DC2626' },
+    { ratio: 873 / 1310, title: 'BEAST MODE', color: '#7C3AED' },
+    { ratio: 1, title: 'GOD OF THE DAY', color: '#D4AF37' },
 ];
 function getRunnerMilestones(goalXP: number) {
     return MILESTONE_RATIOS.map(m => ({
@@ -418,9 +440,9 @@ function UpperScreenEffect({ effect, slotState }: {
         return () => { timerRef.current.forEach(t => clearTimeout(t)); };
     }, [effect.key, effect.type]);
 
-    const isRush = slotState === 'rush' || slotState === 'RUSH' || slotState === 'special' || slotState === 'SPECIAL' || slotState === 'fever' || slotState === 'FEVER';
-    const isFever = slotState === 'fever' || slotState === 'FEVER';
-    const isSpecial = slotState === 'special' || slotState === 'SPECIAL';
+    const isRush = slotState === 'RUSH' || slotState === 'SPECIAL' || slotState === 'FEVER';
+    const isFever = slotState === 'FEVER';
+    const isSpecial = slotState === 'SPECIAL';
 
     // GARO makai BURST color palette
     const rushColor = isFever ? '#D4AF37' : isSpecial ? '#A855F7' : '#EF4444';
@@ -730,6 +752,108 @@ function UpperScreenEffect({ effect, slotState }: {
     );
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CALENDAR RUNNER — Clean dashboard for calendar mode
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function CalendarRunner({ todayXP, goalXP, streak, todayTouches, activeDays }: {
+    todayXP: number;
+    goalXP: number;
+    streak: number;
+    todayTouches: number;
+    activeDays: number;
+}) {
+    const progress = Math.min(todayXP / Math.max(goalXP, 1), 1);
+    const pct = Math.round(progress * 100);
+
+    // Progress ring SVG
+    const ringR = 38;
+    const ringC = 2 * Math.PI * ringR;
+    const ringOffset = ringC * (1 - progress);
+
+    // Rank
+    const rank = pct >= 100 ? { label: 'COMPLETE', color: '#D4AF37', glow: true }
+        : pct >= 75 ? { label: 'ON FIRE', color: '#EF4444', glow: true }
+        : pct >= 50 ? { label: 'CRUISING', color: '#10B981', glow: false }
+        : pct >= 25 ? { label: 'WARMING UP', color: '#3B82F6', glow: false }
+        : { label: 'STARTING', color: '#78716C', glow: false };
+
+    return (
+        <div style={{
+            height: 90, position: 'relative', overflow: 'hidden',
+            background: 'linear-gradient(180deg, #0F0E0D 0%, #1A1918 50%, #0F0E0D 100%)',
+            borderBottom: '2px solid #111',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 32, padding: '0 24px',
+        }}>
+            {/* Subtle ambient */}
+            <div style={{
+                position: 'absolute', inset: 0, pointerEvents: 'none',
+                background: `radial-gradient(ellipse at 20% 50%, ${rank.color}08 0%, transparent 50%)`,
+            }} />
+
+            {/* XP Progress Ring */}
+            <div style={{ position: 'relative', width: 76, height: 76, flexShrink: 0 }}>
+                <svg viewBox="0 0 90 90" style={{ width: 76, height: 76, transform: 'rotate(-90deg)' }}>
+                    <circle cx="45" cy="45" r={ringR} fill="none" stroke="#292524" strokeWidth="5" />
+                    <circle cx="45" cy="45" r={ringR} fill="none"
+                        stroke={pct >= 100 ? '#D4AF37' : pct >= 50 ? '#10B981' : '#3B82F6'}
+                        strokeWidth="5" strokeLinecap="round"
+                        strokeDasharray={ringC} strokeDashoffset={ringOffset}
+                        style={{ transition: 'stroke-dashoffset 600ms ease, stroke 400ms ease' }}
+                    />
+                </svg>
+                <div style={{
+                    position: 'absolute', inset: 0,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                }}>
+                    <span style={{
+                        fontSize: 18, fontWeight: 900, fontFamily: 'monospace',
+                        color: pct >= 100 ? '#D4AF37' : '#E7E5E4',
+                    }}>{todayXP}</span>
+                    <span style={{ fontSize: 8, fontWeight: 700, color: '#57534E' }}>/ {goalXP} XP</span>
+                </div>
+            </div>
+
+            {/* Rank */}
+            <div style={{
+                fontSize: 14, fontWeight: 900, letterSpacing: '0.2em',
+                color: rank.color,
+                textShadow: rank.glow ? `0 0 12px ${rank.color}60` : 'none',
+            }}>
+                {rank.label}
+            </div>
+
+            {/* Streak */}
+            <div style={{ textAlign: 'center' }}>
+                <div style={{
+                    fontSize: 24, fontWeight: 900, fontFamily: 'monospace',
+                    color: streak >= 7 ? '#D4AF37' : streak >= 3 ? '#10B981' : '#E7E5E4',
+                    textShadow: streak >= 7 ? '0 0 10px rgba(212,175,55,0.4)' : 'none',
+                }}>{streak}</div>
+                <div style={{ fontSize: 8, fontWeight: 700, color: '#57534E', letterSpacing: '0.15em' }}>STREAK</div>
+            </div>
+
+            {/* Today touches */}
+            <div style={{ textAlign: 'center' }}>
+                <div style={{
+                    fontSize: 24, fontWeight: 900, fontFamily: 'monospace',
+                    color: todayTouches >= 30 ? '#D4AF37' : '#E7E5E4',
+                }}>{todayTouches}</div>
+                <div style={{ fontSize: 8, fontWeight: 700, color: '#57534E', letterSpacing: '0.15em' }}>TODAY</div>
+            </div>
+
+            {/* Active days */}
+            <div style={{ textAlign: 'center' }}>
+                <div style={{
+                    fontSize: 24, fontWeight: 900, fontFamily: 'monospace', color: '#A8A29E',
+                }}>{activeDays}</div>
+                <div style={{ fontSize: 8, fontWeight: 700, color: '#57534E', letterSpacing: '0.15em' }}>ACTIVE</div>
+            </div>
+        </div>
+    );
+}
+
 export function MiniRunner({ todayXP, goalXP, onGoalChange, lastReviewedWord, dropCard, gridInfo, sessionGP, slotMode = 'full', gridCompleteGrade, onSpecialSlotTrigger }: {
     todayXP: number;
     goalXP: number;
@@ -791,6 +915,12 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, lastReviewedWord, dr
         return 0;
     }); // remaining boosted spins after boss defeat
     useEffect(() => { localStorage.setItem('training-kakuhen-boost', String(kakuhenBoost)); }, [kakuhenBoost]);
+    // Clear kakuhenBoost when fever is disabled in settings
+    useEffect(() => {
+        if (!getSettings().feverEnabled && kakuhenBoost > 0) {
+            setKakuhenBoost(0);
+        }
+    }, []);
     const [cardSlotKakuhenFlash, setCardSlotKakuhenFlash] = useState(false);
     const [cardSlotPremium, setCardSlotPremium] = useState(false); // 1% ultra-rare premium演出
 
@@ -800,13 +930,16 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, lastReviewedWord, dr
     const [pendingGachaGrade, setPendingGachaGrade] = useState<string | null>(null);
     const prevGridGradeRef = useRef<string | null>(null);
 
-    // When grid completes, show the GACHA button (ready state) instead of auto-firing
+    // When grid completes, show the GACHA button (ready state) — skip if delegating to slot panel
     useEffect(() => {
         if (!gridCompleteGrade || gridCompleteGrade === prevGridGradeRef.current) return;
         prevGridGradeRef.current = gridCompleteGrade;
         setPendingGachaGrade(gridCompleteGrade);
-        setGridCompletePhase('ready');
-    }, [gridCompleteGrade]);
+        // If delegating to ReviewSlotPanel's BONUS SLOT, don't show MiniRunner overlay
+        if (!onSpecialSlotTrigger) {
+            setGridCompletePhase('ready');
+        }
+    }, [gridCompleteGrade, onSpecialSlotTrigger]);
 
     // Gacha fire function — triggers special golden slot on parent
     const fireSpecialGacha = useCallback(() => {
@@ -1154,20 +1287,6 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, lastReviewedWord, dr
         localStorage.setItem('inline-slot-state', JSON.stringify({ state: slotState, ceiling, spinsLeft: stateSpinsLeft, kakuhenBoost }));
     }, [slotState, ceiling, stateSpinsLeft, kakuhenBoost]);
 
-    // Reset kakuhen + slot state when SLOT is turned off
-    useEffect(() => {
-        const check = () => {
-            if (!getSettings().slotEnabled) {
-                setKakuhenBoost(0);
-                setSlotState('normal');
-                setCeiling(0);
-                setStateSpinsLeft(0);
-            }
-        };
-        const interval = setInterval(check, 500);
-        return () => clearInterval(interval);
-    }, []);
-
     // State transition handler
     const transitionSlotState = useCallback((to: SlotMachineState) => {
         setStateTransition({ from: slotState, to, key: Date.now() });
@@ -1457,6 +1576,7 @@ export function MiniRunner({ todayXP, goalXP, onGoalChange, lastReviewedWord, dr
                     )}
                 </div>
             )}
+
 
             {/* === XP PROGRESS LINE (bottom edge) === */}
             <div style={{
@@ -2505,26 +2625,29 @@ export interface TrainingInitialData {
     links?: Record<string, PhraseLink[]>;
 }
 
-export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData = false }: { initialData?: TrainingInitialData; onHelpClick?: () => void; skipDefaultData?: boolean }) {
-    // Data mode: phrases (default) or words
-    const [dataMode, setDataMode] = useState<'phrases' | 'words'>(() => {
-        if (skipDefaultData) return 'phrases'; // my-training: phrases only
+export default function PhrasesPage({ initialData }: { initialData?: TrainingInitialData }) {
+    // Data mode: phrases (default), words, or life
+    const [dataMode, setDataMode] = useState<'phrases' | 'words' | 'life'>(() => {
         if (typeof window !== 'undefined') {
-            return (localStorage.getItem('training-data-mode') as 'phrases' | 'words') || 'phrases';
+            return (localStorage.getItem('training-data-mode') as 'phrases' | 'words' | 'life') || 'phrases';
         }
         return 'phrases';
     });
     const [phrases, setPhrases] = useState<Phrase[]>(initialData?.phrases || []);
-    const [loading, setLoading] = useState(!initialData?.phrases);
+    // 空配列でも「データあり」と見なすと、D1 が落ちた回に永久に0件のままになる。
+    // page.tsx は getAllPhrases().catch(() => []) で空配列を返すため
+    const [loading, setLoading] = useState(!initialData?.phrases?.length);
     const [phraseMastery, setPhraseMastery] = useState<Record<string, number>>(initialData?.mastery || {});
-    const [currentMonth, setCurrentMonth] = useState<Date | null>(null);
+    const [currentMonth, setCurrentMonth] = useState<Date | null>(() => {
+        if (typeof window === 'undefined') return null;
+        return new Date();
+    });
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
-    const [clientToday, setClientToday] = useState('');
-    useEffect(() => {
+    const [clientToday, setClientToday] = useState(() => {
+        if (typeof window === 'undefined') return '';
         const now = new Date();
-        setClientToday(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`);
-        setCurrentMonth(now);
-    }, []);
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    });
     const [isMobile, setIsMobile] = useState(false);
     const [goalXP, setGoalXP] = useState(DEFAULT_GOAL_XP);
     useEffect(() => {
@@ -2537,11 +2660,18 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     };
     const [viewMode, setViewMode] = useState<'calendar' | 'list' | 'review'>('calendar');
     const [copiedId, setCopiedId] = useState('');
+    // Goroku/Life: manual level override for viewing all 4 English levels
+    const [viewLevelOverride, setViewLevelOverride] = useState<number | null>(null);
+    const prevDisplayedCardId = useRef<string | null>(null);
 
     // Puzzle board — tab inside calendar view, card drop triggered after each review COMPLETE
-    const [calendarTab, setCalendarTab] = useState<'calendar'>('calendar');
+    const [calendarTab, setCalendarTab] = useState<'calendar' | 'puzzle'>('calendar');
+    const calendarTabRef = useRef(calendarTab);
+    calendarTabRef.current = calendarTab;
+    const viewModeRef = useRef(viewMode);
+    viewModeRef.current = viewMode;
     const [puzzleDropCard, setPuzzleDropCard] = useState<{ phraseId: string; english: string; japanese: string; element: string; rank: string; points: number; bstTotal: number; key: number } | null>(null);
-    const [milestoneData, setMilestoneData] = useState<{ grade?: string } | null>(null);
+    const [milestoneData, setMilestoneData] = useState<GridMilestoneData | null>(null);
 
     const [gridInfo, setGridInfo] = useState<{ filled: number; total: number }>({ filled: 0, total: 9 });
 
@@ -2561,7 +2691,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const inlineMediaRecorderRef = useRef<MediaRecorder | null>(null);
     const inlinePlaybackAudioRef = useRef<HTMLAudioElement | null>(null);
     const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-    const [reviewFilter, setReviewFilter] = useState<0 | 1 | 2 | 3 | 4 | 5 | 6 | 'all' | 'random' | 'recorded' | 'linked'>('random');
+    const [reviewFilter, setReviewFilter] = useState<0 | 1 | 2 | 3 | 4 | 5 | 6 | 'all' | 'random' | 'recorded' | 'linked' | 'retired'>('random');
     const [reviewIndex, setReviewIndex] = useState(0);
     const [reviewHistory, setReviewHistory] = useState<Phrase[]>([]);
     const [historyOffset, setHistoryOffset] = useState(0);
@@ -2576,24 +2706,56 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     } | null>(null);
     const [voiceRecordings, setVoiceRecordings] = useState<Record<string, VoiceRecording[]>>(initialData?.recordings || {});
     const [phraseLinks, setPhraseLinks] = useState<Record<string, PhraseLink[]>>(initialData?.links || {});
-    const [phraseLastLeveled, setPhraseLastLeveled] = useState<Record<string, string>>(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('quest-lastLeveled');
-                if (saved) return JSON.parse(saved);
-            } catch { /* */ }
-        }
-        return initialData?.lastLeveled || {};
+    const [phraseLastLeveled, setPhraseLastLeveled] = useState<Record<string, string>>(initialData?.lastLeveled || {});
+    const [cardPoints, setCardPoints] = useState<Record<string, number>>(initialData?.cardPoints || {});
+
+    // Life → Phrases registration
+    const [lifeRegistered, setLifeRegistered] = useState<Set<string>>(() => {
+        if (typeof window === 'undefined') return new Set();
+        try { return new Set(JSON.parse(localStorage.getItem('life-registered-phrases') || '[]')); } catch { return new Set(); }
     });
-    const [cardPoints, setCardPoints] = useState<Record<string, number>>(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('quest-cardPoints');
-                if (saved) return JSON.parse(saved);
-            } catch { /* */ }
-        }
-        return initialData?.cardPoints || {};
+    const [lifeRegisteringId, setLifeRegisteringId] = useState<string | null>(null);
+    const registerLifeToTraining = useCallback(async (phrase: Phrase, textOverride?: string) => {
+        const english = textOverride || phrase.gorokuLevels?.[1] || phrase.english;
+        const key = english.toLowerCase();
+        if (lifeRegistered.has(key)) return;
+        setLifeRegisteringId(phrase.id);
+        try {
+            const today = new Date();
+            const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            const res = await fetch('/api/phrases', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ english, japanese: phrase.japanese, category: 'expression', date: dateStr }),
+            });
+            const data = await res.json();
+            if (data.success || res.status === 409) {
+                setLifeRegistered(prev => {
+                    const next = new Set(prev).add(key);
+                    try { localStorage.setItem('life-registered-phrases', JSON.stringify([...next])); } catch { /* */ }
+                    return next;
+                });
+            }
+        } catch { /* */ } finally { setLifeRegisteringId(null); }
+    }, [lifeRegistered]);
+
+    const [retiredPhrases, setRetiredPhrases] = useState<Set<string>>(() => {
+        const r = initialData?.retired || {};
+        return new Set(Object.keys(r).filter(k => r[k]));
     });
+    const toggleRetire = useCallback((phraseId: string) => {
+        setRetiredPhrases(prev => {
+            const next = new Set(prev);
+            const willRetire = !next.has(phraseId);
+            if (willRetire) next.add(phraseId); else next.delete(phraseId);
+            fetch('/api/phrases/mastery', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ phraseId, retired: willRetire }),
+            }).catch(() => {});
+            return next;
+        });
+    }, []);
 
     // Card pool for slot reels (different cards on non-triple)
     const slotCardPool = useMemo(() => {
@@ -2661,25 +2823,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     // Cumulative review touches per phrase-date (dateKey → total count from D1)
     const [dateTouchMap, setDateTouchMap] = useState<Record<string, number>>({});
 
-    // Player level state — initialized from localStorage first, then Server Component data
-    const [playerTotalXP, setPlayerTotalXP] = useState(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('quest-playerStats');
-                if (saved) { const xp = JSON.parse(saved).total_xp; if (xp) return xp; }
-            } catch { /* */ }
-        }
-        return initialData?.playerStats?.total_xp || 0;
-    });
-    const [playerLevel, setPlayerLevel] = useState(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('quest-playerStats');
-                if (saved) { const xp = JSON.parse(saved).total_xp; if (xp) return levelFromXP(xp); }
-            } catch { /* */ }
-        }
-        return levelFromXP(initialData?.playerStats?.total_xp || 0);
-    });
+    // Player level state — initialized from Server Component data when available
+    const [playerTotalXP, setPlayerTotalXP] = useState(() => initialData?.playerStats?.total_xp || 0);
+    const [playerLevel, setPlayerLevel] = useState(() => levelFromXP(initialData?.playerStats?.total_xp || 0));
     const [levelUpEffect, setLevelUpEffect] = useState<{ level: number; title: string; color: string; key: number } | null>(null);
 
     // Daily level-up effect
@@ -2687,15 +2833,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const prevDailyLevelRef = useRef(-1);
 
     // Gacha bonus system state
-    const [playerSparks, setPlayerSparks] = useState(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('quest-playerStats');
-                if (saved) { const s = JSON.parse(saved).sparks; if (s) return s; }
-            } catch { /* */ }
-        }
-        return initialData?.playerStats?.sparks || 0;
-    });
+    const [playerSparks, setPlayerSparks] = useState(() => initialData?.playerStats?.sparks || 0);
     const [gachaEffect, setGachaEffect] = useState<{
         phase: 'reel' | 'reveal';
         tier: string;
@@ -2751,22 +2889,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     useEffect(() => {
         localStorage.setItem('training-chain-state', JSON.stringify({ count: chainState.count, mode: chainState.mode }));
     }, [chainState.count, chainState.mode]);
-
-    // Persist player stats, card points, review counts, and last-leveled dates to localStorage
-    useEffect(() => {
-        localStorage.setItem('quest-playerStats', JSON.stringify({ total_xp: playerTotalXP, sparks: playerSparks }));
-    }, [playerTotalXP, playerSparks]);
-    useEffect(() => {
-        if (Object.keys(cardPoints).length > 0) {
-            localStorage.setItem('quest-cardPoints', JSON.stringify(cardPoints));
-        }
-    }, [cardPoints]);
-    useEffect(() => {
-        if (Object.keys(phraseLastLeveled).length > 0) {
-            localStorage.setItem('quest-lastLeveled', JSON.stringify(phraseLastLeveled));
-        }
-    }, [phraseLastLeveled]);
-
     const [chainTransition, setChainTransition] = useState<{ from: ChainMode; to: ChainMode; key: number } | null>(null);
     // Keep backward-compat aliases for FEVER visuals
     const feverMode = { active: chainState.mode !== 'normal', streak: chainState.count, key: chainState.key };
@@ -2774,23 +2896,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const [feverExitEffect, setFeverExitEffect] = useState<{ streak: number } | null>(null);
     const feverDroneRef = useRef<HTMLAudioElement | null>(null);
     const feverRef = useRef({ active: false, streak: 0 });
-
-    // Reset fever chain state when FEVER is turned off
-    useEffect(() => {
-        const check = () => {
-            if (!getSettings().feverEnabled) {
-                setChainState({ count: 0, mode: 'normal', key: Date.now() });
-                if (feverDroneRef.current) {
-                    stopFeverBGM(feverDroneRef.current);
-                    feverDroneRef.current = null;
-                }
-                feverRef.current = { active: false, streak: 0 };
-            }
-        };
-        const interval = setInterval(check, 500);
-        return () => clearInterval(interval);
-    }, []);
-
     // Luck multiplier display
     const [luckMultiplier, setLuckMultiplier] = useState(1.0);
     const [cardRankUpEffect, setCardRankUpEffect] = useState<{ oldRank: string; newRank: string; newRankColor: string; newRankKey: CardRank; oldRankKey: CardRank; snapshotPoints: number; key: number } | null>(null);
@@ -2800,6 +2905,342 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         phrase: Phrase;
         key: number;
     } | null>(null);
+
+    // ══════════════════════════════════════════════════════════════
+    // TIME ATTACK SESSION STATE
+    // ══════════════════════════════════════════════════════════════
+    const TIME_PRESETS = IS_LOCAL ? [
+        { seconds: 60, label: '1 min', labelJa: '1分', subtitle: '今日はこれだけ', color: '#16A34A', icon: 'QUICK', recommended: true },
+        { seconds: 180, label: '3 min', labelJa: '3分', subtitle: 'しっかり復習', color: '#D4AF37', icon: 'STANDARD' },
+        { seconds: 300, label: '5 min', labelJa: '5分', subtitle: 'ガチ勢', color: '#DC2626', icon: 'FOCUS' },
+    ] : [
+        { seconds: 300, label: '5 min', labelJa: '5分', subtitle: 'ウォームアップ', color: '#16A34A', icon: 'SPRINT' },
+        { seconds: 600, label: '10 min', labelJa: '10分', subtitle: 'おすすめ', color: '#D4AF37', icon: 'STANDARD', recommended: true },
+        { seconds: 1800, label: '30 min', labelJa: '30分', subtitle: 'ガチ勢', color: '#DC2626', icon: 'ENDURANCE' },
+        { seconds: 3600, label: '60 min', labelJa: '1時間', subtitle: '修行モード', color: '#7C3AED', icon: 'MARATHON' },
+    ];
+    const MILESTONES = IS_LOCAL ? [
+        { cards: 3, title: 'GOOD START', color: '#16A34A' },
+        { cards: 5, title: 'NICE', color: '#2563EB' },
+        { cards: 10, title: 'ON FIRE', color: '#EA580C' },
+        { cards: 15, title: 'UNSTOPPABLE', color: '#DC2626' },
+        { cards: 20, title: 'BEAST MODE', color: '#7C3AED' },
+        { cards: 30, title: 'LEGENDARY', color: '#D4AF37' },
+    ] : [
+        { cards: 5, title: 'FIRST BLOOD', color: '#78716C' },
+        { cards: 10, title: 'WARMING UP', color: '#2563EB' },
+        { cards: 25, title: 'ON FIRE', color: '#EA580C' },
+        { cards: 50, title: 'UNSTOPPABLE', color: '#DC2626' },
+        { cards: 75, title: 'BEAST MODE', color: '#7C3AED' },
+        { cards: 100, title: 'LEGENDARY', color: '#D4AF37' },
+        { cards: 150, title: 'TRANSCENDENT', color: '#D4AF37' },
+    ];
+    const [timeAttackPhase, setTimeAttackPhase] = useState<'idle' | 'selecting' | 'countdown' | 'running' | 'result'>('idle');
+    const [timeAttackPreset, setTimeAttackPreset] = useState(600);
+    const [timeAttackRemaining, setTimeAttackRemaining] = useState(0);
+    const [timeAttackStartedAt, setTimeAttackStartedAt] = useState(0);
+    const [timeAttackCountdownText, setTimeAttackCountdownText] = useState<string>('');
+    const [timeAttackCountdownColor, setTimeAttackCountdownColor] = useState('#D4AF37');
+    const timeAttackIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const timeAttackSessionRef = useRef({
+        cardsReviewed: 0,
+        xpEarned: 0,
+        levelUps: 0,
+        maxChain: 0,
+        currentChain: 0,
+    });
+    const [timeAttackMilestone, setTimeAttackMilestone] = useState<{ title: string; color: string; key: number } | null>(null);
+    const [timeAttackLivePace, setTimeAttackLivePace] = useState(0); // live cards/min
+    const [timeAttackResult, setTimeAttackResult] = useState<{
+        preset: number;
+        actual: number;
+        cards: number;
+        xp: number;
+        levelUps: number;
+        maxChain: number;
+        cpm: number;
+        grade: string;
+        completed: boolean;
+        isNewRecord: boolean;
+    } | null>(null);
+    const [timeAttackBestRecords, setTimeAttackBestRecords] = useState<Record<number, number>>({});
+    const [timeAttackUrgent, setTimeAttackUrgent] = useState(false); // last 60s warning
+
+    const [timeAttackHistory, setTimeAttackHistory] = useState<Array<{
+        id: number; date: string; duration_preset: number; duration_actual: number;
+        cards_reviewed: number; xp_earned: number; grade: string; cards_per_minute: number;
+        max_chain: number; completed: number;
+    }>>([]);
+    const [timeAttackStats, setTimeAttackStats] = useState<{
+        total_sessions: number; total_cards: number; total_time: number;
+        s_rank_count: number; longest_chain: number; streak_days: number;
+    } | null>(null);
+    const [showTimeAttackHistory, setShowTimeAttackHistory] = useState(false);
+
+    // Load best records + history on mount
+    useEffect(() => {
+        if (IS_LOCAL) {
+            // Public / Goroku: load from localStorage
+            try {
+                const sessions = JSON.parse(localStorage.getItem('ta-sessions') || '[]');
+                setTimeAttackHistory(sessions.slice(0, 20));
+                const bests: Record<number, number> = {};
+                let totalCards = 0, sRanks = 0, longestChain = 0;
+                const dates = new Set<string>();
+                for (const s of sessions) {
+                    const preset = s.duration_preset;
+                    if (!bests[preset] || s.cards_reviewed > bests[preset]) bests[preset] = s.cards_reviewed;
+                    totalCards += s.cards_reviewed;
+                    if (s.grade === 'S') sRanks++;
+                    if (s.max_chain > longestChain) longestChain = s.max_chain;
+                    dates.add(s.date);
+                }
+                setTimeAttackBestRecords(bests);
+                // Calculate streak
+                const today = new Date().toISOString().split('T')[0];
+                let streak = 0, checkDate = today;
+                for (let i = 0; i < 365; i++) {
+                    if (dates.has(checkDate)) { streak++; const prev = new Date(checkDate); prev.setDate(prev.getDate() - 1); checkDate = prev.toISOString().split('T')[0]; } else break;
+                }
+                if (sessions.length > 0) {
+                    setTimeAttackStats({
+                        total_sessions: sessions.length,
+                        total_cards: totalCards,
+                        total_time: sessions.reduce((a: number, s: any) => a + s.duration_actual, 0),
+                        s_rank_count: sRanks,
+                        longest_chain: longestChain,
+                        streak_days: streak,
+                    });
+                }
+            } catch { /* ignore */ }
+        } else {
+            fetch('/api/training-sessions?stats=true')
+                .then(r => r.json())
+                .then(d => {
+                    if (d.success) {
+                        if (d.records_by_preset) {
+                            const bests: Record<number, number> = {};
+                            for (const [preset, rec] of Object.entries(d.records_by_preset)) {
+                                bests[Number(preset)] = (rec as any).best_cards || 0;
+                            }
+                            setTimeAttackBestRecords(bests);
+                        }
+                        setTimeAttackStats({
+                            total_sessions: d.total_sessions || 0,
+                            total_cards: d.total_cards || 0,
+                            total_time: d.total_time || 0,
+                            s_rank_count: d.s_rank_count || 0,
+                            longest_chain: d.longest_chain || 0,
+                            streak_days: d.streak_days || 0,
+                        });
+                    }
+                })
+                .catch(() => {});
+            fetch('/api/training-sessions?limit=20')
+                .then(r => r.json())
+                .then(d => { if (d.success && d.sessions) setTimeAttackHistory(d.sessions); })
+                .catch(() => {});
+        }
+    }, []);
+
+    // Start time attack with READY → 3 → 2 → 1 → GO! sequence
+    const startTimeAttack = useCallback((presetSeconds: number) => {
+        setTimeAttackPreset(presetSeconds);
+        setTimeAttackRemaining(presetSeconds);
+        setTimeAttackStartedAt(Date.now());
+        setTimeAttackUrgent(false);
+        setTimeAttackMilestone(null);
+        setTimeAttackLivePace(0);
+        timeAttackSessionRef.current = { cardsReviewed: 0, xpEarned: 0, levelUps: 0, maxChain: 0, currentChain: 0 };
+        setTimeAttackPhase('countdown');
+
+        // READY → 3 → 2 → 1 → GO! (5 beats)
+        const sequence = [
+            { text: 'READY?', color: '#A8A29E', delay: 0 },
+            { text: '3', color: '#2563EB', delay: 800 },
+            { text: '2', color: '#EA580C', delay: 1600 },
+            { text: '1', color: '#DC2626', delay: 2400 },
+            { text: 'GO!', color: '#D4AF37', delay: 3200 },
+        ];
+        sequence.forEach(({ text, color, delay }) => {
+            setTimeout(() => {
+                setTimeAttackCountdownText(text);
+                setTimeAttackCountdownColor(color);
+            }, delay);
+        });
+
+        // Start actual timer after GO!
+        setTimeout(() => {
+            setTimeAttackRemaining(presetSeconds);
+            setTimeAttackPhase('running');
+            const startTime = Date.now();
+            const startedAt = Date.now();
+            setTimeAttackStartedAt(startedAt);
+            timeAttackIntervalRef.current = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const remaining = Math.max(0, presetSeconds - elapsed);
+                setTimeAttackRemaining(remaining);
+                // Live pace calculation
+                const elapsedMin = Math.max(elapsed / 60, 0.05);
+                setTimeAttackLivePace(Math.round((timeAttackSessionRef.current.cardsReviewed / elapsedMin) * 10) / 10);
+                if (remaining <= 60 && remaining > 0) setTimeAttackUrgent(true);
+                if (remaining <= 0) {
+                    if (timeAttackIntervalRef.current) clearInterval(timeAttackIntervalRef.current);
+                    timeAttackIntervalRef.current = null;
+                    finishTimeAttack(presetSeconds, presetSeconds, true);
+                }
+            }, 250);
+        }, 4000);
+    }, []);
+
+    // Finish time attack (either by timeout or manual stop)
+    const finishTimeAttack = useCallback((preset: number, actualSeconds: number, completed: boolean) => {
+        if (timeAttackIntervalRef.current) {
+            clearInterval(timeAttackIntervalRef.current);
+            timeAttackIntervalRef.current = null;
+        }
+        const session = timeAttackSessionRef.current;
+        const minutes = Math.max(actualSeconds / 60, 0.1);
+        const cpm = Math.round((session.cardsReviewed / minutes) * 10) / 10;
+
+        // Grade calculation: based on cards per minute (public has lower bar)
+        let grade = 'D';
+        if (IS_LOCAL) {
+            // Public / Goroku: 1-5min sessions, lower thresholds, reward showing up
+            if (session.cardsReviewed >= 10) grade = 'S';
+            else if (session.cardsReviewed >= 7) grade = 'A';
+            else if (session.cardsReviewed >= 4) grade = 'B';
+            else if (session.cardsReviewed >= 2) grade = 'C';
+            // Completing the session = at least C
+            if (completed && grade === 'D') grade = 'C';
+        } else {
+            if (cpm >= 8) grade = 'S';
+            else if (cpm >= 5) grade = 'A';
+            else if (cpm >= 3) grade = 'B';
+            else if (cpm >= 1.5) grade = 'C';
+            // Bonus for high volume
+            if (session.cardsReviewed >= 50 && grade !== 'S') {
+                const grades = ['D', 'C', 'B', 'A', 'S'];
+                grade = grades[Math.min(grades.indexOf(grade) + 1, 4)];
+            }
+        }
+
+        const isNewRecord = session.cardsReviewed > (timeAttackBestRecords[preset] || 0);
+
+        setTimeAttackResult({
+            preset,
+            actual: actualSeconds,
+            cards: session.cardsReviewed,
+            xp: session.xpEarned,
+            levelUps: session.levelUps,
+            maxChain: session.maxChain,
+            cpm,
+            grade,
+            completed,
+            isNewRecord,
+        });
+        setTimeAttackPhase('result');
+        setTimeAttackUrgent(false);
+
+        // Update local best
+        if (isNewRecord) {
+            setTimeAttackBestRecords(prev => ({ ...prev, [preset]: session.cardsReviewed }));
+        }
+
+        // Save session
+        const todayDate = clientToday || new Date().toISOString().split('T')[0];
+        const sessionData = {
+            id: Date.now(),
+            date: todayDate,
+            duration_preset: preset,
+            duration_actual: actualSeconds,
+            cards_reviewed: session.cardsReviewed,
+            xp_earned: session.xpEarned,
+            level_ups: session.levelUps,
+            max_chain: session.maxChain,
+            grade,
+            cards_per_minute: cpm,
+            completed: completed ? 1 : 0,
+        };
+
+        if (IS_LOCAL) {
+            // Public / Goroku: save to localStorage
+            try {
+                const existing = JSON.parse(localStorage.getItem('ta-sessions') || '[]');
+                existing.unshift(sessionData);
+                localStorage.setItem('ta-sessions', JSON.stringify(existing.slice(0, 50)));
+                setTimeAttackHistory(existing.slice(0, 20));
+                // Update streak
+                const dates = new Set(existing.map((s: any) => s.date));
+                const today = new Date().toISOString().split('T')[0];
+                let streak = 0;
+                let checkDate = today;
+                for (let i = 0; i < 365; i++) {
+                    if (dates.has(checkDate)) {
+                        streak++;
+                        const prev = new Date(checkDate);
+                        prev.setDate(prev.getDate() - 1);
+                        checkDate = prev.toISOString().split('T')[0];
+                    } else break;
+                }
+                setTimeAttackStats(prev => prev ? { ...prev, total_sessions: existing.length, total_cards: existing.reduce((a: number, s: any) => a + s.cards_reviewed, 0), streak_days: streak, s_rank_count: existing.filter((s: any) => s.grade === 'S').length } : null);
+            } catch { /* ignore */ }
+        } else {
+            fetch('/api/training-sessions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sessionData),
+            }).then(() => {
+                fetch('/api/training-sessions?limit=20')
+                    .then(r => r.json())
+                    .then(d => { if (d.success && d.sessions) setTimeAttackHistory(d.sessions); })
+                    .catch(() => {});
+            }).catch(() => {});
+        }
+    }, [clientToday, timeAttackBestRecords]);
+
+    // Stop time attack early
+    const stopTimeAttack = useCallback(() => {
+        const elapsed = Math.floor((Date.now() - timeAttackStartedAt) / 1000);
+        finishTimeAttack(timeAttackPreset, elapsed, false);
+    }, [timeAttackPreset, timeAttackStartedAt, finishTimeAttack]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (timeAttackIntervalRef.current) clearInterval(timeAttackIntervalRef.current);
+        };
+    }, []);
+
+    // Track reviews during time attack — called from cycleMastery hook
+    const trackTimeAttackReview = useCallback((xpGained: number, isLevelUp: boolean) => {
+        if (timeAttackPhase !== 'running') return;
+        const s = timeAttackSessionRef.current;
+        s.cardsReviewed++;
+        s.xpEarned += xpGained;
+        if (isLevelUp) s.levelUps++;
+        s.currentChain++;
+        if (s.currentChain > s.maxChain) s.maxChain = s.currentChain;
+
+        // Check milestones
+        const milestone = MILESTONES.find(m => m.cards === s.cardsReviewed);
+        if (milestone) {
+            setTimeAttackMilestone({ title: milestone.title, color: milestone.color, key: Date.now() });
+        }
+    }, [timeAttackPhase]);
+
+    // Auto-clear milestone popup
+    useEffect(() => {
+        if (!timeAttackMilestone) return;
+        const timer = setTimeout(() => setTimeAttackMilestone(null), 2000);
+        return () => clearTimeout(timer);
+    }, [timeAttackMilestone]);
+
+    // Reset chain on miss (fever exit)
+    const trackTimeAttackChainBreak = useCallback(() => {
+        if (timeAttackPhase !== 'running') return;
+        timeAttackSessionRef.current.currentChain = 0;
+    }, [timeAttackPhase]);
 
     // Auto-clear fever flash
     useEffect(() => {
@@ -2817,18 +3258,27 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
     // Rank-up overlay is dismissed by tap (no auto-clear)
 
-    // Card celebration: 1s flash for level-up, rank-up stays until tap
+    // Ref so the celebration effect (defined before reviewList) can read current length
+    const reviewListLenRef = useRef(0);
+
+    // Card celebration: 1s flash for level-up (250ms in Time Attack for speed), rank-up stays until tap
     useEffect(() => {
         if (!cardCelebration) return;
         // If rank-up is active, don't auto-dismiss (user taps to continue)
         if (cardRankUpEffect) return;
+        const isTA = timeAttackPhase === 'running';
         const timer = setTimeout(() => {
             setReviewHistory(prev => [...prev, cardCelebration.phrase]);
             setHistoryOffset(0);
             setCardCelebration(null);
-        }, 1000);
+            // Auto-advance to next card during Time Attack for uninterrupted flow
+            if (isTA) {
+                const len = reviewListLenRef.current;
+                if (len > 0) setReviewIndex(i => (i + 1) % len);
+            }
+        }, isTA ? 250 : 1000);
         return () => clearTimeout(timer);
-    }, [cardCelebration, cardRankUpEffect]);
+    }, [cardCelebration, cardRankUpEffect, timeAttackPhase]);
 
     // Auto-play TTS ref (effect placed after displayedCard is defined)
     const prevAutoPlayIdRef = useRef<string | null>(null);
@@ -2838,14 +3288,26 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         feverRef.current = { active: chainState.mode !== 'normal', streak: chainState.count };
     }, [chainState.mode, chainState.count]);
 
-    // Stop FEVER BGM when chain ends
+    // Stop/start FEVER BGM when chain mode changes + duck/restore main BGM
+    // Also handles reload: if chain mode was persisted as non-normal, restart fever BGM
     useEffect(() => {
-        if (chainState.mode === 'normal') {
+        if (chainState.mode !== 'normal') {
+            // Mute main BGM during chain mode
+            if (mainBgmRef.current) mainBgmRef.current.volume = 0;
+            // Start fever BGM if not already playing (handles reload during chain)
+            if (!feverDroneRef.current) {
+                feverDroneRef.current = startFeverBGM();
+            }
+        } else {
+            // Restore main BGM volume
+            if (mainBgmRef.current) {
+                const st = getSettings();
+                mainBgmRef.current.volume = (st.bgmVolume / 100) * (st.volume / 100);
+            }
             if (feverDroneRef.current) {
                 stopFeverBGM(feverDroneRef.current);
                 feverDroneRef.current = null;
             }
-            trackTimeAttackChainBreak();
         }
     }, [chainState.mode]);
 
@@ -2859,15 +3321,59 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     }, [chainTransition]);
 
 
-    // Main BGM is managed by layout.tsx (app-wide). No duplicate here.
-    // Clean up fever BGM on unmount only.
+    // ── Main BGM (always-on loop, independent of FEVER) ──
+    const mainBgmRef = useRef<HTMLAudioElement | null>(null);
     useEffect(() => {
+        const st = getSettings();
+        if (!st.bgmEnabled || !st.soundEnabled) {
+            // stop if playing
+            if (mainBgmRef.current) {
+                mainBgmRef.current.pause();
+                mainBgmRef.current = null;
+            }
+            return;
+        }
+        // already playing
+        if (mainBgmRef.current) {
+            mainBgmRef.current.volume = (st.bgmVolume / 100) * (st.volume / 100);
+            return;
+        }
+        const audio = new Audio('/audio/bgm-main.mp3');
+        audio.loop = true;
+        // Start muted if chain mode is active (fever BGM takes over)
+        audio.volume = chainState.mode !== 'normal' ? 0 : (st.bgmVolume / 100) * (st.volume / 100);
+        audio.play().catch(() => { /* autoplay blocked — will start on first user interaction */ });
+        mainBgmRef.current = audio;
         return () => {
+            audio.pause();
+            mainBgmRef.current = null;
+            // Also clean up fever BGM on unmount
             if (feverDroneRef.current) {
                 stopFeverBGM(feverDroneRef.current);
                 feverDroneRef.current = null;
             }
         };
+    }, []);
+
+    // Listen for settings changes to update main BGM volume / toggle
+    useEffect(() => {
+        const onStorage = (e: StorageEvent) => {
+            if (e.key !== 'eigodamashii-settings') return;
+            const st = getSettings();
+            if (!st.bgmEnabled || !st.soundEnabled) {
+                if (mainBgmRef.current) { mainBgmRef.current.pause(); mainBgmRef.current = null; }
+            } else if (!mainBgmRef.current) {
+                const audio = new Audio('/audio/bgm-main.mp3');
+                audio.loop = true;
+                audio.volume = (st.bgmVolume / 100) * (st.volume / 100);
+                audio.play().catch(() => {});
+                mainBgmRef.current = audio;
+            } else {
+                mainBgmRef.current.volume = (st.bgmVolume / 100) * (st.volume / 100);
+            }
+        };
+        window.addEventListener('storage', onStorage);
+        return () => window.removeEventListener('storage', onStorage);
     }, []);
 
     // Auto-clear level-up effect
@@ -3071,25 +3577,19 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const [quickAddSubmitting, setQuickAddSubmitting] = useState(false);
     const [quickAddedCount, setQuickAddedCount] = useState(0);
 
+    // Transcript edit (PP 由来の書き起こしを D1 phrases.transcript に保存)
+    const [showTranscriptEdit, setShowTranscriptEdit] = useState(false);
+    // カードの英文にコーパスの数字を出すパネル
+    const [showCorpus, setShowCorpus] = useState(false);
+    const [transcriptInput, setTranscriptInput] = useState('');
+    const [transcriptSubmitting, setTranscriptSubmitting] = useState(false);
+
     // Flavor text registration
     const [savedFlavorTexts, setSavedFlavorTexts] = useState<Set<string>>(new Set());
     const [savingFlavorText, setSavingFlavorText] = useState(false);
 
     // Daily review counts per month (date -> { count, xp })
-    const [monthlyReviewCounts, setMonthlyReviewCounts] = useState<Record<string, { count: number; xp: number; sparks?: number }>>(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const saved = localStorage.getItem('quest-reviewCounts');
-                if (saved) return JSON.parse(saved);
-            } catch { /* */ }
-        }
-        return {};
-    });
-    useEffect(() => {
-        if (Object.keys(monthlyReviewCounts).length > 0) {
-            localStorage.setItem('quest-reviewCounts', JSON.stringify(monthlyReviewCounts));
-        }
-    }, [monthlyReviewCounts]);
+    const [monthlyReviewCounts, setMonthlyReviewCounts] = useState<Record<string, { count: number; xp: number; sparks?: number }>>({});
 
     // YouGlish state
     const [youglishPhrase, setYouglishPhrase] = useState<Phrase | null>(null);
@@ -3098,8 +3598,10 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     const youglishLoaded = useRef(false);
     const widgetRef = useRef<ReturnType<typeof window.YG.Widget> | null>(null);
     const currentVideoRef = useRef({ videoId: '', timestamp: 0 });
-    const [captionHistory, setCaptionHistory] = useState<{ text: string; selected: boolean }[]>([]);
+    const pauseAfterSaveRef = useRef(false);
+    const [captionHistory, setCaptionHistory] = useState<{ text: string; selected: boolean; saved?: boolean }[]>([]);
     const [savingPhrase, setSavingPhrase] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
     const [youglishSaveDate, setYouglishSaveDate] = useState(() => {
         const today = new Date();
         return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -3134,323 +3636,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     });
 
-    // ══════════════════════════════════════════════════════════════
-    // TIME ATTACK SESSION STATE
-    // ══════════════════════════════════════════════════════════════
-    const TIME_PRESETS = IS_PUBLIC ? [
-        { seconds: 60, label: '1 min', labelJa: '1分', subtitle: '今日はこれだけ', color: '#16A34A', icon: 'QUICK', recommended: true },
-        { seconds: 180, label: '3 min', labelJa: '3分', subtitle: 'しっかり復習', color: '#D4AF37', icon: 'STANDARD' },
-        { seconds: 300, label: '5 min', labelJa: '5分', subtitle: 'ガチ勢', color: '#DC2626', icon: 'FOCUS' },
-    ] : [
-        { seconds: 60, label: '1 min', labelJa: '1分', subtitle: '今日はこれだけ', color: '#16A34A', icon: 'QUICK', recommended: true },
-        { seconds: 180, label: '3 min', labelJa: '3分', subtitle: 'しっかり復習', color: '#D4AF37', icon: 'STANDARD' },
-        { seconds: 300, label: '5 min', labelJa: '5分', subtitle: 'ガチ勢', color: '#DC2626', icon: 'FOCUS' },
-    ];
-    const MILESTONES = IS_PUBLIC ? [
-        { cards: 3, title: 'GOOD START', color: '#16A34A' },
-        { cards: 5, title: 'NICE', color: '#2563EB' },
-        { cards: 10, title: 'ON FIRE', color: '#EA580C' },
-        { cards: 15, title: 'UNSTOPPABLE', color: '#DC2626' },
-        { cards: 20, title: 'BEAST MODE', color: '#7C3AED' },
-        { cards: 30, title: 'LEGENDARY', color: '#D4AF37' },
-    ] : [
-        { cards: 5, title: 'FIRST BLOOD', color: '#78716C' },
-        { cards: 10, title: 'WARMING UP', color: '#2563EB' },
-        { cards: 25, title: 'ON FIRE', color: '#EA580C' },
-        { cards: 50, title: 'UNSTOPPABLE', color: '#DC2626' },
-        { cards: 75, title: 'BEAST MODE', color: '#7C3AED' },
-        { cards: 100, title: 'LEGENDARY', color: '#D4AF37' },
-        { cards: 150, title: 'TRANSCENDENT', color: '#D4AF37' },
-    ];
-    const [timeAttackPhase, setTimeAttackPhase] = useState<'idle' | 'selecting' | 'countdown' | 'running' | 'result'>('idle');
-    const taAutoRef = useRef(false);
-    const [timeAttackPreset, setTimeAttackPreset] = useState(600);
-    const [timeAttackRemaining, setTimeAttackRemaining] = useState(0);
-    const [timeAttackStartedAt, setTimeAttackStartedAt] = useState(0);
-    const [timeAttackCountdownText, setTimeAttackCountdownText] = useState<string>('');
-    const [timeAttackCountdownColor, setTimeAttackCountdownColor] = useState('#D4AF37');
-    const timeAttackIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const timeAttackSessionRef = useRef({
-        cardsReviewed: 0,
-        xpEarned: 0,
-        levelUps: 0,
-        maxChain: 0,
-        currentChain: 0,
-    });
-    const [timeAttackMilestone, setTimeAttackMilestone] = useState<{ title: string; color: string; key: number } | null>(null);
-    const [timeAttackLivePace, setTimeAttackLivePace] = useState(0);
-    const [timeAttackResult, setTimeAttackResult] = useState<{
-        preset: number;
-        actual: number;
-        cards: number;
-        xp: number;
-        levelUps: number;
-        maxChain: number;
-        cpm: number;
-        grade: string;
-        completed: boolean;
-        isNewRecord: boolean;
-    } | null>(null);
-    const [timeAttackBestRecords, setTimeAttackBestRecords] = useState<Record<number, number>>({});
-    const [timeAttackUrgent, setTimeAttackUrgent] = useState(false);
-
-    const [timeAttackHistory, setTimeAttackHistory] = useState<Array<{
-        id: number; date: string; duration_preset: number; duration_actual: number;
-        cards_reviewed: number; xp_earned: number; grade: string; cards_per_minute: number;
-        max_chain: number; completed: number;
-    }>>([]);
-    const [timeAttackStats, setTimeAttackStats] = useState<{
-        total_sessions: number; total_cards: number; total_time: number;
-        s_rank_count: number; longest_chain: number; streak_days: number;
-    } | null>(null);
-    const [showTimeAttackHistory, setShowTimeAttackHistory] = useState(false);
-
-    // Load best records + history on mount
-    useEffect(() => {
-        if (IS_PUBLIC) {
-            try {
-                const sessions = JSON.parse(localStorage.getItem('ta-sessions') || '[]');
-                setTimeAttackHistory(sessions.slice(0, 20));
-                const bests: Record<number, number> = {};
-                let totalCards = 0, sRanks = 0, longestChain = 0;
-                const dates = new Set<string>();
-                for (const s of sessions) {
-                    const preset = s.duration_preset;
-                    if (!bests[preset] || s.cards_reviewed > bests[preset]) bests[preset] = s.cards_reviewed;
-                    totalCards += s.cards_reviewed;
-                    if (s.grade === 'S') sRanks++;
-                    if (s.max_chain > longestChain) longestChain = s.max_chain;
-                    dates.add(s.date);
-                }
-                setTimeAttackBestRecords(bests);
-                const today = new Date().toISOString().split('T')[0];
-                let streak = 0, checkDate = today;
-                for (let i = 0; i < 365; i++) {
-                    if (dates.has(checkDate)) { streak++; const prev = new Date(checkDate); prev.setDate(prev.getDate() - 1); checkDate = prev.toISOString().split('T')[0]; } else break;
-                }
-                if (sessions.length > 0) {
-                    setTimeAttackStats({
-                        total_sessions: sessions.length,
-                        total_cards: totalCards,
-                        total_time: sessions.reduce((a: number, s: any) => a + s.duration_actual, 0),
-                        s_rank_count: sRanks,
-                        longest_chain: longestChain,
-                        streak_days: streak,
-                    });
-                }
-            } catch { /* ignore */ }
-        } else {
-            fetch('/api/training-sessions?stats=true')
-                .then(r => r.json())
-                .then(d => {
-                    if (d.success) {
-                        if (d.records_by_preset) {
-                            const bests: Record<number, number> = {};
-                            for (const [preset, rec] of Object.entries(d.records_by_preset)) {
-                                bests[Number(preset)] = (rec as any).best_cards || 0;
-                            }
-                            setTimeAttackBestRecords(bests);
-                        }
-                        setTimeAttackStats({
-                            total_sessions: d.total_sessions || 0,
-                            total_cards: d.total_cards || 0,
-                            total_time: d.total_time || 0,
-                            s_rank_count: d.s_rank_count || 0,
-                            longest_chain: d.longest_chain || 0,
-                            streak_days: d.streak_days || 0,
-                        });
-                    }
-                })
-                .catch(() => {});
-            fetch('/api/training-sessions?limit=20')
-                .then(r => r.json())
-                .then(d => { if (d.success && d.sessions) setTimeAttackHistory(d.sessions); })
-                .catch(() => {});
-        }
-    }, []);
-
-    // Start time attack immediately (no countdown)
-    const startTimeAttack = useCallback((presetSeconds: number) => {
-        setTimeAttackPreset(presetSeconds);
-        setTimeAttackRemaining(presetSeconds);
-        setTimeAttackUrgent(false);
-        setTimeAttackMilestone(null);
-        setTimeAttackLivePace(0);
-        timeAttackSessionRef.current = { cardsReviewed: 0, xpEarned: 0, levelUps: 0, maxChain: 0, currentChain: 0 };
-        setTimeAttackPhase('running');
-        const startTime = Date.now();
-        setTimeAttackStartedAt(startTime);
-        timeAttackIntervalRef.current = setInterval(() => {
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const remaining = Math.max(0, presetSeconds - elapsed);
-            setTimeAttackRemaining(remaining);
-            const elapsedMin = Math.max(elapsed / 60, 0.05);
-            setTimeAttackLivePace(Math.round((timeAttackSessionRef.current.cardsReviewed / elapsedMin) * 10) / 10);
-            if (remaining <= 60 && remaining > 0) setTimeAttackUrgent(true);
-            if (remaining <= 0) {
-                if (timeAttackIntervalRef.current) clearInterval(timeAttackIntervalRef.current);
-                timeAttackIntervalRef.current = null;
-                finishTimeAttack(presetSeconds, presetSeconds, true);
-            }
-        }, 250);
-    }, []);
-
-    // Finish time attack (either by timeout or manual stop)
-    const finishTimeAttack = useCallback((preset: number, actualSeconds: number, completed: boolean) => {
-        if (timeAttackIntervalRef.current) {
-            clearInterval(timeAttackIntervalRef.current);
-            timeAttackIntervalRef.current = null;
-        }
-        const session = timeAttackSessionRef.current;
-        const minutes = Math.max(actualSeconds / 60, 0.1);
-        const cpm = Math.round((session.cardsReviewed / minutes) * 10) / 10;
-
-        let grade = 'D';
-        if (IS_PUBLIC) {
-            if (session.cardsReviewed >= 10) grade = 'S';
-            else if (session.cardsReviewed >= 7) grade = 'A';
-            else if (session.cardsReviewed >= 4) grade = 'B';
-            else if (session.cardsReviewed >= 2) grade = 'C';
-            if (completed && grade === 'D') grade = 'C';
-        } else {
-            if (cpm >= 8) grade = 'S';
-            else if (cpm >= 5) grade = 'A';
-            else if (cpm >= 3) grade = 'B';
-            else if (cpm >= 1.5) grade = 'C';
-            if (session.cardsReviewed >= 50 && grade !== 'S') {
-                const grades = ['D', 'C', 'B', 'A', 'S'];
-                grade = grades[Math.min(grades.indexOf(grade) + 1, 4)];
-            }
-        }
-
-        const isNewRecord = session.cardsReviewed > (timeAttackBestRecords[preset] || 0);
-
-        setTimeAttackResult({
-            preset,
-            actual: actualSeconds,
-            cards: session.cardsReviewed,
-            xp: session.xpEarned,
-            levelUps: session.levelUps,
-            maxChain: session.maxChain,
-            cpm,
-            grade,
-            completed,
-            isNewRecord,
-        });
-        setTimeAttackPhase('result');
-        setViewMode('calendar');
-        setTimeAttackUrgent(false);
-        // Restore SHUFFLE as default after TimeAttack so unmastered cards
-        // are the first thing the user sees on next review session.
-        setReviewFilter('random');
-        setReviewIndex(0);
-
-        // Sound effects for TA completion
-        if (completed) playGachaSound('LEGENDARY');
-        if (grade === 'S') setTimeout(() => playGachaSound('MYTHIC'), 500);
-        if (isNewRecord) setTimeout(() => playRankUpSound('GOLD'), grade === 'S' ? 1000 : 500);
-
-        if (isNewRecord) {
-            setTimeAttackBestRecords(prev => ({ ...prev, [preset]: session.cardsReviewed }));
-        }
-
-        const todayDate = clientToday || new Date().toISOString().split('T')[0];
-        const sessionData = {
-            id: Date.now(),
-            date: todayDate,
-            duration_preset: preset,
-            duration_actual: actualSeconds,
-            cards_reviewed: session.cardsReviewed,
-            xp_earned: session.xpEarned,
-            level_ups: session.levelUps,
-            max_chain: session.maxChain,
-            grade,
-            cards_per_minute: cpm,
-            completed: completed ? 1 : 0,
-        };
-
-        if (IS_PUBLIC) {
-            try {
-                const existing = JSON.parse(localStorage.getItem('ta-sessions') || '[]');
-                existing.unshift(sessionData);
-                localStorage.setItem('ta-sessions', JSON.stringify(existing.slice(0, 50)));
-                setTimeAttackHistory(existing.slice(0, 20));
-                const dates = new Set(existing.map((s: any) => s.date));
-                const today = new Date().toISOString().split('T')[0];
-                let streak = 0;
-                let checkDate = today;
-                for (let i = 0; i < 365; i++) {
-                    if (dates.has(checkDate)) {
-                        streak++;
-                        const prev = new Date(checkDate);
-                        prev.setDate(prev.getDate() - 1);
-                        checkDate = prev.toISOString().split('T')[0];
-                    } else break;
-                }
-                setTimeAttackStats(prev => prev ? { ...prev, total_sessions: existing.length, total_cards: existing.reduce((a: number, s: any) => a + s.cards_reviewed, 0), streak_days: streak, s_rank_count: existing.filter((s: any) => s.grade === 'S').length } : null);
-            } catch { /* ignore */ }
-        } else {
-            fetch('/api/training-sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sessionData),
-            }).then(() => {
-                fetch('/api/training-sessions?limit=20')
-                    .then(r => r.json())
-                    .then(d => { if (d.success && d.sessions) setTimeAttackHistory(d.sessions); })
-                    .catch(() => {});
-            }).catch(() => {});
-        }
-    }, [clientToday, timeAttackBestRecords]);
-
-    // Stop time attack early
-    const stopTimeAttack = useCallback(() => {
-        const elapsed = Math.floor((Date.now() - timeAttackStartedAt) / 1000);
-        finishTimeAttack(timeAttackPreset, elapsed, false);
-    }, [timeAttackPreset, timeAttackStartedAt, finishTimeAttack]);
-
-    // Cleanup on unmount
-    useEffect(() => {
-        return () => {
-            if (timeAttackIntervalRef.current) clearInterval(timeAttackIntervalRef.current);
-        };
-    }, []);
-
-    // Track reviews during time attack
-    const trackTimeAttackReview = useCallback((xpGained: number, isLevelUp: boolean) => {
-        if (timeAttackPhase !== 'running') return;
-        const s = timeAttackSessionRef.current;
-        s.cardsReviewed++;
-        s.xpEarned += xpGained;
-        if (isLevelUp) s.levelUps++;
-        s.currentChain++;
-        if (s.currentChain > s.maxChain) s.maxChain = s.currentChain;
-
-        const milestone = MILESTONES.find(m => m.cards === s.cardsReviewed);
-        if (milestone) {
-            setTimeAttackMilestone({ title: milestone.title, color: milestone.color, key: Date.now() });
-            playGachaSound('GREAT');
-        }
-
-        // Chain hit sound during TA
-        if (s.currentChain >= 3) {
-            playFeverChainHit(s.currentChain);
-        }
-    }, [timeAttackPhase]);
-
-    // Auto-clear milestone popup
-    useEffect(() => {
-        if (!timeAttackMilestone) return;
-        const timer = setTimeout(() => setTimeAttackMilestone(null), 2000);
-        return () => clearTimeout(timer);
-    }, [timeAttackMilestone]);
-
-    // Reset chain on miss (fever exit)
-    const trackTimeAttackChainBreak = useCallback(() => {
-        if (timeAttackPhase !== 'running') return;
-        timeAttackSessionRef.current.currentChain = 0;
-    }, [timeAttackPhase]);
-
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 768);
         checkMobile();
@@ -3464,25 +3649,49 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Auto-start Time Attack from ?ta=1 URL parameter (e.g. from kaiwa CTA)
-    // useLayoutEffect to prevent idle UI flash + pre-empt any auto-play TTS
-    useLayoutEffect(() => {
-        if (taAutoRef.current) return;
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('ta') === '1') {
-            taAutoRef.current = true;
-            params.delete('ta');
-            const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
-            window.history.replaceState({}, '', newUrl);
-            // Kill any queued/playing speech before the preset modal shows
-            try { window.speechSynthesis.cancel(); } catch { /* */ }
-            setTimeAttackPhase('selecting');
+    // Restore review state from localStorage (after mount to avoid hydration mismatch)
+    const reviewStateLoaded = useRef(false);
+    useEffect(() => {
+        const savedMode = localStorage.getItem('training-view-mode');
+        if (savedMode === 'calendar' || savedMode === 'list' || savedMode === 'review') {
+            setViewMode(savedMode);
         }
+        const savedFilter = localStorage.getItem('training-review-filter');
+        if (savedFilter) {
+            if (['all', 'random', 'recorded', 'linked', 'retired'].includes(savedFilter)) {
+                setReviewFilter(savedFilter as 'all' | 'random' | 'recorded' | 'linked' | 'retired');
+            } else {
+                const num = Number(savedFilter);
+                if ([0, 1, 2, 3, 4, 5, 6].includes(num)) {
+                    setReviewFilter(num as 0 | 1 | 2 | 3 | 4 | 5 | 6);
+                }
+            }
+        }
+        const savedIndex = localStorage.getItem('training-review-index');
+        if (savedIndex) {
+            setReviewIndex(Math.max(0, parseInt(savedIndex) || 0));
+        }
+        // Mark as loaded so save effects can start writing
+        reviewStateLoaded.current = true;
     }, []);
+
+    // Persist review state to localStorage (skip initial mount to avoid overwriting saved values)
+    useEffect(() => {
+        if (!reviewStateLoaded.current) return;
+        localStorage.setItem('training-view-mode', viewMode);
+    }, [viewMode]);
+    useEffect(() => {
+        if (!reviewStateLoaded.current) return;
+        localStorage.setItem('training-review-filter', String(reviewFilter));
+    }, [reviewFilter]);
+    useEffect(() => {
+        if (!reviewStateLoaded.current) return;
+        localStorage.setItem('training-review-index', String(reviewIndex));
+    }, [reviewIndex]);
 
     // Fetch player stats on mount (3001 only)
     useEffect(() => {
-        if (IS_PUBLIC) return;
+        if (IS_LOCAL) return;
         fetch('/api/player-stats')
             .then(r => r.json())
             .then(d => {
@@ -3497,7 +3706,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
     // Fetch monthly review counts + date touches when month changes (3001 only)
     useEffect(() => {
-        if (IS_PUBLIC) return;
+        if (IS_LOCAL) return;
         if (!currentMonth) return;
         const ym = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}`;
         fetch(`/api/review-count?month=${ym}`)
@@ -3512,8 +3721,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
     // Helper: post XP to review-count + update player level + chain transitions
     const postXP = useCallback((todayKey: string, xpGained: number, slamActive = false, phraseId?: string) => {
-        if (IS_PUBLIC) {
-            // 公開RPG: DBなしでローカルガチャシミュレーション
+        if (IS_LOCAL) {
+            // 公開RPG / 語録310: DBなしでローカルガチャシミュレーション
             const currentChain = feverRef.current;
             const roll = Math.random() * 100;
             const tier = roll < 1 ? 'MYTHIC'
@@ -3523,12 +3732,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 : roll < 50 ? 'GREAT'
                 : roll < 85 ? 'BONUS' : 'MISS';
 
-            // XP + sparks + review count
+            // XP + sparks
             const sparksWon = tier === 'MYTHIC' ? 50 : tier === 'LEGENDARY' ? 25 : tier === 'MEGA' ? 12 : tier === 'SUPER' ? 6 : tier === 'GREAT' ? 3 : tier === 'BONUS' ? 1 : 0;
-            setMonthlyReviewCounts(prev => {
-                const existing = prev[todayKey] || { count: 0, xp: 0, sparks: 0 };
-                return { ...prev, [todayKey]: { count: existing.count + 1, xp: existing.xp + xpGained, sparks: (existing.sparks || 0) + sparksWon } };
-            });
             setPlayerSparks(prev => prev + sparksWon);
             setPlayerTotalXP(prev => {
                 const newXP = prev + xpGained;
@@ -3560,11 +3765,17 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         const exitStreak = currentChain.streak;
                         stopFeverBGM(feverDroneRef.current);
                         feverDroneRef.current = null;
+                        // Restore main BGM immediately (don't wait for useEffect)
+                        if (mainBgmRef.current) {
+                            const st = getSettings();
+                            mainBgmRef.current.volume = (st.bgmVolume / 100) * (st.volume / 100);
+                        }
                         setChainState({ count: 0, mode: 'normal', key: Date.now() });
                         feverRef.current = { active: false, streak: 0 };
                         setFeverFlash('exit');
                         setFeverExitEffect({ streak: exitStreak });
                         playFeverExitSound();
+                        trackTimeAttackChainBreak();
                     }
                 } else {
                     const newCount = currentChain.streak + 1;
@@ -3578,6 +3789,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         if (!wasActive) {
                             setFeverFlash('enter');
                             playFeverEntrySound();
+                            // Mute main BGM immediately (don't wait for useEffect)
+                            if (mainBgmRef.current) mainBgmRef.current.volume = 0;
                             // Stop existing before starting new (prevents double-play)
                             if (feverDroneRef.current) { stopFeverBGM(feverDroneRef.current); }
                             feverDroneRef.current = startFeverBGM();
@@ -3590,8 +3803,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 }
             }
 
-            // Trigger gacha overlay or quiet toast
-            const slotOn = getSettings().slotEnabled;
+            // Trigger gacha overlay or quiet toast (no slot in review mode)
+            const slotOn = getSettings().slotEnabled && viewModeRef.current !== 'review';
             if (slotOn) {
                 if (pendingGachaRef.current) clearTimeout(pendingGachaRef.current);
                 const delay = slamActive ? 1200 : 0;
@@ -3645,7 +3858,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     // Gacha result + card points + FEVER logic
                     if (d.gacha) {
                         const tier = d.gacha.tier as string;
-                        const slotOn = getSettings().slotEnabled;
+                        const slotOn = getSettings().slotEnabled && viewModeRef.current !== 'review';
 
                         // Score updates that would spoil slot result — defer when slot is ON
                         const scoreUpdates = () => {
@@ -3700,6 +3913,11 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 const exitStreak = currentFever.streak;
                                 stopFeverBGM(feverDroneRef.current);
                                 feverDroneRef.current = null;
+                                // Restore main BGM immediately (don't wait for useEffect)
+                                if (mainBgmRef.current) {
+                                    const st = getSettings();
+                                    mainBgmRef.current.volume = (st.bgmVolume / 100) * (st.volume / 100);
+                                }
                                 setChainState({ count: 0, mode: 'normal', key: Date.now() });
                                 feverRef.current = { active: false, streak: 0 };
                                 setFeverFlash('exit');
@@ -3722,6 +3940,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     // First entry into chain mode (normal → kakuhen at 3)
                                     setFeverFlash('enter');
                                     playFeverEntrySound();
+                                    // Mute main BGM immediately (don't wait for useEffect)
+                                    if (mainBgmRef.current) mainBgmRef.current.volume = 0;
                                     // Stop existing before starting new (prevents double-play)
                                     if (feverDroneRef.current) { stopFeverBGM(feverDroneRef.current); }
                                     feverDroneRef.current = startFeverBGM();
@@ -3785,7 +4005,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         };
 
         // Skip fetch if server already provided data via initialData
-        if (initialData?.phrases && dataMode === 'phrases') {
+        if (initialData?.phrases?.length && dataMode === 'phrases') {
             setLoading(false);
             return () => {};
         }
@@ -3795,140 +4015,88 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
         const fetchData = async () => {
             try {
-                if (IS_PUBLIC) {
-                    if (skipDefaultData) {
-                        // initialDataがあればそれを使う（Server Componentから渡される）
-                        // なければlocalStorageフォールバック
-                        if (!initialData?.phrases) {
-                            const myPhrases: Phrase[] = [];
-                            try {
-                                const raw = localStorage.getItem('my-training-phrases');
-                                if (raw) {
-                                    const saved = JSON.parse(raw);
-                                    for (const p of saved) {
-                                        myPhrases.push({
-                                            id: p.id,
-                                            english: p.english || '',
-                                            japanese: p.japanese || '',
-                                            category: p.category || 'my-training',
-                                            date: p.date || new Date().toISOString(),
-                                        });
-                                    }
-                                }
-                            } catch { /* */ }
-                            setPhrases(myPhrases);
-                            try {
-                                const saved = localStorage.getItem('my-training-mastery');
-                                if (saved) setPhraseMastery(JSON.parse(saved));
-                            } catch { /* */ }
-                            try {
-                                const cp = localStorage.getItem('quest-cardPoints');
-                                if (cp) setCardPoints(JSON.parse(cp));
-                            } catch { /* */ }
-                            try {
-                                const ll = localStorage.getItem('quest-lastLeveled');
-                                if (ll) setPhraseLastLeveled(JSON.parse(ll));
-                            } catch { /* */ }
-                        }
-                        setVoiceRecordings({});
-                        setPhraseLinks({});
-                        try {
-                            const ps = localStorage.getItem('quest-playerStats');
-                            if (ps) {
-                                const stats = JSON.parse(ps);
-                                setPlayerTotalXP(stats.total_xp || 0);
-                                setPlayerLevel(levelFromXP(stats.total_xp || 0));
-                                setPlayerSparks(stats.sparks || 0);
-                            }
-                        } catch { /* */ }
-                    } else {
-                    // チュートリアル: TOEIC 30日コンテンツ + エピソードから追加した単語
-                    // カレンダーの各日に20個: Day 1→1日, Day 2→2日, ...
+                if (IS_GOROKU) {
+                    // 語録310商品: goroku seedをPhrase[]に変換、product-storageと同期
+                    const gorokuPhrases = gorokuToTrainingPhrases();
+                    setPhrases(gorokuPhrases);
+                    const savedMastery = loadProductMasteryAsTraining();
+                    if (Object.keys(savedMastery).length > 0) {
+                        setPhraseMastery(savedMastery);
+                    }
+                    setVoiceRecordings({});
+                    setPhraseLinks({});
+                } else if (IS_LIFE) {
+                    // Life 1000表現: life-phrasesをPhrase[]に変換、localStorage同期
+                    const lifePhrases = lifeToTrainingPhrases();
+                    setPhrases(lifePhrases);
+                    const savedMastery = loadLifeMasteryAsTraining();
+                    if (Object.keys(savedMastery).length > 0) {
+                        setPhraseMastery(savedMastery);
+                    }
+                    setVoiceRecordings({});
+                    setPhraseLinks({});
+                } else if (IS_PUBLIC) {
+                    // 公開RPG (3004): DAILY_LESSONS + QUEST_WORDS を10個/日で配分
                     const now = new Date();
-                    const y = now.getFullYear();
-                    const m = now.getMonth();
-                    const daysInMonth = new Date(y, m + 1, 0).getDate();
-                    const makeDayDate = (dayNum: number) => {
-                        const d = new Date(y, m, dayNum, 12, 0, 0);
-                        return d.toISOString();
+                    const year = now.getFullYear();
+                    const month = now.getMonth();
+                    const daysInMonth = new Date(year, month + 1, 0).getDate();
+                    const makeDateStr = (day: number) => {
+                        const d = Math.min(day, daysInMonth);
+                        return `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}T00:00:00.000Z`;
                     };
 
-                    const allPhrases: Phrase[] = [];
-                    let idx = 0;
-
-                    // その月の日数分だけコンテンツを配布（28-31日）
-                    for (const day of TOEIC_30DAY) {
-                        if (day.day > daysInMonth) break;
-                        const dateStr = makeDayDate(day.day);
-                        for (const item of day.items) {
-                            allPhrases.push({
-                                id: `toeic30_${idx}`,
-                                english: item.english,
-                                japanese: item.japanese,
-                                category: `Day ${day.day}: ${day.themeJa}`,
-                                date: dateStr,
-                            });
-                            idx++;
-                        }
-                    }
-
-                    // Append TOEIC酒場 vocab deck (saved from episodes)
-                    try {
-                        const vocabRaw = localStorage.getItem('izakaya_toeic_vocab_deck');
-                        if (vocabRaw) {
-                            const vocabDeck = JSON.parse(vocabRaw);
-                            const masteryFromDeck: Record<string, number> = {};
-                            for (const v of vocabDeck) {
-                                const id = `ep_${idx}`;
-                                const addedDate = v.addedAt || new Date().toISOString();
+                    if (dataMode === 'phrases') {
+                        const allPhrases: Phrase[] = [];
+                        let idx = 0;
+                        for (const lesson of DAILY_LESSONS) {
+                            for (const p of lesson.phrases) {
+                                const day = Math.floor(idx / 10) + 1;
                                 allPhrases.push({
-                                    id,
-                                    english: v.word || '',
-                                    japanese: v.meaning || '',
-                                    category: v.sourceEpisodeTitle || v.sourceEpisode || 'TOEIC酒場',
-                                    date: addedDate,
+                                    id: `phrase_${idx}`,
+                                    english: p.english,
+                                    japanese: p.japanese,
+                                    category: lesson.label || 'phrase',
+                                    date: makeDateStr(day),
                                 });
-                                if (v.masteryLevel) masteryFromDeck[id] = v.masteryLevel;
                                 idx++;
                             }
-                            if (Object.keys(masteryFromDeck).length > 0) {
-                                try {
-                                    const existing = localStorage.getItem('quest-mastery');
-                                    const merged = existing ? { ...JSON.parse(existing), ...masteryFromDeck } : masteryFromDeck;
-                                    localStorage.setItem('quest-mastery', JSON.stringify(merged));
-                                } catch { /* */ }
-                            }
                         }
-                    } catch { /* */ }
-
-                    // Tutorial mode: TOEIC_30DAY + vocab deck only. No custom phrases.
-                    // User-registered phrases go to /english/my-training (production) instead.
-
-                    setPhrases(allPhrases);
+                        // Append any 5min localStorage phrases
+                        try {
+                            const saved5min = localStorage.getItem('5min-training-phrases');
+                            if (saved5min) {
+                                const parsed = JSON.parse(saved5min);
+                                for (const p of parsed) {
+                                    const day = Math.floor(idx / 10) + 1;
+                                    allPhrases.push({
+                                        id: p.id || `5min_${idx}`,
+                                        english: p.english || p.phrase,
+                                        japanese: p.japanese || p.meaning || '',
+                                        category: p.category || '5min',
+                                        date: makeDateStr(day),
+                                    });
+                                    idx++;
+                                }
+                            }
+                        } catch { /* */ }
+                        setPhrases(allPhrases);
+                    } else {
+                        const mapped: Phrase[] = QUEST_WORDS.map((w, i) => ({
+                            id: `quest_${i}`,
+                            english: w.en,
+                            japanese: w.ja + ` (${w.pron})`,
+                            category: w.cat,
+                            date: makeDateStr(Math.floor(i / 10) + 1),
+                        }));
+                        setPhrases(mapped);
+                    }
                     try {
                         const saved = localStorage.getItem('quest-mastery');
                         if (saved) setPhraseMastery(JSON.parse(saved));
                     } catch { /* */ }
-                    try {
-                        const cp = localStorage.getItem('quest-cardPoints');
-                        if (cp) setCardPoints(JSON.parse(cp));
-                    } catch { /* */ }
-                    try {
-                        const ll = localStorage.getItem('quest-lastLeveled');
-                        if (ll) setPhraseLastLeveled(JSON.parse(ll));
-                    } catch { /* */ }
-                    try {
-                        const ps = localStorage.getItem('quest-playerStats');
-                        if (ps) {
-                            const stats = JSON.parse(ps);
-                            setPlayerTotalXP(stats.total_xp || 0);
-                            setPlayerLevel(levelFromXP(stats.total_xp || 0));
-                            setPlayerSparks(stats.sparks || 0);
-                        }
-                    } catch { /* */ }
                     setVoiceRecordings({});
                     setPhraseLinks({});
-                    } // end else (tutorial mode)
                 } else if (dataMode === 'words') {
                     // Word mode: load from user-words API (with retry for cold-start compile)
                     const [wordsRes, masteryRes] = await Promise.all([
@@ -3952,6 +4120,16 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         setPhraseMastery(masteryData.mastery || {});
                         if (masteryData.lastLeveled) setPhraseLastLeveled(masteryData.lastLeveled);
                         if (masteryData.cardPoints) setCardPoints(masteryData.cardPoints);
+                    }
+                    setVoiceRecordings({});
+                    setPhraseLinks({});
+                } else if (dataMode === 'life') {
+                    // Life 1000表現: life-phrasesをPhrase[]に変換、localStorage mastery
+                    const lifePhrases = lifeToTrainingPhrases();
+                    setPhrases(lifePhrases);
+                    const savedMastery = loadLifeMasteryAsTraining();
+                    if (Object.keys(savedMastery).length > 0) {
+                        setPhraseMastery(savedMastery);
                     }
                     setVoiceRecordings({});
                     setPhraseLinks({});
@@ -4055,11 +4233,166 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         };
     }, [isDragging, isResizing]);
 
+    // Audio clip state — stored on Cloudflare R2 + D1, synced across devices
+    const [clipIds, setClipIds] = useState<Set<string>>(new Set());
+    const [clipUrls, setClipUrls] = useState<Record<string, string>>({});
+    const [playingClipId, setPlayingClipId] = useState<string | null>(null);
+    const [uploadingClipId, setUploadingClipId] = useState<string | null>(null);
+    const clipAudioRef = useRef<HTMLAudioElement | null>(null);
+    const clipFileRef = useRef<HTMLInputElement | null>(null);
+    const [pendingClipPhrase, setPendingClipPhrase] = useState<Phrase | null>(null);
+
+    // One-time migration: push any clips still in this device's IndexedDB up to R2
+    const migrateLocalClips = useCallback(async (serverIds: Set<string>) => {
+        if (localStorage.getItem('clips_migrated_v1') === 'done') return;
+        try {
+            const localIds = await loadAllClipIds();
+            const metaMap = new Map((await loadAllClipMeta()).map(m => [m.id, m]));
+            for (const id of localIds) {
+                if (serverIds.has(id)) continue;
+                const blob = await loadClip(id);
+                if (!blob) continue;
+                const m = metaMap.get(id);
+                const fd = new FormData();
+                fd.append('audio', blob, 'clip');
+                fd.append('phraseId', id);
+                if (m) {
+                    fd.append('english', m.english); fd.append('japanese', m.japanese);
+                    fd.append('date', m.date); fd.append('category', m.category);
+                }
+                const res = await fetch('/api/phrase-clips', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data?.success) {
+                    setClipIds(prev => new Set(prev).add(id));
+                    setClipUrls(prev => ({ ...prev, [id]: data.url }));
+                    await deleteClip(id).catch(() => {});
+                }
+            }
+            localStorage.setItem('clips_migrated_v1', 'done');
+        } catch { /* offline / no local clips */ }
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            try {
+                const res = await fetch('/api/phrase-clips');
+                const data = await res.json();
+                const serverIds = new Set<string>();
+                const urls: Record<string, string> = {};
+                if (data?.success && Array.isArray(data.clips)) {
+                    for (const c of data.clips) { serverIds.add(c.phrase_id); urls[c.phrase_id] = c.url; }
+                }
+                if (cancelled) return;
+                setClipIds(new Set(serverIds));
+                setClipUrls(urls);
+                migrateLocalClips(serverIds);
+            } catch { /* offline */ }
+        })();
+        return () => { cancelled = true; };
+    }, [migrateLocalClips]);
+
+    const attachClipFile = useCallback(async (file: File, phrase: Phrase) => {
+        if (!file.type.startsWith('audio/') && !file.type.startsWith('video/')) return;
+        setUploadingClipId(phrase.id);
+        try {
+            const fd = new FormData();
+            fd.append('audio', file);
+            fd.append('phraseId', phrase.id);
+            fd.append('english', phrase.english || '');
+            fd.append('japanese', phrase.japanese || '');
+            fd.append('date', (phrase.date || '').split('T')[0]);
+            fd.append('category', phrase.category || '');
+            const res = await fetch('/api/phrase-clips', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data?.success) {
+                setClipIds(prev => new Set(prev).add(phrase.id));
+                setClipUrls(prev => ({ ...prev, [phrase.id]: data.url }));
+            } else {
+                alert('CLIPのアップロードに失敗しました');
+            }
+        } catch {
+            alert('CLIPのアップロードに失敗しました');
+        } finally {
+            setUploadingClipId(null);
+        }
+    }, []);
+
+    const playClip = useCallback((phraseId: string) => {
+        if (clipAudioRef.current) { clipAudioRef.current.pause(); clipAudioRef.current = null; }
+        if (playingClipId === phraseId) { setPlayingClipId(null); return; }
+        const url = clipUrls[phraseId];
+        if (!url) return;
+        const audio = new Audio(url);
+        clipAudioRef.current = audio;
+        audio.onended = () => { setPlayingClipId(null); };
+        audio.onerror = () => { setPlayingClipId(null); };
+        audio.play().catch(() => setPlayingClipId(null));
+        setPlayingClipId(phraseId);
+    }, [playingClipId, clipUrls]);
+
+    const removeClip = useCallback(async (phraseId: string) => {
+        try { await fetch(`/api/phrase-clips?phraseId=${encodeURIComponent(phraseId)}`, { method: 'DELETE' }); } catch { /* */ }
+        setClipIds(prev => { const next = new Set(prev); next.delete(phraseId); return next; });
+        setClipUrls(prev => { const n = { ...prev }; delete n[phraseId]; return n; });
+        if (playingClipId === phraseId) { clipAudioRef.current?.pause(); setPlayingClipId(null); }
+    }, [playingClipId]);
+
+    const [ppWordPicker, setPpWordPicker] = useState<{ phraseId: string; words: string[]; selected: boolean[] } | null>(null);
+
+    const openPlayPhrase = (phrase?: Phrase) => {
+        if (!phrase) return;
+        const words = phrase.english.replace(/[^\w\s'-]/g, ' ').trim().split(/\s+/).filter(w => w.length > 0);
+        setPpWordPicker({ phraseId: phrase.id, words, selected: words.map(() => false) });
+    };
+
+    const ppToggleWord = (idx: number) => {
+        setPpWordPicker(prev => {
+            if (!prev) return null;
+            const next = [...prev.selected];
+            next[idx] = !next[idx];
+            return { ...prev, selected: next };
+        });
+    };
+
+    const ppSearch = () => {
+        if (!ppWordPicker) return;
+        const query = ppWordPicker.words.filter((_, i) => ppWordPicker.selected[i]).join(' ');
+        if (!query.trim()) return;
+        const url = `https://www.playphrase.me/#/search?q=${encodeURIComponent(query.trim())}`;
+        window.open(url, '_blank');
+        setPpWordPicker(null);
+    };
+
+    // Aggressively pause the YouGlish widget — try widget API + YouTube iframe postMessage
+    const pauseYouGlishWidget = () => {
+        try { widgetRef.current?.pause?.(); } catch { }
+        try {
+            const iframe = document.querySelector('#yg-widget-phrases iframe') as HTMLIFrameElement | null;
+            iframe?.contentWindow?.postMessage(JSON.stringify({ event: 'command', func: 'pauseVideo', args: '' }), '*');
+        } catch { }
+    };
+
+    // Kill the YG widget completely — used on save to stop auto-advance loop
+    const killYouGlishWidget = () => {
+        try { widgetRef.current?.pause?.(); } catch { }
+        try {
+            const container = document.getElementById('yg-widget-phrases');
+            if (container) {
+                // Empty the container — kills iframe + stops YG's auto-advance loop dead
+                container.innerHTML = '';
+            }
+        } catch { }
+        widgetRef.current = null;
+    };
+
     const playYouGlish = (phrase: Phrase) => {
         setYouglishPhrase(phrase);
         setYouglishQuery('');
         setYouglishSearched(false);
         setCaptionHistory([]);
+        setSaveSuccess(false);
+        pauseAfterSaveRef.current = false;
         currentVideoRef.current = { videoId: '', timestamp: 0 };
         setPlayerPosition({
             x: Math.max(20, window.innerWidth - 460),
@@ -4076,6 +4409,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
         setYouglishSearched(true);
         setCaptionHistory([]);
+        pauseAfterSaveRef.current = false;
         currentVideoRef.current = { videoId: '', timestamp: 0 };
 
         // Wait for React to render the empty container
@@ -4095,19 +4429,25 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         const start = event.start || 0;
                         if (videoId) {
                             currentVideoRef.current = { videoId, timestamp: start };
-                            setCaptionHistory([]);
+                        }
+                        // If user just saved, kill the auto-advance attempt immediately
+                        if (pauseAfterSaveRef.current) {
+                            pauseYouGlishWidget();
+                            // YG may take a beat to inject the player; pause again after a short delay
+                            setTimeout(pauseYouGlishWidget, 300);
+                            setTimeout(pauseYouGlishWidget, 1000);
                         }
                     },
                     onCaptionChange: (event: { caption: string }) => {
+                        // Don't accept new captions after save — the widget is being killed
+                        if (pauseAfterSaveRef.current) return;
                         let caption = event.caption;
                         try { caption = decodeURIComponent(caption); } catch { }
                         caption = caption.replace(/\[\[\[/g, '').replace(/\]\]\]/g, '');
 
                         setCaptionHistory(prev => {
-                            if (prev.length === 0 || prev[prev.length - 1].text !== caption) {
-                                return [...prev, { text: caption, selected: true }];
-                            }
-                            return prev;
+                            if (prev.some(c => c.text === caption)) return prev;
+                            return [...prev, { text: caption, selected: true }];
                         });
                     }
                 }
@@ -4118,11 +4458,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
     const saveSelectedCaptions = async () => {
         if (savingPhrase) return;
-        const selectedCaptions = captionHistory.filter(c => c.selected);
-        if (selectedCaptions.length === 0) {
-            alert('No captions selected');
-            return;
-        }
+        const selectedCaptions = captionHistory.filter(c => c.selected && !c.saved);
+        if (selectedCaptions.length === 0) return;
         setSavingPhrase(true);
         try {
             const fullText = selectedCaptions.map(c => c.text).join(' ');
@@ -4131,7 +4468,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     english: fullText,
-                    japanese: `(${youglishPhrase ? youglishPhrase.english.slice(0, 30) : 'YouGlish'})`,
+                    japanese: `(${youglishPhrase?.english.slice(0, 30) || 'YouGlish'})`,
                     category: 'YouGlish',
                     date: youglishSaveDate
                 })
@@ -4141,8 +4478,17 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 if (data.success && data.phrase && !data.duplicate) {
                     setPhrases(prev => [...prev, data.phrase]);
                 }
-                alert('Saved!');
-                setCaptionHistory([]);
+                // Mark saved captions in place — don't clear, don't auto-advance
+                const savedTexts = new Set(selectedCaptions.map(c => c.text));
+                setCaptionHistory(prev => prev.map(c =>
+                    savedTexts.has(c.text) ? { ...c, saved: true, selected: false } : c
+                ));
+                // Kill the YG widget — pause() alone doesn't stop the auto-advance loop in v4.3
+                pauseAfterSaveRef.current = true;
+                killYouGlishWidget();
+                setYouglishSearched(false);
+                setSaveSuccess(true);
+                setTimeout(() => setSaveSuccess(false), 2200);
             } else {
                 alert('Failed to save');
             }
@@ -4187,46 +4533,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         }
         return map;
     }, [timeAttackHistory]);
-
-    // Practice drill completion dates (from practice page localStorage)
-    const [practiceDoneDates, setPracticeDoneDates] = useState<Set<string>>(new Set());
-    useEffect(() => {
-        const loadPracticeDates = () => {
-            const dates = new Set<string>();
-            const now = new Date();
-            for (let d = 0; d < 31; d++) {
-                const dt = new Date(now.getFullYear(), now.getMonth(), now.getDate() - d);
-                const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-                if (localStorage.getItem(`practice-done-${key}`)) dates.add(key);
-            }
-            setPracticeDoneDates(dates);
-        };
-        loadPracticeDates();
-        const interval = setInterval(loadPracticeDates, 5000);
-        return () => clearInterval(interval);
-    }, []);
-
-    // TA streak: set of dateKeys that are part of the current consecutive streak (counting back from today)
-    const taStreakInfo = useMemo(() => {
-        const streakSet = new Set<string>();
-        const todayKey = clientToday || new Date().toISOString().split('T')[0];
-        const sessionDates = new Set(Object.keys(taSessionsByDate));
-        const doneToday = sessionDates.has(todayKey);
-        let streakCount = 0;
-        const check = new Date();
-        // If not done today, start from yesterday
-        if (!doneToday) check.setDate(check.getDate() - 1);
-        while (true) {
-            const key = `${check.getFullYear()}-${String(check.getMonth() + 1).padStart(2, '0')}-${String(check.getDate()).padStart(2, '0')}`;
-            if (sessionDates.has(key)) {
-                streakSet.add(key);
-                streakCount++;
-                check.setDate(check.getDate() - 1);
-            } else break;
-        }
-        if (doneToday) streakSet.add(todayKey);
-        return { streakSet, streakCount, doneToday, todayGrade: doneToday ? taSessionsByDate[todayKey]?.bestGrade || '' : '' };
-    }, [taSessionsByDate, clientToday]);
 
     // Deep link support: ?date=YYYY-MM-DD and/or ?phrase=PHRASE_ID
     useEffect(() => {
@@ -4278,37 +4584,63 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         );
     }, [phrases, searchQuery]);
 
-    // This month's phrases for review, grouped by mastery level
-    // Each level is independently shuffled on every reload / tab switch / shuffleKey change
-    const thisMonthReviewPhrases = useMemo(() => {
-        void shuffleKey; // dependency trigger — forces full re-shuffle
-        if (!currentMonth) return { level0: [], level1: [], level2: [], level3: [], all: [], total: [] };
-        // Use string comparison to avoid UTC vs local timezone mismatch
+    // Base month phrases — stable list, only changes when phrases or month changes
+    const monthPhrases = useMemo(() => {
+        if (!currentMonth) return [];
         const y = currentMonth.getFullYear();
         const m = String(currentMonth.getMonth() + 1).padStart(2, '0');
         const monthPrefix = `${y}-${m}`;
+        return phrases.filter(p => p.date.split('T')[0].startsWith(monthPrefix));
+    }, [phrases, currentMonth]);
 
-        const monthPhrases = phrases.filter(p => {
-            const dateStr = p.date.split('T')[0];
-            return dateStr.startsWith(monthPrefix);
-        });
+    // Shuffle order — only re-shuffles on shuffleKey change (manual shuffle button or reload)
+    // or when the SET of phrases changes (add/delete). Key on the id signature, NOT the
+    // monthPhrases array reference, so editing a card's text (setPhrases → new ref, same ids)
+    // does NOT re-shuffle and bump the user to a different card.
+    const monthPhraseIdSig = useMemo(() => monthPhrases.map(p => p.id).join('|'), [monthPhrases]);
+    const shuffledOrder = useMemo(() => {
+        void shuffleKey;
+        if (!monthPhrases.length) return { ids: [] as string[], idSet: new Set<string>() };
+        const shuffled = fisherYates(monthPhrases);
+        return { ids: shuffled.map(p => p.id), idSet: new Set(shuffled.map(p => p.id)) };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [monthPhraseIdSig, shuffleKey]);
 
-        const withChakra = monthPhrases.map(p => {
+    // Chakra levels — recomputes on mastery/recording changes but does NOT re-shuffle
+    const phraseChakraMap = useMemo(() => {
+        const map: Record<string, number> = {};
+        for (const p of monthPhrases) {
             const m = Number(phraseMastery[p.id] || 0);
             const hasRec = (voiceRecordings[p.id] || []).length > 0;
             const hasLink = (phraseLinks[p.id] || []).length > 0;
-            return { phrase: p, chakra: getChakraLevel(m, hasRec, hasLink) };
-        });
+            map[p.id] = getChakraLevel(m, hasRec, hasLink);
+        }
+        return map;
+    }, [monthPhrases, phraseMastery, voiceRecordings, phraseLinks]);
+
+    // This month's phrases for review, grouped by mastery level
+    // Uses stable shuffle order — mastery changes only move cards between groups, never re-shuffle
+    const thisMonthReviewPhrases = useMemo(() => {
+        if (!monthPhrases.length) return { level0: [], level1: [], level2: [], level3: [], level4: [], level5: [], level6: [], all: [], total: [] };
+
+        const phraseMap = new Map(monthPhrases.map(p => [p.id, p]));
+        // Apply stored shuffle order
+        const ordered = shuffledOrder.ids
+            .filter(id => phraseMap.has(id))
+            .map(id => ({ phrase: phraseMap.get(id)!, chakra: phraseChakraMap[id] || 0 }));
 
         return {
-            level0: fisherYates(withChakra.filter(x => x.chakra === 0).map(x => x.phrase)),
-            level1: fisherYates(withChakra.filter(x => x.chakra === 1).map(x => x.phrase)),
-            level2: fisherYates(withChakra.filter(x => x.chakra === 2).map(x => x.phrase)),
-            level3: fisherYates(withChakra.filter(x => x.chakra === 3).map(x => x.phrase)),
-            all: fisherYates(withChakra.filter(x => x.chakra < 3).map(x => x.phrase)),
-            total: fisherYates(monthPhrases),
+            level0: ordered.filter(x => x.chakra === 0).map(x => x.phrase),
+            level1: ordered.filter(x => x.chakra === 1).map(x => x.phrase),
+            level2: ordered.filter(x => x.chakra === 2).map(x => x.phrase),
+            level3: ordered.filter(x => x.chakra === 3).map(x => x.phrase),
+            level4: ordered.filter(x => x.chakra === 4).map(x => x.phrase),
+            level5: ordered.filter(x => x.chakra === 5).map(x => x.phrase),
+            level6: ordered.filter(x => x.chakra === 6).map(x => x.phrase),
+            all: ordered.filter(x => x.chakra < 3).map(x => x.phrase),
+            total: ordered.map(x => x.phrase),
         };
-    }, [phrases, currentMonth, shuffleKey, phraseMastery, voiceRecordings, phraseLinks]);
+    }, [monthPhrases, shuffledOrder, phraseChakraMap]);
 
     // Remaining clicks to get all phrases to FIGHTER (mastery 3 / Lv.4)
     // Lv.1(EGG/0)=3clicks, Lv.2(HATCH/1)=2, Lv.3(ROOKIE/2)=1, Lv.4+(FIGHTER/3+)=0
@@ -4410,38 +4742,33 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         return thisMonthReviewPhrases.total.filter(p => (phraseLinks[p.id] || []).length > 0);
     }, [thisMonthReviewPhrases.total, phraseLinks]);
 
+    // Retired phrases for this month
+    const retiredReviewPhrases = useMemo(() => {
+        return thisMonthReviewPhrases.total.filter(p => retiredPhrases.has(p.id));
+    }, [thisMonthReviewPhrases, retiredPhrases]);
+
     // Live computed list (recomputes on every recording/mastery change — used for tab counts)
     const computedReviewList = useMemo(() => {
+        if (reviewFilter === 'retired') return retiredReviewPhrases;
         if (reviewFilter === 'all') return thisMonthReviewPhrases.total;
         if (reviewFilter === 'random') return thisMonthReviewPhrases.all;
         if (reviewFilter === 'recorded') return recordedReviewPhrases;
         if (reviewFilter === 'linked') return linkedReviewPhrases;
         return thisMonthReviewPhrases[`level${reviewFilter}` as keyof typeof thisMonthReviewPhrases] as Phrase[];
-    }, [thisMonthReviewPhrases, reviewFilter, recordedReviewPhrases, linkedReviewPhrases]);
+    }, [thisMonthReviewPhrases, reviewFilter, recordedReviewPhrases, linkedReviewPhrases, retiredReviewPhrases]);
 
-    // Stable review list — only updates on filter/shuffle/phrase changes, NOT on recording/mastery
-    // This prevents "jump to next" when recording promotes a phrase to a higher chakra level
-    const reviewListCacheRef = useRef<{ filter: string; shuffleKey: number; listRef: Phrase[]; list: Phrase[] }>(
-        { filter: '', shuffleKey: -1, listRef: [], list: [] }
-    );
-    const cacheKey = reviewListCacheRef.current;
-    if (cacheKey.filter !== String(reviewFilter) || cacheKey.shuffleKey !== shuffleKey || cacheKey.listRef !== computedReviewList) {
-        reviewListCacheRef.current = { filter: String(reviewFilter), shuffleKey, listRef: computedReviewList, list: computedReviewList };
-    }
+    // Stable review list — only updates on filter/shuffle changes
+    // Now that thisMonthReviewPhrases preserves shuffle order across mastery changes,
+    // we can directly use computedReviewList (it won't re-shuffle unexpectedly)
     // Hide phrases touched today — once you press mastery, it won't reappear until tomorrow
-    // During time attack: show all EXCEPT already-maxed (mastery 3 or 6) AND already-leveled-today cards
-    const reviewListRaw = reviewListCacheRef.current.list;
+    // Exception: during time attack, show all phrases (user explicitly chose to practice)
+    // Retired tab shows retired phrases; other tabs exclude them
+    const reviewListRaw = reviewFilter === 'retired' ? computedReviewList : computedReviewList.filter(p => !retiredPhrases.has(p.id));
     const isTimeAttackActive = timeAttackPhase === 'running' || timeAttackPhase === 'countdown';
-    const reviewList = isTimeAttackActive
-        ? reviewListRaw.filter(p => {
-            const m = Number(phraseMastery[p.id] || 0);
-            if (m === 3 || m === 6) return false;
-            if (phraseLastLeveled[p.id] === clientToday) return false;
-            return true;
-        })
-        : clientToday
-            ? reviewListRaw.filter(p => phraseLastLeveled[p.id] !== clientToday)
-            : reviewListRaw;
+    const reviewList = (clientToday && !isTimeAttackActive)
+        ? reviewListRaw.filter(p => phraseLastLeveled[p.id] !== clientToday)
+        : reviewListRaw;
+    reviewListLenRef.current = reviewList.length;
 
     // History-aware displayed card: celebration > history > queue
     const displayedCard = cardCelebration
@@ -4486,6 +4813,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     setChainState({ count: 10, mode: 'god', key: Date.now() });
                 } else if (k === ')') { // Shift+0 = reset chain
                     setChainState({ count: 0, mode: 'normal', key: Date.now() });
+                } else if (k === 'K') { // Shift+K = kakuhen boost 10
+                    setKakuhenBoost(prev => prev > 0 ? 0 : 10);
                 }
             }
         };
@@ -4532,9 +4861,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         if (!pointEffect) return;
         const fid = Date.now();
         setXpFloats(prev => [...prev, { id: fid, value: pointEffect.points, color: pointEffect.color }]);
-        const duration = isTimeAttackActive ? 700 : 1200;
-        setTimeout(() => setXpFloats(prev => prev.filter(f => f.id !== fid)), duration);
-    }, [pointEffect, isTimeAttackActive]);
+        setTimeout(() => setXpFloats(prev => prev.filter(f => f.id !== fid)), 1200);
+    }, [pointEffect]);
 
     // Spawn touch float when monthlyReviewCounts for today changes
     const prevTouchRef = useRef(0);
@@ -4548,13 +4876,12 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         prevTouchRef.current = current;
     }, [monthlyReviewCounts, todayKey]);
 
-    // Auto-clear point effect (shorter during time attack for rapid reviews)
+    // Auto-clear point effect
     useEffect(() => {
         if (!pointEffect) return;
-        const duration = isTimeAttackActive ? 800 : 2000;
-        const timer = setTimeout(() => setPointEffect(null), duration);
+        const timer = setTimeout(() => setPointEffect(null), 2000);
         return () => clearTimeout(timer);
-    }, [pointEffect, isTimeAttackActive]);
+    }, [pointEffect]);
 
     // Auto-clear calendar pulse (particle burst + floating number)
     useEffect(() => {
@@ -4594,8 +4921,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     };
 
     // Review content: large version for PC fullscreen, compact for mobile inline
-    // During time attack on PC, use compact sizing for faster review flow
-    const isFullReview = viewMode === 'review' && !isMobile && !isTimeAttackActive;
+    const isFullReview = viewMode === 'review' && !isMobile;
 
     const renderReviewContent = () => {
         const currentPhrase = displayedCard;
@@ -4714,8 +5040,20 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             zIndex: 3,
                         }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                {/* Element icon */}
-                                {currentPhrase && (
+                                {/* Element icon / Goroku or Life category */}
+                                {(IS_GOROKU || IS_LIFE || dataMode === 'life') && currentPhrase && (GOROKU_CATEGORIES[currentPhrase.category] || LIFE_CATEGORIES[currentPhrase.category]) ? (
+                                    <span style={{
+                                        fontSize: isFullReview ? '10px' : '8px',
+                                        fontWeight: '800',
+                                        color: (GOROKU_CATEGORIES[currentPhrase.category] || LIFE_CATEGORIES[currentPhrase.category])?.color || '#78716C',
+                                        backgroundColor: (GOROKU_CATEGORIES[currentPhrase.category] || LIFE_CATEGORIES[currentPhrase.category])?.bg || '#F5F5F4',
+                                        padding: '2px 6px',
+                                        borderRadius: '4px',
+                                        letterSpacing: '0.5px',
+                                    }}>
+                                        {(GOROKU_CATEGORIES[currentPhrase.category] || LIFE_CATEGORIES[currentPhrase.category])?.label || currentPhrase.category}
+                                    </span>
+                                ) : currentPhrase && (
                                     <ElementBadge element={currentPhrase.category} size={12} />
                                 )}
                                 {/* Rank label */}
@@ -4774,8 +5112,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 const current = Number(phraseMastery[currentPhrase.id] || 0);
                                 const hasRec = (voiceRecordings[currentPhrase.id] || []).length > 0;
                                 const hasLink = (phraseLinks[currentPhrase.id] || []).length > 0;
-                                const isLockedToday = !isTimeAttackActive && (current === 3 || (current !== 6 && current < 3 && phraseLastLeveled[currentPhrase.id] === clientToday));
-                                if (isLockedToday || current === 6) {
+                                const isTARunning = timeAttackPhase === 'running';
+                                const isLockedToday = !isTARunning && (current === 3 || (current !== 6 && current < 3 && phraseLastLeveled[currentPhrase.id] === clientToday));
+                                if ((isLockedToday || current === 6) && !isTARunning) {
                                     // Locked or MASTER: just advance to next card
                                     if (historyOffset > 0) setHistoryOffset(h => h - 1);
                                     else if (reviewList.length > 0) setReviewIndex(i => (i + 1) % reviewList.length);
@@ -4831,7 +5170,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         letterSpacing: '2px',
                                         marginTop: '4px',
                                     }}>
-                                        経験値
+                                        XP
                                     </div>
                                     {/* Floating +N XP */}
                                     {xpFloats.map(f => (
@@ -4856,8 +5195,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 {/* Divider */}
                                 <div style={{ width: '1px', height: isFullReview ? '36px' : '24px', backgroundColor: '#e5e5e5' }} />
 
-                                {/* Progress */}
-                                <div style={{ textAlign: 'center' }}>
+                                {/* Progress + Random */}
+                                <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
                                     <div style={{
                                         fontSize: isFullReview ? '20px' : '14px',
                                         fontWeight: '700',
@@ -4867,15 +5206,34 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     }}>
                                         {reviewIndex + 1}<span style={{ color: '#ccc', fontWeight: '400' }}>/{reviewList.length}</span>
                                     </div>
-                                    <div style={{
-                                        fontSize: isFullReview ? '10px' : '8px',
-                                        fontWeight: '600',
-                                        color: '#aaa',
-                                        letterSpacing: '1px',
-                                        marginTop: '4px',
-                                    }}>
-                                        カード
-                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            if (reviewList.length > 1) {
+                                                if (cardCelebration) { setReviewHistory(prev => [...prev, cardCelebration.phrase]); setCardCelebration(null); }
+                                                setHistoryOffset(0);
+                                                setReviewIndex(i => {
+                                                    let next = Math.floor(Math.random() * reviewList.length);
+                                                    while (next === i && reviewList.length > 1) next = Math.floor(Math.random() * reviewList.length);
+                                                    return next;
+                                                });
+                                            }
+                                        }}
+                                        style={{
+                                            padding: '2px 8px',
+                                            borderRadius: '4px',
+                                            border: '1px solid #D4AF3740',
+                                            backgroundColor: 'transparent',
+                                            fontSize: isFullReview ? '9px' : '7px',
+                                            fontWeight: '700',
+                                            cursor: reviewList.length > 1 ? 'pointer' : 'default',
+                                            color: '#D4AF37',
+                                            letterSpacing: '1px',
+                                            opacity: reviewList.length > 1 ? 1 : 0.3,
+                                        }}
+                                        title="Random jump"
+                                    >
+                                        RANDOM
+                                    </button>
                                 </div>
 
                                 {/* Divider */}
@@ -4900,7 +5258,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         letterSpacing: '2px',
                                         marginTop: '4px',
                                     }}>
-                                        回数
+                                        REPS
                                     </div>
                                     {/* Floating +1 */}
                                     {touchFloats.map(f => (
@@ -4951,14 +5309,14 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         letterSpacing: '3px',
                                         marginTop: '3px',
                                     }}>
-                                        スロット
+                                        SPARKS
                                     </div>
                                 </div>
                             </div>
 
                             {/* English */}
                             <div style={{
-                                fontSize: isFullReview ? '32px' : '16px',
+                                fontSize: isFullReview ? '32px' : '20px',
                                 fontWeight: '600',
                                 color: '#1a1a1a',
                                 marginBottom: isFullReview ? '16px' : '10px',
@@ -4971,7 +5329,17 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     const hr = (voiceRecordings[pid] || []).length > 0;
                                     const hl = (phraseLinks[pid] || []).length > 0;
                                     const chakra = getChakraLevel(bm, hr, hl);
-                                    const text = displayedCard ? displayedCard.english : '';
+                                    // Goroku/Life: show selected or mastery-appropriate English level
+                                    const autoLevel = bm >= 3 ? 3 : bm >= 2 ? 2 : bm >= 1 ? 1 : 0;
+                                    const gorokuLevel = viewLevelOverride !== null ? viewLevelOverride : autoLevel;
+                                    // Reset override when card changes
+                                    if (displayedCard && displayedCard.id !== prevDisplayedCardId.current) {
+                                        prevDisplayedCardId.current = displayedCard.id;
+                                        if (viewLevelOverride !== null) setViewLevelOverride(null);
+                                    }
+                                    const text = (displayedCard?.gorokuLevels)
+                                        ? (displayedCard.gorokuLevels[gorokuLevel] || displayedCard.english)
+                                        : (displayedCard?.english || '');
                                     // Tap to Level: plain text, no links (whole card is tap target)
                                     if (getSettings().tapToLevel) {
                                         return <span style={{ color: '#1a1a1a' }}>{text}</span>;
@@ -5005,9 +5373,10 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         );
                                     }
                                     // All other levels: Google search
-                                    const q = dataMode === 'words'
-                                        ? `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(text)}`
-                                        : `https://www.google.com/search?q=${encodeURIComponent(text)}`;
+                                    // Words も Phrases と同じく解説クエリ。Google の AI Overview に
+                                    // 日本人がつまずく単語・熟語・文法・ニュアンスを説明させる。
+                                    const aiPrompt = `「${text}」この英文を日本語で解説して。日本人が特につまずきやすい単語・熟語・文法・ニュアンスと、なぜその表現が使われるのかを説明して`;
+                                    const q = `https://www.google.com/search?q=${encodeURIComponent(aiPrompt)}`;
                                     return (
                                         <a
                                             href={q}
@@ -5019,7 +5388,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 borderBottom: `1px dashed ${dataMode === 'words' ? '#D4AF37' : '#10B981'}`,
                                                 cursor: 'pointer',
                                             }}
-                                            title={dataMode === 'words' ? 'Google Images で検索' : 'Google で検索'}
+                                            title="AIに解説してもらう (Google)"
                                         >
                                             {text}
                                         </a>
@@ -5035,7 +5404,139 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 textAlign: 'center',
                             }}>
                                 {displayedCard?.japanese}
+                                {/* Goroku: literal translation if exists */}
+                                {displayedCard?.gorokuLiteral && (
+                                    <span style={{ fontSize: '11px', color: '#A8A29E', marginLeft: '8px' }}>
+                                        (lit. {displayedCard.gorokuLiteral})
+                                    </span>
+                                )}
                             </div>
+
+                            {/* Goroku: Context (the product core -- WHY English works this way) */}
+                            {displayedCard?.gorokuContext && !getSettings().tapToLevel && (
+                                <div style={{
+                                    padding: isFullReview ? '14px 16px' : '10px 12px',
+                                    backgroundColor: '#FFFBEB',
+                                    borderRadius: '10px',
+                                    border: '1px solid #FDE68A',
+                                    marginBottom: isFullReview ? '16px' : '8px',
+                                }}>
+                                    <div style={{
+                                        fontSize: '10px',
+                                        fontWeight: '800',
+                                        color: '#D4AF37',
+                                        letterSpacing: '1.5px',
+                                        marginBottom: '6px',
+                                    }}>
+                                        WHY?
+                                    </div>
+                                    <div style={{
+                                        fontSize: isFullReview ? '13px' : '11px',
+                                        color: '#44403C',
+                                        lineHeight: 1.7,
+                                    }}>
+                                        {displayedCard.gorokuContext}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Goroku: English level indicator */}
+                            {displayedCard?.gorokuLevels && !getSettings().tapToLevel && (() => {
+                                const bm = Number(phraseMastery[displayedCard.id] || 0);
+                                const autoLevel = bm >= 3 ? 3 : bm >= 2 ? 2 : bm >= 1 ? 1 : 0;
+                                const activeLevel = viewLevelOverride !== null ? viewLevelOverride : autoLevel;
+                                const levelLabels = ['SHORT', 'ATTITUDE', 'FULL', 'MONOLOGUE'];
+                                const levelColors = ['#78716C', '#D4AF37', '#2563EB', '#7C3AED'];
+                                return (
+                                    <div style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        gap: '4px',
+                                        marginBottom: isFullReview ? '16px' : '8px',
+                                    }}>
+                                        {levelLabels.map((label, i) => (
+                                            <button key={i} onClick={() => {
+                                                setViewLevelOverride(i);
+                                                const text = displayedCard.gorokuLevels?.[i] || displayedCard.english;
+                                                playPhrase(displayedCard, text);
+                                            }} style={{
+                                                padding: '4px 10px',
+                                                borderRadius: '4px',
+                                                fontSize: '9px',
+                                                fontWeight: '700',
+                                                letterSpacing: '0.5px',
+                                                border: i === activeLevel ? `2px solid ${levelColors[i]}` : '1px solid transparent',
+                                                backgroundColor: i === activeLevel ? levelColors[i] : i <= autoLevel ? `${levelColors[i]}30` : '#E7E5E4',
+                                                color: i === activeLevel ? '#fff' : i <= autoLevel ? levelColors[i] : '#A8A29E',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s ease',
+                                            }}>
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Goroku: Slot Practice (pattern swapping) */}
+                            {displayedCard?.gorokuSlot && displayedCard.gorokuSlotHints && !getSettings().tapToLevel && (
+                                <div style={{
+                                    padding: isFullReview ? '12px 16px' : '8px 12px',
+                                    backgroundColor: '#F5F3FF',
+                                    borderRadius: '10px',
+                                    border: '1px solid #E9E5FF',
+                                    marginBottom: isFullReview ? '16px' : '8px',
+                                }}>
+                                    <div style={{
+                                        fontSize: '10px',
+                                        fontWeight: '800',
+                                        color: '#7C3AED',
+                                        letterSpacing: '1.5px',
+                                        marginBottom: '6px',
+                                    }}>
+                                        PATTERN SWAP
+                                    </div>
+                                    <div style={{
+                                        fontSize: isFullReview ? '12px' : '10px',
+                                        color: '#44403C',
+                                        marginBottom: '6px',
+                                    }}>
+                                        <strong style={{ color: '#7C3AED' }}>{displayedCard.gorokuSlot}</strong> を入れ替えてみよう:
+                                    </div>
+                                    <div style={{
+                                        display: 'flex',
+                                        flexWrap: 'wrap',
+                                        gap: '6px',
+                                    }}>
+                                        {displayedCard.gorokuSlotHints.map((hint, i) => (
+                                            <span key={i} style={{
+                                                padding: '3px 10px',
+                                                borderRadius: '12px',
+                                                fontSize: isFullReview ? '12px' : '10px',
+                                                fontWeight: '600',
+                                                backgroundColor: '#EDE9FE',
+                                                color: '#6D28D9',
+                                                cursor: 'pointer',
+                                            }}
+                                            onClick={() => {
+                                                const synth = window.speechSynthesis;
+                                                if (synth && displayedCard.gorokuLevels) {
+                                                    const base = displayedCard.gorokuLevels[1] || displayedCard.english;
+                                                    const swapped = base.replace(displayedCard.gorokuSlot!, hint);
+                                                    const u = new SpeechSynthesisUtterance(swapped);
+                                                    u.lang = 'en-US';
+                                                    u.rate = 0.9;
+                                                    synth.cancel();
+                                                    synth.speak(u);
+                                                }
+                                            }}
+                                            >
+                                                {hint}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Flavor Text — register to user phrases (hidden in tapToLevel mode) */}
                             {displayedCard && !getSettings().tapToLevel && (() => {
@@ -5119,11 +5620,12 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             fontSize: isFullReview ? '14px' : '12px',
                                             color: '#5B21B6',
                                         }}>
-                                            <span>{link.text}</span>
+                                            <span style={{ whiteSpace: 'pre-line' }}>{link.text}</span>
                                             <button
                                                 onClick={() => {
                                                     window.speechSynthesis.cancel();
-                                                    const u = new SpeechSynthesisUtterance(link.text);
+                                                    // 会話の「A:」「B:」は読み上げない
+                                                    const u = new SpeechSynthesisUtterance(link.text.replace(/^\s*[AB]:\s*/gm, ''));
                                                     u.lang = 'en-US';
                                                     u.rate = 0.9;
                                                     const v = voices.find(v => v.name.includes('Google US English')) || voices[0];
@@ -5153,13 +5655,210 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 const hasRec = (voiceRecordings[displayedCard.id] || []).length > 0;
                                 const hasLink = (phraseLinks[displayedCard.id] || []).length > 0;
                                 const chakra = getChakraInfo(baseMastery, hasRec, hasLink);
-                                const isLockedToday = !isTimeAttackActive && (baseMastery === 3 || (baseMastery !== 6 && baseMastery < 3 && phraseLastLeveled[displayedCard.id] === clientToday));
+                                const isTARunning = timeAttackPhase === 'running';
+                                const isLockedToday = !isTARunning && (baseMastery === 3 || (baseMastery !== 6 && baseMastery < 3 && phraseLastLeveled[displayedCard.id] === clientToday));
                                 const isCrownReady = chakra.level === 5;
-                                const isMaxed = baseMastery === 3 || baseMastery === 6;
+                                const isMaxed = !isTARunning && (baseMastery === 3 || baseMastery === 6);
                                 return (
                                     <div style={{ marginTop: isFullReview ? '8px' : '4px' }}>
-                                        {isMaxed ? (
-                                            /* 得 — fully complete */
+                                        {isCrownReady ? (
+                                            <button
+                                                onClick={() => {
+                                                    if (cardCelebration) return;
+                                                    if (displayedCard) {
+                                                        setCardCelebration({ phrase: displayedCard, key: Date.now() });
+                                                    }
+                                                    declareStart(displayedCard.id);
+                                                }}
+                                                style={{
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
+                                                    width: '100%',
+                                                    padding: isFullReview ? '18px 0' : '14px 0',
+                                                    borderRadius: '14px',
+                                                    border: 'none',
+                                                    background: 'linear-gradient(135deg, #7E22CE, #A855F7)',
+                                                    color: '#fff',
+                                                    fontSize: isFullReview ? '17px' : '15px',
+                                                    fontWeight: '800',
+                                                    cursor: 'pointer',
+                                                    letterSpacing: '2px',
+                                                    boxShadow: '0 4px 16px #A855F740',
+                                                    transition: 'transform 0.12s, box-shadow 0.12s',
+                                                }}
+                                                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+                                                onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                            >
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                                                </svg>
+                                                START
+                                            </button>
+                                        ) : isMaxed && !hasRec ? (
+                                            /* Lv.4: 音読した(主) + REC(任意) + NEXT */
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', flexWrap: 'wrap' }}>
+                                                <button
+                                                    onClick={async () => {
+                                                        const pid = displayedCard.id;
+                                                        if ((voiceRecordings[pid] || []).length > 0) return;
+                                                        try {
+                                                            const fd = new FormData();
+                                                            fd.append('phraseId', pid);
+                                                            fd.append('readAloud', 'true');
+                                                            const res = await fetch('/api/voice-recordings', { method: 'POST', body: fd });
+                                                            const data = await res.json();
+                                                            if (data.success && data.recording) {
+                                                                const wasFirst = (voiceRecordings[pid] || []).length === 0;
+                                                                setVoiceRecordings(prev => ({ ...prev, [pid]: [data.recording, ...(prev[pid] || [])] }));
+                                                                const bm = Number(phraseMastery[pid] || 0);
+                                                                const hl = (phraseLinks[pid] || []).length > 0;
+                                                                const lvB = getChakraLevel(bm, !wasFirst, hl);
+                                                                const lvA = getChakraLevel(bm, true, hl);
+                                                                const xp = lvA > lvB ? CHAKRA_CONFIG[lvA].lv : 0;
+                                                                if (xp > 0) {
+                                                                    postXP(new Date().toISOString().split('T')[0], xp, false, pid);
+                                                                    const nc = CHAKRA_CONFIG[lvA];
+                                                                    const k = Date.now();
+                                                                    playLevelSound(lvA);
+                                                                    setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
+                                                                    setCalendarPulse({ dateKey: displayedCard.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: lvA, key: k });
+                                                                    setCardCelebration({ phrase: displayedCard, key: k });
+                                                                    const pts = cardPoints[pid] || 0;
+                                                                    const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                                                                    setPuzzleDropCard({ phraseId: pid, english: displayedCard.english, japanese: displayedCard.japanese, element: displayedCard.category, rank, points: pts, bstTotal: calcBstTotal(pid), key: k });
+                                                                }
+                                                            } else { throw new Error(data.error || 'failed'); }
+                                                        } catch (err) { console.error('read-aloud failed:', err); alert('音読の登録に失敗しました'); }
+                                                    }}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                                        flex: '1 1 100%', padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none',
+                                                        background: 'linear-gradient(135deg, #34d399, #059669)', color: '#fff',
+                                                        fontSize: isFullReview ? '15px' : '13px', fontWeight: '800', cursor: 'pointer', letterSpacing: '2px',
+                                                        boxShadow: '0 4px 16px #05966940', transition: 'transform 0.12s',
+                                                    }}
+                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+                                                    onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                >
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                                    音読した
+                                                </button>
+                                                {(() => {
+                                                    const recState = recordingStateForCard;
+                                                    return (
+                                                        <button
+                                                            onClick={() => {
+                                                                if (recState === 'uploading') return;
+                                                                if (recState === 'recording') {
+                                                                    if (inlineMediaRecorderRef.current) { inlineMediaRecorderRef.current.stop(); setRecordingStateForCard('uploading'); }
+                                                                } else {
+                                                                    (async () => {
+                                                                        try {
+                                                                            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                                                                            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4';
+                                                                            const mr = new MediaRecorder(stream, { mimeType });
+                                                                            const chunks: Blob[] = [];
+                                                                            mr.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+                                                                            mr.onstop = async () => {
+                                                                                stream.getTracks().forEach(t => t.stop());
+                                                                                const blob = new Blob(chunks, { type: mimeType });
+                                                                                const pid = displayedCard.id;
+                                                                                const fd = new FormData();
+                                                                                fd.append('audio', blob, 'recording.webm');
+                                                                                fd.append('phraseId', pid);
+                                                                                try {
+                                                                                    const res = await fetch('/api/voice-recordings', { method: 'POST', body: fd });
+                                                                                    const data = await res.json();
+                                                                                    if (data.success && data.recording) {
+                                                                                        const prevRecs = voiceRecordings[pid] || [];
+                                                                                        const wasFirst = prevRecs.length === 0;
+                                                                                        setVoiceRecordings(prev => ({ ...prev, [pid]: [data.recording, ...(prev[pid] || [])] }));
+                                                                                        const bm = Number(phraseMastery[pid] || 0);
+                                                                                        const hl = (phraseLinks[pid] || []).length > 0;
+                                                                                        const lvB = getChakraLevel(bm, !wasFirst, hl);
+                                                                                        const lvA = getChakraLevel(bm, true, hl);
+                                                                                        const xp = lvA > lvB ? CHAKRA_CONFIG[lvA].lv : 0;
+                                                                                        if (xp > 0) {
+                                                                                            postXP(new Date().toISOString().split('T')[0], xp, false, pid);
+                                                                                            // Full level-up effects (same as normal level-up)
+                                                                                            const nc = CHAKRA_CONFIG[lvA];
+                                                                                            const k = Date.now();
+                                                                                            playLevelSound(lvA);
+                                                                                            setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
+                                                                                            setCalendarPulse({ dateKey: displayedCard.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: lvA, key: k });
+                                                                                            setCardCelebration({ phrase: displayedCard, key: k });
+                                                                                            // Register card to GOD GRID
+                                                                                            const pts = cardPoints[pid] || 0;
+                                                                                            const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                                                                                            setPuzzleDropCard({ phraseId: pid, english: displayedCard.english, japanese: displayedCard.japanese, element: displayedCard.category, rank, points: pts, bstTotal: calcBstTotal(pid), key: k });
+                                                                                        }
+                                                                                        if (data.recording.url) {
+                                                                                            setRecordAutoPlayId(null);
+                                                                                        }
+                                                                                    }
+                                                                                } catch (err) { console.error('Upload failed:', err); }
+                                                                                setRecordingStateForCard('idle');
+                                                                            };
+                                                                            inlineMediaRecorderRef.current = mr; mr.start(); setRecordingStateForCard('recording');
+                                                                        } catch (err) { console.error('Mic denied:', err); alert('マイクへのアクセスが許可されていません'); }
+                                                                    })();
+                                                                }
+                                                            }}
+                                                            style={{
+                                                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                                                flex: 1, padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px',
+                                                                border: recState === 'recording' ? '2px solid #dc2626' : 'none',
+                                                                background: recState === 'recording' ? '#fef2f2' : recState === 'uploading' ? '#E7E5E4' : 'linear-gradient(135deg, #fbbf24, #d97706)',
+                                                                color: recState === 'recording' ? '#dc2626' : recState === 'uploading' ? '#A8A29E' : '#fff',
+                                                                fontSize: isFullReview ? '15px' : '13px', fontWeight: '800',
+                                                                cursor: recState === 'uploading' ? 'not-allowed' : 'pointer', letterSpacing: '2px',
+                                                                boxShadow: recState === 'recording' ? '0 0 0 4px rgba(220,38,38,0.15)' : recState === 'uploading' ? 'none' : '0 4px 16px #d9770640',
+                                                                transition: 'transform 0.12s, box-shadow 0.12s',
+                                                            }}
+                                                            className={recState === 'recording' ? 'recording-pulse' : undefined}
+                                                            onMouseDown={e => { if (recState !== 'uploading') e.currentTarget.style.transform = 'scale(0.97)'; }}
+                                                            onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                            onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                        >
+                                                            {recState === 'recording' ? (<><svg width="16" height="16" viewBox="0 0 24 24" fill="#dc2626"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>STOP</>)
+                                                            : recState === 'uploading' ? (<><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ animation: 'spin 1s linear infinite' }}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>...</>)
+                                                            : (<><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>REC</>)}
+                                                        </button>
+                                                    );
+                                                })()}
+                                                <button onClick={() => { if (cardCelebration) { setReviewHistory(prev => [...prev, cardCelebration.phrase]); setHistoryOffset(0); setCardCelebration(null); return; } if (historyOffset > 0) setHistoryOffset(h => h - 1); else if (reviewList.length > 0) setReviewIndex(i => (i + 1) % reviewList.length); }}
+                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: isFullReview ? '52px' : '44px', padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none', background: 'linear-gradient(135deg, #D4AF37, #B8941E)', color: '#fff', cursor: 'pointer', boxShadow: '0 2px 8px #D4AF3730', transition: 'transform 0.12s', flexShrink: 0 }}
+                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.95)'; }} onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }} title="Next card"
+                                                ><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg></button>
+                                            </div>
+                                        ) : isMaxed && hasRec && !hasLink ? (
+                                            /* Lv.5 has recording, needs link: Big 研究 + small NEXT */
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+                                                <button
+                                                    onClick={() => setShowQuickAdd(!showQuickAdd)}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                                                        flex: 1, padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none',
+                                                        background: showQuickAdd ? 'linear-gradient(135deg, #92400E, #78350F)' : 'linear-gradient(135deg, #D4AF37, #B8941E)',
+                                                        color: '#fff', fontSize: isFullReview ? '15px' : '13px', fontWeight: '800',
+                                                        cursor: 'pointer', letterSpacing: '2px',
+                                                        boxShadow: '0 4px 16px #D4AF3740', transition: 'transform 0.12s, box-shadow 0.12s',
+                                                    }}
+                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.97)'; }}
+                                                    onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                                >
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                                                    {showQuickAdd ? 'CLOSE' : '研究'}
+                                                </button>
+                                                <button onClick={() => { if (cardCelebration) { setReviewHistory(prev => [...prev, cardCelebration.phrase]); setHistoryOffset(0); setCardCelebration(null); return; } if (historyOffset > 0) setHistoryOffset(h => h - 1); else if (reviewList.length > 0) setReviewIndex(i => (i + 1) % reviewList.length); }}
+                                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: isFullReview ? '52px' : '44px', padding: isFullReview ? '14px 0' : '11px 0', borderRadius: '14px', border: 'none', background: 'linear-gradient(135deg, #D4AF37, #B8941E)', color: '#fff', cursor: 'pointer', boxShadow: '0 2px 8px #D4AF3730', transition: 'transform 0.12s', flexShrink: 0 }}
+                                                    onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.95)'; }} onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)'; }} onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }} title="Next card"
+                                                ><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg></button>
+                                            </div>
+                                        ) : isMaxed ? (
+                                            /* Lv.7 MASTER — fully complete */
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', width: '100%', padding: isFullReview ? '12px 0' : '10px 0', borderRadius: '14px', backgroundColor: '#F5F5F4', color: '#A8A29E', fontSize: isFullReview ? '13px' : '11px', fontWeight: '700', letterSpacing: '2px' }}>
                                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                                                 COMPLETE
@@ -5172,7 +5871,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                         const currentPhrase = displayedCard;
                                                         if (!currentPhrase) return;
                                                         const current = Number(phraseMastery[currentPhrase.id] || 0);
-                                                        if (current === 3) return;
+                                                        if (current === 3 && timeAttackPhase !== 'running') return;
                                                         const next = current === 6 ? 0 : (current + 1);
                                                         const isLevelUp = next > 0 && next > current;
 
@@ -5203,6 +5902,10 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                             setCardCelebration({ phrase: currentPhrase, key: Date.now() });
                                                         }
                                                         cycleMastery(currentPhrase.id, isLevelUp);
+                                                        // In Time Attack, if no celebration will fire (e.g. base=6 → 0), advance immediately
+                                                        if (timeAttackPhase === 'running' && !isLevelUp && reviewList.length > 0) {
+                                                            setReviewIndex(i => (i + 1) % reviewList.length);
+                                                        }
                                                     }}
                                                     style={{
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
@@ -5239,7 +5942,11 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                                     window.speechSynthesis.cancel();
                                                                     setPlayingPhraseId(null);
                                                                 } else {
-                                                                    playPhrase(displayedCard);
+                                                                    const bm = Number(phraseMastery[displayedCard.id] || 0);
+                                                                    const autoLevel = bm >= 3 ? 3 : bm >= 2 ? 2 : bm >= 1 ? 1 : 0;
+                                                                    const activeLevel = viewLevelOverride !== null ? viewLevelOverride : autoLevel;
+                                                                    const text = displayedCard.gorokuLevels?.[activeLevel] || displayedCard.english;
+                                                                    playPhrase(displayedCard, text);
                                                                 }
                                                             }}
                                                             style={{
@@ -5285,10 +5992,111 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 })()}
                                             </div>
                                         )}
+                                        {/* Retire button */}
+                                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                                            <button
+                                                onClick={() => { if (displayedCard) toggleRetire(displayedCard.id); }}
+                                                style={{
+                                                    background: 'none', border: 'none', cursor: 'pointer',
+                                                    fontSize: '10px', color: retiredPhrases.has(displayedCard?.id || '') ? '#D4AF37' : '#ccc',
+                                                    fontWeight: '600', letterSpacing: '0.5px', padding: '2px 6px',
+                                                }}
+                                                onMouseEnter={e => { e.currentTarget.style.color = '#D4AF37'; }}
+                                                onMouseLeave={e => { e.currentTarget.style.color = retiredPhrases.has(displayedCard?.id || '') ? '#D4AF37' : '#ccc'; }}
+                                            >
+                                                {retiredPhrases.has(displayedCard?.id || '') ? '-- RETIRED --' : 'RETIRE'}
+                                            </button>
+                                        </div>
                                     </div>
                                 );
                             })()}
                         </div>{/* End Illustration Window */}
+
+                        {/* Delete button + CLIP playback — only in tapToLevel mode (actions row is hidden) */}
+                        {displayedCard && getSettings().tapToLevel && (
+                            <div style={{
+                                display: 'flex',
+                                gap: '8px',
+                                padding: isFullReview ? '10px 12px 0' : '8px 8px 0',
+                                position: 'relative',
+                                zIndex: 3,
+                            }}>
+                                {/* Movie audio clip — playable in tapToLevel mode */}
+                                {clipIds.has(displayedCard.id) && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            playClip(displayedCard.id);
+                                        }}
+                                        style={{
+                                            flex: 1,
+                                            minHeight: '56px',
+                                            padding: '14px 20px',
+                                            background: playingClipId === displayedCard.id ? '#7C3AED' : '#F5F3FF',
+                                            border: '2px solid #C4B5FD',
+                                            color: playingClipId === displayedCard.id ? '#fff' : '#7C3AED',
+                                            fontSize: '18px',
+                                            fontWeight: '800',
+                                            borderRadius: '12px',
+                                            cursor: 'pointer',
+                                            letterSpacing: '2px',
+                                        }}
+                                    >
+                                        {playingClipId === displayedCard.id ? '■ 再生中' : '▶ 音声'}
+                                    </button>
+                                )}
+                                {/* SKIP — advance to next card without leveling up. Prominent + easy to press. */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (historyOffset > 0) setHistoryOffset(h => h - 1);
+                                        else if (reviewList.length > 0) setReviewIndex(i => (i + 1) % reviewList.length);
+                                    }}
+                                    style={{
+                                        flex: 1,
+                                        minHeight: '56px',
+                                        padding: '14px 20px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: '8px',
+                                        background: '#FAFAF9',
+                                        border: '2px solid #E7E5E4',
+                                        color: '#78716C',
+                                        fontSize: '18px',
+                                        fontWeight: '800',
+                                        borderRadius: '12px',
+                                        cursor: 'pointer',
+                                        letterSpacing: '2px',
+                                    }}
+                                >
+                                    SKIP
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+                                </button>
+                                {/* 削除 — no confirmation (instant delete per user request). */}
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeletePhrase(displayedCard.id, true);
+                                    }}
+                                    style={{
+                                        flexShrink: 0,
+                                        minHeight: '56px',
+                                        padding: '0 16px',
+                                        background: 'transparent',
+                                        border: '2px solid #FCA5A5',
+                                        color: '#DC2626',
+                                        fontSize: '13px',
+                                        fontWeight: '800',
+                                        borderRadius: '12px',
+                                        cursor: 'pointer',
+                                        letterSpacing: '1px',
+                                    }}
+                                >
+                                    DELETE
+                                </button>
+                            </div>
+                        )}
 
                         {/* XP Bars Section — between window and attacks */}
                         <div style={{
@@ -5319,7 +6127,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 fontWeight: '700',
                                                 color: '#bbb',
                                                 letterSpacing: '1.5px',
-                                            }}>本日</span>
+                                            }}>TODAY</span>
                                             <span style={{
                                                 fontSize: isFullReview ? '16px' : '12px',
                                                 fontWeight: '900',
@@ -5464,7 +6272,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                         {/* Writing Practice Panel */}
                         {showQuickAdd && displayedCard && (() => {
-                            const targetText = displayedCard ? displayedCard.english : '';
+                            const targetText = displayedCard.english || '';
                             const inputVal = quickAddEnglish;
                             const useExactMatch = dataMode === 'words' || getSettings().typingMatch;
                             const isMatch = useExactMatch
@@ -5493,15 +6301,57 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     position: 'relative',
                                     zIndex: 3,
                                 }}>
-                                    {/* Header */}
+                                    {/* Header + 言い換えヒント (Google AI モード、1ボタンで言い換え1文+短い会話、英語のみ) */}
                                     <div style={{
-                                        fontSize: isFullReview ? '10px' : '9px',
-                                        fontWeight: '700',
-                                        color: '#A8A29E',
-                                        letterSpacing: '1.5px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
                                         marginBottom: '8px',
                                     }}>
-                                        {useExactMatch ? 'TYPING' : 'WRITING'}
+                                        <div style={{
+                                            fontSize: isFullReview ? '10px' : '9px',
+                                            fontWeight: '700',
+                                            color: '#A8A29E',
+                                            letterSpacing: '1.5px',
+                                        }}>
+                                            {useExactMatch ? 'TYPING' : 'WRITING'}
+                                        </div>
+                                        {(() => {
+                                            const draft = quickAddEnglish.trim();
+                                            // 回答をそのまま書く欄に貼って音読できるよう、英語だけの4行 (言い換え1 + 会話3) で返させる
+                                            const hasDraft = !!draft && draft.toLowerCase() !== targetText.trim().toLowerCase();
+                                            const aiPrompt = [
+                                                `「${targetText}」`,
+                                                hasDraft ? `私の言い換え:「${draft}」` : '',
+                                                '英語だけで次の4行を返して。日本語・前置き・解説・見出し・太字は禁止。全体で50語以内。よく使う語だけで、凝った言い回しは禁止。',
+                                                hasDraft
+                                                    ? '1行目: 私の言い換えを、ネイティブが会話で普通に言う形に直した1文'
+                                                    : '1行目: この英文を、ネイティブが会話で普通に言う形に言い換えた1文',
+                                                '2-4行目: 「A:」「B:」「A:」で始まる、友達同士が実際に話す口調の短い会話。元の英文の核になる表現を自然に使い、似た語との違いが伝わるセリフを1つ入れる。教科書や演説の口調は禁止',
+                                            ].filter(Boolean).join('\n');
+                                            return (
+                                                <a
+                                                    href={`https://www.google.com/search?udm=50&q=${encodeURIComponent(aiPrompt)}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    title={hasDraft ? '自分の文を直した1文 + 短い会話 (Google AI、英語のみ)' : '言い換え1文 + 短い会話 (Google AI、英語のみ)'}
+                                                    style={{
+                                                        fontSize: isFullReview ? '11px' : '10px',
+                                                        fontWeight: '700',
+                                                        letterSpacing: '1px',
+                                                        color: '#3730A3',
+                                                        backgroundColor: '#EEF2FF',
+                                                        border: '1px solid #C7D2FE',
+                                                        borderRadius: '8px',
+                                                        padding: isFullReview ? '5px 12px' : '4px 10px',
+                                                        textDecoration: 'none',
+                                                        whiteSpace: 'nowrap',
+                                                    }}
+                                                >
+                                                    {hasDraft ? '言い換え + 添削' : '言い換え'}
+                                                </a>
+                                            );
+                                        })()}
                                     </div>
                                     {/* Target phrase: char-by-char highlight for exact match, plain for free */}
                                     {useExactMatch ? (
@@ -5537,11 +6387,13 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     {/* Typing input */}
                                     <textarea
                                         value={quickAddEnglish}
-                                        onChange={e => setQuickAddEnglish(e.target.value.replace(/\n/g, ''))}
+                                        // 自由入力は改行を残す (言い換え+会話の複数行を貼って音読するため)。改行は Shift+Enter
+                                        onChange={e => setQuickAddEnglish(useExactMatch ? e.target.value.replace(/\n/g, '') : e.target.value)}
                                         placeholder={useExactMatch ? 'Type the phrase above...' : 'Write your own sentence using this phrase...'}
+                                        rows={useExactMatch ? undefined : Math.min(6, Math.max(2, quickAddEnglish.split('\n').length))}
                                         autoFocus
                                         onKeyDown={e => {
-                                            if (e.key === 'Enter') {
+                                            if (e.key === 'Enter' && !e.shiftKey) {
                                                 e.preventDefault();
                                                 if (useExactMatch ? isMatch : hasFreeText) handleQuickAdd();
                                             }
@@ -5604,16 +6456,212 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             );
                         })()}
 
+                        {/* Transcript display -- 保存済みの書き起こしをカードに常時表示 (パネル開閉問わず) */}
+                        {displayedCard && displayedCard.transcript && (
+                            <div
+                                onClick={() => {
+                                    if (showTranscriptEdit) return;
+                                    setTranscriptInput(displayedCard.transcript ?? '');
+                                    setShowTranscriptEdit(true);
+                                }}
+                                title={showTranscriptEdit ? '' : 'クリックで編集'}
+                                style={{
+                                    borderRadius: '14px',
+                                    border: '1px solid #A7F3D0',
+                                    backgroundColor: '#F0FDF4',
+                                    padding: isFullReview ? '14px 18px' : '10px 14px',
+                                    margin: isFullReview ? '8px 8px 4px' : '6px 4px 2px',
+                                    cursor: showTranscriptEdit ? 'default' : 'pointer',
+                                    position: 'relative',
+                                    zIndex: 3,
+                                    opacity: showTranscriptEdit ? 0.7 : 1,
+                                }}
+                            >
+                                <div style={{
+                                    fontSize: isFullReview ? '10px' : '9px',
+                                    fontWeight: '700',
+                                    color: '#059669',
+                                    letterSpacing: '1.5px',
+                                    marginBottom: '6px',
+                                }}>
+                                    TRANSCRIPT
+                                </div>
+                                <div style={{
+                                    fontSize: isFullReview ? '16px' : '14px',
+                                    fontWeight: '500',
+                                    color: '#1C1917',
+                                    lineHeight: 1.6,
+                                    whiteSpace: 'pre-wrap',
+                                }}>
+                                    {displayedCard.transcript}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* 熟語のチップ -- 押したらその表現の実映像へ1タップ */}
+                        {displayedCard && !getSettings().tapToLevel && (
+                            <CardChunkChips
+                                text={displayedCard.english}
+                                onLookup={(kind, phrase) => {
+                                    if (kind === 'pp') {
+                                        window.open(`https://www.playphrase.me/#/search?q=${encodeURIComponent(phrase)}`, '_blank');
+                                        return;
+                                    }
+                                    playYouGlish(displayedCard);
+                                    setYouglishQuery(phrase);
+                                }}
+                            />
+                        )}
+
+                        {/* コーパスの数字 -- 1語ずつと熟語ごとの遭遇回数 */}
+                        {showCorpus && displayedCard && (
+                            <CardCorpusPanel
+                                text={displayedCard.english}
+                                onLookup={(kind, phrase) => {
+                                    // 見出し語が確定しているので、どの語を検索するか聞く必要がない
+                                    if (kind === 'pp') {
+                                        window.open(`https://www.playphrase.me/#/search?q=${encodeURIComponent(phrase)}`, '_blank');
+                                        return;
+                                    }
+                                    playYouGlish(displayedCard);
+                                    setYouglishQuery(phrase);
+                                }}
+                            />
+                        )}
+
+                        {/* Transcript edit panel -- 研究パネルと同じ構造 */}
+                        {showTranscriptEdit && displayedCard && (() => {
+                            const savedValue = (displayedCard.transcript ?? '').trim();
+                            const inputVal = transcriptInput.trim();
+                            const isDirty = inputVal !== savedValue;
+                            const hasValue = inputVal.length > 0;
+                            const handleSave = async () => {
+                                if (transcriptSubmitting) return;
+                                setTranscriptSubmitting(true);
+                                try {
+                                    const res = await fetch(`/api/phrases/${displayedCard.id}`, {
+                                        method: 'PATCH',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ transcript: inputVal || null }),
+                                    });
+                                    const data = await res.json();
+                                    if (data.success) {
+                                        setPhrases(prev => prev.map(p =>
+                                            p.id === displayedCard.id ? { ...p, transcript: inputVal || null } : p
+                                        ));
+                                        // 研究と同じ: パネル閉じない、カード動かない
+                                    }
+                                } catch (err) {
+                                    console.error('transcript save failed', err);
+                                } finally {
+                                    setTranscriptSubmitting(false);
+                                }
+                            };
+                            const borderColor = isDirty ? '#10B981' : hasValue ? '#86EFAC' : '#A7F3D0';
+                            const bgColor = isDirty ? '#F0FDF4' : '#ECFDF5';
+                            return (
+                                <div style={{
+                                    borderRadius: '14px',
+                                    border: `2px solid ${borderColor}`,
+                                    backgroundColor: bgColor,
+                                    padding: isFullReview ? '20px' : '14px',
+                                    margin: isFullReview ? '8px 8px 4px' : '6px 4px 2px',
+                                    transition: 'all 0.2s',
+                                    position: 'relative',
+                                    zIndex: 3,
+                                }}>
+                                    <div style={{
+                                        fontSize: isFullReview ? '10px' : '9px',
+                                        fontWeight: '700',
+                                        color: '#059669',
+                                        letterSpacing: '1.5px',
+                                        marginBottom: '8px',
+                                    }}>
+                                        TRANSCRIPT (書き起こし)
+                                    </div>
+                                    <textarea
+                                        value={transcriptInput}
+                                        onChange={e => setTranscriptInput(e.target.value)}
+                                        placeholder="PlayPhrase の書き起こしを貼り付け..."
+                                        autoFocus
+                                        onKeyDown={e => {
+                                            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                                                e.preventDefault();
+                                                if (isDirty) handleSave();
+                                            }
+                                        }}
+                                        style={{
+                                            width: '100%',
+                                            padding: isFullReview ? '16px' : '12px',
+                                            borderRadius: '10px',
+                                            border: isDirty ? '2px solid #10B981' : '1px solid #A7F3D0',
+                                            fontSize: isFullReview ? '18px' : '14px',
+                                            fontWeight: '500',
+                                            outline: 'none',
+                                            backgroundColor: '#fff',
+                                            color: '#1C1917',
+                                            resize: 'vertical',
+                                            minHeight: isFullReview ? '90px' : '72px',
+                                            boxSizing: 'border-box',
+                                            fontFamily: 'inherit',
+                                            lineHeight: 1.6,
+                                            transition: 'border-color 0.2s',
+                                        }}
+                                    />
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        marginTop: isFullReview ? '12px' : '8px',
+                                    }}>
+                                        <div style={{
+                                            fontSize: isFullReview ? '12px' : '10px',
+                                            fontWeight: '600',
+                                            color: isDirty ? '#10B981' : hasValue ? '#86EFAC' : '#A8A29E',
+                                        }}>
+                                            {isDirty
+                                                ? `${inputVal.length} chars -- 未保存`
+                                                : hasValue ? '保存済み' : 'ペーストして SAVE'}
+                                        </div>
+                                        <button
+                                            onClick={handleSave}
+                                            disabled={transcriptSubmitting || !isDirty}
+                                            style={{
+                                                padding: isFullReview ? '10px 24px' : '8px 18px',
+                                                borderRadius: '10px',
+                                                border: 'none',
+                                                backgroundColor: isDirty ? '#10B981' : '#E7E5E4',
+                                                color: isDirty ? '#fff' : '#A8A29E',
+                                                fontSize: isFullReview ? '14px' : '12px',
+                                                fontWeight: '700',
+                                                cursor: isDirty ? 'pointer' : 'not-allowed',
+                                                letterSpacing: '1px',
+                                                transition: 'all 0.2s',
+                                                boxShadow: isDirty ? '0 4px 12px rgba(16,185,129,0.3)' : 'none',
+                                            }}
+                                        >
+                                            {transcriptSubmitting ? '...' : 'SAVE'}
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })()}
+
                         {/* Actions row: 削除 / 編集 / 研究 / 録音 (hidden in tapToLevel mode) */}
                         {displayedCard && !getSettings().tapToLevel && (
                             <div style={{
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                // 折り返す。ボタンを1つ足すたびに横幅が伸びて、
+                                // スマホでカレンダーが横に並ぶところまで押し広げていた
+                                flexWrap: 'wrap',
+                                rowGap: '4px',
                                 gap: isFullReview ? '6px' : '4px',
                                 padding: isFullReview ? '2px 12px 10px' : '2px 8px 6px',
                                 position: 'relative',
                                 zIndex: 3,
+                                maxWidth: '100%',
                             }}>
                                 <button
                                     onClick={() => handleDeletePhrase(displayedCard.id)}
@@ -5676,7 +6724,13 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         <button
                                             onClick={() => {
                                                 if (isTTSPlaying) { window.speechSynthesis.cancel(); setPlayingPhraseId(null); }
-                                                else { playPhrase(displayedCard); }
+                                                else {
+                                                    const bm = Number(phraseMastery[displayedCard.id] || 0);
+                                                    const autoLevel = bm >= 3 ? 3 : bm >= 2 ? 2 : bm >= 1 ? 1 : 0;
+                                                    const activeLevel = viewLevelOverride !== null ? viewLevelOverride : autoLevel;
+                                                    const text = displayedCard.gorokuLevels?.[activeLevel] || displayedCard.english;
+                                                    playPhrase(displayedCard, text);
+                                                }
                                             }}
                                             style={{
                                                 padding: isFullReview ? '6px 14px' : '5px 10px', borderRadius: '5px',
@@ -5696,12 +6750,43 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         </button>
                                     );
                                 })()}
+                                {/* PlayPhrase + YouGlish */}
+                                <button
+                                    onClick={() => openPlayPhrase(displayedCard)}
+                                    style={{
+                                        padding: isFullReview ? '6px 10px' : '5px 8px', borderRadius: '5px',
+                                        border: 'none',
+                                        background: 'linear-gradient(135deg, #D4AF37, #F5D76E)',
+                                        color: '#1a1a1a',
+                                        fontSize: isFullReview ? '11px' : '10px', fontWeight: '700', cursor: 'pointer',
+                                        transition: 'all 0.15s',
+                                    }}
+                                >
+                                    PP
+                                </button>
+                                <button
+                                    onClick={() => playYouGlish(displayedCard)}
+                                    style={{
+                                        padding: isFullReview ? '6px 10px' : '5px 8px', borderRadius: '5px',
+                                        border: '1px solid #ddd',
+                                        background: 'transparent',
+                                        color: '#999',
+                                        fontSize: isFullReview ? '10px' : '9px', fontWeight: '600', cursor: 'pointer',
+                                        transition: 'all 0.15s',
+                                    }}
+                                >
+                                    YG
+                                </button>
                                 {/* Play recorded voice + delete button */}
                                 {displayedCard && (voiceRecordings[displayedCard.id] || []).length > 0 && (() => {
                                     const latestRec = (voiceRecordings[displayedCard.id] || [])[0];
                                     const isAutoPlaying = recordAutoPlayId === displayedCard.id;
+                                    const isMarker = latestRec.url === 'read-aloud';
                                     return (
                                         <>
+                                            {isMarker ? (
+                                                <span title="音読済み" style={{ padding: isFullReview ? '6px 14px' : '5px 10px', borderRadius: '5px', border: '1px solid #A7F3D0', backgroundColor: '#ECFDF5', color: '#059669', fontSize: isFullReview ? '11px' : '10px', fontWeight: '700' }}>音読済</span>
+                                            ) : (
                                             <button
                                                 onClick={() => {
                                                     if (isAutoPlaying) {
@@ -5732,6 +6817,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 )}
                                                 {isAutoPlaying ? '停止' : '録音'}
                                             </button>
+                                            )}
                                             <button
                                                 onClick={async () => {
                                                     if (!confirm('この録音を削除しますか？')) return;
@@ -5758,6 +6844,115 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
                                             </button>
                                         </>
+                                    );
+                                })()}
+                                {/* Audio clip in review mode */}
+                                {displayedCard && clipIds.has(displayedCard.id) ? (
+                                    <>
+                                        <button
+                                            onClick={() => playClip(displayedCard.id)}
+                                            style={{
+                                                padding: isFullReview ? '6px 14px' : '5px 10px', borderRadius: '5px',
+                                                border: playingClipId === displayedCard.id ? '2px solid #7C3AED' : '1px solid #ddd',
+                                                backgroundColor: playingClipId === displayedCard.id ? '#F5F3FF' : 'transparent',
+                                                color: playingClipId === displayedCard.id ? '#7C3AED' : '#888',
+                                                fontSize: isFullReview ? '11px' : '10px', fontWeight: '600', cursor: 'pointer',
+                                                display: 'flex', alignItems: 'center', gap: '4px', transition: 'all 0.15s',
+                                            }}
+                                        >
+                                            {playingClipId === displayedCard.id ? '\u25A0' : '\u25B6'} CLIP
+                                        </button>
+                                        <button
+                                            onClick={() => removeClip(displayedCard.id)}
+                                            style={{
+                                                width: '24px', height: '24px', borderRadius: '50%', border: 'none',
+                                                background: 'transparent', color: '#ccc', cursor: 'pointer',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s',
+                                            }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = '#ef4444'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#ccc'; }}
+                                        >
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                        </button>
+                                    </>
+                                ) : displayedCard ? (
+                                    <button
+                                        onClick={() => { setPendingClipPhraseId(displayedCard.id); clipFileRef.current?.click(); }}
+                                        style={{
+                                            padding: isFullReview ? '6px 10px' : '5px 8px', borderRadius: '5px',
+                                            border: '1px dashed #D6D3D1', background: 'transparent',
+                                            color: '#A8A29E', fontSize: isFullReview ? '10px' : '9px',
+                                            fontWeight: '600', cursor: 'pointer', transition: 'all 0.15s',
+                                        }}
+                                    >
+                                        +CLIP
+                                    </button>
+                                ) : null}
+                                {/* 数字 -- カードの英文をコーパスに当てる */}
+                                {displayedCard && (
+                                    <button
+                                        onClick={() => setShowCorpus(!showCorpus)}
+                                        style={{
+                                            // PP / YG と同じ細さ。ここだけ太いと行が1つ余計に折り返す
+                                            padding: isFullReview ? '6px 10px' : '5px 8px', borderRadius: '5px',
+                                            border: showCorpus ? '2px solid #B45309' : '1px solid #ddd',
+                                            backgroundColor: showCorpus ? '#FFFBEB' : 'transparent',
+                                            color: showCorpus ? '#B45309' : '#999',
+                                            fontSize: isFullReview ? '10px' : '9px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        {showCorpus ? 'Close' : '数字'}
+                                    </button>
+                                )}
+                                {/* +TEXT ボタン -- 研究と完全同一パターン */}
+                                {displayedCard && (
+                                    <button
+                                        onClick={() => {
+                                            setTranscriptInput(displayedCard.transcript ?? '');
+                                            setShowTranscriptEdit(!showTranscriptEdit);
+                                        }}
+                                        style={{
+                                            padding: isFullReview ? '6px 14px' : '5px 10px', borderRadius: '5px',
+                                            border: showTranscriptEdit ? '2px solid #10B981' : '1px solid #ddd',
+                                            backgroundColor: showTranscriptEdit ? '#F0FDF4' : 'transparent',
+                                            color: showTranscriptEdit ? '#10B981' : displayedCard.transcript ? '#10B981' : '#888',
+                                            fontSize: isFullReview ? '11px' : '10px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        {showTranscriptEdit ? 'Close' : displayedCard.transcript ? 'TEXT✓' : '+TEXT'}
+                                    </button>
+                                )}
+                                {/* Life → Phrases registration button */}
+                                {dataMode === 'life' && displayedCard && (() => {
+                                    const bm = Number(phraseMastery[displayedCard.id] || 0);
+                                    const autoLevel = bm >= 3 ? 3 : bm >= 2 ? 2 : bm >= 1 ? 1 : 0;
+                                    const activeLevel = viewLevelOverride !== null ? viewLevelOverride : autoLevel;
+                                    const activeText = displayedCard.gorokuLevels?.[activeLevel] || displayedCard.english;
+                                    const regKey = activeText.toLowerCase();
+                                    const isReg = lifeRegistered.has(regKey);
+                                    const isReging = lifeRegisteringId === displayedCard.id;
+                                    return (
+                                        <button
+                                            onClick={() => registerLifeToTraining(displayedCard, activeText)}
+                                            disabled={isReg || isReging}
+                                            style={{
+                                                padding: isFullReview ? '6px 12px' : '5px 10px', borderRadius: '5px',
+                                                border: isReg ? '1.5px solid #10B981' : '1.5px solid #D4AF37',
+                                                background: isReg ? '#ECFDF5' : '#FFFBEB',
+                                                color: isReg ? '#10B981' : '#92400E',
+                                                fontSize: isFullReview ? '11px' : '10px', fontWeight: '700',
+                                                cursor: isReg ? 'default' : 'pointer',
+                                                opacity: isReging ? 0.5 : 1,
+                                                transition: 'all 0.15s',
+                                            }}
+                                        >
+                                            {isReging ? '...' : isReg ? '\u767B\u9332\u6E08' : '\u767B\u9332'}
+                                        </button>
                                     );
                                 })()}
                             </div>
@@ -5803,7 +6998,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             color: _chakra.color,
                                             whiteSpace: 'nowrap',
                                         }}>
-                                            {_chakra.ja}
+                                            {_chakra.name}
                                         </span>
                                     </div>
                                     {/* Center: CARD counter + BST */}
@@ -5816,7 +7011,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             color: historyOffset > 0 ? '#D4AF37' : '#A8A29E',
                                             fontVariantNumeric: 'tabular-nums',
                                         }}>
-                                            {historyOffset > 0 ? `戻り ${historyOffset}` : `カード ${reviewIndex + 1}/${reviewList.length}`}
+                                            {historyOffset > 0 ? `BACK ${historyOffset}` : `CARD ${reviewIndex + 1}/${reviewList.length}`}
                                         </span>
                                         {currentPhrase && (() => {
                                             const bst = calcBstTotal(currentPhrase.id);
@@ -5835,8 +7030,35 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             );
                                         })()}
                                     </div>
-                                    {/* Right: Prev / Next */}
+                                    {/* Right: Random / Prev / Next */}
                                     <div style={{ display: 'flex', gap: '4px' }}>
+                                        <button
+                                            onClick={() => {
+                                                if (reviewList.length > 1) {
+                                                    if (cardCelebration) { setReviewHistory(prev => [...prev, cardCelebration.phrase]); setCardCelebration(null); }
+                                                    setHistoryOffset(0);
+                                                    setReviewIndex(i => {
+                                                        let next = Math.floor(Math.random() * reviewList.length);
+                                                        while (next === i && reviewList.length > 1) next = Math.floor(Math.random() * reviewList.length);
+                                                        return next;
+                                                    });
+                                                }
+                                            }}
+                                            style={{
+                                                padding: isFullReview ? '6px 10px' : '4px 8px',
+                                                borderRadius: '5px',
+                                                border: '1px solid #D4AF3740',
+                                                backgroundColor: 'transparent',
+                                                fontSize: isFullReview ? '11px' : '9px',
+                                                fontWeight: '700',
+                                                cursor: reviewList.length > 1 ? 'pointer' : 'default',
+                                                color: '#D4AF37',
+                                                opacity: reviewList.length > 1 ? 1 : 0.3,
+                                            }}
+                                            title="Random jump"
+                                        >
+                                            <svg width={isFullReview ? 14 : 12} height={isFullReview ? 14 : 12} viewBox="0 0 24 24" fill="none" stroke="#D4AF37" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+                                        </button>
                                         <button
                                             onClick={() => {
                                                 if (cardCelebration) {
@@ -5863,7 +7085,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 color: historyOffset < reviewHistory.length ? '#D4AF37' : '#78716C',
                                             }}
                                         >
-                                            前{reviewHistory.length > 0 ? ` (${reviewHistory.length})` : ''}
+                                            PREV{reviewHistory.length > 0 ? ` (${reviewHistory.length})` : ''}
                                         </button>
                                         <button
                                             onClick={() => {
@@ -5891,7 +7113,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 cursor: 'pointer',
                                             }}
                                         >
-                                            次
+                                            NEXT
                                         </button>
                                     </div>
                                 </div>
@@ -5907,7 +7129,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                     }}>
                         <div style={{ fontSize: '14px', color: '#888' }}>
-                            復習するフレーズがありません
+                            No phrases to review
                         </div>
                     </div>
                 )}
@@ -5921,13 +7143,16 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     {[
                         { key: 'all' as const, label: 'ALL', count: thisMonthReviewPhrases.total.length, color: '#78716C', accent: '#78716C' },
                         { key: 'random' as const, label: 'SHUFFLE', count: thisMonthReviewPhrases.all.length, color: '#D4AF37', accent: '#D4AF37' },
-                        ...([0, 1, 2, 3] as const).map(k => ({
+                        ...([0, 1, 2, 3, 4, 5, 6] as const).map(k => ({
                             key: k,
                             label: `${CHAKRA_CONFIG[k].ja} ${CHAKRA_CONFIG[k].name}`,
                             count: thisMonthReviewPhrases[`level${k}` as keyof typeof thisMonthReviewPhrases].length,
                             color: CHAKRA_CONFIG[k].color,
                             accent: CHAKRA_CONFIG[k].color,
                         })),
+                        { key: 'recorded' as const, label: '声 REC', count: recordedReviewPhrases.length, color: '#DC2626', accent: '#DC2626' },
+                        { key: 'linked' as const, label: '研 LINK', count: linkedReviewPhrases.length, color: '#059669', accent: '#059669' },
+                        { key: 'retired' as const, label: 'RETIRED', count: retiredReviewPhrases.length, color: '#A8A29E', accent: '#A8A29E' },
                     ].map(tab => {
                         const isActive = reviewFilter === tab.key;
                         return (
@@ -5999,11 +7224,26 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     // Date gate: each level-up requires a different calendar day
     const cycleMastery = useCallback(async (phraseId: string, slamActive = false): Promise<boolean> => {
         const current = Number(phraseMastery[phraseId] || 0);
+        const isTA = timeAttackPhase === 'running';
+
+        // During Time Attack: count the tap regardless of mastery level
+        // Don't change mastery for OWN/START — just track the review
+        if (isTA && (current === 3 || current === 6)) {
+            const hasRec = (voiceRecordings[phraseId] || []).length > 0;
+            const hasLink = (phraseLinks[phraseId] || []).length > 0;
+            const chakraLvl = getChakraLevel(current, hasRec, hasLink);
+            const xpGained = CHAKRA_CONFIG[chakraLvl].lv;
+            postXP(clientToday, xpGained, slamActive, phraseId);
+            trackTimeAttackReview(xpGained, false);
+            return true;
+        }
+
         if (current === 3) return false;  // OWN = terminal, no cycle back
         const next = current === 6 ? 0 : (current + 1);
 
         // Same-day gate: block level-ups (not resets) if already leveled today
-        if (next > 0 && phraseLastLeveled[phraseId] === clientToday) return false;
+        // Exception: during time attack, allow re-leveling for card count
+        if (next > 0 && phraseLastLeveled[phraseId] === clientToday && !isTA) return false;
 
         // START reset requires confirmation
         if (current === 6) {
@@ -6033,6 +7273,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             const nextLevel = getChakraLevel(next, hasRec, hasLink);
             const xpGained = CHAKRA_CONFIG[nextLevel].lv;
             postXP(todayKey, xpGained, slamActive, phraseId);
+
+            // Track for time attack session
             trackTimeAttackReview(xpGained, next > current);
 
             // Send reviewed word to runner word stream
@@ -6041,55 +7283,47 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 setLastReviewedWord({ text: reviewedPhrase.english, key: Date.now() });
             }
 
-            // Trigger puzzle board card drop
-            const phrase = phrases.find(p => p.id === phraseId);
-            if (phrase) {
-                const pts = cardPoints[phraseId] || 0;
-                const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
-                setPuzzleDropCard({
-                    phraseId: phrase.id,
-                    english: phrase.english,
-                    japanese: phrase.japanese,
-                    element: phrase.category,
-                    rank,
-                    points: pts,
-                    bstTotal: calcBstTotal(phraseId),
-                    key: Date.now(),
-                });
+            // Trigger puzzle board card drop (skip when on calendar tab)
+            const isGridActive = viewModeRef.current === 'review' || calendarTabRef.current === 'puzzle';
+            if (isGridActive) {
+                const phrase = phrases.find(p => p.id === phraseId);
+                if (phrase) {
+                    const pts = cardPoints[phraseId] || 0;
+                    const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                    setPuzzleDropCard({
+                        phraseId: phrase.id,
+                        english: phrase.english,
+                        japanese: phrase.japanese,
+                        element: phrase.category,
+                        rank,
+                        points: pts,
+                        bstTotal: calcBstTotal(phraseId),
+                        key: Date.now(),
+                    });
+                }
             }
         }
 
         try {
-            if (IS_PUBLIC) {
+            if (IS_GOROKU) {
+                // 語録310: product-storageと双方向同期
+                const updated = { ...phraseMastery, [phraseId]: next };
+                localStorage.setItem('goroku-mastery', JSON.stringify(updated));
+                syncTrainingToProduct(updated);
+            } else if (IS_LIFE) {
+                // Life 1000: localStorageに保存 + Lifeページのsavedと同期
+                const updated = { ...phraseMastery, [phraseId]: next };
+                saveLifeTrainingMastery(updated);
+                syncLifeTrainingToLifePage(updated);
+            } else if (IS_PUBLIC) {
                 // 3004: localStorageに保存
                 const updated = { ...phraseMastery, [phraseId]: next };
                 localStorage.setItem('quest-mastery', JSON.stringify(updated));
-                if (skipDefaultData) {
-                    localStorage.setItem('my-training-mastery', JSON.stringify(updated));
-                }
-                // Mark training done for today (calendar integration)
-                const td = new Date();
-                const todayKey = `training-done-${td.getFullYear()}-${String(td.getMonth() + 1).padStart(2, '0')}-${String(td.getDate()).padStart(2, '0')}`;
-                localStorage.setItem(todayKey, JSON.stringify({ count: Object.keys(updated).length, timestamp: Date.now() }));
-                // Sync back to TOEIC酒場 vocab deck if this is a toeic_ phrase
-                if (phraseId.startsWith('toeic_')) {
-                    try {
-                        const vocabRaw = localStorage.getItem('izakaya_toeic_vocab_deck');
-                        if (vocabRaw) {
-                            const deck = JSON.parse(vocabRaw);
-                            const phrase = phrases.find(p => p.id === phraseId);
-                            if (phrase) {
-                                const deckItem = deck.find((v: any) => v.word === phrase.english);
-                                if (deckItem) {
-                                    deckItem.masteryLevel = Math.min(next, 3);
-                                    deckItem.lastReviewedAt = new Date().toISOString();
-                                    deckItem.reviewCount = (deckItem.reviewCount || 0) + 1;
-                                    localStorage.setItem('izakaya_toeic_vocab_deck', JSON.stringify(deck));
-                                }
-                            }
-                        }
-                    } catch { /* */ }
-                }
+            } else if (dataMode === 'life') {
+                // Life: localStorageに保存 + Lifeページのsavedと同期
+                const updated = { ...phraseMastery, [phraseId]: next };
+                saveLifeTrainingMastery(updated);
+                syncLifeTrainingToLifePage(updated);
             } else if (dataMode === 'words') {
                 await fetch(`/api/user-words/${phraseId}`, {
                     method: 'PATCH',
@@ -6097,13 +7331,14 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     body: JSON.stringify({ mastery_level: next })
                 });
             } else {
+                const isTA = timeAttackPhase === 'running';
                 const res = await fetch('/api/phrases/mastery', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phraseId, level: next, today: clientToday })
+                    body: JSON.stringify({ phraseId, level: next, today: isTA ? undefined : clientToday })
                 });
                 // Rollback on 409 (server rejected same-day level-up)
-                if (res.status === 409) {
+                if (res.status === 409 && !isTA) {
                     setPhraseMastery(prev => ({ ...prev, [phraseId]: current }));
                     return false;
                 }
@@ -6113,14 +7348,14 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         }
 
         return true;
-    }, [phraseMastery, voiceRecordings, phraseLinks, phraseLastLeveled, clientToday, phraseDateMap, dataMode]);
+    }, [phraseMastery, voiceRecordings, phraseLinks, phraseLastLeveled, clientToday, phraseDateMap, dataMode, timeAttackPhase, postXP, trackTimeAttackReview]);
 
     // Declare START: VISION(5) -> START(6) in DB
     const declareStart = useCallback(async (phraseId: string) => {
-        // Same-day gate
-        if (phraseLastLeveled[phraseId] === clientToday) return;
+        const isTA = timeAttackPhase === 'running';
+        // Same-day gate (bypassed during Time Attack so taps still count)
+        if (!isTA && phraseLastLeveled[phraseId] === clientToday) return;
 
-        if (!confirm('ここから始まる。この言葉を自分のものにした。次のステージへ。')) return;
 
         setPhraseMastery(prev => ({ ...prev, [phraseId]: 6 }));
         setPhraseLastLeveled(prev => ({ ...prev, [phraseId]: clientToday }));
@@ -6134,6 +7369,23 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
             }).catch(() => { });
         }
         playLevelSound(6);
+
+        // Full level-up effects (match VISION/VOICE/normal level-up paths)
+        const phrase = phrases.find(p => p.id === phraseId);
+        if (phrase) {
+            const nc = CHAKRA_CONFIG[6];
+            const k = Date.now();
+            setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
+            setCalendarPulse({ dateKey: phrase.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: 6, key: k });
+            setCardCelebration({ phrase, key: k });
+            // Register card to GOD GRID so MiniRunner slot spins (puzzle tab only)
+            const isGridActive = viewModeRef.current === 'review' || calendarTabRef.current === 'puzzle';
+            if (isGridActive) {
+                const pts = cardPoints[phraseId] || 0;
+                const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                setPuzzleDropCard({ phraseId, english: phrase.english, japanese: phrase.japanese, element: phrase.category, rank, points: pts, bstTotal: calcBstTotal(phraseId), key: k });
+            }
+        }
 
         try {
             const res = dataMode === 'words'
@@ -6151,19 +7403,26 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 setPhraseMastery(prev => ({ ...prev, [phraseId]: 5 }));
                 return;
             }
-            // OWN = max level XP
-            postXP(clientToday, CHAKRA_CONFIG[3].lv, false, phraseId);
+            // START = lv 7 XP
+            postXP(clientToday, CHAKRA_CONFIG[6].lv, false, phraseId);
+            // Count toward Time Attack session
+            if (isTA) trackTimeAttackReview(CHAKRA_CONFIG[6].lv, true);
         } catch (err) {
             console.error('Failed to declare START:', err);
         }
-    }, [phraseLastLeveled, clientToday, phraseDateMap]);
+    }, [phraseLastLeveled, clientToday, phraseDateMap, phrases, cardPoints, dataMode, postXP, timeAttackPhase, trackTimeAttackReview]);
 
     // Play phrase audio (must be synchronous to preserve user gesture for Chrome)
-    const playPhrase = useCallback((phrase: Phrase) => {
+    const playPhrase = useCallback((phrase: Phrase, textOverride?: string) => {
         window.speechSynthesis.cancel();
+        if (clipAudioRef.current) {
+            try { clipAudioRef.current.pause(); } catch { /* */ }
+            clipAudioRef.current = null;
+        }
+        setPlayingClipId(null);
         setPlayingPhraseId(phrase.id);
 
-        const utterance = new SpeechSynthesisUtterance(phrase.english);
+        const utterance = new SpeechSynthesisUtterance(textOverride || phrase.english);
         utterance.lang = 'en-US';
         utterance.rate = 0.9;
 
@@ -6177,18 +7436,16 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
     }, [voices]);
 
     // Auto-play TTS when displayed card changes
-    // Suppress while Time Attack preset picker is up (user hasn't chosen duration yet)
     useEffect(() => {
         if (!displayedCard || cardCelebration) return;
-        if (timeAttackPhase === 'selecting' || timeAttackPhase === 'countdown') {
-            try { window.speechSynthesis.cancel(); } catch { /* */ }
-            setPlayingPhraseId(null);
-            return;
-        }
         if (displayedCard.id === prevAutoPlayIdRef.current) return;
         prevAutoPlayIdRef.current = displayedCard.id;
-        playPhrase(displayedCard);
-    }, [displayedCard, cardCelebration, playPhrase, timeAttackPhase]);
+        const bm = Number(phraseMastery[displayedCard.id] || 0);
+        const autoLevel = bm >= 3 ? 3 : bm >= 2 ? 2 : bm >= 1 ? 1 : 0;
+        const activeLevel = viewLevelOverride !== null ? viewLevelOverride : autoLevel;
+        const text = displayedCard.gorokuLevels?.[activeLevel] || displayedCard.english;
+        playPhrase(displayedCard, text);
+    }, [displayedCard, cardCelebration, playPhrase, phraseMastery, viewLevelOverride]);
 
     const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
     const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
@@ -6339,14 +7596,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         ? { ...p, english: updatedEnglish, japanese: updatedJapanese }
                         : p
                 ));
-                // Also update cached review list so review card reflects the edit
-                if (reviewListCacheRef.current.list) {
-                    reviewListCacheRef.current.list = reviewListCacheRef.current.list.map(p =>
-                        p.id === editingPhrase.id
-                            ? { ...p, english: updatedEnglish, japanese: updatedJapanese }
-                            : p
-                    );
-                }
+                // Review list now derives from phrases state — no separate cache to update
                 setEditingPhrase(null);
             } else {
                 alert(data.error || 'Failed to update');
@@ -6359,8 +7609,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
         }
     };
 
-    const handleDeletePhrase = async (id: string) => {
-        if (!confirm(dataMode === 'words' ? 'Delete this word?' : 'Delete this phrase?')) return;
+    const handleDeletePhrase = async (id: string, skipConfirm = false) => {
+        if (!skipConfirm && !confirm(dataMode === 'words' ? 'Delete this word?' : 'Delete this phrase?')) return;
         try {
             const endpoint = dataMode === 'words' ? `/api/user-words/${id}` : `/api/phrases/${id}`;
             const res = await fetch(endpoint, { method: 'DELETE' });
@@ -6462,10 +7712,12 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         if (displayedCard) {
                             setCalendarPulse({ dateKey: displayedCard.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: levelAfter, key: k });
                             setCardCelebration({ phrase: displayedCard, key: k });
-                            // Register card to GOD GRID
-                            const pts = cardPoints[phraseId] || 0;
-                            const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
-                            setPuzzleDropCard({ phraseId, english: displayedCard.english, japanese: displayedCard.japanese, element: displayedCard.category, rank, points: pts, bstTotal: calcBstTotal(phraseId), key: k });
+                            // Register card to GOD GRID (skip on calendar tab)
+                            if (calendarTab === 'puzzle') {
+                                const pts = cardPoints[phraseId] || 0;
+                                const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                                setPuzzleDropCard({ phraseId, english: displayedCard.english, japanese: displayedCard.japanese, element: displayedCard.category, rank, points: pts, bstTotal: calcBstTotal(phraseId), key: k });
+                            }
                         }
                     }
                 }
@@ -6631,7 +7883,56 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 );
             })()}
 
-            {/* RUSH test panel removed */}
+            {/* RUSH test panel -- compact pill toggle, bottom-left to avoid card overlap */}
+            <div style={{
+                position: 'fixed',
+                bottom: isMobile ? '8px' : '12px',
+                left: isMobile ? '8px' : '12px',
+                zIndex: 9999,
+                display: 'flex',
+                gap: '3px',
+                opacity: 0.5,
+                transition: 'opacity 0.2s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+            onMouseLeave={e => (e.currentTarget.style.opacity = '0.5')}
+            >
+                {(['kakuhen', 'gekiatsu', 'god'] as const).map((mode, i) => {
+                    const labels = ['R', 'F', 'G'];
+                    const colors = ['#D4AF37', '#DC2626', '#7C3AED'];
+                    const counts = [3, 5, 10];
+                    const active = chainState.mode === mode;
+                    return (
+                        <button key={mode} onClick={() => {
+                            if (active) {
+                                setChainState({ count: 0, mode: 'normal', key: Date.now() });
+                            } else {
+                                setChainState({ count: counts[i], mode, key: Date.now() });
+                            }
+                        }} style={{
+                            background: active ? colors[i] : 'rgba(0,0,0,0.7)',
+                            color: active ? '#fff' : colors[i],
+                            border: `1.5px solid ${active ? colors[i] : colors[i] + '60'}`,
+                            borderRadius: '50%',
+                            width: isMobile ? '28px' : '24px',
+                            height: isMobile ? '28px' : '24px',
+                            padding: 0,
+                            fontSize: '9px',
+                            fontWeight: 900,
+                            cursor: 'pointer',
+                            fontFamily: 'monospace',
+                            lineHeight: 1,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: active ? `0 0 12px ${colors[i]}80` : 'none',
+                            transition: 'all 0.15s ease',
+                        }}>
+                            {labels[i]}
+                        </button>
+                    );
+                })}
+            </div>
 
             {/* Chain mode HUD -- pachinko RUSH counter (fixed bottom-right) */}
             {feverMode.active && (
@@ -6873,8 +8174,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
             {/* Old rank-up banner removed -- replaced by full-screen celebration below */}
 
-            {/* Point Effect Overlay — suppressed during time attack (small xp float is enough) */}
-            {pointEffect && !isTimeAttackActive && (
+            {/* Point Effect Overlay */}
+            {pointEffect && (
                 <div key={pointEffect.key} style={{
                     position: 'fixed', inset: 0,
                     pointerEvents: 'none', zIndex: 9999,
@@ -7031,8 +8332,575 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 </div>
             )}
 
+            {/* ══════ TIME ATTACK SELECTION MODAL ══════ */}
+            {timeAttackPhase === 'selecting' && (
+                <div style={{
+                    position: 'fixed',
+                    inset: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'rgba(28,25,23,0.7)',
+                    zIndex: 300,
+                    backdropFilter: 'blur(6px)',
+                }}
+                    onClick={() => setTimeAttackPhase('idle')}
+                >
+                    <div
+                        style={{
+                            background: '#fff',
+                            borderRadius: '20px',
+                            padding: '40px',
+                            maxWidth: '480px',
+                            width: '90%',
+                            boxShadow: '0 25px 60px rgba(0,0,0,0.3)',
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div style={{
+                            textAlign: 'center',
+                            marginBottom: IS_LOCAL ? '24px' : '32px',
+                        }}>
+                            {IS_LOCAL && timeAttackStats && timeAttackStats.streak_days > 0 && (
+                                <div style={{
+                                    display: 'inline-block',
+                                    background: 'linear-gradient(135deg, #D4AF37, #F6C85F)',
+                                    borderRadius: '20px',
+                                    padding: '4px 14px',
+                                    fontSize: '11px',
+                                    fontWeight: '800',
+                                    color: '#fff',
+                                    marginBottom: '12px',
+                                    letterSpacing: '0.5px',
+                                }}>
+                                    {timeAttackStats.streak_days} DAY STREAK
+                                </div>
+                            )}
+                            <div style={{
+                                fontSize: '12px',
+                                fontWeight: '700',
+                                letterSpacing: '3px',
+                                color: '#D4AF37',
+                                marginBottom: '8px',
+                            }}>
+                                {IS_LOCAL ? 'DAILY REVIEW' : 'TIME ATTACK'}
+                            </div>
+                            <div style={{
+                                fontSize: IS_LOCAL ? '20px' : '22px',
+                                fontWeight: '900',
+                                color: '#1C1917',
+                                letterSpacing: '-0.5px',
+                            }}>
+                                {IS_LOCAL ? "How long for today's review?" : 'Pick your time limit'}
+                            </div>
+                            {IS_LOCAL && (
+                                <div style={{
+                                    fontSize: '12px',
+                                    color: '#78716C',
+                                    marginTop: '6px',
+                                    lineHeight: 1.5,
+                                }}>
+                                    Even 1 minute works. Tap to recall what you've learned
+                                </div>
+                            )}
+                        </div>
+
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: IS_LOCAL ? '1fr 1fr 1fr' : '1fr 1fr',
+                            gap: '12px',
+                            marginBottom: '24px',
+                        }}>
+                            {TIME_PRESETS.map(p => {
+                                const best = timeAttackBestRecords[p.seconds] || 0;
+                                const isRec = (p as any).recommended;
+                                return (
+                                    <button
+                                        key={p.seconds}
+                                        onClick={() => {
+                                            setTimeAttackPhase('idle');
+                                            setViewMode('review');
+                                            setReviewFilter('all');
+                                            setReviewIndex(0);
+                                            if (!shuffledToday) handleShuffle();
+                                            setTimeout(() => startTimeAttack(p.seconds), 200);
+                                        }}
+                                        style={{
+                                            background: isRec ? `linear-gradient(135deg, ${p.color}08, ${p.color}15)` : '#FAFAF9',
+                                            border: `2px solid ${isRec ? p.color + '40' : '#E7E5E4'}`,
+                                            borderRadius: '16px',
+                                            padding: '20px 16px 16px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            gap: '4px',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                        }}
+                                        onMouseEnter={e => {
+                                            e.currentTarget.style.borderColor = p.color;
+                                            e.currentTarget.style.background = `linear-gradient(135deg, ${p.color}10, ${p.color}20)`;
+                                            e.currentTarget.style.transform = 'scale(1.04)';
+                                            e.currentTarget.style.boxShadow = `0 8px 24px ${p.color}20`;
+                                        }}
+                                        onMouseLeave={e => {
+                                            e.currentTarget.style.borderColor = isRec ? p.color + '40' : '#E7E5E4';
+                                            e.currentTarget.style.background = isRec ? `linear-gradient(135deg, ${p.color}08, ${p.color}15)` : '#FAFAF9';
+                                            e.currentTarget.style.transform = 'scale(1)';
+                                            e.currentTarget.style.boxShadow = 'none';
+                                        }}
+                                    >
+                                        {/* Recommended badge */}
+                                        {isRec && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                top: '6px',
+                                                right: '6px',
+                                                background: p.color,
+                                                borderRadius: '4px',
+                                                padding: '2px 6px',
+                                                fontSize: '8px',
+                                                fontWeight: '800',
+                                                color: '#fff',
+                                                letterSpacing: '0.5px',
+                                            }}>
+                                                RECOMMENDED
+                                            </div>
+                                        )}
+                                        {/* Mode icon label */}
+                                        <div style={{
+                                            fontSize: '9px',
+                                            fontWeight: '800',
+                                            color: p.color,
+                                            letterSpacing: '2px',
+                                            marginBottom: '2px',
+                                        }}>
+                                            {p.icon}
+                                        </div>
+                                        <div style={{
+                                            fontSize: '32px',
+                                            fontWeight: '900',
+                                            color: '#1C1917',
+                                            lineHeight: 1,
+                                        }}>
+                                            {p.labelJa}
+                                        </div>
+                                        <div style={{
+                                            fontSize: '11px',
+                                            fontWeight: '600',
+                                            color: '#78716C',
+                                            marginTop: '2px',
+                                        }}>
+                                            {p.subtitle}
+                                        </div>
+                                        {best > 0 && (
+                                            <div style={{
+                                                fontSize: '10px',
+                                                fontWeight: '800',
+                                                color: p.color,
+                                                marginTop: '6px',
+                                                padding: '2px 8px',
+                                                background: `${p.color}10`,
+                                                borderRadius: '4px',
+                                            }}>
+                                                BEST: {best} cards
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Stats summary (if has history) */}
+                        {timeAttackStats && timeAttackStats.total_sessions > 0 && (
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '20px',
+                                marginBottom: '16px',
+                                padding: '12px',
+                                background: '#FAFAF9',
+                                borderRadius: '10px',
+                                border: '1px solid #F5F5F4',
+                            }}>
+                                {[
+                                    { label: 'TOTAL', value: timeAttackStats.total_sessions, unit: '回' },
+                                    { label: 'CARDS', value: timeAttackStats.total_cards, unit: '' },
+                                    { label: 'S RANK', value: timeAttackStats.s_rank_count, unit: '' },
+                                    { label: 'STREAK', value: timeAttackStats.streak_days, unit: '日' },
+                                ].map((s, i) => (
+                                    <div key={i} style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '9px', fontWeight: '700', color: '#A8A29E', letterSpacing: '1px' }}>{s.label}</div>
+                                        <div style={{ fontSize: '18px', fontWeight: '900', color: '#1C1917' }}>
+                                            {s.value}<span style={{ fontSize: '10px', color: '#A8A29E', fontWeight: '600' }}>{s.unit}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Bottom row: free review + history toggle */}
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <button
+                                onClick={() => {
+                                    setTimeAttackPhase('idle');
+                                    setViewMode('review');
+                                    if (!shuffledToday) handleShuffle();
+                                }}
+                                style={{
+                                    flex: 1,
+                                    background: 'none',
+                                    border: '1px solid #E7E5E4',
+                                    borderRadius: '10px',
+                                    padding: '12px',
+                                    cursor: 'pointer',
+                                    fontSize: '13px',
+                                    fontWeight: '600',
+                                    color: '#78716C',
+                                }}
+                            >
+                                Review without a timer
+                            </button>
+                            {timeAttackHistory.length > 0 && (
+                                <button
+                                    onClick={() => setShowTimeAttackHistory(h => !h)}
+                                    style={{
+                                        background: showTimeAttackHistory ? '#1C1917' : 'none',
+                                        border: '1px solid #E7E5E4',
+                                        borderRadius: '10px',
+                                        padding: '12px 16px',
+                                        cursor: 'pointer',
+                                        fontSize: '13px',
+                                        fontWeight: '600',
+                                        color: showTimeAttackHistory ? '#fff' : '#78716C',
+                                    }}
+                                >
+                                    履歴
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Session History */}
+                        {showTimeAttackHistory && timeAttackHistory.length > 0 && (
+                            <div style={{
+                                marginTop: '16px',
+                                maxHeight: '240px',
+                                overflowY: 'auto',
+                                borderRadius: '10px',
+                                border: '1px solid #F5F5F4',
+                            }}>
+                                {timeAttackHistory.map((s, i) => {
+                                    const presetLabel = TIME_PRESETS.find(p => p.seconds === s.duration_preset)?.labelJa || `${Math.floor(s.duration_preset / 60)}分`;
+                                    const gradeColor: Record<string, string> = { S: '#D4AF37', A: '#DC2626', B: '#2563EB', C: '#16A34A', D: '#78716C' };
+                                    return (
+                                        <div key={s.id || i} style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
+                                            padding: '10px 14px',
+                                            borderBottom: i < timeAttackHistory.length - 1 ? '1px solid #F5F5F4' : 'none',
+                                            background: i % 2 === 0 ? '#fff' : '#FAFAF9',
+                                        }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                                <div style={{
+                                                    fontSize: '18px',
+                                                    fontWeight: '900',
+                                                    color: gradeColor[s.grade] || '#78716C',
+                                                    width: '28px',
+                                                    textAlign: 'center',
+                                                }}>
+                                                    {s.grade}
+                                                </div>
+                                                <div>
+                                                    <div style={{ fontSize: '12px', fontWeight: '700', color: '#1C1917' }}>
+                                                        {s.cards_reviewed} cards / {presetLabel}
+                                                    </div>
+                                                    <div style={{ fontSize: '10px', color: '#A8A29E' }}>
+                                                        {s.date} -- {s.cards_per_minute} cards/min -- {s.xp_earned} XP
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {!s.completed && (
+                                                <div style={{ fontSize: '9px', color: '#A8A29E', fontWeight: '600' }}>途中終了</div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ══════ TIME ATTACK RESULT OVERLAY — Enhanced ══════ */}
+            {timeAttackPhase === 'result' && timeAttackResult && (() => {
+                const r = timeAttackResult;
+                const gradeColors: Record<string, { bg: string; text: string; glow: string; particle: string }> = {
+                    S: { bg: 'linear-gradient(135deg, #D4AF37 0%, #F6C85F 50%, #D4AF37 100%)', text: '#fff', glow: 'rgba(212,175,55,0.5)', particle: '#F6C85F' },
+                    A: { bg: 'linear-gradient(135deg, #DC2626 0%, #EF4444 50%, #DC2626 100%)', text: '#fff', glow: 'rgba(220,38,38,0.4)', particle: '#FCA5A5' },
+                    B: { bg: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 50%, #2563EB 100%)', text: '#fff', glow: 'rgba(37,99,235,0.4)', particle: '#93C5FD' },
+                    C: { bg: 'linear-gradient(135deg, #16A34A 0%, #22C55E 50%, #16A34A 100%)', text: '#fff', glow: 'rgba(22,163,74,0.3)', particle: '#86EFAC' },
+                    D: { bg: 'linear-gradient(135deg, #78716C 0%, #A8A29E 50%, #78716C 100%)', text: '#fff', glow: 'rgba(120,113,108,0.2)', particle: '#D6D3D1' },
+                };
+                const gc = gradeColors[r.grade] || gradeColors.D;
+                const presetLabel = TIME_PRESETS.find(p => p.seconds === r.preset)?.labelJa || `${Math.floor(r.preset / 60)}分`;
+                const actualMins = Math.floor(r.actual / 60);
+                const actualSecs = r.actual % 60;
+
+                const motivationalMessages: Record<string, string[]> = IS_LOCAL ? {
+                    S: ['PERFECT', 'AMAZING', 'MASTER'],
+                    A: ['GREAT JOB', 'IMPRESSIVE', 'NICE'],
+                    B: ['GOOD WORK', 'SOLID', 'KEEP IT UP'],
+                    C: ['NICE TRY', 'GOOD START', 'GETTING BETTER'],
+                    D: ['YOU DID IT', 'FIRST STEP', 'COME BACK TOMORROW'],
+                } : {
+                    S: ['PERFECT', 'GODLIKE', 'INSANE'],
+                    A: ['EXCELLENT', 'IMPRESSIVE', 'WELL DONE'],
+                    B: ['GOOD JOB', 'SOLID', 'NICE WORK'],
+                    C: ['KEEP GOING', 'NOT BAD', 'GETTING THERE'],
+                    D: ['JUST START', 'BABY STEPS', 'NEXT TIME'],
+                };
+                const msgs = motivationalMessages[r.grade] || motivationalMessages.D;
+                const motivMsg = msgs[Math.floor(Math.random() * msgs.length)];
+                const showParticles = r.grade === 'S' || r.grade === 'A';
+
+                return (
+                    <div style={{
+                        position: 'fixed',
+                        inset: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'rgba(28,25,23,0.9)',
+                        zIndex: 300,
+                        backdropFilter: 'blur(12px)',
+                        animation: 'result-fade-in 0.6s ease-out',
+                    }}>
+                        {/* Floating particles for S/A rank */}
+                        {showParticles && Array.from({ length: 20 }).map((_, i) => (
+                            <div key={i} style={{
+                                position: 'absolute',
+                                width: `${3 + (i % 3) * 2}px`,
+                                height: `${3 + (i % 3) * 2}px`,
+                                borderRadius: '50%',
+                                background: i % 3 === 0 ? gc.particle : i % 3 === 1 ? '#fff' : gc.particle + '80',
+                                left: `${5 + (i * 4.7) % 90}%`,
+                                top: `${5 + (i * 7.3) % 90}%`,
+                                animation: `ta-result-particle ${3 + (i % 4)}s ease-in-out infinite`,
+                                animationDelay: `${i * 0.15}s`,
+                                opacity: 0.6,
+                                pointerEvents: 'none',
+                            }} />
+                        ))}
+
+                        <div style={{
+                            background: '#fff',
+                            borderRadius: '24px',
+                            padding: '0',
+                            maxWidth: '420px',
+                            width: '90%',
+                            boxShadow: `0 30px 80px rgba(0,0,0,0.5), 0 0 80px ${gc.glow}`,
+                            overflow: 'hidden',
+                            animation: 'ta-result-card-enter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        }}>
+                            {/* Grade Header — with animated background */}
+                            <div style={{
+                                background: gc.bg,
+                                backgroundSize: '200% 200%',
+                                animation: r.grade === 'S' ? 'ta-grade-shimmer 3s ease-in-out infinite' : undefined,
+                                padding: '36px 24px',
+                                textAlign: 'center',
+                                position: 'relative',
+                                overflow: 'hidden',
+                            }}>
+                                {/* Radial shine behind grade */}
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '50%',
+                                    left: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    width: '200px',
+                                    height: '200px',
+                                    borderRadius: '50%',
+                                    background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
+                                    animation: 'ta-result-shine 2s ease-in-out infinite',
+                                }} />
+
+                                {r.isNewRecord && (
+                                    <div style={{
+                                        position: 'absolute',
+                                        top: '12px',
+                                        right: '16px',
+                                        background: 'rgba(255,255,255,0.3)',
+                                        borderRadius: '8px',
+                                        padding: '4px 12px',
+                                        fontSize: '10px',
+                                        fontWeight: '900',
+                                        color: '#fff',
+                                        letterSpacing: '2px',
+                                        animation: 'new-record-flash 1.5s ease-in-out infinite',
+                                        boxShadow: '0 0 20px rgba(255,255,255,0.3)',
+                                    }}>
+                                        NEW RECORD
+                                    </div>
+                                )}
+                                <div style={{
+                                    fontSize: '11px',
+                                    fontWeight: '700',
+                                    color: 'rgba(255,255,255,0.6)',
+                                    letterSpacing: '4px',
+                                    marginBottom: '8px',
+                                    position: 'relative',
+                                }}>
+                                    {r.completed ? 'TIME UP' : 'SESSION END'}
+                                </div>
+                                <div style={{
+                                    fontSize: '96px',
+                                    fontWeight: '900',
+                                    color: gc.text,
+                                    lineHeight: 1,
+                                    textShadow: `0 4px 30px ${gc.glow}, 0 0 60px ${gc.glow}`,
+                                    letterSpacing: '-4px',
+                                    position: 'relative',
+                                    animation: 'ta-grade-zoom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                                }}>
+                                    {r.grade}
+                                </div>
+                                <div style={{
+                                    fontSize: '16px',
+                                    fontWeight: '800',
+                                    color: 'rgba(255,255,255,0.9)',
+                                    marginTop: '8px',
+                                    letterSpacing: '3px',
+                                    position: 'relative',
+                                    animation: 'ta-motiv-fade 1s ease-out 0.5s both',
+                                }}>
+                                    {motivMsg}
+                                </div>
+                                <div style={{
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    color: 'rgba(255,255,255,0.6)',
+                                    marginTop: '6px',
+                                    position: 'relative',
+                                }}>
+                                    {presetLabel} {r.completed ? 'Complete' : `(${actualMins}:${String(actualSecs).padStart(2, '0')})`}
+                                </div>
+                            </div>
+
+                            {/* Stats Grid — staggered entrance */}
+                            <div style={{
+                                padding: '20px',
+                                display: 'grid',
+                                gridTemplateColumns: '1fr 1fr 1fr',
+                                gap: '10px',
+                            }}>
+                                {[
+                                    { label: 'CARDS', value: r.cards, unit: '', color: '#1C1917', big: true },
+                                    { label: 'XP', value: r.xp, unit: '', color: '#D4AF37', big: true },
+                                    { label: 'PACE', value: r.cpm, unit: '/min', color: '#3B82F6', big: true },
+                                    { label: 'LEVEL UP', value: r.levelUps, unit: '', color: '#16A34A', big: false },
+                                    { label: 'MAX CHAIN', value: r.maxChain, unit: '', color: '#7C3AED', big: false },
+                                    { label: 'BEST', value: timeAttackBestRecords[r.preset] || r.cards, unit: '', color: '#D4AF37', big: false },
+                                ].map((stat, i) => (
+                                    <div key={i} style={{
+                                        background: '#FAFAF9',
+                                        borderRadius: '12px',
+                                        padding: '12px',
+                                        border: '1px solid #F5F5F4',
+                                        textAlign: 'center',
+                                        animation: `ta-stat-enter 0.4s ease-out ${0.3 + i * 0.08}s both`,
+                                    }}>
+                                        <div style={{
+                                            fontSize: '9px',
+                                            fontWeight: '700',
+                                            color: '#A8A29E',
+                                            letterSpacing: '1px',
+                                            marginBottom: '4px',
+                                        }}>
+                                            {stat.label}
+                                        </div>
+                                        <div style={{
+                                            fontSize: stat.big ? '26px' : '22px',
+                                            fontWeight: '900',
+                                            color: stat.color,
+                                            lineHeight: 1,
+                                            fontVariantNumeric: 'tabular-nums',
+                                        }}>
+                                            {stat.value}
+                                            {stat.unit && (
+                                                <span style={{ fontSize: '10px', fontWeight: '600', color: '#A8A29E' }}>
+                                                    {stat.unit}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div style={{
+                                padding: '0 20px 20px',
+                                display: 'flex',
+                                gap: '10px',
+                            }}>
+                                <button
+                                    onClick={() => {
+                                        setTimeAttackResult(null);
+                                        setTimeAttackPhase('selecting');
+                                    }}
+                                    style={{
+                                        flex: 1,
+                                        background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
+                                        border: 'none',
+                                        borderRadius: '14px',
+                                        padding: '16px',
+                                        cursor: 'pointer',
+                                        fontSize: '15px',
+                                        fontWeight: '900',
+                                        color: '#fff',
+                                        letterSpacing: '2px',
+                                        boxShadow: '0 4px 16px rgba(212,175,55,0.3)',
+                                        transition: 'transform 0.2s',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                >
+                                    RETRY
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setTimeAttackResult(null);
+                                        setTimeAttackPhase('idle');
+                                        setViewMode('calendar');
+                                    }}
+                                    style={{
+                                        flex: 1,
+                                        background: '#FAFAF9',
+                                        border: '1.5px solid #E7E5E4',
+                                        borderRadius: '14px',
+                                        padding: '16px',
+                                        cursor: 'pointer',
+                                        fontSize: '15px',
+                                        fontWeight: '700',
+                                        color: '#78716C',
+                                        transition: 'transform 0.2s',
+                                    }}
+                                    onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; }}
+                                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                                >
+                                    終了
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+
             {/* Gacha Overlay — Nintendo-level (hidden in GOD GRID — ReviewSlotPanel handles it) */}
-            {gachaEffect && (() => {
+            {gachaEffect && calendarTab !== 'puzzle' && viewMode !== 'review' && (() => {
                 const cfg = GACHA_TIER_CONFIG[gachaEffect.tier] || GACHA_TIER_CONFIG.MISS;
                 const isReveal = gachaEffect.phase === 'reveal';
                 const tier = gachaEffect.tier;
@@ -7666,6 +9534,11 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexShrink: 0,
+                // 月送りとモードのタブが横に長く、スマホでは画面より広くなる。
+                // 折り返さないと、ここが土台ごと押し広げて全体が横スクロールになる
+                flexWrap: 'wrap',
+                rowGap: '6px',
+                maxWidth: '100%',
                 // Raise above fever overlay (z-50)
                 position: 'relative',
                 zIndex: feverMode.active ? 51 : undefined,
@@ -7702,20 +9575,28 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     </div>
                 ) : (
                     <button
-                        onClick={() => setViewMode('calendar')}
+                        onClick={() => {
+                            if (timeAttackPhase === 'running') {
+                                if (confirm('タイムアタック中！終了しますか？')) {
+                                    stopTimeAttack();
+                                }
+                                return;
+                            }
+                            setTimeAttackPhase('idle');
+                            setViewMode('calendar');
+                        }}
                         style={{
                             background: 'none', border: 'none', cursor: 'pointer',
                             fontSize: '12px', color: '#78716C',
                             display: 'flex', alignItems: 'center', gap: '2px',
                         }}
                     >
-                        ← カレンダー
+                        ← Calendar
                     </button>
                 )}
 
                 <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
-                    {/* Data Mode Toggle — hide on my-training (phrases only) */}
-                    {!skipDefaultData && (
+                    {/* Data Mode Toggle */}
                     <div style={{ display: 'flex', marginRight: '4px' }}>
                         <button
                             onClick={() => {
@@ -7735,7 +9616,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 transition: 'all 0.15s',
                             }}
                         >
-                            フレーズ
+                            Phrases
                         </button>
                         <button
                             onClick={() => {
@@ -7745,7 +9626,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             }}
                             style={{
                                 padding: '4px 10px',
-                                borderRadius: '0 4px 4px 0',
+                                borderRadius: '0',
                                 border: dataMode === 'words' ? '1.5px solid #8B5CF6' : '1px solid #E7E5E4',
                                 backgroundColor: dataMode === 'words' ? '#F5F3FF' : '#fff',
                                 color: dataMode === 'words' ? '#6D28D9' : '#A8A29E',
@@ -7755,13 +9636,31 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 transition: 'all 0.15s',
                             }}
                         >
-                            単語
+                            Words
+                        </button>
+                        <button
+                            onClick={() => {
+                                setDataMode('life');
+                                localStorage.setItem('training-data-mode', 'life');
+                                setViewMode('calendar');
+                            }}
+                            style={{
+                                padding: '4px 10px',
+                                borderRadius: '0 4px 4px 0',
+                                border: dataMode === 'life' ? '1.5px solid #10B981' : '1px solid #E7E5E4',
+                                backgroundColor: dataMode === 'life' ? '#ECFDF5' : '#fff',
+                                color: dataMode === 'life' ? '#065F46' : '#A8A29E',
+                                fontSize: '10px',
+                                fontWeight: dataMode === 'life' ? '700' : '500',
+                                cursor: 'pointer',
+                                transition: 'all 0.15s',
+                            }}
+                        >
+                            Life
                         </button>
                     </div>
-                    )}
                     {viewMode === 'calendar' && (
                         <>
-                            {!skipDefaultData && (
                             <button
                                 onClick={() => {
                                     const target = selectedDate || (() => {
@@ -7776,8 +9675,27 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     fontSize: '11px', fontWeight: '600', color: '#3B82F6',
                                 }}
                             >
-                                聞く
+                                Listen
                             </button>
+                            {!isMobile && (
+                                <button
+                                    onClick={() => { setTimeAttackPhase('selecting'); }}
+                                    style={{
+                                        background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        padding: IS_LOCAL ? '6px 16px' : '4px 12px',
+                                        cursor: 'pointer',
+                                        fontSize: IS_LOCAL ? '12px' : '11px',
+                                        fontWeight: IS_LOCAL ? '800' : '700',
+                                        color: '#fff',
+                                        letterSpacing: '0.5px',
+                                        boxShadow: IS_LOCAL ? '0 2px 8px rgba(212,175,55,0.3)' : undefined,
+                                        animation: IS_LOCAL ? 'ta-cta-pulse 3s ease-in-out infinite' : undefined,
+                                    }}
+                                >
+                                    {IS_LOCAL ? "Today's Review" : 'TIME ATTACK'}
+                                </button>
                             )}
                             {!isMobile && (
                                 <button
@@ -7788,25 +9706,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         fontSize: '11px', fontWeight: '600', color: '#D4AF37',
                                     }}
                                 >
-                                    復習
+                                    REVIEW
                                 </button>
                             )}
-                            <button
-                                onClick={() => setTimeAttackPhase('selecting')}
-                                style={{
-                                    background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
-                                    border: 'none',
-                                    borderRadius: '6px',
-                                    padding: '4px 10px',
-                                    cursor: 'pointer',
-                                    fontSize: '11px',
-                                    fontWeight: '800',
-                                    color: '#fff',
-                                    letterSpacing: '1px',
-                                }}
-                            >
-                                タイムアタック
-                            </button>
                             <button
                                 onClick={() => setViewMode('list')}
                                 style={{
@@ -7815,50 +9717,139 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     fontSize: '11px', fontWeight: '500', color: '#78716C',
                                 }}
                             >
-                                一覧
+                                List
                             </button>
                         </>
                     )}
-                    <button
-                        onClick={() => setShowAddForm(true)}
-                        style={{
-                            background: '#1C1917', border: 'none',
-                            borderRadius: '6px', padding: '4px 10px', cursor: 'pointer',
-                            fontSize: '11px', fontWeight: '600', color: '#fff',
-                        }}
-                    >
-                        +
-                    </button>
-                    <button
-                        onClick={onHelpClick}
-                        style={{
-                            background: 'none', border: '1.5px solid #D4AF37',
-                            borderRadius: '50%', width: '26px', height: '26px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            cursor: 'pointer', fontSize: '13px', fontWeight: '800', color: '#D4AF37',
-                            padding: 0, flexShrink: 0,
-                        }}
-                    >
-                        ?
-                    </button>
+                    {!isMobile && (
+                        <button
+                            onClick={() => setShowAddForm(true)}
+                            style={{
+                                background: '#1C1917', border: 'none',
+                                borderRadius: '6px', padding: '4px 10px', cursor: 'pointer',
+                                fontSize: '11px', fontWeight: '600', color: '#fff',
+                            }}
+                        >
+                            +
+                        </button>
+                    )}
+                    {!isMobile && (
+                        <Link
+                            href="/english/training/topics"
+                            style={{
+                                background: '#FFFBEB', border: '1px solid #FDE68A',
+                                borderRadius: '6px', padding: '4px 10px', cursor: 'pointer',
+                                fontSize: '11px', fontWeight: '600', color: '#A16207',
+                                textDecoration: 'none', letterSpacing: '0.5px',
+                            }}
+                        >
+                            TOPICS
+                        </Link>
+                    )}
+                    {!isMobile && (
+                        <Link
+                            href="/english/training/dmm365"
+                            style={{
+                                background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
+                                border: '1px solid #D4AF37',
+                                borderRadius: '6px', padding: '4px 10px', cursor: 'pointer',
+                                fontSize: '11px', fontWeight: '700', color: '#A16207',
+                                textDecoration: 'none', letterSpacing: '0.5px',
+                                boxShadow: '0 1px 3px rgba(212,175,55,0.25)',
+                            }}
+                            title="DMM 365 Deployment Lab"
+                        >
+                            DMM 365
+                        </Link>
+                    )}
+                    {!isMobile && (
+                        <Link
+                            href="/english/training/guide"
+                            style={{
+                                background: 'none', border: 'none',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                cursor: 'pointer', fontSize: '11px', color: '#A8A29E',
+                                textDecoration: 'none', padding: '4px',
+                            }}
+                        >
+                            ?
+                        </Link>
+                    )}
                 </div>
             </div>
 
+            {/* Runner - PC only: CalendarRunner on calendar tab, MiniRunner on puzzle tab */}
+            {viewMode === 'calendar' && !isMobile && (
+                <div style={{ position: 'relative' }}>
+                    {showRunner && calendarTab === 'puzzle' && <UpperScreenEffect effect={upperEffect} slotState={slotPanelState} />}
+                    {showRunner && calendarTab === 'puzzle' && (
+                        <MiniRunner
+                            todayXP={todayXP}
+                            goalXP={goalXP}
+                            onGoalChange={handleGoalChange}
+                            lastReviewedWord={lastReviewedWord}
+                            dropCard={puzzleDropCard as any}
+                            gridInfo={gridInfo}
+                            sessionGP={playerSparks}
+                            slotMode="effects"
+                            gridCompleteGrade={milestoneData?.grade || null}
+                            onSpecialSlotTrigger={handleSpecialSlotTrigger}
+                        />
+                    )}
+                    {showRunner && calendarTab === 'calendar' && (
+                        <CalendarRunner
+                            todayXP={todayXP}
+                            goalXP={goalXP}
+                            streak={chakraAnalytics.streak}
+                            todayTouches={chakraAnalytics.todayTouches}
+                            activeDays={chakraAnalytics.activeDays}
+                        />
+                    )}
+                    <button
+                        onClick={() => {
+                            setShowRunner(prev => {
+                                const next = !prev;
+                                localStorage.setItem('training-show-runner', String(next));
+                                return next;
+                            });
+                        }}
+                        style={{
+                            position: showRunner ? 'absolute' : 'relative',
+                            right: showRunner ? '8px' : undefined,
+                            bottom: showRunner ? '4px' : undefined,
+                            marginLeft: showRunner ? undefined : 'auto',
+                            display: 'block',
+                            background: 'rgba(255,255,255,0.7)',
+                            border: '1px solid #E7E5E4',
+                            borderRadius: '4px',
+                            padding: '2px 8px',
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            color: '#A8A29E',
+                            cursor: 'pointer',
+                            zIndex: 40,
+                            letterSpacing: '0.5px',
+                            backdropFilter: 'blur(4px)',
+                        }}
+                    >
+                        {showRunner ? 'HIDE' : 'SHOW RUNNER'}
+                    </button>
+                </div>
+            )}
 
             {/* Main Content */}
             {viewMode === 'review' ? (
-                /* Review View with Slot Machine */
+                /* Review View (no slot) */
                 <div style={{
                     flex: 1,
                     overflow: 'auto',
                     display: 'flex',
-                    flexDirection: (isMobile || timeAttackPhase === 'running' || timeAttackPhase === 'countdown') ? 'column' : 'row',
-                    gap: isMobile ? '0' : '0',
-                    // Raise above fever overlay (z-50) so content stays readable
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     position: 'relative',
                     zIndex: feverMode.active ? 51 : undefined,
                 }}>
-                    {/* Time Attack timer bar */}
+                    {/* TIME ATTACK TIMER BAR — Enhanced */}
                     {timeAttackPhase === 'running' && (() => {
                         const progress = timeAttackRemaining / timeAttackPreset;
                         const mins = Math.floor(timeAttackRemaining / 60);
@@ -7890,6 +9881,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 borderBottom: `2px solid ${barColor}30`,
                                 animation: isHeartbeat ? 'ta-heartbeat 1s ease-in-out infinite' : undefined,
                             }}>
+                                {/* Screen edge glow for urgency */}
                                 {timeAttackUrgent && (
                                     <div style={{
                                         position: 'fixed',
@@ -7903,6 +9895,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         transition: 'box-shadow 0.5s',
                                     }} />
                                 )}
+                                {/* Progress bar — thicker, with glow */}
                                 <div style={{ width: '100%', height: '5px', background: '#F5F5F4', position: 'relative' }}>
                                     <div style={{
                                         width: `${progress * 100}%`,
@@ -7912,6 +9905,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         borderRadius: '0 3px 3px 0',
                                         boxShadow: `0 0 8px ${barColor}40`,
                                     }} />
+                                    {/* Pulse dot at progress edge */}
                                     <div style={{
                                         position: 'absolute',
                                         right: `${(1 - progress) * 100}%`,
@@ -7925,6 +9919,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         transition: 'right 0.5s linear',
                                     }} />
                                 </div>
+                                {/* Stats row */}
                                 <div style={{
                                     display: 'flex',
                                     alignItems: 'center',
@@ -7935,6 +9930,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     width: '100%',
                                     boxSizing: 'border-box',
                                 }}>
+                                    {/* Left: Timer + Cards */}
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                                         <div style={{
                                             fontSize: isHeartbeat ? '28px' : '24px',
@@ -7967,6 +9963,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                     </span>
                                                 )}
                                             </div>
+                                            {/* Live pace + best comparison */}
                                             <div style={{ display: 'flex', gap: '8px', fontSize: '10px', color: '#A8A29E' }}>
                                                 <span>{timeAttackLivePace} cards/min</span>
                                                 {isAheadOfBest && (
@@ -8035,7 +10032,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         </div>
                     )}
 
-                    {/* Countdown overlay */}
+                    {/* Countdown overlay — READY → 3 → 2 → 1 → GO! */}
                     {timeAttackPhase === 'countdown' && (
                         <div style={{
                             position: 'absolute',
@@ -8048,6 +10045,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             zIndex: 200,
                             backdropFilter: 'blur(12px)',
                         }}>
+                            {/* Radial burst behind text */}
                             <div style={{
                                 position: 'absolute',
                                 width: '300px',
@@ -8055,6 +10053,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 borderRadius: '50%',
                                 background: `radial-gradient(circle, ${timeAttackCountdownColor}20 0%, transparent 70%)`,
                                 animation: 'ta-burst 0.8s ease-out',
+                                key: timeAttackCountdownText,
                             }} />
                             <div
                                 key={timeAttackCountdownText}
@@ -8073,6 +10072,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             >
                                 {timeAttackCountdownText}
                             </div>
+                            {/* Preset label */}
                             <div style={{
                                 fontSize: '14px',
                                 fontWeight: '600',
@@ -8086,56 +10086,15 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             </div>
                         </div>
                     )}
-
-                    {/* Left: Review content */}
                     <div style={{
-                        flex: 1,
-                        overflow: 'auto',
+                        width: '100%',
+                        maxWidth: '780px',
                         display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'flex-start',
+                        flexDirection: 'column',
+                        gap: '16px',
                         padding: isMobile ? '16px' : '48px 24px',
-                        order: isMobile ? 2 : 1,
                     }}>
-                        <div style={{
-                            width: '100%',
-                            maxWidth: isTimeAttackActive ? '520px' : '780px',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '16px',
-                        }}>
-                            {phrases.length === 0 && timeAttackPhase === 'running' ? (
-                                <div style={{
-                                    textAlign: 'center',
-                                    padding: '60px 24px',
-                                    color: '#78716C',
-                                }}>
-                                    <div style={{ fontSize: '48px', fontWeight: '900', color: '#E7E5E4', marginBottom: '16px' }}>0</div>
-                                    <div style={{ fontSize: '16px', fontWeight: '700', color: '#1C1917', marginBottom: '8px' }}>
-                                        まだフレーズが登録されていません
-                                    </div>
-                                    <div style={{ fontSize: '13px', lineHeight: 1.6 }}>
-                                        カレンダーの「+」ボタンか、会話ページからフレーズを登録してください。
-                                    </div>
-                                    <button
-                                        onClick={() => { stopTimeAttack(); setViewMode('calendar'); }}
-                                        style={{
-                                            marginTop: '20px',
-                                            background: '#D4AF37',
-                                            border: 'none',
-                                            borderRadius: '10px',
-                                            padding: '12px 24px',
-                                            cursor: 'pointer',
-                                            fontSize: '14px',
-                                            fontWeight: '700',
-                                            color: '#fff',
-                                        }}
-                                    >
-                                        カレンダーに戻る
-                                    </button>
-                                </div>
-                            ) : renderReviewContent()}
-                        </div>
+                        {renderReviewContent()}
                     </div>
                 </div>
             ) : viewMode === 'list' ? (
@@ -8173,14 +10132,14 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             All Phrases ({filteredPhrases.length})
                         </div>
                         <div style={{ fontSize: '12px', color: '#888' }}>
-                            Active: {activeCount} | OWN+: {ownPlusCount}
+                            Active: {activeCount} | OWN+: {ownPlusCount}{retiredPhrases.size > 0 ? ` | Retired: ${retiredPhrases.size}` : ''}
                         </div>
                     </div>
 
                     {/* Table Header */}
                     <div style={{
                         display: 'grid',
-                        gridTemplateColumns: '2fr 80px 2fr 80px 60px 30px 32px 40px',
+                        gridTemplateColumns: '2fr 80px 2fr 80px 60px 30px 32px 40px 24px',
                         padding: '10px 16px',
                         borderBottom: '1px solid #e5e5e5',
                         backgroundColor: '#fafafa',
@@ -8196,6 +10155,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         <div></div>
                         <div></div>
                         <div></div>
+                        <div></div>
                     </div>
 
                     {/* List */}
@@ -8206,15 +10166,17 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             const hasLink = (phraseLinks[phrase.id] || []).length > 0;
                             const masteryInfo = getChakraInfo(baseMastery, hasRec, hasLink);
                             const isLockedToday = baseMastery === 3 || (baseMastery !== 6 && baseMastery < 3 && phraseLastLeveled[phrase.id] === clientToday);
+                            const isRetired = retiredPhrases.has(phrase.id);
                             return (
                                 <div
                                     key={phrase.id}
                                     style={{
                                         display: 'grid',
-                                        gridTemplateColumns: '2fr 80px 2fr 80px 60px 30px 32px 40px',
+                                        gridTemplateColumns: '2fr 80px 2fr 80px 60px 30px 32px 40px 24px',
                                         padding: '12px 16px',
                                         borderBottom: '1px solid #f0f0f0',
-                                        alignItems: 'center'
+                                        alignItems: 'center',
+                                        opacity: isRetired ? 0.4 : 1,
                                     }}
                                 >
                                     <div
@@ -8254,14 +10216,29 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                         {phrase.date.split('T')[0].slice(5)}
                                     </div>
                                     <button
+                                        onClick={() => openPlayPhrase(phrase)}
+                                        style={{
+                                            background: 'linear-gradient(135deg, #D4AF37, #F5D76E)',
+                                            border: 'none',
+                                            color: '#1a1a1a',
+                                            fontSize: '9px',
+                                            fontWeight: '700',
+                                            cursor: 'pointer',
+                                            padding: '4px 6px',
+                                            borderRadius: '4px'
+                                        }}
+                                    >
+                                        PP
+                                    </button>
+                                    <button
                                         onClick={() => playYouGlish(phrase)}
                                         style={{
                                             background: '#f0f0f0',
                                             border: 'none',
-                                            color: '#666',
-                                            fontSize: '9px',
+                                            color: '#999',
+                                            fontSize: '8px',
                                             cursor: 'pointer',
-                                            padding: '4px 6px',
+                                            padding: '4px 5px',
                                             borderRadius: '4px'
                                         }}
                                     >
@@ -8301,6 +10278,19 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     >
                                         削除
                                     </button>
+                                    <button
+                                        onClick={() => toggleRetire(phrase.id)}
+                                        title={isRetired ? '復帰' : '除外'}
+                                        style={{
+                                            background: 'none', border: 'none',
+                                            color: isRetired ? '#D4AF37' : '#ddd',
+                                            fontSize: '13px', cursor: 'pointer', padding: '2px',
+                                        }}
+                                        onMouseEnter={(e) => { e.currentTarget.style.color = '#D4AF37'; }}
+                                        onMouseLeave={(e) => { e.currentTarget.style.color = isRetired ? '#D4AF37' : '#ddd'; }}
+                                    >
+                                        {isRetired ? '&#9632;' : '&#9633;'}
+                                    </button>
                                 </div>
                             );
                         })}
@@ -8320,8 +10310,12 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 }}>
                     {/* Calendar Section */}
                     <div style={{
-                        flex: isMobile ? 'none' : '1 1 0%',
+                        flex: isMobile ? 'none' : (calendarTab === 'puzzle' ? '0 0 auto' : '1 1 0%'),
                         minWidth: 0,
+                        // スマホでは flex:none = 中身の幅になる。
+                        // 7列のマス目が画面より広がって、横スクロールが生まれていた
+                        width: isMobile ? '100%' : undefined,
+                        maxWidth: '100%',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: isMobile ? 'visible' : 'hidden',
@@ -8348,86 +10342,29 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             >
                                 CALENDAR
                             </button>
+                            <button
+                                onClick={() => setCalendarTab('puzzle')}
+                                style={{
+                                    flex: 1, padding: '7px 0', border: 'none', cursor: 'pointer',
+                                    fontSize: '10px', fontWeight: calendarTab === 'puzzle' ? '800' : '500',
+                                    letterSpacing: '1.5px', color: calendarTab === 'puzzle' ? '#D4AF37' : '#A8A29E',
+                                    background: '#fff',
+                                    borderBottom: calendarTab === 'puzzle' ? '2px solid #D4AF37' : '2px solid transparent',
+                                }}
+                            >
+                                GOD GRID
+                            </button>
                         </div>
 
                         {/* Tab Content: Calendar */}
                         {calendarTab === 'calendar' && (<>
-                        {/* Daily TA CTA Motivation Bar */}
-                        <div style={{
-                            padding: '8px 12px',
-                            background: taStreakInfo.doneToday
-                                ? 'linear-gradient(135deg, #F0FDF4, #DCFCE7)'
-                                : 'linear-gradient(135deg, #FFFBEB, #FEF3C7)',
-                            borderBottom: '1px solid #E7E5E4',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 10,
-                            ...((!taStreakInfo.doneToday && taStreakInfo.streakCount > 0) ? {
-                                animation: 'ta-daily-pulse 2s ease-in-out infinite',
-                                border: '2px solid rgba(212,175,55,0.3)',
-                                borderRadius: 0,
-                            } : {}),
-                        }}>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                {taStreakInfo.doneToday ? (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <span style={{ fontSize: 11, fontWeight: 900, color: '#10B981', letterSpacing: '1px' }}>
-                                            TODAY COMPLETE
-                                        </span>
-                                        <span style={{ fontSize: 13, fontWeight: 900, color: '#D4AF37' }}>
-                                            {taStreakInfo.todayGrade}
-                                        </span>
-                                        {taStreakInfo.streakCount > 0 && (
-                                            <span style={{ fontSize: 10, fontWeight: 700, color: '#78716C' }}>
-                                                STREAK {taStreakInfo.streakCount}
-                                            </span>
-                                        )}
-                                    </div>
-                                ) : taStreakInfo.streakCount > 0 ? (
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                        <span style={{ fontSize: 18, fontWeight: 900, color: '#D4AF37', lineHeight: 1 }}>
-                                            {taStreakInfo.streakCount}
-                                        </span>
-                                        <span style={{ fontSize: 11, fontWeight: 800, color: '#B8941F' }}>
-                                            STREAK -- 今日もやろう！
-                                        </span>
-                                    </div>
-                                ) : (
-                                    <span style={{ fontSize: 11, fontWeight: 700, color: '#78716C' }}>
-                                        1分だけ。今日から始めよう
-                                    </span>
-                                )}
-                            </div>
-                            {!taStreakInfo.doneToday && (
-                                <button
-                                    onClick={() => {
-                                        setTimeAttackPhase('selecting');
-                                    }}
-                                    style={{
-                                        background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
-                                        color: '#fff',
-                                        border: 'none',
-                                        borderRadius: 8,
-                                        padding: '7px 14px',
-                                        fontWeight: 900,
-                                        fontSize: 11,
-                                        letterSpacing: '1px',
-                                        cursor: 'pointer',
-                                        flexShrink: 0,
-                                        animation: 'ta-cta-pulse 2s ease-in-out infinite',
-                                    }}
-                                >
-                                    1分チャレンジ START
-                                </button>
-                            )}
-                        </div>
                         {/* Mobile: Today's Activity Calendar (31-day grid showing today's review touches) */}
                         {isMobile && (
                             <>
                                 {/* Mobile Day Headers */}
                                 <div style={{
                                     display: 'grid',
-                                    gridTemplateColumns: 'repeat(7, 1fr)',
+                                    gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
                                     borderBottom: '1px solid #eee',
                                     flexShrink: 0,
                                 }}>
@@ -8446,7 +10383,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 {/* Mobile Activity Grid */}
                                 <div style={{
                                     display: 'grid',
-                                    gridTemplateColumns: 'repeat(7, 1fr)',
+                                    gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
                                     gap: '2px',
                                     padding: '4px',
                                 }}>
@@ -8462,7 +10399,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                                         // Chakra computation (same as PC)
                                         const total = allDayPhrases.length;
-                                        const mChakraCounts: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
+                                        const mChakraCounts: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
                                         for (const p of allDayPhrases) {
                                             const m = Number(phraseMastery[p.id] || 0);
                                             const hasRec = (voiceRecordings[p.id] || []).length > 0;
@@ -8470,9 +10407,9 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                             mChakraCounts[getChakraLevel(m, hasRec, hasLink)]++;
                                         }
                                         const dailyPts = Object.entries(mChakraCounts).reduce((s, [lv, cnt]) => s + (Number(lv) > 0 ? CHAKRA_CONFIG[Number(lv) as ChakraLevel].lv * cnt : 0), 0);
-                                        const mCum: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
+                                        const mCum: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
                                         let mSum = 0;
-                                        for (let lv = 3; lv >= 1; lv--) { mSum += mChakraCounts[lv as ChakraLevel]; mCum[lv as ChakraLevel] = mSum; }
+                                        for (let lv = 6; lv >= 1; lv--) { mSum += mChakraCounts[lv as ChakraLevel]; mCum[lv as ChakraLevel] = mSum; }
 
                                         return (
                                             <div
@@ -8592,46 +10529,29 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                         </span>
                                                     )}
                                                 </div>
+                                                {/* Time Attack session indicator */}
                                                 {taSessionsByDate[dateKey] && (() => {
                                                     const ta = taSessionsByDate[dateKey];
                                                     const gradeColor: Record<string, string> = { S: '#D4AF37', A: '#ef4444', B: '#3b82f6', C: '#10B981', D: '#78716C' };
-                                                    const inStreak = taStreakInfo.streakSet.has(dateKey);
-                                                    const isToday = dateKey === (clientToday || '');
                                                     return (
                                                         <div style={{
                                                             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px',
                                                             marginTop: '1px', padding: '1px 0',
                                                             background: `${gradeColor[ta.bestGrade] || '#78716C'}12`,
                                                             borderRadius: '2px',
-                                                            ...(inStreak && taStreakInfo.streakCount >= 7 ? {
-                                                                border: '1px solid #D4AF3780',
-                                                                animation: 'ta-streak-glow 2s ease-in-out infinite',
-                                                            } : inStreak && taStreakInfo.streakCount >= 3 ? {
-                                                                animation: 'ta-streak-glow 2s ease-in-out infinite',
-                                                            } : {}),
                                                         }}>
                                                             <span style={{ fontSize: '7px', color: gradeColor[ta.bestGrade] || '#78716C', lineHeight: 1 }}>TA</span>
                                                             <span style={{
-                                                                fontSize: '8px', fontWeight: '900', lineHeight: 1,
+                                                                fontSize: '8px', fontWeight: '900',
                                                                 color: gradeColor[ta.bestGrade] || '#78716C',
-                                                                ...(isToday ? { animation: 'ta-clear-bounce 0.5s ease-out' } : {}),
-                                                            }}>{isToday ? 'CLEAR' : ta.bestGrade}</span>
-                                                            {ta.count > 1 && (<span style={{ fontSize: '6px', color: '#A8A29E', lineHeight: 1 }}>x{ta.count}</span>)}
+                                                                lineHeight: 1,
+                                                            }}>{ta.bestGrade}</span>
+                                                            {ta.count > 1 && (
+                                                                <span style={{ fontSize: '6px', color: '#A8A29E', lineHeight: 1 }}>x{ta.count}</span>
+                                                            )}
                                                         </div>
                                                     );
                                                 })()}
-                                                {/* Practice drill badge */}
-                                                {practiceDoneDates.has(dateKey) && (
-                                                    <div style={{
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px',
-                                                        marginTop: '1px', padding: '1px 0',
-                                                        background: '#3B82F612',
-                                                        borderRadius: '2px',
-                                                        border: '1px solid #3B82F630',
-                                                    }}>
-                                                        <span style={{ fontSize: '7px', color: '#3B82F6', lineHeight: 1, fontWeight: 700 }}>DRILL</span>
-                                                    </div>
-                                                )}
                                                 {/* Chakra bars (same structure as PC) */}
                                                 {hasPhrases && (
                                                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1px', marginTop: '2px', position: 'relative' }}>
@@ -8644,7 +10564,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                                 </span>
                                                             )}
                                                         </div>
-                                                        {([3, 2, 1, 0] as ChakraLevel[]).map(lv => {
+                                                        {([6, 5, 4, 3, 2, 1] as ChakraLevel[]).map(lv => {
                                                             const pct = total > 0 ? (mCum[lv] / total) * 100 : 0;
                                                             const isFlashLv = isPulsing && calendarPulse!.level === lv;
                                                             const isActiveBar = isActiveReview && activeReviewLevel === lv && !isPulsing;
@@ -8708,7 +10628,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         {!isMobile && (
                             <div style={{
                                 display: 'grid',
-                                gridTemplateColumns: 'repeat(7, 1fr)',
+                                gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
                                 borderBottom: '1px solid #eee',
                                 flexShrink: 0
                             }}>
@@ -8733,7 +10653,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         {!isMobile && (
                             <div style={{
                                 display: 'grid',
-                                gridTemplateColumns: 'repeat(7, 1fr)',
+                                gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
                                 gridTemplateRows: `repeat(${rows}, 1fr)`,
                                 gap: '0px',
                                 padding: '0px',
@@ -8753,7 +10673,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                                     // Count phrases at each chakra level for this day
                                     const total = allDayPhrases.length;
-                                    const chakraCounts: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
+                                    const chakraCounts: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
                                     for (const p of allDayPhrases) {
                                         const m = Number(phraseMastery[p.id] || 0);
                                         const hasRec = (voiceRecordings[p.id] || []).length > 0;
@@ -8767,14 +10687,14 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
 
                                     // Cumulative: each level = "phrases that reached at least this level"
                                     // EGG(0) = untouched, always 0%. Bars start from HATCH(1).
-                                    const cumulative: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0 };
+                                    const cumulative: Record<ChakraLevel, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
                                     let runningSum = 0;
-                                    for (let lv = 3; lv >= 1; lv--) {
+                                    for (let lv = 6; lv >= 1; lv--) {
                                         runningSum += chakraCounts[lv as ChakraLevel];
                                         cumulative[lv as ChakraLevel] = runningSum;
                                     }
                                     // SEED stays 0 — never fills the bar
-                                    const barSegments = ([0, 1, 2, 3] as ChakraLevel[]).map(lv => ({
+                                    const barSegments = ([0, 1, 2, 3, 4, 5, 6] as ChakraLevel[]).map(lv => ({
                                         reached: cumulative[lv],
                                         pct: total > 0 ? (cumulative[lv] / total) * 100 : 0,
                                         exactCount: chakraCounts[lv],
@@ -8933,50 +10853,35 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                     </span>
                                                 )}
                                             </div>
+
+                                            {/* Time Attack session indicator */}
                                             {taSessionsByDate[dateKey] && (() => {
                                                 const ta = taSessionsByDate[dateKey];
                                                 const gradeColor: Record<string, string> = { S: '#D4AF37', A: '#ef4444', B: '#3b82f6', C: '#10B981', D: '#78716C' };
-                                                const inStreak = taStreakInfo.streakSet.has(dateKey);
-                                                const isToday = dateKey === (clientToday || '');
                                                 return (
                                                     <div style={{
                                                         display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px',
                                                         margin: '2px 0', padding: '2px 4px',
                                                         background: `${gradeColor[ta.bestGrade] || '#78716C'}12`,
                                                         borderRadius: '3px',
-                                                        border: inStreak && taStreakInfo.streakCount >= 7
-                                                            ? '1.5px solid #D4AF3780'
-                                                            : `1px solid ${gradeColor[ta.bestGrade] || '#78716C'}25`,
-                                                        ...(inStreak && taStreakInfo.streakCount >= 3 ? {
-                                                            animation: 'ta-streak-glow 2s ease-in-out infinite',
-                                                        } : {}),
+                                                        border: `1px solid ${gradeColor[ta.bestGrade] || '#78716C'}25`,
                                                     }}>
                                                         <span style={{ fontSize: '9px', fontWeight: '600', color: '#A8A29E', lineHeight: 1 }}>TA</span>
                                                         <span style={{
-                                                            fontSize: '12px', fontWeight: '900', lineHeight: 1,
+                                                            fontSize: '12px', fontWeight: '900',
                                                             color: gradeColor[ta.bestGrade] || '#78716C',
+                                                            lineHeight: 1,
                                                             textShadow: ta.bestGrade === 'S' ? '0 0 4px rgba(212,175,55,0.3)' : 'none',
-                                                            ...(isToday ? { animation: 'ta-clear-bounce 0.5s ease-out' } : {}),
-                                                        }}>{isToday ? 'CLEAR' : ta.bestGrade}</span>
-                                                        {ta.count > 1 && (<span style={{ fontSize: '8px', fontWeight: '700', color: '#A8A29E', lineHeight: 1 }}>x{ta.count}</span>)}
+                                                        }}>{ta.bestGrade}</span>
+                                                        {ta.count > 1 && (
+                                                            <span style={{ fontSize: '8px', fontWeight: '700', color: '#A8A29E', lineHeight: 1 }}>x{ta.count}</span>
+                                                        )}
                                                         <span style={{ fontSize: '8px', color: '#A8A29E', lineHeight: 1 }}>{ta.totalCards}cards</span>
                                                     </div>
                                                 );
                                             })()}
 
-                                            {/* Practice drill badge (PC) */}
-                                            {practiceDoneDates.has(dateKey) && (
-                                                <div style={{
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px',
-                                                    margin: '2px 0', padding: '2px 4px',
-                                                    background: '#3B82F612',
-                                                    borderRadius: '3px',
-                                                    border: '1px solid #3B82F630',
-                                                }}>
-                                                    <span style={{ fontSize: '9px', fontWeight: '600', color: '#3B82F6', lineHeight: 1 }}>DRILL</span>
-                                                </div>
-                                            )}
-                                            {/* 4-row evolution bars (得 top → 種 bottom) - cumulative */}
+                                            {/* 7-row evolution bars (MASTER top → EGG bottom) - cumulative */}
                                             {hasAnyPhrases && (
                                                 <div style={{
                                                     flex: 1,
@@ -9018,7 +10923,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                             </span>
                                                         )}
                                                     </div>
-                                                    {([3, 2, 1, 0] as ChakraLevel[]).map(lv => {
+                                                    {([6, 5, 4, 3, 2, 1] as ChakraLevel[]).map(lv => {
                                                         const seg = barSegments[lv];
                                                         const isFlashingLevel = isPulsing && calendarPulse.level === lv;
                                                         const isActiveBar = isActiveReview && activeReviewLevel === lv && !isPulsing;
@@ -9145,8 +11050,126 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         )}
                         </>)}
 
+                        {/* Tab Content: GOD GRID + Slot Machine — side by side on PC */}
+                        {/* Always mounted to preserve prevKeyRef — hidden via display */}
+                        <div style={{
+                                flex: 1,
+                                display: calendarTab === 'puzzle' ? 'flex' : 'none',
+                                flexDirection: isMobile ? 'column' : 'row',
+                                backgroundColor: '#FAFAF9',
+                                overflow: 'hidden',
+                                // Raise above fever overlay (z-50) so content stays readable
+                                position: 'relative',
+                                zIndex: feverMode.active ? 51 : undefined,
+                            }}>
+                                {/* Left: GOD GRID */}
+                                <div style={{
+                                    flex: '0 0 auto',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'flex-start',
+                                    padding: isMobile ? '4px 2px' : '8px',
+                                    overflowY: 'auto',
+                                }}>
+                                    <PuzzleBoard
+                                        dropCard={puzzleDropCard as any}
+                                        chainMode={chainState.mode}
+                                        isMobile={isMobile}
+                                        cardPoints={cardPoints}
+                                        mastery={phraseMastery}
+                                        hideSidePanel={!isMobile}
+                                        onChainResult={(result) => {
+                                            if (result.gpEarned > 0) {
+                                                setPlayerSparks(prev => prev + result.gpEarned);
+                                            }
+                                        }}
+                                        onGridMilestone={(data) => setMilestoneData(data)}
+                                        onGridUpdate={setGridInfo}
+                                        onCardClick={(phraseId) => {
+                                            const phrase = phrases.find(p => p.id === phraseId);
+                                            if (phrase) {
+                                                const dateKey = phrase.date.split('T')[0];
+                                                setSelectedDate(dateKey);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                                {/* Center: Card Slot Machine */}
+                                <div style={{
+                                    flex: isMobile ? undefined : 1,
+                                    minWidth: isMobile ? undefined : '420px',
+                                    borderLeft: isMobile ? 'none' : '1px solid #292524',
+                                    borderTop: isMobile ? '1px solid #292524' : 'none',
+                                    backgroundColor: '#0A0A0A',
+                                    display: 'flex',
+                                    alignItems: 'flex-start',
+                                    justifyContent: 'center',
+                                    padding: isMobile ? '8px 0' : '16px 0',
+                                    overflowY: 'auto',
+                                }}>
+                                    <ReviewSlotPanel
+                                        dropCard={puzzleDropCard}
+                                        cardPool={slotCardPool}
+                                        specialMode={specialSlotMode}
+                                        onSpecialSpinDone={handleSpecialSpinDone}
+                                        onSpinComplete={handleSlotSpinComplete}
+                                        onBigWin={handleSlotResult}
+                                        gridInfo={gridInfo}
+                                        gridCompleteGrade={milestoneData?.grade || null}
+                                        onBonusSlotPress={() => handleSpecialSlotTrigger(milestoneData?.grade || 'B')}
+                                        onReset={() => setChainState({ count: 0, mode: 'normal', key: Date.now() })}
+                                        sessionGP={playerSparks}
+                                        isMobile={isMobile}
+                                    />
+                                </div>
+                            </div>
                     </div>
 
+                    {/* Mini Runner - Mobile only, review mode only */}
+                    {isMobile && viewMode === 'review' && (
+                        <div style={{ position: 'relative' }}>
+                            {showRunner && (
+                                <MiniRunner
+                                    todayXP={todayXP}
+                                    goalXP={goalXP}
+                                    onGoalChange={handleGoalChange}
+                                    lastReviewedWord={lastReviewedWord}
+                                    dropCard={puzzleDropCard as any}
+                                    gridInfo={gridInfo}
+                                    sessionGP={playerSparks}
+                                    slotMode="minimal"
+                                        />
+                            )}
+                            <button
+                                onClick={() => {
+                                    setShowRunner(prev => {
+                                        const next = !prev;
+                                        localStorage.setItem('training-show-runner', String(next));
+                                        return next;
+                                    });
+                                }}
+                                style={{
+                                    position: showRunner ? 'absolute' : 'relative',
+                                    right: showRunner ? '6px' : undefined,
+                                    bottom: showRunner ? '4px' : undefined,
+                                    marginLeft: showRunner ? undefined : 'auto',
+                                    display: 'block',
+                                    background: 'rgba(255,255,255,0.7)',
+                                    border: '1px solid #E7E5E4',
+                                    borderRadius: '4px',
+                                    padding: '2px 6px',
+                                    fontSize: '9px',
+                                    fontWeight: '600',
+                                    color: '#A8A29E',
+                                    cursor: 'pointer',
+                                    zIndex: 40,
+                                    backdropFilter: 'blur(4px)',
+                                }}
+                            >
+                                {showRunner ? 'HIDE' : 'SHOW RUNNER'}
+                            </button>
+                        </div>
+                    )}
 
                     {/* Right Panel - Stats OR Selected Date Phrases (hidden in review mode) */}
                     <div style={{
@@ -9159,6 +11182,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                         borderLeft: isMobile ? 'none' : '1px solid #e5e5e5',
                         borderBottom: isMobile ? '1px solid #e5e5e5' : 'none',
                         padding: '16px',
+                        display: 'flex',
                         flexDirection: 'column',
                         gap: '12px',
                         overflowY: isMobile ? 'visible' : 'auto',
@@ -9353,7 +11377,11 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                 }}>
                                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                                                         <button
-                                                            onClick={() => playPhrase(phrase)}
+                                                            onClick={() => {
+                                                                const lvl = phrase._viewLevel ?? 0;
+                                                                const text = phrase.gorokuLevels?.[lvl] || phrase.english;
+                                                                playPhrase(phrase, text);
+                                                            }}
                                                             style={{
                                                                 width: '24px', height: '24px',
                                                                 borderRadius: '50%',
@@ -9415,11 +11443,47 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                     padding: '10px 12px',
                                                 }}>
                                                     <div style={{ fontSize: '14px', fontWeight: '600', color: '#1a1a1a', marginBottom: '4px' }}>
-                                                        {phrase.english}
+                                                        {phrase.gorokuLevels
+                                                            ? (phrase.gorokuLevels[phrase._viewLevel ?? 0] || phrase.english)
+                                                            : phrase.english}
                                                     </div>
                                                     <div style={{ fontSize: '12px', color: '#666' }}>
                                                         {phrase.japanese}
                                                     </div>
+                                                    {/* Life/Goroku: 4-level switcher + WHY context */}
+                                                    {phrase.gorokuLevels && (() => {
+                                                        const levelLabels = ['SHORT', 'ATTITUDE', 'FULL', 'MONO'];
+                                                        const levelColors = ['#78716C', '#D4AF37', '#2563EB', '#7C3AED'];
+                                                        const active = phrase._viewLevel ?? 0;
+                                                        return (
+                                                            <div style={{ marginTop: '6px', marginBottom: '4px' }}>
+                                                                <div style={{ display: 'flex', gap: '3px', marginBottom: phrase.gorokuContext ? '6px' : '0' }}>
+                                                                    {levelLabels.map((label, i) => (
+                                                                        <button key={i} onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            const text = phrase.gorokuLevels?.[i] || phrase.english;
+                                                                            setPhrases(prev => prev.map(p => p.id === phrase.id ? { ...p, _viewLevel: i } : p));
+                                                                            playPhrase(phrase, text);
+                                                                        }} style={{
+                                                                            padding: '2px 6px', borderRadius: '3px', fontSize: '8px', fontWeight: '700',
+                                                                            border: i === active ? `1.5px solid ${levelColors[i]}` : '1px solid #E7E5E4',
+                                                                            backgroundColor: i === active ? levelColors[i] : '#fff',
+                                                                            color: i === active ? '#fff' : '#A8A29E',
+                                                                            cursor: 'pointer', transition: 'all 0.15s',
+                                                                        }}>{label}</button>
+                                                                    ))}
+                                                                </div>
+                                                                {phrase.gorokuContext && (
+                                                                    <div style={{
+                                                                        background: '#FFFBEB', borderRadius: '6px', padding: '6px 8px',
+                                                                        borderLeft: '2px solid #D4AF37', fontSize: '10px', color: '#44403C', lineHeight: 1.6,
+                                                                    }}>
+                                                                        {phrase.gorokuContext}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })()}
                                                     {(() => {
                                                         const flavor = getFlavorText(phrase.id);
                                                         const flavorSaved = savedFlavorTexts.has(flavor.en);
@@ -9515,6 +11579,20 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                         >
                                                             {masteryInfo.label}
                                                         </button>
+                                                        <button
+                                                            onClick={() => toggleRetire(phrase.id)}
+                                                            style={{
+                                                                padding: '3px 8px', borderRadius: '4px',
+                                                                border: retiredPhrases.has(phrase.id) ? '1px solid #D4AF37' : '1px solid #D6D3D1',
+                                                                backgroundColor: retiredPhrases.has(phrase.id) ? '#FFFBEB' : '#FAFAF9',
+                                                                color: retiredPhrases.has(phrase.id) ? '#B8941E' : '#A8A29E',
+                                                                fontSize: '9px', fontWeight: '700',
+                                                                cursor: 'pointer',
+                                                                marginLeft: 'auto',
+                                                            }}
+                                                        >
+                                                            {retiredPhrases.has(phrase.id) ? '復帰' : '除外'}
+                                                        </button>
                                                         {masteryInfo.level === 5 && (
                                                             <button
                                                                 onClick={() => declareStart(phrase.id)}
@@ -9553,10 +11631,12 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                                     playLevelSound(levelAfter);
                                                                     setPointEffect({ points: nc.lv, color: nc.color, gradFrom: nc.gradFrom, gradTo: nc.gradTo, levelName: nc.name, key: k });
                                                                     setCalendarPulse({ dateKey: phrase.date.split('T')[0], points: nc.lv, gradFrom: nc.gradFrom, color: nc.color, level: levelAfter, key: k });
-                                                                    // Register card to GOD GRID
-                                                                    const pts = cardPoints[pid] || 0;
-                                                                    const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
-                                                                    setPuzzleDropCard({ phraseId: pid, english: phrase.english, japanese: phrase.japanese, element: phrase.category, rank, points: pts, bstTotal: calcBstTotal(pid), key: k });
+                                                                    // Register card to GOD GRID (skip on calendar tab)
+                                                                    if (calendarTab === 'puzzle') {
+                                                                        const pts = cardPoints[pid] || 0;
+                                                                        const rank = pts >= 250 ? 'LEGENDARY' : pts >= 100 ? 'HOLOGRAPHIC' : pts >= 50 ? 'GOLD' : pts >= 20 ? 'SILVER' : pts >= 5 ? 'BRONZE' : 'NORMAL';
+                                                                        setPuzzleDropCard({ phraseId: pid, english: phrase.english, japanese: phrase.japanese, element: phrase.category, rank, points: pts, bstTotal: calcBstTotal(pid), key: k });
+                                                                    }
                                                                 }
                                                             }}
                                                             onRecordingDelete={(id) => {
@@ -9577,11 +11657,22 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                     }}>
                                                         <div style={{ display: 'flex', gap: '4px' }}>
                                                             <button
+                                                                onClick={() => openPlayPhrase(phrase)}
+                                                                style={{
+                                                                    background: 'linear-gradient(135deg, #D4AF37, #F5D76E)', border: 'none',
+                                                                    color: '#1a1a1a', fontSize: '9px', fontWeight: '700',
+                                                                    cursor: 'pointer', padding: '3px 6px',
+                                                                    borderRadius: '3px',
+                                                                }}
+                                                            >
+                                                                PP
+                                                            </button>
+                                                            <button
                                                                 onClick={() => playYouGlish(phrase)}
                                                                 style={{
                                                                     background: '#f0f0f0', border: 'none',
-                                                                    color: '#666', fontSize: '9px',
-                                                                    cursor: 'pointer', padding: '3px 6px',
+                                                                    color: '#999', fontSize: '8px',
+                                                                    cursor: 'pointer', padding: '3px 5px',
                                                                     borderRadius: '3px',
                                                                 }}
                                                             >
@@ -9598,6 +11689,77 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                             >
                                                                 +Vocab
                                                             </button>
+                                                            {/* Audio clip buttons */}
+                                                            {clipIds.has(phrase.id) ? (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => playClip(phrase.id)}
+                                                                        style={{
+                                                                            background: playingClipId === phrase.id ? '#F5F3FF' : '#fff',
+                                                                            border: playingClipId === phrase.id ? '1px solid #7C3AED' : '1px solid #E7E5E4',
+                                                                            color: playingClipId === phrase.id ? '#7C3AED' : '#78716C',
+                                                                            fontSize: '9px', fontWeight: '700',
+                                                                            cursor: 'pointer', padding: '3px 6px',
+                                                                            borderRadius: '3px',
+                                                                        }}
+                                                                    >
+                                                                        {playingClipId === phrase.id ? '\u25A0' : '\u25B6'} CLIP
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => removeClip(phrase.id)}
+                                                                        style={{
+                                                                            background: 'none', border: 'none',
+                                                                            color: '#D6D3D1', fontSize: '9px',
+                                                                            cursor: 'pointer', padding: '2px 4px',
+                                                                        }}
+                                                                        onMouseEnter={(e) => { e.currentTarget.style.color = '#EF4444'; }}
+                                                                        onMouseLeave={(e) => { e.currentTarget.style.color = '#D6D3D1'; }}
+                                                                    >
+                                                                        x
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                <button
+                                                                    disabled={uploadingClipId === phrase.id}
+                                                                    onClick={() => {
+                                                                        setPendingClipPhrase(phrase);
+                                                                        clipFileRef.current?.click();
+                                                                    }}
+                                                                    style={{
+                                                                        background: '#fff', border: '1px dashed #D6D3D1',
+                                                                        color: '#A8A29E', fontSize: '9px', fontWeight: '600',
+                                                                        cursor: uploadingClipId === phrase.id ? 'wait' : 'pointer', padding: '3px 6px',
+                                                                        borderRadius: '3px',
+                                                                    }}
+                                                                >
+                                                                    {uploadingClipId === phrase.id ? '...' : '+CLIP'}
+                                                                </button>
+                                                            )}
+                                                            {/* Life → Phrases registration (list view) */}
+                                                            {dataMode === 'life' && (() => {
+                                                                const lvl = phrase._viewLevel ?? 0;
+                                                                const activeText = phrase.gorokuLevels?.[lvl] || phrase.english;
+                                                                const regKey = activeText.toLowerCase();
+                                                                const isReg = lifeRegistered.has(regKey);
+                                                                const isReging = lifeRegisteringId === phrase.id;
+                                                                return (
+                                                                    <button
+                                                                        onClick={() => registerLifeToTraining(phrase, activeText)}
+                                                                        disabled={isReg || isReging}
+                                                                        style={{
+                                                                            background: isReg ? '#ECFDF5' : '#FFFBEB',
+                                                                            border: isReg ? '1px solid #10B981' : '1px solid #D4AF37',
+                                                                            color: isReg ? '#10B981' : '#92400E',
+                                                                            fontSize: '9px', fontWeight: '700',
+                                                                            cursor: isReg ? 'default' : 'pointer',
+                                                                            padding: '3px 8px', borderRadius: '3px',
+                                                                            opacity: isReging ? 0.5 : 1,
+                                                                        }}
+                                                                    >
+                                                                        {isReging ? '...' : isReg ? '\u767B\u9332\u6E08' : '\u767B\u9332'}
+                                                                    </button>
+                                                                );
+                                                            })()}
                                                         </div>
                                                         <div style={{ display: 'flex', gap: '3px' }}>
                                                             <button
@@ -9620,6 +11782,18 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                                             >
                                                                 削除
                                                             </button>
+                                                            <button
+                                                                onClick={() => toggleRetire(phrase.id)}
+                                                                style={{
+                                                                    background: retiredPhrases.has(phrase.id) ? '#FFFBEB' : '#F5F5F4',
+                                                                    border: retiredPhrases.has(phrase.id) ? '1px solid #D4AF37' : '1px solid #E7E5E4',
+                                                                    color: retiredPhrases.has(phrase.id) ? '#B8941E' : '#A8A29E',
+                                                                    fontSize: '9px', fontWeight: '600',
+                                                                    cursor: 'pointer', padding: '3px 8px', borderRadius: '3px',
+                                                                }}
+                                                            >
+                                                                {retiredPhrases.has(phrase.id) ? '復帰' : '除外'}
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -9630,135 +11804,7 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                             </>
                         ) : (
                             /* No date selected: summary + review */
-                            isMobile ? (
-                                <>{renderReviewContent()}</>
-                            ) : (
-                                <>
-                                    {/* Review Cards (top) */}
-                                    {renderReviewContent()}
-                                    {/* Analytics Dashboard (bottom) */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-
-                                        {/* Daily Activity Sparkline */}
-                                        <div style={{
-                                            backgroundColor: '#fff',
-                                            borderRadius: '12px',
-                                            padding: '12px',
-                                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                                        }}>
-                                            <div style={{ fontSize: '10px', fontWeight: '700', color: '#666', letterSpacing: '0.5px', marginBottom: '8px' }}>
-                                                {year}年{monthNames[month]} ACTIVITY
-                                            </div>
-                                            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1px', height: '40px' }}>
-                                                {chakraAnalytics.dailyData.map((d) => {
-                                                    const maxTouches = Math.max(...chakraAnalytics.dailyData.map(x => x.touches), 1);
-                                                    const h = d.touches > 0 ? Math.max((d.touches / maxTouches) * 36, 3) : 2;
-                                                    return (
-                                                        <div
-                                                            key={d.day}
-                                                            title={`${d.day}日: ${d.touches} touches`}
-                                                            style={{
-                                                                flex: 1,
-                                                                height: `${h}px`,
-                                                                borderRadius: '2px',
-                                                                backgroundColor: d.touches > 0 ? '#D4AF37' : '#EBEBEB',
-                                                                transition: 'height 0.3s ease-out',
-                                                            }}
-                                                        />
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-
-                                        {/* Month Stats Row */}
-                                        <div style={{
-                                            display: 'flex',
-                                            justifyContent: 'space-around',
-                                            backgroundColor: '#fff',
-                                            borderRadius: '12px',
-                                            padding: '10px 8px',
-                                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                                        }}>
-                                            <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '16px', fontWeight: '700', color: '#D4AF37' }}>{chakraAnalytics.monthPoints}</div>
-                                                <div style={{ fontSize: '8px', color: '#999', fontWeight: '600' }}>MONTH PTS</div>
-                                            </div>
-                                            <div style={{ width: '1px', backgroundColor: '#eee' }} />
-                                            <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '16px', fontWeight: '700', color: chakraAnalytics.streak > 0 ? '#10B981' : '#ccc' }}>{chakraAnalytics.streak}</div>
-                                                <div style={{ fontSize: '8px', color: '#999', fontWeight: '600' }}>STREAK</div>
-                                            </div>
-                                            <div style={{ width: '1px', backgroundColor: '#eee' }} />
-                                            <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '16px', fontWeight: '700', color: '#333' }}>{chakraAnalytics.activeDays}<span style={{ fontSize: '10px', color: '#999' }}>/{chakraAnalytics.daysInMonth}</span></div>
-                                                <div style={{ fontSize: '8px', color: '#999', fontWeight: '600' }}>ACTIVE DAYS</div>
-                                            </div>
-                                            <div style={{ width: '1px', backgroundColor: '#eee' }} />
-                                            <div style={{ textAlign: 'center' }}>
-                                                <div style={{ fontSize: '16px', fontWeight: '700', color: '#333' }}>Lv.{(chakraAnalytics.avgLevel + 1).toFixed(1)}</div>
-                                                <div style={{ fontSize: '8px', color: '#999', fontWeight: '600' }}>AVG LEVEL</div>
-                                            </div>
-                                        </div>
-
-                                        {/* Level Distribution (existing cumulative bars) */}
-                                        <div style={{
-                                            backgroundColor: '#fff',
-                                            borderRadius: '12px',
-                                            padding: '12px',
-                                            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-                                        }}>
-                                            <div style={{ fontSize: '10px', fontWeight: '700', color: '#666', letterSpacing: '0.5px', marginBottom: '8px' }}>LEVEL DISTRIBUTION</div>
-                                            {thisMonthReviewPhrases.total.length > 0 && (() => {
-                                                const t = thisMonthReviewPhrases.total.length;
-                                                const exactCounts = [0, 1, 2, 3].map(lv =>
-                                                    (thisMonthReviewPhrases[`level${lv}` as keyof typeof thisMonthReviewPhrases] as Phrase[]).length
-                                                );
-                                                const monthCumulative: number[] = [0, 0, 0, 0];
-                                                let sum = 0;
-                                                for (let lv = 3; lv >= 0; lv--) {
-                                                    sum += exactCounts[lv];
-                                                    monthCumulative[lv] = sum;
-                                                }
-                                                return (
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                                        {([3, 2, 1, 0] as ChakraLevel[]).map(lv => {
-                                                            const cfg = CHAKRA_CONFIG[lv];
-                                                            const reached = monthCumulative[lv];
-                                                            const pct = (reached / t) * 100;
-                                                            return (
-                                                                <div key={lv} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                                                    <span style={{ fontSize: '9px', fontWeight: '700', color: cfg.color, width: '42px', textAlign: 'right' }}>
-                                                                        {cfg.name}
-                                                                    </span>
-                                                                    <div style={{
-                                                                        flex: 1,
-                                                                        height: '8px',
-                                                                        borderRadius: '4px',
-                                                                        backgroundColor: '#f0f0f0',
-                                                                        overflow: 'hidden',
-                                                                    }}>
-                                                                        <div style={{
-                                                                            width: `${pct}%`,
-                                                                            height: '100%',
-                                                                            background: `linear-gradient(90deg, ${cfg.gradFrom}, ${cfg.gradTo})`,
-                                                                            borderRadius: '4px',
-                                                                            transition: 'width 0.3s ease-out',
-                                                                        }} />
-                                                                    </div>
-                                                                    <span style={{ fontSize: '9px', fontWeight: '600', color: cfg.color, width: '28px' }}>
-                                                                        {reached}/{t}
-                                                                    </span>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                );
-                                            })()}
-                                        </div>
-
-                                    </div>
-                                </>
-                            )
+                            <>{renderReviewContent()}</>
                         )}
                     </div>
                 </div>
@@ -10225,6 +12271,91 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                 </div>
             )}
 
+            {/* Hidden file input for audio clip */}
+            <input
+                ref={clipFileRef}
+                type="file"
+                accept="audio/*,video/*"
+                style={{ display: 'none' }}
+                onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file && pendingClipPhrase) {
+                        await attachClipFile(file, pendingClipPhrase);
+                        setPendingClipPhrase(null);
+                    }
+                    e.target.value = '';
+                }}
+            />
+
+            {/* PlayPhrase Word Picker */}
+            {ppWordPicker && (
+                <div style={{
+                    position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+                    zIndex: 1100, backgroundColor: '#fff', borderRadius: '16px',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.25)', padding: '16px 20px',
+                    maxWidth: '600px', width: '90vw',
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: '700', color: '#D4AF37', letterSpacing: '1px' }}>PlayPhrase.me</span>
+                        <button onClick={() => setPpWordPicker(null)} style={{ background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '16px' }}>X</button>
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
+                        {ppWordPicker.words.map((word, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => ppToggleWord(idx)}
+                                style={{
+                                    padding: '6px 12px', borderRadius: '8px', cursor: 'pointer',
+                                    fontSize: '14px', fontWeight: ppWordPicker.selected[idx] ? '700' : '400',
+                                    border: ppWordPicker.selected[idx] ? '2px solid #D4AF37' : '1px solid #e5e5e5',
+                                    backgroundColor: ppWordPicker.selected[idx] ? '#FFFBEB' : '#f9f9f9',
+                                    color: ppWordPicker.selected[idx] ? '#92400E' : '#666',
+                                    transition: 'all 0.1s',
+                                }}
+                            >
+                                {word}
+                            </button>
+                        ))}
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <div style={{ flex: 1, fontSize: '13px', color: '#999', minHeight: '20px' }}>
+                            {ppWordPicker.selected.some(s => s)
+                                ? ppWordPicker.words.filter((_, i) => ppWordPicker.selected[i]).join(' ')
+                                : 'Tap words to select'}
+                        </div>
+                        {ppWordPicker.selected.some(s => s) && (
+                            <button
+                                onClick={() => {
+                                    const text = ppWordPicker.words.filter((_, i) => ppWordPicker.selected[i]).join(' ');
+                                    const u = new SpeechSynthesisUtterance(text);
+                                    u.lang = 'en-US'; u.rate = 0.9;
+                                    window.speechSynthesis.cancel();
+                                    window.speechSynthesis.speak(u);
+                                }}
+                                style={{
+                                    padding: '8px 12px', borderRadius: '10px', border: '1px solid #ddd',
+                                    background: '#f9f9f9', color: '#666', fontSize: '13px', cursor: 'pointer',
+                                }}
+                            >
+                                Listen
+                            </button>
+                        )}
+                        <button
+                            onClick={ppSearch}
+                            disabled={!ppWordPicker.selected.some(s => s)}
+                            style={{
+                                padding: '10px 20px', borderRadius: '10px', border: 'none',
+                                background: ppWordPicker.selected.some(s => s) ? 'linear-gradient(135deg, #D4AF37, #F5D76E)' : '#e5e5e5',
+                                color: ppWordPicker.selected.some(s => s) ? '#1a1a1a' : '#999',
+                                fontSize: '13px', fontWeight: '700', cursor: ppWordPicker.selected.some(s => s) ? 'pointer' : 'not-allowed',
+                            }}
+                        >
+                            Search
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* YouGlish Player */}
             {youglishPhrase && (
                 <div style={{
@@ -10315,7 +12446,8 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     </div>
 
                     {!playerMinimized && (
-                        <div style={{ padding: '12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+                        <>
+                        <div style={{ padding: '12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, minHeight: 0 }}>
                             {/* Search Input */}
                             <div style={{ display: 'flex', gap: '8px' }}>
                                 <input
@@ -10351,9 +12483,78 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                 </button>
                             </div>
 
-                            {/* Original phrase reference */}
-                            <div style={{ fontSize: '11px', color: '#888', padding: '8px', backgroundColor: '#f9f9f9', borderRadius: '6px' }}>
-                                <strong>Original:</strong> {youglishPhrase.english}
+                            {/* Original phrase — click words to build search query */}
+                            <div style={{ padding: '8px', backgroundColor: '#f9f9f9', borderRadius: '6px' }}>
+                                <div style={{ fontSize: '10px', color: '#999', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '6px' }}>
+                                    単語をタップして検索
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                                    {youglishPhrase.english.replace(/[^\w\s'-]/g, ' ').trim().split(/\s+/).filter(w => w.length > 0).map((word, idx) => {
+                                        const normalized = youglishQuery.trim().toLowerCase().split(/\s+/);
+                                        const isSelected = normalized.includes(word.toLowerCase());
+                                        return (
+                                            <button
+                                                key={idx}
+                                                onClick={() => {
+                                                    const current = youglishQuery.trim().split(/\s+/).filter(Boolean);
+                                                    const lower = word.toLowerCase();
+                                                    const has = current.some(w => w.toLowerCase() === lower);
+                                                    const next = has
+                                                        ? current.filter(w => w.toLowerCase() !== lower)
+                                                        : [...current, word];
+                                                    setYouglishQuery(next.join(' '));
+                                                }}
+                                                style={{
+                                                    padding: '5px 10px',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    fontSize: '12px',
+                                                    fontWeight: isSelected ? 700 : 400,
+                                                    border: isSelected ? '2px solid #D4AF37' : '1px solid #e5e5e5',
+                                                    backgroundColor: isSelected ? '#FFFBEB' : '#fff',
+                                                    color: isSelected ? '#92400E' : '#666',
+                                                    transition: 'all 0.1s',
+                                                }}
+                                            >
+                                                {word}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                    <button
+                                        onClick={() => setYouglishQuery('')}
+                                        disabled={!youglishQuery.trim()}
+                                        style={{
+                                            padding: '6px 10px',
+                                            borderRadius: '6px',
+                                            border: '1px solid #e5e5e5',
+                                            background: '#fff',
+                                            color: youglishQuery.trim() ? '#666' : '#ccc',
+                                            fontSize: '11px',
+                                            cursor: youglishQuery.trim() ? 'pointer' : 'not-allowed',
+                                        }}
+                                    >
+                                        Clear
+                                    </button>
+                                    <button
+                                        onClick={() => openPlayPhrase(youglishPhrase)}
+                                        style={{
+                                            marginLeft: 'auto',
+                                            padding: '6px 12px',
+                                            borderRadius: '6px',
+                                            border: 'none',
+                                            background: 'linear-gradient(135deg, #D4AF37, #F5D76E)',
+                                            color: '#1a1a1a',
+                                            fontSize: '11px',
+                                            fontWeight: 700,
+                                            cursor: 'pointer',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        PlayPhrase
+                                    </button>
+                                </div>
                             </div>
 
                             {/* YouGlish Widget */}
@@ -10369,94 +12570,209 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                                     <span style={{ color: '#888', fontSize: '13px' }}>Enter a keyword to search</span>
                                 )}
                             </div>
+                        </div>
 
-                            {/* Caption History */}
-                            {captionHistory.length > 0 && (
+                        {/* Caption History — sticky bottom panel (always visible, no scrolling needed) */}
+                        {captionHistory.length > 0 && (() => {
+                                const selectableCount = captionHistory.filter(c => !c.saved).length;
+                                const selectedCount = captionHistory.filter(c => c.selected && !c.saved).length;
+                                const savedCount = captionHistory.filter(c => c.saved).length;
+                                return (
                                 <div style={{
-                                    padding: '10px',
-                                    backgroundColor: '#f0fdf4',
-                                    borderRadius: '8px',
-                                    border: '1px solid #bbf7d0'
+                                    padding: '12px',
+                                    backgroundColor: '#fff',
+                                    borderTop: '2px solid #D4AF37',
+                                    flexShrink: 0,
+                                    boxShadow: '0 -4px 16px rgba(0,0,0,0.06)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '10px'
                                 }}>
+                                    {/* Header row */}
                                     <div style={{
-                                        fontSize: '11px',
-                                        color: '#666',
-                                        marginBottom: '6px',
                                         display: 'flex',
                                         justifyContent: 'space-between',
-                                        alignItems: 'center'
+                                        alignItems: 'center',
+                                        gap: '8px'
                                     }}>
-                                        <span>Captions ({captionHistory.filter(c => c.selected).length}/{captionHistory.length}):</span>
-                                        <div style={{ display: 'flex', gap: '6px' }}>
-                                            <button onClick={() => setCaptionHistory(prev => prev.map(c => ({ ...c, selected: true })))} style={{ background: 'none', border: 'none', color: '#10B981', fontSize: '10px', cursor: 'pointer' }}>All</button>
-                                            <button onClick={() => setCaptionHistory(prev => prev.map(c => ({ ...c, selected: false })))} style={{ background: 'none', border: 'none', color: '#999', fontSize: '10px', cursor: 'pointer' }}>None</button>
-                                            <button onClick={() => setCaptionHistory([])} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '10px', cursor: 'pointer' }}>Clear</button>
+                                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', flexWrap: 'wrap' }}>
+                                            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', color: '#44403c', textTransform: 'uppercase' }}>
+                                                Captions
+                                            </span>
+                                            <span style={{ fontSize: '11px', color: '#78716c' }}>
+                                                {selectedCount} selected
+                                                {savedCount > 0 && <span style={{ color: '#10B981', marginLeft: '6px' }}>+ {savedCount} saved</span>}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '4px' }}>
+                                            <button
+                                                onClick={() => setCaptionHistory(prev => prev.map(c => c.saved ? c : { ...c, selected: true }))}
+                                                disabled={selectableCount === 0}
+                                                style={{
+                                                    background: 'none',
+                                                    border: '1px solid transparent',
+                                                    color: selectableCount === 0 ? '#d6d3d1' : '#10B981',
+                                                    fontSize: '10px',
+                                                    fontWeight: 600,
+                                                    padding: '3px 8px',
+                                                    borderRadius: '4px',
+                                                    cursor: selectableCount === 0 ? 'not-allowed' : 'pointer'
+                                                }}
+                                            >All</button>
+                                            <button
+                                                onClick={() => setCaptionHistory(prev => prev.map(c => c.saved ? c : { ...c, selected: false }))}
+                                                disabled={selectedCount === 0}
+                                                style={{
+                                                    background: 'none',
+                                                    border: '1px solid transparent',
+                                                    color: selectedCount === 0 ? '#d6d3d1' : '#78716c',
+                                                    fontSize: '10px',
+                                                    fontWeight: 600,
+                                                    padding: '3px 8px',
+                                                    borderRadius: '4px',
+                                                    cursor: selectedCount === 0 ? 'not-allowed' : 'pointer'
+                                                }}
+                                            >None</button>
+                                            <button
+                                                onClick={() => setCaptionHistory([])}
+                                                style={{
+                                                    background: 'none',
+                                                    border: '1px solid transparent',
+                                                    color: '#dc2626',
+                                                    fontSize: '10px',
+                                                    fontWeight: 600,
+                                                    padding: '3px 8px',
+                                                    borderRadius: '4px',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >Clear</button>
                                         </div>
                                     </div>
+
+                                    {/* Caption chips */}
                                     <div style={{
-                                        fontSize: '11px',
-                                        maxHeight: '100px',
+                                        maxHeight: '140px',
                                         overflowY: 'auto',
-                                        padding: '6px',
+                                        padding: '8px',
                                         backgroundColor: '#fff',
-                                        borderRadius: '6px',
-                                        border: '1px solid #e5e5e5',
+                                        borderRadius: '8px',
+                                        border: '1px solid #e7e5e4',
                                         display: 'flex',
-                                        flexWrap: 'wrap',
-                                        gap: '3px'
+                                        flexDirection: 'column',
+                                        gap: '4px'
                                     }}>
-                                        {captionHistory.map((caption, idx) => (
-                                            <span
-                                                key={idx}
-                                                onClick={() => setCaptionHistory(prev => prev.map((c, i) => i === idx ? { ...c, selected: !c.selected } : c))}
-                                                style={{
-                                                    padding: '3px 6px',
-                                                    borderRadius: '3px',
-                                                    backgroundColor: caption.selected ? '#dcfce7' : '#f5f5f5',
-                                                    color: caption.selected ? '#166534' : '#999',
-                                                    cursor: 'pointer',
-                                                    border: caption.selected ? '1px solid #86efac' : '1px solid #e5e5e5',
-                                                    textDecoration: caption.selected ? 'none' : 'line-through'
-                                                }}
-                                            >
-                                                {caption.text}
-                                            </span>
-                                        ))}
+                                        {captionHistory.map((caption, idx) => {
+                                            const isSaved = !!caption.saved;
+                                            const isSelected = caption.selected && !isSaved;
+                                            const bg = isSaved ? '#ecfdf5' : isSelected ? '#FFFBEB' : '#fafaf9';
+                                            const border = isSaved ? '1px solid #6ee7b7' : isSelected ? '1px solid #D4AF37' : '1px solid #e7e5e4';
+                                            const color = isSaved ? '#065f46' : isSelected ? '#92400E' : '#78716c';
+                                            return (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => {
+                                                        if (isSaved) return;
+                                                        setCaptionHistory(prev => prev.map((c, i) => i === idx ? { ...c, selected: !c.selected } : c));
+                                                    }}
+                                                    disabled={isSaved}
+                                                    style={{
+                                                        textAlign: 'left',
+                                                        padding: '8px 10px',
+                                                        borderRadius: '6px',
+                                                        backgroundColor: bg,
+                                                        color,
+                                                        cursor: isSaved ? 'default' : 'pointer',
+                                                        border,
+                                                        fontSize: '12px',
+                                                        lineHeight: 1.4,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '8px',
+                                                        transition: 'all 0.1s'
+                                                    }}
+                                                >
+                                                    <span style={{
+                                                        flexShrink: 0,
+                                                        width: '14px',
+                                                        height: '14px',
+                                                        borderRadius: '3px',
+                                                        border: isSaved ? 'none' : isSelected ? '2px solid #D4AF37' : '1.5px solid #d6d3d1',
+                                                        backgroundColor: isSaved ? '#10B981' : isSelected ? '#D4AF37' : '#fff',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        fontSize: '10px',
+                                                        color: '#fff',
+                                                        fontWeight: 900
+                                                    }}>
+                                                        {(isSaved || isSelected) ? '✓' : ''}
+                                                    </span>
+                                                    <span style={{ flex: 1 }}>{caption.text}</span>
+                                                    {isSaved && (
+                                                        <span style={{
+                                                            flexShrink: 0,
+                                                            fontSize: '9px',
+                                                            fontWeight: 700,
+                                                            letterSpacing: '0.05em',
+                                                            color: '#10B981',
+                                                            textTransform: 'uppercase'
+                                                        }}>Saved</span>
+                                                    )}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
-                                    <div style={{ display: 'flex', gap: '8px', marginTop: '8px', alignItems: 'center' }}>
+
+                                    {/* Save action row */}
+                                    <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
                                         <input
                                             type="date"
                                             value={youglishSaveDate}
                                             onChange={(e) => setYouglishSaveDate(e.target.value)}
                                             style={{
                                                 flex: '0 0 auto',
-                                                padding: '8px',
-                                                borderRadius: '6px',
-                                                border: '1px solid #e5e5e5',
-                                                fontSize: '12px'
+                                                padding: '10px',
+                                                borderRadius: '8px',
+                                                border: '1px solid #e7e5e4',
+                                                fontSize: '12px',
+                                                color: '#44403c',
+                                                backgroundColor: '#fff'
                                             }}
                                         />
                                         <button
                                             onClick={saveSelectedCaptions}
-                                            disabled={savingPhrase || captionHistory.filter(c => c.selected).length === 0}
+                                            disabled={savingPhrase || selectedCount === 0}
                                             style={{
                                                 flex: 1,
-                                                padding: '8px',
-                                                borderRadius: '6px',
+                                                padding: '10px',
+                                                borderRadius: '8px',
                                                 border: 'none',
-                                                backgroundColor: captionHistory.filter(c => c.selected).length === 0 ? '#e5e5e5' : '#D4AF37',
-                                                color: captionHistory.filter(c => c.selected).length === 0 ? '#999' : '#000',
-                                                fontSize: '12px',
-                                                fontWeight: '600',
-                                                cursor: savingPhrase || captionHistory.filter(c => c.selected).length === 0 ? 'not-allowed' : 'pointer'
+                                                background: saveSuccess
+                                                    ? '#10B981'
+                                                    : selectedCount === 0
+                                                        ? '#e7e5e4'
+                                                        : 'linear-gradient(135deg, #D4AF37, #F5D76E)',
+                                                color: saveSuccess ? '#fff' : selectedCount === 0 ? '#a8a29e' : '#1a1a1a',
+                                                fontSize: '13px',
+                                                fontWeight: 700,
+                                                letterSpacing: '0.02em',
+                                                cursor: savingPhrase || selectedCount === 0 ? 'not-allowed' : 'pointer',
+                                                transition: 'all 0.2s'
                                             }}
                                         >
-                                            {savingPhrase ? 'Saving...' : 'Add to phrases'}
+                                            {saveSuccess
+                                                ? 'Saved'
+                                                : savingPhrase
+                                                    ? 'Saving...'
+                                                    : selectedCount === 0
+                                                        ? 'Add to phrases'
+                                                        : `Add ${selectedCount} to phrases`}
                                         </button>
                                     </div>
                                 </div>
-                            )}
-                        </div>
+                                );
+                        })()}
+                        </>
                     )}
 
                     {/* Resize Handle */}
@@ -10756,575 +13072,6 @@ export default function PhrasesPage({ initialData, onHelpClick, skipDefaultData 
                     </div>
                 </div>
             )}
-
-            {/* ══════ TIME ATTACK SELECTION MODAL ══════ */}
-            {timeAttackPhase === 'selecting' && (
-                <div style={{
-                    position: 'fixed',
-                    inset: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'rgba(28,25,23,0.7)',
-                    zIndex: 300,
-                    backdropFilter: 'blur(6px)',
-                }}
-                    onClick={() => { setTimeAttackPhase('idle'); setViewMode('calendar'); }}
-                >
-                    <div
-                        style={{
-                            background: '#fff',
-                            borderRadius: '20px',
-                            padding: '40px',
-                            maxWidth: '480px',
-                            width: '90%',
-                            boxShadow: '0 25px 60px rgba(0,0,0,0.3)',
-                        }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <div style={{
-                            textAlign: 'center',
-                            marginBottom: IS_PUBLIC ? '24px' : '32px',
-                        }}>
-                            {IS_PUBLIC && timeAttackStats && timeAttackStats.streak_days > 0 && (
-                                <div style={{
-                                    display: 'inline-block',
-                                    background: 'linear-gradient(135deg, #D4AF37, #F6C85F)',
-                                    borderRadius: '20px',
-                                    padding: '4px 14px',
-                                    fontSize: '11px',
-                                    fontWeight: '800',
-                                    color: '#fff',
-                                    marginBottom: '12px',
-                                    letterSpacing: '0.5px',
-                                }}>
-                                    {timeAttackStats.streak_days} DAY STREAK
-                                </div>
-                            )}
-                            <div style={{
-                                fontSize: '12px',
-                                fontWeight: '700',
-                                letterSpacing: '3px',
-                                color: '#D4AF37',
-                                marginBottom: '8px',
-                            }}>
-                                {IS_PUBLIC ? 'DAILY REVIEW' : 'TIME ATTACK'}
-                            </div>
-                            <div style={{
-                                fontSize: IS_PUBLIC ? '20px' : '22px',
-                                fontWeight: '900',
-                                color: '#1C1917',
-                                letterSpacing: '-0.5px',
-                            }}>
-                                今日の復習、何分やる？
-                            </div>
-                            <div style={{
-                                fontSize: '12px',
-                                color: '#78716C',
-                                marginTop: '6px',
-                                lineHeight: 1.5,
-                            }}>
-                                1分でOK。タップで覚えた表現を思い出そう
-                            </div>
-                            {phrases.length === 0 && (
-                                <div style={{
-                                    marginTop: '8px',
-                                    padding: '10px 16px',
-                                    background: '#FEF2F2',
-                                    borderRadius: '8px',
-                                    fontSize: '12px',
-                                    fontWeight: '600',
-                                    color: '#DC2626',
-                                    textAlign: 'center',
-                                }}>
-                                    まだフレーズが登録されていません。会話ページからフレーズを追加してください。
-                                </div>
-                            )}
-                        </div>
-
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 1fr 1fr',
-                            gap: '12px',
-                            marginBottom: '24px',
-                        }}>
-                            {TIME_PRESETS.map(p => {
-                                const best = timeAttackBestRecords[p.seconds] || 0;
-                                const isRec = (p as any).recommended;
-                                return (
-                                    <button
-                                        key={p.seconds}
-                                        onClick={() => {
-                                            setTimeAttackPhase('idle');
-                                            setViewMode('review');
-                                            setReviewFilter('all');
-                                            setReviewIndex(0);
-                                            if (!shuffledToday) handleShuffle();
-                                            setTimeout(() => startTimeAttack(p.seconds), 200);
-                                        }}
-                                        style={{
-                                            background: isRec ? `linear-gradient(135deg, ${p.color}08, ${p.color}15)` : '#FAFAF9',
-                                            border: `2px solid ${isRec ? p.color + '40' : '#E7E5E4'}`,
-                                            borderRadius: '16px',
-                                            padding: '20px 16px 16px',
-                                            cursor: 'pointer',
-                                            transition: 'all 0.2s',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            gap: '4px',
-                                            position: 'relative',
-                                            overflow: 'hidden',
-                                        }}
-                                        onMouseEnter={e => {
-                                            e.currentTarget.style.borderColor = p.color;
-                                            e.currentTarget.style.background = `linear-gradient(135deg, ${p.color}10, ${p.color}20)`;
-                                            e.currentTarget.style.transform = 'scale(1.04)';
-                                            e.currentTarget.style.boxShadow = `0 8px 24px ${p.color}20`;
-                                        }}
-                                        onMouseLeave={e => {
-                                            e.currentTarget.style.borderColor = isRec ? p.color + '40' : '#E7E5E4';
-                                            e.currentTarget.style.background = isRec ? `linear-gradient(135deg, ${p.color}08, ${p.color}15)` : '#FAFAF9';
-                                            e.currentTarget.style.transform = 'scale(1)';
-                                            e.currentTarget.style.boxShadow = 'none';
-                                        }}
-                                    >
-                                        {isRec && (
-                                            <div style={{
-                                                position: 'absolute',
-                                                top: '6px',
-                                                right: '6px',
-                                                background: p.color,
-                                                borderRadius: '4px',
-                                                padding: '2px 6px',
-                                                fontSize: '8px',
-                                                fontWeight: '800',
-                                                color: '#fff',
-                                                letterSpacing: '0.5px',
-                                            }}>
-                                                RECOMMENDED
-                                            </div>
-                                        )}
-                                        <div style={{
-                                            fontSize: '9px',
-                                            fontWeight: '800',
-                                            color: p.color,
-                                            letterSpacing: '2px',
-                                            marginBottom: '2px',
-                                        }}>
-                                            {p.icon}
-                                        </div>
-                                        <div style={{
-                                            fontSize: '32px',
-                                            fontWeight: '900',
-                                            color: '#1C1917',
-                                            lineHeight: 1,
-                                        }}>
-                                            {p.labelJa}
-                                        </div>
-                                        <div style={{
-                                            fontSize: '11px',
-                                            fontWeight: '600',
-                                            color: '#78716C',
-                                            marginTop: '2px',
-                                        }}>
-                                            {p.subtitle}
-                                        </div>
-                                        {best > 0 && (
-                                            <div style={{
-                                                fontSize: '10px',
-                                                fontWeight: '800',
-                                                color: p.color,
-                                                marginTop: '6px',
-                                                padding: '2px 8px',
-                                                background: `${p.color}10`,
-                                                borderRadius: '4px',
-                                            }}>
-                                                BEST: {best} cards
-                                            </div>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        {timeAttackStats && timeAttackStats.total_sessions > 0 && (
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                gap: '20px',
-                                marginBottom: '16px',
-                                padding: '12px',
-                                background: '#FAFAF9',
-                                borderRadius: '10px',
-                                border: '1px solid #F5F5F4',
-                            }}>
-                                {[
-                                    { label: 'TOTAL', value: timeAttackStats.total_sessions, unit: '回' },
-                                    { label: 'CARDS', value: timeAttackStats.total_cards, unit: '' },
-                                    { label: 'S RANK', value: timeAttackStats.s_rank_count, unit: '' },
-                                    { label: 'STREAK', value: timeAttackStats.streak_days, unit: '日' },
-                                ].map((s, i) => (
-                                    <div key={i} style={{ textAlign: 'center' }}>
-                                        <div style={{ fontSize: '9px', fontWeight: '700', color: '#A8A29E', letterSpacing: '1px' }}>{s.label}</div>
-                                        <div style={{ fontSize: '18px', fontWeight: '900', color: '#1C1917' }}>
-                                            {s.value}<span style={{ fontSize: '10px', color: '#A8A29E', fontWeight: '600' }}>{s.unit}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                            <button
-                                onClick={() => {
-                                    setTimeAttackPhase('idle');
-                                    setViewMode('review');
-                                    if (!shuffledToday) handleShuffle();
-                                }}
-                                style={{
-                                    flex: 1,
-                                    background: 'none',
-                                    border: '1px solid #E7E5E4',
-                                    borderRadius: '10px',
-                                    padding: '12px',
-                                    cursor: 'pointer',
-                                    fontSize: '13px',
-                                    fontWeight: '600',
-                                    color: '#78716C',
-                                }}
-                            >
-                                タイマーなしで復習
-                            </button>
-                            {timeAttackHistory.length > 0 && (
-                                <button
-                                    onClick={() => setShowTimeAttackHistory(h => !h)}
-                                    style={{
-                                        background: showTimeAttackHistory ? '#1C1917' : 'none',
-                                        border: '1px solid #E7E5E4',
-                                        borderRadius: '10px',
-                                        padding: '12px 16px',
-                                        cursor: 'pointer',
-                                        fontSize: '13px',
-                                        fontWeight: '600',
-                                        color: showTimeAttackHistory ? '#fff' : '#78716C',
-                                    }}
-                                >
-                                    履歴
-                                </button>
-                            )}
-                        </div>
-
-                        {showTimeAttackHistory && timeAttackHistory.length > 0 && (
-                            <div style={{
-                                marginTop: '16px',
-                                maxHeight: '240px',
-                                overflowY: 'auto',
-                                borderRadius: '10px',
-                                border: '1px solid #F5F5F4',
-                            }}>
-                                {timeAttackHistory.map((s, i) => {
-                                    const presetLabel = TIME_PRESETS.find(p => p.seconds === s.duration_preset)?.labelJa || `${Math.floor(s.duration_preset / 60)}分`;
-                                    const gradeColor: Record<string, string> = { S: '#D4AF37', A: '#DC2626', B: '#2563EB', C: '#16A34A', D: '#78716C' };
-                                    return (
-                                        <div key={s.id || i} style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'space-between',
-                                            padding: '10px 14px',
-                                            borderBottom: i < timeAttackHistory.length - 1 ? '1px solid #F5F5F4' : 'none',
-                                            background: i % 2 === 0 ? '#fff' : '#FAFAF9',
-                                        }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                <div style={{
-                                                    fontSize: '18px',
-                                                    fontWeight: '900',
-                                                    color: gradeColor[s.grade] || '#78716C',
-                                                    width: '28px',
-                                                    textAlign: 'center',
-                                                }}>
-                                                    {s.grade}
-                                                </div>
-                                                <div>
-                                                    <div style={{ fontSize: '12px', fontWeight: '700', color: '#1C1917' }}>
-                                                        {s.cards_reviewed} cards / {presetLabel}
-                                                    </div>
-                                                    <div style={{ fontSize: '10px', color: '#A8A29E' }}>
-                                                        {s.date} -- {s.cards_per_minute} cards/min -- {s.xp_earned} XP
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {!s.completed && (
-                                                <div style={{ fontSize: '9px', color: '#A8A29E', fontWeight: '600' }}>途中終了</div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {/* ══════ TIME ATTACK RESULT OVERLAY ══════ */}
-            {timeAttackPhase === 'result' && timeAttackResult && (() => {
-                const r = timeAttackResult;
-                const gradeColors: Record<string, { bg: string; text: string; glow: string; particle: string }> = {
-                    S: { bg: 'linear-gradient(135deg, #D4AF37 0%, #F6C85F 50%, #D4AF37 100%)', text: '#fff', glow: 'rgba(212,175,55,0.5)', particle: '#F6C85F' },
-                    A: { bg: 'linear-gradient(135deg, #DC2626 0%, #EF4444 50%, #DC2626 100%)', text: '#fff', glow: 'rgba(220,38,38,0.4)', particle: '#FCA5A5' },
-                    B: { bg: 'linear-gradient(135deg, #2563EB 0%, #3B82F6 50%, #2563EB 100%)', text: '#fff', glow: 'rgba(37,99,235,0.4)', particle: '#93C5FD' },
-                    C: { bg: 'linear-gradient(135deg, #16A34A 0%, #22C55E 50%, #16A34A 100%)', text: '#fff', glow: 'rgba(22,163,74,0.3)', particle: '#86EFAC' },
-                    D: { bg: 'linear-gradient(135deg, #78716C 0%, #A8A29E 50%, #78716C 100%)', text: '#fff', glow: 'rgba(120,113,108,0.2)', particle: '#D6D3D1' },
-                };
-                const gc = gradeColors[r.grade] || gradeColors.D;
-                const presetLabel = TIME_PRESETS.find(p => p.seconds === r.preset)?.labelJa || `${Math.floor(r.preset / 60)}分`;
-                const actualMins = Math.floor(r.actual / 60);
-                const actualSecs = r.actual % 60;
-
-                const motivationalMessages: Record<string, string[]> = IS_PUBLIC ? {
-                    S: ['PERFECT', 'AMAZING', 'MASTER'],
-                    A: ['GREAT JOB', 'IMPRESSIVE', 'NICE'],
-                    B: ['GOOD WORK', 'SOLID', 'KEEP IT UP'],
-                    C: ['NICE TRY', 'GOOD START', 'GETTING BETTER'],
-                    D: ['YOU DID IT', 'FIRST STEP', 'COME BACK TOMORROW'],
-                } : {
-                    S: ['PERFECT', 'GODLIKE', 'INSANE'],
-                    A: ['EXCELLENT', 'IMPRESSIVE', 'WELL DONE'],
-                    B: ['GOOD JOB', 'SOLID', 'NICE WORK'],
-                    C: ['KEEP GOING', 'NOT BAD', 'GETTING THERE'],
-                    D: ['JUST START', 'BABY STEPS', 'NEXT TIME'],
-                };
-                const msgs = motivationalMessages[r.grade] || motivationalMessages.D;
-                const motivMsg = msgs[Math.floor(Math.random() * msgs.length)];
-                const showParticles = r.grade === 'S' || r.grade === 'A';
-
-                return (
-                    <div style={{
-                        position: 'fixed',
-                        inset: 0,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'rgba(28,25,23,0.9)',
-                        zIndex: 300,
-                        backdropFilter: 'blur(12px)',
-                        animation: 'result-fade-in 0.6s ease-out',
-                    }}>
-                        {showParticles && Array.from({ length: 20 }).map((_, i) => (
-                            <div key={i} style={{
-                                position: 'absolute',
-                                width: `${3 + (i % 3) * 2}px`,
-                                height: `${3 + (i % 3) * 2}px`,
-                                borderRadius: '50%',
-                                background: i % 3 === 0 ? gc.particle : i % 3 === 1 ? '#fff' : gc.particle + '80',
-                                left: `${5 + (i * 4.7) % 90}%`,
-                                top: `${5 + (i * 7.3) % 90}%`,
-                                animation: `ta-result-particle ${3 + (i % 4)}s ease-in-out infinite`,
-                                animationDelay: `${i * 0.15}s`,
-                                opacity: 0.6,
-                                pointerEvents: 'none',
-                            }} />
-                        ))}
-
-                        <div style={{
-                            background: '#fff',
-                            borderRadius: '24px',
-                            padding: '0',
-                            maxWidth: '420px',
-                            width: '90%',
-                            boxShadow: `0 30px 80px rgba(0,0,0,0.5), 0 0 80px ${gc.glow}`,
-                            overflow: 'hidden',
-                            animation: 'ta-result-card-enter 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                        }}>
-                            <div style={{
-                                background: gc.bg,
-                                backgroundSize: '200% 200%',
-                                animation: r.grade === 'S' ? 'ta-grade-shimmer 3s ease-in-out infinite' : undefined,
-                                padding: '36px 24px',
-                                textAlign: 'center',
-                                position: 'relative',
-                                overflow: 'hidden',
-                            }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: '200px',
-                                    height: '200px',
-                                    borderRadius: '50%',
-                                    background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
-                                    animation: 'ta-result-shine 2s ease-in-out infinite',
-                                }} />
-
-                                {r.isNewRecord && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '12px',
-                                        right: '16px',
-                                        background: 'rgba(255,255,255,0.3)',
-                                        borderRadius: '8px',
-                                        padding: '4px 12px',
-                                        fontSize: '10px',
-                                        fontWeight: '900',
-                                        color: '#fff',
-                                        letterSpacing: '2px',
-                                        animation: 'new-record-flash 1.5s ease-in-out infinite',
-                                        boxShadow: '0 0 20px rgba(255,255,255,0.3)',
-                                    }}>
-                                        NEW RECORD
-                                    </div>
-                                )}
-                                <div style={{
-                                    fontSize: '11px',
-                                    fontWeight: '700',
-                                    color: 'rgba(255,255,255,0.6)',
-                                    letterSpacing: '4px',
-                                    marginBottom: '8px',
-                                    position: 'relative',
-                                }}>
-                                    {r.completed ? 'TIME UP' : 'SESSION END'}
-                                </div>
-                                <div style={{
-                                    fontSize: '96px',
-                                    fontWeight: '900',
-                                    color: gc.text,
-                                    lineHeight: 1,
-                                    textShadow: `0 4px 30px ${gc.glow}, 0 0 60px ${gc.glow}`,
-                                    letterSpacing: '-4px',
-                                    position: 'relative',
-                                    animation: 'ta-grade-zoom 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                                }}>
-                                    {r.grade}
-                                </div>
-                                <div style={{
-                                    fontSize: '16px',
-                                    fontWeight: '800',
-                                    color: 'rgba(255,255,255,0.9)',
-                                    marginTop: '8px',
-                                    letterSpacing: '3px',
-                                    position: 'relative',
-                                    animation: 'ta-motiv-fade 1s ease-out 0.5s both',
-                                }}>
-                                    {motivMsg}
-                                </div>
-                                <div style={{
-                                    fontSize: '12px',
-                                    fontWeight: '600',
-                                    color: 'rgba(255,255,255,0.6)',
-                                    marginTop: '6px',
-                                    position: 'relative',
-                                }}>
-                                    {presetLabel} {r.completed ? 'Complete' : `(${actualMins}:${String(actualSecs).padStart(2, '0')})`}
-                                </div>
-                            </div>
-
-                            <div style={{
-                                padding: '20px',
-                                display: 'grid',
-                                gridTemplateColumns: '1fr 1fr 1fr',
-                                gap: '10px',
-                            }}>
-                                {[
-                                    { label: 'CARDS', value: r.cards, unit: '', color: '#1C1917', big: true },
-                                    { label: 'XP', value: r.xp, unit: '', color: '#D4AF37', big: true },
-                                    { label: 'PACE', value: r.cpm, unit: '/min', color: '#3B82F6', big: true },
-                                    { label: 'LEVEL UP', value: r.levelUps, unit: '', color: '#16A34A', big: false },
-                                    { label: 'MAX CHAIN', value: r.maxChain, unit: '', color: '#7C3AED', big: false },
-                                    { label: 'BEST', value: timeAttackBestRecords[r.preset] || r.cards, unit: '', color: '#D4AF37', big: false },
-                                ].map((stat, i) => (
-                                    <div key={i} style={{
-                                        background: '#FAFAF9',
-                                        borderRadius: '12px',
-                                        padding: '12px',
-                                        border: '1px solid #F5F5F4',
-                                        textAlign: 'center',
-                                        animation: `ta-stat-enter 0.4s ease-out ${0.3 + i * 0.08}s both`,
-                                    }}>
-                                        <div style={{
-                                            fontSize: '9px',
-                                            fontWeight: '700',
-                                            color: '#A8A29E',
-                                            letterSpacing: '1px',
-                                            marginBottom: '4px',
-                                        }}>
-                                            {stat.label}
-                                        </div>
-                                        <div style={{
-                                            fontSize: stat.big ? '26px' : '22px',
-                                            fontWeight: '900',
-                                            color: stat.color,
-                                            lineHeight: 1,
-                                            fontVariantNumeric: 'tabular-nums',
-                                        }}>
-                                            {stat.value}
-                                            {stat.unit && (
-                                                <span style={{ fontSize: '10px', fontWeight: '600', color: '#A8A29E' }}>
-                                                    {stat.unit}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div style={{
-                                padding: '0 20px 20px',
-                                display: 'flex',
-                                gap: '10px',
-                            }}>
-                                <button
-                                    onClick={() => {
-                                        setTimeAttackResult(null);
-                                        setTimeAttackPhase('selecting');
-                                    }}
-                                    style={{
-                                        flex: 1,
-                                        background: 'linear-gradient(135deg, #D4AF37, #B8941F)',
-                                        border: 'none',
-                                        borderRadius: '14px',
-                                        padding: '16px',
-                                        cursor: 'pointer',
-                                        fontSize: '15px',
-                                        fontWeight: '900',
-                                        color: '#fff',
-                                        letterSpacing: '2px',
-                                        boxShadow: '0 4px 16px rgba(212,175,55,0.3)',
-                                        transition: 'transform 0.2s',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                                >
-                                    RETRY
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setTimeAttackResult(null);
-                                        setTimeAttackPhase('idle');
-                                        setViewMode('calendar');
-                                    }}
-                                    style={{
-                                        flex: 1,
-                                        background: '#FAFAF9',
-                                        border: '1.5px solid #E7E5E4',
-                                        borderRadius: '14px',
-                                        padding: '16px',
-                                        cursor: 'pointer',
-                                        fontSize: '15px',
-                                        fontWeight: '700',
-                                        color: '#78716C',
-                                        transition: 'transform 0.2s',
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.03)'; }}
-                                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                                >
-                                    終了
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
-            })()}
         </div>
     );
 }

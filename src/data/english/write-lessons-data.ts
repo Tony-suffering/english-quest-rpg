@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/data/english/write-lessons-data.ts
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * 自動生成(_build_lessons.mts)。全30日のインタラクティブ・レッスンデータ。
  * 各 day: 本文タップ辞書(glossary, 文法解説つき) + 語彙演習(vocab) + 文法重要事項(grammar)。

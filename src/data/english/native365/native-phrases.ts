@@ -2,7 +2,7 @@
  * ネイティブ音声フレーズ・バンク
  *
  * PlayPhrase.me 由来の実写クリップ (movie/TV の native 発話)。
- * シャドーイング素材として 68 本。
+ * シャドーイング素材として 106 本。
  * transcript はファイル名から復元 (apostrophe 位置はおおよそ)。
  * tags は文字列検出で自動付与。
  */
@@ -649,4 +649,337 @@ export const NATIVE_PHRASES: NativePhrase[] = [
       "long"
     ]
   }
+,
+  {
+    "slug": "you-have-got-to-take-the-upper-hand-in-all-situations-where-people-whether-they",
+    "file": "/audio/native-phrases/you-have-got-to-take-the-upper-hand-in-all-situations-where-people-whether-they.mp3",
+    "transcript": "You have got to take the upper hand in all situations where people, whether they are dead or alive, will walk all over you.",
+    "tags": [
+      "past-tense",
+      "long"
+    ]
+  },
+  {
+    "slug": "open-this-door-you-dead-people-or-we-ll-bust-it-down-and-we-ll-drag-you-out-by-t",
+    "file": "/audio/native-phrases/open-this-door-you-dead-people-or-we-ll-bust-it-down-and-we-ll-drag-you-out-by-t.mp3",
+    "transcript": "Open this door, you dead people, or we'll bust it down and we'll drag you out by the ropes you hanged yourself with.",
+    "tags": [
+      "long"
+    ]
+  },
+  {
+    "slug": "well-my-mom-couldn-t-believe-that-i-only-put-my-clothes-to-the-washer-once-inste",
+    "file": "/audio/native-phrases/well-my-mom-couldn-t-believe-that-i-only-put-my-clothes-to-the-washer-once-inste.mp3",
+    "transcript": "Well, my mom couldn't believe that I only put my clothes to the washer once instead of three or five times.",
+    "tags": [
+      "discourse",
+      "long"
+    ]
+  },
+  {
+    "slug": "i-think-the-exact-word-they-used-was-defiled-but-i-can-send-you-guys-a-link-if-y",
+    "file": "/audio/native-phrases/i-think-the-exact-word-they-used-was-defiled-but-i-can-send-you-guys-a-link-if-y.mp3",
+    "transcript": "I think the exact word they used was defiled, but I can send you guys a link if you wanna read more about it.",
+    "tags": [
+      "reductions",
+      "past-tense",
+      "conditional",
+      "long"
+    ]
+  },
+  {
+    "slug": "i-m-gonna-round-it-up-some-supplies-and-we-re-gonna-dish-it-out",
+    "file": "/audio/native-phrases/i-m-gonna-round-it-up-some-supplies-and-we-re-gonna-dish-it-out.mp3",
+    "transcript": "I'm gonna round it up some supplies and we're gonna dish it out.",
+    "tags": [
+      "reductions"
+    ]
+  },
+  {
+    "slug": "abby-listen-you-need-to-step-away-for-perspective-clarity-on-what-s-happened",
+    "file": "/audio/native-phrases/abby-listen-you-need-to-step-away-for-perspective-clarity-on-what-s-happened.mp3",
+    "transcript": "Abby, listen, you need to step away for perspective, clarity on what's happened.",
+    "tags": [
+      "discourse"
+    ]
+  },
+  {
+    "slug": "run-as-if-the-devil-himself-had-himself-upon-us",
+    "file": "/audio/native-phrases/run-as-if-the-devil-himself-had-himself-upon-us.mp3",
+    "transcript": "Run as if the devil himself had himself upon us!",
+    "tags": [
+      "past-tense",
+      "conditional"
+    ]
+  },
+  {
+    "slug": "i-made-him-a-card-and-i-m-going-to-give-it-to-him-today",
+    "file": "/audio/native-phrases/i-made-him-a-card-and-i-m-going-to-give-it-to-him-today.mp3",
+    "transcript": "I made him a card and I'm going to give it to him today.",
+    "tags": [
+      "reductions",
+      "past-tense"
+    ]
+  },
+  {
+    "slug": "i-ll-keep-you-posted-on-how-it-goes",
+    "file": "/audio/native-phrases/i-ll-keep-you-posted-on-how-it-goes.mp3",
+    "transcript": "I'll keep you posted on how it goes.",
+    "tags": [
+      "general"
+    ]
+  },
+  {
+    "slug": "she-don-t-spend-money-on-nothing-but-vintage-and-wet-wipes",
+    "file": "/audio/native-phrases/she-don-t-spend-money-on-nothing-but-vintage-and-wet-wipes.mp3",
+    "transcript": "She don't spend money on nothing but vintage and wet wipes.",
+    "tags": [
+      "reductions"
+    ]
+  },
+  {
+    "slug": "don-t-fret",
+    "file": "/audio/native-phrases/don-t-fret.mp3",
+    "transcript": "Don't fret.",
+    "tags": [
+      "reductions",
+      "short"
+    ]
+  },
+  {
+    "slug": "no-but-i-m-about-it-all",
+    "file": "/audio/native-phrases/no-but-i-m-about-it-all.mp3",
+    "transcript": "No, but I'm about it all.",
+    "tags": [
+      "reductions",
+      "short"
+    ]
+  },
+  {
+    "slug": "i-was-told-marco-was-in-charge",
+    "file": "/audio/native-phrases/i-was-told-marco-was-in-charge.mp3",
+    "transcript": "I was told Marco was in charge.",
+    "tags": [
+      "past-tense"
+    ]
+  },
+  {
+    "slug": "you-come-to-this-country-take-advantage-of-the-system-and-think-because-we-are-t",
+    "file": "/audio/native-phrases/you-come-to-this-country-take-advantage-of-the-system-and-think-because-we-are-t.mp3",
+    "transcript": "You come to this country, take advantage of the system, and think because we are tolerant, we are weak and helpless.",
+    "tags": [
+      "long"
+    ]
+  },
+  {
+    "slug": "your-arrogance-offends-me",
+    "file": "/audio/native-phrases/your-arrogance-offends-me.mp3",
+    "transcript": "Your arrogance offends me.",
+    "tags": [
+      "short"
+    ]
+  },
+  {
+    "slug": "he-s-gonna-hear-you-out-there-and-he-s-the-one-who-s-got-the-gun-so-he-s-the-one",
+    "file": "/audio/native-phrases/he-s-gonna-hear-you-out-there-and-he-s-the-one-who-s-got-the-gun-so-he-s-the-one.mp3",
+    "transcript": "He's gonna hear you out there, and he's the one who's got the gun, so he's the one who's in charge.",
+    "tags": [
+      "reductions",
+      "past-tense",
+      "discourse",
+      "long"
+    ]
+  },
+  {
+    "slug": "yes-well-kate-is-shacked-up-with-brody-at-the-sheraton-right-now-so-you-need-to",
+    "file": "/audio/native-phrases/yes-well-kate-is-shacked-up-with-brody-at-the-sheraton-right-now-so-you-need-to.mp3",
+    "transcript": "Yes, well, Kate is shacked up with Brody at the Sheraton right now, so you need to move on.",
+    "tags": [
+      "discourse",
+      "long"
+    ]
+  },
+  {
+    "slug": "mike-tyson-can-touch-anybody-s-nose-without-them-even-seeing-him-flinch",
+    "file": "/audio/native-phrases/mike-tyson-can-touch-anybody-s-nose-without-them-even-seeing-him-flinch.mp3",
+    "transcript": "Mike Tyson can touch anybody's nose without them even seeing him flinch.",
+    "tags": [
+      "general"
+    ]
+  },
+  {
+    "slug": "i-mean-not-the-blood-boiling-and-the-sky-and-stuff-but-you-want-to-buy-it",
+    "file": "/audio/native-phrases/i-mean-not-the-blood-boiling-and-the-sky-and-stuff-but-you-want-to-buy-it.mp3",
+    "transcript": "I mean, not the blood boiling and the sky and stuff, but you want to buy it.",
+    "tags": [
+      "discourse",
+      "long"
+    ]
+  },
+  {
+    "slug": "money-truly-is-no-object",
+    "file": "/audio/native-phrases/money-truly-is-no-object.mp3",
+    "transcript": "Money truly is no object.",
+    "tags": [
+      "short"
+    ]
+  },
+  {
+    "slug": "yeah-yeah-yeah-i-can-make-it-down-there-right-now",
+    "file": "/audio/native-phrases/yeah-yeah-yeah-i-can-make-it-down-there-right-now.mp3",
+    "transcript": "Yeah, yeah, yeah, I can make it down there right now.",
+    "tags": [
+      "discourse"
+    ]
+  },
+  {
+    "slug": "sorry-my-stepson-got-into-a-little-trouble-at-school",
+    "file": "/audio/native-phrases/sorry-my-stepson-got-into-a-little-trouble-at-school.mp3",
+    "transcript": "Sorry, my stepson got into a little trouble at school.",
+    "tags": [
+      "past-tense"
+    ]
+  },
+  {
+    "slug": "funny-you-mention-school",
+    "file": "/audio/native-phrases/funny-you-mention-school.mp3",
+    "transcript": "Funny you mention school.",
+    "tags": [
+      "short"
+    ]
+  },
+  {
+    "slug": "i-ll-be-damned-if-i-worked-all-these-years-so-my-little-girl-can-marry-a-roughne",
+    "file": "/audio/native-phrases/i-ll-be-damned-if-i-worked-all-these-years-so-my-little-girl-can-marry-a-roughne.mp3",
+    "transcript": "I'll be damned if I worked all these years so my little girl can marry a roughneck.",
+    "tags": [
+      "conditional",
+      "discourse",
+      "long"
+    ]
+  },
+  {
+    "slug": "harry-just-sit-back-relax-and-put-on-a-little-free-arbordillo-driving-clinic-for",
+    "file": "/audio/native-phrases/harry-just-sit-back-relax-and-put-on-a-little-free-arbordillo-driving-clinic-for.mp3",
+    "transcript": "Harry, just sit back, relax, and put on a little free Arbordillo driving clinic for you.",
+    "tags": [
+      "long"
+    ]
+  },
+  {
+    "slug": "he-called-you-a-wildcat-before-i-didn-t-even-pick-up-on-it",
+    "file": "/audio/native-phrases/he-called-you-a-wildcat-before-i-didn-t-even-pick-up-on-it.mp3",
+    "transcript": "He called you a wildcat before I didn't even pick up on it.",
+    "tags": [
+      "general"
+    ]
+  },
+  {
+    "slug": "it-s-going-to-take-a-lot-to-drag-me-away-from-you",
+    "file": "/audio/native-phrases/it-s-going-to-take-a-lot-to-drag-me-away-from-you.mp3",
+    "transcript": "It's going to take a lot to drag me away from you.",
+    "tags": [
+      "reductions"
+    ]
+  },
+  {
+    "slug": "i-know-you-had-this-religious-experience-or-whatever-the-hell-that-was-but-you-b",
+    "file": "/audio/native-phrases/i-know-you-had-this-religious-experience-or-whatever-the-hell-that-was-but-you-b.mp3",
+    "transcript": "I know you had this religious experience or whatever the hell that was, but you better snap out of it and get your shit together or you're gonna get canned.",
+    "tags": [
+      "reductions",
+      "past-tense",
+      "long"
+    ]
+  },
+  {
+    "slug": "speak-for-yourself-there-sport",
+    "file": "/audio/native-phrases/speak-for-yourself-there-sport.mp3",
+    "transcript": "Speak for yourself there, sport.",
+    "tags": [
+      "short"
+    ]
+  },
+  {
+    "slug": "well-come-hell-or-high-water-you-get-it-done-don-t-you",
+    "file": "/audio/native-phrases/well-come-hell-or-high-water-you-get-it-done-don-t-you.mp3",
+    "transcript": "Well, come hell or high water, you get it done, don't you?",
+    "tags": [
+      "reductions",
+      "discourse",
+      "question"
+    ]
+  },
+  {
+    "slug": "now-i-m-assuming-you-can-clear-up-this-little-mess-and-i-ll-be-glad-to-handle-th",
+    "file": "/audio/native-phrases/now-i-m-assuming-you-can-clear-up-this-little-mess-and-i-ll-be-glad-to-handle-th.mp3",
+    "transcript": "Now, I'm assuming you can clear up this little mess, and I'll be glad to handle this little bump in the road for your son.",
+    "tags": [
+      "reductions",
+      "long"
+    ]
+  },
+  {
+    "slug": "i-had-two-different-harvard-statisticians-try-to-reverse-engineer-the-equation-t",
+    "file": "/audio/native-phrases/i-had-two-different-harvard-statisticians-try-to-reverse-engineer-the-equation-t.mp3",
+    "transcript": "I had two different Harvard statisticians try to reverse engineer the equation that you came up with.",
+    "tags": [
+      "past-tense",
+      "long"
+    ]
+  },
+  {
+    "slug": "as-a-matter-of-fact-i-brought-you-a-peace-offering",
+    "file": "/audio/native-phrases/as-a-matter-of-fact-i-brought-you-a-peace-offering.mp3",
+    "transcript": "As a matter of fact i brought you a peace offering",
+    "tags": [
+      "past-tense",
+      "chunk"
+    ]
+  },
+  {
+    "slug": "i-was-actually-up-all-night-running-the-numbers-identifying-new-markets-and-i-th",
+    "file": "/audio/native-phrases/i-was-actually-up-all-night-running-the-numbers-identifying-new-markets-and-i-th.mp3",
+    "transcript": "I was actually up all night running the numbers identifying new markets and i th",
+    "tags": [
+      "reductions",
+      "past-tense",
+      "discourse",
+      "long"
+    ]
+  },
+  {
+    "slug": "sir-i-also-took-the-liberty-to-go-ahead-and-put-it-out-over-the-wire-and-see-if-",
+    "file": "/audio/native-phrases/sir-i-also-took-the-liberty-to-go-ahead-and-put-it-out-over-the-wire-and-see-if-.mp3",
+    "transcript": "Sir i also took the liberty to go ahead and put it out over the wire and see if",
+    "tags": [
+      "past-tense",
+      "conditional",
+      "long"
+    ]
+  },
+  {
+    "slug": "and-the-language-she-uses-is-like-corporate-speak-run-riot",
+    "file": "/audio/native-phrases/and-the-language-she-uses-is-like-corporate-speak-run-riot.mp3",
+    "transcript": "And the language she uses is like corporate speak run riot",
+    "tags": [
+      "discourse"
+    ]
+  },
+  {
+    "slug": "her-life-is-empty-so-she-wrecks-creative-companies-for-kicks",
+    "file": "/audio/native-phrases/her-life-is-empty-so-she-wrecks-creative-companies-for-kicks.mp3",
+    "transcript": "Her life is empty so she wrecks creative companies for kicks",
+    "tags": [
+      "discourse"
+    ]
+  },
+  {
+    "slug": "that-s-exactly-what-she-needs-a-decent-seeing-to",
+    "file": "/audio/native-phrases/that-s-exactly-what-she-needs-a-decent-seeing-to.mp3",
+    "transcript": "That's exactly what she needs a decent seeing to",
+    "tags": [
+      "general"
+    ]
+  },
 ];

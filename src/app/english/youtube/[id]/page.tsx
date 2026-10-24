@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Repeat1, List, Volume2, Star, Video, Headphones, ExternalLink, Maximize2, Minimize2, BookOpen, Layers } from "lucide-react";
 import Link from "next/link";
 import { listeningContents } from "@/data/english-listening";
-import { SavedPhrasesStorage } from "@/lib/saved-phrases";
+import { addPhraseToTraining } from "@/lib/saved-phrases";
 
 // YouTube IFrame API types
 declare global {
@@ -151,12 +151,6 @@ export default function ListeningPlayerPage() {
 
     // ==================== COMMON FUNCTIONS ====================
 
-    // Load saved phrases
-    useEffect(() => {
-        const all = SavedPhrasesStorage.getAll();
-        setSavedPhrases(new Set(all.map(p => p.english)));
-    }, []);
-
     // Auto-scroll to current segment
     useEffect(() => {
         if (listRef.current) {
@@ -167,25 +161,11 @@ export default function ListeningPlayerPage() {
         }
     }, [currentIndex]);
 
-    const toggleSavePhrase = (e: React.MouseEvent, english: string, japanese: string) => {
+    const toggleSavePhrase = async (e: React.MouseEvent, english: string, japanese: string) => {
         e.stopPropagation();
-        if (savedPhrases.has(english)) {
-            const all = SavedPhrasesStorage.getAll();
-            const found = all.find(p => p.english === english);
-            if (found) SavedPhrasesStorage.remove(found.id);
-            setSavedPhrases(prev => {
-                const next = new Set(prev);
-                next.delete(english);
-                return next;
-            });
-        } else {
-            SavedPhrasesStorage.save({
-                english,
-                japanese,
-                source: `YouTube: ${content?.title || 'Listening'}`,
-            });
-            setSavedPhrases(prev => new Set(prev).add(english));
-        }
+        if (savedPhrases.has(english)) return;
+        const result = await addPhraseToTraining(english, japanese || '');
+        if (result !== 'error') setSavedPhrases(prev => new Set(prev).add(english));
     };
 
     const openVocabModal = (e: React.MouseEvent, english: string) => {
@@ -1083,7 +1063,7 @@ export default function ListeningPlayerPage() {
                                             </span>
                                             <div className="flex-1" />
                                             <button onClick={(e) => openVocabModal(e, segment.english)} className="px-1.5 py-0.5 rounded text-[9px] border border-emerald-500 text-emerald-500 hover:bg-emerald-50">+V</button>
-                                            <button onClick={(e) => toggleSavePhrase(e, segment.english, segment.japanese)} className="p-1">
+                                            <button onClick={(e) => toggleSavePhrase(e, segment.english, segment.japanese)} title={savedPhrases.has(segment.english) ? 'Added to training' : 'Add to training'} className="p-1">
                                                 <Star size={12} className={savedPhrases.has(segment.english) ? 'text-yellow-400 fill-yellow-400' : 'text-stone-300'} />
                                             </button>
                                         </div>
@@ -1126,11 +1106,6 @@ export default function ListeningPlayerPage() {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            {savedPhrases.size > 0 && (
-                                <Link href="/english/bookmarks" className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-100 text-amber-700 text-xs">
-                                    <Star size={10} className="fill-yellow-400" /> {savedPhrases.size}
-                                </Link>
-                            )}
                             <a href={`https://www.youtube.com/watch?v=${content.youtubeId}`} target="_blank" rel="noopener noreferrer" className="text-stone-400 hover:text-red-600">
                                 <ExternalLink size={16} />
                             </a>
@@ -1298,7 +1273,7 @@ export default function ListeningPlayerPage() {
                                                 <Volume2 size={14} />
                                             </button>
                                             <button onClick={(e) => openVocabModal(e, segment.english)} className="px-1.5 py-0.5 rounded text-[9px] border border-emerald-500 text-emerald-500 hover:bg-emerald-50">+Vocab</button>
-                                            <button onClick={(e) => toggleSavePhrase(e, segment.english, segment.japanese)} className="p-1">
+                                            <button onClick={(e) => toggleSavePhrase(e, segment.english, segment.japanese)} title={savedPhrases.has(segment.english) ? 'Added to training' : 'Add to training'} className="p-1">
                                                 <Star size={14} className={savedPhrases.has(segment.english) ? 'text-yellow-400 fill-yellow-400' : 'text-stone-300'} />
                                             </button>
                                         </div>
@@ -1379,12 +1354,6 @@ export default function ListeningPlayerPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            {savedPhrases.size > 0 && (
-                                <Link href="/english/bookmarks" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-300 text-xs hover:bg-amber-200 transition-colors">
-                                    <Star size={12} className="fill-yellow-400" />
-                                    <span>{savedPhrases.size}</span>
-                                </Link>
-                            )}
                         </div>
                     </div>
                 </header>
@@ -1538,6 +1507,7 @@ export default function ListeningPlayerPage() {
                                             </button>
                                             <button
                                                 onClick={(e) => toggleSavePhrase(e, segment.english, segment.japanese)}
+                                                title={savedPhrases.has(segment.english) ? 'Added to training' : 'Add to training'}
                                                 className="p-1.5 rounded-full hover:bg-stone-100 transition-colors"
                                             >
                                                 <Star size={16} className={savedPhrases.has(segment.english) ? 'text-yellow-400 fill-yellow-400' : 'text-stone-400'} />
@@ -1625,12 +1595,6 @@ export default function ListeningPlayerPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
-                            {savedPhrases.size > 0 && (
-                                <Link href="/english/bookmarks" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-300 text-xs hover:bg-amber-200 transition-colors">
-                                    <Star size={12} className="fill-yellow-400" />
-                                    <span>{savedPhrases.size}</span>
-                                </Link>
-                            )}
                         </div>
                     </div>
                 </header>
@@ -1808,6 +1772,7 @@ export default function ListeningPlayerPage() {
                                             </button>
                                             <button
                                                 onClick={(e) => toggleSavePhrase(e, segment.english, segment.japanese)}
+                                                title={savedPhrases.has(segment.english) ? 'Added to training' : 'Add to training'}
                                                 className="p-1.5 rounded-full hover:bg-stone-100 transition-colors"
                                             >
                                                 <Star size={16} className={savedPhrases.has(segment.english) ? 'text-yellow-400 fill-yellow-400' : 'text-stone-400'} />
@@ -1893,12 +1858,6 @@ export default function ListeningPlayerPage() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                        {savedPhrases.size > 0 && (
-                            <Link href="/english/bookmarks" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 text-amber-700 border border-amber-300 text-xs hover:bg-amber-200 transition-colors">
-                                <Star size={12} className="fill-yellow-400" />
-                                <span>{savedPhrases.size}</span>
-                            </Link>
-                        )}
                         <button onClick={() => setShowTranscript(!showTranscript)} className="flex items-center gap-1 text-stone-500 hover:text-stone-800 transition-colors md:hidden">
                             <List size={20} />
                         </button>
@@ -1991,7 +1950,7 @@ export default function ListeningPlayerPage() {
                                                 {segment.startTime > 0 && <span className="text-[10px] text-stone-400 font-mono">{formatTime(segment.startTime)}</span>}
                                                 <div className="flex-1" />
                                                 <button onClick={(e) => openVocabModal(e, segment.english)} className="px-2 py-1 rounded text-[10px] font-semibold border border-emerald-500 text-emerald-500 hover:bg-emerald-500/10 transition-colors">+Vocab</button>
-                                                <button onClick={(e) => toggleSavePhrase(e, segment.english, segment.japanese)} className="p-1.5 rounded-full hover:bg-stone-100 transition-colors">
+                                                <button onClick={(e) => toggleSavePhrase(e, segment.english, segment.japanese)} title={savedPhrases.has(segment.english) ? 'Added to training' : 'Add to training'} className="p-1.5 rounded-full hover:bg-stone-100 transition-colors">
                                                     <Star size={16} className={savedPhrases.has(segment.english) ? 'text-yellow-400 fill-yellow-400' : 'text-stone-400'} />
                                                 </button>
                                             </div>

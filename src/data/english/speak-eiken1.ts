@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/data/english/speak-eiken1.ts
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * スピークパス / SPEAKPASS -- 英検1級 2次面接 模範スピーチ 30日(アウトプット限定の英検対策)。
  *

@@ -246,7 +246,7 @@ export function playGachaSound(tier: string) {
 // FEVER entry sound — pachinko kakuhen-level impact (~1.5s)
 export function playFeverEntrySound() {
     try {
-        const st = getSettings(); if (!st.soundEnabled) return;
+        const st = getSettings(); if (!st.soundEnabled || !st.feverEnabled) return;
         const vol = st.volume / 100;
         const ctx = getAudioCtx();
         if (ctx.state === 'suspended') ctx.resume();
@@ -322,7 +322,7 @@ export function playFeverEntrySound() {
 // FEVER exit sound — descending sweep (~0.8s)
 export function playFeverExitSound() {
     try {
-        const st = getSettings(); if (!st.soundEnabled) return;
+        const st = getSettings(); if (!st.soundEnabled || !st.feverEnabled) return;
         const vol = st.volume / 100;
         const ctx = getAudioCtx();
         if (ctx.state === 'suspended') ctx.resume();
@@ -357,7 +357,7 @@ let _feverBGMFadeInterval: ReturnType<typeof setInterval> | null = null;
 
 export function startFeverBGM(): HTMLAudioElement | null {
     try {
-        const st = getSettings(); if (!st.soundEnabled) return null;
+        const st = getSettings(); if (!st.soundEnabled || !st.feverEnabled) return null;
         // Stop any existing fever BGM before creating a new one
         if (_activeFeverBGM) {
             try { _activeFeverBGM.pause(); _activeFeverBGM.currentTime = 0; } catch { /* */ }
@@ -619,7 +619,7 @@ export function playBossExplode() {
 // Kakuhen entry — dramatic power-up jingle
 export function playKakuhenEntry() {
     try {
-        const st = getSettings(); if (!st.soundEnabled) return;
+        const st = getSettings(); if (!st.soundEnabled || !st.feverEnabled) return;
         const vol = st.volume / 100;
         const ctx = getAudioCtx();
         if (ctx.state === 'suspended') ctx.resume();
@@ -720,7 +720,7 @@ export function playStreakBreak() {
 // FEVER chain hit — metallic ping that rises with streak
 export function playFeverChainHit(streak: number) {
     try {
-        const st = getSettings(); if (!st.soundEnabled) return;
+        const st = getSettings(); if (!st.soundEnabled || !st.feverEnabled) return;
         const vol = st.volume / 100;
         const ctx = getAudioCtx();
         if (ctx.state === 'suspended') ctx.resume();

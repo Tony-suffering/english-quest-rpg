@@ -1,12 +1,9 @@
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 
 // FINANCE用Supabase（施工記録・診断結果用）
-const financeSupabaseUrl = process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL || ''
-const financeSupabaseAnonKey = process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY || ''
-
 export const createFinanceClient = () => {
-  if (!financeSupabaseUrl || !financeSupabaseAnonKey) {
-    return null
-  }
-  return createBrowserClient(financeSupabaseUrl, financeSupabaseAnonKey)
+  const url = process.env.NEXT_PUBLIC_FINANCE_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_FINANCE_SUPABASE_ANON_KEY
+  if (!url || !key) return null
+  return createClient(url, key)
 }

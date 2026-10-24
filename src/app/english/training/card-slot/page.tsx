@@ -23,19 +23,6 @@ import {
 // TYPES
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-interface VocabDeckItem {
-  word: string;
-  meaning: string;
-  example?: string;
-  partOfSpeech?: string;
-  sourceEpisode: string;
-  sourceEpisodeTitle: string;
-  masteryLevel: 0 | 1 | 2 | 3;
-  lastReviewedAt: string | null;
-  reviewCount: number;
-  correctStreak: number;
-}
-
 interface PhraseData {
   id: string;
   english: string;
@@ -421,58 +408,6 @@ function generateDemoCards(count: number): CardData[] {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// LOCALSTORAGE HELPERS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-function loadFromLocalStorage(): { phrases: PhraseData[], masteryMap: Record<string, number>, pointsMap: Record<string, number> } {
-  const raw = localStorage.getItem('izakaya_toeic_vocab_deck');
-  const items: VocabDeckItem[] = raw ? JSON.parse(raw) : [];
-
-  // Also load card points from localStorage
-  const pointsRaw = localStorage.getItem('izakaya_card_points');
-  const savedPoints: Record<string, number> = pointsRaw ? JSON.parse(pointsRaw) : {};
-
-  const phrases: PhraseData[] = items.map((item, i) => ({
-    id: `vocab-${item.word.replace(/\s+/g, '-').toLowerCase()}`,
-    english: item.word,
-    japanese: item.meaning,
-    phrase: item.word,
-    type: item.partOfSpeech || 'word',
-    meaning: item.meaning,
-    category: ['flame', 'aqua', 'wind', 'earth', 'thunder'][i % 5],
-    mastery_level: item.masteryLevel,
-    created_at: item.lastReviewedAt || new Date().toISOString(),
-  }));
-
-  const masteryMap: Record<string, number> = {};
-  const pointsMap: Record<string, number> = {};
-  phrases.forEach(p => {
-    masteryMap[p.id] = p.mastery_level || 0;
-    pointsMap[p.id] = savedPoints[p.id] || 0;
-  });
-
-  return { phrases, masteryMap, pointsMap };
-}
-
-function saveCardPoints(pointsMap: Record<string, number>) {
-  localStorage.setItem('izakaya_card_points', JSON.stringify(pointsMap));
-}
-
-function updateLocalMastery(cardId: string, newMastery: number) {
-  const raw = localStorage.getItem('izakaya_toeic_vocab_deck');
-  const items: VocabDeckItem[] = raw ? JSON.parse(raw) : [];
-  // cardId is "vocab-word-here", extract the word
-  const word = cardId.replace('vocab-', '').replace(/-/g, ' ');
-  const item = items.find((i) => i.word.toLowerCase().replace(/\s+/g, ' ') === word);
-  if (item) {
-    item.masteryLevel = Math.min(3, newMastery) as 0 | 1 | 2 | 3;
-    item.lastReviewedAt = new Date().toISOString();
-    item.reviewCount = (item.reviewCount || 0) + 1;
-    localStorage.setItem('izakaya_toeic_vocab_deck', JSON.stringify(items));
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // SLOT ENGINE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -714,7 +649,6 @@ export default function CardSlotPage() {
   const counterTraitStoreRef = useRef(false);
   const spinInStateRef = useRef(0);
   const forcedSymbolsRef = useRef<GodSymbol[] | null>(null);
-  const cardPointsMapRef = useRef<Record<string, number>>({});
 
   // ── Responsive ──
   const [isMobile, setIsMobile] = useState(false);
@@ -740,26 +674,38 @@ export default function CardSlotPage() {
     };
   }, []);
 
-  // ── Data Load from localStorage ──
+  // ── Data Fetch ──
   useEffect(() => {
-    try {
-      const { phrases, masteryMap, pointsMap } = loadFromLocalStorage();
-      cardPointsMapRef.current = pointsMap;
-      if (phrases.length === 0) {
-        const demoCards = generateDemoCards(20);
-        setDeck(demoCards);
-        setError('デッキが空です。エピソードで単語を保存してください。');
-      } else {
+    let cancelled = false;
+    async function load() {
+      try {
+        const [phrasesRes, masteryRes] = await Promise.all([
+          fetch('/api/phrases'),
+          fetch('/api/phrases/mastery'),
+        ]);
+        if (!phrasesRes.ok || !masteryRes.ok) throw new Error('API error');
+        const phrasesData = await phrasesRes.json();
+        const masteryData = await masteryRes.json();
+        if (cancelled) return;
+
+        const phrases: PhraseData[] = phrasesData.phrases || [];
+        const masteryMap: Record<string, number> = masteryData.mastery || {};
+        const pointsMap: Record<string, number> = masteryData.cardPoints || {};
+        if (phrases.length === 0) throw new Error('No phrases');
+
         const cards = phrases.map((p) => buildCard(p, masteryMap, pointsMap));
         setDeck(cards);
+        setLoading(false);
+      } catch {
+        if (cancelled) return;
+        const demoCards = generateDemoCards(20);
+        setDeck(demoCards);
+        setError('API unavailable - using demo deck');
+        setLoading(false);
       }
-      setLoading(false);
-    } catch {
-      const demoCards = generateDemoCards(20);
-      setDeck(demoCards);
-      setError('Demo mode');
-      setLoading(false);
     }
+    load();
+    return () => { cancelled = true; };
   }, []);
 
   // ── GP Counter Animation ──
@@ -875,9 +821,11 @@ export default function CardSlotPage() {
       let gp = calcGP(combinedCard, slotState, stats.combo, curSpinInState, prevTrait, traitDoubled);
 
       // === PAYOUT SYSTEM ===
+      // スロットは大半がハズレ。図柄が揃った時だけ払い出し。
+      // ハズレ(全BLANK) = 0枚。BET20枚が丸損。これが普通。
       const symbolTriple = reelRoll.triple;
       const nonBlankSymbols = drawnSymbols.filter(s => s !== 'BLANK');
-      const baseGP = gp;
+      const baseGP = gp; // calcGPの基準値を保持
 
       if (symbolTriple === 'GOD') {
         gp = Math.round(baseGP * 10);
@@ -903,6 +851,7 @@ export default function CardSlotPage() {
         const pairs = Object.entries(symbolCounts).filter(([k, v]) => v === 2 && k !== 'BLANK');
 
         if (pairs.length > 0) {
+          // ペア = 小当たり (BET回収+α程度)
           const [pairSymbol] = pairs[0];
           if (pairSymbol === 'GOD') {
             gp = Math.round(baseGP * 1.5);
@@ -915,10 +864,13 @@ export default function CardSlotPage() {
             setMatchBonus(`${SYMBOL_LABELS[pairSymbol as GodSymbol]} x2`);
           }
         } else if (nonBlankSymbols.length >= 2) {
+          // バラの2図柄 = 微当たり (BETの半分くらい戻る)
           gp = Math.round(baseGP * 0.3);
         } else if (nonBlankSymbols.length === 1) {
+          // 1図柄 = ほぼハズレ (気持ち程度)
           gp = Math.round(baseGP * 0.1);
         } else {
+          // === 完全ハズレ === ALL BLANK = 0枚。BET丸損。
           gp = 0;
         }
       }
@@ -942,6 +894,7 @@ export default function CardSlotPage() {
           const czLimit = calcCeiling(avgSPA, card);
 
           if (symbolTriple === 'GOD') {
+            // GOD揃い -> PGG direct
             newState = 'FEVER';
             transition = 'SPECIAL_TO_FEVER';
             setLoopRate(89);
@@ -951,6 +904,7 @@ export default function CardSlotPage() {
             newCeiling = 0;
             newSpinInState = 0;
           } else if (symbolTriple === 'RED7') {
+            // 赤7揃い -> SGG -> GG
             newState = 'SPECIAL';
             transition = 'RUSH_TO_SPECIAL';
             newSpecialLeft = 5;
@@ -959,6 +913,7 @@ export default function CardSlotPage() {
             newCeiling = 0;
             newSpinInState = 0;
           } else if (symbolTriple === 'YELLOW7' || symbolTriple === 'BLUE7') {
+            // 7揃い -> GG direct
             newState = 'RUSH';
             transition = 'CZ_TO_RUSH';
             const lr = assignLoopRate(symbolTriple === 'YELLOW7' ? 'yellow7' : 'blue7');
@@ -969,6 +924,7 @@ export default function CardSlotPage() {
             newSpinInState = 0;
             newCombo = 0;
           } else if (newCeiling >= czLimit || rollCZTrigger(card)) {
+            // Ceiling or random -> G-STOP
             newState = 'CZ';
             transition = 'NORMAL_TO_CZ';
             newCzLeft = 5;
@@ -977,7 +933,7 @@ export default function CardSlotPage() {
           }
           break;
         }
-        case 'CZ': {
+        case 'CZ': { // G-STOP
           newCzLeft = czSpinsLeft - 1;
 
           if (symbolTriple === 'GOD') {
@@ -996,6 +952,7 @@ export default function CardSlotPage() {
             setGgSetsRemaining(1);
             newSpinInState = 0;
           } else if (symbolTriple === 'V_SYMBOL' || symbolTriple === 'YELLOW7' || symbolTriple === 'BLUE7') {
+            // V揃いまたは7揃い -> GG
             newState = 'RUSH';
             transition = 'CZ_TO_RUSH';
             const trigger = symbolTriple === 'V_SYMBOL' ? 'v_symbol' : symbolTriple === 'YELLOW7' ? 'yellow7' : 'blue7';
@@ -1005,6 +962,7 @@ export default function CardSlotPage() {
             newCombo = 0;
             newSpinInState = 0;
           } else if (drawnSymbols.includes('V_SYMBOL')) {
+            // Single V symbol also triggers GG in G-STOP
             newState = 'RUSH';
             transition = 'CZ_TO_RUSH';
             setLoopRate(assignLoopRate('v_symbol'));
@@ -1028,11 +986,12 @@ export default function CardSlotPage() {
           }
           break;
         }
-        case 'RUSH': {
+        case 'RUSH': { // GOD GAME
           newCombo = stats.combo + 1;
           const newSetSpins = ggSetSpinsLeft - 1;
 
           if (symbolTriple === 'GOD') {
+            // GOD揃い during GG -> PGG
             newState = 'FEVER';
             transition = 'SPECIAL_TO_FEVER';
             setLoopRate(89);
@@ -1041,20 +1000,25 @@ export default function CardSlotPage() {
             newFeverLeft = 5;
             newSpinInState = 0;
           } else if (symbolTriple === 'RED7') {
+            // 赤7 during GG -> SGG
             newState = 'SPECIAL';
             transition = 'RUSH_TO_SPECIAL';
             newSpecialLeft = 5;
             newSpinInState = 0;
           } else if (newSetSpins <= 0) {
+            // Set complete -> loop rate check
             if (ggSetsRemaining > 0) {
+              // Guaranteed sets remaining
               setGgSetsRemaining(prev => prev - 1);
               setGgSetSpinsLeft(15);
               setMatchBonus(`継続! 残り${ggSetsRemaining - 1}セット`);
             } else if (Math.random() * 100 < loopRate) {
+              // Loop rate success -> new set!
               setGgSetSpinsLeft(15);
               setMatchBonus(`${loopRate}%ループ継続!`);
               playFeverChainHit(newCombo);
             } else {
+              // Loop rate fail -> back to NORMAL
               newState = 'NORMAL';
               transition = 'FALL_TO_NORMAL';
               newCeiling = 0;
@@ -1062,6 +1026,7 @@ export default function CardSlotPage() {
             }
           } else {
             setGgSetSpinsLeft(newSetSpins);
+            // Yellow7 triple during GG -> loop rate upgrade
             if (symbolTriple === 'YELLOW7') {
               const newLoop = Math.min(89, loopRate + 10);
               setLoopRate(newLoop);
@@ -1070,7 +1035,7 @@ export default function CardSlotPage() {
           }
           break;
         }
-        case 'SPECIAL': {
+        case 'SPECIAL': { // SGG
           newSpecialLeft = specialSpinsLeft - 1;
           newCombo = stats.combo + 1;
 
@@ -1083,17 +1048,19 @@ export default function CardSlotPage() {
             newFeverLeft = 5;
             newSpinInState = 0;
           } else if (newSpecialLeft <= 0) {
+            // SGG ends -> back to GG (NOT NORMAL!)
             newState = 'RUSH';
             setGgSetSpinsLeft(15);
             newSpinInState = 0;
           }
           break;
         }
-        case 'FEVER': {
+        case 'FEVER': { // PGG
           newFeverLeft = feverSpinsLeft - 1;
           newCombo = stats.combo + 1;
 
           if (newFeverLeft <= 0) {
+            // PGG ends -> back to GG with 89% loop (NOT NORMAL!)
             newState = 'RUSH';
             setGgSetSpinsLeft(15);
             setLoopRate(89);
@@ -1117,17 +1084,6 @@ export default function CardSlotPage() {
       // Add GP as credit winnings
       setCredits(prev => prev + finalGP);
       setTotalWin(prev => prev + finalGP);
-
-      // Persist card points to localStorage
-      if (finalGP > 0 && card.id) {
-        cardPointsMapRef.current[card.id] = (cardPointsMapRef.current[card.id] || 0) + finalGP;
-        saveCardPoints(cardPointsMapRef.current);
-      }
-
-      // Update mastery in localStorage on each spin (review count bump)
-      if (card.id && !card.id.startsWith('demo')) {
-        updateLocalMastery(card.id, card.mastery);
-      }
 
       const spinResult: SpinResult = { card, gpEarned: finalGP, stateAfter: newState, transitionType: transition };
 
@@ -2352,6 +2308,7 @@ export default function CardSlotPage() {
                   overflow: 'hidden',
                   position: 'relative',
                   transition: 'all 300ms ease',
+                  // Metallic reel window frame
                   border: stopped ? `2px solid ${stateConfig.color}80` : '2px solid #333',
                   boxShadow: stopped
                     ? `0 0 15px ${stateConfig.color}30, inset 0 0 20px rgba(0,0,0,0.5)`

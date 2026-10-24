@@ -1,0 +1,615 @@
+/**
+ * The Honeymoon Cruise -- 10-episode conversation series for Memoria
+ * Newlyweds Ben and Kayla board a ten-day Caribbean cruise out of Miami on the
+ * Fourth of July -- and get assigned to Table 12, a dinner table they share with
+ * Marv and Arlene (a couple on their 27th cruise, celebrating their 45th wedding
+ * anniversary) and Cheryl (a 54-year-old on a solo "divorce cruise" she almost
+ * cancelled). Over ten days the table of strangers becomes a family: buffet
+ * doctrine, a storm at sea, a talent show, a lost wedding ring on a snorkel trip,
+ * and a vow renewal on the last night.
+ * 6 core characters: Ben (29M, newlywed, plans everything in a spreadsheet),
+ *   Kayla (28F, newlywed, deadpan, just wants to unplug), Marv (68M, cruise
+ *   veteran, treats the buffet like a military campaign), Arlene (66F, knows every
+ *   crew member by name, collects gossip), Cheryl (54F, solo traveler finding her
+ *   feet again), Julian (35M, relentlessly upbeat cruise director).
+ * Plus rotating crew guests: Andres (head waiter, dry humor), Captain Lund
+ *   (58M, calm Norwegian captain), Tessa (31F, snorkel excursion guide).
+ * The 10 "days" are 10 actual days of the cruise.
+ * Speech patterns: NO g-dropping (full -ing forms), contractions OK,
+ *   fillers, hedges, false starts, cruise-ship chaos and table-of-strangers warmth.
+ * Format: ~16 lines per day per language.
+ */
+
+export interface CruiseEntry {
+    id: string;
+    date: string;
+    title: string;
+    titleJa: string;
+    content: string;
+    series: string;
+    seriesTitle: string;
+    conversation: {
+        english: Array<{ speaker: 'male' | 'female'; text: string }>;
+        japanese: Array<{ speaker: 'male' | 'female'; text: string }>;
+        generatedAt: Date;
+        tone: string;
+    };
+    tone: string;
+    tags: string[];
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const generatedAt = new Date('2026-07-04T12:00:00.000Z');
+
+export const cruiseEntries: CruiseEntry[] = [
+    // ============================================================
+    // DAY 1 (Jul 4) -- EMBARKATION DAY
+    // ============================================================
+    {
+        id: 'cruise-day1',
+        date: '2026-07-04',
+        title: 'Day 1: Embarkation Day',
+        titleJa: 'Day 1: 乗船日',
+        content: '7月4日、マイアミ港。新婚のベンとケイラが10日間のカリブ海クルーズに乗船する。ベンはスプレッドシート化した完璧な旅程表を握りしめ、ケイラは早くも呆れ顔。夕食で案内された「テーブル12」には、クルーズ27回目のベテラン夫婦マーヴ&アーリーンと、一人旅のシェリルが待っていた。夜は独立記念日の洋上花火。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'humorous',
+        tags: ['cruise', 'honeymoon', 'comedy', 'embarkation', 'july-4th'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'male', text: "Ben: Okay, we're checked in, we're on board, and according to my spreadsheet we are eleven minutes ahead of schedule. Honeymoon officially started. How do you feel?" },
+                { speaker: 'female', text: "Kayla: I feel like I married a man who brought a spreadsheet on his honeymoon. Ben. Babe. Put the phone away. The whole point of a cruise is that the ship does the planning." },
+                { speaker: 'male', text: "Julian: Good afternoon, you beautiful people! Welcome aboard! I'm Julian, your cruise director, and for the next ten days my only job is making sure you have the time of your lives. No pressure on me at all!" },
+                { speaker: 'female', text: "Kayla: He has the energy of a golden retriever that drank my coffee. I already can't tell if I love him or fear him." },
+                { speaker: 'male', text: "Ben: Muster drill first, then cabin, then sail-away deck party at five. It's all color-coded. Orange is mandatory events, green is meals--" },
+                { speaker: 'female', text: "Kayla: And I'm about to add a new color for 'husband overboard.' Come on, they said our dinner table is assigned. Table 12. We eat with strangers for ten days. That's the real adventure." },
+                { speaker: 'male', text: "Marv: Evening! You must be our newlyweds. Marv. This is Arlene. Twenty-seventh cruise, forty-fifth wedding anniversary, and I can tell you the salmon here is a trap. Trust me on that." },
+                { speaker: 'female', text: "Arlene: Don't listen to him about the salmon, that was one cruise, in 2019, and he's never let it go. Oh, look at you two. Babies. On your honeymoon! Cheryl, come sit, the kids don't bite." },
+                { speaker: 'female', text: "Cheryl: Hi. Cheryl. I'm... it's just me. Solo trip. I almost cancelled about nine times, so if I seem nervous, that's why. My sister made me promise not to eat in my cabin all ten days." },
+                { speaker: 'female', text: "Arlene: Well, that settles it, you're ours now. Table 12 sticks together. That's the rule of the sea, or if it isn't, it is now." },
+                { speaker: 'male', text: "Andres: Good evening, Table 12. I'm Andres, your waiter for the voyage. Ten days, three courses a night, and I judge no one. Last cruise a gentleman ordered four desserts every night. He's my hero." },
+                { speaker: 'male', text: "Marv: Four desserts. Amateur hour. Andres, my friend, we're going to get along just fine." },
+                { speaker: 'male', text: "Ben: Wait, everybody, it's almost nine. It's the Fourth of July -- they're doing fireworks off the back of the ship. That one wasn't even on my spreadsheet, the captain announced it." },
+                { speaker: 'female', text: "Kayla: Fireworks at sea on our first married Fourth of July. Okay. The spreadsheet can stay. This is a good start, Ben." },
+                { speaker: 'male', text: "Marv: Kid, let me give you the only cruise advice that matters. The ship's got the schedule. You've got the ocean. Let go of the wheel and something good always happens." },
+                { speaker: 'female', text: "Cheryl: You know what? First night, and I'm watching fireworks with five strangers instead of hiding in my cabin. Maybe my sister was onto something." },
+            ],
+            japanese: [
+                { speaker: 'male', text: "Ben: よし、チェックイン完了、乗船完了、スプレッドシートによると予定より11分早い。新婚旅行、公式にスタート。気分はどう？" },
+                { speaker: 'female', text: "Kayla: 新婚旅行にスプレッドシートを持ち込む男と結婚した気分。ベン。ねえ。スマホしまって。クルーズの意味はね、船が計画を立ててくれることなの。" },
+                { speaker: 'male', text: "Julian: こんにちは、素敵な皆さん！ようこそ船へ！クルーズディレクターのジュリアンです。これから10日間、私の唯一の仕事は皆さんに人生最高の時間を過ごしてもらうこと。プレッシャーなんて全然ないですよ！" },
+                { speaker: 'female', text: "Kayla: 私のコーヒーを飲んだゴールデンレトリバー並みのエネルギー。好きなのか怖いのか、もう分からない。" },
+                { speaker: 'male', text: "Ben: まず避難訓練、次に船室、5時から出港デッキパーティー。全部色分けしてある。オレンジが必須イベント、緑が食事--" },
+                { speaker: 'female', text: "Kayla: で、私は今から『夫が海に落ちた』用の新色を追加するところ。ほら、夕食のテーブルは指定制だって。テーブル12。10日間、知らない人と食事。そっちが本当の冒険よ。" },
+                { speaker: 'male', text: "Marv: こんばんは！あんたたちがうちの新婚さんだな。マーヴだ。こっちはアーリーン。クルーズ27回目、結婚45周年、それからここのサーモンは罠だと教えておく。わしを信じろ。" },
+                { speaker: 'female', text: "Arlene: サーモンの話は聞かないで、あれは2019年の1回だけなのに、この人ずっと根に持ってるの。まあ、見て、あなたたち。赤ちゃんみたい。新婚旅行ですって！シェリル、いらっしゃい、この子たちは噛みつかないわよ。" },
+                { speaker: 'female', text: "Cheryl: どうも。シェリルです。その…私だけなの。一人旅。9回くらいキャンセルしかけたから、緊張して見えたらそのせい。10日間ずっと船室で食べないって妹に約束させられて。" },
+                { speaker: 'female', text: "Arlene: じゃあ決まりね、あなたはもううちの子。テーブル12は一蓮托生。それが海の掟よ。掟じゃなくても、今から掟。" },
+                { speaker: 'male', text: "Andres: こんばんは、テーブル12の皆さん。この航海の担当ウェイター、アンドレスです。10日間、毎晩3コース、そして私は誰も裁きません。前のクルーズでは毎晩デザートを4つ頼む紳士がいました。私のヒーローです。" },
+                { speaker: 'male', text: "Marv: デザート4つ。素人め。アンドレス、わしらはいい友達になれそうだ。" },
+                { speaker: 'male', text: "Ben: 待って、みんな、もうすぐ9時だ。今日は独立記念日 -- 船尾から花火をやるって。これはスプレッドシートにも載ってなかった、船長のアナウンスだ。" },
+                { speaker: 'female', text: "Kayla: 結婚して初めての独立記念日に、海の上で花火。オーケー。スプレッドシートは許す。いいスタートよ、ベン。" },
+                { speaker: 'male', text: "Marv: 坊主、唯一意味のあるクルーズの助言をやろう。予定は船が持ってる。あんたは海を持ってる。ハンドルから手を放せば、必ずいいことが起こるんだ。" },
+                { speaker: 'female', text: "Cheryl: ねえ、聞いて。初日の夜に、船室に隠れる代わりに5人の他人と花火を見てる。妹の言うとおりだったのかも。" },
+            ],
+            generatedAt,
+            tone: 'humorous',
+        },
+    },
+
+    // ============================================================
+    // DAY 2 (Jul 5) -- THE BUFFET
+    // ============================================================
+    {
+        id: 'cruise-day2',
+        date: '2026-07-05',
+        title: 'Day 2: The Buffet',
+        titleJa: 'Day 2: ビュッフェの流儀',
+        content: '終日航海日の朝。マーヴが27回のクルーズで磨き上げた「ビュッフェ戦術」をテーブル12に伝授する。皿は2枚持て、オムレツの列は開店5分前に並べ、デザートは偵察してから取れ。ベンは戦術をメモし始め、ケイラは夫が完全に洗脳されるのを見守る。シェリルは初めて他人と朝食を囲む。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'humorous',
+        tags: ['cruise', 'buffet', 'comedy', 'sea-day', 'food'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'male', text: "Marv: All right, Table 12, gather around. Before anybody touches a plate, we do a full lap of the buffet. You never commit to the first station. That's rule one. Reconnaissance before appetite." },
+                { speaker: 'female', text: "Kayla: It's seven in the morning and he's running a military briefing about scrambled eggs. Ben, why are you taking notes? Ben." },
+                { speaker: 'male', text: "Ben: Because it's brilliant, that's why. Look at him. Twenty-seven cruises. This man has systems. I've been waiting my whole life for someone to treat breakfast with this level of seriousness." },
+                { speaker: 'male', text: "Marv: Rule two. Two plates. One savory, one sweet. You carry both at once, you save yourself a whole trip. The rookies go back and forth like ping-pong balls. We are not rookies." },
+                { speaker: 'female', text: "Arlene: Forty-five years I've watched this man treat a breakfast buffet like the invasion of Normandy. You'd think after 27 cruises he'd relax. It only gets worse, kids." },
+                { speaker: 'female', text: "Cheryl: I'll be honest, I was going to grab a yogurt and run back to my cabin. But this is... kind of amazing? Is he going to make us do drills?" },
+                { speaker: 'male', text: "Marv: Cheryl, I heard that, and yes. Your assignment is the omelet station. Get in line five minutes before the rush at seven thirty. Tell Manny extra mushrooms. Say Marv sent you." },
+                { speaker: 'female', text: "Arlene: Manny's the omelet man. He's been on this ship six years, two kids, one on the way. His wife wants to move back to Lisbon. I know everything, dear, don't look so surprised." },
+                { speaker: 'female', text: "Kayla: We've been on this ship eighteen hours and Arlene already has a full dossier on the entire crew. Meanwhile I can't remember our cabin number." },
+                { speaker: 'male', text: "Julian: Good morning, Table 12! I see you've discovered the buffet! Quick reminder, belly-flop contest at noon, art auction at two, and tonight is trivia night! I expect all of you there! No excuses!" },
+                { speaker: 'male', text: "Ben: How does he already know we're Table 12? We're not even at the table. The buffet doesn't have table numbers." },
+                { speaker: 'female', text: "Arlene: Julian knows everything too, honey. He's me, but with a microphone and better knees." },
+                { speaker: 'male', text: "Marv: Final rule, and this is the one that matters. Dessert reconnaissance happens at breakfast. You see the good stuff early, you plan your whole day around it. That bread pudding at station four? That's tonight's target." },
+                { speaker: 'female', text: "Cheryl: You know what's funny? I have not thought about my ex-husband once since the omelet line. This buffet is cheaper than my therapist and the portions are bigger." },
+                { speaker: 'female', text: "Kayla: Okay, that got dark and then it got beautiful. Cheryl, you're my favorite. Ben, put it in the spreadsheet: Cheryl is my favorite." },
+                { speaker: 'male', text: "Ben: Already logged. Right under Marv's buffet rules, which now have their own tab. This is the best honeymoon ever and it's day two at a breakfast bar." },
+            ],
+            japanese: [
+                { speaker: 'male', text: "Marv: よし、テーブル12、集合。誰も皿に触る前に、ビュッフェを一周フルで回る。最初のコーナーで決めるな。それがルール1。食欲の前に偵察だ。" },
+                { speaker: 'female', text: "Kayla: 朝の7時に、この人スクランブルエッグについて軍事ブリーフィングやってる。ベン、なんでメモ取ってるの？ベン。" },
+                { speaker: 'male', text: "Ben: 天才的だからだよ。見てよ。クルーズ27回。この人にはシステムがある。朝食をこのレベルの真剣さで扱う人を、僕は人生ずっと待ってたんだ。" },
+                { speaker: 'male', text: "Marv: ルール2。皿は2枚。塩気用と甘味用。両方いっぺんに運べば、丸ごと1往復浮く。素人は卓球の球みたいに行ったり来たりする。わしらは素人じゃない。" },
+                { speaker: 'female', text: "Arlene: 45年間、この人が朝食ビュッフェをノルマンディー上陸作戦みたいに扱うのを見てきたわ。27回も乗れば落ち着くと思うでしょ。悪化する一方よ、あなたたち。" },
+                { speaker: 'female', text: "Cheryl: 正直言うと、ヨーグルトだけ取って船室に戻るつもりだったの。でもこれ…ちょっとすごくない？私たち、訓練させられるの？" },
+                { speaker: 'male', text: "Marv: シェリル、聞こえたぞ、そしてイエスだ。あんたの任務はオムレツコーナー。7時半のラッシュの5分前に並べ。マニーにマッシュルーム増しと言え。マーヴの紹介だと言うんだ。" },
+                { speaker: 'female', text: "Arlene: マニーはオムレツ担当よ。この船6年目、子供2人、3人目がもうすぐ。奥さんはリスボンに帰りたがってる。私は何でも知ってるの、そんなに驚いた顔しないで。" },
+                { speaker: 'female', text: "Kayla: 乗船して18時間なのに、アーリーンはもう乗組員全員の身上調書を持ってる。一方私は自分の船室番号も思い出せない。" },
+                { speaker: 'male', text: "Julian: おはようございます、テーブル12！ビュッフェを発見しましたね！ご連絡です、正午に腹打ち飛び込みコンテスト、2時にアートオークション、そして今夜はトリビアナイト！全員の参加を期待してますよ！言い訳なし！" },
+                { speaker: 'male', text: "Ben: なんで僕らがテーブル12だってもう知ってるんだ？テーブルにすらいないのに。ビュッフェに席番号はないぞ。" },
+                { speaker: 'female', text: "Arlene: ジュリアンも何でも知ってるのよ。あの子は私なの、マイクと丈夫な膝がついてるだけで。" },
+                { speaker: 'male', text: "Marv: 最後のルール、これが一番大事だ。デザートの偵察は朝食の時にやる。良い物を早めに見ておけば、一日をそれ中心に組める。4番コーナーのブレッドプディング？あれが今夜の標的だ。" },
+                { speaker: 'female', text: "Cheryl: おかしな話だけど、オムレツの列に並んでから、元夫のこと一度も考えてない。このビュッフェ、私のセラピストより安くて量が多いわ。" },
+                { speaker: 'female', text: "Kayla: 今の、一瞬暗くなってから美しくなった。シェリル、あなた私のお気に入り。ベン、スプレッドシートに入れて：シェリルは私のお気に入り。" },
+                { speaker: 'male', text: "Ben: 記録済み。マーヴのビュッフェ規則の真下に。ちなみに規則は専用タブになった。史上最高の新婚旅行だよ、まだ2日目の朝食バーだけど。" },
+            ],
+            generatedAt,
+            tone: 'humorous',
+        },
+    },
+
+    // ============================================================
+    // DAY 3 (Jul 6) -- THE POOL DECK
+    // ============================================================
+    {
+        id: 'cruise-day3',
+        date: '2026-07-06',
+        title: 'Day 3: The Pool Deck',
+        titleJa: 'Day 3: プールデッキ',
+        content: '2度目の終日航海日。プールデッキはタオルで席取りする「チェアホッガー」だらけ。アーリーンが往年の技で2列分の寝椅子を確保し、ジュリアンの司会でトリビア大会が始まる。チーム「テーブル12」は最終問題まで首位、まさかの珍回答で優勝を逃す。夜、タオルアートの白鳥が全員の船室に出現。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'humorous',
+        tags: ['cruise', 'pool', 'comedy', 'trivia', 'sea-day'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'male', text: "Ben: It's nine in the morning and every single deck chair has a towel on it and zero humans. Every chair. This is organized crime." },
+                { speaker: 'female', text: "Arlene: Chair hogs, honey. Oldest war at sea. But watch and learn -- I've been outmaneuvering these people since before you were born. See that family? They left at eight. Ship rule says thirty minutes, then the towel comes off." },
+                { speaker: 'female', text: "Kayla: Arlene is currently timing strangers' towels with a stopwatch. I have never respected anyone more in my entire life." },
+                { speaker: 'male', text: "Marv: She once cleared half a row on the Baltic run. The Norwegians still talk about it. Legendary morning." },
+                { speaker: 'female', text: "Cheryl: I got us six chairs together. I just... asked the pool attendant nicely and mentioned Arlene. He moved so fast. What exactly is your reputation on this fleet?" },
+                { speaker: 'female', text: "Arlene: Earned, dear. Fully earned. Now sit, the sun's perfect and Julian's trivia starts in ten minutes. We're a team. Team name's already registered: Table 12 and the Deep Blue Sea." },
+                { speaker: 'male', text: "Julian: Ladies and gentlemen, it's trivia time! Twenty questions, five categories, and the winning team gets the grand prize: a bottle of champagne and, more importantly, glory! Eternal, shipwide glory!" },
+                { speaker: 'male', text: "Ben: Okay team, I've got geography and math, Kayla's got movies and music, Marv's got history, Arlene's got, apparently, everything that has ever happened on any ship." },
+                { speaker: 'female', text: "Cheryl: What do I have? Oh no, what's my category? I haven't been on a team for anything since my divorce lawyer's office softball league." },
+                { speaker: 'female', text: "Kayla: Cheryl, you're a middle school science teacher. You've got science. You are secretly our strongest player and you don't even know it." },
+                { speaker: 'male', text: "Julian: Final question, for the win! Table 12 leads by one point! Question: what is the only mammal capable of true sustained flight? Thirty seconds!" },
+                { speaker: 'male', text: "Marv: Flying squirrel. Write it down. Flying squirrel. I'd bet the anniversary champagne on it. My gut has never been wrong at sea." },
+                { speaker: 'female', text: "Cheryl: Marv, no, it's the bat, flying squirrels glide, they don't-- he already wrote it. He wrote it and he's holding the card up. It's over. We lost to a squirrel." },
+                { speaker: 'female', text: "Arlene: Forty-five years, and this is the man I chose. The bat, Marvin. Every schoolchild in America knows it's the bat." },
+                { speaker: 'male', text: "Marv: And I stand by the squirrel. That's what leadership is, kids. Being wrong with total confidence. Anyway, second place still gets dignity, and dinner's in an hour." },
+                { speaker: 'female', text: "Kayla: Update: we got back to our cabins and there's a towel swan on every bed. Every cabin. Andres says the room stewards heard we 'lost with honor.' I love this cursed boat so much." },
+            ],
+            japanese: [
+                { speaker: 'male', text: "Ben: 朝の9時なのに、デッキチェア全部にタオルが置かれて人間はゼロ。全部の椅子だよ。これは組織犯罪だ。" },
+                { speaker: 'female', text: "Arlene: チェアホッガーよ、坊や。海で一番古い戦争。でも見て学びなさい -- あなたが生まれる前から、私はこの人たちを出し抜いてきたの。あの家族見える？8時に居なくなった。船の規則では30分、それでタオルは撤去よ。" },
+                { speaker: 'female', text: "Kayla: アーリーンが今、ストップウォッチで他人のタオルを計測してる。人生でこれほど人を尊敬したことない。" },
+                { speaker: 'male', text: "Marv: この人は昔、バルト海航路で半列を一掃したんだ。ノルウェー人たちは今もその話をする。伝説の朝だよ。" },
+                { speaker: 'female', text: "Cheryl: 6席並びで確保できたわ。ただ…プール係の人に丁寧にお願いして、アーリーンの名前を出しただけ。ものすごい速さで動いてくれた。この船団におけるあなたの評判って一体何なの？" },
+                { speaker: 'female', text: "Arlene: 勝ち取ったのよ、正々堂々とね。さあ座って、日差しは完璧、ジュリアンのトリビアが10分後に始まるわ。私たちはチーム。チーム名はもう登録済み：『テーブル12と深く青い海』。" },
+                { speaker: 'male', text: "Julian: 皆さん、トリビアの時間です！全20問、5カテゴリー、優勝チームには豪華賞品：シャンパン1本と、もっと大事な、栄光！船中に轟く永遠の栄光です！" },
+                { speaker: 'male', text: "Ben: よしチーム、僕が地理と数学、ケイラが映画と音楽、マーヴが歴史、アーリーンは、どうやら、あらゆる船で起きたあらゆる出来事全部。" },
+                { speaker: 'female', text: "Cheryl: 私は何担当？どうしよう、私のカテゴリーは？離婚弁護士事務所のソフトボールリーグ以来、チームってものに入ってないのに。" },
+                { speaker: 'female', text: "Kayla: シェリル、あなた中学の理科の先生でしょ。科学担当よ。あなたは実は最強メンバーなの、本人が気づいてないだけで。" },
+                { speaker: 'male', text: "Julian: 優勝を懸けた最終問題！テーブル12が1ポイントリード！問題：真の持続飛行ができる唯一の哺乳類は？30秒！" },
+                { speaker: 'male', text: "Marv: モモンガだ。書け。モモンガ。記念日のシャンパンを賭けてもいい。わしの勘は海の上で外れたことがない。" },
+                { speaker: 'female', text: "Cheryl: マーヴ、違う、コウモリよ、モモンガは滑空で、飛んでは-- もう書いちゃった。書いて、カードを掲げてる。終わりよ。私たちリスに負けたの。" },
+                { speaker: 'female', text: "Arlene: 45年。それで私が選んだ男がこれ。コウモリよ、マーヴィン。アメリカの小学生はみんなコウモリだと知ってるわ。" },
+                { speaker: 'male', text: "Marv: それでもわしはモモンガを支持する。それがリーダーシップだ、諸君。全幅の自信を持って間違えること。まあいい、2位にも尊厳はある、夕食は1時間後だ。" },
+                { speaker: 'female', text: "Kayla: 続報：船室に戻ったら、全員のベッドにタオルの白鳥がいた。全部の部屋に。アンドレスいわく、客室係が私たちが『名誉ある敗北をした』と聞いたからって。この呪われた船、大好きすぎる。" },
+            ],
+            generatedAt,
+            tone: 'humorous',
+        },
+    },
+
+    // ============================================================
+    // DAY 4 (Jul 7) -- THE FIRST PORT
+    // ============================================================
+    {
+        id: 'cruise-day4',
+        date: '2026-07-07',
+        title: 'Day 4: The First Port',
+        titleJa: 'Day 4: 最初の寄港地',
+        content: '最初の寄港地、コスメル島。ベンは「上陸は自由行動、ただし全員バディ制」の計画を配布。市場でアーリーンが値切り交渉の神業を見せ、マーヴはソンブレロを購入。帰船リミット30分前、シェリルの姿がない -- 全員で捜索した結果、彼女は桟橋のバーで地元のバンドと歌っていた。出港5分前に全力疾走で帰艦。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'humorous',
+        tags: ['cruise', 'port-day', 'comedy', 'cozumel', 'shopping'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'male', text: "Ben: All ashore that's going ashore! Okay, listen up. The ship leaves at five thirty sharp. All-aboard time is five. If you're not on the boat, the boat does not care about your feelings. It leaves." },
+                { speaker: 'male', text: "Marv: The kid's right about this one. I've seen it happen. San Juan, 2011. A fella ran down the pier waving his hat while the ship pulled away. Pier runners. Saddest sight at sea." },
+                { speaker: 'female', text: "Kayla: So everyone's got a buddy. I've got Ben, obviously, for better or worse -- that's literally in the contract now. Marv has Arlene. Cheryl, you're officially with all of us." },
+                { speaker: 'female', text: "Cheryl: Actually... I was thinking I might wander on my own for a bit? Just an hour. I've never done a foreign country alone. My ex did all the navigating for twenty-six years. I want to try." },
+                { speaker: 'female', text: "Arlene: Look at her. Day four and she's going rogue. Go, honey. Get lost a little. That's what ports are for. But be at that gangway at five or Ben's head will explode." },
+                { speaker: 'male', text: "Ben: My head will absolutely explode. Cheryl, I'm serious, five o'clock. I'm setting three alarms for you on principle." },
+                { speaker: 'female', text: "Arlene: Now, this market. Watch me work, kids. That vendor wants forty for the silver bracelet. Twenty-seven cruises of haggling says we settle at eighteen and he throws in earrings." },
+                { speaker: 'female', text: "Kayla: I just watched Arlene negotiate a man down from forty dollars to seventeen fifty and somehow he looked HAPPY about it. He gave her a hug. Who are you people." },
+                { speaker: 'male', text: "Marv: Meanwhile, executive decision: I bought a sombrero. The biggest one they had. Arlene says I look ridiculous. Correct. That's the entire point of a sombrero." },
+                { speaker: 'male', text: "Ben: Okay, it's four fifty-five and we have a situation. Everyone's at the gangway except Cheryl. Her phone's going straight to voicemail. Nobody panic. I'm panicking." },
+                { speaker: 'female', text: "Kayla: Ben ran back down the pier like an action hero. Marv's scanning the crowd with actual binoculars. Where did he even get binoculars? Why does he cruise with binoculars?" },
+                { speaker: 'male', text: "Marv: There! Pier bar, eleven o'clock! That's our girl -- on the STAGE?! She's got a microphone! She's singing with the band!" },
+                { speaker: 'female', text: "Cheryl: I lost track of time! They were playing my song! The one I used to sing before I got married and stopped doing everything! I'm sorry! I'm running! Look at me, I'm running in sandals!" },
+                { speaker: 'male', text: "Julian: And Table 12 comes sprinting up the gangway at five twenty-nine, ladies and gentlemen! In my nine years at sea that is the single best pier run I have ever witnessed! She was SINGING, folks!" },
+                { speaker: 'male', text: "Ben: Never again. My heart cannot take it. New rule in the spreadsheet: Cheryl gets a two-hour buffer and a tracking device." },
+                { speaker: 'female', text: "Cheryl: Worth it. Totally worth it. Twenty-six years without a stage, and it took a pier bar in Cozumel. Ben, honey, breathe. The ship waited. Everything's fine, and I remember the words to my song." },
+            ],
+            japanese: [
+                { speaker: 'male', text: "Ben: 上陸する者は全員上陸！よし、聞いて。船は5時半きっかりに出る。帰船時刻は5時。船に乗ってなければ、船は君の気持ちなんて考慮しない。出ちゃうんだ。" },
+                { speaker: 'male', text: "Marv: これについては坊主が正しい。わしは実際に見たことがある。サンフアン、2011年。船が離れていく中、男が帽子を振りながら桟橋を走ってた。ピアランナー。海で一番悲しい光景だ。" },
+                { speaker: 'female', text: "Kayla: というわけで全員バディ制。私はベン、当然ね、良い時も悪い時も -- 今やそれが文字通り契約書に入ってるから。マーヴはアーリーン。シェリル、あなたは公式に私たち全員とペア。" },
+                { speaker: 'female', text: "Cheryl: 実は…ちょっとだけ一人で歩いてみようかと思って。1時間だけ。外国を一人で歩いたことがないの。26年間、道案内は全部元夫がやってた。試してみたいの。" },
+                { speaker: 'female', text: "Arlene: 見てこの子。4日目にして単独行動よ。行きなさい。ちょっと迷子になってらっしゃい。寄港地はそのためにあるの。でも5時にはタラップにいないと、ベンの頭が爆発するわよ。" },
+                { speaker: 'male', text: "Ben: 僕の頭は間違いなく爆発する。シェリル、本気だからね、5時。念のため君用にアラームを3つセットする。" },
+                { speaker: 'female', text: "Arlene: さて、この市場。私の仕事ぶりを見てなさい。あの店主は銀のブレスレットに40ドルと言ってる。クルーズ27回分の値切り経験によると、18ドルで手を打って、イヤリングをおまけに付けさせるわ。" },
+                { speaker: 'female', text: "Kayla: 今アーリーンが男の人を40ドルから17ドル50に値切ったんだけど、なぜか相手は嬉しそうだった。彼女にハグまでした。あなたたち一体何者なの。" },
+                { speaker: 'male', text: "Marv: 一方こちらは経営判断：ソンブレロを買った。店で一番デカいやつだ。アーリーンは馬鹿みたいだと言う。正解。それこそがソンブレロの存在意義だ。" },
+                { speaker: 'male', text: "Ben: まずい、4時55分、緊急事態発生。シェリル以外全員タラップに集合してる。彼女の電話は留守電に直行。誰もパニックにならないで。僕はパニックだ。" },
+                { speaker: 'female', text: "Kayla: ベンがアクション映画のヒーローみたいに桟橋を駆け下りてった。マーヴは本物の双眼鏡で人混みをスキャン中。てか双眼鏡どこから出したの？なんで双眼鏡持ってクルーズ乗ってるの？" },
+                { speaker: 'male', text: "Marv: いたぞ！桟橋のバー、11時の方向！うちの子だ -- ステージの上？！マイク持ってるぞ！バンドと歌ってる！" },
+                { speaker: 'female', text: "Cheryl: 時間を忘れてたの！私の歌をやってたのよ！結婚して何もかもやめる前に歌ってた、あの歌！ごめんなさい！走ってる！見て、サンダルで走ってるわ！" },
+                { speaker: 'male', text: "Julian: そしてテーブル12、5時29分にタラップを駆け上がってきました、皆さん！私の海上勤務9年間で、間違いなく史上最高のピアランです！彼女、歌ってたんですよ、皆さん！" },
+                { speaker: 'male', text: "Ben: 二度とごめんだ。心臓がもたない。スプレッドシートに新規則：シェリルには2時間のバッファーと発信機を付ける。" },
+                { speaker: 'female', text: "Cheryl: 価値はあった。完全に価値あり。26年ステージなしで、コスメルの桟橋バーがそれを終わらせたの。ベン、深呼吸して。船は待ってくれた。何も問題ないし、私は自分の歌の歌詞をまだ覚えてた。" },
+            ],
+            generatedAt,
+            tone: 'humorous',
+        },
+    },
+
+    // ============================================================
+    // DAY 5 (Jul 8) -- FORMAL NIGHT
+    // ============================================================
+    {
+        id: 'cruise-day5',
+        date: '2026-07-08',
+        title: 'Day 5: Formal Night',
+        titleJa: 'Day 5: フォーマルナイト',
+        content: 'フォーマルナイト。ベンのタキシードのボタンが直前に取れ、アーリーンが裁縫キットで救出。マーヴは45年前の結婚式と同じ蝶ネクタイを着用。キャプテンズディナーでロブスターが振る舞われ、ラウンド船長がテーブル12に挨拶に来る。写真撮影でシェリルは初めて「一人の写真」を撮ってもらう。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'casual',
+        tags: ['cruise', 'formal-night', 'dinner', 'captain', 'lobster'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'male', text: "Ben: Kayla. Code red. The button just came off my tux jacket. The main one. The one that does all the work. We're due at dinner in forty minutes." },
+                { speaker: 'female', text: "Kayla: Of course it did. Okay, don't spiral. This is a boat full of retirees. Somebody within a hundred feet of us owns a sewing kit. It's basic math." },
+                { speaker: 'female', text: "Arlene: Sewing kit, reading glasses, and forty years of fixing this man's jackets. Hand it over, Ben, and hold still. I've sewn buttons in rougher seas than this, believe me." },
+                { speaker: 'male', text: "Marv: While she works -- Ben, look at this. This bow tie. Same one I wore at our wedding, 1981. Arlene says keeping it is sentimental nonsense. And yet, every formal night, here it is." },
+                { speaker: 'female', text: "Arlene: I said keeping it in the SOCK DRAWER is nonsense. The tie itself is the only fashionable decision you've made in five decades. Done, Ben. Better than the factory did it." },
+                { speaker: 'female', text: "Cheryl: Okay, I need honest opinions. This dress. I bought it for the cruise and I've been too scared to wear it. My ex always said red was 'a lot.' Is it a lot?" },
+                { speaker: 'female', text: "Kayla: Cheryl. It is exactly the right amount. You look incredible. Your ex had the taste of a beige wall. Wear the red." },
+                { speaker: 'male', text: "Julian: Table 12, my goodness, look at all of you! Formal night suits this table! Photographer's on deck five, captain's toast at seven, and Cheryl -- that dress! Somebody call the fire department!" },
+                { speaker: 'male', text: "Andres: Tonight we have the lobster. Now, a professional secret, free of charge: you may order two. Nobody tells the first-time cruisers this. It's the fleet's best-kept secret." },
+                { speaker: 'male', text: "Marv: TWO lobsters?! Andres. Six cruises together and you never told me. I've been leaving lobster on the table for YEARS. Do you understand what you've done to me?" },
+                { speaker: 'male', text: "Captain Lund: Good evening, Table 12. I'm Captain Lund. Julian tells me this table has the best story on board. Newlyweds, a forty-fifth anniversary, and, I'm told, a singer who nearly missed my ship in Cozumel." },
+                { speaker: 'female', text: "Cheryl: That's me. The singer. Captain, I am so sorry about the pier thing. In my defense, the band was playing Fleetwood Mac." },
+                { speaker: 'male', text: "Captain Lund: Madam, for Fleetwood Mac, I would have held the ship myself. Enjoy your evening, all of you. Smooth seas ahead. Well -- mostly. Keep an eye on tomorrow." },
+                { speaker: 'male', text: "Ben: 'Mostly'? What does 'mostly' mean? Captains don't just say 'mostly' and walk away. Kayla, he said 'keep an eye on tomorrow.' That's foreshadowing. I know foreshadowing." },
+                { speaker: 'female', text: "Kayla: Babe, eat your two lobsters. We just took the nicest photo of my whole life and Cheryl got a solo portrait on a staircase like a movie star. Tomorrow can do whatever it wants." },
+                { speaker: 'female', text: "Cheryl: A photo of just me. Not cropped out of someone else's picture. Just... me, in the red dress, on formal night. I'm buying the biggest print they sell." },
+            ],
+            japanese: [
+                { speaker: 'male', text: "Ben: ケイラ。緊急事態。タキシードのボタンが今取れた。メインのやつ。全部の仕事をしてるあのボタン。夕食まで40分しかない。" },
+                { speaker: 'female', text: "Kayla: でしょうね。オーケー、パニックにならないで。この船は引退世代でいっぱいなの。半径30メートル以内に必ず裁縫セット所持者がいる。単純な数学よ。" },
+                { speaker: 'female', text: "Arlene: 裁縫セット、老眼鏡、そしてこの人の上着を40年直し続けた経験。よこしなさい、ベン、じっとして。これより荒れた海でもボタンを付けたことがあるのよ、本当なんだから。" },
+                { speaker: 'male', text: "Marv: 彼女が作業してる間に -- ベン、これを見ろ。この蝶ネクタイ。1981年、わしらの結婚式で着けたのと同じやつだ。アーリーンは取っておくなんて感傷的なたわ言だと言う。それでも、フォーマルナイトのたびに、ほらここにある。" },
+                { speaker: 'female', text: "Arlene: 私が言ったのは『靴下の引き出しに』しまうのがたわ言ってこと。そのネクタイ自体は、この50年であなたがした唯一のおしゃれな決断よ。できたわ、ベン。工場より上手よ。" },
+                { speaker: 'female', text: "Cheryl: ねえ、正直な意見が欲しいの。このドレス。クルーズのために買ったんだけど、怖くて着られなかった。元夫はいつも赤は『やりすぎ』だって。やりすぎかな？" },
+                { speaker: 'female', text: "Kayla: シェリル。完璧にちょうどいい量よ。ものすごく素敵。あなたの元夫のセンスはベージュの壁並み。赤を着なさい。" },
+                { speaker: 'male', text: "Julian: テーブル12、なんてことだ、皆さん見てくださいよ！フォーマルナイトはこのテーブルのためにある！写真撮影は5デッキ、船長の乾杯は7時、そしてシェリル -- そのドレス！誰か消防署に電話を！" },
+                { speaker: 'male', text: "Andres: 今夜はロブスターです。ここでプロの秘密を無料でひとつ：2尾注文できます。初クルーズの方には誰も教えません。船団最大の秘密です。" },
+                { speaker: 'male', text: "Marv: ロブスター2尾？！アンドレス。一緒に6回クルーズして、今まで黙ってたのか。わしは何年もロブスターを取り損ねてたんだぞ。自分が何をしたか分かってるのか？" },
+                { speaker: 'male', text: "Captain Lund: こんばんは、テーブル12。ラウンド船長です。ジュリアンが、船内で一番いい物語を持つテーブルだと言うのでね。新婚夫婦に、結婚45周年、それから聞くところによると、コスメルで私の船に乗り遅れかけた歌手がいるとか。" },
+                { speaker: 'female', text: "Cheryl: それ私です。歌手です。船長、桟橋の件は本当にすみませんでした。弁明させてもらうと、バンドがフリートウッド・マックをやってたんです。" },
+                { speaker: 'male', text: "Captain Lund: マダム、フリートウッド・マックのためなら、私が自ら船を待たせましたよ。皆さん、良い夜を。この先は穏やかな海です。まあ -- おおむね。明日は気をつけて。" },
+                { speaker: 'male', text: "Ben: 『おおむね』？『おおむね』ってどういう意味だ？船長は『おおむね』とだけ言って立ち去ったりしない。ケイラ、『明日は気をつけて』って言った。あれは伏線だ。僕は伏線が分かるんだ。" },
+                { speaker: 'female', text: "Kayla: ベン、ロブスター2尾食べなさい。今、人生で一番素敵な写真を撮ったばかりだし、シェリルは映画スターみたいに階段でソロポートレートを撮ってもらったの。明日は明日の好きにさせておけばいい。" },
+                { speaker: 'female', text: "Cheryl: 私だけの写真。誰かの写真の端から切り取られたんじゃなくて。ただ…私が、赤いドレスで、フォーマルナイトにいる。売ってる中で一番大きいプリントを買うわ。" },
+            ],
+            generatedAt,
+            tone: 'casual',
+        },
+    },
+
+    // ============================================================
+    // DAY 6 (Jul 9) -- THE STORM
+    // ============================================================
+    {
+        id: 'cruise-day6',
+        date: '2026-07-09',
+        title: 'Day 6: The Storm',
+        titleJa: 'Day 6: 嵐',
+        content: '船長の予告どおり熱帯低気圧の縁をかすめ、船は一日中大きく揺れる。プールは閉鎖、ショーは中止、ベンは船酔いでダウン。テーブル12はラウンジに避難し、マーヴの「過去27回のクルーズで一番ひどかった嵐」自慢大会が始まる。ラウンド船長の冷静な船内放送が乗客を落ち着かせ、夜には星が見え始める。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'casual',
+        tags: ['cruise', 'storm', 'rough-seas', 'bonding', 'lounge'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'male', text: "Captain Lund: Good morning, ladies and gentlemen, this is your captain. As you have certainly noticed, we are skirting the edge of a tropical system. You will feel motion today. The ship is built for far worse. The pools are closed, the crew is smiling, and I am entirely calm. Thank you." },
+                { speaker: 'female', text: "Kayla: 'I am entirely calm' might be the most reassuring and most terrifying sentence I've ever heard over a loudspeaker." },
+                { speaker: 'male', text: "Ben: I'm not calm. I am the opposite of calm. The horizon keeps MOVING, Kayla. I took the seasickness pill, I'm wearing the wristbands, I ate the green apple Arlene swears by. I'm still green." },
+                { speaker: 'female', text: "Arlene: Poor baby. Sixth cruise rule: when the sea acts up, you go low and center. That's why we're in this lounge, midship, deck four. Least motion on the boat. Sit, watch the waves, sip the ginger ale." },
+                { speaker: 'male', text: "Marv: You call this a storm? Kids, let me tell you about the Atlantic crossing of 2009. Waves over the bow. Grand piano slid across the ballroom like a hockey puck. Now THAT was weather." },
+                { speaker: 'female', text: "Arlene: The piano moved four inches, Marvin, and the waves were in your imagination. I was there. I have photos. It was drizzling." },
+                { speaker: 'female', text: "Cheryl: Honestly? I kind of love this. The whole ocean's showing off. My ex would've spent the whole day complaining to guest services and demanding a refund for the weather." },
+                { speaker: 'female', text: "Kayla: Meanwhile my husband is lying on the lounge floor doing breathing exercises from a yoga app. In public. This is the man I married, everyone. In sickness and in health." },
+                { speaker: 'male', text: "Ben: The floor is the only honest place on this ship. The floor doesn't pretend the horizon is stable. The floor and I have an understanding." },
+                { speaker: 'male', text: "Julian: Table 12! There you are! Show's cancelled tonight, so we're doing an impromptu game tournament right here in the lounge in one hour. Cards, dominoes, the works! The sea can cancel the show, folks, but it cannot cancel FUN!" },
+                { speaker: 'male', text: "Marv: The boy's relentless. Ship could be sideways and he'd be announcing a limbo contest. Fine, deal me in. Dominoes. Cheryl, you're my partner, and unlike the trivia, I actually know this game." },
+                { speaker: 'female', text: "Cheryl: You said that about mammals, Marv. But okay, partners. If we lose, we blame the waves. Built-in excuse. That's the beauty of storm dominoes." },
+                { speaker: 'male', text: "Captain Lund: Good evening once more, this is your captain. The worst is behind us. Seas will settle overnight. And if you look out the starboard side in about twenty minutes, the clouds are breaking. You may see stars. A storm always pays for itself, in my experience. Good night." },
+                { speaker: 'female', text: "Kayla: Everyone went quiet and just walked to the windows. He was right. The sky did this... curtain thing. Even Ben got off the floor for it." },
+                { speaker: 'male', text: "Ben: For the record, I stood up for the stars and I regret nothing, even though my stomach filed a formal complaint. That's the closest I've come to poetry all week." },
+                { speaker: 'female', text: "Arlene: Forty-five years of cruises, and the nights after storms are still my favorite. The sea apologizes prettier than anybody I know. Look at that sky. Worth every wave." },
+            ],
+            japanese: [
+                { speaker: 'male', text: "Captain Lund: おはようございます、皆さん、船長です。すでにお気づきのとおり、我々は熱帯低気圧の縁を通過しています。本日は揺れを感じるでしょう。この船ははるかに悪い海況にも耐えるよう造られています。プールは閉鎖、乗組員は笑顔、そして私は完全に冷静です。以上。" },
+                { speaker: 'female', text: "Kayla: 『私は完全に冷静です』って、船内放送で聞いた中で一番安心できて一番怖い文章かもしれない。" },
+                { speaker: 'male', text: "Ben: 僕は冷静じゃない。冷静の正反対だ。水平線が動き続けてるんだよ、ケイラ。酔い止めは飲んだ、リストバンドも着けた、アーリーンが絶対効くって言う青リンゴも食べた。それでもまだ顔が緑色だ。" },
+                { speaker: 'female', text: "Arlene: かわいそうに。クルーズ規則その6：海が荒れたら、低く、中央へ。だからこのラウンジにいるのよ、船体中央、4デッキ。船で一番揺れない場所。座って、波を眺めて、ジンジャーエールをお飲みなさい。" },
+                { speaker: 'male', text: "Marv: これが嵐だと？諸君、2009年の大西洋横断の話をしてやろう。波が船首を越えてきた。グランドピアノがホッケーのパックみたいにボールルームを滑っていった。あれこそが荒天ってもんだ。" },
+                { speaker: 'female', text: "Arlene: ピアノは10センチ動いただけよ、マーヴィン、波はあなたの想像の中。私もいたのよ。写真もあるわ。霧雨だったじゃない。" },
+                { speaker: 'female', text: "Cheryl: 正直言うと？私これ、ちょっと好き。海全体が力を見せびらかしてる。元夫だったら一日中ゲストサービスに文句を言って、天気の返金を要求してたでしょうね。" },
+                { speaker: 'female', text: "Kayla: 一方、私の夫はラウンジの床に寝転がってヨガアプリの呼吸法をやってます。公衆の面前で。皆さん、これが私の結婚した男です。病める時も健やかなる時も。" },
+                { speaker: 'male', text: "Ben: 床はこの船で唯一正直な場所なんだ。床は水平線が安定してるふりをしない。床と僕は分かり合ってる。" },
+                { speaker: 'male', text: "Julian: テーブル12！ここにいましたね！今夜のショーは中止、なので1時間後にこのラウンジで即席ゲーム大会をやります。カード、ドミノ、なんでもあり！海はショーを中止にできても、皆さん、楽しさは中止にできません！" },
+                { speaker: 'male', text: "Marv: この小僧はへこたれん。船が横倒しになってもリンボー大会を告知してるだろうよ。よし、わしも入れろ。ドミノだ。シェリル、あんたがパートナーだ、トリビアと違ってこのゲームは本当に知ってる。" },
+                { speaker: 'female', text: "Cheryl: 哺乳類の時もそう言ってたわよ、マーヴ。でもいいわ、パートナーね。負けたら波のせいにしましょう。言い訳が最初から用意されてる。それが嵐のドミノの美学よ。" },
+                { speaker: 'male', text: "Captain Lund: 改めてこんばんは、船長です。最悪の区間は抜けました。海は夜のうちに落ち着きます。それから、20分ほどしたら右舷側をご覧ください、雲が切れてきています。星が見えるかもしれません。嵐は必ず元を取らせてくれる、というのが私の経験です。おやすみなさい。" },
+                { speaker: 'female', text: "Kayla: みんな静かになって、黙って窓に歩いていった。船長は正しかった。空がこう…幕が開くみたいになったの。ベンですらそのために床から起き上がった。" },
+                { speaker: 'male', text: "Ben: 記録のために言うと、僕は星のために立ち上がって、全く後悔してない、胃が正式に抗議文を提出したけど。今週一番、詩に近づいた瞬間だった。" },
+                { speaker: 'female', text: "Arlene: クルーズ45年、嵐の後の夜は今でも一番のお気に入り。海はね、私の知る誰よりも美しく謝るのよ。あの空を見て。波1つ分残らず、価値があったわ。" },
+            ],
+            generatedAt,
+            tone: 'casual',
+        },
+    },
+
+    // ============================================================
+    // DAY 7 (Jul 10) -- THE TALENT SHOW
+    // ============================================================
+    {
+        id: 'cruise-day7',
+        date: '2026-07-10',
+        title: 'Day 7: The Talent Show',
+        titleJa: 'Day 7: タレントショー',
+        content: 'ジュリアン主催の乗客タレントショー。コスメルの伝説を聞きつけたジュリアンがシェリルの出場を猛プッシュ。マーヴは手品(失敗確定)でエントリー、ベンとケイラは応援席で手作りうちわを掲げる。シェリルはフリートウッド・マックを歌い、スタンディングオベーションで優勝。トロフィーは無いのでタオル白鳥が授与される。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'humorous',
+        tags: ['cruise', 'talent-show', 'singing', 'comedy', 'triumph'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'male', text: "Julian: Cheryl! There she is! The Voice of Cozumel! The passenger talent show is TONIGHT and I have one open slot with your name written on it. In glitter pen. I already wrote it. Don't make me un-glitter it." },
+                { speaker: 'female', text: "Cheryl: Julian, singing at a pier bar after two margaritas is one thing. A theater with six hundred seats is a completely different animal. I haven't sung on an actual stage since Reagan was president." },
+                { speaker: 'female', text: "Arlene: And whose fault is that? Twenty-six years of a man who kept the radio off. Honey, the stage didn't go anywhere. It's been waiting. Sign the form." },
+                { speaker: 'male', text: "Marv: Besides, you won't even be the most nervous act. I'm doing my magic. The disappearing scarf. Fair warning: the scarf has never once disappeared. But the crowd loves watching me fail. I'm a crowd favorite." },
+                { speaker: 'female', text: "Kayla: Ben and I made signs. Actual poster-board signs. Mine says 'CHERYL' with a lightning bolt and Ben's has a pie chart for some reason. Explain the pie chart, Ben." },
+                { speaker: 'male', text: "Ben: It shows the audience breakdown: 40 percent rooting for Cheryl, 35 percent rooting for Marv's scarf to finally disappear, 25 percent here for the free cookies. It's motivational DATA." },
+                { speaker: 'female', text: "Cheryl: Okay. Okay okay okay. I'll do it. But if I freeze up there, Marv, you run on stage with that scarf and cause a diversion. Swear it. Swear on the buffet." },
+                { speaker: 'male', text: "Marv: On the buffet and on my two lobsters, I swear. Now go warm up. Do the thing singers do. Scales. Hot tea. Believing in yourself. All of it." },
+                { speaker: 'male', text: "Julian: Ladies and gentlemen, six acts tonight! A juggler, a comedian, a gentleman and his extremely loyal scarf -- and closing the show, direct from a pier bar in Cozumel, Miss CHERYL!" },
+                { speaker: 'female', text: "Kayla: The lights went down and I grabbed Ben's arm so hard he lost circulation. She walked out there in the red dress. Whole theater went quiet." },
+                { speaker: 'female', text: "Cheryl: I almost ran. My hands were shaking on the mic. And then I found four ridiculous faces in the second row -- one holding a pie chart -- and the first note just... came out. And after that, honestly, I don't remember deciding anything. I just sang." },
+                { speaker: 'male', text: "Marv: Six hundred people, on their feet. I've seen a lot of things at sea in twenty-seven cruises. I've never seen a room fall in love that fast." },
+                { speaker: 'female', text: "Arlene: I cried, Marv cried, the juggler cried. The comedian said following her should be illegal. Even the cookie people stood up, and they only came for the cookies." },
+                { speaker: 'male', text: "Julian: And your winner, by the loudest applause in this theater's history: CHERYL! We, uh, we don't actually have a trophy, so tonight the room stewards made you something. Folks, the golden towel swan!" },
+                { speaker: 'female', text: "Cheryl: A towel swan trophy. I've been handed diplomas, wedding rings, divorce papers. This is the best thing anyone's ever handed me, and I will be taking it through customs." },
+                { speaker: 'male', text: "Ben: Updated pie chart: 100 percent of this table is crying. Statistically significant honeymoon. Best data I've ever collected." },
+            ],
+            japanese: [
+                { speaker: 'male', text: "Julian: シェリル！いたいた！コスメルの歌姫！乗客タレントショーは今夜、そして出場枠が1つ、あなたの名前入りで空いてます。ラメペンで。もう書いちゃいました。ラメを消させないでくださいよ。" },
+                { speaker: 'female', text: "Cheryl: ジュリアン、マルガリータ2杯の後に桟橋のバーで歌うのと、600席の劇場は完全に別の生き物よ。ちゃんとしたステージで歌ったのはレーガンが大統領だった頃が最後なの。" },
+                { speaker: 'female', text: "Arlene: それは誰のせい？ラジオを消し続ける男との26年のせいよ。ねえ、ステージはどこにも行かなかった。ずっと待ってたの。申込書にサインなさい。" },
+                { speaker: 'male', text: "Marv: それに、あんたが一番緊張する出演者ってわけでもない。わしは手品をやる。消えるスカーフだ。先に言っておく：スカーフは一度も消えたことがない。だが観客はわしの失敗を見るのが大好きでな。わしは人気者なんだ。" },
+                { speaker: 'female', text: "Kayla: ベンと私は応援ボードを作ったの。本物のポスターボード。私のは稲妻付きの『CHERYL』、ベンのはなぜか円グラフ。円グラフの説明をどうぞ、ベン。" },
+                { speaker: 'male', text: "Ben: 観客の内訳だよ：40パーセントがシェリル応援、35パーセントがマーヴのスカーフが今度こそ消えるのを応援、25パーセントは無料クッキー目当て。モチベーションのためのデータだ。" },
+                { speaker: 'female', text: "Cheryl: 分かった。分かった分かった分かった。やるわ。でももしステージで固まったら、マーヴ、あなたスカーフ持って乱入して注意をそらして。誓って。ビュッフェに誓って。" },
+                { speaker: 'male', text: "Marv: ビュッフェと、わしのロブスター2尾に誓おう。さあウォームアップに行け。歌手がやるやつをやれ。発声練習。熱いお茶。自分を信じるってやつ。全部だ。" },
+                { speaker: 'male', text: "Julian: 皆さん、今夜は6組！ジャグラー、コメディアン、紳士と彼の極めて忠実なスカーフ -- そしてトリを飾るのは、コスメルの桟橋バーから直行、ミス・シェリル！" },
+                { speaker: 'female', text: "Kayla: 照明が落ちて、私はベンの腕を血が止まるくらい強く掴んだ。彼女が赤いドレスで歩いて出ていったの。劇場全体が静まり返った。" },
+                { speaker: 'female', text: "Cheryl: 逃げ出しかけたわ。マイクの上で手が震えてた。そしたら2列目に馬鹿みたいな顔が4つ見えたの -- 1人は円グラフを掲げてる -- そして最初の音が、ただ…出てきた。その後のことは、正直、何かを決めた記憶がないの。ただ歌ってた。" },
+                { speaker: 'male', text: "Marv: 600人が総立ちだ。27回のクルーズで、海の上でいろんなものを見てきた。部屋があんな速さで恋に落ちるのは初めて見たよ。" },
+                { speaker: 'female', text: "Arlene: 私は泣いた、マーヴも泣いた、ジャグラーも泣いた。コメディアンは彼女の後にやるのは法律で禁止すべきだって。クッキー目当ての人たちまで立ち上がったのよ、クッキーのためだけに来たのに。" },
+                { speaker: 'male', text: "Julian: そして優勝者は、この劇場史上最大の拍手をもって：シェリル！えー、実はトロフィーがないので、今夜は客室係が特別に作りました。皆さん、黄金のタオル白鳥です！" },
+                { speaker: 'female', text: "Cheryl: タオル白鳥のトロフィー。卒業証書も、結婚指輪も、離婚届も渡されてきたけど。これは人生で手渡された中で最高のもの。税関も一緒に通るからね。" },
+                { speaker: 'male', text: "Ben: 円グラフ更新：このテーブルの100パーセントが泣いてます。統計的に有意な新婚旅行。人生最高のデータが取れた。" },
+            ],
+            generatedAt,
+            tone: 'humorous',
+        },
+    },
+
+    // ============================================================
+    // DAY 8 (Jul 11) -- THE SNORKEL TRIP
+    // ============================================================
+    {
+        id: 'cruise-day8',
+        date: '2026-07-11',
+        title: 'Day 8: The Snorkel Trip',
+        titleJa: 'Day 8: シュノーケルツアー',
+        content: '2つ目の寄港地でシュノーケル・エクスカーション。ガイドのテッサに率いられ、テーブル12はウミガメと熱帯魚の海へ。最高の1日 -- のはずが、船に戻るボートの上でベンの結婚指輪が消えていることが発覚。パニックの中、マーヴが冷静に「防水ポーチの二重底」を捜索、指輪はベン自身が仕舞い込んで忘れていた。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'humorous',
+        tags: ['cruise', 'snorkeling', 'port-day', 'wedding-ring', 'panic'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'female', text: "Tessa: Good morning, snorkelers! I'm Tessa, your guide. Today: sea turtles, a reef, and the clearest water you've ever seen. Three rules. Don't touch the coral, don't chase the turtles, and don't lose anything you love, because the ocean keeps what it catches." },
+                { speaker: 'male', text: "Ben: 'The ocean keeps what it catches.' See, that's a great safety briefing. Kayla, I'm putting my ring in the waterproof pouch. Witnessed? Everyone see me do this responsible thing?" },
+                { speaker: 'female', text: "Kayla: Witnessed and notarized, babe. Meanwhile Marv is wearing flippers he brought from home. From HOME, Tessa. He owns personal flippers. He's owned them since the Clinton administration." },
+                { speaker: 'male', text: "Marv: And they've never let me down. Gear you trust is gear you keep. Write that down, Ben, that's a life rule, not just a snorkel rule." },
+                { speaker: 'female', text: "Cheryl: I haven't snorkeled in thirty years. If I see one turtle, ONE, I'm going to cry directly into the mask. Just so everyone's emotionally prepared for that." },
+                { speaker: 'female', text: "Tessa: Then get ready, because there's a big old male we call Winston who patrols this reef like he pays taxes on it. If he shows up, stay calm and let him run his errands." },
+                { speaker: 'female', text: "Arlene: WINSTON SHOWED UP. He swam right under Cheryl, slow as a Sunday, like he knew. Like the ocean heard about the talent show and sent its best guy." },
+                { speaker: 'female', text: "Cheryl: I cried in the mask. Tessa said that's the most normal thing that happens on her boat. Winston, if you're listening, you beautiful old man: thank you." },
+                { speaker: 'male', text: "Ben: Okay. Okay, don't-- everybody stay calm. We're on the boat, we're heading back, and my ring is not on my finger. My WEDDING ring. It's not in the left pouch pocket. Kayla. It's NOT IN THE POCKET." },
+                { speaker: 'female', text: "Kayla: Deep breaths. Babe. Look at me. When did you last physically see it? Don't spiral into the pie-chart place. Facts first." },
+                { speaker: 'male', text: "Ben: On the dock! I put it in the pouch, you notarized it! What if it fell out on the reef? Tessa said the ocean keeps what it catches. THE OCEAN HAS MY MARRIAGE, KAYLA." },
+                { speaker: 'male', text: "Marv: Son. Look at me. Twenty-seven cruises. Nobody's lost a ring on my watch yet. Hand me the pouch. These things have a second zipper compartment, and men in a panic never check the second zipper. It's a scientific fact." },
+                { speaker: 'female', text: "Arlene: The whole boat went silent. Tessa cut the engine. A pelican was watching. Marv opened the second zipper like he was defusing a bomb." },
+                { speaker: 'male', text: "Marv: ...And there it is. Second compartment. You zipped it in the safe pocket yourself, kid, and then your brain deleted the memory to make room for panic. Seen it a hundred times." },
+                { speaker: 'female', text: "Kayla: My husband proposed to the second zipper compartment right there on the boat. Got down on one knee and everything. Tessa says it's the best rescue she's had all season, and she once pulled a man off a jet ski." },
+                { speaker: 'male', text: "Ben: New spreadsheet tab: 'Things Marv Is Right About.' Current entries: buffets, second zippers, gear you trust. It's going to be a long tab. Winston, the ring, the turtle, the whole day -- ten out of ten." },
+            ],
+            japanese: [
+                { speaker: 'female', text: "Tessa: おはようございます、シュノーケラーの皆さん！ガイドのテッサです。本日は：ウミガメ、サンゴ礁、そして人生で一番透明な海。ルールは3つ。サンゴに触らない、カメを追いかけない、大切なものをなくさない。海は捕まえたものを返しませんから。" },
+                { speaker: 'male', text: "Ben: 『海は捕まえたものを返さない』。ほら、最高の安全講習だ。ケイラ、指輪は防水ポーチに入れるよ。証人になった？僕がこの責任ある行動をするの、みんな見た？" },
+                { speaker: 'female', text: "Kayla: 目撃、公証済みよ。一方マーヴは家から持参したフィン装着中。家からよ、テッサ。マイフィン所有者なの。クリントン政権の頃から持ってるんだって。" },
+                { speaker: 'male', text: "Marv: そして一度もわしを裏切ったことがない。信頼できる道具は持ち続ける道具だ。メモしろ、ベン、それは人生のルールだ、シュノーケルだけの話じゃない。" },
+                { speaker: 'female', text: "Cheryl: シュノーケルなんて30年ぶり。カメを1匹でも見たら、1匹でもよ、マスクの中に直接泣くから。みんな心の準備をしておいて。" },
+                { speaker: 'female', text: "Tessa: なら準備してください。このリーフには、まるで固定資産税でも払ってるみたいに巡回してるウィンストンっていう大きな雄がいるんです。現れたら、落ち着いて、彼の用事の邪魔をしないであげて。" },
+                { speaker: 'female', text: "Arlene: ウィンストンが現れたのよ。シェリルの真下を、日曜日みたいにゆっくり泳いでいったの、まるで知ってたみたいに。海がタレントショーの話を聞いて、エースを送り込んできたみたいに。" },
+                { speaker: 'female', text: "Cheryl: マスクの中で泣いたわ。テッサが言うには、彼女のボートで起こる一番普通の出来事ですって。ウィンストン、聞いてたら伝えたい、美しいおじいさん：ありがとう。" },
+                { speaker: 'male', text: "Ben: オーケー。オーケー、みんな-- 全員落ち着いて。今ボートの上で、帰る途中で、僕の指に指輪がない。結婚指輪だ。ポーチの左ポケットにない。ケイラ。ポケットにないんだ。" },
+                { speaker: 'female', text: "Kayla: 深呼吸。ベン。私を見て。最後に実物を見たのはいつ？円グラフの世界に逃げ込まないで。まず事実から。" },
+                { speaker: 'male', text: "Ben: 桟橋でだよ！ポーチに入れて、君が公証した！リーフで落ちてたら？テッサが言ってた、海は捕まえたものを返さないって。海が僕の結婚を持っていったんだ、ケイラ。" },
+                { speaker: 'male', text: "Marv: 坊主。わしを見ろ。クルーズ27回。わしの見てる前で指輪をなくした奴はまだいない。ポーチをよこせ。こういうのには第二のファスナー収納があってな、パニックになった男は絶対に第二ファスナーを確認しない。科学的事実だ。" },
+                { speaker: 'female', text: "Arlene: ボート全体が静まり返ったわ。テッサはエンジンを切った。ペリカンが見てた。マーヴは爆弾処理みたいに第二ファスナーを開けたの。" },
+                { speaker: 'male', text: "Marv: …ほら、あった。第二収納だ。自分で安全ポケットにしまったんだよ、坊主、そして脳がパニック用の空き容量を作るためにその記憶を削除したんだ。100回は見てきた光景だ。" },
+                { speaker: 'female', text: "Kayla: 私の夫はボートの上で第二ファスナー収納にプロポーズしました。片膝までついて。テッサいわく今シーズン最高の救出劇ですって。ジェットスキーから男の人を引き上げたことがある人が言うのよ。" },
+                { speaker: 'male', text: "Ben: スプレッドシートに新タブ：『マーヴが正しかったこと』。現在の項目：ビュッフェ、第二ファスナー、信頼できる道具。長いタブになりそうだ。ウィンストン、指輪、カメ、今日という一日 -- 10点満点で10点。" },
+            ],
+            generatedAt,
+            tone: 'humorous',
+        },
+    },
+
+    // ============================================================
+    // DAY 9 (Jul 12) -- THE VOW RENEWAL
+    // ============================================================
+    {
+        id: 'cruise-day9',
+        date: '2026-07-12',
+        title: 'Day 9: The Vow Renewal',
+        titleJa: 'Day 9: 誓いの更新',
+        content: '最後の終日航海日。アーリーンがぽろりと漏らした「45年前は式にお金をかけられなかった」の一言を聞いたテーブル12が動き出す。ジュリアンが根回しし、日没のデッキでラウンド船長によるマーヴ&アーリーンの誓いの更新式(バウ・リニューアル)が実現。ベンが進行表を作り、ケイラが花を、シェリルが歌を担当する。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'emotional',
+        tags: ['cruise', 'vow-renewal', 'anniversary', 'sunset', 'emotional'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'female', text: "Arlene: It's silly, what I remember. We got married on a Tuesday lunch break, 1981. Courthouse. My bouquet was carnations from a gas station. Marv promised me a real wedding someday. Then life just... kept being life." },
+                { speaker: 'female', text: "Kayla: Okay. She went to get her sun hat, so we have maybe ten minutes. Table 12 emergency meeting. We're throwing them a wedding. Tonight. At sunset. Objections? Good. Ben, go." },
+                { speaker: 'male', text: "Ben: Way ahead of you. I already talked to Julian. Vow renewals are literally a service the ship offers, there was a form, I have never filled out a form faster. Captain Lund does the ceremony. Deck sixteen, aft, seven o'clock. Golden hour. I checked the sun angle." },
+                { speaker: 'male', text: "Julian: Folks, in nine years I have never moved this fast. Flowers from the spa arrangement, the string quartet owes me a favor, and the pastry chef -- who, by the way, cried -- is making a two-tier cake shaped like a lobster. It was that or the towel swan. Committee vote." },
+                { speaker: 'female', text: "Cheryl: I asked what song they danced to in their kitchen for forty-five years. He said 'Songbird.' Fleetwood Mac. Of course it is. Of course. Yes, I'll sing it. Don't look at me, I'm already crying and it's only two in the afternoon." },
+                { speaker: 'male', text: "Marv: Hold on. Hold on. You want ME to keep a secret from ARLENE? The woman who found out about her own surprise party in 1994 from a cheese platter? Kids, she reads minds. I give us four hours." },
+                { speaker: 'female', text: "Kayla: Which is why you're not keeping the secret, Marv. You're the decoy. Take her to the art auction. Complain about the prices. Be yourself, basically. We handle the rest." },
+                { speaker: 'female', text: "Arlene: For the record, I knew by four thirty. Marvin voluntarily attended an art auction, dear. The man was practically wearing a sign. But I didn't know how big it was until they walked me onto that deck." },
+                { speaker: 'male', text: "Captain Lund: Ladies and gentlemen, in thirty-one years at sea I have married many strangers. Tonight is better. Tonight I get to look at forty-five years of proof. Marv, Arlene -- the sea has seen every kind of weather, and so have you. And here you both are. Still sailing." },
+                { speaker: 'male', text: "Marv: Arlene. Forty-five years ago I promised you a real wedding and a big cake, and I am only forty-four years late, which for me is punctual. You're the best decision I ever made, and you know I don't say that about anything but the buffet." },
+                { speaker: 'female', text: "Arlene: Marvin. I have followed you onto twenty-seven ships. I'd follow you onto a hundred more. You still make me laugh every single morning, you old fool, and that's rarer than any wedding. Yes. Again. Always yes." },
+                { speaker: 'female', text: "Cheryl: Then I sang 'Songbird' while the sun went down, and Marv -- Marv, who swears he never cries -- stood there with tears just rolling into his collar, holding her hands like it was 1981." },
+                { speaker: 'male', text: "Ben: I had a whole run sheet for the ceremony. Timed to the minute. I looked at it once, put it in my pocket, and just... watched. Some things shouldn't run on a schedule. That's going in the spreadsheet as a formal finding." },
+                { speaker: 'female', text: "Kayla: The captain signed a certificate, the quartet played, and the lobster cake was somehow delicious? Julian danced with everyone. EVERYONE. I watched him waltz with an eighty-year-old woman and then with the pastry chef." },
+                { speaker: 'male', text: "Julian: Best event of my career, folks, and I once organized a conga line through a hurricane warning. Table 12, you did this. I just made phone calls. Well -- seventeen phone calls. But who's counting!" },
+                { speaker: 'female', text: "Arlene: A wedding at sea, a lobster cake, and all five of you. Worth every year of the wait. Now everybody stop crying, because tomorrow we dock, and I refuse to say goodbye with puffy eyes." },
+            ],
+            japanese: [
+                { speaker: 'female', text: "Arlene: 覚えてることが、ばかみたいなの。1981年、火曜日の昼休みに結婚したのよ。裁判所でね。ブーケはガソリンスタンドのカーネーション。マーヴはいつか本物の結婚式をって約束してくれた。それから人生はただ…人生であり続けたわけ。" },
+                { speaker: 'female', text: "Kayla: よし。彼女、日よけ帽子を取りに行ったから、たぶん10分ある。テーブル12緊急会議。あの2人に結婚式を挙げてもらいます。今夜。日没に。異議は？よろしい。ベン、報告。" },
+                { speaker: 'male', text: "Ben: とっくに動いてる。もうジュリアンと話した。誓いの更新式は文字通り船の公式サービスで、申込書があって、人生最速で記入した。ラウンド船長が式を執り行う。16デッキ船尾、7時。ゴールデンアワー。太陽の角度は確認済みだ。" },
+                { speaker: 'male', text: "Julian: 皆さん、9年間でこんなに速く動いたのは初めてです。花はスパの装花から、弦楽四重奏は私に貸しがある、そしてパティシエは -- ちなみに泣いてました -- ロブスター型の2段ケーキを作ってます。それかタオル白鳥かの二択で。委員会採決の結果です。" },
+                { speaker: 'female', text: "Cheryl: 45年間キッチンで何の曲で踊ってきたのか聞いたの。彼、『ソングバード』って。フリートウッド・マック。そりゃそうよね。当然よ。ええ、歌うわ。こっち見ないで、もう泣いてるの、まだ昼の2時なのに。" },
+                { speaker: 'male', text: "Marv: 待て。待て待て。わしにアーリーンに隠し事をしろと？1994年、自分のサプライズパーティーをチーズの盛り合わせから見破った女だぞ？諸君、あれは心が読めるんだ。もって4時間だな。" },
+                { speaker: 'female', text: "Kayla: だからあなたは秘密を守る係じゃないの、マーヴ。あなたは囮。彼女をアートオークションに連れて行って。値段に文句を言って。要するに普段どおりにしてて。あとは私たちがやる。" },
+                { speaker: 'female', text: "Arlene: 記録のために言うと、4時半には気づいてたわ。マーヴィンが自分からアートオークションに参加したのよ、あなた。看板を下げて歩いてるようなものだったわ。でも、あのデッキに連れて行かれるまで、こんなに大きな話だとは知らなかった。" },
+                { speaker: 'male', text: "Captain Lund: 皆さん、私は31年間海の上で、多くの見知らぬ者同士を結婚させてきました。今夜はそれより良い。今夜は45年分の証明を見ることができるのですから。マーヴ、アーリーン -- 海はあらゆる天候を見てきました。あなたたちもです。そして2人は今もここにいる。まだ航海を続けている。" },
+                { speaker: 'male', text: "Marv: アーリーン。45年前、本物の結婚式とデカいケーキを約束した。遅れはたったの44年、わしにしては時間厳守だ。あんたはわしの人生最高の決断だ。わしがビュッフェ以外にそう言わないのは知ってるだろ。" },
+                { speaker: 'female', text: "Arlene: マーヴィン。私はあなたについて27隻の船に乗った。あと100隻でもついて行くわ。あなたは今でも毎朝私を笑わせてくれる、この老いぼれ。それはどんな結婚式より貴重なのよ。ええ。もう一度。いつでもイエスよ。" },
+                { speaker: 'female', text: "Cheryl: それから私は日が沈む中『ソングバード』を歌ったの。そしてマーヴが -- 絶対泣かないって言い張るマーヴが -- 涙を襟に流しながら立ってた。1981年みたいに彼女の両手を握って。" },
+                { speaker: 'male', text: "Ben: 式の進行表を作ってあったんだ。分刻みで。一度見て、ポケットにしまって、ただ…見てた。スケジュールで動かしちゃいけないものもある。これは正式な調査結果としてスプレッドシートに載せる。" },
+                { speaker: 'female', text: "Kayla: 船長が証明書にサインして、四重奏が演奏して、ロブスターケーキはなぜか美味しかった。ジュリアンは全員と踊ったの。全員とよ。80歳の女性とワルツを踊って、その次はパティシエと踊ってた。" },
+                { speaker: 'male', text: "Julian: キャリア最高のイベントです、皆さん。ハリケーン警報の中コンガの列を組織したことがある私が言うんですから。テーブル12、これは皆さんの功績です。私は電話をかけただけ。まあ -- 17本ですけど。細かいことはいいんです！" },
+                { speaker: 'female', text: "Arlene: 海の上の結婚式、ロブスターケーキ、そしてあなたたち5人。待った年月すべてに価値があったわ。さあみんな泣きやんで。明日は下船よ、腫れた目でさよならは言いたくないの。" },
+            ],
+            generatedAt,
+            tone: 'emotional',
+        },
+    },
+
+    // ============================================================
+    // DAY 10 (Jul 13) -- DISEMBARKATION
+    // ============================================================
+    {
+        id: 'cruise-day10',
+        date: '2026-07-13',
+        title: 'Day 10: Disembarkation',
+        titleJa: 'Day 10: 下船の日',
+        content: 'マイアミ帰港。廊下にスーツケースが並び、最後の朝食にテーブル12が集まる。アンドレスが「10日間で最高のテーブルだった」と告げ、連絡先が交換され、マーヴが来年の同じ船・同じ日程を全員分「仮押さえ」していたことが発覚。シェリルはタオル白鳥を機内持ち込みにすると宣言。ベンのスプレッドシートの最終行には数式ではなく一言だけ。',
+        series: 'cruise',
+        seriesTitle: 'The Honeymoon Cruise',
+        tone: 'emotional',
+        tags: ['cruise', 'disembarkation', 'goodbye', 'reunion-promise', 'emotional'],
+        createdAt: generatedAt,
+        updatedAt: generatedAt,
+        conversation: {
+            english: [
+                { speaker: 'male', text: "Ben: Suitcases in the hallway by midnight, breakfast at seven, our group gets called at eight forty. I have everyone's disembarkation number color-coded. Last spreadsheet of the trip. I made it slowly on purpose." },
+                { speaker: 'female', text: "Kayla: Ten days ago I threatened to throw that phone in the ocean. Now watching him make the last tab is genuinely making me sad. What has this boat done to me." },
+                { speaker: 'female', text: "Cheryl: I packed the towel swan in bubble wrap, then unpacked it, and it's coming on the plane as my personal item. The trophy flies carry-on. I've already decided and TSA can write me up." },
+                { speaker: 'male', text: "Andres: Table 12. Every cruise, the crew votes -- unofficially, quietly -- on the best table of the voyage. Ten days, three hundred tables. It was not close, my friends. It was not close." },
+                { speaker: 'female', text: "Arlene: Andres, honey, you say that to every table on the last morning. I know, because you said it to us in 2021. Don't you dare stop, it works every time. Come here, you're getting hugged." },
+                { speaker: 'male', text: "Marv: Before anybody gets weepy, business item. I made some calls yesterday. Same ship, same ten days, next July. There were five cabins left on our deck. There are now zero cabins left on our deck." },
+                { speaker: 'male', text: "Ben: You... booked us? All of us? Marv, that's -- Kayla, he pre-booked our anniversary. The math works. Our first anniversary is their forty-sixth. It's the same cruise. It's a reunion cruise." },
+                { speaker: 'female', text: "Kayla: I'm calling it now: this is the only standing appointment I will keep for the rest of my life. Dentists can be rescheduled. Table 12 cannot." },
+                { speaker: 'female', text: "Cheryl: A year from now. Same table, hopefully same waiter, and I'll have a whole year of singing again behind me. I signed up for a choir. I did it from the ship wifi at one in the morning. It cost me eleven dollars a minute and I regret nothing." },
+                { speaker: 'male', text: "Julian: There they are! My favorite disaster of a table! Cheryl, the theater tech guys made you something -- it's the audio file of your song, with the applause. All two minutes of the applause. Don't listen to it on the gangway, you'll block traffic crying." },
+                { speaker: 'female', text: "Arlene: Phone numbers, all of you. Real ones. And addresses, because I send Christmas cards, real paper ones, and starting this year there are five new names on my list. That's not a promise, that's a warning." },
+                { speaker: 'male', text: "Captain Lund: Table 12. I came down to see you off myself. In thirty-one years, do you know how many tables I remember? A handful. You are now a handful plus one. Fair winds until next July. My ship and I will be waiting." },
+                { speaker: 'female', text: "Cheryl: Ten days ago I almost cancelled this trip nine times. Nine. If you're listening, past Cheryl: get on the boat. Always get on the boat." },
+                { speaker: 'male', text: "Marv: One last rule, kids, and then we walk down that gangway like professionals. The cruise doesn't end when you dock. It ends when you stop telling the stories. So it doesn't end." },
+                { speaker: 'female', text: "Kayla: Group hug at the bottom of the gangway. Even Ben. ESPECIALLY Ben. Then we all held it together right up until Arlene waved from the taxi line, and then nobody held anything together at all." },
+                { speaker: 'male', text: "Ben: Final row of the honeymoon spreadsheet. No formula. It just says: 'Book Table 12 forever.' Logged, saved, and backed up twice. See everybody next July." },
+            ],
+            japanese: [
+                { speaker: 'male', text: "Ben: スーツケースは夜中の12時までに廊下へ、朝食は7時、僕らのグループの呼び出しは8時40分。全員の下船番号を色分けしてある。この旅最後のスプレッドシートだ。わざとゆっくり作った。" },
+                { speaker: 'female', text: "Kayla: 10日前、私はあのスマホを海に投げると脅してた。今は彼が最後のタブを作るのを見て、本気で寂しくなってる。この船、私に何をしたの。" },
+                { speaker: 'female', text: "Cheryl: タオル白鳥をプチプチで梱包して、それから梱包を解いたわ。飛行機には身の回り品として一緒に乗ります。トロフィーは機内持ち込み。もう決めたことだから、保安検査で報告書でも何でも書けばいいわ。" },
+                { speaker: 'male', text: "Andres: テーブル12。どのクルーズでも、乗組員は投票するんです -- 非公式に、こっそりと -- その航海のベストテーブルを。10日間、300テーブル。接戦ではありませんでした、皆さん。接戦では、ありませんでした。" },
+                { speaker: 'female', text: "Arlene: アンドレス、あなた、最後の朝には全部のテーブルにそれを言うんでしょ。知ってるのよ、2021年に私たちにも言ったんだから。絶対やめちゃだめよ、毎回効くんだから。いらっしゃい、ハグの刑よ。" },
+                { speaker: 'male', text: "Marv: 誰かが泣き出す前に、業務連絡だ。昨日何本か電話をかけた。同じ船、同じ10日間、来年の7月。わしらのデッキに空き船室が5つあった。今、わしらのデッキに空き船室はゼロだ。" },
+                { speaker: 'male', text: "Ben: 僕らの分を…予約した？全員分？マーヴ、それって -- ケイラ、この人僕らの結婚記念日を先行予約したんだ。計算が合う。僕らの1周年は2人の46周年。同じクルーズだ。同窓会クルーズだよ。" },
+                { speaker: 'female', text: "Kayla: 今ここで宣言する：これは私が一生守り続ける唯一の定例予定です。歯医者はリスケできる。テーブル12はできない。" },
+                { speaker: 'female', text: "Cheryl: 1年後。同じテーブルで、できれば同じウェイターで、そして私は歌い続けた1年間を背負ってここに戻ってくる。聖歌隊に申し込んだの。夜中の1時に船のWi-Fiでやったのよ。1分11ドルかかったけど、1ミリも後悔してない。" },
+                { speaker: 'male', text: "Julian: いたいた！私のお気に入りの、愛すべき問題テーブル！シェリル、劇場の音響スタッフから贈り物です -- あなたの歌の音声ファイル、拍手入りで。拍手まるごと2分間。タラップでは聴かないでくださいよ、泣いて通行止めになりますから。" },
+                { speaker: 'female', text: "Arlene: 電話番号、全員分よ。本物のをね。それから住所も。私はクリスマスカードを送るの、本物の紙のやつを。今年からリストに5人の新しい名前が加わるわ。これは約束じゃなくて、警告よ。" },
+                { speaker: 'male', text: "Captain Lund: テーブル12。自ら見送りに降りてきました。31年間で、私が覚えているテーブルがいくつあると思いますか？ほんの一握りです。あなたたちは今、一握りプラス1になりました。来年の7月まで、順風を。私と私の船は待っていますよ。" },
+                { speaker: 'female', text: "Cheryl: 10日前、私はこの旅行を9回キャンセルしかけた。9回よ。過去の私、聞こえてたら伝えたい：船に乗りなさい。いつだって、船に乗りなさい。" },
+                { speaker: 'male', text: "Marv: 最後のルールだ、諸君。それからプロらしくあのタラップを降りるぞ。クルーズは下船で終わるんじゃない。物語を語るのをやめた時に終わるんだ。だから、終わらない。" },
+                { speaker: 'female', text: "Kayla: タラップの下でグループハグ。ベンも。ベンこそね。それから全員、アーリーンがタクシー乗り場から手を振るまでは持ちこたえて、そこから先は誰一人として何も持ちこたえられなかった。" },
+                { speaker: 'male', text: "Ben: 新婚旅行スプレッドシートの最終行。数式はなし。ただ一言：『テーブル12を永遠に予約せよ』。記録、保存、バックアップ2回。みんな、来年の7月に。" },
+            ],
+            generatedAt,
+            tone: 'emotional',
+        },
+    },
+];

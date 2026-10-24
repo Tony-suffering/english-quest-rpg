@@ -1,9 +1,6 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/app/english/newspaper/page.tsx
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 'use client';
 
-// The Tonio Times — A4英字新聞。
+// The Tonio Times — 俺専用 A4英字新聞。
 // カレンダーから号を選ぶ → その日の新聞(Sheet 1: 英語のみ)+ 解説(Sheet 2: 日本語)を表示。
 // No.55〜 紙面は話題そのものを掘る記事2本 + それに反応する町の声と小説。
 // 語彙解説はやめた (Sheet 2 は原則編集後記だけ)。出典の帯も刷らない。
@@ -596,7 +593,7 @@ export default function NewspaperPage() {
                     紙面は DOM から外さない (印刷が mode に左右されないようにするため)。 */}
                 {(narrow || mode === 'read') && !ed.theme && <ReadSheet ed={ed} />}
                 <div className="nt-paper-wrap" style={(narrow || mode === 'read') && !ed.theme ? { display: 'none' } : undefined}>
-                    {ed.theme === 'aot' ? <AotSheet ed={ed} /> : ed.theme === 'ghost' ? <GhostSheet ed={ed} /> : <NewspaperSheet ed={ed} />}
+                    {ed.theme === 'aot' ? <AotSheet ed={ed} /> : ed.theme === 'ghost' ? <GhostSheet ed={ed} /> : ed.theme === 'exam' ? <ExamSheet ed={ed} /> : <NewspaperSheet ed={ed} />}
                 </div>
                 <NotesSheet ed={ed} />
                 {/* 紙面を1文ずつ読み上げるプレーヤー (画面のみ)。紙面側の data-tts に効く */}
@@ -657,15 +654,50 @@ function Tappable({ text, map, onPick }: {
     return <>{out}</>;
 }
 
-// 登録先は Words (/api/user-words) に一本化。語も表現も同じ棚に入れる。
+// 登録先は pick.kind で分ける (2026-09-25〜)。
+//   kind: 'word'  → Words   (/api/user-words)  単語・複合名詞
+//   それ以外       → Phrases (/api/phrases)     連語・言い回し・文
+// それまでは全部 Words に入れていたが、フレーズ復習に出ないので分けた。
+const isWordPick = (p: GlossPick) => p.kind === 'word';
+const pickKey = (p: GlossPick) => (isWordPick(p) ? 'w:' : 'p:') + p.en.trim().toLowerCase();
+
 async function postPick(pick: GlossPick): Promise<boolean> {
     try {
-        const res = await fetch('/api/user-words', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ english: pick.en, pronunciation: '', japanese: pick.ja, note: '', category: 'newspaper' }),
-        });
+        const res = isWordPick(pick)
+            ? await fetch('/api/user-words', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ english: pick.en, pronunciation: '', japanese: pick.ja, note: '', category: 'newspaper' }),
+            })
+            : await fetch('/api/phrases', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ english: pick.en, japanese: pick.ja, category: 'expression', date: todayStr() }),
+            });
         return res.ok || res.status === 409;
     } catch { return false; }
+}
+
+// Words と Phrases に既にあるものを 'w:' / 'p:' + 小文字 のキーで返す。取得に失敗した側は空。
+async function fetchRegisteredKeys(): Promise<Set<string>> {
+    const [pr, wr] = await Promise.all([
+        fetch('/api/phrases').then((r) => r.json()).catch(() => null),
+        fetch('/api/user-words').then((r) => r.json()).catch(() => null),
+    ]);
+    const s = new Set<string>();
+    pr?.phrases?.forEach((p: { english: string }) => s.add('p:' + p.english.trim().toLowerCase()));
+    wr?.words?.forEach((w: { english: string }) => s.add('w:' + w.english.trim().toLowerCase()));
+    return s;
+}
+
+// 語 / 句 の小さな札。どっちの棚に入るかを押す前に見せる。
+function KindTag({ p }: { p: GlossPick }) {
+    const w = isWordPick(p);
+    return (
+        <span style={{
+            display: 'inline-block', fontFamily: JP, fontSize: '9px', fontWeight: 800, lineHeight: 1,
+            padding: '2px 4px', borderRadius: '3px', marginRight: '5px', verticalAlign: '1px',
+            color: w ? '#8A6D12' : '#047857', border: `1px solid ${w ? '#D4AF3788' : '#10B98166'}`,
+        }}>{w ? '語' : '句'}</span>
+    );
 }
 
 // 画面下に出る解説。印刷には出さない。
@@ -775,7 +807,7 @@ function GlossPanel({ g, onClose, index, total, onMove }: {
                     文そのものは長いと復習できないので core があればそちらを登録する。 */}
                 <div style={{ marginTop: '12px', paddingTop: '10px', borderTop: `1px dashed ${RULE}33` }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '7px' }}>
-                        <span style={{ fontFamily: JP, fontSize: '9px', fontWeight: 800, color: GOLD, letterSpacing: '1.5px' }}>トレーニングに登録（WORDS）</span>
+                        <span style={{ fontFamily: JP, fontSize: '9px', fontWeight: 800, color: GOLD, letterSpacing: '1.5px' }}>トレーニングに登録（語 → WORDS / 句 → PHRASES）</span>
                         <button onClick={addAll} disabled={busy !== null}
                             style={{ ...chip(all.every((x) => done.has(x.en)), busy === '*'), marginLeft: 'auto' }}>
                             {all.every((x) => done.has(x.en)) ? 'すべて登録済み' : busy === '*' ? '登録中…' : 'まとめて登録'}
@@ -785,6 +817,7 @@ function GlossPanel({ g, onClose, index, total, onMove }: {
                     {(g.picks ?? []).map((pick, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'baseline', gap: '8px', padding: '5px 0', borderTop: i === 0 ? 'none' : `1px dotted ${RULE}22` }}>
                             <div style={{ flex: 1 }}>
+                                <KindTag p={pick} />
                                 <span style={{ fontFamily: SERIF, fontSize: '13px', fontWeight: 700, color: INK }}>{pick.en}</span>
                                 <span style={{ fontFamily: JP, fontSize: '11.5px', color: MUTED }}> — {pick.ja}</span>
                             </div>
@@ -797,7 +830,7 @@ function GlossPanel({ g, onClose, index, total, onMove }: {
 
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', padding: '5px 0', borderTop: `1px dotted ${RULE}22` }}>
                         <div style={{ flex: 1 }}>
-                            <span style={{ fontFamily: JP, fontSize: '10px', color: MUTED }}>{g.core ? '文（核だけ）' : '文まるごと'}</span>
+                            <span style={{ fontFamily: JP, fontSize: '10px', color: MUTED }}>{g.core ? '文（核だけ）' : '文まるごと'} → PHRASES</span>
                             <div style={{ fontFamily: SERIF, fontSize: '12.5px', color: INK, lineHeight: 1.5 }}>{sentencePick.en}</div>
                         </div>
                         <button onClick={() => add(sentencePick)} disabled={done.has(sentencePick.en) || busy !== null}
@@ -815,41 +848,37 @@ function GlossPanel({ g, onClose, index, total, onMove }: {
 // 難所の語は文をタップすれば出るが、それは「読んでいる途中で止まる」やり方になる。
 // 先に語だけ通してから読めば、同じ紙面でも負担が下がる。ここは紙面の頭に置く入口で、
 // 一覧そのものは紙の2枚目 (NotesSheet の WORD LIST) にある。登録先は GlossPanel と
-// 同じ /api/user-words (語も連語も同じ棚)。
+// 同じく kind で分ける (語 → Words / 句 → Phrases)。
 function PreReadWords({ ed }: { ed: NewspaperEdition }) {
     const groups = useMemo(() => collectEditionPicks(ed), [ed]);
     const all = useMemo(() => groups.flatMap((g) => g.picks), [groups]);
+    const words = useMemo(() => all.filter(isWordPick), [all]);
+    const phrases = useMemo(() => all.filter((p) => !isWordPick(p)), [all]);
     const [done, setDone] = useState<Set<string>>(new Set());
     const [busy, setBusy] = useState<string | null>(null);
 
-    // 既に Words にあるものは押さなくていい。取得できなければ黙って諦める (登録自体は通る)。
+    // 既に Words / Phrases にあるものは押さなくていい。取得できなければ黙って諦める (登録自体は通る)。
     useEffect(() => {
         let alive = true;
-        (async () => {
-            try {
-                const r = await fetch('/api/user-words').then((x) => x.json());
-                if (!alive) return;
-                const have = new Set<string>();
-                r?.words?.forEach((w: { english: string }) => have.add(w.english.trim().toLowerCase()));
-                setDone(new Set(all.filter((p) => have.has(p.en.trim().toLowerCase())).map((p) => p.en)));
-            } catch { /* noop */ }
-        })();
+        fetchRegisteredKeys().then((have) => { if (alive) setDone(have); }).catch(() => { /* noop */ });
         return () => { alive = false; };
     }, [all]);
 
     if (!all.length) return null;
 
-    const isDone = (p: GlossPick) => done.has(p.en);
+    const isDone = (p: GlossPick) => done.has(pickKey(p));
     const addMany = async (list: GlossPick[], tag: string) => {
         if (busy) return;
         setBusy(tag);
         for (const p of list) {
-            if (done.has(p.en)) continue;
-            if (await postPick(p)) setDone((prev) => new Set(prev).add(p.en));
+            if (isDone(p)) continue;
+            if (await postPick(p)) setDone((prev) => new Set(prev).add(pickKey(p)));
         }
         setBusy(null);
     };
     const doneCount = all.filter(isDone).length;
+    const wDone = words.filter(isDone).length;
+    const pDone = phrases.filter(isDone).length;
 
     const btn = (active: boolean): React.CSSProperties => ({
         border: 'none', borderRadius: '8px', padding: '7px 15px', fontFamily: JP,
@@ -867,6 +896,16 @@ function PreReadWords({ ed }: { ed: NewspaperEdition }) {
                     読む前に — この号の語 <b>{all.length}件</b>
                     <span style={{ color: MUTED, marginLeft: '8px', fontSize: '11px' }}>登録済み {doneCount}/{all.length}</span>
                 </div>
+                {words.length > 0 && phrases.length > 0 && <>
+                    <button onClick={() => addMany(words, 'w')} disabled={busy !== null || wDone === words.length}
+                        style={{ ...btn(busy === null && wDone < words.length), padding: '7px 11px' }}>
+                        {wDone === words.length ? `語 登録済み` : busy === 'w' ? `語 ${wDone}/${words.length}…` : `語だけ ${words.length} → Words`}
+                    </button>
+                    <button onClick={() => addMany(phrases, 'p')} disabled={busy !== null || pDone === phrases.length}
+                        style={{ ...btn(busy === null && pDone < phrases.length), padding: '7px 11px' }}>
+                        {pDone === phrases.length ? `句 登録済み` : busy === 'p' ? `句 ${pDone}/${phrases.length}…` : `句だけ ${phrases.length} → Phrases`}
+                    </button>
+                </>}
                 <button onClick={() => {
                     document.getElementById('notes-sheet')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }} style={{
@@ -1491,6 +1530,242 @@ function GhostSheet({ ed }: { ed: NewspaperEdition }) {
     );
 }
 
+// ===================== SHEET 1 (EXAM SKIN) — 号外 =====================
+// theme:'exam' 号外専用の紙面。試験会場の号外。マークシートの朱色の罫と、
+// 3時を指したまま時間を遅くする腕時計の紋章。ライトテーマ厳守。
+// 印刷ズームのため id="news-sheet" / className="a4-print" / 794px は通常号と共通。
+const EX = {
+    PAPER: '#FFFDF8',
+    PAPER2: '#FFF4EE',
+    INK: '#2A1D14',
+    MUTED: '#7A5E50',
+    MARK: '#C8492D',   // マークシートの朱
+    LEAD: '#3B3B3B',   // 鉛筆の黒
+    RULE: '#2A1D14',
+};
+
+// 時間を遅くする時計 — 針は3:00、本当の時刻 (4:20) は点線の幽霊の針で出す。
+function SlowWatch({ size = 62 }: { size?: number }) {
+    const ticks: React.ReactNode[] = [];
+    for (let i = 0; i < 12; i++) {
+        const a = (i * 30 * Math.PI) / 180;
+        const r1 = i % 3 === 0 ? 30 : 33;
+        ticks.push(<line key={i} x1={50 + Math.sin(a) * r1} y1={50 - Math.cos(a) * r1} x2={50 + Math.sin(a) * 37} y2={50 - Math.cos(a) * 37} stroke={EX.INK} strokeWidth={i % 3 === 0 ? 2.4 : 1.2} />);
+    }
+    const hand = (deg: number, len: number) => {
+        const a = (deg * Math.PI) / 180;
+        return { x2: 50 + Math.sin(a) * len, y2: 50 - Math.cos(a) * len };
+    };
+    return (
+        <svg width={size} height={size} viewBox="0 0 100 100" aria-hidden="true">
+            {/* ベルト */}
+            <rect x={38} y={2} width={24} height={12} rx={3} fill={EX.PAPER2} stroke={EX.INK} strokeWidth={1.6} />
+            <rect x={38} y={86} width={24} height={12} rx={3} fill={EX.PAPER2} stroke={EX.INK} strokeWidth={1.6} />
+            <circle cx={50} cy={50} r={41} fill="#FFFFFF" stroke={EX.INK} strokeWidth={3} />
+            {ticks}
+            {/* 本当の時刻 4:20 (幽霊の針) */}
+            <line x1={50} y1={50} {...hand(130, 20)} stroke={EX.MARK} strokeWidth={2.4} strokeDasharray="3 2.4" strokeLinecap="round" opacity={0.85} />
+            <line x1={50} y1={50} {...hand(120, 31)} stroke={EX.MARK} strokeWidth={1.6} strokeDasharray="3 2.4" strokeLinecap="round" opacity={0.85} />
+            {/* 時計が言い張る時刻 3:00 */}
+            <line x1={50} y1={50} {...hand(90, 21)} stroke={EX.INK} strokeWidth={3.6} strokeLinecap="round" />
+            <line x1={50} y1={50} {...hand(0, 32)} stroke={EX.INK} strokeWidth={2.2} strokeLinecap="round" />
+            <circle cx={50} cy={50} r={2.8} fill={EX.INK} />
+            {/* ガラスのひび */}
+            <path d="M22 30 L34 40 L30 46 L42 56" fill="none" stroke={EX.MUTED} strokeWidth={1} opacity={0.7} />
+            {/* 値札 */}
+            <text x={50} y={73} textAnchor="middle" fontSize={8} fontFamily="Georgia, serif" fontWeight={700} fill={EX.MARK}>¥100</text>
+        </svg>
+    );
+}
+
+// マークシートの1行 (A〜D、塗るのは1つだけ)。
+function Bubbles({ filled, label }: { filled: number; label: string }) {
+    return (
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', marginRight: '12px' }}>
+            <span style={{ fontFamily: SERIF, fontSize: '9px', fontWeight: 700, color: EX.MARK, minWidth: '14px' }}>{label}</span>
+            {['A', 'B', 'C', 'D'].map((c, i) => (
+                <span key={c} style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                    width: '13px', height: '17px', borderRadius: '7px',
+                    border: `1px solid ${EX.MARK}`, fontFamily: SERIF, fontSize: '7px', color: EX.MARK,
+                    background: i === filled ? EX.LEAD : 'transparent',
+                }}>{i === filled ? '' : c}</span>
+            ))}
+        </span>
+    );
+}
+
+const examSheetStyle: React.CSSProperties = {
+    width: '794px', maxWidth: 'calc(100% - 24px)', margin: '16px auto', backgroundColor: EX.PAPER,
+    boxShadow: '0 8px 30px rgba(0,0,0,0.22)', padding: '10px', boxSizing: 'border-box', color: EX.INK,
+    // マークシートの朱の罫 (うすく)
+    backgroundImage: 'repeating-linear-gradient(0deg, rgba(200,73,45,0.07) 0 1px, transparent 1px 22px)',
+};
+const examKicker: React.CSSProperties = {
+    fontFamily: SERIF, fontSize: '10.5px', fontWeight: 800, letterSpacing: '1.8px',
+    color: EX.MARK, textTransform: 'uppercase', marginBottom: '6px',
+};
+const examBodyP: React.CSSProperties = {
+    fontFamily: SERIF, fontSize: '11px', lineHeight: 1.52, color: EX.INK, margin: '0 0 6px',
+};
+
+function ExamSheet({ ed }: { ed: NewspaperEdition }) {
+    const glossMap = useMemo(() => {
+        const m = new Map<string, SentenceGloss>();
+        for (const g of ed.glosses ?? []) m.set(glossKey(g.en), g);
+        return m;
+    }, [ed]);
+    const [picked, setPicked] = useState<SentenceGloss | null>(null);
+    const T = (text: string) => <Tappable text={text} map={glossMap} onPick={setPicked} />;
+    const glosses = ed.glosses ?? [];
+    const idx = picked ? glosses.findIndex((x) => x.en === picked.en) : -1;
+    const move = (d: number) => {
+        const n = idx + d;
+        if (n >= 0 && n < glosses.length) setPicked(glosses[n]);
+    };
+
+    return (
+        <div id="news-sheet" className="a4-print" style={examSheetStyle}>
+            <div style={{ border: `3px solid ${EX.MARK}`, padding: '3px' }}>
+              <div className="nt-frame" style={{ border: `1px solid ${EX.MARK}`, padding: '16px 20px 18px', position: 'relative' }}>
+
+                {/* 号外シール */}
+                <div className="nt-seal" style={{
+                    position: 'absolute', top: '10px', right: '12px', transform: 'rotate(-8deg)',
+                    width: '58px', height: '58px', borderRadius: '50%', border: `2px solid ${EX.MARK}`,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    color: EX.MARK, fontFamily: JP, lineHeight: 1, background: EX.PAPER,
+                }}>
+                    <span style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '1px' }}>号外</span>
+                    <span style={{ fontSize: '7px', fontWeight: 700, letterSpacing: '1px', marginTop: '2px' }}>EXTRA</span>
+                </div>
+
+                {/* 受験票の帯 */}
+                <div style={{ borderTop: `3px solid ${EX.RULE}`, paddingTop: '7px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: SERIF, fontSize: '9.5px', letterSpacing: '1.5px', color: EX.MUTED, textTransform: 'uppercase', fontWeight: 700 }}>
+                        <span>{ed.mastheadKicker ?? '号外 · EXTRA'}</span>
+                        <span>Seat: back row · Watch: unreliable</span>
+                    </div>
+                </div>
+
+                {/* Emblem + title */}
+                <div className="nt-emblem" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', margin: '4px 0 2px' }}>
+                    <SlowWatch size={62} />
+                    <h1 className="nt-masthead" style={{ fontFamily: SERIF, fontSize: 'clamp(24px, 4.6vw, 40px)', fontWeight: 800, textAlign: 'center', margin: 0, letterSpacing: '0.5px', lineHeight: 1, color: EX.INK }}>
+                        {ed.mastheadTitle ?? 'The Tonio Times'}
+                    </h1>
+                    <SlowWatch size={62} />
+                </div>
+                <div style={{ textAlign: 'center', fontFamily: JP, fontSize: '10.5px', color: EX.MARK, letterSpacing: '1px', marginBottom: '7px', fontWeight: 700 }}>
+                    {ed.mastheadTagline ?? ''}
+                </div>
+
+                {/* Dateline bar */}
+                <div className="nt-dateline" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${EX.RULE}`, borderBottom: `3px double ${EX.RULE}`, padding: '5px 0', fontFamily: SERIF, fontSize: '10.5px', color: EX.INK, letterSpacing: '0.5px' }}>
+                    <span>{ed.weekdayLong}</span>
+                    <span style={{ fontStyle: 'italic', color: EX.MARK, fontWeight: 700 }}>{ed.motto}</span>
+                    <span>Price · One eraser</span>
+                </div>
+
+                {/* Tier 1: Lead + Voices | rail */}
+                <div className="nt-tier" style={{ display: 'grid', gridTemplateColumns: '1.15fr 1.15fr 0.9fr', gap: '0 18px', marginTop: '10px', alignItems: 'stretch' }}>
+                    <div className="nt-lead-col" style={{ gridColumn: '1 / 3', paddingRight: '18px', borderRight: `1px solid ${EX.RULE}`, display: 'flex', flexDirection: 'column' }}>
+                        <div className="nt-kicker" style={examKicker}>{ed.lead.kicker}</div>
+                        <h2 data-tts="lead-headline" style={{ fontFamily: SERIF, fontSize: '30px', fontWeight: 800, lineHeight: 1.03, margin: '0 0 6px', letterSpacing: '-0.4px', color: EX.INK }}>
+                            {T(ed.lead.headline)}
+                        </h2>
+                        {ed.lead.standfirst && (
+                            <p data-tts="lead-standfirst" style={{ fontFamily: SERIF, fontSize: '13px', fontStyle: 'italic', color: EX.MUTED, lineHeight: 1.35, margin: '0 0 6px', paddingBottom: '6px', borderBottom: `1px solid ${EX.RULE}` }}>
+                                {T(ed.lead.standfirst)}
+                            </p>
+                        )}
+                        {ed.lead.byline && (
+                            <div className="nt-byline" style={{ fontFamily: SERIF, fontSize: '9.5px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: EX.MUTED, margin: '0 0 7px' }}>{ed.lead.byline}</div>
+                        )}
+                        <div data-cols="2" style={{ columnCount: 2, columnGap: '18px', columnRule: `1px solid ${EX.RULE}` }}>
+                            {ed.lead.body.map((p, i) => (
+                                <p key={i} data-tts={`lead-body-${i}`} className={`nt-just${i === 0 ? ' nt-dropcap' : ''}`} style={examBodyP}>{T(p)}</p>
+                            ))}
+                        </div>
+
+                        {/* Voices */}
+                        <div className="nt-voices-block" style={{ marginTop: '11px', paddingTop: '8px', borderTop: `3px double ${EX.RULE}` }}>
+                            <div className="nt-kicker" style={examKicker}>{ed.voices.kicker}</div>
+                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap', margin: '0 0 6px' }}>
+                                <h3 data-tts="voices-headline" style={{ fontFamily: SERIF, fontSize: '20px', fontWeight: 800, lineHeight: 1.03, margin: 0, color: EX.INK }}>{T(ed.voices.headline)}</h3>
+                                <span data-tts="voices-headline" style={{ fontFamily: SERIF, fontSize: '12px', fontStyle: 'italic', color: EX.MUTED }}>{T(ed.voices.standfirst)}</span>
+                            </div>
+                            <div data-cols="2" style={{ columnCount: 2, columnGap: '18px', columnRule: `1px solid ${EX.RULE}` }}>
+                                {ed.voices.turns.map((t, i) => (
+                                    <div key={i} data-tts={`voices-turn-${i}`} style={{ marginBottom: '6px', breakInside: 'avoid' }}>
+                                        <p style={{ ...examBodyP, margin: '0 0 2px' }}><span style={{ fontWeight: 800, color: EX.MARK }}>Q. </span>{T(t.q)}</p>
+                                        <p style={{ ...examBodyP, margin: 0 }}><span style={{ fontWeight: 800, color: EX.INK }}>A. </span>“{T(t.a)}”</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Rail */}
+                    <div className="nt-rail-col" style={{ gridColumn: '3 / 4' }}>
+                        <div className="nt-kicker" style={examKicker}>{ed.rail.kicker}</div>
+                        <h3 data-tts="rail-headline" style={{ fontFamily: SERIF, fontSize: '21px', fontWeight: 800, lineHeight: 1.05, margin: '0 0 6px', color: EX.INK }}>{T(ed.rail.headline)}</h3>
+                        {ed.rail.byline && (
+                            <div className="nt-byline" style={{ fontFamily: SERIF, fontSize: '9px', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', color: EX.MUTED, margin: '0 0 7px' }}>{ed.rail.byline}</div>
+                        )}
+                        {ed.rail.body.map((p, i) => (<p key={i} data-tts={`rail-body-${i}`} className="nt-just" style={examBodyP}>{T(p)}</p>))}
+                        {/* 時刻の監査 = 受験票の枠 */}
+                        <div style={{ border: `1.5px solid ${EX.MARK}`, padding: '8px 10px', marginTop: '5px', background: EX.PAPER2 }}>
+                            <div style={{ fontFamily: SERIF, fontSize: '9px', fontWeight: 800, letterSpacing: '1.5px', textTransform: 'uppercase', color: EX.MARK, borderBottom: `1px solid ${EX.MARK}`, paddingBottom: '4px', marginBottom: '5px' }}>Time Audit · Official Findings</div>
+                            {ed.railStats.map((s, i) => (
+                                <div key={i} className="nt-stat" style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', fontFamily: SERIF, fontSize: '10.5px', padding: '2px 0', borderBottom: i < ed.railStats.length - 1 ? '1px dotted rgba(200,73,45,0.35)' : 'none' }}>
+                                    <span style={{ color: EX.MUTED }}>{s.label}</span>
+                                    <span style={{ fontWeight: 800, color: EX.INK, textAlign: 'right' }}>{s.value}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Story */}
+                <div style={{ marginTop: '8px', paddingTop: '8px', borderTop: `1px solid ${EX.RULE}` }}>
+                    <div className="nt-kicker" style={examKicker}>{ed.story.kicker}</div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap', margin: '0 0 7px' }}>
+                        <h3 data-tts="story-headline" style={{ fontFamily: SERIF, fontSize: '22px', fontWeight: 800, lineHeight: 1.03, margin: 0, color: EX.INK }}>{T(ed.story.headline)}</h3>
+                        <span style={{ fontFamily: SERIF, fontSize: '12.5px', fontStyle: 'italic', color: EX.MARK, fontWeight: 700 }}>{ed.story.cast}</span>
+                    </div>
+                    <div data-cols="3" style={{ columnCount: 3, columnGap: '18px', columnRule: `1px solid ${EX.RULE}` }}>
+                        {ed.story.body.map((p, i) => (
+                            <p key={i} data-tts={`story-body-${i}`} className={`nt-just${i === 0 ? ' nt-dropcap' : ''}`}
+                               style={{ ...examBodyP, ...(i === ed.story.body.length - 1 ? { fontStyle: 'italic', color: EX.MUTED, textAlign: 'right' } : {}) }}>
+                                {T(p)}
+                            </p>
+                        ))}
+                    </div>
+                </div>
+
+                {/* マークシートの帯 */}
+                <div style={{ marginTop: '10px', borderTop: `2px solid ${EX.MARK}`, paddingTop: '6px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', rowGap: '4px' }}>
+                    <Bubbles label="1" filled={2} />
+                    <Bubbles label="2" filled={0} />
+                    <Bubbles label="3" filled={3} />
+                    <Bubbles label="4" filled={1} />
+                    <span style={{ fontFamily: SERIF, fontSize: '8.5px', color: EX.MARK, letterSpacing: '1.5px', textTransform: 'uppercase', fontWeight: 700 }}>
+                        Fill each bubble completely · Do not trust the watch on your wrist
+                    </span>
+                </div>
+              </div>
+            </div>
+            {glossMap.size > 0 && (
+                <div className="no-print" style={{ textAlign: 'center', fontFamily: JP, fontSize: '11px', color: EX.MUTED, marginTop: '8px' }}>
+                    点線の文をタップすると、訳と「なぜ日本人に難しいか」が出る ({glossMap.size}文)
+                </div>
+            )}
+            {picked && <GlossPanel g={picked} index={idx} total={glosses.length} onMove={move} onClose={() => setPicked(null)} />}
+        </div>
+    );
+}
+
 // ===================== SHEET 2 — 解説 NOTES (Japanese) =====================
 const EMERALD = '#0F9D6E';
 const todayStr = () => {
@@ -1570,29 +1845,35 @@ function NotesSheet({ ed }: { ed: NewspaperEdition }) {
     };
 
     // ── 単語・表現の一覧 (紙の2枚目以降) ───────────────────────────────
-    // 注釈 (文タップ) に入れた picks を欄ごとに集めたもの。登録先は Words に一本化する
-    // (語も連語も同じ棚)。GlossPanel の「＋登録」と同じところに入るので、どちらから
-    // 押しても二重にはならない。
+    // 注釈 (文タップ) に入れた picks を欄ごとに集めたもの。登録先は kind で分ける
+    // (語 → Words / 句 → Phrases)。GlossPanel の「＋登録」と同じところに入るので、
+    // どちらから押しても二重にはならない。
     const pickGroups = useMemo(() => collectEditionPicks(ed), [ed]);
     const allPicks = useMemo(() => pickGroups.flatMap((g) => g.picks), [pickGroups]);
-    const pickDone = allPicks.filter((p) => registered.has(wKey(p.en))).length;
+    const pickIsDone = (p: GlossPick) => registered.has(pickKey(p));
+    const pickDone = allPicks.filter(pickIsDone).length;
     const [pickBusy, setPickBusy] = useState<string | null>(null);
 
+    const sendPick = async (p: GlossPick) => {
+        if (await postPick(p)) setRegistered((prev) => new Set(prev).add(pickKey(p)));
+    };
     const clickPick = async (p: GlossPick) => {
-        if (registered.has(wKey(p.en)) || pickBusy) return;
+        if (pickIsDone(p) || pickBusy) return;
         setPickBusy(p.en);
-        try { await registerWord(p.en, p.ja, ''); } finally { setPickBusy(null); }
+        try { await sendPick(p); } finally { setPickBusy(null); }
     };
     const registerPicks = async (list: GlossPick[], tag: string) => {
         if (pickBusy) return;
         setPickBusy(tag);
         try {
             for (const p of list) {
-                if (registered.has(wKey(p.en))) continue;
-                await registerWord(p.en, p.ja, '');
+                if (pickIsDone(p)) continue;
+                await sendPick(p);
             }
         } finally { setPickBusy(null); }
     };
+    const wordPicks = allPicks.filter(isWordPick);
+    const phrasePicks = allPicks.filter((p) => !isWordPick(p));
 
     // この号の単語・会話・作文をまとめて登録。
     const registerAll = async () => {
@@ -1736,6 +2017,7 @@ function NotesSheet({ ed }: { ed: NewspaperEdition }) {
                     }}>
                         <div style={{ fontFamily: JP, fontSize: '12px', color: INK }}>
                             読む前にここを通す
+                            <span style={{ color: MUTED, marginLeft: '8px', fontSize: '11px' }}>語 {wordPicks.length} → Words / 句 {phrasePicks.length} → Phrases</span>
                             <span style={{ color: MUTED, marginLeft: '8px', fontSize: '11px' }}>登録済み {pickDone}/{allPicks.length}</span>
                         </div>
                         <button
@@ -1754,7 +2036,7 @@ function NotesSheet({ ed }: { ed: NewspaperEdition }) {
                     </div>
 
                     {pickGroups.map((grp) => {
-                        const gDone = grp.picks.filter((p) => registered.has(wKey(p.en))).length;
+                        const gDone = grp.picks.filter(pickIsDone).length;
                         return (
                             <div key={grp.section} style={{ marginBottom: '12px', breakInside: 'auto' }}>
                                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', borderBottom: `1px solid ${RULE}`, paddingBottom: '3px', marginBottom: '6px' }}>
@@ -1779,10 +2061,10 @@ function NotesSheet({ ed }: { ed: NewspaperEdition }) {
                                 <div data-cols="2" style={{ columnCount: 2, columnGap: '20px' }}>
                                     {grp.picks.map((p, i) => (
                                         <div key={i} style={{ marginBottom: '3px', lineHeight: 1.4, breakInside: 'avoid' }}>
-                                            <span style={{ fontFamily: SERIF, fontSize: '12px', fontWeight: 700, color: INK }}>{p.en}</span>
+                                            <KindTag p={p} /><span style={{ fontFamily: SERIF, fontSize: '12px', fontWeight: 700, color: INK }}>{p.en}</span>
                                             <span style={{ fontFamily: JP, fontSize: '11px', color: INK }}> — {p.ja}</span>
                                             <AddChip
-                                                done={registered.has(wKey(p.en))}
+                                                done={pickIsDone(p)}
                                                 loading={pickBusy === p.en}
                                                 onClick={() => clickPick(p)}
                                             />

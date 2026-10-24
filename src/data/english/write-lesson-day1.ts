@@ -1,6 +1,3 @@
-// 自動生成 — ここでは直さない。
-// 元: iwasaki-naisou-website/src/data/english/write-lesson-day1.ts
-// 直すときは向こうを直して `node scripts/port-to-toniolab.mjs` を流す。
 /**
  * Day 1 インタラクティブ・レッスン(試作)。
  * 模範解答(意見論述)を「全文タップ辞書 + 語彙演習 + 文法重要事項」のレッスンに。

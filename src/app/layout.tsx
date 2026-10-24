@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Sora, Zen_Kaku_Gothic_New, Noto_Sans_JP } from 'next/font/google'
+import { Space_Grotesk, Sora, M_PLUS_Rounded_1c, Zen_Kaku_Gothic_New, Noto_Sans_JP } from 'next/font/google'
 import "./globals.css";
 import { Toaster } from '@/components/ui/sonner'
 import { SITE_URL, SITE_DESCRIPTION } from '@/lib/site'
@@ -23,6 +23,8 @@ const notoSansJP = Noto_Sans_JP({
 // 以下は遅延読み込み（preload: false）
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', weight: ['400', '700'], display: 'swap', preload: false })
 const sora = Sora({ subsets: ['latin'], variable: '--font-sora', weight: ['400', '700'], display: 'swap', preload: false })
+// 英語魂のページが var(--font-mplus-rounded) を使う(iwasaki の root layout と同じ定義)
+const mPlusRounded = M_PLUS_Rounded_1c({ subsets: ['latin'], variable: '--font-mplus-rounded', weight: ['400', '700'], display: 'swap', preload: false })
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -79,7 +81,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" suppressHydrationWarning className={`${spaceGrotesk.variable} ${sora.variable} ${zenKaku.variable} ${notoSansJP.variable}`}>
+    <html lang="ja" suppressHydrationWarning className={`${spaceGrotesk.variable} ${sora.variable} ${mPlusRounded.variable} ${zenKaku.variable} ${notoSansJP.variable}`}>
       <body className={`${zenKaku.className} antialiased`}>
         <CinematicOverlay />
         {children}

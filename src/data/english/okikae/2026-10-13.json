@@ -1,0 +1,209 @@
+{
+ "date": "2026-10-13",
+ "rows": [
+  {
+   "ja": "見栄張りたい",
+   "line": "もう買いにくくない？ちょっと見栄張りたい、見栄張りたいけど。",
+   "en1": "I kind of want to show off.",
+   "en2": "You want to look like a big shot, right?"
+  },
+  {
+   "ja": "冷静になった",
+   "line": "カタログ見てすごい冷静になったんだけど。",
+   "en1": "Looking at the catalog snapped me right out of it.",
+   "en2": "The catalog brought me back down to earth."
+  },
+  {
+   "ja": "下手すりゃ〜",
+   "line": "自転車乗る前と乗った後なんて、下手すりゃ5kgぐらい体重差ある。",
+   "en1": "It could easily be like five kilos.",
+   "en2": "Worst case, we're talking five kilos."
+  },
+  {
+   "ja": "そう考えると",
+   "line": "朝晩の体重差が3kgぐらいあるわけだ。そう考えると……",
+   "en1": "When you think about it that way...",
+   "en2": "So if you look at it like that..."
+  },
+  {
+   "ja": "誤差の範囲",
+   "line": "俺の誤差の範囲の中に平気で何十万収まるんだったら。",
+   "en1": "It's basically a rounding error.",
+   "en2": "That's well within the margin of error."
+  },
+  {
+   "ja": "〜ば〜ほどいい",
+   "line": "ダイエットのために乗ってんだから、疲れりゃ疲れるほどいいじゃん。",
+   "en1": "The more tired I get, the better.",
+   "en2": "If it wears me out, even better."
+  },
+  {
+   "ja": "ぶっ壊れるまで〜ればいい",
+   "line": "結果、今のがぶっ壊れるまで乗ればいいみたいな感じになっちゃって。",
+   "en1": "I'll just ride it till it falls apart.",
+   "en2": "I'm going to run this one into the ground."
+  },
+  {
+   "ja": "いや分かりますよ",
+   "line": "いや分かりますよ、タイトルコール前だってこと。",
+   "en1": "No, I know, I know.",
+   "en2": "Yeah, I get it, trust me."
+  },
+  {
+   "ja": "比べるもんじゃない",
+   "line": "だからそことは、比べるもんじゃないっていうか。",
+   "en1": "It's apples and oranges, really.",
+   "en2": "You can't even compare them."
+  },
+  {
+   "ja": "ハードルを上げすぎる",
+   "line": "頭の中で変にそこと比べてたから、ハードルを異常に上げすぎてた。",
+   "en1": "I set the bar way too high.",
+   "en2": "My expectations were through the roof."
+  },
+  {
+   "ja": "もうわかんなくなる",
+   "line": "もうわかんなくなるわ。もうビッグの話になってきたから。",
+   "en1": "I've totally lost the thread.",
+   "en2": "Now I don't even know where I'm going with this."
+  },
+  {
+   "ja": "もうどうでもいいんですよ",
+   "line": "うどんの話はどうなったの、みたいな。もうどうでもいいんですよ。",
+   "en1": "Who cares, honestly.",
+   "en2": "It doesn't even matter at this point."
+  },
+  {
+   "ja": "売り切れ次第終了",
+   "line": "8時とかから始まって、売り切れ次第終了って書いてある。",
+   "en1": "They're open till they sell out.",
+   "en2": "Once it's gone, it's gone."
+  },
+  {
+   "ja": "要は",
+   "line": "要は元々製麺所のところが製麺して、他にも出すけど。",
+   "en1": "Basically...",
+   "en2": "Bottom line is..."
+  },
+  {
+   "ja": "どうやら〜とされている",
+   "line": "そのお店のここがどうやら美味しいとされていて。",
+   "en1": "Apparently this is the place to go.",
+   "en2": "Word is this place is the real deal."
+  },
+  {
+   "ja": "〜だよ？",
+   "line": "7時に行くんだけど、平日だよ？",
+   "en1": "And this is on a weekday!",
+   "en2": "On a weekday, mind you."
+  },
+  {
+   "ja": "商売っ気がある",
+   "line": "商売っ気ある人がすごいなと思うのは。",
+   "en1": "Some people really know how to make a buck.",
+   "en2": "Those guys have a real nose for business."
+  },
+  {
+   "ja": "まさか〜はないだろう",
+   "line": "まさかピンポイントで住所行っても分からないはないだろうと思って。",
+   "en1": "There's no way I'm going to miss it with the exact address.",
+   "en2": "I figured I couldn't possibly get lost with the address, right?"
+  },
+  {
+   "ja": "話には聞いてたけど",
+   "line": "うどん屋さん行って、やっぱり話には聞いてたけど。",
+   "en1": "I'd heard about it, but still...",
+   "en2": "I knew what to expect, but man..."
+  },
+  {
+   "ja": "恥ずかしくてしょうがない",
+   "line": "並んで食べるとこだと、恥ずかしくてしょうがない。",
+   "en1": "It's so embarrassing.",
+   "en2": "I can't stand how awkward it is."
+  },
+  {
+   "ja": "食べ比べしたい",
+   "line": "もう1軒食べ比べしたいなってちょっと思って。",
+   "en1": "I wanted to try another place and compare.",
+   "en2": "I kind of wanted to do a taste test."
+  },
+  {
+   "ja": "それがもうおかしくて",
+   "line": "卵ぐっていう感じ。それがもう俺おかしくて。",
+   "en1": "That just cracked me up.",
+   "en2": "I couldn't stop laughing at that."
+  },
+  {
+   "ja": "またちょっと別だな",
+   "line": "800円のうどんと比べてどうかっていうと、またちょっと別だな。",
+   "en1": "That's a whole other story.",
+   "en2": "That's a different thing altogether."
+  },
+  {
+   "ja": "納得いかない",
+   "line": "劣ってるうどんを5倍の値段で食うっていうのは納得いかなかったり。",
+   "en1": "That just doesn't sit right with them.",
+   "en2": "It doesn't add up for them."
+  },
+  {
+   "ja": "〜のは分かるんだけど",
+   "line": "納得いかなかったりするのは分かるんだけど。",
+   "en1": "I totally get that, but...",
+   "en2": "I see where they're coming from, but..."
+  },
+  {
+   "ja": "いくらでも値上げできる",
+   "line": "便乗すればいくらでも値上げできると思うの。",
+   "en1": "They could jack up the prices all they want.",
+   "en2": "They could charge whatever they feel like."
+  },
+  {
+   "ja": "尊敬に値する",
+   "line": "もうちょっと尊敬に値することだなと思ったりはまあするんだけど。",
+   "en1": "You've got to respect that.",
+   "en2": "Honestly, hats off to them."
+  },
+  {
+   "ja": "〜すぎたせいで",
+   "line": "うどん県推しすぎたせいでさ、骨付き鳥が全然クローズアップされてない。",
+   "en1": "They pushed the udon thing so hard nobody talks about the chicken.",
+   "en2": "The udon hype totally buried the chicken."
+  },
+  {
+   "ja": "〜な気がしてる",
+   "line": "カーネルサンダースに対抗できるの、骨付き鳥な気俺ちょっとしてる。",
+   "en1": "I kind of feel like it could take on KFC.",
+   "en2": "I've got a hunch it could go toe to toe with KFC."
+  },
+  {
+   "ja": "定着しない",
+   "line": "池袋に1回美味しい店ができたんだけど、定着しなくてなくなった。",
+   "en1": "It just never caught on.",
+   "en2": "It didn't stick."
+  },
+  {
+   "ja": "なんで教えてくれないの",
+   "line": "あそこうまかったんですよ、みたいな。なんで教えてくれないの的な。",
+   "en1": "Why didn't you tell me?",
+   "en2": "And you're only telling me now?"
+  },
+  {
+   "ja": "酸いも甘いも噛み分ける",
+   "line": "ラジオの酸いも甘いも噛み分けてるはずのスタッフが。",
+   "en1": "guys who've seen it all",
+   "en2": "people who've been around the block"
+  },
+  {
+   "ja": "どうかしてる",
+   "line": "ただ単に急に気がどうかしてるような大きい声がいいみたいです。",
+   "en1": "like I've totally lost my mind",
+   "en2": "like I've gone completely nuts"
+  },
+  {
+   "ja": "足を伸ばす",
+   "line": "愛媛県の四国中央ぐらいまでまたあるんだけど、そこまで足伸ばし……",
+   "en1": "if I go a little further out",
+   "en2": "if I head out that way too"
+  }
+ ]
+}

@@ -1,5 +1,39 @@
 // Saved Phrases - localStorage management for favorite phrases
 
+// Local (device-timezone) YYYY-MM-DD, so late-night JST saves land on the right day.
+export function todayLocalDate(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// Register a phrase straight into training (Daily Phrases / D1), skipping the bookmarks step.
+// Returns 'added' on success, 'duplicate' if it already exists, 'error' on failure.
+export async function addPhraseToTraining(
+    english: string,
+    japanese?: string,
+    date?: string,
+): Promise<'added' | 'duplicate' | 'error'> {
+    if (!english.trim()) return 'error';
+    try {
+        const res = await fetch('/api/phrases', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                english,
+                japanese: japanese || '',
+                category: 'daily',
+                date: date || todayLocalDate(),
+            }),
+        });
+        if (!res.ok) return 'error';
+        const data = await res.json();
+        return data.duplicate ? 'duplicate' : 'added';
+    } catch (e) {
+        console.error('addPhraseToTraining failed:', e);
+        return 'error';
+    }
+}
+
 export interface SavedPhrase {
     id: string;
     english: string;
