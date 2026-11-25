@@ -11,6 +11,7 @@
 
 export interface DebateLine {
     who: 'hasan' | 'pinker';
+    t?: number;      // 動画の中で言い始める秒(英語字幕の単語の時刻から取った。数語ずれることがある)
     en: string;
     ja: string;
 }
@@ -53,9 +54,9 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '暗い事実を4つ(権威主義の台頭・難民・核の危機・気候変動)並べてから、相手の本の「楽観的な一文」を引用して落差を見せる。',
         defense: '「どの物差しで測っても良くなっている」と一般論で受け、具体の物差し(寿命・教育・安全・戦死)を4つ即答で並べる。',
         lines: [
-            { who: 'hasan', en: 'We live in a world in which authoritarianism is on the rise ... and yet you come along with your new much-discussed book.', ja: '権威主義が台頭する世界に生きているのに、あなたは話題の新刊を引っさげてやって来た。' },
-            { who: 'pinker', en: 'Any aspect of human well-being that you measure has shown an increase.', ja: '人間の幸福のどの面を測っても、上がっている。' },
-            { who: 'pinker', en: 'We live longer, more of us go to school, life is safer, fewer of us die in wars.', ja: '寿命は延び、学校に行く人は増え、暮らしは安全になり、戦争で死ぬ人は減った。' },
+            { who: 'hasan', t: 7.4, en: 'We live in a world in which authoritarianism is on the rise ... and yet you come along with your new much-discussed book.', ja: '権威主義が台頭する世界に生きているのに、あなたは話題の新刊を引っさげてやって来た。' },
+            { who: 'pinker', t: 35.1, en: 'Any aspect of human well-being that you measure has shown an increase.', ja: '人間の幸福のどの面を測っても、上がっている。' },
+            { who: 'pinker', t: 38.7, en: 'We live longer, more of us go to school, life is safer, fewer of us die in wars.', ja: '寿命は延び、学校に行く人は増え、暮らしは安全になり、戦争で死ぬ人は減った。' },
         ],
         moves: [
             { name: '落差の演出', who: 'hasan', how: '暗い事実を先に積んでから、相手の明るい言葉を読む。読まれた側は弁解から入らされる。' },
@@ -76,9 +77,9 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '「批判者はこう言っている」と第三者の声を借り、さらに哲学者の差別発言(カント・ロック・ヒューム・ヴォルテール)を名指しで4つ並べる。',
         defense: '最初は「それは誤りだ、時系列が違う」と全否定。名指しを並べられると「人には暗部があった」と人は認めて、「私が掲げるのは人ではなく考えだ」と線を引く。',
         lines: [
-            { who: 'pinker', en: "That's false. I do take it into account, and it's anachronistic. The chronology is wrong.", ja: 'それは誤りだ。考慮している。時代錯誤だし、時系列が違う。' },
-            { who: 'pinker', en: 'Slavery has existed since civilization has existed.', ja: '奴隷制は文明と同じだけ古い。' },
-            { who: 'pinker', en: "Absolutely a dark side to these people. ... What I'm holding up are the ideas.", ja: 'この人たちには確かに暗部があった。私が掲げているのは、考えのほうだ。' },
+            { who: 'pinker', t: 110.3, en: "That's false. I do take it into account, and it's anachronistic. The chronology is wrong.", ja: 'それは誤りだ。考慮している。時代錯誤だし、時系列が違う。' },
+            { who: 'pinker', t: 115.5, en: 'Slavery has existed since civilization has existed.', ja: '奴隷制は文明と同じだけ古い。' },
+            { who: 'pinker', t: 194.3, en: "Absolutely a dark side to these people. ... What I'm holding up are the ideas.", ja: 'この人たちには確かに暗部があった。私が掲げているのは、考えのほうだ。' },
         ],
         moves: [
             { name: '第三者の声を借りる', who: 'hasan', how: 'Critics say / Some scholars say で始めると、司会自身は攻撃していない形のまま攻められる。' },
@@ -100,9 +101,9 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '相手の肩書きを持ち上げてから(very prominent, well-credentialed scientist)、「でも本は論証ではなく論争文だ」と落とす。',
         defense: '一言で全否定(Totally wrong. That\'s just dead wrong.)。それから「何が幸福か(寿命・病死・暴力死)は誰でも合意している。それを全部グラフにしただけだ」と、選んでいない根拠を示す。',
         lines: [
-            { who: 'hasan', en: 'Some say you cherry-pick data to justify that conclusion. What do you say to them?', ja: '結論を正当化するためにデータをつまみ食いしている、と言う人もいる。どう答える?' },
-            { who: 'pinker', en: "Totally wrong. That's just dead wrong.", ja: '完全に間違いだ。まったくの見当違いだ。' },
-            { who: 'pinker', en: 'We all agree on what human well-being consists of — like life expectancy, like death from disease.', ja: '人間の幸福が何でできているかは、誰でも合意している。寿命、病気による死。' },
+            { who: 'hasan', t: 254.1, en: 'Some say you cherry-pick data to justify that conclusion. What do you say to them?', ja: '結論を正当化するためにデータをつまみ食いしている、と言う人もいる。どう答える?' },
+            { who: 'pinker', t: 258.2, en: "Totally wrong. That's just dead wrong.", ja: '完全に間違いだ。まったくの見当違いだ。' },
+            { who: 'pinker', t: 261.9, en: 'We all agree on what human well-being consists of — like life expectancy, like death from disease.', ja: '人間の幸福が何でできているかは、誰でも合意している。寿命、病気による死。' },
         ],
         moves: [
             { name: '持ち上げてから落とす', who: 'hasan', how: '相手を褒めてから批判すると、批判が個人攻撃に聞こえない。' },
@@ -123,9 +124,9 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '相手の数字を正確に読み上げてから、「でもその物差し自体が恣意的だと言う学者が大勢いる」と物差しを攻める。別の学者の数字(40億人が貧困)をぶつける。',
         defense: '「定義が恣意的なのは当たり前だ」と相手の前提を先に認め、「どこに線を引いても向きは下だ」と、物差しを変えても結論が変わらないと返す。',
         lines: [
-            { who: 'hasan', en: 'There are numerous studies and a number of scholars who dispute that poverty measure as arbitrary, as inaccurate.', ja: 'その貧困の物差しを、恣意的で不正確だと異を唱える研究や学者がたくさんいる。' },
-            { who: 'pinker', en: 'Of course the definition of extreme poverty is going to be arbitrary. If you make it higher, more people will be in poverty.', ja: 'もちろん極度の貧困の定義は恣意的だ。線を高くすれば、貧困の人は増える。' },
-            { who: 'pinker', en: 'No matter what cutoff you set, the direction is down.', ja: 'どこで線を引いても、向きは下だ。' },
+            { who: 'hasan', t: 304, en: 'There are numerous studies and a number of scholars who dispute that poverty measure as arbitrary, as inaccurate.', ja: 'その貧困の物差しを、恣意的で不正確だと異を唱える研究や学者がたくさんいる。' },
+            { who: 'pinker', t: 326.7, en: 'Of course the definition of extreme poverty is going to be arbitrary. If you make it higher, more people will be in poverty.', ja: 'もちろん極度の貧困の定義は恣意的だ。線を高くすれば、貧困の人は増える。' },
+            { who: 'pinker', t: 335.4, en: 'No matter what cutoff you set, the direction is down.', ja: 'どこで線を引いても、向きは下だ。' },
         ],
         moves: [
             { name: '物差しを攻める', who: 'hasan', how: '数字の中身ではなく、数字を作る定義を疑う。数字が正しくても議論が揺らぐ。' },
@@ -147,10 +148,10 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '線を5ドルに上げて「人数は10億人増えた」と、相手の主張と逆向きの数字を出す。さらに「あなたも本で人数を使っている」と矛盾を突く。',
         defense: '「その間に世界の人口が数十億人増えた。大事なのは割合だ」と分母を持ち出す。矛盾を突かれると「最も広く受け入れられた定義では人数も減っている。でも主眼は割合だ」と順位を付けて答える。',
         lines: [
-            { who: 'hasan', en: 'A billion people have been added to the number of people on that poverty measure since 1981.', ja: 'その物差しでは、1981年から貧困の人が10億人増えている。' },
-            { who: 'pinker', en: "Billions of people have been added to the world as a whole. What's relevant is the proportion.", ja: '世界全体で数十億人増えた。大事なのは割合だ。' },
-            { who: 'hasan', en: 'You also use absolute numbers in your book.', ja: 'あなたも本で人数を使っている。' },
-            { who: 'pinker', en: 'The absolute numbers have declined as well, but the main point is the proportion.', ja: '人数も減っている。でも要点は割合だ。' },
+            { who: 'hasan', t: 344.3, en: 'A billion people have been added to the number of people on that poverty measure since 1981.', ja: 'その物差しでは、1981年から貧困の人が10億人増えている。' },
+            { who: 'pinker', t: 362.4, en: "Billions of people have been added to the world as a whole. What's relevant is the proportion.", ja: '世界全体で数十億人増えた。大事なのは割合だ。' },
+            { who: 'hasan', t: 365.6, en: 'You also use absolute numbers in your book.', ja: 'あなたも本で人数を使っている。' },
+            { who: 'pinker', t: 375.8, en: 'The absolute numbers have declined as well, but the main point is the proportion.', ja: '人数も減っている。でも要点は割合だ。' },
         ],
         moves: [
             { name: '逆向きの数字', who: 'hasan', how: '同じデータの別の切り口(線を上げる)で、逆の結論を出す。' },
@@ -172,9 +173,9 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '相手の同僚(同じハーバード)の名前を出して、専門家の声で物差しを書き換える。「その本の議論は崩れるのでは?」と短い疑問で終える。',
         defense: '「6倍にするのはかなり極端な定義変更だ」と、変更の大きさに名前を付ける。「専門家にも反対はいる」には「いる。でも幅広い推計で絵は同じだ」と認めてから返す。',
         lines: [
-            { who: 'hasan', en: 'When you make that simple statistical change, the entire picture of poverty changes, and the arguments in your book basically fall apart, do they not?', ja: 'その単純な統計上の変更をすると、貧困の絵は丸ごと変わり、本の議論は崩れる。違いますか?' },
-            { who: 'pinker', en: "That's a rather extreme redefinition. That's multiplying by a factor of six.", ja: 'それはかなり極端な定義変更だ。6倍にしている。' },
-            { who: 'pinker', en: 'Yes, some do, but ... over a wide range of estimates, the picture is the same.', ja: 'いる。でも、幅広い推計で絵は同じだ。' },
+            { who: 'hasan', t: 397.5, en: 'When you make that simple statistical change, the entire picture of poverty changes, and the arguments in your book basically fall apart, do they not?', ja: 'その単純な統計上の変更をすると、貧困の絵は丸ごと変わり、本の議論は崩れる。違いますか?' },
+            { who: 'pinker', t: 412.3, en: "That's a rather extreme redefinition. That's multiplying by a factor of six.", ja: 'それはかなり極端な定義変更だ。6倍にしている。' },
+            { who: 'pinker', t: 430.9, en: 'Yes, some do, but ... over a wide range of estimates, the picture is the same.', ja: 'いる。でも、幅広い推計で絵は同じだ。' },
         ],
         moves: [
             { name: '相手の陣地の専門家', who: 'hasan', how: '相手の同僚・同じ大学の人を引く。「素人の批判」として退けられない。' },
@@ -198,9 +199,9 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '数字の議論から、人の顔に切り替える。「北米の中流の学者が」「その人に」「文句を言うなと言ったら」と場面を絵にして、笑われる結末で締める。',
         defense: '「でもその人を20年前と比べたら」と時間の比較に戻す。飢餓死・感染症死の数を並べ、「一番悪い人だけ選べば、良くないに決まっている」と相手の選び方を逆に指摘する。',
         lines: [
-            { who: 'hasan', en: 'If you go to someone living on $1.91 a day and say, "Well, you\'re not in extreme poverty," he or she would probably laugh in your face.', ja: '1日1.91ドルで暮らす人に「あなたは極度の貧困じゃない」と言ったら、たぶん面と向かって笑われる。' },
-            { who: 'pinker', en: 'But if you compared that person to the situation twenty years ago ...', ja: 'でもその人を20年前の状況と比べたら……' },
-            { who: 'pinker', en: "If you cherry-pick the people who are worst off, they're not gonna be very well off.", ja: '一番悪い人だけを選べば、暮らし向きが良くないのは当然だ。' },
+            { who: 'hasan', t: 447.9, en: 'If you go to someone living on $1.91 a day and say, "Well, you\'re not in extreme poverty," he or she would probably laugh in your face.', ja: '1日1.91ドルで暮らす人に「あなたは極度の貧困じゃない」と言ったら、たぶん面と向かって笑われる。' },
+            { who: 'pinker', t: 458.8, en: 'But if you compared that person to the situation twenty years ago ...', ja: 'でもその人を20年前の状況と比べたら……' },
+            { who: 'pinker', t: 475.1, en: "If you cherry-pick the people who are worst off, they're not gonna be very well off.", ja: '一番悪い人だけを選べば、暮らし向きが良くないのは当然だ。' },
         ],
         moves: [
             { name: '数字を顔に変える', who: 'hasan', how: '統計の議論で劣勢になったら、1人の人物の場面に切り替える。聞き手の感情が動く。' },
@@ -222,9 +223,9 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '権威ある機関の名前を並べ(World Bank, IMF)、本(The Spirit Level)を挙げ、さらに「1970年代から300本の論文」と数で押す。',
         defense: '「その本の主張は検証されて否定された」と1本ずつ崩し、数で押されると「格差は他の多くのもの(経済の発展・教育・女性の権利)とも相関する。問題は相関ではなく因果だ」と、論文の数を論点から外す。',
         lines: [
-            { who: 'pinker', en: 'For one thing, the claims of The Spirit Level have been evaluated and shown to be false.', ja: 'まず、その本の主張は検証され、誤りだと示されている。' },
-            { who: 'pinker', en: 'The question is not whether there\'s a first-order correlation, but whether you can show it to be causal.', ja: '問題は相関があるかではなく、因果だと示せるかだ。' },
-            { who: 'hasan', en: 'Causation and correlation, as you know, is a real problem — and some say that\'s a problem in your book.', ja: '因果と相関は、ご存じの通り本当に厄介だ。そしてそれはあなたの本の問題でもある、と言う人がいる。' },
+            { who: 'pinker', t: 505.3, en: 'For one thing, the claims of The Spirit Level have been evaluated and shown to be false.', ja: 'まず、その本の主張は検証され、誤りだと示されている。' },
+            { who: 'pinker', t: 548.2, en: 'The question is not whether there\'s a first-order correlation, but whether you can show it to be causal.', ja: '問題は相関があるかではなく、因果だと示せるかだ。' },
+            { who: 'hasan', t: 554.3, en: 'Causation and correlation, as you know, is a real problem — and some say that\'s a problem in your book.', ja: '因果と相関は、ご存じの通り本当に厄介だ。そしてそれはあなたの本の問題でもある、と言う人がいる。' },
         ],
         moves: [
             { name: '権威を並べる', who: 'hasan', how: '機関名と論文の本数で、「あなた1人対世界」の構図を作る。' },
@@ -247,11 +248,11 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '相手の本の軽い一文と、重い数字(寿命の差15年)を並べて、「でも心配ない、同じ靴を履いている」と皮肉でまとめる。',
         defense: '「心配するなとは言っていない。起きた前進を認めよう、と言っているだけだ」と言い分を言い直す。「上位1%を早死にさせれば格差は縮む。それが進歩か?」と、格差を目標にする考えの極端な帰結を示す。司会に藁人形だと言われると「格差を問題の中心に置くと、そういう帰結になる」と返す。',
         lines: [
-            { who: 'hasan', en: 'And you tell us, "Don\'t worry, they have the same shoes and jeans."', ja: 'そしてあなたは言う。「心配ない、同じ靴とジーンズを履いている」と。' },
-            { who: 'pinker', en: "It's not the insinuation. It's: let's appreciate the progress that has happened. It doesn't mean there are no more problems to be solved.", ja: 'そういう含みではない。起きた前進を認めよう、ということだ。解くべき問題がもう無いという意味ではない。' },
-            { who: 'pinker', en: 'The goal should not be reducing inequality — as if, if we got the top 1% to die earlier, that would be progress.', ja: '目標は格差を縮めることではない。上位1%を早死にさせたら進歩だ、ということになってしまう。' },
-            { who: 'hasan', en: "I think that's a straw man.", ja: 'それは藁人形(わら人形論法)だと思う。' },
-            { who: 'pinker', en: 'Those are two very different ways of stating these.', ja: 'それは2つのまったく違う言い方だ。' },
+            { who: 'hasan', t: 585.4, en: 'And you tell us, "Don\'t worry, they have the same shoes and jeans."', ja: 'そしてあなたは言う。「心配ない、同じ靴とジーンズを履いている」と。' },
+            { who: 'pinker', t: 591.1, en: "It's not the insinuation. It's: let's appreciate the progress that has happened. It doesn't mean there are no more problems to be solved.", ja: 'そういう含みではない。起きた前進を認めよう、ということだ。解くべき問題がもう無いという意味ではない。' },
+            { who: 'pinker', t: 622.5, en: 'The goal should not be reducing inequality — as if, if we got the top 1% to die earlier, that would be progress.', ja: '目標は格差を縮めることではない。上位1%を早死にさせたら進歩だ、ということになってしまう。' },
+            { who: 'hasan', t: 631.6, en: "I think that's a straw man.", ja: 'それは藁人形(わら人形論法)だと思う。' },
+            { who: 'pinker', t: 640.2, en: 'Those are two very different ways of stating these.', ja: 'それは2つのまったく違う言い方だ。' },
         ],
         moves: [
             { name: '軽い一文 × 重い数字', who: 'hasan', how: '相手の文の軽さと、事実の重さを並べると、相手が冷たく見える。' },
@@ -275,9 +276,9 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '権威ある科学者の強い言葉(文明の織物を脅かす)を引き、相手の文を「軽率だ」と評する。「現場の人はみんな頭を抱えている、流れは悪い方向だ」と現場の声で押す。',
         defense: '「その点は Hansen と完全に同意する」と相手の権威を自分の側に引き込む。「流れが悪い」には「流れが悪いことと、何をしても無駄なことは別の話だ」と、相手の文を2つに割る。',
         lines: [
-            { who: 'pinker', en: 'There, I agree completely with Jim Hansen. He would say the exact same thing.', ja: 'そこは Jim Hansen に完全に同意する。彼もまったく同じことを言うだろう。' },
-            { who: 'hasan', en: "The trend is in the wrong direction. Things aren't getting better.", ja: '流れは悪い方向だ。良くなっていない。' },
-            { who: 'pinker', en: "The trend is in the wrong direction, but that doesn't mean that nothing could work. Those are two different statements.", ja: '流れは悪い方向だ。でも、それは何をしても無駄だという意味ではない。その2つは別の話だ。' },
+            { who: 'pinker', t: 670.3, en: 'There, I agree completely with Jim Hansen. He would say the exact same thing.', ja: 'そこは Jim Hansen に完全に同意する。彼もまったく同じことを言うだろう。' },
+            { who: 'hasan', t: 734.4, en: "The trend is in the wrong direction. Things aren't getting better.", ja: '流れは悪い方向だ。良くなっていない。' },
+            { who: 'pinker', t: 737, en: "The trend is in the wrong direction, but that doesn't mean that nothing could work. Those are two different statements.", ja: '流れは悪い方向だ。でも、それは何をしても無駄だという意味ではない。その2つは別の話だ。' },
         ],
         moves: [
             { name: '権威を引き込む', who: 'pinker', how: '相手が引いた専門家に「私も同意見だ」と言うと、権威が自分の側に移る。' },
@@ -298,11 +299,11 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '「楽観の根拠は?」と根拠を迫り、「確率で言うと?」と数字で答えさせようとする(nail you down = 逃げ場を無くす)。',
         defense: '「これは容赦なく楽観的な本ではない、現実的な本だ」と自分の立場を言い直し、「条件付きで楽観していい」と条件を付ける。確率を迫られると「ゼロよりかなり大きい」とだけ答え、数字は出さない。',
         lines: [
-            { who: 'pinker', en: "This is not a relentlessly optimistic book. It's a realistic book.", ja: 'これは容赦なく楽観的な本ではない。現実的な本だ。' },
-            { who: 'pinker', en: 'We can be conditionally optimistic — that is, if we take these steps.', ja: '条件付きで楽観していい。つまり、こういう手を打てば。' },
-            { who: 'hasan', en: "Since we're trying to nail you down on this ...", ja: 'この点ではっきりさせたいので……' },
-            { who: 'pinker', en: 'I think the probability is significantly greater than zero.', ja: '確率は、ゼロよりかなり大きいと思う。' },
-            { who: 'hasan', en: 'How much greater than zero?', ja: 'ゼロよりどれくらい大きい?' },
+            { who: 'pinker', t: 746.9, en: "This is not a relentlessly optimistic book. It's a realistic book.", ja: 'これは容赦なく楽観的な本ではない。現実的な本だ。' },
+            { who: 'pinker', t: 753.6, en: 'We can be conditionally optimistic — that is, if we take these steps.', ja: '条件付きで楽観していい。つまり、こういう手を打てば。' },
+            { who: 'hasan', t: 765.3, en: "Since we're trying to nail you down on this ...", ja: 'この点ではっきりさせたいので……' },
+            { who: 'pinker', t: 777.2, en: 'I think the probability is significantly greater than zero.', ja: '確率は、ゼロよりかなり大きいと思う。' },
+            { who: 'hasan', t: 781.4, en: 'How much greater than zero?', ja: 'ゼロよりどれくらい大きい?' },
         ],
         moves: [
             { name: 'ラベルを貼り替える', who: 'pinker', how: '「楽観的な本」というラベルを「現実的な本」に貼り替える。言葉1つで立場が変わる。' },
@@ -326,10 +327,10 @@ export const DEBATE_ROUNDS: DebateRound[] = [
         attack: '書評(New York Times, Guardian など)の名前を並べて「みんなそう言っている」。最後は「心理学者が気候変動を語る資格は?」と専門外を突く。',
         defense: '「誰がゼロと言った?」と相手の言い換えを指摘。資格を問われると「危機は解決できるかもしれない、というのは大きな主張ではない」と、自分の主張を小さく言い直す。',
         lines: [
-            { who: 'pinker', en: "Who's saying zero? Nobody's saying zero.", ja: '誰がゼロと言った? 誰も言っていない。' },
-            { who: 'pinker', en: "It's not true that we're not doing anything about it.", ja: '何もしていない、というのは事実ではない。' },
-            { who: 'hasan', en: "How does that make you qualified to make these kinds of sweeping claims when you're not a climate scientist yourself?", ja: '気候学者でもないあなたが、こんな大きな主張をする資格がどこにある?' },
-            { who: 'pinker', en: "The idea that it's possible that we will solve a crisis is not a sweeping claim.", ja: '危機を解決できるかもしれない、という考えは大きな主張ではない。' },
+            { who: 'pinker', t: 801.7, en: "Who's saying zero? Nobody's saying zero.", ja: '誰がゼロと言った? 誰も言っていない。' },
+            { who: 'pinker', t: 828.4, en: "It's not true that we're not doing anything about it.", ja: '何もしていない、というのは事実ではない。' },
+            { who: 'hasan', t: 865.4, en: "How does that make you qualified to make these kinds of sweeping claims when you're not a climate scientist yourself?", ja: '気候学者でもないあなたが、こんな大きな主張をする資格がどこにある?' },
+            { who: 'pinker', t: 875, en: "The idea that it's possible that we will solve a crisis is not a sweeping claim.", ja: '危機を解決できるかもしれない、という考えは大きな主張ではない。' },
         ],
         moves: [
             { name: '書評を並べる', who: 'hasan', how: '有名な媒体の名前を並べると「世論」の形になる。' },

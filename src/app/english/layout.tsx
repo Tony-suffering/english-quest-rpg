@@ -75,6 +75,9 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // 講師と一緒に見る討論ページは、サイドバーもタブも出さない全画面
+    if (pathname === '/english/debate') return <>{children}</>;
+
     if (isLoading) {
         return (
             <div style={{ minHeight: '100vh', backgroundColor: '#FAFAF9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A8A29E', fontSize: 13 }}>
