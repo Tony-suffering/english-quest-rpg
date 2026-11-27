@@ -404,14 +404,14 @@ function Card({ spec, w, back, chant, noCost, fx, onClick, onHover, attrs, style
                             <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, #FFF2A8, transparent)', marginTop: 6 }} />
                             {spec.ability !== 'NONE' && (
                                 <div style={{ marginTop: 4, fontSize: 9, lineHeight: 1.3, color: 'rgba(255,242,168,0.92)', textShadow: '0 1px 2px #000' }}>
-                                    <b style={{ letterSpacing: 1, color: c1 }}>{spec.ability}</b> {ABILITY_TEXT[spec.ability]}
+                                    <b style={{ letterSpacing: 1, color: c1 }}>{abilityName(spec.ability)}</b> {LANG === 'ja' ? ABILITY_JA[spec.ability] : ABILITY_TEXT[spec.ability]}
                                 </div>
                             )}
                         </div>
                         {/* 上: コスト … 属性と枠 */}
                         <div style={{ position: 'absolute', right: 6, top: 7, display: 'flex', gap: 4, alignItems: 'center' }}>
-                            {RANK_NAMES[spec.rank] && <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: 1.5, color: R.label, background: 'rgba(10,8,30,0.6)', borderRadius: 4, padding: '1px 5px' }}>{RANK_NAMES[spec.rank]}</span>}
-                            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: 1, color: '#fff', background: 'rgba(10,8,30,0.6)', border: `1px solid ${c1}`, borderRadius: 4, padding: '1px 6px' }}>{ELEMENT_NAMES[spec.element]}</span>
+                            {rankLabel(spec) && <span style={{ fontSize: 8, fontWeight: 900, letterSpacing: 1.5, color: R.label, background: 'rgba(10,8,30,0.6)', borderRadius: 4, padding: '1px 5px' }}>{rankLabel(spec)}</span>}
+                            <span style={{ fontSize: 9, fontWeight: 900, letterSpacing: 1, color: '#fff', background: 'rgba(10,8,30,0.6)', border: `1px solid ${c1}`, borderRadius: 4, padding: '1px 6px' }}>{elementLabel(spec)}</span>
                         </div>
                         {/* 下: ATK … 画風・番号 … HP */}
                         {/* 四隅の飾り */}
@@ -461,7 +461,7 @@ function Token({ spec, w, atk, hp, fx, attrs, onClick, onHover }: {
                 {spec.ability === 'WARD' && <div style={{ position: 'absolute', inset: 0, borderRadius: shape, boxShadow: 'inset 0 0 0 3px rgba(255,255,255,0.9), inset 0 0 18px 6px rgba(96,165,250,0.95)' }} />}
             </div>
             {spec.ability !== 'NONE' && (
-                <div style={{ position: 'absolute', left: '50%', top: -Math.round(w * 0.07), transform: 'translateX(-50%)', fontSize: Math.max(8, w * 0.1), fontWeight: 900, letterSpacing: 1, color: '#fff', background: `linear-gradient(180deg, ${c1}, ${c2})`, border: '1.5px solid #fff', borderRadius: 999, padding: '0 7px', lineHeight: 1.5, whiteSpace: 'nowrap', boxShadow: '0 2px 5px rgba(0,0,0,0.45)' }}>{spec.ability}</div>
+                <div style={{ position: 'absolute', left: '50%', top: -Math.round(w * 0.07), transform: 'translateX(-50%)', fontSize: Math.max(8, w * 0.1), fontWeight: 900, letterSpacing: 1, color: '#fff', background: `linear-gradient(180deg, ${c1}, ${c2})`, border: '1.5px solid #fff', borderRadius: 999, padding: '0 7px', lineHeight: 1.5, whiteSpace: 'nowrap', boxShadow: '0 2px 5px rgba(0,0,0,0.45)' }}>{abilityName(spec.ability)}</div>
             )}
             <div style={{ position: 'absolute', left: -gem * 0.28, bottom: -gem * 0.22 }}><Gem value={atk} color={['#93C5FD', '#1D4ED8']} size={gem} tint={atk > spec.atk ? '#BBF7D0' : undefined} /></div>
             <div style={{ position: 'absolute', right: -gem * 0.28, bottom: -gem * 0.22 }}><Gem value={hp} color={['#FCA5A5', '#B91C1C']} size={gem} tint={hp < spec.hp ? '#FECACA' : undefined} /></div>
@@ -494,7 +494,7 @@ function Leader({ side, hp, size, hit, target, onClick }: { side: 0 | 1; hp: num
                 )}
             </div>
             <div style={{ position: 'absolute', right: -gem * 0.5, bottom: -gem * 0.12 }}><Gem value={hp} color={['#FCA5A5', '#B91C1C']} size={gem} tint={hp < START_HP ? '#FECACA' : undefined} /></div>
-            <div style={{ position: 'absolute', left: '50%', bottom: -Math.round(size * 0.2), transform: 'translateX(-50%)', fontSize: Math.max(9, size * 0.12), fontWeight: 900, letterSpacing: 3, color: '#FFF2A8', background: 'linear-gradient(180deg, #5B4513, #2E220A)', border: '1.5px solid #D4AF37', borderRadius: 4, padding: '1px 10px', fontFamily: 'Georgia, serif', whiteSpace: 'nowrap' }}>{side === 0 ? 'YOU' : 'RIVAL'}</div>
+            <div style={{ position: 'absolute', left: '50%', bottom: -Math.round(size * 0.2), transform: 'translateX(-50%)', fontSize: Math.max(9, size * 0.12), fontWeight: 900, letterSpacing: 3, color: '#FFF2A8', background: 'linear-gradient(180deg, #5B4513, #2E220A)', border: '1.5px solid #D4AF37', borderRadius: 4, padding: '1px 10px', fontFamily: 'Georgia, serif', whiteSpace: 'nowrap' }}>{side === 0 ? BT[LANG].you : BT[LANG].rival}</div>
         </div>
     );
 }
@@ -573,7 +573,9 @@ const TEXT = {
         pitch: '自分の英語カードで戦うカードゲーム。カードを出すたびに、その英語が声で流れる。相手のリーダーの体力を 0 にしたら勝ち。',
         play: '対戦する', playSub: 'コンピューターと1戦。デッキは自動で組まれる',
         online: '友だちと対戦', onlineSub: '招待リンクを送るだけ。相手は登録もデッキもいらない',
+        walk: '中庭を歩く', walkSub: '3Dの中庭を歩いて、声を聞きながら20枚を自分で選ぶ',
         how: '遊び方', howSub: '盤面が動いて、1分でルールを見せる',
+        guide: 'ルールブック', guideSub: '図で読む。画面の見方から、勝つコツまで',
         cards: 'カードを見る', cardsSub: '絵と英文と声。押すと大きく出る',
         record: '戦績', win: '勝', lose: '敗', loading: 'カードを読み込み中...', loadFail: 'カードを読み込めなかった。読み込み直して。',
         back: '戻る', count: '枚', cardsHint: 'カードを押すと、大きく表示される。', close: '閉じる',
@@ -584,12 +586,60 @@ const TEXT = {
         pitch: 'A card game played with your own English lines. Every card you play is spoken aloud. Bring the rival leader to 0 HP to win.',
         play: 'Play', playSub: 'One match against the computer. Your deck is built for you',
         online: 'Play a friend', onlineSub: 'Send an invite link. No account or deck needed on their side',
+        walk: 'Walk the grounds', walkSub: 'A 3D courtyard. Hear each card and pick your own twenty',
         how: 'How to play', howSub: 'The board plays itself and shows the rules in a minute',
+        guide: 'Rulebook', guideSub: 'Read it with pictures: the screen, the cards, a turn, tips',
         cards: 'Cards', cardsSub: 'Art, lines and voices. Tap one to see it large',
         record: 'Record', win: 'W', lose: 'L', loading: 'Loading cards...', loadFail: 'Could not load the cards. Reload the page.',
         back: 'Back', count: 'cards', cardsHint: 'Tap a card to see it large.', close: 'Close',
         listen: 'Hear it read', listenActed: 'Hear the voice', cost: 'Cost', atk: 'Attack', hp: 'Health', noAbility: 'No ability', style: 'Art style',
         room: 'ONLINE ROOM', roomHelp: 'Send this link. The duel starts the moment they open it.', waiting: 'Waiting for the other player...', copy: 'Copy link', cancel: 'Cancel',
+    },
+} as const;
+/** いま表示している言語。対戦の部品(Card など)は DuelGame の外にあるので、ここから読む。DuelGame が描くたびに書き込む */
+let LANG: 'ja' | 'en' = 'ja';
+// 本人(2026-11-27)「日本人が使いやすいように日本語の表記を工夫して、バトル説明も超丁寧に」。対戦中の表示は全部ここから出す(English に切り替えると元の英語)
+const ABILITY_NAME_JA: Record<string, string> = { HEAL: '回復', STRIKE: '一撃', WARD: '守護', INSIGHT: 'ひらめき', RUSH: '速攻', NONE: '' };
+const abilityName = (a: string) => LANG === 'ja' ? (ABILITY_NAME_JA[a] ?? a) : a;
+const ELEMENT_JA: Record<string, string> = { flame: '炎', aqua: '水', wind: '風', earth: '土', thunder: '雷' };
+const POS_LABEL: Record<string, [string, string]> = { flame: ['動詞', 'VERB'], earth: ['名詞', 'NOUN'], wind: ['形容詞', 'ADJ'], thunder: ['副詞', 'ADV'], aqua: ['熟語', 'PHRASE'] };
+const FREQ_LABEL: [string, string][] = [['', ''], ['', ''], ['最頻出', 'TOP'], ['頻出', 'COMMON'], ['重要', 'KEY'], ['発展', 'ADVANCED']];
+/** カード右上の札。単語カードは品詞、ふつうのカードは属性 */
+const elementLabel = (c: CardSpec) => c.word ? (POS_LABEL[c.element] || ['', ''])[LANG === 'ja' ? 0 : 1] : LANG === 'ja' ? ELEMENT_JA[c.element] : ELEMENT_NAMES[c.element];
+/** その隣の札。単語カードはよく出る度、ふつうのカードはランク */
+const rankLabel = (c: CardSpec) => c.word ? (FREQ_LABEL[c.rank] || ['', ''])[LANG === 'ja' ? 0 : 1] : RANK_NAMES[c.rank];
+const BT = {
+    ja: {
+        you: 'あなた', rival: '相手', energy: 'エナジー', deck: '山札', hand: '手札', turn: 'ターン', win: '勝', lose: '敗',
+        end1: 'ターン', end2: '終了', rv1: '相手', rv2: 'の番', yourField: '自分の場', rivalField: '相手の場',
+        soundOn: '音 入', soundOff: '音 切', quit: 'やめる', yourTurn: 'あなたの番', rivalTurn: '相手の番',
+        play: '場に出す', noEnergy: 'エナジーが足りない', notTurn: '相手の番です', back: '戻る',
+        howto: '遊び方', skip: '飛ばして対戦する', restart: '最初から',
+        winSub: '相手のリーダーを倒した', loseSub: '自分のリーダーが倒された', tLeader: 'あなたの体力', tTurns: 'ターン数', tRecord: '戦績',
+        home: 'ホームへ', words: '出た単語', rematch: 'もう1戦', guestAgain: 'もう1戦するときは、新しいリンクをもらってください。',
+        reviewTitle: 'この対戦で出た単語', reviewHelp: '意味を思い出してから、押して確かめる。', tapMeaning: '押すと意味',
+        hOver: '対戦は終わり。', hRival: '相手の番。相手が考えています...', hTarget: '攻撃する相手を押す。相手のユニットでも、相手のリーダーでもいい。',
+        hWard: '「守護」のユニットが道をふさいでいる。先にそれを攻撃する。', hIdle: 'もうできることがない。右の「ターン終了」を押す。',
+        hBoth: '緑に光るカードは出せる。光っているユニットは攻撃できる。どちらからでもいい。',
+        hPlay: '緑に光っているカードを押すと、場に出る。カード左上の数字が、必要なエナジー。',
+        hAttack: '光っている自分のユニットを押して選ぶ。そのあと、攻撃する相手を押す。',
+        hPhonePlay: '手札を押すと大きく出る。「場に出す」で場に出る。', hPhoneBoth: '手札を押すと出せる。光っているユニットを押すと攻撃できる。',
+    },
+    en: {
+        you: 'YOU', rival: 'RIVAL', energy: 'ENERGY', deck: 'DECK', hand: 'HAND', turn: 'TURN', win: 'W', lose: 'L',
+        end1: 'END', end2: 'TURN', rv1: 'RIVAL', rv2: 'TURN', yourField: 'YOUR FIELD', rivalField: 'RIVAL FIELD',
+        soundOn: 'SOUND ON', soundOff: 'SOUND OFF', quit: 'QUIT', yourTurn: 'YOUR TURN', rivalTurn: 'RIVAL TURN',
+        play: 'PLAY', noEnergy: 'NOT ENOUGH ENERGY', notTurn: 'RIVAL TURN', back: 'BACK',
+        howto: 'HOW TO PLAY', skip: 'SKIP AND PLAY', restart: 'RESTART',
+        winSub: 'THE RIVAL LEADER HAS FALLEN', loseSub: 'YOUR LEADER HAS FALLEN', tLeader: 'YOUR LEADER', tTurns: 'TURNS', tRecord: 'RECORD',
+        home: 'HOME', words: 'WORDS', rematch: 'REMATCH', guestAgain: 'Ask for a new link to play again.',
+        reviewTitle: 'WORDS FROM THIS DUEL', reviewHelp: 'Recall the meaning first, then tap to check.', tapMeaning: 'tap for meaning',
+        hOver: 'Game over.', hRival: 'Rival is thinking...', hTarget: 'Tap a rival unit or the rival leader.',
+        hWard: 'A WARD unit blocks the way. Tap it.', hIdle: 'Nothing left to do. End your turn.',
+        hBoth: 'Tap a glowing card to play it. Tap a glowing unit, then a target.',
+        hPlay: 'Tap a glowing card to play it. The number at its top left is the energy it needs.',
+        hAttack: 'Tap one of your glowing units, then tap a target.',
+        hPhonePlay: 'Tap a card to look at it and play it.', hPhoneBoth: 'Tap a card to play it. Tap a glowing unit to attack.',
     },
 } as const;
 const ABILITY_JA: Record<string, string> = {
@@ -608,15 +658,15 @@ const DEMO_JA = [
     '青い宝石が攻撃、赤い宝石が体力。',
     '自分のユニットを押して、相手を押す。お互いに、相手の攻撃の分だけ体力が減る。',
     '体力が 0 になると破壊。こちらは 2 残って生き残った。',
-    'RUSH: このユニットは、出したターンに攻撃できる。',
+    '能力「速攻」: このユニットは、出したターンにすぐ攻撃できる。',
     '邪魔がいなければ、相手のリーダーを攻撃する。',
     'ターンを終える。',
-    'WARD: 相手は、先にこのユニットを攻撃しなければならない。',
-    'WARD が、リーダーへの道をふさぐ。',
-    'だから、先に WARD を倒す。',
+    '能力「守護」: 相手は、先にこのユニットを攻撃しなければならない。',
+    '「守護」が、リーダーへの道をふさいでいる。',
+    'だから、先に「守護」のユニットを倒す。',
     'もう1回。',
-    'ほかの能力。HEAL: リーダーの体力 +2。INSIGHT: 1枚引く。STRIKE: 相手の最強ユニットに 2 ダメージ。',
-    'これで全部。さあ対戦しよう。',
+    'ほかの能力。「回復」: リーダーの体力 +2。「ひらめき」: カードを1枚引く。「一撃」: 相手のいちばん強いユニットに 2 ダメージ。',
+    'これで全部。くわしくは、最初の画面の「ルールブック」にまとめてある。さあ対戦しよう。',
 ];
 
 /** 舞台。1つずつ専用の絵がある(public/duel/art/board*.webp。scripts/duel-art-generate.mjs --base で作る。お題は src/data/english/duel-art.json)。
@@ -689,7 +739,8 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     const [lang, setLang] = useState<'ja' | 'en'>('ja');
     const [mounted, setMounted] = useState(false);   // 画面全体を覆う部品は body に出すので、ブラウザで開いてから描く
     useEffect(() => setMounted(true), []);
-    const [view, setView] = useState<'home' | 'cards'>('home');
+    const [view, setView] = useState<'home' | 'cards' | 'guide'>('home');
+    LANG = lang;
     const [detail, setDetail] = useState<CardSpec | null>(null);   // カード一覧で大きく見ているカード
     const [reveal, setReveal] = useState<{ id: number; spec: CardSpec; side: 0 | 1; ms: number } | null>(null);
     const [demo, setDemo] = useState<{ cap: string; n: number; total: number } | null>(null);
@@ -707,6 +758,8 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     const [, setArtV] = useState(0);
     const gameRef = useRef<Game | null>(null);
     const busy = useRef(false);
+    const worldDeck = useRef<CardSpec[] | null>(null);   // 中庭(/english/duel/world)で自分で選んだ20枚
+    const fromWorld = useRef(false);
     const fxId = useRef(1);
     const soundRef = useRef(true);
     const sfx = (name: string) => { if (soundRef.current) playSfx(name); };
@@ -728,7 +781,18 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         if (guestRoom) { setPool([]); return () => window.removeEventListener('resize', onResize); }
         if (pack) { setPool(pack.cards.map(wordSpec)); return () => window.removeEventListener('resize', onResize); }   // 単語パック: 中身は同梱のファイル。通信しない
         fetch('/api/phrases/duel-pool').then(r => r.json()).then(d => {
-            const cards = ((d?.cards || []) as PoolCard[]).map(toSpec);
+            let cards = ((d?.cards || []) as PoolCard[]).map(toSpec);
+            // 中庭から来たとき: 向こうで選んだ20枚をデッキにして(山に無ければ足す)、最初の画面を挟まずに始める
+            if (new URLSearchParams(window.location.search).get('from') === 'world') {
+                const carried = load<PoolCard[]>('duel:world:cards:v1', []).map(toSpec);
+                if (carried.length === DECK_SIZE) {
+                    cards = [...cards, ...carried.filter(c => !cards.some(x => x.id === c.id))];
+                    worldDeck.current = carried;
+                    fromWorld.current = true;
+                    save(DEMO_SEEN_KEY, 1);
+                }
+                window.history.replaceState(null, '', window.location.pathname);
+            }
             setPool(cards);
             const saved = load<string[]>(DECK_KEY, []).filter(id => cards.some(c => c.id === id));
             setDeckIds(saved.length === DECK_SIZE ? saved : autoDeck(cards).map(c => c.id));
@@ -780,7 +844,12 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         if (!pool || pool.length < minPool) return;
         seen.current = new Map(); setReview(false); setShownJa({});
         const seed = Math.floor(Math.random() * 1e9);
-        const { mine: deck, rival } = dealDecks(seed);
+        let { mine: deck, rival } = dealDecks(seed);
+        if (worldDeck.current) {
+            deck = worldDeck.current;
+            const ids = new Set(deck.map(c => c.id));
+            rival = autoDeck(shuffle(pool.filter(c => !ids.has(c.id)), makeRng(seed)).slice(0, 70));
+        }
         const g = newGame(deck, rival, seed);
         const fxp = new URLSearchParams(window.location.search).get('fx');   // 結果の画面を見るための入口(?fx=victory / ?fx=defeat)
         if (fxp === 'victory' || fxp === 'defeat') { g.winner = fxp === 'victory' ? 0 : 1; g.sides[fxp === 'victory' ? 1 : 0].hp = 0; g.turn = 17; }
@@ -972,6 +1041,14 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     };
 
     /** 部屋を作る(自分のデッキと、相手に渡すデッキを置く)。相手が入るのを待つ */
+    // 中庭から来た: 山が読めたら、そのまま始める
+    useEffect(() => {
+        if (!fromWorld.current || !pool || pool.length < 40 || gameRef.current) return;
+        fromWorld.current = false;
+        start();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pool]);
+
     const createRoom = async () => {
         if (pack || !pool || pool.length < 40) return;
         const seed = Math.floor(Math.random() * 1e9);
@@ -1097,8 +1174,10 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         const plate: React.CSSProperties = { background: 'linear-gradient(180deg, rgba(42,31,8,0.86), rgba(20,14,4,0.92))', border: '1.5px solid #D4AF37', boxShadow: '0 8px 24px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,242,168,0.25)', borderRadius: 12 };
         const menu: { key: string; icon: string; title: string; sub: string; on: () => void; main?: boolean; off?: boolean }[] = [
             { key: 'duel', icon: 'M5 3l7 7 7-7 2 2-7 7 3 3-2 2-3-3-3 3-2-2 3-3-7-7z', title: t.play, sub: t.playSub, on: start, main: true, off: !ready },
+            ...(pack ? [] : [{ key: 'world', icon: 'M12 2l2.4 5.6L20 9l-4.2 3.9L17 19l-5-3-5 3 1.2-6.1L4 9l5.6-1.4z', title: t.walk, sub: t.walkSub, on: () => { window.location.href = '/english/duel/world'; } }]),
             { key: 'online', icon: 'M9 12a4 4 0 0 1 4-4h3a4 4 0 0 1 0 8h-1v-2h1a2 2 0 0 0 0-4h-3a2 2 0 0 0-2 2zm6 0a4 4 0 0 1-4 4H8a4 4 0 0 1 0-8h1v2H8a2 2 0 0 0 0 4h3a2 2 0 0 0 2-2z', title: t.online, sub: t.onlineSub, on: createRoom, off: !ready || !!pack },
             { key: 'demo', icon: 'M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zm16 0h-5a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h5z', title: t.how, sub: t.howSub, on: runDemo, off: !pool || pool.length < 12 },
+            { key: 'guide', icon: 'M6 3h11a2 2 0 0 1 2 2v16l-3-2-3 2-3-2-3 2-3-2V5a2 2 0 0 1 2-2zm2 5v2h7V8zm0 4v2h7v-2z', title: t.guide, sub: t.guideSub, on: () => setView('guide') },
             { key: 'cards', icon: 'M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 5l-3 4 3 4 3-4z', title: t.cards, sub: t.cardsSub, on: () => setView('cards'), off: !pool || !pool.length },
         ];
         const langBtn = (
@@ -1109,7 +1188,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             </div>
         );
         const shell = (children: React.ReactNode) => createPortal(
-            <div id="duel-root" style={{ position: 'fixed', left: 0, top: 0, width: '100vw', height: '100dvh', zIndex: 99999, overflowY: 'auto', overflowX: 'hidden', color: '#fff', fontFamily: 'inherit',
+            <div id="duel-root" key={`menu-${view}`} style={{ position: 'fixed', left: 0, top: 0, width: '100vw', height: '100dvh', zIndex: 99999, overflowY: 'auto', overflowX: 'hidden', color: '#fff', fontFamily: 'inherit',
                 background: `linear-gradient(180deg, rgba(14,10,4,0.72) 0%, rgba(14,10,4,0.5) 40%, rgba(14,10,4,0.86) 100%), ${ART.board ? `center / cover no-repeat url(${ART.board})` : 'radial-gradient(ellipse at 50% 40%, #5B4513, #1C1407)'}` }}>
                 <style>{CSS}</style>
                 {children}
@@ -1141,7 +1220,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                                 <div style={{ ...plate, padding: '18px 20px', width: narrow ? '100%' : 440, boxSizing: 'border-box' }}>
                                     <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, borderBottom: '1px solid rgba(212,175,55,0.6)', paddingBottom: 8 }}>
                                         <span style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 22, background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{d.no ? `No.${d.no}` : d.id.slice(0, 6)}</span>
-                                        <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, color: '#D4AF37' }}>{ELEMENT_NAMES[d.element]} · {RANK_NAMES[d.rank] || 'NORMAL'}</span>
+                                        <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, color: '#D4AF37' }}>{elementLabel(d)} · {rankLabel(d) || 'NORMAL'}</span>
                                     </div>
                                     {d.word && (
                                         <div style={{ marginTop: 12 }}>
@@ -1159,7 +1238,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                                         ))}
                                     </div>
                                     <div style={{ marginTop: 16, padding: '10px 12px', borderRadius: 8, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(212,175,55,0.35)' }}>
-                                        <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: 2, color: '#F6C85F' }}>{d.ability === 'NONE' ? t.noAbility : d.ability}</div>
+                                        <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: 2, color: '#F6C85F' }}>{d.ability === 'NONE' ? t.noAbility : abilityName(d.ability)}</div>
                                         {d.ability !== 'NONE' && <div style={{ fontSize: 14, lineHeight: 1.6, color: '#fff', marginTop: 2 }}>{lang === 'ja' ? ABILITY_JA[d.ability] : ABILITY_TEXT[d.ability]}</div>}
                                     </div>
                                     {ART[`card-${d.id}`] && <div style={{ marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.6)' }}>{t.style}: {d.style || styleOf(d.id)}</div>}
@@ -1168,6 +1247,169 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                             </div>
                         </div>
                     )}
+                </>,
+            );
+        }
+
+        // ── ルールブック: 図つきで、順に読める(本人 2026-11-27「バトル説明も超丁寧に」)──
+        if (view === 'guide') {
+            const J = (ja: string, en: string) => lang === 'ja' ? ja : en;
+            const sample = (pool || []).find(c => c.ability === 'RUSH') || (pool || [])[0];
+            const cw = narrow ? Math.min(220, scr.w - 130) : 250, chh = cw * CH / CW;
+            const sec: React.CSSProperties = { ...plate, padding: narrow ? '16px 14px' : '20px 24px', marginTop: 16 };
+            const para: React.CSSProperties = { fontSize: narrow ? 14 : 15.5, lineHeight: 1.85, color: '#FFFDF2', margin: '4px 0' };
+            const mark: React.CSSProperties = { width: 24, height: 24, borderRadius: '50%', background: '#DC2626', border: '2px solid #fff', color: '#fff', fontWeight: 900, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.6)', flexShrink: 0 };
+            const h2 = (n: number, text: string) => (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <span style={{ width: 32, height: 32, borderRadius: '50%', background: gold, color: '#2A1F08', fontWeight: 900, fontSize: 17, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>{n}</span>
+                    <span style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: narrow ? 20 : 25, color: '#FFF6C8' }}>{text}</span>
+                </div>
+            );
+            const dot = (k: string, x: number, y: number) => <span key={k} style={{ ...mark, position: 'absolute', left: x, top: y, zIndex: 5 }}>{k}</span>;
+            const row = (k: string, title: string, body: string) => (
+                <div key={k} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', margin: '9px 0' }}>
+                    <span style={mark}>{k}</span>
+                    <div style={{ ...para, margin: 0 }}><b style={{ color: '#F6C85F' }}>{title}</b>{J('　', ' — ')}{body}</div>
+                </div>
+            );
+            const zone = (k: string, label: string, st: React.CSSProperties) => (
+                <div key={k} style={{ position: 'absolute', border: '2px dashed rgba(255,242,168,0.8)', borderRadius: 10, background: 'rgba(255,242,168,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 12, fontWeight: 800, color: '#fff', textAlign: 'center', lineHeight: 1.3, ...st }}>
+                    <span style={{ ...mark, width: 22, height: 22, fontSize: 12 }}>{k}</span>{label}
+                </div>
+            );
+            const unit = (label: string, atk: number, hp: number, dead?: boolean) => (
+                <div style={{ textAlign: 'center', opacity: dead ? 0.45 : 1 }}>
+                    <div style={{ fontSize: 12, fontWeight: 800, color: '#fff', marginBottom: 4 }}>{label}</div>
+                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center', alignItems: 'center', padding: '8px 12px', borderRadius: 10, border: '1.5px solid #D4AF37', background: 'rgba(0,0,0,0.35)' }}>
+                        <Gem value={atk} color={['#93C5FD', '#1D4ED8']} size={38} /><Gem value={hp} color={['#FCA5A5', '#B91C1C']} size={38} />
+                    </div>
+                    {dead && <div style={{ fontSize: 12, fontWeight: 900, color: '#FCA5A5', marginTop: 3 }}>{J('破壊', 'DESTROYED')}</div>}
+                </div>
+            );
+            const mw = Math.min(scr.w - 60, 360);
+            return shell(
+                <>
+                    <div style={{ position: 'sticky', top: 0, zIndex: 5, display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: 'linear-gradient(180deg, rgba(14,10,4,0.96), rgba(14,10,4,0.8))', borderBottom: '1.5px solid #D4AF37' }}>
+                        <button data-act="back" onClick={() => setView('home')} style={{ ...plate, color: '#FFF2A8', fontWeight: 900, fontSize: 13, padding: '7px 16px', cursor: 'pointer' }}>‹ {t.back}</button>
+                        <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 20, letterSpacing: 2, background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{t.guide}</div>
+                        <div style={{ marginLeft: 'auto' }}>{langBtn}</div>
+                    </div>
+                    <div data-guide style={{ maxWidth: 860, margin: '0 auto', padding: '4px 16px 70px' }}>
+                        <div style={sec}>
+                            {h2(1, J('勝ち方', 'How to win'))}
+                            <p style={para}>{J('自分と相手に、それぞれ「リーダー」がいる。リーダーの体力は 20。', 'Each side has a leader with 20 health.')}</p>
+                            <p style={para}><b style={{ color: '#F6C85F' }}>{J('相手のリーダーの体力を 0 にしたら勝ち。', 'Bring the rival leader to 0 and you win.')}</b> {J('自分のリーダーが 0 になったら負け。', 'If your leader reaches 0, you lose.')}</p>
+                            <p style={para}>{J('山札が無くなって、カードを引けなくなったときも負けになる。', 'You also lose if your deck runs out and you cannot draw.')}</p>
+                        </div>
+
+                        <div style={sec}>
+                            {h2(2, J('カードの見方', 'Reading a card'))}
+                            <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: narrow ? 14 : 30, alignItems: narrow ? 'center' : 'flex-start' }}>
+                                {sample && (
+                                    <div style={{ position: 'relative', padding: 26, flexShrink: 0 }}>
+                                        <Card spec={sample} w={cw} />
+                                        {dot('1', 8, 8)}{dot('2', 8, 26 + chh - 6)}{dot('3', 26 + cw - 6, 26 + chh - 6)}{dot('4', 26 + cw / 2 - 12, 26 + chh * 0.6)}{dot('5', 26 + cw / 2 - 12, 26 + chh * 0.79)}{dot('6', 26 + cw - 6, 22)}
+                                    </div>
+                                )}
+                                <div style={{ flex: 1 }}>
+                                    {row('1', J('コスト(左上・緑)', 'Cost (top left, green)'), J('このカードを出すのに必要なエナジーの数。', 'The energy you need to play this card.'))}
+                                    {row('2', J('攻撃(左下・青)', 'Attack (bottom left, blue)'), J('攻撃したとき、相手に与えるダメージの数。', 'The damage it deals when it attacks.'))}
+                                    {row('3', J('体力(右下・赤)', 'Health (bottom right, red)'), J('ダメージを受けると減る。0 になると破壊される。', 'Goes down when it takes damage. At 0 the unit is destroyed.'))}
+                                    {row('4', pack ? J('単語と意味', 'Word and meaning') : J('英文', 'The line'), pack ? J('このカードで覚える語。出すと、この語を使った英文が声で流れて、語が金色に光る。', 'The word this card teaches. When played, a line using it is spoken and the word lights up.') : J('出すと、この英文が声で流れる。', 'When played, this line is spoken aloud.'))}
+                                    {row('5', J('能力', 'Ability'), J('そのカードだけの特別な効果。能力が無いカードもあり、そのぶん数字が少し高い。', 'A special effect. Some cards have none, and get slightly higher numbers instead.'))}
+                                    {row('6', pack ? J('品詞と、よく出る度(右上)', 'Part of speech and frequency (top right)') : J('属性とランク(右上)', 'Element and rank (top right)'), pack ? J('動詞・名詞などの品詞と、その語がどれくらいよく出るか。', 'Verb, noun and so on, and how often the word appears.') : J('カードの種類を表す札。', 'Tags that show the kind of card.'))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={sec}>
+                            {h2(3, J('画面の見方', 'The screen'))}
+                            <div style={{ display: 'flex', flexDirection: narrow ? 'column' : 'row', gap: narrow ? 14 : 30, alignItems: narrow ? 'center' : 'flex-start' }}>
+                                <div style={{ position: 'relative', width: mw, height: 400, flexShrink: 0, borderRadius: 14, border: '1.5px solid #D4AF37', background: 'radial-gradient(ellipse at 50% 45%, #3b3320, #17130a)' }}>
+                                    {zone('A', J('相手のリーダー', 'Rival leader'), { left: '30%', width: '40%', top: 10, height: 50 })}
+                                    {zone('B', J('相手の場', 'Rival field'), { left: '6%', width: '66%', top: 74, height: 76 })}
+                                    <div style={{ position: 'absolute', left: '4%', right: '26%', top: 160, height: 2, background: 'linear-gradient(90deg, transparent, #FFF2A8, transparent)' }} />
+                                    {zone('C', J('自分の場', 'Your field'), { left: '6%', width: '66%', top: 172, height: 76 })}
+                                    {zone('D', J('自分のリーダー', 'Your leader'), { left: '30%', width: '40%', top: 260, height: 50 })}
+                                    {zone('E', J('手札', 'Your hand'), { left: '6%', width: '88%', top: 322, height: 66 })}
+                                    {zone('F', J('ターン終了', 'End turn'), { right: '3%', width: '20%', top: 128, height: 66, borderRadius: 40, flexDirection: 'column', gap: 2 })}
+                                </div>
+                                <div style={{ flex: 1 }}>
+                                    {row('A', J('相手のリーダー', 'Rival leader'), J('赤い数字が体力。これを 0 にする。', 'The red number is its health. Bring it to 0.'))}
+                                    {row('B', J('相手の場', 'Rival field'), J('相手が出したユニットが並ぶ。', 'Units the rival has played.'))}
+                                    {row('C', J('自分の場', 'Your field'), J('自分が出したユニットが並ぶ。5体まで置ける。', 'Units you have played. Up to 5.'))}
+                                    {row('D', J('自分のリーダー', 'Your leader'), J('これが 0 になると負け。', 'If this reaches 0, you lose.'))}
+                                    {row('E', J('手札', 'Your hand'), J('緑に光っているカードが、いま出せるカード。8枚まで持てる。', 'Cards glowing green can be played now. You can hold up to 8.'))}
+                                    {row('F', J('ターン終了ボタン', 'End turn button'), J('まわりの珠が、いま使えるエナジー。やることが終わったら押す。', 'The gems around it are your energy. Press it when you are done.'))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={sec}>
+                            {h2(4, J('1ターンの流れ', 'One turn'))}
+                            {([
+                                [J('カードを1枚引く', 'Draw a card'), J('自分の番が来ると、自動で山札から1枚引く。', 'At the start of your turn you draw one card automatically.')],
+                                [J('エナジーが増える', 'Energy grows'), J('使える数が 1 つ増えて、全部回復する。1ターン目は 1、2ターン目は 2、と増えて、最大 8。', 'Your energy limit rises by 1 and refills. 1 on turn one, 2 on turn two, up to 8.')],
+                                [J('カードを出す', 'Play cards'), J('手札のカードを押して場に出す。エナジーが足りるかぎり、何枚出してもいい。出したカードは「ユニット」になって場に残る。', 'Tap cards in your hand to play them, as many as your energy allows. A played card stays on the field as a unit.')],
+                                [J('ユニットで攻撃する', 'Attack'), J('場のユニットを押して選び、攻撃する相手を押す。1体につき、1ターンに1回。', 'Tap one of your units, then tap a target. Each unit attacks once per turn.')],
+                                [J('ターンを終える', 'End your turn'), J('「ターン終了」を押すと、相手の番になる。', 'Press End Turn and the rival takes a turn.')],
+                            ] as [string, string][]).map(([a, b2], i) => row(String(i + 1), a, b2))}
+                            <p style={{ ...para, marginTop: 10, color: 'rgba(255,255,255,0.78)' }}>{J('最初はあなたが先攻で、手札は4枚。相手は後攻のかわりに5枚持って始まる。', 'You go first with 4 cards. The rival goes second and starts with 5.')}</p>
+                        </div>
+
+                        <div style={sec}>
+                            {h2(5, J('攻撃のルール', 'How attacks work'))}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: narrow ? 8 : 18, flexWrap: 'wrap', margin: '6px 0 12px' }}>
+                                {unit(J('あなた', 'Yours'), 3, 4)}
+                                <span style={{ fontSize: 13, fontWeight: 900, color: '#F6C85F' }}>{J('攻撃', 'attacks')} ▶</span>
+                                {unit(J('相手', 'Rival'), 2, 3)}
+                                <span style={{ fontSize: 22, color: '#F6C85F' }}>⇒</span>
+                                {unit(J('あなた', 'Yours'), 3, 2)}
+                                {unit(J('相手', 'Rival'), 2, 0, true)}
+                            </div>
+                            <p style={para}>{J('ユニットどうしがぶつかると、お互いに、相手の「攻撃」の数だけ「体力」が減る。上の例では、あなたは 4 − 2 で 2 残り、相手は 3 − 3 で 0 になって破壊される。', 'When units fight, each loses health equal to the other\'s attack. Above, yours goes 4 − 2 = 2 and survives; the rival goes 3 − 3 = 0 and is destroyed.')}</p>
+                            <p style={para}>{J('相手のリーダーを攻撃すると、攻撃の数だけリーダーの体力が減る。このとき、こちらは傷つかない。', 'Attack the rival leader and its health drops by your attack. Your unit is not hurt.')}</p>
+                            <p style={para}>{J('出したばかりのユニットは、次の自分の番まで攻撃できない(能力「速攻」は例外)。', 'A unit cannot attack on the turn it is played (except with RUSH).')}</p>
+                            <p style={para}>{J('相手の場に「守護」のユニットがいるあいだは、守護しか攻撃できない。リーダーにも届かない。', 'While the rival has a WARD unit, you can only attack that unit. The leader is out of reach.')}</p>
+                            <p style={para}>{J('減った体力は、ターンが変わっても元に戻らない。', 'Lost health does not come back on later turns.')}</p>
+                        </div>
+
+                        <div style={sec}>
+                            {h2(6, J('能力は5つ', 'The five abilities'))}
+                            {(['RUSH', 'WARD', 'HEAL', 'INSIGHT', 'STRIKE'] as const).map(a => (
+                                <div key={a} style={{ display: 'flex', gap: 12, alignItems: 'center', margin: '9px 0' }}>
+                                    <span style={{ minWidth: 86, textAlign: 'center', fontSize: 14, fontWeight: 900, color: '#2A1F08', background: gold, borderRadius: 999, padding: '3px 10px', flexShrink: 0 }}>{abilityName(a)}</span>
+                                    <span style={{ ...para, margin: 0 }}>{lang === 'ja' ? ABILITY_JA[a] : ABILITY_TEXT[a]}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {pack && (
+                            <div style={sec}>
+                                {h2(7, J('単語カードの決まり', 'How word cards are built'))}
+                                <p style={para}>{J('1枚のカードが、1つの単語。カードを出すと、その語を使った英文が声で流れる。対戦しているうちに、何度も耳に入る。', 'One card is one word. Playing it speaks a line that uses the word, so you hear it again and again as you play.')}</p>
+                                <p style={para}><b style={{ color: '#F6C85F' }}>{J('よく出る語ほど、コストが軽い。', 'The more common the word, the cheaper the card.')}</b> {J('「最頻出」はコスト 1、「頻出」は 2、「重要」は 3、「発展」は 4。', 'TOP costs 1, COMMON 2, KEY 3, ADVANCED 4.')}</p>
+                                <p style={para}>{J('カードの色は品詞で決まる。炎=動詞、土=名詞、風=形容詞、雷=副詞、水=熟語。', 'The colour shows the part of speech: flame = verb, earth = noun, wind = adjective, thunder = adverb, water = phrase.')}</p>
+                                <p style={para}>{J('対戦が終わると「出た単語」で、その対戦に出てきた語を見直せる。意味は隠してあるので、思い出してから押す。', 'After a duel, open the word list to review the words that appeared. Meanings are hidden until you tap.')}</p>
+                            </div>
+                        )}
+
+                        <div style={sec}>
+                            {h2(pack ? 8 : 7, J('勝つコツ', 'Tips'))}
+                            {([
+                                J('最初のうちは、コストの軽いカードから出して、場にユニットを並べる。', 'Early on, play cheap cards and build a board.'),
+                                J('体力の多いユニットで、相手の弱いユニットを攻撃する。こちらは生き残って、相手だけ減る。', 'Attack weak rival units with your sturdy ones: yours survive, theirs do not.'),
+                                J('「守護」を出しておくと、相手はリーダーを攻撃できなくなる。', 'A WARD unit stops the rival from reaching your leader.'),
+                                J('相手の場にユニットがいなければ、全員でリーダーを攻撃する。', 'If the rival field is empty, send everything at the leader.'),
+                                J('エナジーは次のターンに持ち越せない。使い切るつもりで出す。', 'Energy does not carry over. Try to spend it all.'),
+                            ]).map((x, i) => <p key={i} style={para}>・{x}</p>)}
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap' }}>
+                            <button data-act="guide-play" disabled={!ready} onClick={() => { setView('home'); start(); }} style={{ flex: 1, minWidth: 200, border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 18, letterSpacing: 1, borderRadius: 12, padding: '14px 0', cursor: 'pointer' }}>{t.play}</button>
+                            <button onClick={() => { setView('home'); runDemo(); }} style={{ ...plate, flex: 1, minWidth: 200, color: '#FFF6C8', fontWeight: 900, fontSize: 16, padding: '14px 0', cursor: 'pointer' }}>{J('動く説明を見る', 'Watch the demo')}</button>
+                        </div>
+                    </div>
                 </>,
             );
         }
@@ -1237,6 +1479,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     const g = game;
     const me = g.sides[0], foe = g.sides[1];
     const myTurn = g.active === 0 && g.winner === null;
+    const b = BT[lang];
     // 狭い画面(スマホなど)では、幅 760 の盤面を組んでから全体を縮めて収める。部品を1つずつ詰め直すより崩れない
     // 縦長の画面(スマホ)は専用の配置: 幅 480 で組む。駒は横5体が入る大きさ、END TURN は右下、手札は幅いっぱい
     const portrait = scr.w < 700 && scr.w < scr.h * 0.8;
@@ -1297,7 +1540,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
 
     // 画面全体を覆う。親に transform があると fixed が親の大きさになるので、body の直下に出す
     return createPortal(
-        <div id="duel-root" onMouseMove={selUnit ? e => setAim({ x: e.clientX / zoom, y: e.clientY / zoom }) : undefined}
+        <div id="duel-root" key="battle" onMouseMove={selUnit ? e => setAim({ x: e.clientX / zoom, y: e.clientY / zoom }) : undefined}
             onClick={handSel !== null ? e => { if (!(e.target as HTMLElement).closest('[data-hand]')) setHandSel(null); } : undefined}
             style={{ position: 'fixed', left: 0, top: 0, width: SW, height: SH, transform: zoom < 1 ? `scale(${zoom})` : undefined, transformOrigin: 'top left', zIndex: 99999, overflow: 'hidden', userSelect: 'none', fontFamily: 'inherit', animation: quake ? 'duel-quake .35s ease' : undefined,
             background: ART.board ? AR.base : [
@@ -1373,21 +1616,21 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             </div>
             <div style={{ position: 'absolute', left: '50%', top: portrait ? 64 : Math.round(leaderS * 0.16) + 6, transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: portrait ? 26 : Math.round(leaderS * 0.5) }}>
                 <Plaque style={{ padding: '4px 12px', textAlign: 'center', lineHeight: 1.1 }}>
-                    <div style={{ fontSize: 9, letterSpacing: 2, color: '#6EE7B7' }}>ENERGY</div>
+                    <div style={{ fontSize: 9, letterSpacing: 2, color: '#6EE7B7' }}>{b.energy}</div>
                     <div style={{ fontSize: Math.max(16, leaderS * 0.24) }}>{foe.energy}<span style={{ fontSize: '0.6em', color: '#D4AF37' }}> / {foe.energyMax}</span></div>
                 </Plaque>
                 <Leader side={1} hp={foe.hp} size={leaderS} hit={hits.includes('L1')} target={legal.leader}
                     onClick={legal.leader && selUnit ? () => perform({ type: 'attack', a: selUnit.uid, t: null }) : undefined} />
                 <Plaque style={{ padding: '4px 12px', fontSize: 11, lineHeight: 1.5, letterSpacing: 1, fontFamily: 'inherit' }}>
-                    <div>DECK <b style={{ color: '#fff' }}>{foe.deck.length}</b></div>
-                    <div>HAND <b style={{ color: '#fff' }}>{foe.hand.length}</b></div>
+                    <div>{b.deck} <b style={{ color: '#fff' }}>{foe.deck.length}</b></div>
+                    <div>{b.hand} <b style={{ color: '#fff' }}>{foe.hand.length}</b></div>
                 </Plaque>
             </div>
 
             {row(1)}
             {row(0)}
-            {foe.field.length === 0 && <div style={{ position: 'absolute', left: 0, right: 0, top: midY - rowGap / 2 - tokenH / 2 - 16, textAlign: 'center', fontSize: 11, fontWeight: 800, letterSpacing: 4, color: 'rgba(255,255,255,0.6)', textShadow: '0 1px 3px rgba(0,0,0,0.6)', pointerEvents: 'none' }}>RIVAL FIELD</div>}
-            {me.field.length === 0 && <div style={{ position: 'absolute', left: 0, right: 0, top: midY + rowGap / 2 + tokenH / 2 - 8, textAlign: 'center', fontSize: 11, fontWeight: 800, letterSpacing: 4, color: 'rgba(255,255,255,0.6)', textShadow: '0 1px 3px rgba(0,0,0,0.6)', pointerEvents: 'none' }}>YOUR FIELD</div>}
+            {foe.field.length === 0 && <div style={{ position: 'absolute', left: 0, right: 0, top: midY - rowGap / 2 - tokenH / 2 - 16, textAlign: 'center', fontSize: 11, fontWeight: 800, letterSpacing: 4, color: 'rgba(255,255,255,0.6)', textShadow: '0 1px 3px rgba(0,0,0,0.6)', pointerEvents: 'none' }}>{b.rivalField}</div>}
+            {me.field.length === 0 && <div style={{ position: 'absolute', left: 0, right: 0, top: midY + rowGap / 2 + tokenH / 2 - 8, textAlign: 'center', fontSize: 11, fontWeight: 800, letterSpacing: 4, color: 'rgba(255,255,255,0.6)', textShadow: '0 1px 3px rgba(0,0,0,0.6)', pointerEvents: 'none' }}>{b.yourField}</div>}
 
             {/* 右: END TURN。まわりの珠が自分のエナジー */}
             <div style={{ position: 'absolute', right: portrait ? ringR + 24 : ringR + 30, top: portrait ? SH - handPeek - 30 - leaderS / 2 : midY, width: 0, height: 0, zIndex: 6 }}>
@@ -1403,9 +1646,9 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                     color: '#fff', fontWeight: 900, fontSize: Math.max(9, ringR * 0.21), letterSpacing: 1, lineHeight: 1.1, textShadow: '0 1px 3px rgba(0,0,0,0.6)', fontFamily: 'Georgia, serif', padding: 0,
                     boxShadow: myTurn ? '0 0 20px 4px rgba(255,242,168,0.85), inset 0 -6px 12px rgba(0,0,0,0.25)' : 'inset 0 -6px 12px rgba(0,0,0,0.35)',
                     animation: idle ? 'duel-pulse 0.9s ease-in-out infinite' : undefined,
-                }}>{myTurn ? <>END<br />TURN</> : <>RIVAL<br />TURN</>}</button>
+                }}>{myTurn ? <>{b.end1}<br />{b.end2}</> : <>{b.rv1}<br />{b.rv2}</>}</button>
                 <Plaque style={{ position: 'absolute', left: -44, top: portrait ? -(ringR + 16) - 52 : ringR + 24, width: 88, textAlign: 'center', padding: '3px 0', lineHeight: 1.1 }}>
-                    <div style={{ fontSize: 9, letterSpacing: 2, color: '#6EE7B7' }}>ENERGY</div>
+                    <div style={{ fontSize: 9, letterSpacing: 2, color: '#6EE7B7' }}>{b.energy}</div>
                     <div style={{ fontSize: 20 }}>{me.energy}<span style={{ fontSize: 12, color: '#D4AF37' }}> / {me.energyMax}</span></div>
                 </Plaque>
             </div>
@@ -1417,8 +1660,8 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             )}
             {/* 右上: 音と戻る */}
             <div style={{ position: 'absolute', right: 10, top: 10, display: 'flex', gap: 6, zIndex: 8 }}>
-                <Plaque style={{ padding: 0 }}><button onClick={() => { soundRef.current = !sound; setSound(!sound); if (sound) { voiceEl?.pause(); try { window.speechSynthesis.cancel(); } catch { /* 無い端末 */ } } }} style={{ background: 'none', border: 'none', color: '#FFF2A8', fontSize: 10, fontWeight: 800, letterSpacing: 1, padding: '5px 9px', cursor: 'pointer' }}>SOUND {sound ? 'ON' : 'OFF'}</button></Plaque>
-                <Plaque style={{ padding: 0 }}><button onClick={() => { leaveNet(); gameRef.current = null; setGame(null); }} style={{ background: 'none', border: 'none', color: '#FFF2A8', fontSize: 10, fontWeight: 800, letterSpacing: 1, padding: '5px 9px', cursor: 'pointer' }}>QUIT</button></Plaque>
+                <Plaque style={{ padding: 0 }}><button onClick={() => { soundRef.current = !sound; setSound(!sound); if (sound) { voiceEl?.pause(); try { window.speechSynthesis.cancel(); } catch { /* 無い端末 */ } } }} style={{ background: 'none', border: 'none', color: '#FFF2A8', fontSize: 10, fontWeight: 800, letterSpacing: 1, padding: '5px 9px', cursor: 'pointer' }}>{sound ? b.soundOn : b.soundOff}</button></Plaque>
+                <Plaque style={{ padding: 0 }}><button onClick={() => { leaveNet(); gameRef.current = null; setGame(null); }} style={{ background: 'none', border: 'none', color: '#FFF2A8', fontSize: 10, fontWeight: 800, letterSpacing: 1, padding: '5px 9px', cursor: 'pointer' }}>{b.quit}</button></Plaque>
             </div>
 
             {/* 左: カードの拡大(マウスを乗せたか、選んだカード) */}
@@ -1438,13 +1681,13 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             {/* 自分: リーダー(手札の上)、枚数 */}
             <div style={{ position: 'absolute', left: '50%', bottom: portrait ? handPeek + 30 : handPeek + Math.round(leaderS * 0.3), transform: 'translateX(-50%)', display: 'flex', alignItems: 'center', gap: portrait ? 26 : Math.round(leaderS * 0.5), zIndex: 4 }}>
                 <Plaque style={{ padding: '4px 12px', fontSize: 11, lineHeight: 1.5, letterSpacing: 1, fontFamily: 'inherit' }}>
-                    <div>DECK <b style={{ color: '#fff' }}>{me.deck.length}</b></div>
-                    <div>HAND <b style={{ color: '#fff' }}>{me.hand.length}</b></div>
+                    <div>{b.deck} <b style={{ color: '#fff' }}>{me.deck.length}</b></div>
+                    <div>{b.hand} <b style={{ color: '#fff' }}>{me.hand.length}</b></div>
                 </Plaque>
                 <Leader side={0} hp={me.hp} size={leaderS} hit={hits.includes('L0')} target={false} />
                 <Plaque style={{ padding: '4px 12px', fontSize: 11, lineHeight: 1.5, letterSpacing: 1, fontFamily: 'inherit', visibility: portrait ? 'hidden' : undefined }}>
-                    <div>TURN <b style={{ color: '#fff' }}>{g.turn}</b></div>
-                    <div>W <b style={{ color: '#fff' }}>{record.win}</b> · L <b style={{ color: '#fff' }}>{record.lose}</b></div>
+                    <div>{b.turn} <b style={{ color: '#fff' }}>{g.turn}</b></div>
+                    <div><b style={{ color: '#fff' }}>{record.win}</b> {b.win} · <b style={{ color: '#fff' }}>{record.lose}</b> {b.lose}</div>
                 </Plaque>
             </div>
 
@@ -1478,24 +1721,32 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                     <div style={{ display: 'flex', gap: 12 }} onClick={e => e.stopPropagation()}>
                         {inspect.hand !== undefined && (
                             <button data-act="inspect-play" disabled={!(myTurn && canPlay(g, inspect.hand))} onClick={() => { const i = inspect.hand!; setInspect(null); perform({ type: 'play', idx: i }); }}
-                                style={{ ...btn(true, !(myTurn && canPlay(g, inspect.hand))), fontSize: 18, padding: '14px 34px' }}>{myTurn && canPlay(g, inspect.hand) ? 'PLAY' : myTurn ? 'NOT ENOUGH ENERGY' : 'RIVAL TURN'}</button>
+                                style={{ ...btn(true, !(myTurn && canPlay(g, inspect.hand))), fontSize: 18, padding: '14px 34px' }}>{myTurn && canPlay(g, inspect.hand) ? b.play : myTurn ? b.noEnergy : b.notTurn}</button>
                         )}
-                        <button onClick={() => setInspect(null)} style={{ ...btn(false), fontSize: 18, padding: '14px 28px' }}>BACK</button>
+                        <button onClick={() => setInspect(null)} style={{ ...btn(false), fontSize: 18, padding: '14px 28px' }}>{b.back}</button>
                     </div>
                 </div>
             )}
 
             {/* 案内(左下) */}
             <Plaque style={{ display: demo ? 'none' : undefined, position: 'absolute', ...(portrait ? { left: '50%', top: midY + rowGap / 2 + tokenH + 56, transform: 'translateX(-50%)', whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0.94 } : { left: 10, bottom: handPeek + 10, maxWidth: Math.min(280, SW * 0.3), whiteSpace: 'normal' as const }), padding: '6px 10px', fontSize: 11, fontWeight: 700, lineHeight: 1.45, fontFamily: 'inherit', zIndex: 4 }}>
-                <div style={{ color: '#fff' }}>{g.winner !== null ? 'Game over.' : !myTurn ? 'Rival is thinking...' : selUnit ? (legal.leader ? 'Tap a rival unit or the rival leader.' : 'A WARD unit blocks the way. Tap it.') : idle ? 'Nothing left to do. End your turn.' : portrait ? 'Tap a card to look at it and play it.' : 'Tap a glowing card to play it. Tap a glowing unit, then a target.'}</div>
-                {!portrait && <div style={{ color: '#D4AF37', fontWeight: 400, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.log[g.log.length - 1]}</div>}
+                <div style={{ color: '#fff', fontSize: lang === 'ja' ? 12.5 : 11, whiteSpace: portrait && lang === 'ja' ? 'normal' : undefined, maxWidth: portrait ? SW - 150 : undefined }}>{(() => {
+                    if (g.winner !== null) return b.hOver;
+                    if (!myTurn) return b.hRival;
+                    if (selUnit) return legal.leader ? b.hTarget : b.hWard;
+                    if (idle) return b.hIdle;
+                    const canP = me.hand.some((_, i) => canPlay(g, i)), canA = me.field.some(u => canAttack(g, u));
+                    if (portrait) return canA ? b.hPhoneBoth : b.hPhonePlay;
+                    return canP && canA ? b.hBoth : canP ? b.hPlay : b.hAttack;
+                })()}</div>
+                {!portrait && lang === 'en' && <div style={{ color: '#D4AF37', fontWeight: 400, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.log[g.log.length - 1]}</div>}
             </Plaque>
 
             {/* デモ: 盤面は触れないようにして、説明の札を出す */}
             {demo && (
                 <>
                     <div style={{ position: 'absolute', inset: 0, zIndex: 60 }} />
-                    <div style={{ position: 'absolute', left: '50%', top: 10, transform: 'translateX(-50%)', zIndex: 81, fontSize: 11, fontWeight: 900, letterSpacing: 4, color: '#FFF2A8', background: 'linear-gradient(180deg, #9F1239, #4C0519)', border: '2px solid #FFF2A8', borderRadius: 999, padding: '3px 16px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>HOW TO PLAY</div>
+                    <div style={{ position: 'absolute', left: '50%', top: 10, transform: 'translateX(-50%)', zIndex: 81, fontSize: 11, fontWeight: 900, letterSpacing: 4, color: '#FFF2A8', background: 'linear-gradient(180deg, #9F1239, #4C0519)', border: '2px solid #FFF2A8', borderRadius: 999, padding: '3px 16px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>{b.howto}</div>
                     <div key={demo.n} style={{ position: 'absolute', left: 12, bottom: portrait ? handPeek + 30 + leaderS + 40 : handPeek + 12, width: portrait ? SW - 24 : Math.min(440, SW * 0.44), zIndex: 81, background: 'linear-gradient(180deg, #FFFDF7, #FEF3C7)', border: '3px solid #D4AF37', borderRadius: 14, boxShadow: '0 12px 30px rgba(0,0,0,0.55), inset 0 0 0 1px #fff', padding: '12px 14px 10px', animation: 'duel-cap .35s ease-out' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
                             <span style={{ fontSize: 10, fontWeight: 900, letterSpacing: 2, color: '#fff', background: '#B8941E', borderRadius: 999, padding: '1px 9px' }}>{demo.n} / {demo.total}</span>
@@ -1503,8 +1754,8 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                         </div>
                         <div style={{ fontSize: Math.max(15, Math.min(20, SW / 52)), fontWeight: 800, lineHeight: 1.4, color: INK }}>{lang === 'ja' ? DEMO_JA[demo.n - 1] : demo.cap}</div>
                         <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-                            <button data-act="demo-skip" onClick={stopDemo} style={{ ...btn(true), fontSize: 12, padding: '7px 16px' }}>SKIP AND PLAY</button>
-                            <button onClick={runDemo} style={{ ...btn(false), fontSize: 12, padding: '7px 16px' }}>RESTART</button>
+                            <button data-act="demo-skip" onClick={stopDemo} style={{ ...btn(true), fontSize: 12, padding: '7px 16px' }}>{b.skip}</button>
+                            <button onClick={runDemo} style={{ ...btn(false), fontSize: 12, padding: '7px 16px' }}>{b.restart}</button>
                         </div>
                     </div>
                 </>
@@ -1515,7 +1766,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                 <div style={{ position: 'absolute', left: -60, right: -60, top: midY - 48, height: 96, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', zIndex: 30,
                     background: banner.startsWith('YOUR') ? 'linear-gradient(90deg, transparent, rgba(4,120,87,0.94) 22%, rgba(4,120,87,0.94) 78%, transparent)' : 'linear-gradient(90deg, transparent, rgba(159,18,57,0.94) 22%, rgba(159,18,57,0.94) 78%, transparent)',
                     borderTop: '3px solid #FFF2A8', borderBottom: '3px solid #FFF2A8', animation: 'duel-banner 1.25s ease-in-out forwards' }}>
-                    <span style={{ fontSize: Math.min(60, SW / 11), fontWeight: 900, letterSpacing: 12, color: '#fff', fontFamily: 'Georgia, serif', textShadow: '0 3px 0 rgba(0,0,0,0.4), 0 0 26px rgba(255,242,168,0.95)' }}>{banner}</span>
+                    <span style={{ fontSize: Math.min(60, SW / 11), fontWeight: 900, letterSpacing: 12, color: '#fff', fontFamily: 'Georgia, serif', textShadow: '0 3px 0 rgba(0,0,0,0.4), 0 0 26px rgba(255,242,168,0.95)' }}>{banner.startsWith('YOUR') ? b.yourTurn : b.rivalTurn}</span>
                 </div>
             )}
 
@@ -1562,20 +1813,20 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                             ))}
                         </div>
                         <div style={{ position: 'relative', width: Math.min(560, SW * 0.7), height: 2, marginTop: 10, background: `linear-gradient(90deg, transparent, ${tone.a}, transparent)`, boxShadow: `0 0 12px ${tone.glow}`, animation: 'duel-line .8s ease-out 1.15s both' }} />
-                        <div style={{ position: 'relative', marginTop: 8, fontSize: Math.max(11, Math.min(15, SW / 60)), fontWeight: 700, letterSpacing: 6, color: tone.a, animation: 'duel-fadeup .6s ease-out 1.3s both' }}>{win ? 'THE RIVAL LEADER HAS FALLEN' : 'YOUR LEADER HAS FALLEN'}</div>
+                        <div style={{ position: 'relative', marginTop: 8, fontSize: Math.max(11, Math.min(15, SW / 60)), fontWeight: 700, letterSpacing: 6, color: tone.a, animation: 'duel-fadeup .6s ease-out 1.3s both' }}>{win ? b.winSub : b.loseSub}</div>
 
                         <div style={{ position: 'relative', display: 'flex', gap: Math.min(26, SW / 40), marginTop: 22 }}>
-                            {tile('YOUR LEADER', me.hp, ' HP', 1.5)}
-                            {tile('TURNS', g.turn, '', 1.65)}
-                            {tile('RECORD', record.win, ` W · ${record.lose} L`, 1.8)}
+                            {tile(b.tLeader, me.hp, lang === 'ja' ? '' : ' HP', 1.5)}
+                            {tile(b.tTurns, g.turn, '', 1.65)}
+                            {tile(b.tRecord, record.win, ` ${b.win} · ${record.lose} ${b.lose}`, 1.8)}
                         </div>
 
                         <div style={{ position: 'relative', marginTop: 26, display: 'flex', gap: 12, alignItems: 'center', animation: 'duel-fadeup .6s ease-out 2.2s both' }}>
-                            {net?.role === 'guest' ? <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>Ask for a new link to play again.</span> : (
+                            {net?.role === 'guest' ? <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{b.guestAgain}</span> : (
                                 <>
-                                    <button style={{ ...btn(false), background: 'rgba(255,255,255,0.08)', color: '#fff', border: `1px solid ${tone.b}` }} onClick={() => { leaveNet(); gameRef.current = null; setGame(null); }}>{net ? 'BACK TO DECK' : 'REBUILD DECK'}</button>
-                                    {pack && seen.current.size > 0 && <button data-act="review" style={{ ...btn(false), background: 'rgba(255,255,255,0.08)', color: '#fff', border: `1px solid ${tone.b}` }} onClick={() => setReview(true)}>WORDS · {seen.current.size}</button>}
-                                    {!net && <button data-act="rematch" style={{ ...btn(true), fontSize: 16, padding: '13px 34px' }} onClick={start}>REMATCH</button>}
+                                    <button style={{ ...btn(false), background: 'rgba(255,255,255,0.08)', color: '#fff', border: `1px solid ${tone.b}` }} onClick={() => { leaveNet(); gameRef.current = null; setGame(null); }}>{b.home}</button>
+                                    {pack && seen.current.size > 0 && <button data-act="review" style={{ ...btn(false), background: 'rgba(255,255,255,0.08)', color: '#fff', border: `1px solid ${tone.b}` }} onClick={() => setReview(true)}>{b.words} · {seen.current.size}</button>}
+                                    {!net && <button data-act="rematch" style={{ ...btn(true), fontSize: 16, padding: '13px 34px' }} onClick={start}>{b.rematch}</button>}
                                 </>
                             )}
                         </div>
@@ -1588,10 +1839,10 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                 <div data-act="review-list" style={{ position: 'absolute', inset: 0, zIndex: 60, background: 'rgba(8,6,2,0.94)', overflowY: 'auto', padding: '18px 16px 40px' }}>
                     <div style={{ maxWidth: 760, margin: '0 auto' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                            <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 24, letterSpacing: 2, color: '#F6C85F' }}>WORDS FROM THIS DUEL</div>
-                            <button onClick={() => setReview(false)} style={{ ...btn(false), marginLeft: 'auto' }}>BACK</button>
+                            <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 24, letterSpacing: 2, color: '#F6C85F' }}>{b.reviewTitle}</div>
+                            <button onClick={() => setReview(false)} style={{ ...btn(false), marginLeft: 'auto' }}>{b.back}</button>
                         </div>
-                        <div style={{ marginTop: 4, fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>この対戦で出た単語。意味を思い出してから、押して確かめる。</div>
+                        <div style={{ marginTop: 4, fontSize: 13, color: 'rgba(255,255,255,0.75)' }}>{b.reviewHelp}</div>
                         <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
                             {[...seen.current.values()].map(c => (
                                 <div key={c.id} onClick={() => setShownJa(x => ({ ...x, [c.id]: !x[c.id] }))} style={{ display: 'flex', gap: 14, alignItems: 'center', padding: 10, borderRadius: 12, cursor: 'pointer', background: 'linear-gradient(180deg, rgba(42,31,8,0.86), rgba(20,14,4,0.92))', border: '1.5px solid #D4AF37' }}>
@@ -1600,7 +1851,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                                     <div style={{ flex: 1, minWidth: 0 }}>
                                         <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
                                             <span style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 24, color: '#FFF6C8' }}>{c.word}</span>
-                                            <span style={{ fontSize: 15, fontWeight: 800, color: shownJa[c.id] ? '#fff' : 'rgba(255,255,255,0.4)' }}>{shownJa[c.id] ? c.ja : '押すと意味'}</span>
+                                            <span style={{ fontSize: 15, fontWeight: 800, color: shownJa[c.id] ? '#fff' : 'rgba(255,255,255,0.4)' }}>{shownJa[c.id] ? c.ja : b.tapMeaning}</span>
                                         </div>
                                         <div style={{ marginTop: 3, fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 15, lineHeight: 1.4, color: '#FFFDF2' }}>{c.text}</div>
                                         {shownJa[c.id] && <div style={{ marginTop: 3, fontSize: 13, lineHeight: 1.5, color: 'rgba(255,255,255,0.85)' }}>{c.lineJa}</div>}
