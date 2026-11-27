@@ -1,0 +1,402 @@
+[
+  {
+    "name": "ANIME FANTASY",
+    "prompt": "vivid anime fantasy illustration, dramatic lighting, ornate costume details"
+  },
+  {
+    "name": "MONOCHROME MANGA",
+    "prompt": "black and white manga page art with screentone shading and bold ink lines, no color"
+  },
+  {
+    "name": "UKIYO-E",
+    "prompt": "Japanese ukiyo-e woodblock print, flat colors, bold outlines, washi paper texture"
+  },
+  {
+    "name": "SUMI-E",
+    "prompt": "Japanese sumi-e ink wash painting, black ink on white paper, loose brush strokes, lots of empty space"
+  },
+  {
+    "name": "NIHONGA",
+    "prompt": "traditional nihonga painting with mineral pigments and gold leaf background"
+  },
+  {
+    "name": "EMAKI SCROLL",
+    "prompt": "medieval Japanese picture scroll, soft earth colors, drifting gold clouds, flat perspective"
+  },
+  {
+    "name": "KABUKI POSTER",
+    "prompt": "bold kabuki theater poster, exaggerated poses, red black and white, thick brush outlines"
+  },
+  {
+    "name": "WASHI COLLAGE",
+    "prompt": "torn washi paper collage, layered textured papers, soft natural colors"
+  },
+  {
+    "name": "KIRIE PAPERCUT",
+    "prompt": "Japanese kirie paper cutting, intricate black cut-paper silhouette over a colored background"
+  },
+  {
+    "name": "SHOWA RETRO",
+    "prompt": "1960s Japanese retro advertisement illustration, faded print colors, halftone dots"
+  },
+  {
+    "name": "WATERCOLOR",
+    "prompt": "loose transparent watercolor painting, soft bleeding edges, white paper showing through"
+  },
+  {
+    "name": "OIL PAINTING",
+    "prompt": "classical oil painting, rich impasto brushwork, warm chiaroscuro lighting"
+  },
+  {
+    "name": "IMPRESSIONIST",
+    "prompt": "impressionist painting, short visible brush strokes, shimmering outdoor light"
+  },
+  {
+    "name": "PENCIL SKETCH",
+    "prompt": "detailed graphite pencil sketch on cream paper, cross-hatching, no color"
+  },
+  {
+    "name": "CHARCOAL",
+    "prompt": "expressive charcoal drawing, smudged shadows, rough paper grain, black and white"
+  },
+  {
+    "name": "INK AND WASH",
+    "prompt": "pen and ink line drawing with pale sepia wash, travel sketchbook feeling"
+  },
+  {
+    "name": "PASTEL CHALK",
+    "prompt": "soft chalk pastel drawing on dark paper, powdery glowing colors"
+  },
+  {
+    "name": "GOUACHE",
+    "prompt": "flat matte gouache illustration, opaque bold shapes, mid-century picture book feeling"
+  },
+  {
+    "name": "CRAYON",
+    "prompt": "child's wax crayon drawing, wobbly lines, bright simple colors, paper texture"
+  },
+  {
+    "name": "COLORED PENCIL",
+    "prompt": "careful colored pencil illustration, layered soft hatching, gentle colors"
+  },
+  {
+    "name": "STORYBOOK",
+    "prompt": "classic children's storybook illustration, warm cozy colors, gentle rounded characters"
+  },
+  {
+    "name": "FAIRY TALE ENGRAVING",
+    "prompt": "vintage fairy tale book engraving, fine black line work, antique paper"
+  },
+  {
+    "name": "ART NOUVEAU",
+    "prompt": "art nouveau poster, flowing organic lines, ornamental floral border shapes, muted gold and pastel"
+  },
+  {
+    "name": "ART DECO",
+    "prompt": "art deco poster, geometric symmetry, gold and black, sleek stylized figures"
+  },
+  {
+    "name": "POP ART",
+    "prompt": "pop art print, flat saturated colors, thick black outlines, ben-day dots"
+  },
+  {
+    "name": "COMIC BOOK",
+    "prompt": "American comic book panel art, dynamic inking, halftone color, heavy shadows"
+  },
+  {
+    "name": "PULP COVER",
+    "prompt": "1950s pulp magazine cover painting, dramatic poses, saturated lurid colors"
+  },
+  {
+    "name": "FILM NOIR",
+    "prompt": "black and white film noir still, hard shadows, venetian blind light, smoke"
+  },
+  {
+    "name": "VINTAGE TRAVEL POSTER",
+    "prompt": "vintage travel poster, simplified shapes, limited flat color palette, sunny mood"
+  },
+  {
+    "name": "RETRO 50S AD",
+    "prompt": "cheerful 1950s magazine advertisement illustration, clean airbrushed look"
+  },
+  {
+    "name": "PSYCHEDELIC 60S",
+    "prompt": "1960s psychedelic concert poster, swirling shapes, clashing bright colors"
+  },
+  {
+    "name": "VAPORWAVE",
+    "prompt": "vaporwave aesthetic, pink and teal gradients, grid floor, glossy retro shapes"
+  },
+  {
+    "name": "SYNTHWAVE",
+    "prompt": "1980s synthwave poster, neon sunset, chrome highlights, purple night sky"
+  },
+  {
+    "name": "CYBERPUNK NEON",
+    "prompt": "cyberpunk city at night, neon signs, rain reflections, magenta and cyan light"
+  },
+  {
+    "name": "STEAMPUNK",
+    "prompt": "steampunk world, brass gears, leather and goggles, warm sepia tones"
+  },
+  {
+    "name": "GOTHIC",
+    "prompt": "gothic dark fantasy painting, cathedral arches, candlelight, deep crimson and black"
+  },
+  {
+    "name": "PIXEL ART",
+    "prompt": "16-bit pixel art game scene, limited palette, crisp square pixels"
+  },
+  {
+    "name": "8-BIT",
+    "prompt": "8-bit retro video game screen, very low resolution chunky pixels, four-color palette"
+  },
+  {
+    "name": "LOW POLY",
+    "prompt": "low-poly 3D render, faceted geometric shapes, soft gradient lighting"
+  },
+  {
+    "name": "ISOMETRIC",
+    "prompt": "isometric miniature diorama, clean vector shapes, tiny detailed scene seen from above"
+  },
+  {
+    "name": "VOXEL",
+    "prompt": "voxel art scene built from small cubes, bright toy-like colors"
+  },
+  {
+    "name": "CLAY STOP-MOTION",
+    "prompt": "claymation stop-motion still, handmade clay figures, fingerprints visible, miniature set"
+  },
+  {
+    "name": "FELT CRAFT",
+    "prompt": "needle-felted wool craft scene, fuzzy soft figures, handmade miniature props"
+  },
+  {
+    "name": "PAPER DIORAMA",
+    "prompt": "layered cut-paper diorama with depth and soft shadows between the layers"
+  },
+  {
+    "name": "ORIGAMI",
+    "prompt": "scene made of folded origami paper figures, crisp folds, patterned paper"
+  },
+  {
+    "name": "EMBROIDERY",
+    "prompt": "hand embroidery on linen, visible colored stitches, hoop-art feeling"
+  },
+  {
+    "name": "STAINED GLASS",
+    "prompt": "stained glass window, thick black lead lines, glowing jewel colors"
+  },
+  {
+    "name": "MOSAIC",
+    "prompt": "ancient mosaic made of small stone tiles, earthy colors, visible grout lines"
+  },
+  {
+    "name": "ILLUMINATED MANUSCRIPT",
+    "prompt": "medieval illuminated manuscript miniature, gold leaf, flat figures, decorative vines"
+  },
+  {
+    "name": "TAPESTRY",
+    "prompt": "medieval woven tapestry, flat stylized figures, faded wool colors"
+  },
+  {
+    "name": "GREEK POTTERY",
+    "prompt": "ancient Greek black-figure pottery painting, black silhouettes on terracotta orange"
+  },
+  {
+    "name": "EGYPTIAN MURAL",
+    "prompt": "ancient Egyptian wall painting, profile figures, flat ochre and turquoise"
+  },
+  {
+    "name": "CAVE PAINTING",
+    "prompt": "prehistoric cave painting, ochre and charcoal on rough rock wall"
+  },
+  {
+    "name": "BYZANTINE ICON",
+    "prompt": "byzantine icon painting, gold background, solemn frontal figures"
+  },
+  {
+    "name": "RENAISSANCE FRESCO",
+    "prompt": "renaissance fresco, soft plaster colors, balanced classical composition"
+  },
+  {
+    "name": "BAROQUE",
+    "prompt": "baroque painting, theatrical light and shadow, swirling fabric, deep rich colors"
+  },
+  {
+    "name": "ROCOCO",
+    "prompt": "rococo painting, pastel pinks and blues, playful elegance, soft clouds"
+  },
+  {
+    "name": "ROMANTIC LANDSCAPE",
+    "prompt": "romantic era landscape painting, tiny figure before vast dramatic nature"
+  },
+  {
+    "name": "CUBIST",
+    "prompt": "cubist painting, fragmented overlapping geometric planes, muted browns and blues"
+  },
+  {
+    "name": "SURREAL",
+    "prompt": "surrealist dreamscape, impossible objects, long shadows, calm strange sky"
+  },
+  {
+    "name": "EXPRESSIONIST",
+    "prompt": "expressionist painting, distorted shapes, raw emotional color, thick strokes"
+  },
+  {
+    "name": "BAUHAUS",
+    "prompt": "bauhaus poster design, primary colors, circles triangles and squares, clean layout"
+  },
+  {
+    "name": "CONSTRUCTIVIST POSTER",
+    "prompt": "constructivist poster, diagonal composition, red black and cream, bold geometric shapes"
+  },
+  {
+    "name": "MINIMAL FLAT",
+    "prompt": "minimal flat vector illustration, few simple shapes, two or three colors, lots of space"
+  },
+  {
+    "name": "LINE ART",
+    "prompt": "single continuous thin black line drawing on white, elegant and sparse"
+  },
+  {
+    "name": "SILHOUETTE",
+    "prompt": "black silhouette figures against a glowing sunset gradient"
+  },
+  {
+    "name": "NEON SIGN",
+    "prompt": "scene drawn as glowing neon tube signs on a dark brick wall"
+  },
+  {
+    "name": "CHALKBOARD",
+    "prompt": "white and colored chalk drawing on a dusty green chalkboard"
+  },
+  {
+    "name": "BLUEPRINT",
+    "prompt": "technical blueprint drawing, white lines on deep blue, measurement marks"
+  },
+  {
+    "name": "PATENT DIAGRAM",
+    "prompt": "old patent diagram illustration, precise black line work, numbered parts feeling without readable text"
+  },
+  {
+    "name": "BOTANICAL PLATE",
+    "prompt": "vintage botanical illustration plate, delicate watercolor and ink, cream paper"
+  },
+  {
+    "name": "NATURALIST FIELD NOTES",
+    "prompt": "naturalist field notebook sketch, pencil and watercolor studies on aged paper"
+  },
+  {
+    "name": "MAP ILLUSTRATION",
+    "prompt": "illustrated antique map style, sea monsters, compass rose, parchment colors"
+  },
+  {
+    "name": "TAROT CARD",
+    "prompt": "ornate tarot card illustration, symbolic figure, gold line details, mystical mood"
+  },
+  {
+    "name": "PLAYING CARD",
+    "prompt": "classic playing card face-card style, mirrored ornamental figure, red black and gold"
+  },
+  {
+    "name": "LINOCUT",
+    "prompt": "linocut print, rough carved lines, two-color ink, handmade print texture"
+  },
+  {
+    "name": "WOODCUT",
+    "prompt": "old European woodcut print, heavy black lines, coarse hatching"
+  },
+  {
+    "name": "RISOGRAPH",
+    "prompt": "risograph print, two overlapping spot colors, grainy misregistered ink"
+  },
+  {
+    "name": "SCREEN PRINT",
+    "prompt": "hand-pulled screen print poster, flat layered inks, slight texture"
+  },
+  {
+    "name": "SPRAY GRAFFITI",
+    "prompt": "street graffiti mural, spray paint drips, wild color, concrete wall"
+  },
+  {
+    "name": "STENCIL STREET ART",
+    "prompt": "stencil street art, high contrast black figure with one accent color on a wall"
+  },
+  {
+    "name": "STICKER BOMB",
+    "prompt": "cute glossy sticker illustration with thick white border, bright colors"
+  },
+  {
+    "name": "KAWAII PASTEL",
+    "prompt": "kawaii pastel illustration, round simple characters, soft pinks and mint"
+  },
+  {
+    "name": "CHIBI",
+    "prompt": "chibi style, tiny bodies and big heads, playful exaggerated expressions"
+  },
+  {
+    "name": "SHOJO MANGA",
+    "prompt": "shojo manga color illustration, sparkling eyes, flowers and soft screentones"
+  },
+  {
+    "name": "SEINEN GEKIGA",
+    "prompt": "gritty gekiga manga style, realistic faces, heavy black ink, dramatic angles"
+  },
+  {
+    "name": "90S CEL ANIME",
+    "prompt": "1990s cel animation still, hand-painted backgrounds, slightly faded colors"
+  },
+  {
+    "name": "MECHA",
+    "prompt": "mecha anime illustration, hard metallic surfaces, panel lines, dynamic low angle"
+  },
+  {
+    "name": "WESTERN CARTOON",
+    "prompt": "classic Saturday-morning cartoon style, thick outlines, flat bright colors"
+  },
+  {
+    "name": "RUBBER HOSE",
+    "prompt": "1930s rubber-hose cartoon, black and white, bendy limbs, film grain"
+  },
+  {
+    "name": "CLAY TABLET RELIEF",
+    "prompt": "carved stone bas-relief sculpture, monochrome, strong side lighting"
+  },
+  {
+    "name": "BRONZE STATUE",
+    "prompt": "scene as polished bronze statues in a museum, dramatic spotlight"
+  },
+  {
+    "name": "MARBLE SCULPTURE",
+    "prompt": "white marble sculpture group, soft gallery light, classical drapery"
+  },
+  {
+    "name": "GLASS FIGURINES",
+    "prompt": "delicate blown-glass figurines, transparent colored glass, bright reflections"
+  },
+  {
+    "name": "TOY BRICKS",
+    "prompt": "scene built from plastic toy bricks and minifigures, shiny studs, playful colors"
+  },
+  {
+    "name": "MINIATURE PHOTO",
+    "prompt": "tilt-shift photo of a tiny handmade miniature model scene, shallow focus"
+  },
+  {
+    "name": "POLAROID",
+    "prompt": "faded instant photo look, soft flash, warm color cast, nostalgic everyday moment"
+  },
+  {
+    "name": "DOUBLE EXPOSURE",
+    "prompt": "double exposure photograph, a figure's silhouette filled with a landscape"
+  },
+  {
+    "name": "KINTSUGI GOLD",
+    "prompt": "dark ceramic surface cracked and repaired with shining gold kintsugi lines that form the scene"
+  },
+  {
+    "name": "INFRARED DREAM",
+    "prompt": "surreal false-color infrared photo look, pink foliage, white glowing sky"
+  }
+]

@@ -1,0 +1,19 @@
+Card Duel audio. All sources are CC0 (public domain), from OpenGameArt.org.
+
+Music (public/duel/bgm)
+- home.mp3      "Fantasy Orchestral Theme" by Joth
+- victory.mp3   "Victory Theme for RPG" by cynicmusic
+- battle.mp3    "Determined Pursuit (epic orchestra loop)" by Emma_MA
+- battle-2.mp3  "QaziJamJam (orchestral battle theme)" by Emma_MA
+- battle-3.mp3  "Boss Battle Music" (Epic Boss Battle) by Juhani Junkala (SubspaceAudio)
+- battle-4.mp3  "The Final Battle" by skrjablin
+- battle-5.mp3  "To Battle!" by Umplix
+- battle-6.mp3  "The Fire Dragon" by Umplix
+- battle-7.mp3  "Hope (Orchestral battle music)" by mintodog
+
+Sound effects (public/duel/sfx), layered and processed from:
+- "50 RPG sound effects" by Kenney (kenney.nl)
+- "51 UI sound effects (buttons, switches and clicks)" by Kenney (kenney.nl)
+- "80 CC0 RPG SFX" (opengameart.org/content/80-cc0-rpg-sfx)
+- "100 CC0 SFX" (opengameart.org/content/100-cc0-sfx)
+plus synthesized low thumps and chime tails.

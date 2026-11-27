@@ -31,6 +31,7 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
     // Start BGM on first user interaction (autoplay policy requires gesture)
     const startBGM = useCallback(() => {
         if (bgmStartedRef.current) return;
+        if (window.location.pathname.startsWith('/english/duel')) return;   // カード対戦は自分の曲を鳴らす。サイトの曲は重ねない
         const st = getSettings();
         if (!st.bgmEnabled || !st.soundEnabled) return;
         bgmStartedRef.current = true;
@@ -45,7 +46,7 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
         // Poll settings every 2 seconds
         const interval = setInterval(() => {
             const s = getSettings();
-            if (!s.bgmEnabled || !s.soundEnabled) {
+            if (!s.bgmEnabled || !s.soundEnabled || window.location.pathname.startsWith('/english/duel')) {
                 audio.pause();
             } else {
                 audio.volume = Math.min((s.bgmVolume / 100) * (s.volume / 100) * 0.15, 0.15);
@@ -62,7 +63,7 @@ export default function EnglishLayout({ children }: { children: React.ReactNode 
         setIsLoading(false);
 
         // Start BGM on first click/tap/keydown anywhere
-        const handler = () => { startBGM(); window.removeEventListener('click', handler); window.removeEventListener('keydown', handler); };
+        const handler = () => { if (window.location.pathname.startsWith('/english/duel')) return; startBGM(); window.removeEventListener('click', handler); window.removeEventListener('keydown', handler); };
         window.addEventListener('click', handler);
         window.addEventListener('keydown', handler);
         return () => { window.removeEventListener('click', handler); window.removeEventListener('keydown', handler); };
