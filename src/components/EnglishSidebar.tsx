@@ -87,6 +87,16 @@ const PROGRAMS: Program[] = [
         ],
     },
     {
+        id: 'duel',
+        label: 'WORD DUEL',
+        tagline: '1枚が1語のカード対戦。仕事の必須語',
+        color: C.gold,
+        prefixes: ['/english/duel'],
+        items: [
+            { id: '/english/duel', label: 'WORD DUEL を開く', featured: true },
+        ],
+    },
+    {
         id: 'course',
         label: '百日課程',
         tagline: '会話で本当によく出る1,000表現',

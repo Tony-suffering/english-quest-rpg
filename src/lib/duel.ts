@@ -69,11 +69,12 @@ export interface CardSpec {
     lineJa?: string;    // 英文の訳
     tone?: string;      // 英文の型(日本語の呼び名)
     style?: string;     // 絵の画風の名前
+    band?: number;      // TOEIC の点数帯(500〜900)。章になる
 }
 
 /** 単語パックの1枚(src/data/english/duel-words-*.json の cards) */
 export interface WordCard {
-    id: string; word: string; pos: string; ja: string; level: number; ability: string;
+    id: string; word: string; pos: string; ja: string; level: number; ability: string; band?: number; cost?: number;
     tone: string; toneJa: string; style: string; line: string; lineJa: string;
 }
 export interface WordPack { id: string; title: string; titleJa: string; cards: WordCard[] }
@@ -81,9 +82,11 @@ export interface WordPack { id: string; title: string; titleJa: string; cards: W
 const POS_ELEMENT: Record<string, string> = { verb: 'flame', noun: 'earth', adjective: 'wind', adverb: 'thunder', phrase: 'aqua' };
 const TIER_BY_COST: BstTier[] = ['F', 'F', 'D', 'C', 'B', 'A', 'S'];
 
-/** 単語カードを対戦のカードにする。よく出る語ほど軽い(level がそのままコスト)。品詞が属性。攻撃と体力の割り方は id から決める */
+/** 単語カードを対戦のカードにする。点数帯(band)が章、コスト(cost)は語ごと。品詞が属性。攻撃と体力の割り方は id から決める。
+ *  最初の20語は level をコストにも点数帯にも使っていた。64語に増やしたとき、章の中でコストがばらけるように2つに分けた */
 export function wordSpec(c: WordCard, i: number): CardSpec {
-    const cost = Math.max(1, Math.min(6, c.level));
+    const cost = Math.max(1, Math.min(6, c.cost ?? c.level));
+    const band = c.band ?? [500, 600, 700, 800, 900][Math.max(0, Math.min(4, c.level - 1))];
     const ability = (ABILITY_BY_STAT as string[]).includes(c.ability) ? c.ability as Ability : 'NONE';
     const budget = cost * 2 + 1 + (ability === 'NONE' ? 1 : 0);
     let h = 0;
@@ -91,7 +94,7 @@ export function wordSpec(c: WordCard, i: number): CardSpec {
     const atk = Math.max(1, Math.min(budget - 1, Math.round(budget * (0.4 + (h % 21) / 100))));
     return {
         id: c.id, text: c.line, element: POS_ELEMENT[c.pos] || 'earth', cost, atk, hp: budget - atk, ability,
-        rank: Math.max(0, Math.min(5, c.level + 1)), tier: TIER_BY_COST[cost], no: i + 1, gp: 0,
+        rank: Math.max(2, Math.min(5, band / 100 - 3)), tier: TIER_BY_COST[cost], no: i + 1, gp: 0, band,
         word: c.word, ja: c.ja, lineJa: c.lineJa, tone: c.toneJa, style: c.style,
     };
 }

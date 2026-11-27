@@ -603,11 +603,10 @@ const ABILITY_NAME_JA: Record<string, string> = { HEAL: '回復', STRIKE: '一�
 const abilityName = (a: string) => LANG === 'ja' ? (ABILITY_NAME_JA[a] ?? a) : a;
 const ELEMENT_JA: Record<string, string> = { flame: '炎', aqua: '水', wind: '風', earth: '土', thunder: '雷' };
 const POS_LABEL: Record<string, [string, string]> = { flame: ['動詞', 'VERB'], earth: ['名詞', 'NOUN'], wind: ['形容詞', 'ADJ'], thunder: ['副詞', 'ADV'], aqua: ['熟語', 'PHRASE'] };
-const FREQ_LABEL: [string, string][] = [['', ''], ['', ''], ['最頻出', 'TOP'], ['頻出', 'COMMON'], ['重要', 'KEY'], ['発展', 'ADVANCED']];
 /** カード右上の札。単語カードは品詞、ふつうのカードは属性 */
 const elementLabel = (c: CardSpec) => c.word ? (POS_LABEL[c.element] || ['', ''])[LANG === 'ja' ? 0 : 1] : LANG === 'ja' ? ELEMENT_JA[c.element] : ELEMENT_NAMES[c.element];
-/** その隣の札。単語カードはよく出る度、ふつうのカードはランク */
-const rankLabel = (c: CardSpec) => c.word ? (FREQ_LABEL[c.rank] || ['', ''])[LANG === 'ja' ? 0 : 1] : RANK_NAMES[c.rank];
+/** その隣の札。単語カードは TOEIC の点数帯、ふつうのカードはランク */
+const rankLabel = (c: CardSpec) => c.word ? `TOEIC ${c.band || 500}` : RANK_NAMES[c.rank];
 const BT = {
     ja: {
         you: 'あなた', rival: '相手', energy: 'エナジー', deck: '山札', hand: '手札', turn: 'ターン', win: '勝', lose: '敗',
@@ -727,7 +726,7 @@ const BOSS_NEED = 0.8;      // ボスに挑むのに要る、その章の殿堂�
 const okCount = (p: Progress, id: string) => p.words[id]?.ok.length || 0;
 const inHall = (p: Progress, id: string) => okCount(p, id) >= HALL_NEED;
 const BANDS = [500, 600, 700, 800, 900];
-const chapterOf = (c: CardSpec) => Math.max(0, Math.min(4, c.cost - 1));   // コスト(よく出る度)がそのまま章
+const chapterOf = (c: CardSpec) => Math.max(0, BANDS.indexOf(c.band || 500));   // 点数帯が章
 const CHAPTERS: { name: [string, string]; boss: [string, string]; intro: [string, string]; arena: number }[] = [
     { name: ['見習いの森', 'Apprentice Woods'], boss: ['森の門番', 'The Gatekeeper'], intro: ['仕事の英語の入口。いちばんよく出る語が待っている。', 'The gateway. The most common work words live here.'], arena: 0 },
     { name: ['商人の砂漠', 'Merchant Desert'], boss: ['帳簿の番人', 'The Ledger Keeper'], intro: ['請求と支払いの語が行き交う道。', 'A road of invoices and payments.'], arena: 5 },
@@ -861,6 +860,8 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     const [ptr, setPtr] = useState<{ x: number; y: number } | null>(null);
     // 通信対戦。net = 部屋の状態、applied = ここまでに当てた行動の数(自分のも相手のも)
     const [net, setNet] = useState<{ code: string; role: 'host' | 'guest'; status: 'waiting' | 'playing' | 'error'; msg?: string } | null>(null);
+    // 終わっていない通信対戦の部屋(自分が作った側)。最初の画面に「続きに戻る」を出す
+    const [resume, setResume] = useState<{ code: string; go: () => void } | null>(null);
     const netRef = useRef<{ code: string; role: 'host' | 'guest' } | null>(null);
     const applied = useRef(0);
     const pending = useRef<{ seed: number; guestDeck: CardSpec[] } | null>(null);
@@ -1206,6 +1207,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             applied.current = 0;
             hostDeckRef.current = deck;
             save(ROOM_KEY, { code: d.code, seed, hostDeck: deck, guestDeck, at: Date.now() });
+            setResume(null);
             setNet({ code: d.code, role: 'host', status: 'waiting' });
         } catch { setNet({ code: '', role: 'host', status: 'error', msg: 'Could not create a room.' }); }
     };
@@ -1215,15 +1217,28 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         if (guestRoom) return;
         const r = load<{ code: string; seed: number; hostDeck: CardSpec[]; guestDeck: CardSpec[]; at: number } | null>(ROOM_KEY, null);
         if (!r || Date.now() - r.at > 3 * 3600_000) return;
+        // 勝手には戻らない。最初の画面に「対戦の続きに戻る」を出して、本人が押したら戻る
+        // (終わらせずに閉じた部屋が残っていると、開くたびに最初の画面を飛ばして対戦が始まってしまっていた)
         fetch(`/api/duel/room?code=${r.code}`, { cache: 'no-store' }).then(x => x.json()).then(d => {
             if (!d.success || netRef.current || gameRef.current) return;
-            if (!d.joined) { pending.current = { seed: r.seed, guestDeck: r.guestDeck }; hostDeckRef.current = r.hostDeck; applied.current = 0; setNet({ code: r.code, role: 'host', status: 'waiting' }); return; }
-            let g = newGame(r.hostDeck, r.guestDeck, r.seed);
-            for (const a of d.actions as Action[]) g = apply(g, a);
-            if (g.winner !== null) { save(ROOM_KEY, null); return; }
-            applied.current = (d.actions as Action[]).length;
-            demoToken.current++; demoOn.current = false; setDemo(null);
-            beginNet(g, r.code, 'host');
+            let g: Game | null = null;
+            if (d.joined) {
+                g = newGame(r.hostDeck, r.guestDeck, r.seed);
+                for (const a of d.actions as Action[]) g = apply(g, a);
+                if (g.winner !== null) { save(ROOM_KEY, null); return; }
+            }
+            const resumed = g, count = d.joined ? (d.actions as Action[]).length : 0;
+            setResume({
+                code: r.code,
+                go: () => {
+                    setResume(null);
+                    if (netRef.current || gameRef.current) return;
+                    if (!resumed) { pending.current = { seed: r.seed, guestDeck: r.guestDeck }; hostDeckRef.current = r.hostDeck; applied.current = 0; setNet({ code: r.code, role: 'host', status: 'waiting' }); return; }
+                    applied.current = count;
+                    demoToken.current++; demoOn.current = false; setDemo(null);
+                    beginNet(resumed, r.code, 'host');
+                },
+            });
         }).catch(() => { /* つながらなければ普通に始める */ });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -1319,6 +1334,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         const gold = 'linear-gradient(180deg, #FFF6C8 0%, #F6C85F 45%, #B8941E 55%, #F6C85F 100%)';
         const plate: React.CSSProperties = { background: 'linear-gradient(180deg, rgba(42,31,8,0.86), rgba(20,14,4,0.92))', border: '1.5px solid #D4AF37', boxShadow: '0 8px 24px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,242,168,0.25)', borderRadius: 12 };
         const menu: { key: string; icon: string; title: string; sub: string; on: () => void; main?: boolean; off?: boolean }[] = [
+            ...(resume ? [{ key: 'resume', icon: 'M8 5v14l11-7z', title: lang === 'ja' ? '対戦の続きに戻る' : 'Resume match', sub: lang === 'ja' ? `友だちとの対戦が途中のまま(部屋 ${resume.code})` : `Your match with a friend is unfinished (room ${resume.code})`, on: resume.go }] : []),
             { key: 'duel', icon: 'M5 3l7 7 7-7 2 2-7 7 3 3-2 2-3-3-3 3-2-2 3-3-7-7z', title: t.play, sub: pack ? (lang === 'ja' ? 'いまのデッキ(覚えている途中の単語)で、コンピューターと1戦' : 'One match with your deck of words in progress') : t.playSub, on: start, main: true, off: !ready },
             ...(pack ? [] : [{ key: 'world', icon: 'M12 2l2.4 5.6L20 9l-4.2 3.9L17 19l-5-3-5 3 1.2-6.1L4 9l5.6-1.4z', title: t.walk, sub: t.walkSub, on: () => { window.location.href = '/english/duel/world'; } }]),
             { key: 'online', icon: 'M9 12a4 4 0 0 1 4-4h3a4 4 0 0 1 0 8h-1v-2h1a2 2 0 0 0 0-4h-3a2 2 0 0 0-2 2zm6 0a4 4 0 0 1-4 4H8a4 4 0 0 1 0-8h1v2H8a2 2 0 0 0 0 4h3a2 2 0 0 0 2-2z', title: t.online, sub: t.onlineSub, on: createRoom, off: !ready || !!pack },
@@ -1597,7 +1613,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                                     {row('3', J('体力(右下・赤)', 'Health (bottom right, red)'), J('ダメージを受けると減る。0 になると破壊される。', 'Goes down when it takes damage. At 0 the unit is destroyed.'))}
                                     {row('4', pack ? J('単語と意味', 'Word and meaning') : J('英文', 'The line'), pack ? J('このカードで覚える語。出すと、この語を使った英文が声で流れて、語が金色に光る。', 'The word this card teaches. When played, a line using it is spoken and the word lights up.') : J('出すと、この英文が声で流れる。', 'When played, this line is spoken aloud.'))}
                                     {row('5', J('能力', 'Ability'), J('そのカードだけの特別な効果。能力が無いカードもあり、そのぶん数字が少し高い。', 'A special effect. Some cards have none, and get slightly higher numbers instead.'))}
-                                    {row('6', pack ? J('品詞と、よく出る度(右上)', 'Part of speech and frequency (top right)') : J('属性とランク(右上)', 'Element and rank (top right)'), pack ? J('動詞・名詞などの品詞と、その語がどれくらいよく出るか。', 'Verb, noun and so on, and how often the word appears.') : J('カードの種類を表す札。', 'Tags that show the kind of card.'))}
+                                    {row('6', pack ? J('品詞と、点数帯(右上)', 'Part of speech and score band (top right)') : J('属性とランク(右上)', 'Element and rank (top right)'), pack ? J('動詞・名詞などの品詞と、その語が TOEIC の何点あたりで要るか。', 'Verb, noun and so on, and the TOEIC score band the word belongs to.') : J('カードの種類を表す札。', 'Tags that show the kind of card.'))}
                                 </div>
                             </div>
                         </div>
@@ -1668,7 +1684,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                             <div style={sec}>
                                 {h2(7, J('単語カードの決まり', 'How word cards are built'))}
                                 <p style={para}>{J('1枚のカードが、1つの単語。カードを出すと、その語を使った英文が声で流れる。対戦しているうちに、何度も耳に入る。', 'One card is one word. Playing it speaks a line that uses the word, so you hear it again and again as you play.')}</p>
-                                <p style={para}><b style={{ color: '#F6C85F' }}>{J('よく出る語ほど、コストが軽い。', 'The more common the word, the cheaper the card.')}</b> {J('「最頻出」はコスト 1、「頻出」は 2、「重要」は 3、「発展」は 4。', 'TOP costs 1, COMMON 2, KEY 3, ADVANCED 4.')}</p>
+                                <p style={para}><b style={{ color: '#F6C85F' }}>{J('カードの右上に、TOEIC の点数帯が書いてある。', 'The top right shows the TOEIC score band.')}</b> {J('500 から 900 まで。章はこの点数帯で分かれていて、最初のテストで始める章が決まる。', 'From 500 to 900. Chapters follow these bands, and the placement test picks where you start.')}</p>
                                 <p style={para}>{J('カードの色は品詞で決まる。炎=動詞、土=名詞、風=形容詞、雷=副詞、水=熟語。', 'The colour shows the part of speech: flame = verb, earth = noun, wind = adjective, thunder = adverb, water = phrase.')}</p>
                                 <p style={para}>{J('対戦が終わると「出た単語」で、その対戦に出てきた語を見直せる。意味は隠してあるので、思い出してから押す。', 'After a duel, open the word list to review the words that appeared. Meanings are hidden until you tap.')}</p>
                             </div>
@@ -1711,7 +1727,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                     <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 6, color: '#F6C85F' }}>{pack ? 'TONIO LAB' : 'EIGODAMASHII'}</div>
                     <div style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 900, fontSize: narrow ? 52 : 84, lineHeight: 1, letterSpacing: 3, background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0 4px 0 rgba(0,0,0,0.5)) drop-shadow(0 0 26px rgba(246,200,95,0.55))' }}>{pack ? 'WORD DUEL' : 'CARD DUEL'}</div>
                     <div style={{ width: narrow ? 220 : 380, height: 2, margin: '12px 0 10px', background: 'linear-gradient(90deg, #FFF2A8, transparent)' }} />
-                    {pack && <div style={{ display: 'inline-block', alignSelf: 'flex-start', marginBottom: 8, padding: '4px 12px', borderRadius: 999, border: '1px solid #F6C85F', background: 'rgba(20,14,4,0.7)', fontSize: 13, fontWeight: 900, letterSpacing: 1, color: '#FFF6C8' }}>{lang === 'ja' ? pack.titleJa : pack.title} · {pack.cards.length} {lang === 'ja' ? '語(試作)' : 'words (preview)'}</div>}
+                    {pack && <div style={{ display: 'inline-block', alignSelf: 'flex-start', marginBottom: 8, padding: '4px 12px', borderRadius: 999, border: '1px solid #F6C85F', background: 'rgba(20,14,4,0.7)', fontSize: 13, fontWeight: 900, letterSpacing: 1, color: '#FFF6C8' }}>{lang === 'ja' ? pack.titleJa : pack.title} · {pack.cards.length} {lang === 'ja' ? '語' : 'words'}</div>}
                     <div style={{ fontSize: narrow ? 14 : 17, lineHeight: 1.7, color: '#FFFDF2', textShadow: '0 1px 3px #000', maxWidth: 480 }}>{pack ? (lang === 'ja' ? '1枚が1語のカードゲーム。出すたびに声が鳴って、英文の中でその語が光る。遊んでいるうちに、仕事で必ず出る単語が入る。' : 'One card, one word. Every card you play is spoken aloud and the word lights up inside its line. Play, and the must-know work words stick.') : t.pitch}</div>
 
                     {/* 単語パック: 勇者のレベルと、次にやること */}
