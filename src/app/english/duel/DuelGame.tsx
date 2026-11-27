@@ -884,7 +884,10 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         onResize();
         window.addEventListener('resize', onResize);
         setRecord(load(RECORD_KEY, { win: 0, lose: 0 }));
-        setLang(load<'ja' | 'en'>(LANG_KEY, 'ja') === 'en' ? 'en' : 'ja');
+        // 言語: 自分で選んだことがあればそれ。無ければ端末の言語で決める(日本語の端末だけ日本語)。
+        // 2026-11-27 の DMM で、招待リンクで入った先生の画面に日本語が出た。入った側には切り替えが無く、既定が日本語だったため
+        const savedLang = load<string | null>(LANG_KEY, null);
+        setLang(savedLang === 'en' || savedLang === 'ja' ? savedLang : (navigator.language || 'en').toLowerCase().startsWith('ja') ? 'ja' : 'en');
         fetch('/duel/voice/manifest.json', { cache: 'no-store' }).then(r => r.json()).then((m: { ids: string[]; v: number }) => {
             VOICE = Object.fromEntries((m.ids || []).map(k => [k, `/duel/voice/${k}.mp3?v=${m.v}`]));
         }).catch(() => { /* 声が無ければ端末の読み上げ */ });
@@ -1963,6 +1966,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             )}
             {/* 右上: 音と戻る */}
             <div style={{ position: 'absolute', right: 10, top: 10, display: 'flex', gap: 6, zIndex: 8 }}>
+                <Plaque style={{ padding: 0 }}><button data-act="lang" onClick={() => { const l = lang === 'ja' ? 'en' : 'ja'; setLang(l); save(LANG_KEY, l); }} style={{ background: 'none', border: 'none', color: '#FFF2A8', fontSize: 10, fontWeight: 800, letterSpacing: 1, padding: '5px 9px', cursor: 'pointer' }}>{lang === 'ja' ? 'English' : '日本語'}</button></Plaque>
                 <Plaque style={{ padding: 0 }}><button onClick={() => { soundRef.current = !sound; setSound(!sound); if (sound) { voiceEl?.pause(); try { window.speechSynthesis.cancel(); } catch { /* 無い端末 */ } } }} style={{ background: 'none', border: 'none', color: '#FFF2A8', fontSize: 10, fontWeight: 800, letterSpacing: 1, padding: '5px 9px', cursor: 'pointer' }}>{sound ? b.soundOn : b.soundOff}</button></Plaque>
                 <Plaque style={{ padding: 0 }}><button onClick={() => { leaveNet(); gameRef.current = null; setGame(null); }} style={{ background: 'none', border: 'none', color: '#FFF2A8', fontSize: 10, fontWeight: 800, letterSpacing: 1, padding: '5px 9px', cursor: 'pointer' }}>{b.quit}</button></Plaque>
             </div>
