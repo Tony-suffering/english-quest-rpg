@@ -358,7 +358,7 @@ function Card({ spec, w, back, chant, noCost, fx, onClick, onHover, attrs, style
     const step = Math.min(0.16, 1.15 / words.length);
     const size = spec.text.length > 80 ? 12 : spec.text.length > 55 ? 13.5 : spec.text.length > 30 ? 15.5 : 18;
     const hot = new Set((spec.word || '').toLowerCase().split(' ').filter(Boolean));
-    const isHot = (x: string) => hot.has(x.toLowerCase().replace(/[^a-z]/g, ''));
+    const isHot = (x: string) => { const t = x.toLowerCase().replace(/[^a-z]/g, ''); return hot.has(t) || [...hot].some(h => h.length >= 5 && t.startsWith(h)); };   // executives のような変化形も光らせる
     const own = !!ART[`card-${spec.id}`];
     return (
         <div {...attrs} onClick={onClick} onMouseEnter={onHover ? () => onHover(spec) : undefined} onMouseLeave={onHover ? () => onHover(null) : undefined}
