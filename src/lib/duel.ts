@@ -254,7 +254,7 @@ export function apply(g0: Game, a: Action): Game {
         s.energy -= c.cost;
         s.field.push({ uid: g.nextUid++, card: c, atk: c.atk, hp: c.hp, attacked: false, summonedTurn: g.turn });
         g.log.push(`${NAMES[p]} played ${short(c)}.`);
-        if (c.ability === 'HEAL') s.hp = Math.min(START_HP, s.hp + 2);
+        if (c.ability === 'HEAL') s.hp = Math.max(s.hp, Math.min(START_HP, s.hp + 2));   // 体力が 20 より多いボスを削らない
         if (c.ability === 'INSIGHT') draw(g, p);
         if (c.ability === 'STRIKE' && foe.field.length) {
             const t = foe.field.reduce((m, u) => u.atk > m.atk ? u : m);
