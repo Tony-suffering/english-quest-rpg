@@ -81,6 +81,9 @@ const CSS = `
 @keyframes duel-drift { 0% { opacity: 0; transform: translate(0,0) rotate(0deg); } 8% { opacity: 0.95; } 88% { opacity: 0.85; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); } }
 @keyframes duel-firefly { 0%,100% { opacity: 0; transform: translate(0,0); } 20% { opacity: 1; transform: translate(var(--dx), calc(var(--dy) * 0.3)); } 50% { opacity: 0.2; transform: translate(calc(var(--dx) * 0.4), var(--dy)); } 75% { opacity: 1; transform: translate(calc(var(--dx) * -0.5), calc(var(--dy) * 0.5)); } }
 @keyframes duel-chant-hot { 0% { opacity: 0.28; text-shadow: none; } 40% { opacity: 1; color: #fff; text-shadow: 0 0 14px #FDE68A, 0 0 30px #F59E0B; transform: scale(1.25); } 100% { opacity: 1; color: #F6C85F; font-weight: 900; text-shadow: 0 0 10px rgba(246,200,95,0.95), 0 1px 2px #000; transform: scale(1.08); } }
+@keyframes duel-bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -9px); } }
+@keyframes duel-spot { 0%,100% { box-shadow: 0 0 0 9999px rgba(5,4,12,0.6), 0 0 0 3px #FDE68A, 0 0 22px 6px rgba(253,230,138,0.85); } 50% { box-shadow: 0 0 0 9999px rgba(5,4,12,0.6), 0 0 0 5px #fff, 0 0 34px 12px rgba(253,230,138,1); } }
+@keyframes duel-nudge { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-7px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
 @keyframes duel-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.07); } }
 @keyframes duel-shimmer { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
 .duel-hand-card { transition: transform .16s ease; }
@@ -574,7 +577,7 @@ const TEXT = {
         play: '対戦する', playSub: 'コンピューターと1戦。デッキは自動で組まれる',
         online: '友だちと対戦', onlineSub: '招待リンクを送るだけ。相手は登録もデッキもいらない',
         walk: '中庭を歩く', walkSub: '3Dの中庭を歩いて、声を聞きながら20枚を自分で選ぶ',
-        how: '遊び方', howSub: '盤面が動いて、1分でルールを見せる',
+        how: 'チュートリアル', howSub: '案内のとおりに押していくだけ。約3分で、遊び方をひととおり体験する',
         guide: 'ルールブック', guideSub: '図で読む。画面の見方から、勝つコツまで',
         cards: 'カードを見る', cardsSub: '絵と英文と声。押すと大きく出る',
         record: '戦績', win: '勝', lose: '敗', loading: 'カードを読み込み中...', loadFail: 'カードを読み込めなかった。読み込み直して。',
@@ -587,7 +590,7 @@ const TEXT = {
         play: 'Play', playSub: 'One match against the computer. Your deck is built for you',
         online: 'Play a friend', onlineSub: 'Send an invite link. No account or deck needed on their side',
         walk: 'Walk the grounds', walkSub: 'A 3D courtyard. Hear each card and pick your own twenty',
-        how: 'How to play', howSub: 'The board plays itself and shows the rules in a minute',
+        how: 'Tutorial', howSub: 'Follow the guide and press what lights up. About three minutes, hands-on',
         guide: 'Rulebook', guideSub: 'Read it with pictures: the screen, the cards, a turn, tips',
         cards: 'Cards', cardsSub: 'Art, lines and voices. Tap one to see it large',
         record: 'Record', win: 'W', lose: 'L', loading: 'Loading cards...', loadFail: 'Could not load the cards. Reload the page.',
@@ -667,6 +670,71 @@ const DEMO_JA = [
     'ほかの能力。「回復」: リーダーの体力 +2。「ひらめき」: カードを1枚引く。「一撃」: 相手のいちばん強いユニットに 2 ダメージ。',
     'これで全部。くわしくは、最初の画面の「ルールブック」にまとめてある。さあ対戦しよう。',
 ];
+
+// ── チュートリアル(自分で押して進める)──
+// 本人(2026-11-28)「丁寧なチュートリアルがないと絶対にわからない。なにをどうすればいいのかを丁寧に説明するチュートリアルを作って、デラックスに」。
+// 見るだけのデモ(上の DEMO_STEPS)とは別。決まった山で1戦ぶんを、案内のとおりに自分で押していく。
+// 押す場所だけを照らし、ちがう行動は受け付けない。相手の手は台本が動かす。行動は本番と同じ apply() を通る。
+type TStep = { lesson: number; kind: 'say' | 'do' | 'rival' | 'finish'; ja: string; en: string; jaPhone?: string; act?: Action; spot?: string; packOnly?: boolean };
+const TUTOR_LESSONS: [string, string][] = [['勝ち方と画面', 'Goal and screen'], ['カードを出す', 'Play a card'], ['相手の番', "The rival's turn"], ['攻撃する', 'Attack'], ['能力「速攻」', 'Ability: Rush'], ['能力「守護」', 'Ability: Ward'], ['ほかの能力', 'Other abilities'], ['このあと', 'What comes next']];
+const TUTOR: TStep[] = [
+    { lesson: 0, kind: 'say', ja: 'ようこそ。これから3分で、遊び方をひととおり実際にやってみます。案内のとおりに、光っている所を押していくだけです。', en: 'Welcome. In three minutes you will try everything yourself. Just press the highlighted spot each time.' },
+    { lesson: 0, kind: 'say', spot: '[data-leader="1"]', ja: '上にいるのが、相手のリーダーです。赤い盾の数字が「体力」で、いまは 20。これを 0 にしたら、あなたの勝ちです。', en: 'At the top is the rival leader. The red shield shows its health: 20. Bring it to 0 and you win.' },
+    { lesson: 0, kind: 'say', spot: '[data-leader="0"]', ja: '下にいるのが、あなたのリーダーです。こちらの体力が 0 になると、負けです。', en: 'At the bottom is your leader. If its health reaches 0, you lose.' },
+    { lesson: 0, kind: 'say', spot: '[data-hand]', ja: '画面のいちばん下に並んでいるのが、あなたの手札です。ここからカードを選んで、場に出していきます。', en: 'Along the bottom is your hand. You play cards from here onto the field.' },
+    { lesson: 0, kind: 'say', spot: '[data-act="end"]', ja: '右の丸いボタンが「ターン終了」。まわりの緑の珠が、いま使える「エナジー」です。エナジーは、毎ターン 1 つずつ増えていきます。', en: 'The round button on the right ends your turn. The green gems around it are your energy. You get one more every turn.' },
+
+    { lesson: 1, kind: 'say', spot: '[data-hand="0"]', ja: 'カードの左上の緑の数字が「コスト」。出すのに必要なエナジーの数です。このカードはコスト 1。いまエナジーは 1 あるので、出せます。出せるカードは、緑に光ります。', en: 'The green number at the top left of a card is its cost: the energy you need. This one costs 1 and you have 1, so you can play it. Playable cards glow green.' },
+    { lesson: 1, kind: 'do', act: { type: 'play', idx: 0 }, ja: 'では、光っているカードを押して、場に出してみましょう。', jaPhone: '光っているカードを押してください。大きく表示されたら、「場に出す」を押します。', en: 'Now press the glowing card to play it.' },
+    { lesson: 1, kind: 'say', spot: '[data-u="1"]', ja: '出ました。カードを出すと、その英語が声で流れます。場に出たカードは「ユニット」と呼びます。左下の青い数字が「攻撃」、右下の赤い数字が「体力」です。', en: 'Done. The line on the card was spoken aloud. A card on the field is called a unit. Blue at the bottom left is attack, red at the bottom right is health.' },
+    { lesson: 1, kind: 'say', ja: 'ユニットは、出したターンには攻撃できません。攻撃できるのは、次のあなたの番からです。', en: 'A unit cannot attack on the turn it is played. It can attack from your next turn.' },
+    { lesson: 1, kind: 'do', act: { type: 'end' }, ja: 'いまは、もうできることがありません。右の「ターン終了」を押して、相手に番を渡しましょう。', en: 'There is nothing more to do. Press End Turn on the right.' },
+
+    { lesson: 2, kind: 'rival', act: { type: 'play', idx: 0 }, ja: '相手の番です。相手も、同じようにユニットを出してきます。', en: "It is the rival's turn. The rival plays a unit too." },
+    { lesson: 2, kind: 'say', spot: '[data-u="2"]', ja: '相手のユニットは、攻撃 1、体力 2。数字の見方は、あなたのユニットと同じです。', en: 'The rival unit has 1 attack and 2 health. The numbers read the same way as yours.' },
+    { lesson: 2, kind: 'rival', act: { type: 'end' }, ja: '相手がターンを終えます。あなたの番になると、山札からカードを1枚引いて、エナジーが 2 に増えます。', en: 'The rival ends the turn. On your turn you draw a card and your energy rises to 2.' },
+
+    { lesson: 3, kind: 'say', spot: '[data-u="1"]', ja: 'あなたの番です。さっき出したユニットが光っています。光っているユニットは、攻撃できます。', en: 'Your turn. The unit you played is glowing, which means it can attack.' },
+    { lesson: 3, kind: 'do', act: { type: 'attack', a: 1, t: 2 }, ja: 'まず、自分のユニットを押して選びます。次に、相手のユニットを押してください。', en: 'First press your unit to select it. Then press the rival unit.' },
+    { lesson: 3, kind: 'say', ja: 'ユニットどうしがぶつかると、お互いに、相手の「攻撃」の数だけ体力が減ります。相手は体力 2 に 2 ダメージを受けて、破壊されました。あなたのユニットは 1 ダメージを受けて、体力が 3 から 2 になりました。', en: 'When units fight, each loses health equal to the other\'s attack. The rival had 2 health, took 2 and was destroyed. Yours took 1 and went from 3 to 2.' },
+
+    { lesson: 4, kind: 'say', spot: '[data-hand="0"]', ja: 'カードには「能力」を持つものがあります。このカードの能力は「速攻」。出したターンに、すぐ攻撃できます。', en: 'Some cards have an ability. This one has Rush: it can attack on the turn it is played.' },
+    { lesson: 4, kind: 'do', act: { type: 'play', idx: 0 }, ja: 'コストは 2。エナジーは 2 あるので出せます。押して、場に出してください。', jaPhone: 'コストは 2。エナジーは 2 あるので出せます。カードを押して、「場に出す」を押してください。', en: 'It costs 2 and you have 2 energy. Press it to play it.' },
+    { lesson: 4, kind: 'say', spot: '[data-leader="1"]', ja: '相手の場には、もうユニットがいません。邪魔がいないときは、相手のリーダーを直接攻撃できます。', en: 'The rival field is empty. With nothing in the way, you can attack the rival leader directly.' },
+    { lesson: 4, kind: 'do', act: { type: 'attack', a: 3, t: null }, ja: 'いま出した「速攻」のユニットを押して、次に、相手のリーダーを押してください。', en: 'Press the Rush unit you just played, then press the rival leader.' },
+    { lesson: 4, kind: 'say', spot: '[data-leader="1"]', ja: '相手のリーダーの体力が、20 から 18 に減りました。リーダーを攻撃したときは、こちらのユニットは傷つきません。', en: 'The rival leader went from 20 to 18. Your unit is not hurt when it attacks a leader.' },
+    { lesson: 4, kind: 'do', act: { type: 'end' }, ja: 'ここでターンを終了しましょう。', en: 'End your turn here.' },
+
+    { lesson: 5, kind: 'rival', act: { type: 'play', idx: 0 }, ja: '相手が、能力「守護」を持つユニットを出しました。', en: 'The rival played a unit with Ward.' },
+    { lesson: 5, kind: 'say', spot: '[data-u="4"]', ja: '「守護」のユニットがいるあいだは、ほかのユニットも、リーダーも、攻撃できません。先に「守護」を倒す必要があります。', en: 'While a Ward unit is on the field, you cannot attack anything else, not even the leader. You have to destroy the Ward first.' },
+    { lesson: 5, kind: 'rival', act: { type: 'end' }, ja: '相手がターンを終えます。', en: 'The rival ends the turn.' },
+    { lesson: 5, kind: 'do', act: { type: 'attack', a: 1, t: 4 }, ja: '「守護」を倒しましょう。まず1体目。自分のユニットを押して、「守護」のユニットを押してください。', en: 'Break the Ward. Press one of your units, then press the Ward unit.' },
+    { lesson: 5, kind: 'do', act: { type: 'attack', a: 3, t: 4 }, ja: 'もう1体でも攻撃します。1体のユニットが攻撃できるのは、1ターンに1回です。', en: 'Attack with your other unit too. Each unit can attack once per turn.' },
+    { lesson: 5, kind: 'say', ja: '「守護」を倒しました。これで、また相手のリーダーを狙えるようになります。', en: 'The Ward is gone. The leader is open again.' },
+
+    { lesson: 6, kind: 'say', spot: '[data-hand="0"]', ja: '次は、能力「ひらめき」。出したときに、山札からカードを1枚引けます。', en: 'Next, Insight: when played, you draw a card.' },
+    { lesson: 6, kind: 'do', act: { type: 'play', idx: 0 }, ja: 'コストは 3。押して、場に出してください。', jaPhone: 'コストは 3。カードを押して、「場に出す」を押してください。', en: 'It costs 3. Press it to play it.' },
+    { lesson: 6, kind: 'say', spot: '[data-hand]', ja: '手札が1枚増えました。能力は、あと2つあります。「回復」は、出したときに自分のリーダーの体力が 2 戻ります。「一撃」は、出したときに相手のいちばん強いユニットに 2 ダメージを与えます。', en: 'You drew a card. Two more abilities: Heal restores 2 health to your leader, and Strike deals 2 damage to the strongest rival unit.' },
+
+    { lesson: 7, kind: 'say', ja: '対戦は、このくり返しです。カードを出す、攻撃する、ターンを終える。相手のリーダーの体力を先に 0 にしたほうが勝ちです。山札が無くなって、カードを引けなくなったときも負けになります。', en: 'A duel is this, repeated: play cards, attack, end your turn. First to bring the other leader to 0 wins. You also lose if you cannot draw.' },
+    { lesson: 7, kind: 'say', packOnly: true, ja: '対戦が終わると「確認テスト」を受けられます。出てきた単語の意味を、4択で答えます。別の日に2回正解した単語は「殿堂入り」。殿堂入りした単語の数が、勇者のレベルになります。', en: 'After a duel you can take a check: pick the meaning of the words that appeared. Two correct answers on different days put a word in the Hall, and the Hall count is your level.' },
+    { lesson: 7, kind: 'finish', ja: 'これで、遊び方はすべてです。', en: 'That is everything.' },
+];
+const sameAct = (x: Action, y: Action) => x.type === y.type && (x.type === 'play' ? x.idx === (y as { idx: number }).idx : x.type === 'attack' ? x.a === (y as { a: number }).a && x.t === (y as { t: number | null }).t : true);
+function tutorGame(pool: CardSpec[]): Game {
+    const pick = (i: number, o: Partial<CardSpec>): CardSpec => ({ ...pool[i % pool.length], ...o });
+    const me: Side = {
+        hp: START_HP, energy: 1, energyMax: 1, field: [], grave: [],
+        hand: [pick(0, { cost: 1, atk: 2, hp: 3, ability: 'NONE' }), pick(1, { cost: 2, atk: 2, hp: 2, ability: 'RUSH' }), pick(2, { cost: 3, atk: 3, hp: 4, ability: 'INSIGHT' })],
+        deck: [pick(6, { cost: 3, atk: 3, hp: 3, ability: 'HEAL' }), pick(7, { cost: 4, atk: 4, hp: 4, ability: 'STRIKE' }), pick(8, { cost: 2, atk: 2, hp: 3, ability: 'NONE' }), pick(12, { cost: 3, atk: 3, hp: 3, ability: 'NONE' }), pick(13, { cost: 2, atk: 2, hp: 2, ability: 'NONE' }), pick(14, { cost: 4, atk: 4, hp: 5, ability: 'NONE' })],
+    };
+    const foe: Side = {
+        hp: START_HP, energy: 0, energyMax: 0, field: [], grave: [],
+        hand: [pick(3, { cost: 1, atk: 1, hp: 2, ability: 'NONE' }), pick(4, { cost: 2, atk: 1, hp: 4, ability: 'WARD' }), pick(5, { cost: 4, atk: 4, hp: 5, ability: 'NONE' })],
+        deck: [pick(9, { cost: 3, atk: 3, hp: 3, ability: 'NONE' }), pick(10, { cost: 2, atk: 2, hp: 2, ability: 'NONE' }), pick(11, { cost: 3, atk: 2, hp: 4, ability: 'NONE' }), pick(15, { cost: 2, atk: 2, hp: 2, ability: 'NONE' }), pick(16, { cost: 3, atk: 3, hp: 3, ability: 'NONE' }), pick(17, { cost: 4, atk: 4, hp: 4, ability: 'NONE' })],
+    };
+    return { seed: 1, turn: 1, active: 0, sides: [me, foe], winner: null, log: ['Tutorial.'], nextUid: 1 };
+}
 
 /** 舞台。1つずつ専用の絵がある(public/duel/art/board*.webp。scripts/duel-art-generate.mjs --base で作る。お題は src/data/english/duel-art.json)。
  *  横長(1536x1024)と、スマホ用の縦長(<名前>-tall、1024x1536)の2枚ずつ。cy は絵の中の魔法陣の中心の高さ(0〜1)、ring は魔法陣の幅(絵の幅に対する割合)。tcy / tring は縦長の絵の同じ数字。重ねる輪をこれに合わせる。
@@ -858,6 +926,12 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     const [reveal, setReveal] = useState<{ id: number; spec: CardSpec; side: 0 | 1; ms: number } | null>(null);
     const [demo, setDemo] = useState<{ cap: string; n: number; total: number } | null>(null);
     const [ptr, setPtr] = useState<{ x: number; y: number } | null>(null);
+    // チュートリアル: いま何番目か。ready = 「次へ」を押せる(相手の手が終わった、など)
+    const [tutor, setTutor] = useState<{ i: number; ready: boolean } | null>(null);
+    const tutorRef = useRef<{ expect: Action | null; pending: boolean; onMatched: (() => void) | null } | null>(null);
+    const [nudge, setNudge] = useState(0);                                  // ちがう所を押したとき、案内を揺らす
+    const [spot, setSpot] = useState<{ x: number; y: number; w: number; h: number } | null>(null);   // 照らす場所
+    const steps = useMemo(() => TUTOR.filter(st => !st.packOnly || !!pack), [pack]);
     // 通信対戦。net = 部屋の状態、applied = ここまでに当てた行動の数(自分のも相手のも)
     const [net, setNet] = useState<{ code: string; role: 'host' | 'guest'; status: 'waiting' | 'playing' | 'error'; msg?: string } | null>(null);
     // 終わっていない通信対戦の部屋(自分が作った側)。最初の画面に「続きに戻る」を出す
@@ -1017,6 +1091,11 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         if (!g || busy.current || g.winner !== null) return;
         const next = apply(g, a);
         if (next === g) return;
+        const tu = tutorRef.current;
+        if (tu) {
+            if (!tu.expect || !sameAct(tu.expect, a)) { setNudge(n => n + 1); return; }   // 案内とちがう行動は受け付けない
+            tu.pending = true;
+        }
         if (netRef.current) {
             if (!remote && g.active !== 0) return;          // 通信対戦で、相手の番に自分が動かすことはない
             const n = applied.current++;
@@ -1111,7 +1190,63 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         }
         busy.current = false;
         setTick(t => t + 1);
+        const tu2 = tutorRef.current;
+        if (tu2?.pending) { tu2.pending = false; tu2.onMatched?.(); }   // チュートリアル: 台本どおりの行動が終わった
     }, []);
+
+    /** チュートリアルを始める(決まった山で、案内のとおりに自分で押していく) */
+    const startTutor = () => {
+        if (!pool || pool.length < 12) return;
+        demoToken.current++;
+        demoOn.current = true;                       // 相手の手は台本が動かす
+        const g0 = tutorGame(pool);
+        gameRef.current = g0;
+        busy.current = false;
+        bossRef.current = null; forcedArena.current = 0;
+        seen.current = new Map(); setQuiz(null); setVerdict(null); setReview(false);
+        setSel(null); setPops([]); setGhosts([]); setBursts([]); setDemo(null); setPtr(null);
+        tutorRef.current = { expect: null, pending: false, onMatched: null };
+        setTutor({ i: 0, ready: true });
+        setGame(g0);
+        save(DEMO_SEEN_KEY, 1);
+    };
+    const stopTutor = () => {
+        tutorRef.current = null;
+        demoOn.current = false;
+        setTutor(null); setSpot(null); setSel(null); setAim(null); setInspect(null);
+        busy.current = false;
+        gameRef.current = null;
+        setGame(null);
+    };
+    const tutorNext = () => setTutor(t => t && t.ready && t.i + 1 < steps.length ? { i: t.i + 1, ready: false } : t);
+    // 1つの段に入ったとき: 何を待つかを決める。相手の手は、少し間を置いてから台本が打つ
+    const tutorI = tutor ? tutor.i : -1;
+    useEffect(() => {
+        const tu = tutorRef.current, st = steps[tutorI];
+        if (!tu || !st) return;
+        tu.pending = false;
+        if (st.kind === 'do') {
+            tu.expect = st.act!;
+            tu.onMatched = () => setTutor(t => t && t.i + 1 < steps.length ? { i: t.i + 1, ready: false } : t);
+            return;
+        }
+        tu.expect = null; tu.onMatched = null;
+        if (st.kind === 'rival') {
+            const id = setTimeout(() => {
+                const cur = tutorRef.current;
+                if (!cur) return;
+                cur.expect = st.act!;
+                cur.onMatched = () => { cur.expect = null; setTutor(t => t && { ...t, ready: true }); };
+                perform(st.act!);
+            }, 1200);
+            return () => clearTimeout(id);
+        }
+        setTutor(t => t && !t.ready ? { ...t, ready: true } : t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tutorI]);
+    // 対戦が閉じられたら(やめる を押した、など)、チュートリアルも閉じる
+    const gameOn = !!game;
+    useEffect(() => { if (!gameOn && tutorRef.current) { tutorRef.current = null; demoOn.current = false; setTutor(null); setSpot(null); } }, [gameOn]);
 
     const stopDemo = () => {
         demoToken.current++;
@@ -1165,12 +1300,35 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         if (alive()) stopDemo();
     };
 
+    // チュートリアル: いまの段で押す場所を測って、そこだけ照らす(動きが落ち着いたあとにもう一度測る)
+    const inspectOn = !!inspect;
+    useEffect(() => {
+        const st = tutor ? steps[tutor.i] : null;
+        if (!st) { setSpot(null); return; }
+        const a = st.act;
+        const sels = st.kind === 'say' ? (st.spot ? [st.spot] : [])
+            : st.kind !== 'do' || !a ? []
+                : a.type === 'play' ? [inspectOn ? '[data-act="inspect-play"]' : `[data-hand="${a.idx}"]`]
+                    : a.type === 'end' ? ['[data-act="end"]']
+                        : a.type === 'attack' ? [sel === a.a ? (a.t === null ? '[data-leader="1"]' : `[data-u="${a.t}"]`) : `[data-u="${a.a}"]`] : [];
+        const calc = () => {
+            const z = zoomRef.current;
+            const rs = sels.flatMap(q => [...document.querySelectorAll(q)]).map(e => e.getBoundingClientRect()).filter(r => r.width > 0);
+            if (!rs.length) { setSpot(null); return; }
+            const x0 = Math.min(...rs.map(r => r.left)), y0 = Math.min(...rs.map(r => r.top)), x1 = Math.max(...rs.map(r => r.right)), y1 = Math.max(...rs.map(r => r.bottom));
+            const n = { x: x0 / z, y: y0 / z, w: (x1 - x0) / z, h: (y1 - y0) / z };
+            setSpot(o => o && Math.abs(o.x - n.x) < 1 && Math.abs(o.y - n.y) < 1 && Math.abs(o.w - n.w) < 1 && Math.abs(o.h - n.h) < 1 ? o : n);   // 変わっていなければ描き直さない
+        };
+        const t1 = setTimeout(calc, 60), t2 = setInterval(calc, 450);   // カードが動いている途中で測ることがあるので、測り直し続ける
+        return () => { clearTimeout(t1); clearInterval(t2); };
+    }, [tutor, steps, game, tick, sel, inspectOn, scr.w, scr.h]);
+
     // 初めて開いたときは、山が読めたらデモを流す
     useEffect(() => {
         if (!pool || pool.length < 12 || game || demoOn.current || guestRoom) return;
         if (load<number>(DEMO_SEEN_KEY, 0) || load<unknown>(ROOM_KEY, null)) return;
         save(DEMO_SEEN_KEY, 1);
-        runDemo();
+        startTutor();   // 初めての人には、自分で押して覚えるチュートリアルから
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pool]);
 
@@ -1338,7 +1496,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             { key: 'duel', icon: 'M5 3l7 7 7-7 2 2-7 7 3 3-2 2-3-3-3 3-2-2 3-3-7-7z', title: t.play, sub: pack ? (lang === 'ja' ? 'いまのデッキ(覚えている途中の単語)で、コンピューターと1戦' : 'One match with your deck of words in progress') : t.playSub, on: start, main: true, off: !ready },
             ...(pack ? [] : [{ key: 'world', icon: 'M12 2l2.4 5.6L20 9l-4.2 3.9L17 19l-5-3-5 3 1.2-6.1L4 9l5.6-1.4z', title: t.walk, sub: t.walkSub, on: () => { window.location.href = '/english/duel/world'; } }]),
             { key: 'online', icon: 'M9 12a4 4 0 0 1 4-4h3a4 4 0 0 1 0 8h-1v-2h1a2 2 0 0 0 0-4h-3a2 2 0 0 0-2 2zm6 0a4 4 0 0 1-4 4H8a4 4 0 0 1 0-8h1v2H8a2 2 0 0 0 0 4h3a2 2 0 0 0 2-2z', title: t.online, sub: t.onlineSub, on: createRoom, off: !ready || !!pack },
-            { key: 'demo', icon: 'M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zm16 0h-5a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h5z', title: t.how, sub: t.howSub, on: runDemo, off: !pool || pool.length < 12 },
+            { key: 'demo', icon: 'M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zm16 0h-5a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h5z', title: t.how, sub: t.howSub, on: startTutor, off: !pool || pool.length < 12 },
             ...(pack ? [{ key: 'story', icon: 'M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.6 6.500 19.500l1-6.300L3 8.900 9 8z', title: lang === 'ja' ? '冒険と殿堂' : 'Journey & Hall', sub: lang === 'ja' ? '章とボス、いまのデッキ、殿堂入りした単語' : 'Chapters and bosses, your deck, mastered words', on: () => { setPlacedMsg(null); setView('story'); } }] : []),
             { key: 'guide', icon: 'M6 3h11a2 2 0 0 1 2 2v16l-3-2-3 2-3-2-3 2-3-2V5a2 2 0 0 1 2-2zm2 5v2h7V8zm0 4v2h7v-2z', title: t.guide, sub: t.guideSub, on: () => setView('guide') },
             { key: 'cards', icon: 'M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 5l-3 4 3 4 3-4z', title: t.cards, sub: t.cardsSub, on: () => setView('cards'), off: !pool || !pool.length },
@@ -1805,7 +1963,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     // 狭い画面(スマホなど)では、幅 760 の盤面を組んでから全体を縮めて収める。部品を1つずつ詰め直すより崩れない
     // 縦長の画面(スマホ)は専用の配置: 幅 480 で組む。駒は横5体が入る大きさ、END TURN は右下、手札は幅いっぱい
     const portrait = scr.w < 700 && scr.w < scr.h * 0.8;
-    const zoom = Math.min(1, scr.w / (portrait ? 480 : 760));
+    const zoom = Math.min(1, Math.max(0.2, (scr.w || 760) / (portrait ? 480 : 760)));   // 幅が一瞬 0 になっても割り算が壊れないように
     zoomRef.current = zoom;
     const SW = Math.round(scr.w / zoom), SH = Math.round(scr.h / zoom);
     const leaderS = portrait ? 84 : Math.round(Math.max(60, Math.min(SH * 0.125, SW * 0.11, 112)));
@@ -1988,7 +2146,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             </div>
 
             {/* 左: カードの拡大(マウスを乗せたか、選んだカード) */}
-            {shown && !portrait && !inspect && (
+            {shown && !portrait && !inspect && !tutor && (
                 <div style={{ position: 'absolute', left: 12, top: midY, transform: 'translateY(-50%)', zIndex: 9, pointerEvents: 'none', filter: 'drop-shadow(0 14px 26px rgba(0,0,0,0.6))' }}>
                     <Card spec={shown} w={Math.round(Math.max(190, Math.min(SW * 0.2, (SH * 0.5) * CW / CH, 330)))} />
                     {/* 単語カード: 英文と訳を、カードの下に出す */}
@@ -2052,7 +2210,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             )}
 
             {/* 案内(左下) */}
-            <Plaque style={{ display: demo ? 'none' : undefined, position: 'absolute', ...(portrait ? { left: '50%', top: midY + rowGap / 2 + tokenH + 56, transform: 'translateX(-50%)', whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0.94 } : { left: 10, bottom: handPeek + 10, maxWidth: Math.min(280, SW * 0.3), whiteSpace: 'normal' as const }), padding: '6px 10px', fontSize: 11, fontWeight: 700, lineHeight: 1.45, fontFamily: 'inherit', zIndex: 4 }}>
+            <Plaque style={{ display: demo || tutor ? 'none' : undefined, position: 'absolute', ...(portrait ? { left: '50%', top: midY + rowGap / 2 + tokenH + 56, transform: 'translateX(-50%)', whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0.94 } : { left: 10, bottom: handPeek + 10, maxWidth: Math.min(280, SW * 0.3), whiteSpace: 'normal' as const }), padding: '6px 10px', fontSize: 11, fontWeight: 700, lineHeight: 1.45, fontFamily: 'inherit', zIndex: 4 }}>
                 <div style={{ color: '#fff', fontSize: lang === 'ja' ? 12.5 : 11, whiteSpace: portrait && lang === 'ja' ? 'normal' : undefined, maxWidth: portrait ? SW - 150 : undefined }}>{(() => {
                     if (g.winner !== null) return b.hOver;
                     if (!myTurn) return b.hRival;
@@ -2064,6 +2222,82 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                 })()}</div>
                 {!portrait && lang === 'en' && <div style={{ color: '#D4AF37', fontWeight: 400, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{g.log[g.log.length - 1]}</div>}
             </Plaque>
+
+            {/* チュートリアル: 押す場所を照らし、案内役が説明する */}
+            {tutor && steps[tutor.i] && (() => {
+                const st = steps[tutor.i];
+                const J = (ja: string, en: string) => lang === 'ja' ? ja : en;
+                const lessonSteps = steps.filter(x => x.lesson === st.lesson);
+                const inLesson = lessonSteps.indexOf(st) + 1;
+                const isDo = st.kind === 'do';
+                const text = lang === 'ja' ? (portrait && st.jaPhone ? st.jaPhone : st.ja) : st.en;
+                const gold = 'linear-gradient(180deg, #FFF6C8 0%, #F6C85F 45%, #B8941E 55%, #F6C85F 100%)';
+                if (st.kind === 'finish') {
+                    return (
+                        <div data-tutor="finish" style={{ position: 'absolute', inset: 0, zIndex: 86, background: 'rgba(8,6,2,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, overflowY: 'auto' }}>
+                            <div style={{ maxWidth: 560, width: '100%', textAlign: 'center', color: '#fff', animation: 'duel-fadeup .5s ease-out both' }}>
+                                {ART['leader-you'] && <div style={{ width: 110, height: 110, margin: '0 auto', borderRadius: '50%', backgroundImage: `url(${ART['leader-you']})`, backgroundSize: 'cover', border: '4px solid #F6C85F', boxShadow: '0 0 30px rgba(246,200,95,0.8)' }} />}
+                                <div style={{ marginTop: 12, fontSize: 13, fontWeight: 800, letterSpacing: 4, color: '#F6C85F' }}>{J('チュートリアル完了', 'TUTORIAL COMPLETE')}</div>
+                                <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: Math.min(44, SW / 11), lineHeight: 1.2, background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{J('これで遊べます', 'You are ready')}</div>
+                                <div style={{ marginTop: 14, textAlign: 'left', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(212,175,55,0.5)', borderRadius: 12, padding: '12px 16px', fontSize: 15, lineHeight: 1.9 }}>
+                                    {[
+                                        J('緑に光るカードを押して、場に出す。', 'Press a glowing card to play it.'),
+                                        J('光っているユニットを押して、攻撃する相手を押す。', 'Press a glowing unit, then its target.'),
+                                        J('「守護」がいたら、先にそれを倒す。', 'If there is a Ward, destroy it first.'),
+                                        J('やることが終わったら、「ターン終了」。', 'When you are done, End Turn.'),
+                                        J('相手のリーダーの体力を 0 にしたら勝ち。', 'Bring the rival leader to 0 to win.'),
+                                    ].map((x, i) => <div key={i}><b style={{ color: '#F6C85F' }}>{i + 1}.</b> {x}</div>)}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 18 }}>
+                                    <button data-act="tutor-play" onClick={() => { stopTutor(); setTimeout(start, 60); }} style={{ border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 19, borderRadius: 12, padding: '14px 0', cursor: 'pointer' }}>{J('さっそく対戦する', 'Play a duel')}</button>
+                                    {pack && !prog.placed && <button onClick={() => { stopTutor(); setView('test'); }} style={{ border: '1.5px solid #D4AF37', background: 'rgba(20,14,4,0.8)', color: '#FFF6C8', fontWeight: 900, fontSize: 15, borderRadius: 12, padding: '11px 0', cursor: 'pointer' }}>{J('最初のテストを受ける(自分に合った章から始める)', 'Take the placement test')}</button>}
+                                    <button onClick={() => { stopTutor(); setView('guide'); }} style={{ border: '1.5px solid #D4AF37', background: 'rgba(20,14,4,0.8)', color: '#FFF6C8', fontWeight: 900, fontSize: 15, borderRadius: 12, padding: '11px 0', cursor: 'pointer' }}>{J('ルールブックで読み返す', 'Read the rulebook')}</button>
+                                    <button onClick={startTutor} style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.75)', fontWeight: 700, fontSize: 13, padding: '6px 0', cursor: 'pointer', textDecoration: 'underline' }}>{J('チュートリアルをもう一度', 'Do the tutorial again')}</button>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+                return (
+                    <>
+                        {/* 照らす場所。まわりを暗くして、押す所だけ明るく残す */}
+                        {spot && !busy.current && (
+                            <div style={{ position: 'absolute', left: spot.x - 8, top: spot.y - 8, width: spot.w + 16, height: spot.h + 16, borderRadius: 16, zIndex: 58, pointerEvents: 'none', animation: 'duel-spot 1.3s ease-in-out infinite' }} />
+                        )}
+                        {spot && isDo && !busy.current && (
+                            <div style={{ position: 'absolute', left: spot.x + spot.w / 2, top: spot.y > 70 ? spot.y - 50 : spot.y + spot.h + 14, zIndex: 82, pointerEvents: 'none', animation: 'duel-bob .9s ease-in-out infinite', display: 'flex', flexDirection: spot.y > 70 ? 'column' : 'column-reverse', alignItems: 'center' }}>
+                                <span style={{ fontSize: 13, fontWeight: 900, color: '#2A1F08', background: gold, border: '2px solid #fff', borderRadius: 999, padding: '2px 12px', whiteSpace: 'nowrap', boxShadow: '0 4px 10px rgba(0,0,0,0.5)' }}>{J('ここを押す', 'Press here')}</span>
+                                <svg width="22" height="14" viewBox="0 0 22 14" style={{ transform: spot.y > 70 ? undefined : 'rotate(180deg)' }}><polygon points="0,0 22,0 11,14" fill="#F6C85F" stroke="#fff" strokeWidth="2" /></svg>
+                            </div>
+                        )}
+                        {/* 上の帯: いまのレッスン */}
+                        <div style={{ position: 'absolute', left: '50%', top: 10, transform: 'translateX(-50%)', zIndex: 83, display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, fontWeight: 900, letterSpacing: 2, color: '#FFF2A8', background: 'linear-gradient(180deg, #065F46, #022C22)', border: '2px solid #FFF2A8', borderRadius: 999, padding: '3px 14px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', whiteSpace: 'nowrap' }}>
+                            {J('チュートリアル', 'TUTORIAL')}
+                            <span style={{ display: 'flex', gap: 4 }}>{TUTOR_LESSONS.map((_, i) => <span key={i} style={{ width: 9, height: 9, borderRadius: '50%', background: i < st.lesson ? '#34D399' : i === st.lesson ? '#FDE68A' : 'rgba(255,255,255,0.25)', border: i === st.lesson ? '1.5px solid #fff' : undefined }} />)}</span>
+                        </div>
+                        {/* 案内役の吹き出し */}
+                        <div key={`${tutor.i}-${nudge}`} data-tutor={tutor.i} style={{ position: 'absolute', zIndex: 83, ...(portrait ? { left: 10, right: 10, ...(spot && spot.y + spot.h / 2 < SH * 0.5 ? { bottom: 12 } : { top: 44 }) } : { left: 12, top: 64, width: Math.min(430, SW * 0.33) }),   // スマホ: 照らしている場所と反対側に出す
+                            background: 'linear-gradient(180deg, #FFFDF7, #FEF3C7)', border: '3px solid #D4AF37', borderRadius: 16, boxShadow: '0 14px 34px rgba(0,0,0,0.6), inset 0 0 0 1px #fff', padding: '12px 14px 12px', animation: nudge ? 'duel-nudge .4s ease' : 'duel-cap .35s ease-out' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                                {ART['leader-you'] && <div style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0, backgroundImage: `url(${ART['leader-you']})`, backgroundSize: 'cover', border: '2px solid #D4AF37' }} />}
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                    <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: 1, color: '#8C6D0F' }}>{J(`レッスン ${st.lesson + 1} / ${TUTOR_LESSONS.length}`, `LESSON ${st.lesson + 1} / ${TUTOR_LESSONS.length}`)}　{inLesson} / {lessonSteps.length}</div>
+                                    <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 17, color: INK, lineHeight: 1.2 }}>{TUTOR_LESSONS[st.lesson][lang === 'ja' ? 0 : 1]}</div>
+                                </div>
+                                {isDo && <span style={{ fontSize: 11, fontWeight: 900, color: '#fff', background: '#047857', borderRadius: 999, padding: '2px 10px', whiteSpace: 'nowrap' }}>{J('やってみよう', 'YOUR MOVE')}</span>}
+                            </div>
+                            <div style={{ height: 4, borderRadius: 2, background: '#E7E5E4', overflow: 'hidden', marginBottom: 8 }}><div style={{ width: `${((tutor.i + 1) / steps.length) * 100}%`, height: '100%', background: '#10B981', transition: 'width .4s ease' }} /></div>
+                            <div style={{ fontSize: Math.max(15, Math.min(18, SW / 60)), fontWeight: 700, lineHeight: 1.65, color: INK }}>{text}</div>
+                            {nudge > 0 && isDo && <div style={{ marginTop: 6, fontSize: 13, fontWeight: 800, color: '#B91C1C' }}>{J('いまは、光っている所を押してください。', 'For now, press the highlighted spot.')}</div>}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                                {!isDo && <button data-act="tutor-next" disabled={!tutor.ready} onClick={tutorNext} style={{ border: 'none', background: tutor.ready ? 'linear-gradient(135deg, #F6C85F, #B8941E)' : '#E7E5E4', color: tutor.ready ? '#fff' : '#A8A29E', fontWeight: 900, fontSize: 15, borderRadius: 10, padding: '9px 26px', cursor: tutor.ready ? 'pointer' : 'default', boxShadow: tutor.ready ? '0 6px 14px rgba(184,148,30,0.45)' : undefined }}>{tutor.ready ? J('次へ', 'Next') : J('相手の番...', 'Rival...')}</button>}
+                                {isDo && <span style={{ fontSize: 13, fontWeight: 800, color: '#047857' }}>{J('光っている所を押すと、先へ進みます。', 'Press the highlighted spot to continue.')}</span>}
+                                <button data-act="tutor-skip" onClick={stopTutor} style={{ marginLeft: 'auto', border: 'none', background: 'transparent', color: SUB, fontSize: 12, fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}>{J('チュートリアルをやめる', 'Skip tutorial')}</button>
+                            </div>
+                        </div>
+                    </>
+                );
+            })()}
 
             {/* デモ: 盤面は触れないようにして、説明の札を出す */}
             {demo && (
