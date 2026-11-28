@@ -160,6 +160,54 @@ export interface Unit {
     hp: number;
     attacked: boolean;
     summonedTurn: number;
+    evolved?: boolean;      // 読解モード: Part 6 で進化した(+2/+2)
+}
+
+// ── 読解モード(TOEIC Reading。2026-11-28)──
+// 本人「Part 5 以降を速く読んでほぼ満点を取るのが目標。シャドバ形式は保守したい」。
+// TOEIC の3つの Part を、カードゲームの3つの仕組みに1つずつ乗せる。対戦そのもの(出す・殴る・ターン)は変えない。
+//  Part 5 = エナジー: 自分のターンの頭に1問。速く当てるほど、そのターンのエナジーが増える(read5)
+//  Part 6 = 進化:     進化するとき長文の空所を1つ解く。当たれば +2/+2、外せば進化の権利だけ減る(evolve)
+//  Part 7 = 文書:     相手が文書(メール・広告・通知)を場に置く。カウントが 0 になると自分のリーダーに大ダメージ。
+//                     設問に当てるたびに封が1つ外れ、全部当てると文書が砕けて相手のリーダーに跳ね返る(readDoc)
+// 問題の中身(本文・選択肢・正解)は画面側が持つ。ルールは「何問あって、どれが残っているか」だけを数える。
+
+export interface DocAmulet {
+    uid: number;
+    key: string;          // 問題の在りか(画面側の問題集の鍵)
+    total: number;        // 設問の数
+    left: number[];       // まだ答えていない設問の番号(0 始まり)
+    hit: number;          // 当てた数
+    count: number;        // 爆発までのカウント。相手のターンの頭に1つ減る
+}
+export interface Reading {
+    docs: DocAmulet[];                     // 相手(1)が置いた文書。自分(0)が読む
+    queue: { key: string; total: number }[];   // これから置かれる文書の順番
+    evo: [number, number];                 // 進化の残り回数
+    evoTurn: [number, number];             // 最後に進化したターン(1ターンに1回まで)
+    read5: number;                         // Part 5 を解いたターン(1ターンに1回)
+    docTurns: number;                      // 相手のターンの数(文書を置く間隔を数える)
+}
+export const READ5_GAIN = { fast: 2, ok: 1 } as const;   // 速く当てた / 当てた
+export const READ5_FAST_SEC = 12, READ5_LIMIT_SEC = 30;
+export const EVO_POINTS: [number, number] = [2, 2];
+export const EVO_FROM_TURN: [number, number] = [5, 6];   // 自分の3ターン目 / 相手の3ターン目から
+export const EVO_BONUS = 2;
+export const DOC_COUNT = 3, DOC_MAX = 2;
+export const docDamage = (d: DocAmulet) => 2 + d.left.length * 2;   // 爆発したときの痛さ(読み残しが多いほど痛い)
+export const docRecoil = (d: DocAmulet) => d.hit + 1;                // 読み切ったときに相手へ返す分(当てた数+1)
+
+/** 対戦を読解モードにする(newGame のすぐあとに呼ぶ)。queue は置かれる順の文書 */
+export function withReading(g: Game, queue: { key: string; total: number }[]): Game {
+    return { ...g, reading: { docs: [], queue: [...queue], evo: [...EVO_POINTS], evoTurn: [0, 0], read5: 0, docTurns: 0 } };
+}
+export function canRead5(g: Game): boolean {
+    return !!g.reading && g.winner === null && g.active === 0 && g.reading.read5 !== g.turn;
+}
+export function canEvolve(g: Game, u: Unit): boolean {
+    const r = g.reading, p = g.active;
+    return !!r && g.winner === null && !u.evolved && r.evo[p] > 0 && g.turn >= EVO_FROM_TURN[p] && r.evoTurn[p] !== g.turn
+        && g.sides[p].field.some(x => x.uid === u.uid);
 }
 export interface Side {
     hp: number;
@@ -178,12 +226,16 @@ export interface Game {
     winner: 0 | 1 | null;
     log: string[];
     nextUid: number;
+    reading?: Reading;
 }
 
 export type Action =
     | { type: 'play'; idx: number }
     | { type: 'attack'; a: number; t: number | null }   // t = null はリーダーへ
-    | { type: 'end' };
+    | { type: 'end' }
+    | { type: 'read5'; gain: number }                    // Part 5 の結果(0 / 1 / 2)
+    | { type: 'evolve'; uid: number; ok: boolean }       // Part 6 の結果
+    | { type: 'readDoc'; doc: number; q: number; ok: boolean };   // Part 7 の1問の結果
 
 const NAMES = ['You', 'Rival'];
 const short = (c: CardSpec) => `"${c.text.length > 26 ? c.text.slice(0, 24) + '…' : c.text}"`;
@@ -206,6 +258,27 @@ function startTurn(g: Game) {
     s.energy = s.energyMax;
     s.field.forEach(u => { u.attacked = false; });
     draw(g, g.active);
+    if (g.reading && g.active === 1 && g.winner === null) docsTick(g);
+}
+
+/** 読解モード: 相手のターンの頭。置いてある文書のカウントを減らし、0 になったものは爆発。そのあと、間隔が来ていれば次の文書を置く */
+function docsTick(g: Game) {
+    const r = g.reading!;
+    r.docTurns += 1;
+    for (const d of r.docs) d.count -= 1;
+    const boom = r.docs.filter(d => d.count <= 0);
+    for (const d of boom) {
+        g.sides[0].hp -= docDamage(d);
+        g.log.push(`A document exploded for ${docDamage(d)}.`);
+    }
+    r.docs = r.docs.filter(d => d.count > 0);
+    if (g.sides[0].hp <= 0 && g.winner === null) { g.sides[0].hp = 0; g.winner = 1; return; }
+    // 相手の1・3・5…ターン目に1枚ずつ(場には2枚まで)
+    if (r.docTurns % 2 === 1 && r.docs.length < DOC_MAX && r.queue.length) {
+        const next = r.queue.shift()!;
+        r.docs.push({ uid: g.nextUid++, key: next.key, total: next.total, left: Array.from({ length: next.total }, (_, i) => i), hit: 0, count: DOC_COUNT + (next.total >= 5 ? 1 : 0) });
+        g.log.push('The rival placed a document.');
+    }
 }
 
 export function newGame(deckA: CardSpec[], deckB: CardSpec[], seed: number): Game {
@@ -222,15 +295,20 @@ export function canPlay(g: Game, idx: number): boolean {
     const s = g.sides[g.active], c = s.hand[idx];
     return g.winner === null && !!c && c.cost <= s.energy && s.field.length < FIELD_SIZE;
 }
+/** 出したターンに進化したユニットは、ユニットだけを殴れる(リーダーは殴れない) */
+const freshEvolved = (g: Game, u: Unit) => !!u.evolved && u.summonedTurn >= g.turn && u.card.ability !== 'RUSH';
 export function canAttack(g: Game, u: Unit): boolean {
-    return g.winner === null && !u.attacked && (u.summonedTurn < g.turn || u.card.ability === 'RUSH');
+    if (g.winner !== null || u.attacked) return false;
+    if (u.summonedTurn < g.turn || u.card.ability === 'RUSH') return true;
+    return freshEvolved(g, u) && g.sides[1 - g.active].field.length > 0;
 }
-/** いまの番の側が殴れる相手。WARD がいればそれだけ */
-export function targetsFor(g: Game): { units: number[]; leader: boolean } {
+/** いまの番の側が殴れる相手。WARD がいればそれだけ。attacker を渡すと、出したばかりの進化ユニットはリーダーを外す */
+export function targetsFor(g: Game, attacker?: Unit): { units: number[]; leader: boolean } {
     const foe = g.sides[1 - g.active].field;
     const wards = foe.filter(u => u.card.ability === 'WARD');
+    const leaderOk = !(attacker && freshEvolved(g, attacker));
     if (wards.length) return { units: wards.map(u => u.uid), leader: false };
-    return { units: foe.map(u => u.uid), leader: true };
+    return { units: foe.map(u => u.uid), leader: leaderOk };
 }
 
 function bury(g: Game) {
@@ -271,7 +349,7 @@ export function apply(g0: Game, a: Action): Game {
     if (a.type === 'attack') {
         const u0 = g0.sides[p].field.find(u => u.uid === a.a);
         if (!u0 || !canAttack(g0, u0)) return g0;
-        const legal = targetsFor(g0);
+        const legal = targetsFor(g0, u0);
         if (a.t === null ? !legal.leader : !legal.units.includes(a.t)) return g0;
         const g = structuredClone(g0), me = g.sides[p], foe = g.sides[q];
         const au = me.field.find(u => u.uid === a.a)!;
@@ -284,6 +362,51 @@ export function apply(g0: Game, a: Action): Game {
             tu.hp -= au.atk;
             au.hp -= tu.atk;
             g.log.push(`${short(au.card)} attacks ${short(tu.card)}.`);
+        }
+        bury(g);
+        return g;
+    }
+
+    if (a.type === 'read5') {
+        if (!canRead5(g0)) return g0;
+        const g = structuredClone(g0), s = g.sides[p];
+        g.reading!.read5 = g.turn;
+        const gain = Math.max(0, Math.min(READ5_GAIN.fast, Math.round(a.gain)));
+        s.energy = Math.min(ENERGY_MAX + READ5_GAIN.fast, s.energy + gain);
+        g.log.push(gain ? `Part 5: +${gain} energy.` : 'Part 5: no bonus.');
+        return g;
+    }
+
+    if (a.type === 'evolve') {
+        const u0 = g0.sides[p].field.find(u => u.uid === a.uid);
+        if (!u0 || !canEvolve(g0, u0)) return g0;
+        const g = structuredClone(g0), r = g.reading!;
+        r.evo[p] -= 1;
+        r.evoTurn[p] = g.turn;
+        if (a.ok) {
+            const u = g.sides[p].field.find(x => x.uid === a.uid)!;
+            u.evolved = true; u.atk += EVO_BONUS; u.hp += EVO_BONUS;
+            g.log.push(`${short(u.card)} evolved.`);
+        } else g.log.push('The evolution failed.');
+        return g;
+    }
+
+    if (a.type === 'readDoc') {
+        const r0 = g0.reading, d0 = r0?.docs.find(d => d.uid === a.doc);
+        if (!r0 || !d0 || p !== 0 || !d0.left.includes(a.q)) return g0;
+        const g = structuredClone(g0), r = g.reading!, d = r.docs.find(x => x.uid === a.doc)!;
+        // 答えた設問は外れても消える(同じ問題を消去法で当て直せないように)。外すとカウントが1つ進む
+        d.left = d.left.filter(x => x !== a.q);
+        if (a.ok) d.hit += 1;
+        else d.count -= 1;
+        if (!a.ok && d.count <= 0) {
+            g.sides[0].hp -= docDamage(d);
+            r.docs = r.docs.filter(x => x.uid !== d.uid);
+            g.log.push(`A document exploded for ${docDamage(d)}.`);
+        } else if (!d.left.length) {
+            r.docs = r.docs.filter(x => x.uid !== d.uid);
+            if (d.hit) { g.sides[1].hp -= docRecoil(d); g.log.push(`Document cleared. ${docRecoil(d)} damage back to the rival.`); }
+            else g.log.push('The document crumbled.');
         }
         bury(g);
         return g;
@@ -305,12 +428,21 @@ export function aiAction(g: Game): Action {
     s.hand.forEach((c, i) => { if (canPlay(g, i) && (idx < 0 || c.cost > s.hand[idx].cost)) idx = i; });
     if (idx >= 0) return { type: 'play', idx };
 
+    // 1.5 読解モード: 進化できるなら、いちばん強いユニットを進化させる(相手は Part 6 を解かないので、必ず成功)
+    if (g.reading) {
+        const ev = s.field.filter(u => canEvolve(g, u)).sort((a, b) => (b.atk + b.hp) - (a.atk + a.hp))[0];
+        if (ev) return { type: 'evolve', uid: ev.uid, ok: true };
+    }
+
     const attackers = s.field.filter(u => canAttack(g, u)).sort((a, b) => a.atk - b.atk);
     if (!attackers.length) return { type: 'end' };
     const legal = targetsFor(g);
 
+    // 出したばかりの進化ユニットはリーダーを殴れない。リーダーへ行けるのはこの中だけ
+    const toFace = attackers.filter(u => targetsFor(g, u).leader);
+
     // 2. このターンで倒しきれるなら全部リーダーへ
-    if (legal.leader && attackers.reduce((n, u) => n + u.atk, 0) >= foe.hp) return { type: 'attack', a: attackers[0].uid, t: null };
+    if (legal.leader && toFace.length && toFace.reduce((n, u) => n + u.atk, 0) >= foe.hp) return { type: 'attack', a: toFace[0].uid, t: null };
 
     // 3. 得な交換を探す
     for (const u of attackers) {
@@ -326,8 +458,11 @@ export function aiAction(g: Game): Action {
     }
 
     // 4. 交換が無ければリーダーへ。WARD に塞がれていたら、いちばん強いのでいちばん減っている WARD を殴る
-    if (legal.leader) return { type: 'attack', a: attackers[0].uid, t: null };
+    if (legal.leader && toFace.length) return { type: 'attack', a: toFace[0].uid, t: null };
+    if (!legal.units.length) return { type: 'end' };
     const strongest = attackers[attackers.length - 1];
     const ward = legal.units.map(id => foe.field.find(x => x.uid === id)!).sort((a, b) => a.hp - b.hp)[0];
+    // ここに来るのは、WARD に塞がれている / 出したばかりの進化ユニットしか残っていない とき
+    if (legal.leader) return { type: 'end' };   // 進化したての駒で損な交換はしない
     return { type: 'attack', a: strongest.uid, t: ward.uid };
 }
