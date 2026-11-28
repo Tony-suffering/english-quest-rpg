@@ -168,6 +168,60 @@
       "title0": "第1章 相槌の階"
     },
     {
+      "id": "c1-5",
+      "floor": 5,
+      "when": "before",
+      "bg": "ch1",
+      "title": [
+        "名札の壁",
+        "The Wall of Names"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "5階。壁は名札で埋め尽くされていた。",
+          "en": "Floor 5. The wall was covered in name tags.",
+          "ja0": "5階。壁に、名札がびっしり貼ってある。"
+        },
+        {
+          "w": "you",
+          "ja": "名札か。どれも人の名前だ。",
+          "en": "They are names. All of them are people.",
+          "ja0": "名前が書いてある。全部、人の名前だ。"
+        },
+        {
+          "w": "claim",
+          "ja": "言葉を落としたやつらの名前だ。落ちた言葉はその場で持ち主の名前を覚える。帰るときに迷わないようにな。",
+          "en": "The people who dropped them. A word memorizes its owner the moment it falls, so it can find its way back.",
+          "ja0": "落とした人間の名前だ。言葉は、落とされた瞬間に持ち主の名前を覚える。帰るときに迷わないようにな。"
+        },
+        {
+          "w": "you",
+          "ja": "俺の名前もあるのか。",
+          "en": "Is my name here too?"
+        },
+        {
+          "w": "claim",
+          "ja": "上に行きゃ山ほどある。安心しろ、お前だけじゃない。お前の上司の名前もあったぞ。",
+          "en": "Plenty, higher up. Relax, you are not the only one. I saw your boss up there too.",
+          "ja0": "上のほうに山ほどある。安心しろ、お前だけじゃない。お前の上司の名前もあったぞ。"
+        },
+        {
+          "w": "you",
+          "ja": "……あの人も言えなかったのか。",
+          "en": "...Even he could not say it?",
+          "ja0": "……あの人も、言えなかったのか。"
+        },
+        {
+          "w": "claim",
+          "ja": "言えるやつなんかいない。言ったやつがいるだけだ。",
+          "en": "Nobody can say it. There are only people who did.",
+          "ja0": "言えるやつなんか、いない。言ったやつがいるだけだ。"
+        }
+      ],
+      "title0": "名札の壁"
+    },
+    {
       "id": "c1-mid",
       "floor": 10,
       "when": "before",
@@ -223,6 +277,47 @@
         }
       ],
       "title0": "sorry の床"
+    },
+    {
+      "id": "c1-15",
+      "floor": 15,
+      "when": "before",
+      "bg": "ch1",
+      "title": [
+        "行ったり来たり",
+        "Back and Forth"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "15階。ひとつの言葉が同じ場所を行ったり来たりしていた。",
+          "en": "Floor 15. One word was pacing back and forth in the same spot.",
+          "ja0": "15階。ひとつの言葉が、同じ場所を行ったり来たりしていた。"
+        },
+        {
+          "w": "you",
+          "ja": "available。「空いている」。",
+          "en": "Available."
+        },
+        {
+          "w": "claim",
+          "ja": "「その日は空いてます」でいいのに、「たぶん大丈夫だと思います」って答えたやつがいてな。予定は決まらず、仕事も来なかった。そいつの言葉だ。",
+          "en": "Someone should have said, I am available that day. They said, I think it is probably fine. No meeting got booked, and no work came either.",
+          "ja0": "「その日は空いてます」と言えばよかったのに、「たぶん大丈夫だと思います」と言ったやつの言葉だ。おかげで予定は入らず、仕事も来なかった。"
+        },
+        {
+          "w": "you",
+          "ja": "耳が痛い。",
+          "en": "That stings."
+        },
+        {
+          "w": "claim",
+          "ja": "痛いうちに覚えとけ。はっきり言ってくれたほうが、相手は楽なんだ。",
+          "en": "Remember it while it stings. A clear answer is easier on the other person.",
+          "ja0": "痛いうちに覚えとけ。はっきり言われたほうが、相手は楽なんだ。"
+        }
+      ],
+      "title0": "行ったり来たり"
     },
     {
       "id": "c1-boss",
@@ -399,6 +494,58 @@
       "title0": "第2章 持ち帰りの階"
     },
     {
+      "id": "c2-25",
+      "floor": 25,
+      "when": "before",
+      "bg": "ch2",
+      "title": [
+        "片面のトースト",
+        "Toast on One Side"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "25階。下書きの束のあいだにレシートが1枚はさまっていた。",
+          "en": "Floor 25. A single receipt was tucked between the stacks of drafts.",
+          "ja0": "25階。下書きの束のあいだに、レシートが1枚はさまっていた。"
+        },
+        {
+          "w": "you",
+          "ja": "返品用のレシートだ。2年前か。",
+          "en": "A receipt for a return. Dated two years ago.",
+          "ja0": "返品のレシートだ。日付は2年前。"
+        },
+        {
+          "w": "claim",
+          "ja": "「返金してください」が言えなくて、壊れたトースターを2年も使ったやつがいる。",
+          "en": "Somebody could not say, I would like a refund, and used a broken toaster for two years.",
+          "ja0": "「返金してください」が言えなくて、壊れたトースターを2年使ったやつがいる。"
+        },
+        {
+          "w": "you",
+          "ja": "使えたのか。",
+          "en": "Did it work?"
+        },
+        {
+          "w": "claim",
+          "ja": "片面しか焼けない。そいつは2年も片面だけ焼けたパンを食ってた。",
+          "en": "It toasts one side. That person ate bread toasted on one side for two years.",
+          "ja0": "片面しか焼けない。そいつは2年、片面だけ焼けたパンを食った。"
+        },
+        {
+          "w": "you",
+          "ja": "……言えばよかったのに。",
+          "en": "...They should have just said it."
+        },
+        {
+          "w": "claim",
+          "ja": "お前が言うな。",
+          "en": "You are in no position to talk."
+        }
+      ],
+      "title0": "片面のトースト"
+    },
+    {
       "id": "c2-mid",
       "floor": 30,
       "when": "before",
@@ -449,6 +596,54 @@
         }
       ],
       "title0": "震える deadline"
+    },
+    {
+      "id": "c2-35",
+      "floor": 35,
+      "when": "before",
+      "bg": "ch2",
+      "title": [
+        "空いた椅子",
+        "The Empty Chair"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "35階。机がひとつに椅子がふたつ。ほこりが積もっているのは片方だけだ。",
+          "en": "Floor 35. One table, two chairs. Only one of them was covered in dust.",
+          "ja0": "35階。机がひとつ、椅子がふたつ。片方にだけ、ほこりが積もっている。"
+        },
+        {
+          "w": "claim",
+          "ja": "交渉の席だ。片方は来た。もう片方は「言い値でいいです」ってメールをよこして、それきりだ。",
+          "en": "A negotiating table. One side showed up. The other emailed, your price is fine, and never came.",
+          "ja0": "交渉の席だ。片方は来た。もう片方は「言い値でいいです」とメールして、来なかった。"
+        },
+        {
+          "w": "you",
+          "ja": "来なかったやつの椅子は、こっちか。",
+          "en": "So this is the chair that stayed empty.",
+          "ja0": "来なかったほうの椅子が、こっちか。"
+        },
+        {
+          "w": "claim",
+          "ja": "座ってみろ。",
+          "en": "Sit in it."
+        },
+        {
+          "w": "narr",
+          "ja": "腰を下ろすと、机の上に言葉がひとつ浮かんだ。negotiate。",
+          "en": "You sat down. One word rose over the table. Negotiate.",
+          "ja0": "座ると、机の上に言葉がひとつ浮かんだ。negotiate。"
+        },
+        {
+          "w": "claim",
+          "ja": "値切れとは言ってない。席に着けって言ってるんだ。",
+          "en": "I am not telling you to haggle. I am telling you to take your seat.",
+          "ja0": "値切れとは言わない。席に着け、と言ってる。"
+        }
+      ],
+      "title0": "空いた椅子"
     },
     {
       "id": "c2-boss",
@@ -606,6 +801,58 @@
       "title0": "第3章 空気の階"
     },
     {
+      "id": "c3-45",
+      "floor": 45,
+      "when": "before",
+      "bg": "ch3",
+      "title": [
+        "30人ぶん",
+        "Thirty of the Same"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "45階。同じ言葉が30個、輪になって浮かんでいた。",
+          "en": "Floor 45. Thirty copies of the same sentence floated in a ring.",
+          "ja0": "45階。同じ言葉が30個、輪になって浮いていた。"
+        },
+        {
+          "w": "you",
+          "ja": "全部同じだ。「この数字、間違ってませんか？」",
+          "en": "They are all the same. Is this number not wrong?",
+          "ja0": "全部同じだ。「この数字、間違っていませんか」。"
+        },
+        {
+          "w": "claim",
+          "ja": "同じ会議にいた30人ぶんだ。全員が気づいて、全員が「誰かが言うだろう」と思った。",
+          "en": "Thirty people in one meeting. Every one of them noticed, and every one of them thought someone else would say it.",
+          "ja0": "同じ会議の30人ぶんだ。全員が気づいて、全員が「誰かが言うだろう」と思った。"
+        },
+        {
+          "w": "you",
+          "ja": "誰も言わなかった。",
+          "en": "And nobody did."
+        },
+        {
+          "w": "claim",
+          "ja": "で、間違った数字のまま工場が建った。",
+          "en": "So the factory was built on the wrong number."
+        },
+        {
+          "w": "you",
+          "ja": "……笑えない。",
+          "en": "...That is not funny."
+        },
+        {
+          "w": "claim",
+          "ja": "笑うとこじゃねえよ。拾え。30個とも同じ言葉だ。1個でいい。",
+          "en": "It is not supposed to be. Pick it up. They are all the same sentence. One is enough.",
+          "ja0": "笑うところじゃない。拾え。30個とも同じ言葉だ、1個でいい。"
+        }
+      ],
+      "title0": "30人ぶん"
+    },
+    {
       "id": "c3-mid",
       "floor": 50,
       "when": "before",
@@ -666,6 +913,59 @@
         }
       ],
       "title0": "塔の半分"
+    },
+    {
+      "id": "c3-55",
+      "floor": 55,
+      "when": "before",
+      "bg": "ch3",
+      "title": [
+        "前の持ち主",
+        "The Last Owner"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "55階。クレイムがめずらしく黙っていた。",
+          "en": "Floor 55. For once, Claim was quiet.",
+          "ja0": "55階。クレイムが、めずらしく黙っていた。"
+        },
+        {
+          "w": "you",
+          "ja": "どうした。",
+          "en": "What is it?"
+        },
+        {
+          "w": "claim",
+          "ja": "この階に、俺の前の持ち主が落とした言葉がある。",
+          "en": "My last owner has words on this floor.",
+          "ja0": "この階に、俺の前の持ち主の言葉がある。"
+        },
+        {
+          "w": "you",
+          "ja": "前の持ち主？",
+          "en": "Your last owner?",
+          "ja0": "前の持ち主?"
+        },
+        {
+          "w": "claim",
+          "ja": "言葉は使い回しだからな。お前より前に、俺を飲み込んだやつがいた。そいつは結局、取りに来なかった。",
+          "en": "Words get reused. Someone swallowed me before you did. That one never came to get me.",
+          "ja0": "言葉は使い回しだ。お前の前にも、俺を飲み込んだやつがいた。そいつは、最後まで取りに来なかった。"
+        },
+        {
+          "w": "you",
+          "ja": "……",
+          "en": "..."
+        },
+        {
+          "w": "claim",
+          "ja": "だから、お前が門をくぐったときはけっこううれしかった。二度は言わないぞ。",
+          "en": "So when you walked through that gate, I was pretty happy. I will not say that twice.",
+          "ja0": "だから、お前が門をくぐったとき、俺はけっこう嬉しかった。二度は言わないぞ。"
+        }
+      ],
+      "title0": "前の持ち主"
     },
     {
       "id": "c3-boss",
@@ -823,6 +1123,49 @@
       "title0": "第4章 赤ペンの階"
     },
     {
+      "id": "c4-65",
+      "floor": 65,
+      "when": "before",
+      "bg": "ch4",
+      "title": [
+        "出されなかった礼状",
+        "The Unsent Thank-You"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "65階。氷の中に手紙が1通閉じ込められていた。赤字だらけで元の文が読めない。",
+          "en": "Floor 65. One letter in the ice, so full of red ink that the original could not be read.",
+          "ja0": "65階。氷の中に、手紙が1通。赤い字で埋まっていて、元の文が読めない。"
+        },
+        {
+          "w": "you",
+          "ja": "何て書いてあった。",
+          "en": "What did it say?",
+          "ja0": "何が書いてあったんだ。"
+        },
+        {
+          "w": "claim",
+          "ja": "「ありがとう」だ。英語でたった3行。先生に見せたら赤字だらけで返ってきて、そいつは出すのをやめた。",
+          "en": "Thank you. A three-line note in English. It came back from the teacher covered in red, so they never sent it.",
+          "ja0": "「ありがとう」だ。英語で書いた、たった3行の礼状。先生に見せたら真っ赤になって返ってきて、そいつは出すのをやめた。"
+        },
+        {
+          "w": "you",
+          "ja": "礼状なのに。",
+          "en": "A thank-you note.",
+          "ja0": "礼状を。"
+        },
+        {
+          "w": "claim",
+          "ja": "相手は今も、礼のひとつもなかったと思ってる。文法は直った。届かなかっただけだ。",
+          "en": "The other person still thinks nobody thanked them. The grammar got fixed. It just never arrived.",
+          "ja0": "相手は今も、礼を言われてないと思ってる。文法は正しくなった。届かなかっただけだ。"
+        }
+      ],
+      "title0": "出されなかった礼状"
+    },
+    {
       "id": "c4-mid",
       "floor": 70,
       "when": "before",
@@ -877,6 +1220,58 @@
         }
       ],
       "title0": "1ページ目"
+    },
+    {
+      "id": "c4-75",
+      "floor": 75,
+      "when": "before",
+      "bg": "ch4",
+      "title": [
+        "壁に向かって10年",
+        "Ten Years at the Wall"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "75階。ひとつの言葉が氷の壁に向かって同じ音をくり返していた。",
+          "en": "Floor 75. One word faced the wall of ice, repeating the same sound over and over.",
+          "ja0": "75階。言葉がひとつ、氷の壁に向かって、同じ音を何度もくり返している。"
+        },
+        {
+          "w": "you",
+          "ja": "練習か。",
+          "en": "Is it practicing?",
+          "ja0": "練習しているのか。"
+        },
+        {
+          "w": "claim",
+          "ja": "work と walk。もう10年だ。人前じゃまだ一度も言ってない。",
+          "en": "Work and walk. Ten years of it. Never once said in front of a person.",
+          "ja0": "work と walk。10年やってる。まだ人前では一度も言ってない。"
+        },
+        {
+          "w": "you",
+          "ja": "10年。",
+          "en": "Ten years."
+        },
+        {
+          "w": "claim",
+          "ja": "壁には完璧に通じてるぞ。",
+          "en": "The wall understands it perfectly."
+        },
+        {
+          "w": "you",
+          "ja": "……人に言えば、1回で済んだのに。",
+          "en": "...One try with a real person would have settled it."
+        },
+        {
+          "w": "claim",
+          "ja": "通じなきゃ、もう1回言えばいい。それだけのことに10年だ。",
+          "en": "Right. If they do not get it, you say it again. That is all it is. Ten years.",
+          "ja0": "そう。通じなかったら、もう1回言えばいい。それだけの話に、10年。"
+        }
+      ],
+      "title0": "壁に向かって10年"
     },
     {
       "id": "c4-boss",
@@ -1031,6 +1426,59 @@
       "title0": "第5章 王の階"
     },
     {
+      "id": "c5-85",
+      "floor": 85,
+      "when": "before",
+      "bg": "ch5",
+      "title": [
+        "いちばん古い言葉",
+        "The Oldest Words"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "85階に上がると、足元の言葉が急に古びた。",
+          "en": "Floor 85. The words underfoot had suddenly grown old.",
+          "ja0": "85階。足もとの言葉が、急に古くなった。"
+        },
+        {
+          "w": "you",
+          "ja": "字がかすれて読めない。",
+          "en": "The letters are too faded to read."
+        },
+        {
+          "w": "claim",
+          "ja": "いちばん古いやつだ。子どものころのな。「いやだ」「やりたい」「なんで」。",
+          "en": "The oldest ones. From when you were a kid. No. I want to. Why.",
+          "ja0": "いちばん古い言葉だ。子どものころのやつ。「いやだ」「やりたい」「なんで」。"
+        },
+        {
+          "w": "you",
+          "ja": "英語じゃない。",
+          "en": "Those are not English."
+        },
+        {
+          "w": "claim",
+          "ja": "英語を覚える前から黙ってただろ。王はそのころからお前のそばにいる。",
+          "en": "You learned to stay quiet long before you learned English. The king has been with you since then.",
+          "ja0": "黙るのを覚えたのは、英語より前だろ。王は、そのころからお前のそばにいる。"
+        },
+        {
+          "w": "you",
+          "ja": "……ずっと俺を守ってたのか。",
+          "en": "...Has he been protecting me all this time?",
+          "ja0": "……ずっと、守ってくれていたのか。"
+        },
+        {
+          "w": "claim",
+          "ja": "守ってたのか、閉じ込めてたのか。上に行って自分で決めろ。",
+          "en": "Protecting you or locking you in. You decide that yourself, upstairs.",
+          "ja0": "守ってたのか、閉じ込めてたのか。それは上で、自分で決めろ。"
+        }
+      ],
+      "title0": "いちばん古い言葉"
+    },
+    {
       "id": "c5-mid",
       "floor": 90,
       "when": "before",
@@ -1076,6 +1524,58 @@
         }
       ],
       "title0": "引っ越し"
+    },
+    {
+      "id": "c5-95",
+      "floor": 95,
+      "when": "before",
+      "bg": "ch5",
+      "title": [
+        "輪郭だけ",
+        "Only an Outline"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "95階。クレイムはもう輪郭しか残っていなかった。",
+          "en": "Floor 95. Only the outline of Claim was left.",
+          "ja0": "95階。クレイムの体は、もう輪郭しか残っていなかった。"
+        },
+        {
+          "w": "you",
+          "ja": "聞こえるか。",
+          "en": "Can you hear me?"
+        },
+        {
+          "w": "claim",
+          "ja": "聞こえる。前よりでかい声が出るようになったな。",
+          "en": "I can. Your voice is louder than it used to be.",
+          "ja0": "聞こえる。お前の声は、前よりでかい。"
+        },
+        {
+          "w": "you",
+          "ja": "最後まで来い。",
+          "en": "Come with me to the end."
+        },
+        {
+          "w": "claim",
+          "ja": "行くさ。ただ、王の前じゃ口は出せない。あそこじゃお前の言葉しか通らない。",
+          "en": "I will. But I cannot speak for you in front of the king. Only your own words carry up there.",
+          "ja0": "行くさ。ただ、王の前では、俺は口を出せない。あそこは、お前の言葉しか通らない。"
+        },
+        {
+          "w": "you",
+          "ja": "わかった。",
+          "en": "All right."
+        },
+        {
+          "w": "claim",
+          "ja": "……なあ。初めて会った日、俺を「カード」って呼んだろ。あれは傷ついた。主張しとく。",
+          "en": "...Hey. On the first day you called me a card. That hurt. I am asserting that for the record.",
+          "ja0": "……なあ。最初の日、お前は俺を「カード」と呼んだ。あれは傷ついた。主張しておく。"
+        }
+      ],
+      "title0": "輪郭だけ"
     },
     {
       "id": "c5-boss",
@@ -1216,27 +1716,27 @@
       {
         "title": "沈黙の塔",
         "reading": "ちんもくのとう",
-        "why": "短く呼びやすい。誰も口にしなかった言葉が積もるという逆説が、物語を読み終えたあとに効く。"
+        "why": "短く呼びやすく、黙るたびに高くなる塔をひと息で言い表せる。"
       },
       {
-        "title": "黙塔",
-        "reading": "もくとう",
-        "why": "短く硬い響き。「黙祷」と同じ音に、言えなかった言葉を弔うような余韻がある。"
+        "title": "声なき塔",
+        "reading": "こえなきとう",
+        "why": "言葉が積もっているのに声はしない、塔の不気味さが出る。"
       },
       {
         "title": "言葉の底",
         "reading": "ことばのそこ",
-        "why": "飲み込んだ言葉が落ちていく先を、短い題で想像させる。"
+        "why": "言えなかった言葉がどこへ落ちるのか、耳にしただけで気になる。"
       },
       {
-        "title": "無言の王冠",
-        "reading": "むごんのおうかん",
-        "why": "何も言わない者が王になる世界の、ねじれた力関係が伝わる。"
+        "title": "沈黙の王",
+        "reading": "ちんもくのおう",
+        "why": "誰を倒す物語かが伝わり、正体を知ったあとでも響く。"
       },
       {
-        "title": "ひとことの反逆",
-        "reading": "ひとことのはんぎゃく",
-        "why": "会議での小さな一言を、沈黙の王に挑む一手として響かせる。"
+        "title": "沈黙を破れ",
+        "reading": "ちんもくをやぶれ",
+        "why": "対戦への掛け声にも、会議での最後の一言にも重なる。"
       }
     ],
     "chapters": [
@@ -1267,16 +1767,16 @@
       "でも、言葉が出てこなかった。",
       "言えなかった言葉は消えない。",
       "落ちていく。",
-      "世界中から落ちた言葉が、世界の底に積もっていく。",
+      "世界じゅうで言えなかった言葉が、世界の底で塔になる。",
       "《沈黙の塔》",
       "塔の主は、沈黙の王。",
-      "誰かが黙るたびに太る。",
+      "人が黙るたび、王は太る。",
       "いまもあなたの言葉を食べている。",
       "取り返しに行こう。",
       "1語ずつ。",
       "これが最初の1枚。",
       "この言葉に触れろ。",
-      "塔に入る"
+      "塔へ入る"
     ],
     "terms": {
       "未踏": "未踏",
@@ -1291,9 +1791,9 @@
       "戦利品": "戦利品",
       "昇格の間": "昇格の間",
       "見切り": "見切り",
-      "冒険と殿堂": "冒険・殿堂",
+      "冒険と殿堂": "冒険と殿堂",
       "はじまりの中庭": "はじまりの中庭",
-      "塔 第N階に挑む": "塔のN階に挑む",
+      "塔 第N階に挑む": "塔の第N階に挑む",
       "ルールブック": "ルールブック"
     }
   },
