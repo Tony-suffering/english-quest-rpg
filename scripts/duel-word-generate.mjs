@@ -41,6 +41,8 @@ for (const id of (arg('--redo') || '').split(',').filter(Boolean)) {
 
 const artJobs = has('--no-art') ? [] : pack.cards.filter(c => !fs.existsSync(path.join(ART, `card-${c.id}.webp`)));
 const voiceJobs = has('--no-voice') ? [] : pack.cards.filter(c => !fs.existsSync(path.join(VOICE, `${c.id}.mp3`)));
+// 単語だけの発音(対戦で、攻撃する・されるたびに鳴らす)。w-<id>.mp3
+const wordJobs = has('--no-voice') ? [] : pack.cards.filter(c => !fs.existsSync(path.join(VOICE, `w-${c.id}.mp3`)));
 const price = { low: 0.046, medium: 0.18, high: 0.7 }[QUALITY] || 0.046;
 console.log(`パック ${pack.id}: ${pack.cards.length} 語。絵 ${artJobs.length} 枚(目安 $${(artJobs.length * price).toFixed(2)})、声 ${voiceJobs.length} 本。出力先 ${OUT}`);
 if (has('--dry')) process.exit(0);
@@ -78,8 +80,18 @@ async function run(label, list, fn) {
     }));
     return { ok, ng };
 }
+async function wordVoice(c) {
+    const r = await fetch('https://api.openai.com/v1/audio/speech', {
+        method: 'POST', headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'gpt-4o-mini-tts', voice: 'sage', input: c.word, instructions: 'Say only this English word or phrase, once, clearly and at a natural speed, like a dictionary recording. No extra words.', response_format: 'mp3' }),
+    });
+    if (!r.ok) throw new Error((await r.text()).slice(0, 300));
+    fs.writeFileSync(path.join(VOICE, `w-${c.id}.mp3`), Buffer.from(await r.arrayBuffer()));
+}
 const a = await run('絵', artJobs, art);
+const wv = await run('語', wordJobs, wordVoice);
 const v = await run('声', voiceJobs, voice);
 fs.writeFileSync(path.join(ART, 'manifest.json'), JSON.stringify({ keys: fs.readdirSync(ART).filter(f => f.endsWith('.webp')).map(f => f.slice(0, -5)).sort(), v: Date.now() }));
 fs.writeFileSync(path.join(VOICE, 'manifest.json'), JSON.stringify({ ids: fs.readdirSync(VOICE).filter(f => f.endsWith('.mp3')).map(f => f.slice(0, -4)).sort(), v: Date.now() }) + '\n');
+console.log(`語の発音 ${wv.ok} 本(失敗 ${wv.ng})`);
 console.log(`絵 ${a.ok} 枚(失敗 ${a.ng})、声 ${v.ok} 本(失敗 ${v.ng})。目安 $${(a.ok * price).toFixed(2)}(絵のぶんだけ)`);

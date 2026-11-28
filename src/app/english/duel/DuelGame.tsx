@@ -717,7 +717,7 @@ const TUTOR: TStep[] = [
     { lesson: 6, kind: 'say', spot: '[data-hand]', ja: '手札が1枚増えました。能力は、あと2つあります。「回復」は、出したときに自分のリーダーの体力が 2 戻ります。「一撃」は、出したときに相手のいちばん強いユニットに 2 ダメージを与えます。', en: 'You drew a card. Two more abilities: Heal restores 2 health to your leader, and Strike deals 2 damage to the strongest rival unit.' },
 
     { lesson: 7, kind: 'say', ja: '対戦は、このくり返しです。カードを出す、攻撃する、ターンを終える。相手のリーダーの体力を先に 0 にしたほうが勝ちです。山札が無くなって、カードを引けなくなったときも負けになります。', en: 'A duel is this, repeated: play cards, attack, end your turn. First to bring the other leader to 0 wins. You also lose if you cannot draw.' },
-    { lesson: 7, kind: 'say', packOnly: true, ja: '対戦が終わると「確認テスト」を受けられます。出てきた単語の意味を、4択で答えます。別の日に2回正解した単語は「殿堂入り」。殿堂入りした単語の数が、勇者のレベルになります。', en: 'After a duel you can take a check: pick the meaning of the words that appeared. Two correct answers on different days put a word in the Hall, and the Hall count is your level.' },
+    { lesson: 7, kind: 'say', packOnly: true, ja: '対戦が終わると《試練》を受けられます。出てきた言葉の意味を見切ると「刻印」が刻まれ、別の日に2つ刻んだ言葉は「殿堂」に入ります。手にした言葉が増えるほど、あなたの階位が上がります。', en: 'After a duel you can take a check: pick the meaning of the words that appeared. Two correct answers on different days put a word in the Hall, and the Hall count is your level.' },
     { lesson: 7, kind: 'finish', ja: 'これで、遊び方はすべてです。', en: 'That is everything.' },
 ];
 const sameAct = (x: Action, y: Action) => x.type === y.type && (x.type === 'play' ? x.idx === (y as { idx: number }).idx : x.type === 'attack' ? x.a === (y as { a: number }).a && x.t === (y as { t: number | null }).t : true);
@@ -784,15 +784,55 @@ function flip(g: Game): Game {
 // 「最初のテストがあれば、どんなレベルの人でも始められる」「レベルで勇者が成長する、何をしたらクリアかを明確に」。
 // デッキ = いま覚えている途中の20語。対戦のあとの確認テスト(意味の4択)で、日をまたいで2回正解した語は殿堂入りしてデッキから抜け、次の語が入る。
 // 殿堂の数が勇者のレベル。章(TOEIC の点数帯)ごとに、殿堂が8割たまるとボスに挑める。記録は端末の中(localStorage)。
-type WordStat = { seen: number; ok: string[]; miss: number };
-type Progress = { words: Record<string, WordStat>; placed: boolean; start: number; bosses: number[]; deck: string[]; bench: string[] };
-const emptyProg = (): Progress => ({ words: {}, placed: false, start: 0, bosses: [], deck: [], bench: [] });
+type WordStat = { seen: number; ok: string[]; miss: number; k?: boolean };   // k = 掌握(最初から手の内にあった言葉)
+type Progress = { words: Record<string, WordStat>; placed: boolean; start: number; bosses: number[]; deck: string[]; bench: string[]; loot: string[] };   // loot = 戦利品(相手が使った、まだ手にしていない言葉。次にデッキへ入る)
+const emptyProg = (): Progress => ({ words: {}, placed: false, start: 0, bosses: [], deck: [], bench: [], loot: [] });
 const progKey = (id: string) => `duel:progress:v1:${id}`;
 const dayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const HALL_NEED = 2;        // 殿堂入りに要る正解の回数(別の日に)
 const BOSS_NEED = 0.8;      // ボスに挑むのに要る、その章の殿堂の割合
 const okCount = (p: Progress, id: string) => p.words[id]?.ok.length || 0;
 const inHall = (p: Progress, id: string) => okCount(p, id) >= HALL_NEED;
+// 言葉の4つの状態(本人 2026-11-28「知ってるとか微妙とか、そんなしょぼい日本語じゃだめ。常にビジュアルとワードセンス重視」):
+//   未踏 = まだ手にしていない / 修練 = いまデッキで鍛えている / 掌握 = 最初から手の内にあった(入門の儀で示した) / 殿堂 = 修練を終えた
+/** その言葉は、もう手の内か(掌握か殿堂) */
+const owned = (p: Progress, id: string) => inHall(p, id) || !!p.words[id]?.k;
+/** 階位。手にした言葉が10で1つ上がる。千語そろうと Lv 100 = TOEIC 990 の語彙の目安 */
+const rankOf = (n: number) => Math.max(1, Math.min(100, Math.floor(n / 10) + 1));
+// 数値は、カードではなく「枠」に付ける(本人 2026-11-28「カード自体に数値を割り振ると、入れ替えたときに偏る。最初から20枚のバランスを決めて、そこに言葉を割り当てる。毎回同じカードの数値が違ってよい」)。
+// [コスト, 攻撃, 体力, 能力]。軽い順に並べてある。覚えたい言葉ほど軽い枠に座らせる(最初に出すから、いちばん耳に入る)。
+type Slot = [number, number, number, CardSpec['ability']];
+const FRAME: Slot[] = [
+    [1, 1, 2, 'NONE'], [1, 2, 1, 'NONE'], [1, 1, 1, 'RUSH'], [1, 1, 3, 'WARD'],
+    [2, 2, 3, 'NONE'], [2, 3, 2, 'NONE'], [2, 2, 2, 'RUSH'], [2, 1, 4, 'WARD'], [2, 2, 2, 'HEAL'],
+    [3, 3, 4, 'NONE'], [3, 4, 3, 'NONE'], [3, 3, 3, 'INSIGHT'], [3, 2, 5, 'WARD'], [3, 3, 3, 'STRIKE'],
+    [4, 4, 5, 'NONE'], [4, 4, 4, 'HEAL'], [4, 4, 4, 'STRIKE'],
+    [5, 5, 6, 'NONE'], [5, 5, 5, 'INSIGHT'],
+    [6, 6, 7, 'WARD'],
+];
+/** 言葉を枠に座らせる。上の点数帯の言葉ほど、最初から攻撃が高い(成長している手応え) */
+const seat = (c: CardSpec, sl: Slot): CardSpec => ({ ...c, cost: sl[0], atk: sl[1] + Math.floor(BANDS.indexOf(c.band || 500) / 2), hp: sl[2] + (BANDS.indexOf(c.band || 500) >= 4 ? 1 : 0), ability: sl[3] });
+/** 4択の選択肢。品詞をそろえ、点数帯の近い言葉の意味から選ぶ(ありえない選択肢を混ぜない) */
+function choicesFor(c: CardSpec, pool: CardSpec[]): string[] {
+    const band = (x: CardSpec) => BANDS.indexOf(x.band || 500);
+    const cand = pool.filter(x => x.id !== c.id && x.ja && x.ja !== c.ja).map(x => ({ ja: x.ja as string, k: (x.element === c.element ? 0 : 6) + Math.abs(band(x) - band(c)) + Math.random() * 1.6 })).sort((x, y) => x.k - y.k);
+    const others = [...new Set(cand.map(x => x.ja))].slice(0, 3);
+    return [...others, c.ja as string].sort(() => Math.random() - 0.5);
+}
+/** 単語だけを発音する。攻撃する・されるたびに鳴らす(本人「何度も攻撃とか攻撃されるたびに、単語だけでも発音すれば自然に覚える」) */
+let wordEl: HTMLAudioElement | null = null;
+function speakWord(spec: CardSpec, delay = 0) {
+    if (!spec.word) return;
+    window.setTimeout(() => {
+        try {
+            const src = VOICE[`w-${spec.id}`];
+            if (src) { wordEl?.pause(); wordEl = new Audio(src); wordEl.play().catch(() => { /* 鳴らせない端末 */ }); return; }
+            const u = new SpeechSynthesisUtterance(spec.word as string);
+            u.lang = 'en-US';
+            window.speechSynthesis.speak(u);
+        } catch { /* 読み上げが無い端末 */ }
+    }, delay);
+}
 const BANDS = [500, 600, 700, 800, 900];
 const chapterOf = (c: CardSpec) => Math.max(0, BANDS.indexOf(c.band || 500));   // 点数帯が章
 const CHAPTERS: { name: [string, string]; boss: [string, string]; intro: [string, string]; arena: number }[] = [
@@ -803,13 +843,14 @@ const CHAPTERS: { name: [string, string]; boss: [string, string]; intro: [string
     { name: ['竜の火口', 'Dragon Crater'], boss: ['満点の竜', 'The Perfect-Score Dragon'], intro: ['上級者でも落とす語。', 'Words even advanced players miss.'], arena: 1 },
 ];
 const HERO_TITLES: [number, string, string][] = [[0, '見習い', 'Apprentice'], [0.2, '冒険者', 'Adventurer'], [0.4, '騎士', 'Knight'], [0.7, '英雄', 'Hero'], [1, '伝説', 'Legend']];
-const heroTitle = (hall: number, total: number) => { const r = total ? hall / total : 0; let t = HERO_TITLES[0]; for (const x of HERO_TITLES) if (r >= x[0]) t = x; return LANG === 'ja' ? t[1] : t[2]; };
+const heroTitle = (hall: number, _total: number) => { const r = (rankOf(hall) - 1) / 99; /* 称号は階位で決める(いま有る語数に対する割合ではなく、千語の塔のどこにいるか) */ void _total; let t = HERO_TITLES[0]; for (const x of HERO_TITLES) if (r >= x[0]) t = x; return LANG === 'ja' ? t[1] : t[2]; };
 /** デッキを整える。殿堂入りした語を外し、空きを「始める章から上 → それより下」の順に埋める。控えに回した語は自動では戻さない */
 function fillDeck(p: Progress, pool: CardSpec[]): string[] {
     const has = new Set(pool.map(c => c.id));
-    const deck = p.deck.filter(id => has.has(id) && !inHall(p, id));
+    const deck = p.deck.filter(id => has.has(id) && !owned(p, id));
     const key = (c: CardSpec) => chapterOf(c) >= p.start ? chapterOf(c) : 10 + (p.start - chapterOf(c));
-    const cand = pool.filter(c => !inHall(p, c.id) && !deck.includes(c.id) && !p.bench.includes(c.id)).sort((x, y) => key(x) - key(y) || (x.no || 0) - (y.no || 0));
+    const lootAt = (c: CardSpec) => { const i = (p.loot || []).indexOf(c.id); return i < 0 ? 999 : i; };   // 戦利品が先
+    const cand = pool.filter(c => !owned(p, c.id) && !deck.includes(c.id) && !p.bench.includes(c.id)).sort((x, y) => lootAt(x) - lootAt(y) || key(x) - key(y) || (x.no || 0) - (y.no || 0));
     for (const c of cand) { if (deck.length >= DECK_SIZE) break; deck.push(c.id); }
     return deck;
 }
@@ -825,12 +866,157 @@ function applyAnswers(p: Progress, res: Record<string, boolean>, pool: CardSpec[
     return { ...n, deck: fillDeck(n, pool) };
 }
 
+// ── 入門の儀: 物語の導入 → 門番との一戦 ──
+// 本人(2026-11-28)「最初のテストも超デラックスにおもしろくしないと。最初からバトル形式のテストにしないと誰も始めない」「物語もつくらないと。ストーリーがないと主人公がつまらない」。
+// 物語: 言葉が力になる世界。すべての言葉を束ねていた《千語の塔》を沈黙の王が奪い、千の言葉を封じた。主人公は言霊使いの見習いで、言葉を取り戻すたびに塔をのぼる(頂が Lv 100)。
+// 一戦: 関(点数帯)ごとに、門番が言葉を3つ放つ。声で英文が流れ、意味を見切れば打ち返せる。3つのうち2つ見切れば関を越える。越えた関の言葉は「掌握」になり、越えられなかった関から塔をのぼり始める。
+const PROLOGUE: { art: string; ja: string; en: string }[] = [
+    { art: 'board-moon', ja: 'ここは、言葉が力になる世界。\n手にした言葉だけが、あなたの味方として戦う。', en: 'This is a world where words are power.\nOnly the words you have won will fight for you.' },
+    { art: 'board-volcano', ja: 'かつて、すべての言葉を束ねていた《千語の塔》は、\n沈黙の王に奪われた。\n千の言葉は封じられ、塔の中で眠っている。', en: 'The Tower of a Thousand Words once held every word together.\nThe King of Silence took it.\nA thousand words now sleep, sealed inside.' },
+    { art: 'board', ja: 'あなたは、言霊使いの見習い。\n言葉を1つ取り戻すたびに、塔を1段のぼる。\n頂は、Lv 100。', en: 'You are an apprentice wordbinder.\nEvery word you win back takes you one step up the tower.\nThe summit is Lv 100.' },
+    { art: 'board-shrine', ja: '塔の入口には、門番が立っている。\n放たれる言葉の意味を見切れば、打ち返せる。\nいま手の内にある言葉で、力を示せ。', en: 'A gatekeeper guards the entrance.\nRead the meaning of each word it casts and you strike back.\nShow what you already hold.' },
+];
+function EntryRite({ pool, onDone, onClose }: { pool: CardSpec[]; onDone: (r: { passed: number[]; start: number; right: number; asked: number }) => void; onClose: () => void }) {
+    const J = (ja: string, en: string) => LANG === 'ja' ? ja : en;
+    const gates = useMemo(() => {
+        const chs = [...new Set(pool.map(chapterOf))].sort((x, y) => x - y);
+        return chs.map(ch => ({ ch, qs: pool.filter(c => chapterOf(c) === ch).map(c => ({ c, r: Math.random() })).sort((x, y) => x.r - y.r).slice(0, 3).map(x => ({ c: x.c, choices: choicesFor(x.c, pool) })) }));
+    }, [pool]);
+    const [phase, setPhase] = useState<'story' | 'gate' | 'fight' | 'end'>('story');
+    const [panel, setPanel] = useState(0);
+    const [gi, setGi] = useState(0);
+    const [qi, setQi] = useState(0);
+    const [picked, setPicked] = useState<string | null>(null);
+    const [marks, setMarks] = useState<boolean[][]>([]);
+    const gate = gates[gi], q = gate?.qs[qi];
+    const need = (n: number) => Math.ceil(n * 2 / 3);
+    useEffect(() => { if (phase === 'fight' && q) speakLine(q.c.text, q.c.id); }, [phase, gi, qi]);   // eslint-disable-line react-hooks/exhaustive-deps
+    const gold = 'linear-gradient(180deg, #FFF6C8 0%, #F6C85F 45%, #B8941E 55%, #F6C85F 100%)';
+    const bgKey = phase === 'story' ? PROLOGUE[panel].art : ARENAS[CHAPTERS[gate ? gate.ch : 0].arena].img;
+    const bg = ART[bgKey] || ART.board;
+    const got = (i: number) => (marks[i] || []).filter(Boolean).length;
+    const passedList = gates.filter((g2, i) => (marks[i] || []).length === g2.qs.length && got(i) >= need(g2.qs.length)).map(g2 => g2.ch);
+    const firstFail = gates.find((g2, i) => !((marks[i] || []).length === g2.qs.length && got(i) >= need(g2.qs.length)));
+    const startCh = firstFail ? firstFail.ch : gates[gates.length - 1].ch;
+    const ownN = pool.filter(c => passedList.includes(chapterOf(c))).length;
+    const pick = (x: string) => {
+        if (picked || !q) return;
+        const ok = x === q.c.ja;
+        setPicked(x);
+        setMarks(m => { const n = m.map(r => [...r]); while (n.length <= gi) n.push([]); n[gi].push(ok); return n; });
+        playSfx(ok ? 'strike' : 'face');
+    };
+    const next = () => {
+        if (!gate) return;
+        setPicked(null);
+        if (qi + 1 < gate.qs.length) { setQi(qi + 1); return; }
+        const ok = got(gi) >= need(gate.qs.length);
+        if (ok && gi + 1 < gates.length) { setGi(gi + 1); setQi(0); setPhase('gate'); playSfx('turn'); }
+        else { setPhase('end'); playSfx('win'); }
+    };
+    const plate: React.CSSProperties = { background: 'linear-gradient(180deg, rgba(42,31,8,0.9), rgba(20,14,4,0.94))', border: '1.5px solid #D4AF37', boxShadow: '0 8px 24px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,242,168,0.25)', borderRadius: 14 };
+    const goldBtn: React.CSSProperties = { border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 18, letterSpacing: 2, borderRadius: 12, padding: '13px 40px', cursor: 'pointer', boxShadow: '0 10px 26px rgba(0,0,0,0.5), 0 0 22px rgba(246,200,95,0.55)' };
+    return (
+        <div data-rite={phase} style={{ position: 'absolute', inset: 0, minHeight: '100%', overflow: 'hidden', color: '#fff', background: `linear-gradient(180deg, rgba(8,6,14,0.55) 0%, rgba(8,6,14,0.35) 35%, rgba(8,6,14,0.9) 100%), ${bg ? `center / cover no-repeat url(${bg})` : '#14101F'}`, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 900, letterSpacing: 4, color: '#FFF2A8', background: 'linear-gradient(180deg, #9F1239, #4C0519)', border: '2px solid #FFF2A8', borderRadius: 999, padding: '3px 16px' }}>{J('入門の儀', 'RITE OF ENTRY')}</span>
+                <button data-act="rite-quit" onClick={onClose} style={{ marginLeft: 'auto', border: '1px solid rgba(255,255,255,0.5)', background: 'rgba(0,0,0,0.35)', color: '#fff', fontWeight: 700, fontSize: 12, borderRadius: 8, padding: '5px 12px', cursor: 'pointer' }}>{J('あとにする', 'Later')}</button>
+            </div>
+
+            {/* 物語 */}
+            {phase === 'story' && (
+                <div key={panel} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', padding: '0 16px 40px' }}>
+                    <div style={{ ...plate, maxWidth: 680, width: '100%', padding: '22px 24px', textAlign: 'center', animation: 'duel-fadeup .7s ease-out both' }}>
+                        <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: 5, color: '#F6C85F' }}>{J('序', 'PROLOGUE')} {panel + 1} / {PROLOGUE.length}</div>
+                        <div style={{ marginTop: 10, fontFamily: 'Georgia, "Yu Mincho", "Hiragino Mincho ProN", serif', fontSize: 'clamp(17px, 2.6vw, 24px)', fontWeight: 700, lineHeight: 2, whiteSpace: 'pre-line', color: '#FFFDF2', textShadow: '0 2px 6px #000' }}>{LANG === 'ja' ? PROLOGUE[panel].ja : PROLOGUE[panel].en}</div>
+                        <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', marginTop: 18 }}>
+                            <button data-act="rite-next" onClick={() => { playSfx('click'); if (panel + 1 < PROLOGUE.length) setPanel(panel + 1); else setPhase('gate'); }} style={goldBtn}>{panel + 1 < PROLOGUE.length ? J('次へ', 'Next') : J('門へ進む', 'To the gate')}</button>
+                            <button onClick={() => setPhase('gate')} style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}>{J('物語を飛ばす', 'Skip the story')}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 関の名乗り */}
+            {phase === 'gate' && gate && (
+                <div key={gi} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 16, textAlign: 'center' }}>
+                    <div style={{ animation: 'duel-crest .8s cubic-bezier(.2,1.5,.4,1) both' }}>
+                        {ART['leader-rival'] && <div style={{ width: 120, height: 120, margin: '0 auto', borderRadius: '50%', backgroundImage: `url(${ART['leader-rival']})`, backgroundSize: 'cover', border: '4px solid #E11D48', boxShadow: '0 0 34px rgba(225,29,72,0.8)' }} />}
+                    </div>
+                    <div style={{ marginTop: 14, fontSize: 13, fontWeight: 900, letterSpacing: 6, color: '#FDA4AF', animation: 'duel-fadeup .5s ease-out .3s both' }}>{J(`第${gi + 1}の関`, `GATE ${gi + 1}`)}　TOEIC {BANDS[gate.ch]}</div>
+                    <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 'clamp(34px, 7vw, 64px)', lineHeight: 1.15, background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0 4px 0 rgba(0,0,0,0.5))', animation: 'duel-fadeup .6s ease-out .45s both' }}>{CHAPTERS[gate.ch].boss[LANG === 'ja' ? 0 : 1]}</div>
+                    <div style={{ marginTop: 8, fontSize: 15, lineHeight: 1.8, maxWidth: 520, textShadow: '0 1px 4px #000', animation: 'duel-fadeup .6s ease-out .6s both' }}>{J(`門番が、言葉を ${gate.qs.length} つ放つ。${need(gate.qs.length)} つ見切れば、この関を越えられる。`, `The gatekeeper casts ${gate.qs.length} words. Read ${need(gate.qs.length)} of them to pass.`)}</div>
+                    <button data-act="rite-go" onClick={() => { playSfx('click'); setPhase('fight'); }} style={{ ...goldBtn, marginTop: 22, animation: 'duel-fadeup .6s ease-out .8s both' }}>{J('受けて立つ', 'Face it')}</button>
+                </div>
+            )}
+
+            {/* 一戦: 門番が放った言葉を見切る */}
+            {phase === 'fight' && gate && q && (
+                <div key={`${gi}-${qi}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 14px 18px', overflowY: 'auto' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        {ART['leader-rival'] && <div style={{ width: 46, height: 46, borderRadius: '50%', backgroundImage: `url(${ART['leader-rival']})`, backgroundSize: 'cover', border: '2px solid #E11D48' }} />}
+                        <div>
+                            <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: 2, color: '#FDA4AF' }}>{J(`第${gi + 1}の関`, `GATE ${gi + 1}`)} · TOEIC {BANDS[gate.ch]}</div>
+                            <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 17 }}>{CHAPTERS[gate.ch].boss[LANG === 'ja' ? 0 : 1]}</div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 5, marginLeft: 8 }}>
+                            {gate.qs.map((_, i) => { const m = (marks[gi] || [])[i]; return <span key={i} style={{ width: 16, height: 16, transform: 'rotate(45deg)', border: '2px solid #FFF2A8', background: m === undefined ? 'rgba(0,0,0,0.4)' : m ? '#34D399' : '#EF4444', boxShadow: i === qi && !picked ? '0 0 10px #FDE68A' : undefined }} />; })}
+                        </div>
+                    </div>
+                    <div style={{ marginTop: 10, fontSize: 13, fontWeight: 900, letterSpacing: 3, color: picked ? (picked === q.c.ja ? '#6EE7B7' : '#FCA5A5') : '#FFF2A8', textShadow: '0 1px 4px #000' }}>
+                        {picked ? (picked === q.c.ja ? J('見切った — 打ち返した', 'READ IT — you strike back') : J('見切れず — 一撃を受けた', 'MISSED — you take the hit')) : J('放たれた言葉を、見切れ', 'READ THE WORD IT CASTS')}
+                    </div>
+                    <div style={{ marginTop: 8, filter: `drop-shadow(0 0 26px ${picked ? (picked === q.c.ja ? 'rgba(52,211,153,0.9)' : 'rgba(239,68,68,0.9)') : 'rgba(253,164,175,0.9)'}) drop-shadow(0 16px 26px rgba(0,0,0,0.6))`, animation: picked && picked !== q.c.ja ? 'duel-shake .4s ease' : 'duel-win .35s ease-out both' }}>
+                        <Card spec={{ ...q.c, ja: picked ? q.c.ja : '？？？', ability: 'NONE' }} w={Math.round(Math.min(210, window.innerHeight * 0.3 * CW / CH))} noCost />
+                    </div>
+                    <button onClick={() => speakLine(q.c.text, q.c.id)} style={{ marginTop: 8, border: '1px solid #D4AF37', background: 'rgba(0,0,0,0.45)', color: '#FFF2A8', fontWeight: 800, fontSize: 12, borderRadius: 999, padding: '4px 14px', cursor: 'pointer' }}>▶ {J('もう一度聞く', 'Hear it again')}</button>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: 9, width: '100%', maxWidth: 640, marginTop: 12 }}>
+                        {q.choices.map(x => {
+                            const good = picked && x === q.c.ja, bad = picked === x && x !== q.c.ja;
+                            return <button key={x} data-choice={x === q.c.ja ? 'right' : 'wrong'} onClick={() => pick(x)} style={{ ...plate, textAlign: 'left', fontSize: 16, fontWeight: 800, lineHeight: 1.4, padding: '12px 14px', color: '#fff', cursor: picked ? 'default' : 'pointer',
+                                border: `2px solid ${good ? '#10B981' : bad ? '#EF4444' : '#D4AF37'}`, background: good ? 'rgba(6,95,70,0.9)' : bad ? 'rgba(127,29,29,0.9)' : plate.background, opacity: picked && !good && !bad ? 0.45 : 1 }}>{x}</button>;
+                        })}
+                    </div>
+                    {picked && (
+                        <div style={{ ...plate, width: '100%', maxWidth: 640, marginTop: 12, padding: '12px 14px', animation: 'duel-fadeup .35s ease-out both' }}>
+                            <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 16, lineHeight: 1.45, color: '#FFFDF2' }}>{q.c.text}</div>
+                            <div style={{ marginTop: 3, fontSize: 13, lineHeight: 1.55, color: 'rgba(255,255,255,0.85)' }}>{q.c.lineJa}</div>
+                            <button data-act="rite-next" onClick={next} style={{ ...goldBtn, width: '100%', marginTop: 12, fontSize: 16, padding: '11px 0' }}>{qi + 1 < gate.qs.length ? J('次の言葉へ', 'Next word') : J('関の裁きへ', 'Judgment')}</button>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* 結果: 階位が決まる */}
+            {phase === 'end' && (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 16, textAlign: 'center', overflowY: 'auto' }}>
+                    {ART['leader-you'] && <div style={{ width: 110, height: 110, borderRadius: '50%', backgroundImage: `url(${ART['leader-you']})`, backgroundSize: 'cover', border: '4px solid #F6C85F', boxShadow: '0 0 34px rgba(246,200,95,0.85)', animation: 'duel-crest .9s cubic-bezier(.2,1.5,.4,1) both' }} />}
+                    <div style={{ marginTop: 12, fontSize: 13, fontWeight: 900, letterSpacing: 6, color: '#F6C85F', animation: 'duel-fadeup .5s ease-out .3s both' }}>{J('あなたの階位', 'YOUR RANK')}</div>
+                    <div data-rite-rank style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 'clamp(60px, 14vw, 120px)', lineHeight: 1, background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0 5px 0 rgba(0,0,0,0.5)) drop-shadow(0 0 30px rgba(246,200,95,0.6))', animation: 'duel-fadeup .7s ease-out .5s both' }}>Lv {rankOf(ownN)}</div>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center', animation: 'duel-fadeup .6s ease-out .8s both' }}>
+                        {gates.map((g2, i) => { const done = (marks[i] || []).length === g2.qs.length; const ok = done && got(i) >= need(g2.qs.length); return (
+                            <div key={g2.ch} style={{ ...plate, padding: '7px 12px', minWidth: 96, opacity: done ? 1 : 0.5, borderColor: ok ? '#10B981' : done ? '#EF4444' : '#D4AF37' }}>
+                                <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: 1, color: '#F6C85F' }}>TOEIC {BANDS[g2.ch]}</div>
+                                <div style={{ fontSize: 14, fontWeight: 900, color: ok ? '#6EE7B7' : done ? '#FCA5A5' : 'rgba(255,255,255,0.7)' }}>{ok ? J('越えた', 'PASSED') : done ? J('ここから', 'START HERE') : J('未踏', 'AHEAD')}</div>
+                            </div>
+                        ); })}
+                    </div>
+                    <div style={{ marginTop: 14, maxWidth: 560, fontSize: 15, lineHeight: 1.85, textShadow: '0 1px 4px #000', animation: 'duel-fadeup .6s ease-out 1s both' }}>
+                        {ownN > 0 ? J(`越えた関の言葉 ${ownN} 語は、最初からあなたの手の内にある「掌握」として数える。`, `The ${ownN} words behind the gates you passed count as already yours.`) : J('ここが、あなたの出発点。', 'This is where you begin.')}
+                        {J(`あなたは、第${startCh + 1}章「${CHAPTERS[startCh].name[0]}」から塔をのぼる。デッキは、その先のまだ手にしていない言葉で組まれる。`, ` You begin at Chapter ${startCh + 1}, ${CHAPTERS[startCh].name[1]}. Your deck is built from the words beyond.`)}
+                    </div>
+                    <button data-act="rite-done" onClick={() => onDone({ passed: passedList, start: startCh, right: marks.flat().filter(Boolean).length, asked: marks.flat().length })} style={{ ...goldBtn, marginTop: 20, animation: 'duel-fadeup .6s ease-out 1.3s both' }}>{J('塔へ入る', 'Enter the tower')}</button>
+                </div>
+            )}
+        </div>
+    );
+}
+
 /** 意味の4択。対戦のあとの確認テストと、最初のテストで使う */
 function Quiz({ title, sub, cards, pool, onDone, onClose }: { title: string; sub: string; cards: CardSpec[]; pool: CardSpec[]; onDone: (res: Record<string, boolean>) => void; onClose: () => void }) {
     const J = (ja: string, en: string) => LANG === 'ja' ? ja : en;
     const qs = useMemo(() => cards.map(c => {
-        const others = [...new Set(pool.filter(x => x.id !== c.id && x.ja && x.ja !== c.ja).map(x => x.ja as string))].sort(() => Math.random() - 0.5).slice(0, 3);
-        return { c, choices: [...others, c.ja as string].sort(() => Math.random() - 0.5) };
+        return { c, choices: choicesFor(c, pool) };
     }), [cards, pool]);
     const [i, setI] = useState(0);
     const [picked, setPicked] = useState<string | null>(null);
@@ -897,6 +1083,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     const [placedMsg, setPlacedMsg] = useState<{ ch: number; score: number; n: number } | null>(null);
     const [testCards, setTestCards] = useState<CardSpec[]>([]);
     const bossRef = useRef<number | null>(null);          // いまの対戦がボス戦なら、その章
+    const rivalWords = useRef<Set<string>>(new Set());    // この対戦で相手が使った言葉(戦利品になる)
     const forcedArena = useRef<number | null>(null);      // ボス戦は章の舞台で戦う
     const [pool, setPool] = useState<CardSpec[] | null>(null);
     const [deckIds, setDeckIds] = useState<string[]>([]);
@@ -1034,13 +1221,23 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     /** デッキを2つ組む。自分のデッキは、専用の絵があるカードを優先する。毎回ちがう顔ぶれになる */
     const dealDecks = (seed: number, boss: number | null = null) => {
         if (pack) {
-            // 単語パック: 自分のデッキは「覚えている途中の語」。20枚に足りない分は殿堂の語で埋める。相手は山から20枚(ボスはその章の語を優先)
+            // 単語パック: 言葉を20の枠に座らせる。自分は「修練」の言葉(足りない分は手の内の言葉で埋める)。
             const all = pool || [];
+            const rng = makeRng(seed + 3);
             const ids = fillDeck(prog, all);
-            const mine = ids.map(id => all.find(c => c.id === id)).filter(Boolean) as CardSpec[];
-            for (const c of shuffle(all.filter(c => !ids.includes(c.id)), makeRng(seed + 3))) { if (mine.length >= DECK_SIZE) break; mine.push(c); }
+            let words = ids.map(id => all.find(c => c.id === id)).filter(Boolean) as CardSpec[];
+            for (const c of shuffle(all.filter(c => !ids.includes(c.id)), rng)) { if (words.length >= DECK_SIZE) break; words.push(c); }
+            // 覚えたい言葉ほど軽い枠へ: 刻印の少ない言葉から順に、コストの軽い枠に座らせる(同じ刻印の中では毎回ばらばら)
+            const need = (c: CardSpec) => owned(prog, c.id) ? 9 : okCount(prog, c.id);
+            words = shuffle(words, rng).sort((x, y) => need(x) - need(y));
+            const mine = words.map((c, i) => seat(c, FRAME[i % FRAME.length]));
+            // 相手は、こちらがまだ手にしていない言葉を使う。1つ上の点数帯から先に(相手の言葉は、いつも自分の少し上にいる)
             const sh = shuffle(all, makeRng(seed + 7));
-            const rival = boss === null ? sh.slice(0, DECK_SIZE) : [...sh.filter(c => chapterOf(c) === boss), ...sh.filter(c => chapterOf(c) !== boss)].slice(0, DECK_SIZE);
+            const above = (c: CardSpec) => { const d = chapterOf(c) - prog.start; return d > 0 ? d : 10 - d; };
+            const fresh = sh.filter(c => !owned(prog, c.id) && !ids.includes(c.id)).sort((x, y) => above(x) - above(y));
+            const base = boss === null ? [...fresh, ...sh.filter(c => !fresh.includes(c))] : [...sh.filter(c => chapterOf(c) === boss), ...sh.filter(c => chapterOf(c) !== boss)];
+            const seats = shuffle(FRAME, makeRng(seed + 11));
+            const rival = base.slice(0, DECK_SIZE).map((c, i) => seat(c, seats[i % seats.length]));
             return { mine, rival };
         }
         const sh = shuffle(pool || [], makeRng(seed));
@@ -1057,7 +1254,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
     const begin = (boss: number | null) => {
         if (!pool || pool.length < minPool) return;
         seen.current = new Map(); setReview(false); setShownJa({});
-        bossRef.current = boss; setQuiz(null); setVerdict(null);
+        bossRef.current = boss; setQuiz(null); setVerdict(null); rivalWords.current = new Set();
         forcedArena.current = boss !== null ? CHAPTERS[boss].arena : null;
         const seed = Math.floor(Math.random() * 1e9);
         let { mine: deck, rival } = dealDecks(seed, boss);
@@ -1119,6 +1316,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             sfx('play');
             if (spec.word) {
                 seen.current.set(spec.id, spec);
+                if (p === 1 && !tutorRef.current) rivalWords.current.add(spec.id);
                 updateProg(pr => ({ ...pr, words: { ...pr.words, [spec.id]: { ...(pr.words[spec.id] || { ok: [], miss: 0 }), seen: (pr.words[spec.id]?.seen || 0) + 1 } } }));
             }
             if (soundRef.current) speakLine(spec.text, spec.id);
@@ -1133,12 +1331,16 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             const to = center(a.t === null ? `[data-leader="${q}"]` : `[data-u="${a.t}"]`);
             if (from && to) {
                 sfx('swing');
+                const attacker = g.sides[p].field.find(u => u.uid === a.a);
+                if (attacker && soundRef.current) speakWord(attacker.card);
                 setLunge({ uid: a.a, dx: (to.x - from.x) * 0.82, dy: (to.y - from.y) * 0.82 });
                 await sleep(210);
                 const id = fxId.current++;
                 setBursts(b => [...b, { id, x: to.x, y: to.y, color: '#FDE68A' }]);
                 setTimeout(() => setBursts(b => b.filter(x => x.id !== id)), 600);
                 sfx(a.t === null ? 'face' : 'hit');
+                const struck = a.t === null ? undefined : g.sides[q].field.find(u => u.uid === a.t);
+                if (struck && soundRef.current) speakWord(struck.card, 700);
             }
         }
 
@@ -1179,6 +1381,11 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         if (next.winner !== null) {
             await sleep(500);
             sfx(next.winner === 0 ? 'win' : 'lose');
+            if (rivalWords.current.size) {
+                // 戦利品: 相手が使った、まだ手にしていない言葉。次にデッキへ入る
+                const got = [...rivalWords.current];
+                updateProg(pr => ({ ...pr, loot: [...got.filter(id => !owned(pr, id) && !pr.deck.includes(id)), ...(pr.loot || []).filter(id => !got.includes(id))].slice(0, 40) }));
+            }
             if (next.winner === 0 && bossRef.current !== null) { const ch = bossRef.current; updateProg(pr => pr.bosses.includes(ch) ? pr : { ...pr, bosses: [...pr.bosses, ch] }); }
             setRecord(r => { const n = { win: r.win + (next.winner === 0 ? 1 : 0), lose: r.lose + (next.winner === 1 ? 1 : 0) }; save(RECORD_KEY, n); return n; });
         } else if (a.type === 'end') {
@@ -1573,21 +1780,18 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
         }
 
         // ── 最初のテスト: どの章から始めるかを決める ──
+        // ── 入門の儀: 物語の導入と、門番との一戦。越えた関の言葉を「掌握」にして、始める章を決める ──
         if (view === 'test' && pack && pool) {
-            const J = (ja: string, en: string) => lang === 'ja' ? ja : en;
             return shell(
-                <Quiz title={J('最初のテスト', 'Placement test')} sub={J('知っている語は飛ばして、ちょうどいい章から始める。分からなければ勘でいい。', 'Skip what you know and start at the right chapter. Guess if unsure.')} cards={testCards} pool={pool} onClose={() => setView('home')}
-                    onDone={res => {
-                        const chs = [...new Set(pool.map(chapterOf))].sort((x, y) => x - y);
-                        let startCh = chs[chs.length - 1];
-                        for (const ch of chs) {
-                            const asked = testCards.filter(c => chapterOf(c) === ch);
-                            const got = asked.filter(c => res[c.id]).length;
-                            if (got < Math.ceil(asked.length * 2 / 3)) { startCh = ch; break; }
-                        }
-                        const onlyRight = Object.fromEntries(Object.entries(res).filter(([, v]) => v));   // 最初のテストでは、まちがいは記録しない(当たった分だけ1回目の正解にする)
-                        updateProg(p => { const n = applyAnswers({ ...p, placed: true, start: startCh, deck: [] }, onlyRight, pool); return n; });
-                        setPlacedMsg({ ch: startCh, score: Object.values(res).filter(Boolean).length, n: testCards.length });
+                <EntryRite pool={pool} onClose={() => setView('home')}
+                    onDone={r => {
+                        updateProg(pr => {
+                            const words = { ...pr.words };
+                            for (const c of pool) if (r.passed.includes(chapterOf(c))) words[c.id] = { ...(words[c.id] || { seen: 0, ok: [], miss: 0 }), k: true };
+                            const n = { ...pr, words, placed: true, start: r.start, deck: [] as string[] };
+                            return { ...n, deck: fillDeck(n, pool) };
+                        });
+                        setPlacedMsg({ ch: r.start, score: r.right, n: r.asked });
                         setView('story');
                     }} />,
             );
@@ -1598,9 +1802,11 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             const J = (ja: string, en: string) => lang === 'ja' ? ja : en;
             const sec: React.CSSProperties = { ...plate, padding: narrow ? '14px 14px' : '18px 22px', marginTop: 16 };
             const hall = pool.filter(c => inHall(prog, c.id));
+            const grasp = pool.filter(c => !inHall(prog, c.id) && prog.words[c.id]?.k);
+            const ownN = hall.length + grasp.length;
             const deckIdsNow = fillDeck(prog, pool);
             const deckCards = deckIdsNow.map(id => pool.find(c => c.id === id)).filter(Boolean) as CardSpec[];
-            const benchCards = pool.filter(c => !inHall(prog, c.id) && !deckIdsNow.includes(c.id));
+            const benchCards = pool.filter(c => !owned(prog, c.id) && !deckIdsNow.includes(c.id));
             const chs = [...new Set(pool.map(chapterOf))].sort((x, y) => x - y);
             const bar = (v: number, total: number, color = '#10B981') => <div style={{ height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.14)', overflow: 'hidden' }}><div style={{ width: `${total ? (v / total) * 100 : 0}%`, height: '100%', background: color, transition: 'width .5s ease' }} /></div>;
             const sw = narrow ? Math.floor((scr.w - 32 - 28 - 3 * 12) / 4) : 104;
@@ -1620,8 +1826,8 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                     <div data-story style={{ maxWidth: 860, margin: '0 auto', padding: '4px 16px 70px' }}>
                         {placedMsg && (
                             <div style={{ ...sec, border: '2px solid #10B981' }}>
-                                <div style={{ fontSize: 17, fontWeight: 900, color: '#6EE7B7' }}>{J(`テストの結果: ${placedMsg.n}問中 ${placedMsg.score}問 正解`, `Test result: ${placedMsg.score} of ${placedMsg.n}`)}</div>
-                                <div style={{ fontSize: 15, lineHeight: 1.7, marginTop: 4 }}>{J(`あなたは 第${placedMsg.ch + 1}章「${CHAPTERS[placedMsg.ch].name[0]}」(TOEIC ${BANDS[placedMsg.ch]}) から始める。デッキはその章の語から組んだ。`, `You start at Chapter ${placedMsg.ch + 1}, ${CHAPTERS[placedMsg.ch].name[1]} (TOEIC ${BANDS[placedMsg.ch]}). Your deck is built from its words.`)}</div>
+                                <div style={{ fontSize: 17, fontWeight: 900, color: '#6EE7B7' }}>{J(`入門の儀を終えた — ${placedMsg.n} の言葉のうち ${placedMsg.score} を見切った`, `Rite complete: ${placedMsg.score} of ${placedMsg.n}`)}</div>
+                                <div style={{ fontSize: 15, lineHeight: 1.7, marginTop: 4 }}>{J(`あなたの階位は Lv ${rankOf(ownN)}。第${placedMsg.ch + 1}章「${CHAPTERS[placedMsg.ch].name[0]}」(TOEIC ${BANDS[placedMsg.ch]}) から塔をのぼる。門番に示した言葉は「掌握」に入れ、デッキはその先の言葉で組んだ。`, `You start at Chapter ${placedMsg.ch + 1}, ${CHAPTERS[placedMsg.ch].name[1]} (TOEIC ${BANDS[placedMsg.ch]}). Your deck is built from its words.`)}</div>
                             </div>
                         )}
                         {/* 勇者 */}
@@ -1629,29 +1835,29 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                             {ART['leader-you'] && <div style={{ width: narrow ? 70 : 96, height: narrow ? 70 : 96, borderRadius: '50%', flexShrink: 0, backgroundImage: `url(${ART['leader-you']})`, backgroundSize: 'cover', border: '3px solid #F6C85F', boxShadow: '0 0 18px rgba(246,200,95,0.6)' }} />}
                             <div style={{ flex: 1 }}>
                                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-                                    <span style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: narrow ? 26 : 34, color: '#FFF6C8' }}>Lv {hall.length}</span>
-                                    <span style={{ fontSize: 15, fontWeight: 900, color: '#2A1F08', background: gold, borderRadius: 999, padding: '1px 12px' }}>{heroTitle(hall.length, pool.length)}</span>
+                                    <span style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: narrow ? 26 : 34, color: '#FFF6C8' }}>Lv {rankOf(ownN)}</span>
+                                    <span style={{ fontSize: 15, fontWeight: 900, color: '#2A1F08', background: gold, borderRadius: 999, padding: '1px 12px' }}>{heroTitle(ownN, pool.length)}</span>
                                 </div>
-                                <div style={{ fontSize: 13, margin: '6px 0 4px', color: 'rgba(255,255,255,0.85)' }}>{J(`殿堂入り ${hall.length} / ${pool.length} 語。殿堂入りした語の数が、勇者のレベル。`, `${hall.length} of ${pool.length} words in the Hall. That number is your level.`)}</div>
-                                {bar(hall.length, pool.length, '#F6C85F')}
+                                <div style={{ fontSize: 13, margin: '6px 0 4px', color: 'rgba(255,255,255,0.85)' }}>{J(`手にした言葉 ${ownN} / ${pool.length}(掌握 ${grasp.length}・殿堂 ${hall.length})。10の言葉ごとに、階位が1つ上がる。Lv 100 が、TOEIC 990 の語彙。`, `${ownN} of ${pool.length} words won. Every ten words raise your rank. Lv 100 is TOEIC 990 vocabulary.`)}</div>
+                                {bar(ownN, pool.length, '#F6C85F')}
                             </div>
                         </div>
                         {/* 決まり */}
                         <div style={sec}>
                             <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 19, color: '#FFF6C8', marginBottom: 6 }}>{J('進め方', 'How it works')}</div>
                             {[
-                                J('デッキは、いま覚えている途中の単語でできている。', 'Your deck is made of the words you are learning now.'),
-                                J('対戦が終わったら「確認テスト」を受ける。出てきた語の意味を4択で答える。', 'After a duel, take the check: pick the meaning of words that appeared.'),
-                                J(`同じ語に、別の日に ${HALL_NEED} 回正解すると「殿堂入り」。その語はデッキから抜けて、次の語が入る。`, `Answer a word correctly on ${HALL_NEED} different days and it enters the Hall. It leaves your deck and a new word comes in.`),
-                                J('まちがえた語は、数え直しになる。', 'A wrong answer resets that word.'),
+                                J('デッキは、いま「修練」している言葉でできている。まだ手にしていない言葉ほど軽く、最初に出しやすい。', 'Your deck is made of the words you are forging now. The newer the word, the cheaper it is to play.'),
+                                J('対戦が終わったら《試練》を受ける。出てきた言葉の意味を、見切る。', 'After a duel, take the Trial: read the meaning of the words that appeared.'),
+                                J(`見切るたびに「刻印」が1つ刻まれる。別の日に ${HALL_NEED} つ刻んだ言葉は「殿堂」へ。デッキから抜けて、次の言葉が入る。`, `Answer a word correctly on ${HALL_NEED} different days and it enters the Hall. It leaves your deck and a new word comes in.`),
+                                J('見切りそこねた言葉は、刻印が消える。相手が使った言葉は「戦利品」として、次のデッキに入ってくる。', 'A miss wipes the marks. Words the rival used come to you as spoils and enter your next deck.'),
                                 J(`章の語の ${Math.round(BOSS_NEED * 100)}% が殿堂入りすると、その章のボスに挑める。ボスに勝つと章クリア。全部の章のボスを倒したら、このパックはクリア。`, `When ${Math.round(BOSS_NEED * 100)}% of a chapter is in the Hall you can fight its boss. Beat every boss to clear the pack.`),
                             ].map((x, i) => <div key={i} style={{ fontSize: narrow ? 13.5 : 15, lineHeight: 1.8, color: '#FFFDF2' }}>{i + 1}. {x}</div>)}
-                            {!prog.placed && <button data-act="take-test" onClick={() => setView('test')} style={{ marginTop: 12, border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 16, borderRadius: 10, padding: '11px 20px', cursor: 'pointer' }}>{J('最初のテストを受ける(約2分)', 'Take the placement test (about 2 min)')}</button>}
+                            {!prog.placed && <button data-act="take-test" onClick={() => setView('test')} style={{ marginTop: 12, border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 16, borderRadius: 10, padding: '11px 20px', cursor: 'pointer' }}>{J('《入門の儀》に挑む', 'Enter the Rite of Entry')}</button>}
                         </div>
                         {/* 章とボス */}
                         {chs.map(ch => {
                             const list = pool.filter(c => chapterOf(c) === ch);
-                            const h = list.filter(c => inHall(prog, c.id)).length;
+                            const h = list.filter(c => owned(prog, c.id)).length;
                             const need = Math.ceil(list.length * BOSS_NEED);
                             const cleared = prog.bosses.includes(ch);
                             const open = cleared || ch < prog.start || h >= need;
@@ -1678,21 +1884,32 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                         })}
                         {/* デッキ */}
                         <div style={sec}>
-                            <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 19, color: '#FFF6C8' }}>{J(`いまのデッキ — 覚えている途中の ${deckCards.length} 語`, `Your deck — ${deckCards.length} words in progress`)}</div>
+                            <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 19, color: '#FFF6C8' }}>{J(`修練 — いまのデッキ ${deckCards.length} 語`, `Forging — your deck of ${deckCards.length}`)}</div>
                             <div style={{ fontSize: 13, lineHeight: 1.6, color: 'rgba(255,255,255,0.8)', margin: '4px 0 14px' }}>{J(`札の数字は、殿堂入りまでの正解の回数(${HALL_NEED} 回で殿堂入り)。${benchCards.length ? 'カードを押すと控えに回せる。' : ''}${deckCards.length < DECK_SIZE ? ' 20枚に足りない分は、対戦のときだけ殿堂の語で埋める。' : ''}`, `The tag shows correct answers so far (${HALL_NEED} to enter the Hall).`)}</div>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px 12px', justifyContent: narrow ? 'center' : 'flex-start' }}>
-                                {deckCards.map(c => small(c, benchCards.length ? () => updateProg(p => { const n = { ...p, bench: [...p.bench.filter(x => x !== c.id), c.id], deck: p.deck.filter(x => x !== c.id) }; return { ...n, deck: fillDeck(n, pool) }; }) : undefined, `${okCount(prog, c.id)} / ${HALL_NEED}`, okCount(prog, c.id) ? '#047857' : '#57534E'))}
+                                {deckCards.map(c => small(c, benchCards.length ? () => updateProg(p => { const n = { ...p, bench: [...p.bench.filter(x => x !== c.id), c.id], deck: p.deck.filter(x => x !== c.id) }; return { ...n, deck: fillDeck(n, pool) }; }) : undefined, `${lang === 'ja' ? '刻印' : 'MARK'} ${okCount(prog, c.id)}/${HALL_NEED}`, okCount(prog, c.id) ? '#047857' : '#57534E'))}
                             </div>
                             {benchCards.length > 0 && (
                                 <>
-                                    <div style={{ fontSize: 15, fontWeight: 900, color: '#FFF6C8', margin: '22px 0 4px' }}>{J(`控え — ${benchCards.length} 語`, `Bench — ${benchCards.length} words`)}</div>
+                                    <div style={{ fontSize: 15, fontWeight: 900, color: '#FFF6C8', margin: '22px 0 4px' }}>{J(`未踏 — まだ手にしていない ${benchCards.length} 語`, `Uncharted — ${benchCards.length} words`)}</div>
                                     <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)', marginBottom: 14 }}>{J('押すとデッキに入る(デッキがいっぱいのときは、先にデッキのカードを控えに回す)。', 'Tap to add to your deck (make room first if it is full).')}</div>
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px 12px', justifyContent: narrow ? 'center' : 'flex-start' }}>
-                                        {benchCards.map(c => small(c, deckIdsNow.length < DECK_SIZE || prog.bench.includes(c.id) ? () => updateProg(p => { if (fillDeck(p, pool).length >= DECK_SIZE) return p; const n = { ...p, bench: p.bench.filter(x => x !== c.id), deck: [...fillDeck(p, pool), c.id] }; return { ...n, deck: fillDeck(n, pool) }; }) : undefined, J('控え', 'BENCH'), '#57534E'))}
+                                        {benchCards.slice(0, 24).map(c => small(c, deckIdsNow.length < DECK_SIZE || prog.bench.includes(c.id) ? () => updateProg(p => { if (fillDeck(p, pool).length >= DECK_SIZE) return p; const n = { ...p, bench: p.bench.filter(x => x !== c.id), deck: [...fillDeck(p, pool), c.id] }; return { ...n, deck: fillDeck(n, pool) }; }) : undefined, J('未踏', 'NEW'), '#57534E'))}
                                     </div>
                                 </>
                             )}
                         </div>
+                        {/* 掌握: 入門の儀で、最初から手の内にあると示した言葉。あやしいものは、押して修練に戻せる */}
+                        {grasp.length > 0 && (
+                            <div style={sec}>
+                                <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 19, color: '#FFF6C8' }}>{J(`掌握 — 最初から手の内にあった ${grasp.length} 語`, `In hand — ${grasp.length} words you already had`)}</div>
+                                <div style={{ fontSize: 13, lineHeight: 1.6, color: 'rgba(255,255,255,0.8)', margin: '4px 0 12px' }}>{J('入門の儀で越えた関の言葉。あやしいと思う言葉は、押すと「修練」に戻して鍛え直せる。', 'Words from the gates you cleared. Tap any you are unsure of to send it back to forging.')}</div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                                    {grasp.map(c => <button key={c.id} onClick={() => updateProg(pr => { const n = { ...pr, words: { ...pr.words, [c.id]: { ...(pr.words[c.id] || { seen: 0, ok: [], miss: 0 }), k: false } }, loot: [c.id, ...(pr.loot || []).filter(x => x !== c.id)] }; return { ...n, deck: fillDeck(n, pool) }; })}
+                                        style={{ border: '1px solid rgba(212,175,55,0.6)', background: 'rgba(255,255,255,0.05)', color: '#FFFDF2', borderRadius: 999, padding: '4px 12px', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>{c.word}</button>)}
+                                </div>
+                            </div>
+                        )}
                         {/* 殿堂 */}
                         <div style={{ ...sec, border: '2px solid #F6C85F', boxShadow: '0 0 26px rgba(246,200,95,0.35)' }}>
                             <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 22, background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{J(`殿堂 — 覚えた ${hall.length} 語`, `The Hall — ${hall.length} words mastered`)}</div>
@@ -1890,20 +2107,20 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
 
                     {/* 単語パック: 勇者のレベルと、次にやること */}
                     {pack && pool && (() => {
-                        const hallN = pool.filter(c => inHall(prog, c.id)).length;
+                        const hallN = pool.filter(c => owned(prog, c.id)).length;   // 手にした言葉(掌握と殿堂)
                         const chs = [...new Set(pool.map(chapterOf))].sort((x, y) => x - y);
-                        const bossCh = chs.find(ch => !prog.bosses.includes(ch) && (ch < prog.start || pool.filter(c => chapterOf(c) === ch && inHall(prog, c.id)).length >= Math.ceil(pool.filter(c => chapterOf(c) === ch).length * BOSS_NEED)));
+                        const bossCh = chs.find(ch => !prog.bosses.includes(ch) && (ch < prog.start || pool.filter(c => chapterOf(c) === ch && owned(prog, c.id)).length >= Math.ceil(pool.filter(c => chapterOf(c) === ch).length * BOSS_NEED)));
                         const allDone = chs.every(ch => prog.bosses.includes(ch));
-                        const todo = !prog.placed ? { text: lang === 'ja' ? '最初のテストを受ける(約2分)。ちょうどいい章から始められる。' : 'Take the placement test (about 2 minutes).', on: () => setView('test') }
+                        const todo = !prog.placed ? { text: lang === 'ja' ? '《入門の儀》に挑む。門番との一戦で、あなたの階位が決まる。' : 'Take the placement test (about 2 minutes).', on: () => setView('test') }
                             : allDone ? { text: lang === 'ja' ? '全部の章をクリアした。残りの語を殿堂に入れよう。' : 'All chapters cleared. Fill the Hall.', on: start }
                                 : bossCh !== undefined ? { text: lang === 'ja' ? `第${bossCh + 1}章のボス「${CHAPTERS[bossCh].boss[0]}」に挑める。` : `The Chapter ${bossCh + 1} boss is open.`, on: () => { setPlacedMsg(null); setView('story'); } }
-                                    : { text: lang === 'ja' ? '対戦して、終わったら確認テストを受ける。正解した語が殿堂に近づく。' : 'Duel, then take the check. Correct words move toward the Hall.', on: start };
+                                    : { text: lang === 'ja' ? '対戦して、終わったら《試練》を受ける。見切った言葉に、刻印が刻まれる。' : 'Duel, then take the check. Correct words move toward the Hall.', on: start };
                         return (
                             <div data-hero style={{ ...plate, marginTop: 16, padding: '12px 16px' }}>
                                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-                                    <span style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 24, color: '#FFF6C8' }}>{lang === 'ja' ? '勇者' : 'Hero'} Lv {hallN}</span>
+                                    <span style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 24, color: '#FFF6C8' }}>{lang === 'ja' ? '階位' : 'Rank'} Lv {rankOf(hallN)}</span>
                                     <span style={{ fontSize: 13, fontWeight: 900, color: '#2A1F08', background: gold, borderRadius: 999, padding: '1px 10px' }}>{heroTitle(hallN, pool.length)}</span>
-                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>{lang === 'ja' ? `殿堂入り ${hallN} / ${pool.length} 語` : `${hallN} / ${pool.length} words in the Hall`}</span>
+                                    <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>{lang === 'ja' ? `手にした言葉 ${hallN} / ${pool.length}` : `${hallN} / ${pool.length} words won`}</span>
                                 </div>
                                 <div style={{ height: 7, borderRadius: 4, background: 'rgba(255,255,255,0.14)', overflow: 'hidden', margin: '7px 0 9px' }}><div style={{ width: `${(hallN / pool.length) * 100}%`, height: '100%', background: '#F6C85F' }} /></div>
                                 <button data-act="todo" onClick={todo.on} style={{ display: 'flex', width: '100%', alignItems: 'center', gap: 8, textAlign: 'left', border: '1px solid #10B981', background: 'rgba(16,185,129,0.16)', color: '#fff', borderRadius: 8, padding: '8px 12px', cursor: 'pointer' }}>
@@ -2249,8 +2466,8 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                                     ].map((x, i) => <div key={i}><b style={{ color: '#F6C85F' }}>{i + 1}.</b> {x}</div>)}
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 18 }}>
-                                    <button data-act="tutor-play" onClick={() => { stopTutor(); setTimeout(start, 60); }} style={{ border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 19, borderRadius: 12, padding: '14px 0', cursor: 'pointer' }}>{J('さっそく対戦する', 'Play a duel')}</button>
-                                    {pack && !prog.placed && <button onClick={() => { stopTutor(); setView('test'); }} style={{ border: '1.5px solid #D4AF37', background: 'rgba(20,14,4,0.8)', color: '#FFF6C8', fontWeight: 900, fontSize: 15, borderRadius: 12, padding: '11px 0', cursor: 'pointer' }}>{J('最初のテストを受ける(自分に合った章から始める)', 'Take the placement test')}</button>}
+                                    {pack && !prog.placed && <button data-act="tutor-rite" onClick={() => { stopTutor(); setView('test'); }} style={{ border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 19, borderRadius: 12, padding: '14px 0', cursor: 'pointer' }}>{J('《入門の儀》へ — 門番と戦って、階位を決める', 'To the Rite of Entry')}</button>}
+                                    <button data-act="tutor-play" onClick={() => { stopTutor(); setTimeout(start, 60); }} style={pack && !prog.placed ? { border: '1.5px solid #D4AF37', background: 'rgba(20,14,4,0.8)', color: '#FFF6C8', fontWeight: 900, fontSize: 15, borderRadius: 12, padding: '11px 0', cursor: 'pointer' } : { border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 19, borderRadius: 12, padding: '14px 0', cursor: 'pointer' }}>{J('さっそく対戦する', 'Play a duel')}</button>
                                     <button onClick={() => { stopTutor(); setView('guide'); }} style={{ border: '1.5px solid #D4AF37', background: 'rgba(20,14,4,0.8)', color: '#FFF6C8', fontWeight: 900, fontSize: 15, borderRadius: 12, padding: '11px 0', cursor: 'pointer' }}>{J('ルールブックで読み返す', 'Read the rulebook')}</button>
                                     <button onClick={startTutor} style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.75)', fontWeight: 700, fontSize: 13, padding: '6px 0', cursor: 'pointer', textDecoration: 'underline' }}>{J('チュートリアルをもう一度', 'Do the tutorial again')}</button>
                                 </div>
@@ -2382,7 +2599,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
                             {net?.role === 'guest' ? <span style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{b.guestAgain}</span> : (
                                 <>
                                     <button style={{ ...btn(false), background: 'rgba(255,255,255,0.08)', color: '#fff', border: `1px solid ${tone.b}` }} onClick={() => { leaveNet(); gameRef.current = null; setGame(null); }}>{b.home}</button>
-                                    {pack && !verdict && checkCards().length > 0 && <button data-act="check" style={{ ...btn(true), fontSize: 16, padding: '13px 26px' }} onClick={() => setQuiz(checkCards())}>{lang === 'ja' ? '確認テスト' : 'CHECK'}</button>}
+                                    {pack && !verdict && checkCards().length > 0 && <button data-act="check" style={{ ...btn(true), fontSize: 16, padding: '13px 26px' }} onClick={() => setQuiz(checkCards())}>{lang === 'ja' ? '試練に挑む' : 'TRIAL'}</button>}
                                     {pack && seen.current.size > 0 && <button data-act="review" style={{ ...btn(false), background: 'rgba(255,255,255,0.08)', color: '#fff', border: `1px solid ${tone.b}` }} onClick={() => setReview(true)}>{b.words} · {seen.current.size}</button>}
                                     {!net && <button data-act="rematch" style={{ ...btn(true), fontSize: 16, padding: '13px 34px' }} onClick={start}>{b.rematch}</button>}
                                 </>
@@ -2424,7 +2641,7 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
 
             {/* 対戦のあとの確認テスト */}
             {quiz && pool && (
-                <Quiz title={lang === 'ja' ? '確認テスト' : 'Check'} sub={lang === 'ja' ? `この対戦で出た語から ${quiz.length} 問。別の日に ${HALL_NEED} 回正解した語は殿堂入りする。` : `${quiz.length} words from this duel. ${HALL_NEED} correct answers on different days put a word in the Hall.`} cards={quiz} pool={pool} onClose={() => setQuiz(null)}
+                <Quiz title={lang === 'ja' ? '試練' : 'Trial'} sub={lang === 'ja' ? `この対戦で出た語から ${quiz.length} 問。別の日に ${HALL_NEED} 回正解した語は殿堂入りする。` : `${quiz.length} words from this duel. ${HALL_NEED} correct answers on different days put a word in the Hall.`} cards={quiz} pool={pool} onClose={() => setQuiz(null)}
                     onDone={res => {
                         const before = prog;
                         const after = applyAnswers(before, res, pool);
@@ -2438,17 +2655,18 @@ export default function DuelGame({ guestRoom, pack }: { guestRoom?: string; pack
             {verdict && (
                 <div data-verdict style={{ position: 'absolute', inset: 0, zIndex: 88, background: 'rgba(8,6,2,0.95)', overflowY: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
                     <div style={{ maxWidth: 560, width: '100%', textAlign: 'center', color: '#fff' }}>
-                        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 3, color: '#F6C85F' }}>{lang === 'ja' ? '確認テストの結果' : 'CHECK RESULT'}</div>
+                        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 3, color: '#F6C85F' }}>{lang === 'ja' ? '試練の結果' : 'TRIAL RESULT'}</div>
                         <div style={{ fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 64, lineHeight: 1.1, color: '#FFF6C8' }}>{verdict.score} <span style={{ fontSize: 30, color: '#D4AF37' }}>/ {verdict.n}</span></div>
                         {verdict.fresh.length > 0 ? (
                             <>
                                 <div style={{ marginTop: 10, fontFamily: 'Georgia, serif', fontWeight: 900, fontSize: 30, color: '#F6C85F', textShadow: '0 0 20px rgba(246,200,95,0.8)' }}>{lang === 'ja' ? `殿堂入り ${verdict.fresh.length} 語` : `${verdict.fresh.length} into the Hall`}</div>
                                 <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap', marginTop: 14 }}>{verdict.fresh.map(c => <Card key={c.id} spec={c} w={110} noCost />)}</div>
-                                <div style={{ marginTop: 12, fontSize: 14, lineHeight: 1.7 }}>{lang === 'ja' ? `勇者のレベルが ${verdict.fresh.length} 上がった。空いた枠には、次の語が入る。` : 'Your level went up. New words take the empty slots.'}</div>
+                                <div style={{ marginTop: 12, fontSize: 14, lineHeight: 1.7 }}>{lang === 'ja' ? `手にした言葉が ${verdict.fresh.length} 増えた。空いた枠には、次の言葉が入る。` : 'Your level went up. New words take the empty slots.'}</div>
                             </>
                         ) : (
-                            <div style={{ marginTop: 12, fontSize: 15, lineHeight: 1.8 }}>{lang === 'ja' ? `正解した語は、殿堂入りに1歩近づいた。別の日にもう一度正解すると殿堂入りする(同じ日に何度当てても1回ぶん)。まちがえた語は数え直し。` : 'Correct words moved one step closer. Answer them again on another day to put them in the Hall. Wrong ones start over.'}</div>
+                            <div style={{ marginTop: 12, fontSize: 15, lineHeight: 1.8 }}>{lang === 'ja' ? `見切った言葉に、刻印が1つ刻まれた。別の日にもう一度見切ると、殿堂に入る(同じ日に何度見切っても刻印は1つ)。見切りそこねた言葉は、刻印が消える。` : 'Correct words moved one step closer. Answer them again on another day to put them in the Hall. Wrong ones start over.'}</div>
                         )}
+                        {(prog.loot || []).length > 0 && <div style={{ marginTop: 12, fontSize: 14, lineHeight: 1.7, color: '#FDE68A' }}>{lang === 'ja' ? `戦利品: 相手が使った言葉のうち、まだ手にしていない ${(prog.loot || []).length} 語が、次のデッキに入ってくる。` : `Spoils: ${(prog.loot || []).length} of the rival's words will enter your next decks.`}</div>}
                         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', marginTop: 22, flexWrap: 'wrap' }}>
                             <button onClick={() => { setVerdict(null); leaveNet(); gameRef.current = null; setGame(null); setPlacedMsg(null); setView('story'); }} style={{ ...btn(false), background: 'rgba(255,255,255,0.08)', color: '#fff', border: '1px solid #D4AF37' }}>{lang === 'ja' ? '冒険と殿堂を見る' : 'Journey & Hall'}</button>
                             <button data-act="again" onClick={() => begin(null)} style={{ ...btn(true), fontSize: 16, padding: '13px 30px' }}>{b.rematch}</button>
