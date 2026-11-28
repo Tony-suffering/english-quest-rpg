@@ -2572,8 +2572,10 @@ export default function DuelGame({ guestRoom, pack, worldHref, reading }: { gues
     const handW = portrait ? 100 : Math.round(Math.max(96, Math.min(SW / 9.5, SH * 0.2, 150)));
     const handH = Math.round(handW * CH / CW);
     const handPeek = handH + (portrait ? 8 : 12);                       // 画面の下から覗く高さ
-    const tokenW = portrait ? 84 : Math.round(Math.max(54, Math.min(SW / 9.2, (SH - handPeek - Math.min(SH * 0.125, 112) * 3.2) / 3.25, 132)));
+    // 駒の大きさ。背の低い画面でも、自分の駒とその下の名前(2行)が、自分のリーダーに重ならない大きさまで(本人 2026-11-28「見切れてるのとかイージーミスはなしで」)
+    const tokenW = portrait ? 84 : Math.round(Math.max(40, Math.min(SW / 9.2, (SH - handPeek - Math.min(SH * 0.125, 112) * 3.2) / 3.25, ((SH - handPeek) / 2 - leaderS * 1.25 - 6) / 1.82, 132)));
     const tokenH = Math.round(tokenW * 1.24);
+    const peekW = Math.round(Math.max(110, Math.min(SW * 0.2, (SH * 0.5) * CW / CH, (SH - 16 - 190) * CW / CH, 330)));   // 左に出す拡大カードの幅
     const selUnit = sel !== null ? me.field.find(u => u.uid === sel) : undefined;
     const legal = myTurn && selUnit && canAttack(g, selUnit) ? targetsFor(g, selUnit) : { units: [] as number[], leader: false };
     const idle = myTurn && !me.hand.some((_, i) => canPlay(g, i)) && !me.field.some(u => canAttack(g, u)) && !g.reading?.docs.length && !me.field.some(u => canEvolve(g, u));
@@ -2777,11 +2779,12 @@ export default function DuelGame({ guestRoom, pack, worldHref, reading }: { gues
 
             {/* 左: カードの拡大(マウスを乗せたか、選んだカード) */}
             {shown && !portrait && !inspect && !tutor && (
-                <div style={{ position: 'absolute', left: 12, top: midY, transform: 'translateY(-50%)', zIndex: 9, pointerEvents: 'none', filter: 'drop-shadow(0 14px 26px rgba(0,0,0,0.6))' }}>
-                    <Card spec={shown} w={Math.round(Math.max(190, Math.min(SW * 0.2, (SH * 0.5) * CW / CH, 330)))} />
+                // 画面の上下 8px の内側に必ず収める。前は盤面の中心に合わせていたので、背の低い画面でカードの上が切れた。カードの大きさは、下の英文の箱の分を引いた残りで決める
+                <div data-act="peek" style={{ position: 'absolute', left: 12, top: 8, bottom: 8, display: 'flex', flexDirection: 'column', justifyContent: 'center', zIndex: 9, pointerEvents: 'none', filter: 'drop-shadow(0 14px 26px rgba(0,0,0,0.6))' }}>
+                    <Card spec={shown} w={peekW} />
                     {/* 単語カード: 英文と訳を、カードの下に出す */}
                     {shown.word && (
-                        <div style={{ marginTop: 12, width: Math.round(Math.max(190, Math.min(SW * 0.2, (SH * 0.5) * CW / CH, 330))), boxSizing: 'border-box', padding: '8px 10px', borderRadius: 10, background: 'rgba(10,8,30,0.86)', border: '1px solid rgba(246,200,95,0.7)' }}>
+                        <div style={{ marginTop: 10, width: Math.max(peekW, Math.min(230, Math.round(SW * 0.24))), boxSizing: 'border-box', padding: '8px 10px', borderRadius: 10, background: 'rgba(10,8,30,0.86)', border: '1px solid rgba(246,200,95,0.7)' }}>
                             <div style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', fontSize: 14, lineHeight: 1.4, color: '#FFFDF2' }}>{shown.text}</div>
                             <div style={{ marginTop: 4, fontSize: 12, lineHeight: 1.5, color: 'rgba(255,255,255,0.88)' }}>{shown.lineJa}</div>
                         </div>
@@ -2841,7 +2844,7 @@ export default function DuelGame({ guestRoom, pack, worldHref, reading }: { gues
             )}
 
             {/* 案内(左下) */}
-            <Plaque style={{ display: demo || tutor ? 'none' : undefined, position: 'absolute', ...(portrait ? { left: '50%', top: midY + rowGap / 2 + tokenH + 56, transform: 'translateX(-50%)', whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0.94 } : { left: 10, bottom: handPeek + 10, maxWidth: Math.min(280, SW * 0.3), whiteSpace: 'normal' as const }), padding: '6px 10px', fontSize: 11, fontWeight: 700, lineHeight: 1.45, fontFamily: 'inherit', zIndex: 4 }}>
+            <Plaque style={{ display: demo || tutor || (shown && !portrait && !inspect) ? 'none' : undefined, position: 'absolute', ...(portrait ? { left: '50%', top: midY + rowGap / 2 + tokenH + 56, transform: 'translateX(-50%)', whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0.94 } : { left: 10, bottom: handPeek + 10, maxWidth: Math.min(280, SW * 0.3), whiteSpace: 'normal' as const }), padding: '6px 10px', fontSize: 11, fontWeight: 700, lineHeight: 1.45, fontFamily: 'inherit', zIndex: 4 }}>
                 <div style={{ color: '#fff', fontSize: lang === 'ja' ? 12.5 : 11, whiteSpace: portrait && lang === 'ja' ? 'normal' : undefined, maxWidth: portrait ? SW - 150 : undefined }}>{(() => {
                     if (g.winner !== null) return b.hOver;
                     if (!myTurn) return b.hRival;
