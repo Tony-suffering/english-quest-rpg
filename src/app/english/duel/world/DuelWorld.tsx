@@ -171,7 +171,7 @@ export default function DuelWorld({ pack, goal, exitHref }: { pack?: WordPack; g
         done: lang === 'ja' ? `${GOAL}つの言葉を取り戻した — 奥の魔法陣へ` : `${GOAL} WORDS WON BACK — WALK INTO THE CIRCLE`,
         complete: lang === 'ja' ? `${GOAL}つの言葉を取り戻した。奥の魔法陣へ。` : `${GOAL} WORDS WON BACK. WALK INTO THE CIRCLE.`,
         back: lang === 'ja' ? '単語対戦へ戻る' : 'BACK TO WORD DUEL',
-        kicker: lang === 'ja' ? '千語の塔 — はじまりの中庭' : 'THE TOWER OF A THOUSAND WORDS — THE FIRST COURT',
+        kicker: lang === 'ja' ? '沈黙の塔 — はじまりの中庭' : 'THE TOWER OF SILENCE — THE FIRST COURT',
         lead: lang === 'ja' ? '封じられた言葉の1つが、あなたを呼んでいる。' : 'One of the sealed words is calling you.',
         how: lang === 'ja' ? ['声は遠いと小さく、こもって聞こえる。近づくほど、はっきりする。', '声のするほうへ歩いて、しゃべっているカードを見つけて捕まえる。', `${GOAL}つ取り戻したら、奥の魔法陣へ。そこから、あなたの戦いが始まる。`] : ['Far away the voice is faint and muffled. The closer you get, the clearer it is.', 'Walk toward the voice, find the card that is speaking, and catch it.', `Win back ${GOAL} words, then walk into the circle. Your fight begins there.`],
         skipDeck: lang === 'ja' ? '歩かずに先へ進む' : 'Skip the walk',

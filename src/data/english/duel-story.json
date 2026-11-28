@@ -1,0 +1,1392 @@
+{
+  "note": "WORD DUEL 沈黙の塔 の本編。塔の階にはさむ会話。floor = その階、when = before(対戦の前) / after(勝ったあと)。日本語は scripts/duel-story-polish.mjs で別のAIに通して直す(直す前の文は ja0 に残る)。",
+  "cast": {
+    "narr": {
+      "ja": "",
+      "en": "",
+      "art": ""
+    },
+    "you": {
+      "ja": "あなた",
+      "en": "You",
+      "art": "you"
+    },
+    "claim": {
+      "ja": "クレイム",
+      "en": "Claim",
+      "art": "claim",
+      "ja0": "クレイム"
+    },
+    "b1": {
+      "ja": "うなずきの門番",
+      "en": "The Nodding Gatekeeper",
+      "art": "boss1",
+      "ja0": "うなずきの門番"
+    },
+    "b2": {
+      "ja": "持ち帰りの番人",
+      "en": "The Keeper of Later",
+      "art": "boss2",
+      "ja0": "持ち帰りの番人"
+    },
+    "b3": {
+      "ja": "空気の議長",
+      "en": "The Chair",
+      "art": "boss3",
+      "ja0": "空気の議長"
+    },
+    "b4": {
+      "ja": "赤ペンの魔術師",
+      "en": "The Red-Pen Mage",
+      "art": "boss4",
+      "ja0": "赤ペンの魔術師"
+    },
+    "b5": {
+      "ja": "沈黙の王",
+      "en": "The King of Silence",
+      "art": "boss5",
+      "ja0": "沈黙の王"
+    }
+  },
+  "scenes": [
+    {
+      "id": "meet",
+      "floor": 0,
+      "when": "before",
+      "bg": "ch1",
+      "title": [
+        "最初の1語",
+        "The First Word"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "門をくぐると、床一面に言葉が落ちていた。",
+          "en": "Past the gate, the floor was covered in fallen words.",
+          "ja0": "門をくぐると、床いっぱいに言葉が落ちていた。"
+        },
+        {
+          "w": "claim",
+          "ja": "やっと来たか。待ちくたびれたぞ。",
+          "en": "Finally. I got tired of waiting."
+        },
+        {
+          "w": "you",
+          "ja": "……カードがしゃべった。",
+          "en": "...The card just talked.",
+          "ja0": "……カードが、しゃべった。"
+        },
+        {
+          "w": "claim",
+          "ja": "カードじゃない。お前があの会議で飲み込んだ言葉だ。「それは違います」って言いたかったろ。あれが俺だ。",
+          "en": "I am not a card. I am the word you swallowed in that meeting. You wanted to say, that is not right. That was me.",
+          "ja0": "カードじゃない。お前があの会議で飲み込んだ言葉だ。「それは違います」って言いたかったろ。あれが俺。"
+        },
+        {
+          "w": "you",
+          "ja": "クレーム、か。",
+          "en": "Claim. As in a complaint?"
+        },
+        {
+          "w": "claim",
+          "ja": "クレイムだ。苦情じゃない。主張だ。お前んとこの人間は、だいたいそこで間違える。",
+          "en": "As in to assert. Not a complaint. People from your country get that wrong all the time.",
+          "ja0": "クレイムだ。苦情じゃない、主張だ。お前の国の人間は、だいたいそこを間違える。"
+        },
+        {
+          "w": "you",
+          "ja": "あのときは言わなかっただけだ。",
+          "en": "I just chose not to say it back then.",
+          "ja0": "あのときは、言わなかっただけだ。"
+        },
+        {
+          "w": "claim",
+          "ja": "言えなかった、な。主張が仕事だ。そこは訂正しとくぞ。",
+          "en": "You could not say it. Asserting is my job, so I will correct you every time.",
+          "ja0": "言えなかった、な。主張するのが俺の仕事だから、訂正はきっちりやる。"
+        },
+        {
+          "w": "claim",
+          "ja": "この塔にはお前みたいなやつが落とした言葉が千ある。上に行くほど言葉は重くなる。",
+          "en": "This tower holds a thousand words dropped by people like you. The higher you go, the heavier they get.",
+          "ja0": "この塔には、お前みたいなやつが落とした言葉が千ある。上へ行くほど、重い言葉だ。"
+        },
+        {
+          "w": "you",
+          "ja": "全部、取り返すのか。",
+          "en": "And I take all of them back?"
+        },
+        {
+          "w": "claim",
+          "ja": "全部だ。1語ずつ、2回ずつ。1回言えたくらいじゃ、人間はまた落とすからな。",
+          "en": "All of them. One word at a time, twice each. Say it only once and you people drop it again."
+        }
+      ],
+      "title0": "最初の1語"
+    },
+    {
+      "id": "c1-start",
+      "floor": 1,
+      "when": "before",
+      "bg": "ch1",
+      "title": [
+        "第1章 相づちの階",
+        "Chapter 1: The Nodding Floors"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "第1章　相づちの階",
+          "en": "Chapter 1: The Nodding Floors",
+          "ja0": "第1章　相槌の階"
+        },
+        {
+          "w": "narr",
+          "ja": "ここは塔のいちばん下だ。よく使う言葉ほど、たくさん落ちている。",
+          "en": "The bottom of the tower. The most common words are the ones dropped most often.",
+          "ja0": "塔のいちばん下。いちばんよく使う言葉ほど、いちばんたくさん落ちている。"
+        },
+        {
+          "w": "you",
+          "ja": "postpone、confirm、refund。どれも知ってる。",
+          "en": "Postpone, confirm, refund. I know all of these.",
+          "ja0": "postpone、confirm、refund。知っている言葉ばかりだ。"
+        },
+        {
+          "w": "claim",
+          "ja": "知ってるのと口から出るのは別だ。知ってても出てこなかった。だからここにある。",
+          "en": "Knowing a word and getting it out of your mouth are different things. You knew them and they still did not come out. That is why they are here.",
+          "ja0": "知ってるのと、口から出るのは別だ。知ってるのに出なかったから、ここにある。"
+        },
+        {
+          "w": "claim",
+          "ja": "言葉だって持ち主のところに帰りたい。でも一度落とされたんだ。すぐには信用しない。勝負して認めさせろ。",
+          "en": "Words want to go home to their owners. But they were dropped once, so they do not trust you yet. Duel them and earn it.",
+          "ja0": "言葉は、持ち主のところへ帰りたがってる。でも一度落とされたから、すぐには信用しない。勝負して、認めさせろ。"
+        }
+      ],
+      "title0": "第1章 相槌の階"
+    },
+    {
+      "id": "c1-mid",
+      "floor": 10,
+      "when": "before",
+      "bg": "ch1",
+      "title": [
+        "sorry の床",
+        "The Floor of Sorry"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "10階。床は同じ言葉で埋まっていた。",
+          "en": "Floor 10. The whole floor was buried under one word.",
+          "ja0": "10階。床が、同じ言葉で埋まっていた。"
+        },
+        {
+          "w": "you",
+          "ja": "sorry、sorry、sorry……全部これか。",
+          "en": "Sorry, sorry, sorry... Is all of this the same word?",
+          "ja0": "sorry、sorry、sorry……これ、全部か。"
+        },
+        {
+          "w": "claim",
+          "ja": "この階はほとんどそれだ。落とした連中も、だいたい同じ国のやつらだ。",
+          "en": "This floor is almost nothing else. The owners are mostly from one country.",
+          "ja0": "この階はほとんどそれだ。持ち主は、だいたい同じ国の人間。"
+        },
+        {
+          "w": "you",
+          "ja": "……",
+          "en": "..."
+        },
+        {
+          "w": "claim",
+          "ja": "悪くもないのに謝ると、言いたかった言葉の席がなくなる。sorry の下を掘ってみろ。本当に言いたかったやつが埋まってる。",
+          "en": "When you apologize for nothing, there is no seat left for the word you meant. Dig under the sorry. The one you really wanted is down there."
+        },
+        {
+          "w": "narr",
+          "ja": "掘ってみると、ちがう言葉が1枚だけ出てきた。",
+          "en": "You dig. One different word comes up.",
+          "ja0": "掘ると、1枚だけ、ちがう言葉が出てきた。"
+        },
+        {
+          "w": "you",
+          "ja": "confirm。",
+          "en": "Confirm."
+        },
+        {
+          "w": "claim",
+          "ja": "「確認させてください」。謝るかわりに、それを言えばよかったんだ。",
+          "en": "Let me confirm. That is what you should have said instead of sorry."
+        }
+      ],
+      "title0": "sorry の床"
+    },
+    {
+      "id": "c1-boss",
+      "floor": 20,
+      "when": "before",
+      "bg": "ch1",
+      "title": [
+        "うなずきの門番",
+        "The Nodding Gatekeeper"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "20階。大きな男が扉の前でうなずいていた。",
+          "en": "Floor 20. A huge man stood in front of the door, nodding.",
+          "ja0": "20階。大きな男が、扉の前でうなずいていた。"
+        },
+        {
+          "w": "b1",
+          "ja": "なるほど。なるほど。なるほど。",
+          "en": "I see. I see. I see."
+        },
+        {
+          "w": "you",
+          "ja": "まだ何も言ってない。",
+          "en": "I have not said anything yet.",
+          "ja0": "まだ何も言っていない。"
+        },
+        {
+          "w": "b1",
+          "ja": "なるほど。",
+          "en": "I see."
+        },
+        {
+          "w": "claim",
+          "ja": "こいつが門番だ。会議でさっぱりわかってないのに、一度も聞き返さなかった連中の「なるほど」が固まってできた。",
+          "en": "This is the gatekeeper. He is made of every I see from people who never understood a thing in the meeting and never once asked.",
+          "ja0": "こいつが門番だ。会議で一度もわからなかったのに、一度も聞き返さなかった連中の「なるほど」が、固まってできた。"
+        },
+        {
+          "w": "b1",
+          "ja": "なるほど。……なるほど？",
+          "en": "You are absolutely right. ...What were we talking about?",
+          "ja0": "おっしゃるとおりです。……それで、何の話でしたか。"
+        },
+        {
+          "w": "you",
+          "ja": "ここを通してくれ。",
+          "en": "I need to get through this door.",
+          "ja0": "ここを通してほしい。"
+        },
+        {
+          "w": "b1",
+          "ja": "なるほど。……なるほど？",
+          "en": "I see. ...Through, meaning?",
+          "ja0": "なるほど。……通す、とは。"
+        },
+        {
+          "w": "claim",
+          "ja": "だめだ、通じてない。うなずくだけで何も聞いちゃいない。言葉をぶつけて起こせ。",
+          "en": "No use. He is nodding and hearing nothing. Hit him with words and wake him up.",
+          "ja0": "だめだ、通じてない。うなずいてるだけで、何も聞いてない。言葉をぶつけて、起こせ。"
+        }
+      ],
+      "title0": "うなずきの門番"
+    },
+    {
+      "id": "c1-clear",
+      "floor": 20,
+      "when": "after",
+      "bg": "ch1",
+      "title": [
+        "聞き返す",
+        "Asking Again"
+      ],
+      "lines": [
+        {
+          "w": "b1",
+          "ja": "……いま、なんと言った。",
+          "en": "...What did you just say?"
+        },
+        {
+          "w": "you",
+          "ja": "「もう一度言ってください」。",
+          "en": "Could you say that again?",
+          "ja0": "「もう一度、言ってください」。"
+        },
+        {
+          "w": "b1",
+          "ja": "それだ。ずっと誰かにそう言ってほしかった。わからないままうなずくのは疲れる。",
+          "en": "That. I have been waiting for someone to say that. Nodding without understanding is exhausting.",
+          "ja0": "それだ。それを、ずっと誰かに言ってほしかった。わからないままうなずくのは、疲れる。"
+        },
+        {
+          "w": "narr",
+          "ja": "門番は初めて首を横に振った。扉が開いた。",
+          "en": "For the first time, the gatekeeper shook his head. The door opened.",
+          "ja0": "門番は、はじめて首を横に振った。扉が開いた。"
+        },
+        {
+          "w": "claim",
+          "ja": "聞き返すのは負けじゃない。覚えとけ。",
+          "en": "Asking again is not losing. Remember that.",
+          "ja0": "聞き返すのは、負けじゃない。覚えとけ。"
+        }
+      ],
+      "title0": "聞き返す"
+    },
+    {
+      "id": "c2-start",
+      "floor": 21,
+      "when": "before",
+      "bg": "ch2",
+      "title": [
+        "第2章 持ち帰りの階",
+        "Chapter 2: The Floors of Later"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "第2章　持ち帰りの階",
+          "en": "Chapter 2: The Floors of Later"
+        },
+        {
+          "w": "narr",
+          "ja": "21階から上は紙の匂いがした。壁も床も、送られずに残った下書きでできていた。",
+          "en": "From floor 21 up, it smelled of paper. The walls and floors were built from drafts that were never sent.",
+          "ja0": "21階から上は、紙の匂いがした。壁も床も、送られなかった下書きでできている。"
+        },
+        {
+          "w": "you",
+          "ja": "「お世話になっております」で止まってる。何千通も。",
+          "en": "Thousands of emails that stop right after the greeting.",
+          "ja0": "「お世話になっております」で止まっているメールが、何千通もある。"
+        },
+        {
+          "w": "claim",
+          "ja": "挨拶だけ書いて、本題の手前でやめたやつだ。値上げに納期遅れ、お断り。言いにくい話ほどよく落ちてくる。",
+          "en": "People wrote the opening and quit just before the hard part. A price increase, a late delivery, a no. The harder it is to say, the more of it falls.",
+          "ja0": "書き出しだけ書いて、言いにくい本題の手前でやめたやつだ。値上げ、納期の遅れ、お断り。言いにくい話ほど、よく落ちてくる。"
+        },
+        {
+          "w": "you",
+          "ja": "俺のもあるか。",
+          "en": "Are any of them mine?"
+        },
+        {
+          "w": "claim",
+          "ja": "あるぞ。読むか。",
+          "en": "Oh yes. Shall I read one?"
+        },
+        {
+          "w": "you",
+          "ja": "読まなくていい。",
+          "en": "No."
+        },
+        {
+          "w": "claim",
+          "ja": "「請求書の金額が違います」。たった1行だ。お前はこれが書けなくて、3万円多く払った。",
+          "en": "The amount on the invoice is wrong. One line. You could not write it, so you paid thirty thousand yen extra."
+        },
+        {
+          "w": "you",
+          "ja": "読むなって言った。",
+          "en": "I said no.",
+          "ja0": "読むなと言った。"
+        },
+        {
+          "w": "claim",
+          "ja": "主張するのが仕事だ。",
+          "en": "Asserting is my job."
+        }
+      ],
+      "title0": "第2章 持ち帰りの階"
+    },
+    {
+      "id": "c2-mid",
+      "floor": 30,
+      "when": "before",
+      "bg": "ch2",
+      "title": [
+        "震える deadline",
+        "The Trembling Deadline"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "30階。下書きの山で小さな言葉がひとつ震えていた。",
+          "en": "Floor 30. In a mountain of drafts, one small word was trembling.",
+          "ja0": "30階。下書きの山の中で、小さな言葉がひとつ、震えていた。"
+        },
+        {
+          "w": "you",
+          "ja": "deadline。",
+          "en": "Deadline."
+        },
+        {
+          "w": "claim",
+          "ja": "締め切りだ。みんな、こいつの名前を呼ぶのを後回しにする。後回しにされすぎて、もう人間を信用してない。",
+          "en": "Deadline. Everyone puts off saying its name. It has been put off so many times that it stopped trusting people.",
+          "ja0": "締め切り。みんな、こいつの名前を呼ぶのを先に延ばす。延ばされすぎて、人間を信用しなくなった。"
+        },
+        {
+          "w": "you",
+          "ja": "……明日までにやる。",
+          "en": "...I will do it by tomorrow.",
+          "ja0": "……明日までに、やる。"
+        },
+        {
+          "w": "narr",
+          "ja": "deadline は震えるのをやめて、おとなしくカードに戻った。",
+          "en": "The deadline stopped trembling and quietly turned back into a card."
+        },
+        {
+          "w": "claim",
+          "ja": "締め切りを口にしたら、もう守るしかない。だからみんな言わないんだ。お前、いま自分の首を絞めたぞ。",
+          "en": "Once you say a deadline out loud, you have to keep it. That is why nobody says it. You just tied your own hands.",
+          "ja0": "口に出した締め切りは、守るしかなくなる。だからみんな言わないんだ。お前、いま自分の首を絞めたぞ。"
+        },
+        {
+          "w": "you",
+          "ja": "知ってる。",
+          "en": "I know."
+        }
+      ],
+      "title0": "震える deadline"
+    },
+    {
+      "id": "c2-boss",
+      "floor": 40,
+      "when": "before",
+      "bg": "ch2",
+      "title": [
+        "持ち帰りの番人",
+        "The Keeper of Later"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "40階。机の向こうで番人が帳簿を抱えていた。",
+          "en": "Floor 40. Behind a desk sat a keeper, hugging a ledger.",
+          "ja0": "40階。机の向こうに、帳簿を抱えた番人が座っていた。"
+        },
+        {
+          "w": "b2",
+          "ja": "ご用件は承りました。いったん持ち帰って検討いたします。",
+          "en": "Your request has been noted. I will take it back and consider it.",
+          "ja0": "ご用件は承りました。いったん持ち帰って、検討いたします。"
+        },
+        {
+          "w": "you",
+          "ja": "まだ用件を言ってない。",
+          "en": "I have not made a request yet.",
+          "ja0": "まだ用件を言っていない。"
+        },
+        {
+          "w": "b2",
+          "ja": "前向きに検討いたします。",
+          "en": "I will consider it positively.",
+          "ja0": "前向きに、検討いたします。"
+        },
+        {
+          "w": "claim",
+          "ja": "この階の主だ。「持ち帰ります」って言ったきり戻ってこなかった返事が、全部あの帳簿に入ってる。",
+          "en": "The master of these floors. Every answer that someone took back and never brought again is in that ledger.",
+          "ja0": "この階の主だ。「持ち帰ります」と言ったきり、二度と持って来なかった返事が、全部この帳簿に入ってる。"
+        },
+        {
+          "w": "b2",
+          "ja": "結論は次回の会議で。なお、次回の日程は次回決定いたします。",
+          "en": "We will conclude at the next meeting. The date of the next meeting will be decided next time.",
+          "ja0": "結論は、次回の会議で。次回の日程は、次回決めます。"
+        },
+        {
+          "w": "you",
+          "ja": "いま、ここで決めたい。",
+          "en": "I want to decide here and now."
+        },
+        {
+          "w": "b2",
+          "ja": "……そのお言葉は、当方の帳簿にはございません。",
+          "en": "...I am afraid those words are not in my ledger.",
+          "ja0": "……そのお言葉は、当方の帳簿にございません。"
+        }
+      ],
+      "title0": "持ち帰りの番人"
+    },
+    {
+      "id": "c2-clear",
+      "floor": 40,
+      "when": "after",
+      "bg": "ch2",
+      "title": [
+        "いま決める",
+        "Deciding Now"
+      ],
+      "lines": [
+        {
+          "w": "b2",
+          "ja": "「いま決めます」。……そうか。決めてしまえば、持ち帰る必要はないのですね。",
+          "en": "I will decide now. ...I see. If you decide, there is nothing to take back.",
+          "ja0": "「いま決めます」。……そうか。決めてしまえば、持ち帰らなくていいのか。"
+        },
+        {
+          "w": "narr",
+          "ja": "番人は帳簿を閉じた。積もりに積もった「検討中」が音もなく消えた。",
+          "en": "The keeper closed the ledger. A mountain of under consideration vanished without a sound.",
+          "ja0": "番人は帳簿を閉じた。積もりに積もった「検討中」が、音もなく消えた。"
+        },
+        {
+          "w": "b2",
+          "ja": "肩が軽くなりました。どうぞ先へ。上の階には、私より黙るのがうまい者ばかりです。",
+          "en": "My shoulders feel light. Go on. Those above are far better at silence than I am.",
+          "ja0": "肩が軽い。先へ行きなさい。上の階の者たちは、私よりずっと、黙るのがうまい。"
+        },
+        {
+          "w": "claim",
+          "ja": "いい顔してたな、あいつ。持ち帰るほうも重かったんだな。",
+          "en": "Did you see his face? Carrying it all back was heavy for him too.",
+          "ja0": "いい顔してたな、あいつ。持ち帰るほうも、重かったんだ。"
+        }
+      ],
+      "title0": "いま決める"
+    },
+    {
+      "id": "c3-start",
+      "floor": 41,
+      "when": "before",
+      "bg": "ch3",
+      "title": [
+        "第3章 空気の階",
+        "Chapter 3: The Floors of Reading the Room"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "第3章　空気の階",
+          "en": "Chapter 3: The Floors of Reading the Room"
+        },
+        {
+          "w": "narr",
+          "ja": "41階。ふっと音が消えた。言葉は床に落ちていない。どれも宙に浮いたまま動かない。",
+          "en": "Floor 41. Suddenly, there was no sound. The words had not fallen. They all hung frozen in the air.",
+          "ja0": "41階。急に、音がなくなった。言葉は落ちていない。全部、宙に浮いたまま止まっている。"
+        },
+        {
+          "w": "you",
+          "ja": "誰も拾わないのか。",
+          "en": "Nobody picks them up?"
+        },
+        {
+          "w": "claim",
+          "ja": "拾えないんだ。ここの言葉は言おうと思えば言えた。でも口を開く前に、みんなまわりの顔を見た。",
+          "en": "Nobody can. These words could have been said. But before saying them, everyone looked at everyone else.",
+          "ja0": "拾えないんだ。この階の言葉は、言おうと思えば言えた。でも言う前に、全員がまわりの顔を見た。"
+        },
+        {
+          "w": "you",
+          "ja": "空気を読んだ。",
+          "en": "They read the room."
+        },
+        {
+          "w": "claim",
+          "ja": "そう。空気は何も言わない。で、誰も何も言わなかった。ほら、「反対です」「わかりません」「それ、意味ありますか」。",
+          "en": "Right. And the room says nothing, so nobody said anything. These are those words. I disagree. I do not understand. Is there a point to this?",
+          "ja0": "そう。で、空気は何も言わないから、誰も何も言わなかった。浮いてるのはその言葉だ。「反対です」「わかりません」「それ、意味ありますか」。"
+        },
+        {
+          "w": "you",
+          "ja": "最後のは言わなくて正解だろ。",
+          "en": "That last one was probably better left unsaid.",
+          "ja0": "最後のは、言わなくて正解じゃないか。"
+        },
+        {
+          "w": "claim",
+          "ja": "言い方の問題だ。上に行けば、ましな言い方が拾える。",
+          "en": "It is a matter of wording. You will find better ways to say it upstairs.",
+          "ja0": "言い方の問題だ。上の階で、ましな言い方を拾える。"
+        }
+      ],
+      "title0": "第3章 空気の階"
+    },
+    {
+      "id": "c3-mid",
+      "floor": 50,
+      "when": "before",
+      "bg": "ch3",
+      "title": [
+        "塔の半分",
+        "Halfway"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "50階。塔のちょうど半分まで来て、初めて下が見えた。",
+          "en": "Floor 50. Exactly halfway up, you could see the bottom for the first time.",
+          "ja0": "50階。塔のちょうど半分で、はじめて下が見えた。"
+        },
+        {
+          "w": "you",
+          "ja": "落ちてくる。いまも。",
+          "en": "They are still falling. Right now."
+        },
+        {
+          "w": "claim",
+          "ja": "毎日だ。朝9時と午後の会議どきがいちばん多い。",
+          "en": "Every day. Most of them at nine in the morning and during afternoon meetings.",
+          "ja0": "毎日だ。朝の9時と、午後の会議の時間がいちばん多い。"
+        },
+        {
+          "w": "you",
+          "ja": "俺が取り返すより落ちてくるほうが速い。",
+          "en": "They fall faster than I can take them back.",
+          "ja0": "俺が取り返すより、落ちてくるほうが速い。"
+        },
+        {
+          "w": "claim",
+          "ja": "そうだな。",
+          "en": "They do."
+        },
+        {
+          "w": "you",
+          "ja": "じゃあ、きりがない。",
+          "en": "Then there is no end to it."
+        },
+        {
+          "w": "claim",
+          "ja": "千でいい。千の言葉を取り返したやつは、もう言葉を落とさない。そいつが会議で口を開くと、まわりも言葉を落とさなくなる。俺はそれを3回見た。",
+          "en": "A thousand is enough. Someone who takes back a thousand stops dropping them. And when one more person stops, the people in their meetings stop too. I have seen it happen three times.",
+          "ja0": "千でいい。千の言葉を取り返したやつは、もう落とさなくなる。落とさないやつがひとり増えると、そいつのいる会議では、まわりも落とさなくなる。俺はそれを3回見た。"
+        },
+        {
+          "w": "you",
+          "ja": "3回だけか。",
+          "en": "Only three?"
+        },
+        {
+          "w": "claim",
+          "ja": "3回もだ。",
+          "en": "Three whole times."
+        }
+      ],
+      "title0": "塔の半分"
+    },
+    {
+      "id": "c3-boss",
+      "floor": 60,
+      "when": "before",
+      "bg": "ch3",
+      "title": [
+        "空気の議長",
+        "The Chair"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "60階。長い机の端に議長が座っていた。椅子は30脚。埋まっているのは1脚だけだ。",
+          "en": "Floor 60. At the end of a long table sat the Chair. There were thirty seats. Only one was taken.",
+          "ja0": "60階。長い机の端に、議長が座っていた。椅子は30あるが、座っているのは議長だけだ。"
+        },
+        {
+          "w": "b3",
+          "ja": "本件について、ご異議のある方は。",
+          "en": "Are there any objections to this matter?"
+        },
+        {
+          "w": "narr",
+          "ja": "誰も答えない。誰もいないからだ。",
+          "en": "Nobody answers. There is nobody there."
+        },
+        {
+          "w": "b3",
+          "ja": "ご異議なしと認めます。",
+          "en": "Hearing none, the motion carries.",
+          "ja0": "ご異議なし、と認めます。"
+        },
+        {
+          "w": "claim",
+          "ja": "こいつは大昔から同じ採決をくり返してる。反対がないんじゃない。こいつが反対なんて言えない空気にしてるんだ。",
+          "en": "He has been repeating this vote for ages. It is not that nobody objects. He removes the air in which anyone could.",
+          "ja0": "こいつは大昔から、この採決をくり返してる。反対がないんじゃない。反対を言える空気を、自分で消してるんだ。"
+        },
+        {
+          "w": "you",
+          "ja": "異議があります。",
+          "en": "I object."
+        },
+        {
+          "w": "b3",
+          "ja": "……議事の妨げになります。空気をお読みください。",
+          "en": "...You are disrupting the proceedings. Kindly read the room.",
+          "ja0": "……議事の妨げになります。空気を、お読みください。"
+        },
+        {
+          "w": "you",
+          "ja": "読んだ。そのうえで言ってる。",
+          "en": "I read it. I am saying it anyway.",
+          "ja0": "読んだ。読んだうえで、言っている。"
+        }
+      ],
+      "title0": "空気の議長"
+    },
+    {
+      "id": "c3-clear",
+      "floor": 60,
+      "when": "after",
+      "bg": "ch3",
+      "title": [
+        "異議あり",
+        "Objection"
+      ],
+      "lines": [
+        {
+          "w": "b3",
+          "ja": "異議が出ました。……いつ以来でしょうか。",
+          "en": "An objection. ...I cannot remember the last one.",
+          "ja0": "異議が、出た。……いつ以来だろう。"
+        },
+        {
+          "w": "b3",
+          "ja": "正直に申し上げます。私も賛成ではありませんでした。誰も何も言わないので、決まったことにしていたんです。",
+          "en": "I confess. I did not agree either. Nobody said anything, so I treated it as decided.",
+          "ja0": "白状しよう。私も、賛成ではなかった。誰も何も言わないので、決まったことにしていた。"
+        },
+        {
+          "w": "narr",
+          "ja": "議長が木槌を置くと、宙に浮いていた言葉がいっせいに床へ下りてきた。",
+          "en": "The Chair put down the gavel. All the floating words came down to the floor at once.",
+          "ja0": "議長は木槌を置いた。浮いていた言葉が、いっせいに床へ下りてきた。"
+        },
+        {
+          "w": "claim",
+          "ja": "空気は読んでいい。読んだあとで黙るかどうかは別の話だ。",
+          "en": "Read the room all you like. Whether you stay quiet after reading it is a separate question.",
+          "ja0": "空気は読んでいい。読んだあとで黙るかどうかは、別の話だ。"
+        }
+      ],
+      "title0": "異議あり"
+    },
+    {
+      "id": "c4-start",
+      "floor": 61,
+      "when": "before",
+      "bg": "ch4",
+      "title": [
+        "第4章 赤ペンの階",
+        "Chapter 4: The Red-Pen Floors"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "第4章　赤ペンの階",
+          "en": "Chapter 4: The Red-Pen Floors"
+        },
+        {
+          "w": "narr",
+          "ja": "61階。息が白い。言葉という言葉が赤い線を引かれたまま凍っている。",
+          "en": "Floor 61. It was cold. Every single word was frozen with a red line through it.",
+          "ja0": "61階。寒い。言葉という言葉が、赤い線を引かれたまま凍っている。"
+        },
+        {
+          "w": "you",
+          "ja": "全部、直されてる。",
+          "en": "They have all been corrected.",
+          "ja0": "全部、直されている。"
+        },
+        {
+          "w": "claim",
+          "ja": "「a が抜けている」「時制が違う」「不自然」。何度も直されて、そのうち持ち主が口を開かなくなった言葉だ。",
+          "en": "Missing article. Wrong tense. Unnatural. Corrected again and again, until the owner stopped opening their mouth.",
+          "ja0": "「a が抜けている」「時制が違う」「不自然」。直されて、直されて、そのうち持ち主が口を開かなくなった言葉だ。"
+        },
+        {
+          "w": "you",
+          "ja": "直してもらえるのはいいことだろ。",
+          "en": "Being corrected is a good thing.",
+          "ja0": "直してもらえるのは、いいことだろう。"
+        },
+        {
+          "w": "claim",
+          "ja": "直すだけならな。ここの主は直し終わるまで口に出すなと言う。で、いつまでたっても直し終わらない。",
+          "en": "Being corrected, yes. But the master of these floors says nothing leaves until the correcting is finished. And it never finishes.",
+          "ja0": "直されるのはな。でもこの階の主は、直し終わるまで外に出すなと言う。で、直し終わる日は来ない。"
+        },
+        {
+          "w": "you",
+          "ja": "……俺の言葉がいちばん多いの、ここだろ。",
+          "en": "...Most of my words are on these floors, aren't they?",
+          "ja0": "……俺の言葉がいちばん多いのは、この階だな。"
+        },
+        {
+          "w": "claim",
+          "ja": "気づいたか。半分以上がここだ。",
+          "en": "You noticed. More than half of them.",
+          "ja0": "気づいたか。半分以上、ここだ。"
+        }
+      ],
+      "title0": "第4章 赤ペンの階"
+    },
+    {
+      "id": "c4-mid",
+      "floor": 70,
+      "when": "before",
+      "bg": "ch4",
+      "title": [
+        "1ページ目",
+        "Page One"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "70階。氷の中にノートが1冊埋まっていた。",
+          "en": "Floor 70. A notebook was buried in the ice.",
+          "ja0": "70階。氷の中に、ノートが1冊埋まっていた。"
+        },
+        {
+          "w": "you",
+          "ja": "俺の字だ。",
+          "en": "That is my handwriting."
+        },
+        {
+          "w": "claim",
+          "ja": "英語の勉強を始めた日のノートだ。1ページ目に「完璧に話せるようになってから話す」って書いてある。",
+          "en": "The notebook from the day you started studying English. Page one says: I will speak once I can speak perfectly.",
+          "ja0": "英語の勉強を始めた日のノートだ。1ページ目に「完璧に話せるようになってから、話す」と書いてある。"
+        },
+        {
+          "w": "you",
+          "ja": "書いた覚えがある。",
+          "en": "I remember writing that."
+        },
+        {
+          "w": "claim",
+          "ja": "で、完璧になったか。",
+          "en": "And? Are you perfect yet?"
+        },
+        {
+          "w": "you",
+          "ja": "なってない。",
+          "en": "No.",
+          "ja0": "なっていない。"
+        },
+        {
+          "w": "claim",
+          "ja": "だろうな。順番が逆なんだ。話したやつから、ましになる。",
+          "en": "Thought so. You had the order backward. The ones who speak are the ones who get better."
+        },
+        {
+          "w": "narr",
+          "ja": "ノートを閉じると、氷にひびが入った。",
+          "en": "You closed the notebook. A crack ran through the ice."
+        }
+      ],
+      "title0": "1ページ目"
+    },
+    {
+      "id": "c4-boss",
+      "floor": 80,
+      "when": "before",
+      "bg": "ch4",
+      "title": [
+        "赤ペンの魔術師",
+        "The Red-Pen Mage"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "80階。魔術師は宙に浮いた文を赤ペンでひとつずつ消していた。",
+          "en": "Floor 80. The mage was crossing out floating sentences with a red pen, one at a time.",
+          "ja0": "80階。魔術師は、宙に浮いた文を、1本ずつ赤いペンで消していた。"
+        },
+        {
+          "w": "b4",
+          "ja": "冠詞がありません。消去。前置詞が違います。消去。発音が悪い。これは最初からなかったことにしましょう。",
+          "en": "No article. Deleted. Wrong preposition. Deleted. Poor pronunciation. Let us agree this one never existed.",
+          "ja0": "冠詞がない。消去。前置詞が違う。消去。発音が悪い。これは、最初から無かったことにしましょう。"
+        },
+        {
+          "w": "you",
+          "ja": "それは俺の文だ。",
+          "en": "That is my sentence."
+        },
+        {
+          "w": "b4",
+          "ja": "ええ、存じています。あなたのためですよ。間違った英語をお聞かせするくらいなら、黙っているほうが美しいでしょう。",
+          "en": "I am aware. It is for your own good. Silence is more beautiful than letting people hear incorrect English.",
+          "ja0": "存じています。あなたのためです。間違った英語を人に聞かせるくらいなら、黙っているほうが美しい。"
+        },
+        {
+          "w": "claim",
+          "ja": "耳を貸すな。こいつの指摘は全部当たってる。だからたちが悪い。",
+          "en": "Do not listen. Everything this one says is correct. That is what makes it dangerous.",
+          "ja0": "耳を貸すな。こいつの言うことは、全部正しい。だから、たちが悪い。"
+        },
+        {
+          "w": "b4",
+          "ja": "完璧になってからいらっしゃい。そのときはお通ししましょう。",
+          "en": "Come back when you are perfect. I will let you through.",
+          "ja0": "完璧になったら、いらっしゃい。お通しします。"
+        },
+        {
+          "w": "you",
+          "ja": "完璧にはならない。だからいま通る。",
+          "en": "I will never be perfect. So I am going through now.",
+          "ja0": "完璧にはならない。だから、いま通る。"
+        }
+      ],
+      "title0": "赤ペンの魔術師"
+    },
+    {
+      "id": "c4-clear",
+      "floor": 80,
+      "when": "after",
+      "bg": "ch4",
+      "title": [
+        "間違ったまま",
+        "Still Wrong"
+      ],
+      "lines": [
+        {
+          "w": "b4",
+          "ja": "……いまの文、三単現の s が抜けていましたよ。",
+          "en": "...That sentence was missing its third-person s.",
+          "ja0": "……いまの文、三単現の s が抜けていました。"
+        },
+        {
+          "w": "you",
+          "ja": "知ってる。でも通じただろ。",
+          "en": "I know. But you understood it.",
+          "ja0": "知ってる。でも、通じただろう。"
+        },
+        {
+          "w": "b4",
+          "ja": "通じました。……悔しいほど、はっきりと。",
+          "en": "I did. ...Annoyingly clearly.",
+          "ja0": "通じました。……悔しいことに、はっきりと。"
+        },
+        {
+          "w": "narr",
+          "ja": "魔術師は赤ペンを折った。氷が溶け、言葉が間違った形のまま流れ出した。",
+          "en": "The mage snapped the red pen. The frozen words melted and flowed out, mistakes and all.",
+          "ja0": "魔術師は赤いペンを折った。凍っていた言葉が、間違った形のまま、溶けて流れ出した。"
+        },
+        {
+          "w": "b4",
+          "ja": "直すのは口に出したあとでいい。そんな簡単なことを、私は誰にも教えませんでした。",
+          "en": "Correction can come after you speak. Such a simple thing, and I never taught it to anyone.",
+          "ja0": "直すのは、言ったあとでいい。そんな簡単なことを、私は誰にも教えなかった。"
+        }
+      ],
+      "title0": "間違ったまま"
+    },
+    {
+      "id": "c5-start",
+      "floor": 81,
+      "when": "before",
+      "bg": "ch5",
+      "title": [
+        "第5章 王の階",
+        "Chapter 5: The King's Floors"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "第5章　王の階",
+          "en": "Chapter 5: The King's Floors"
+        },
+        {
+          "w": "narr",
+          "ja": "81階。ここから上には床がない。言えなかった言葉が階段になっている。",
+          "en": "Floor 81. From here up, there is no floor. The unsaid words themselves form the stairs.",
+          "ja0": "81階。ここから上には、床がない。言えなかった言葉そのものが、階段になっている。"
+        },
+        {
+          "w": "you",
+          "ja": "踏んでいいのか。",
+          "en": "Is it all right to step on them?"
+        },
+        {
+          "w": "claim",
+          "ja": "踏め。踏まれたくらいで怒る言葉は、ここまで落ちてこない。",
+          "en": "Step. A word that minds being stepped on never falls this far."
+        },
+        {
+          "w": "you",
+          "ja": "……クレイム。お前、だんだん透けてないか。",
+          "en": "...Claim. Are you getting more transparent?",
+          "ja0": "……クレイム。お前、だんだん透けてきていないか。"
+        },
+        {
+          "w": "claim",
+          "ja": "気のせいだ。",
+          "en": "You are imagining it."
+        },
+        {
+          "w": "you",
+          "ja": "向こうの壁が見える。",
+          "en": "I can see the wall through you."
+        },
+        {
+          "w": "claim",
+          "ja": "主張する。気のせいだ。",
+          "en": "I assert that you are imagining it."
+        }
+      ],
+      "title0": "第5章 王の階"
+    },
+    {
+      "id": "c5-mid",
+      "floor": 90,
+      "when": "before",
+      "bg": "ch5",
+      "title": [
+        "引っ越し",
+        "Moving Out"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "90階。クレイムの声が小さくなっていた。",
+          "en": "Floor 90. Claim's voice had grown quiet.",
+          "ja0": "90階。クレイムの声が、小さくなっていた。"
+        },
+        {
+          "w": "claim",
+          "ja": "黙ってたけどな。俺たちは持ち主が口に出すと消える。一度口に出た言葉は、もう塔にはいられない。",
+          "en": "I did not tell you. We disappear once our owner says us. A word that has left the mouth cannot stay in the tower.",
+          "ja0": "黙ってたが、俺たちは、持ち主に言ってもらえたら消える。口から出た言葉は、もう塔にはいられない。"
+        },
+        {
+          "w": "you",
+          "ja": "じゃあ、俺が千の言葉を全部取り返したら。",
+          "en": "So when I have taken back all thousand..."
+        },
+        {
+          "w": "claim",
+          "ja": "全員いなくなる。お前の口ん中に引っ越すだけだ。静かになるぞ。",
+          "en": "All thousand of us go. We just move into your mouth. It will be quiet here.",
+          "ja0": "全員、いなくなる。お前の口の中に引っ越すだけだ。静かになるぞ。"
+        },
+        {
+          "w": "you",
+          "ja": "……お前がいなくなったら、誰が俺の代わりに言うんだ。",
+          "en": "...If you are gone, who says things for me?"
+        },
+        {
+          "w": "claim",
+          "ja": "お前が言うんだよ。ずっと代わりにしゃべってやった。もう十分だろ。",
+          "en": "You do. I have done the talking for you long enough.",
+          "ja0": "それを、お前がやるんだよ。ずっと代わりにしゃべってやった。もう十分だろ。"
+        }
+      ],
+      "title0": "引っ越し"
+    },
+    {
+      "id": "c5-boss",
+      "floor": 100,
+      "when": "before",
+      "bg": "ch5",
+      "title": [
+        "沈黙の王",
+        "The King of Silence"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "100階。玉座の王は思っていたよりずっと小さかった。",
+          "en": "Floor 100. The king on the throne was much smaller than you had imagined.",
+          "ja0": "100階。玉座の王は、思っていたより、ずっと小さかった。"
+        },
+        {
+          "w": "b5",
+          "ja": "よく来た。……いや、よく戻った。",
+          "en": "You have come. No. You have come back.",
+          "ja0": "よく来た。——いや。よく、戻った。"
+        },
+        {
+          "w": "narr",
+          "ja": "王がフードを下ろした。あの会議の日の、あなたの顔があった。",
+          "en": "The king lowered his hood. Underneath was your own face, from the day of that meeting.",
+          "ja0": "王が、フードを下ろした。そこにあったのは、あの会議の日の、あなたの顔だった。"
+        },
+        {
+          "w": "b5",
+          "ja": "わたしはお前の言葉を食べたのではない。預かったのだ。あの日、お前が望んだ。「もう二度と、あんな思いはしたくない」と。",
+          "en": "I did not eat your words. I kept them. You asked me to, that day. You said you never wanted to feel that way again.",
+          "ja0": "わたしは、お前の言葉を食べたのではない。預かったのだ。あの日、お前が頼んだ。「もう二度と、あんな思いはしたくない」と。"
+        },
+        {
+          "w": "you",
+          "ja": "……頼んだ。",
+          "en": "...I did."
+        },
+        {
+          "w": "b5",
+          "ja": "だから守ってきた。言わねば笑われぬ。言わねば間違えぬ。黙っていれば、お前は安全だ。いまもそうだ。",
+          "en": "So I protected you. Say nothing, and nobody laughs. Say nothing, and you are never wrong. Stay silent, and you are safe. You still are.",
+          "ja0": "だから守ってきた。言わなければ、笑われない。言わなければ、間違えない。黙っていれば、お前は安全だ。いまも、そうだ。"
+        },
+        {
+          "w": "claim",
+          "ja": "……主張しろ。",
+          "en": "...Assert yourself.",
+          "ja0": "……主張、しろ。"
+        },
+        {
+          "w": "you",
+          "ja": "ずっと安全だった。そのあいだ、俺はどこにもいなかった。",
+          "en": "I was safe. The whole time. And the whole time, I was not anywhere.",
+          "ja0": "安全だった。ずっと。——そのあいだ、俺はどこにもいなかった。"
+        },
+        {
+          "w": "you",
+          "ja": "返してくれ。笑われるのは俺が引き受ける。",
+          "en": "Give them back. If someone laughs, I will take it.",
+          "ja0": "返してくれ。笑われるのは、俺が引き受ける。"
+        }
+      ],
+      "title0": "沈黙の王"
+    },
+    {
+      "id": "ending",
+      "floor": 100,
+      "when": "after",
+      "bg": "end",
+      "title": [
+        "あの会議",
+        "That Meeting"
+      ],
+      "lines": [
+        {
+          "w": "narr",
+          "ja": "王は何も言わなかった。ただうなずいて、最後の1語を差し出した。",
+          "en": "The king said nothing. He nodded in silence and held out the last word.",
+          "ja0": "王は、何も言わなかった。黙ったままうなずいて、最後の1語を差し出した。"
+        },
+        {
+          "w": "narr",
+          "ja": "塔が静かにほどけていく。千の言葉が上へ、上へと帰っていく。",
+          "en": "The tower quietly came undone. A thousand words rose, up and up, on their way home.",
+          "ja0": "塔が、静かにほどけていく。千の言葉が、上へ、上へ、帰っていく。"
+        },
+        {
+          "w": "narr",
+          "ja": "会議室に蛍光灯がともっている。全員があなたを見ている。",
+          "en": "A meeting room. Fluorescent light. Everyone is looking at you.",
+          "ja0": "——会議室。蛍光灯。全員が、あなたを見ている。"
+        },
+        {
+          "w": "narr",
+          "ja": "あなたは口を開いた。",
+          "en": "You opened your mouth.",
+          "ja0": "あなたは、口を開いた。"
+        },
+        {
+          "w": "narr",
+          "ja": "発音はよくなかった。文法もひとつ間違えた。",
+          "en": "Your pronunciation was not good. You made one grammar mistake.",
+          "ja0": "発音は、よくなかった。文法も、ひとつ間違えた。"
+        },
+        {
+          "w": "narr",
+          "ja": "会議はそのまま進んだ。誰も笑わなかった。",
+          "en": "The meeting simply went on. Nobody laughed.",
+          "ja0": "会議は、そのまま進んだ。誰も、笑わなかった。"
+        },
+        {
+          "w": "narr",
+          "ja": "帰り道、ポケットの中から小さな声が聞こえた気がした。",
+          "en": "On the way home, you thought you heard a small voice in your pocket.",
+          "ja0": "帰り道、ポケットの中で、小さな声がした気がした。"
+        },
+        {
+          "w": "claim",
+          "ja": "な。誰も死ななかったろ。",
+          "en": "See? Nobody died."
+        },
+        {
+          "w": "narr",
+          "ja": "WORD DUEL　沈黙の塔　完",
+          "en": "WORD DUEL: The Tower of Silence. The End."
+        }
+      ],
+      "title0": "あの会議"
+    }
+  ],
+  "naming": {
+    "title": "沈黙の塔",
+    "titleReading": "ちんもくのとう",
+    "titleCandidates": [
+      {
+        "title": "沈黙の塔",
+        "reading": "ちんもくのとう",
+        "why": "短く呼びやすい。誰も口にしなかった言葉が積もるという逆説が、物語を読み終えたあとに効く。"
+      },
+      {
+        "title": "黙塔",
+        "reading": "もくとう",
+        "why": "短く硬い響き。「黙祷」と同じ音に、言えなかった言葉を弔うような余韻がある。"
+      },
+      {
+        "title": "言葉の底",
+        "reading": "ことばのそこ",
+        "why": "飲み込んだ言葉が落ちていく先を、短い題で想像させる。"
+      },
+      {
+        "title": "無言の王冠",
+        "reading": "むごんのおうかん",
+        "why": "何も言わない者が王になる世界の、ねじれた力関係が伝わる。"
+      },
+      {
+        "title": "ひとことの反逆",
+        "reading": "ひとことのはんぎゃく",
+        "why": "会議での小さな一言を、沈黙の王に挑む一手として響かせる。"
+      }
+    ],
+    "chapters": [
+      {
+        "name": "相づちの階",
+        "boss": "うなずきの門番"
+      },
+      {
+        "name": "持ち帰りの階",
+        "boss": "持ち帰りの番人"
+      },
+      {
+        "name": "空気の階",
+        "boss": "空気の議長"
+      },
+      {
+        "name": "赤ペンの階",
+        "boss": "赤ペンの魔術師"
+      },
+      {
+        "name": "王の階",
+        "boss": "沈黙の王"
+      }
+    ],
+    "opening": [
+      "あの会議で、あなたは一言も言えなかった。",
+      "言いたいことはあった。",
+      "でも、言葉が出てこなかった。",
+      "言えなかった言葉は消えない。",
+      "落ちていく。",
+      "世界中から落ちた言葉が、世界の底に積もっていく。",
+      "《沈黙の塔》",
+      "塔の主は、沈黙の王。",
+      "誰かが黙るたびに太る。",
+      "いまもあなたの言葉を食べている。",
+      "取り返しに行こう。",
+      "1語ずつ。",
+      "これが最初の1枚。",
+      "この言葉に触れろ。",
+      "塔に入る"
+    ],
+    "terms": {
+      "未踏": "未踏",
+      "修練": "修練",
+      "掌握": "掌握",
+      "殿堂": "殿堂",
+      "殿堂入り": "殿堂入り",
+      "刻印": "刻印",
+      "試練": "試練",
+      "入門の儀": "入門の儀",
+      "階位": "階位",
+      "戦利品": "戦利品",
+      "昇格の間": "昇格の間",
+      "見切り": "見切り",
+      "冒険と殿堂": "冒険・殿堂",
+      "はじまりの中庭": "はじまりの中庭",
+      "塔 第N階に挑む": "塔のN階に挑む",
+      "ルールブック": "ルールブック"
+    }
+  },
+  "banter": [
+    {
+      "ja": "黙ってても時間は進むが、言葉は進まない。出せ。",
+      "en": "Time moves on even if you stay quiet, but your words won’t get anywhere. Spit ’em out.",
+      "ja0": "黙ってても時間は進む。言葉は進まない。出せ。"
+    },
+    {
+      "ja": "相手の言葉をよく聞け。知らない言葉は、あとで拾える。",
+      "en": "Listen closely to what they say. You can pick up the words you don’t know later.",
+      "ja0": "相手の言葉をよく聞け。知らない言葉は、あとで拾える。"
+    },
+    {
+      "ja": "間違えて覚えた言葉は直せる。出さなかった言葉は直せない。",
+      "en": "You can fix a word you learned wrong. You can’t fix one you never said.",
+      "ja0": "間違えて覚えた言葉は直せる。出さなかった言葉は直せない。"
+    },
+    {
+      "ja": "さっきの会議より、ここのほうが安全だ。誰もお前を見てない。",
+      "en": "It’s safer here than in that meeting earlier. Nobody’s watching you.",
+      "ja0": "さっきの会議より、ここのほうが安全だ。誰もお前を見てない。"
+    },
+    {
+      "ja": "いいか、声に出るまでが単語だ。",
+      "en": "Listen up: it’s not a word till you say it out loud.",
+      "ja0": "いいか、声に出るまでが単語だ。"
+    },
+    {
+      "ja": "負けても言葉は減らない。安心して殴られろ。",
+      "en": "Losing won’t cost you any words. Go ahead and take a hit.",
+      "ja0": "負けても言葉は減らない。安心して殴られろ。"
+    },
+    {
+      "ja": "この階の連中は気が短い。先に名前を呼んでやれ。",
+      "en": "The folks on this floor have short fuses. Call them by name first.",
+      "ja0": "この階の連中は気が短い。先に名前を呼んでやれ。"
+    },
+    {
+      "ja": "同じ言葉に2回勝て。1回目はまぐれ、2回目からがお前の言葉だ。",
+      "en": "Beat the same word twice. The first win’s a fluke; the second makes it yours.",
+      "ja0": "同じ言葉に2回勝て。1回目はまぐれ、2回目からがお前の言葉だ。"
+    },
+    {
+      "ja": "弱い言葉から出せ。弱いうちに、たくさん使ってやれ。",
+      "en": "Start with your weakest words. Use them a lot while they’re still weak.",
+      "ja0": "弱い言葉から出せ。弱いうちに、たくさん使ってやれ。"
+    },
+    {
+      "ja": "「聞いたことがある」で止めるな。そういう言葉がいちばん抜けやすい。",
+      "en": "Don’t stop at ‘I’ve heard that one before.’ Those are the words you forget first.",
+      "ja0": "「聞いたことがある」で止めるな。それがいちばん落ちやすい。"
+    },
+    {
+      "ja": "上の階の言葉は重いぞ。重いぶん、ぶつけると効く。",
+      "en": "The words upstairs are heavy. That’s why they hit harder when you throw them.",
+      "ja0": "上の階の言葉は重いぞ。重いぶん、ぶつけると効く。"
+    },
+    {
+      "ja": "俺に頼るな、と言いたいが、まあ今日は頼れ。",
+      "en": "I’d tell you not to lean on me, but fine, lean on me today.",
+      "ja0": "俺に頼るな。と言いたいが、まあ今日は頼れ。"
+    },
+    {
+      "ja": "英語は度胸じゃない。回数だ。",
+      "en": "English isn’t about guts. It’s about reps.",
+      "ja0": "英語は度胸じゃない。回数だ。"
+    },
+    {
+      "ja": "発音を笑うやつはいない。いたら俺が物申してやる。",
+      "en": "Nobody’s gonna laugh at your pronunciation. If they do, I’ll have a word with them.",
+      "ja0": "発音を笑うやつはいない。いたら俺が主張してやる。"
+    },
+    {
+      "ja": "今日は単語をいくつ取り返す？　3つでいい、3つで上等だ。",
+      "en": "How many words are you taking back today? Three’s enough—three’s damn good.",
+      "ja0": "今日は何語、取り返す。3つでいい。3つで上等だ。"
+    },
+    {
+      "ja": "知らない言葉が出たら喜べ。持って帰れる。",
+      "en": "Be glad when a word you don’t know comes up. You get to take it home.",
+      "ja0": "知らない言葉が出たら喜べ。持って帰れる。"
+    },
+    {
+      "ja": "お前、さっきより口が動いてるぞ。気のせいじゃない。",
+      "en": "Hey, you’re getting more words out than before. You’re not imagining it.",
+      "ja0": "お前、さっきより口が動いてるぞ。気のせいじゃない。"
+    },
+    {
+      "ja": "完璧な文を待つな。出してから直せ。",
+      "en": "Don’t wait for the perfect sentence. Say it first, fix it after.",
+      "ja0": "完璧な文を待つな。出してから直せ。"
+    }
+  ]
+}

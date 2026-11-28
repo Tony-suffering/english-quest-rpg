@@ -67,6 +67,8 @@ export interface CardSpec {
     word?: string;      // 覚える語
     ja?: string;        // 語の意味
     lineJa?: string;    // 英文の訳
+    jaReal?: string;    // 裏版: 日本語の意味(裏版では ja に英語の定義を入れて戦うので、日本語はこちらに取っておく)
+    traps?: { word: string; def: string }[];   // 裏版: まぎらわしい語と、その定義(見切りと試練の選択肢になる)
     tone?: string;      // 英文の型(日本語の呼び名)
     style?: string;     // 絵の画風の名前
     band?: number;      // TOEIC の点数帯(500〜900)。章になる
@@ -76,6 +78,7 @@ export interface CardSpec {
 export interface WordCard {
     id: string; word: string; pos: string; ja: string; level: number; ability: string; band?: number; cost?: number;
     tone: string; toneJa: string; style: string; line: string; lineJa: string;
+    def?: string; traps?: { word: string; def: string }[];   // 裏版だけ: 英語の定義と、まぎらわしい語
 }
 export interface WordPack { id: string; title: string; titleJa: string; cards: WordCard[] }
 
