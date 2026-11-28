@@ -11,5 +11,5 @@ import PACK from '@/data/english/duel-words-toeic.json';
 import type { WordPack } from '@/lib/duel';
 
 export default function WordDuelPage() {
-    return <DuelGame pack={PACK as unknown as WordPack} />;
+    return <DuelGame pack={PACK as unknown as WordPack} worldHref="/english/duel/world" />;
 }
