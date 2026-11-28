@@ -17,3 +17,8 @@ Sound effects (public/duel/sfx), layered and processed from:
 - "80 CC0 RPG SFX" (opengameart.org/content/80-cc0-rpg-sfx)
 - "100 CC0 SFX" (opengameart.org/content/100-cc0-sfx)
 plus synthesized low thumps and chime tails.
+
+Opening (public/duel/opening), CC0 from opengameart.org:
+- bed.mp3   "Prologue Theme" by cleytonkauffman
+- rise.mp3  "Adventure Theme Intro" by nene
+Narration (n1-n6) is generated speech.

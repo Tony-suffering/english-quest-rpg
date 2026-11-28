@@ -83,6 +83,8 @@ const CSS = `
 @keyframes duel-drift { 0% { opacity: 0; transform: translate(0,0) rotate(0deg); } 8% { opacity: 0.95; } 88% { opacity: 0.85; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); } }
 @keyframes duel-firefly { 0%,100% { opacity: 0; transform: translate(0,0); } 20% { opacity: 1; transform: translate(var(--dx), calc(var(--dy) * 0.3)); } 50% { opacity: 0.2; transform: translate(calc(var(--dx) * 0.4), var(--dy)); } 75% { opacity: 1; transform: translate(calc(var(--dx) * -0.5), calc(var(--dy) * 0.5)); } }
 @keyframes duel-chant-hot { 0% { opacity: 0.28; text-shadow: none; } 40% { opacity: 1; color: #fff; text-shadow: 0 0 14px #FDE68A, 0 0 30px #F59E0B; transform: scale(1.25); } 100% { opacity: 1; color: #F6C85F; font-weight: 900; text-shadow: 0 0 10px rgba(246,200,95,0.95), 0 1px 2px #000; transform: scale(1.08); } }
+@keyframes duel-cine-line { 0% { opacity: 0; transform: translateY(18px); filter: blur(10px); } 100% { opacity: 1; transform: none; filter: blur(0); } }
+@keyframes duel-cine-flash { 0% { opacity: 0.95; } 100% { opacity: 0; } }
 @keyframes duel-drain { from { width: 100%; } to { width: 0%; } }
 @keyframes duel-bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -9px); } }
 @keyframes duel-spot { 0%,100% { box-shadow: 0 0 0 9999px rgba(5,4,12,0.6), 0 0 0 3px #FDE68A, 0 0 22px 6px rgba(253,230,138,0.85); } 50% { box-shadow: 0 0 0 9999px rgba(5,4,12,0.6), 0 0 0 5px #fff, 0 0 34px 12px rgba(253,230,138,1); } }
@@ -890,31 +892,174 @@ const PROLOGUE: { art: string; ja: string; en: string }[] = [
     { art: 'board-shrine', ja: '塔の入口には、門番が立っている。\n放たれる言葉の意味を見切れば、打ち返せる。\nいま手の内にある言葉で、力を示せ。', en: 'A gatekeeper guards the entrance.\nRead the meaning of each word it casts and you strike back.\nShow what you already hold.' },
 ];
 const OPENING_KEY = 'duel:opening:seen:v1';
-/** 初めて開いたときの幕開け。物語の序を読んで、中庭(3D)へ。本人(2026-11-28)「最初の導入はどこ? はじめて開いたときは3Dのを使えばと言った」 */
-function Opening({ onWorld, onSkip }: { onWorld: (() => void) | null; onSkip: () => void }) {
+// ── 幕開け(初めて開いたときの映像)──
+// 本人(2026-11-28)「一番最初に開いたとき、音なくね? 動いて無くね? 演出しょぼくね? 導入部分が雑すぎる。ただ使い回してるでしょ。ストーリーで引き付ける、演出で引き付ける。AIが書いたつまらないストーリーならいりません」。
+// 前の版は、盤面の絵に文字の板を4枚重ねただけだった(音なし、動きなし、話は「言葉が力になる世界」という誰でも書ける話)。全部やり直した。
+// 物語: この教材を使う人の実感から始める。会議で一言も言えなかった。言えなかった言葉は消えずに落ちていき、世界の底に積もって塔になる。塔の主・沈黙の王は、人が黙るたびに太る。1語ずつ、取り返しに行く。
+// 作り: 場面ごとに専用の絵(scripts/duel-opening-generate.mjs、public/duel/opening)。絵はゆっくり寄る。語りの声に合わせて1行ずつ出る。王の場面で音が消える。最後に、自分の手で最初の1語に触れて取り返す。そこから曲が立ち上がって題が出る。
+const CINE: { img: string; narr: string; origin: string; from: number; to: number; lines: [string, string][]; hush?: [string, string]; grab?: boolean }[] = [
+    { img: 'meeting', narr: 'n1', origin: '50% 62%', from: 1.04, to: 1.22, lines: [['あの会議で、あなたは一言も言えなかった。', 'In that meeting, you could not say a single word.'], ['言いたいことは、あった。', 'You had something to say.'], ['言葉が、出てこなかった。', 'The words would not come.']] },
+    { img: 'fall', narr: 'n2', origin: '50% 12%', from: 1.3, to: 1.02, lines: [['言えなかった言葉は、消えない。', 'Words left unsaid do not disappear.'], ['落ちていく。', 'They fall.']] },
+    { img: 'tower', narr: 'n3', origin: '50% 88%', from: 1.34, to: 1.02, lines: [['世界中の、言えなかった言葉が、積もる場所がある。', 'There is a place where the unsaid words of the whole world pile up.'], ['《千語の塔》', 'The Tower of a Thousand Words']] },
+    { img: 'king', narr: 'n4', origin: '50% 30%', from: 1.02, to: 1.26, lines: [['塔の主は、沈黙の王。', 'Its master is the King of Silence.'], ['人が黙るたびに、太っていく。', 'He grows fatter every time someone stays quiet.']], hush: ['いまも、あなたの言葉を食べている。', 'He is eating your words right now.'] },
+    { img: 'hero', narr: 'n5', origin: '50% 55%', from: 1.24, to: 1.04, lines: [['取り返しに行く。', 'You are going to take them back.'], ['1語ずつ。', 'One word at a time.']], grab: true },
+];
+function Opening({ pool, onDone }: { pool: CardSpec[]; onDone: () => void }) {
     const J = (ja: string, en: string) => LANG === 'ja' ? ja : en;
-    const [panel, setPanel] = useState(0);
-    const last = panel + 1 >= PROLOGUE.length;
-    const bg = ART[PROLOGUE[panel].art] || ART.board;
-    const goldBtn: React.CSSProperties = { border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 18, letterSpacing: 2, borderRadius: 12, padding: '13px 36px', cursor: 'pointer', boxShadow: '0 10px 26px rgba(0,0,0,0.5), 0 0 22px rgba(246,200,95,0.55)' };
+    const [phase, setPhase] = useState<'tap' | 'play' | 'grab' | 'got' | 'title'>('tap');
+    const [beat, setBeat] = useState(0);
+    const [line, setLine] = useState(-1);
+    const [hush, setHush] = useState<0 | 1 | 2>(0);     // 0 = ふつう / 1 = 音が消えた / 2 = ささやきが出ている
+    const [flash, setFlash] = useState(0);
+    const timers = useRef<number[]>([]);
+    const bed = useRef<HTMLAudioElement | null>(null);
+    const rise = useRef<HTMLAudioElement | null>(null);
+    const voice = useRef<HTMLAudioElement | null>(null);
+    const alive = useRef(true);
+    // 最初の1語: claim(主張する)。「言えなかった」話の最初に取り返す言葉
+    const first = useMemo(() => pool.find(c => c.word === 'claim') || pool[0], [pool]);
+    const later = (fn: () => void, ms: number) => { timers.current.push(window.setTimeout(() => { if (alive.current) fn(); }, ms)); };
+    const fade = (el: HTMLAudioElement | null, to: number, ms: number) => {
+        if (!el) return;
+        const from = el.volume, t0 = performance.now();
+        const id = window.setInterval(() => { const k = Math.min(1, (performance.now() - t0) / ms); el.volume = Math.max(0, Math.min(1, from + (to - from) * k)); if (k >= 1) window.clearInterval(id); }, 40);
+        timers.current.push(id);
+    };
+    useEffect(() => {
+        alive.current = true;
+        for (const c of CINE) { const im = new Image(); im.src = `/duel/opening/${c.img}.webp`; }   // 先に読んでおく
+        return () => { alive.current = false; timers.current.forEach(t => { window.clearTimeout(t); window.clearInterval(t); }); [bed.current, rise.current, voice.current].forEach(a => a?.pause()); };
+    }, []);
+    /** 語りを流して、長さに合わせて行を出す。鳴らせないときは、時間で送る */
+    const say = (key: string, n: number, done: () => void) => {
+        let started = false;
+        const run = (dur: number) => {
+            if (started) return; started = true;
+            for (let i = 0; i < n; i++) later(() => setLine(i), Math.round((dur * 1000 * i) / n) + 250);
+            later(done, Math.round(dur * 1000) + 900);
+        };
+        try {
+            const a = new Audio(`/duel/opening/${key}.mp3`);
+            voice.current?.pause();
+            voice.current = a;
+            a.onloadedmetadata = () => { if (isFinite(a.duration) && a.duration > 0) run(a.duration); };
+            a.onerror = () => run(n * 2.6);
+            a.play().catch(() => run(n * 2.6));
+            later(() => run(n * 2.6), 1800);   // 読めなかったとき
+        } catch { run(n * 2.6); }
+    };
+    const play = (i: number) => {
+        const c = CINE[i];
+        setBeat(i); setLine(-1); setHush(0);
+        say(c.narr, c.lines.length, () => {
+            if (c.hush) {
+                // 王の場面: 一撃のあと、音が消える。少しして、ささやきだけが聞こえる
+                playSfx('face');
+                fade(bed.current, 0, 220);
+                setHush(1);
+                later(() => { setHush(2); try { const a = new Audio('/duel/opening/n4b.mp3'); voice.current = a; a.play().catch(() => { /* 鳴らせない端末 */ }); } catch { /* 無い端末 */ } }, 1500);
+                later(() => { fade(bed.current, 0.3, 1400); play(i + 1); }, 5200);
+            } else if (c.grab) {
+                setPhase('grab');
+            } else play(i + 1);
+        });
+    };
+    const begin = () => {
+        if (phase !== 'tap') return;
+        try { const b = new Audio('/duel/opening/bed.mp3'); b.loop = true; b.volume = 0; bed.current = b; b.play().then(() => fade(b, 0.3, 2500)).catch(() => { /* 鳴らせない端末 */ }); } catch { /* 無い端末 */ }
+        setPhase('play');
+        later(() => play(0), 900);
+    };
+    const grab = () => {
+        if (phase !== 'grab') return;
+        setPhase('got');
+        setFlash(f => f + 1);
+        playSfx('win');
+        speakWord(first);
+        fade(bed.current, 0, 500);
+        try { const r = new Audio('/duel/opening/rise.mp3'); r.volume = 0.8; rise.current = r; r.play().catch(() => { /* 鳴らせない端末 */ }); } catch { /* 無い端末 */ }
+        later(() => { try { const a = new Audio('/duel/opening/n6.mp3'); voice.current = a; a.play().catch(() => { /* 鳴らせない端末 */ }); } catch { /* 無い端末 */ } }, 1500);
+        later(() => setPhase('title'), 5200);
+    };
+    const leave = () => { fade(rise.current, 0, 500); fade(bed.current, 0, 500); voice.current?.pause(); later(() => { [bed.current, rise.current].forEach(a => a?.pause()); }, 520); onDone(); };
+    const c = CINE[beat];
+    const gold = 'linear-gradient(180deg, #FFF6C8 0%, #F6C85F 45%, #B8941E 55%, #F6C85F 100%)';
+    const serif = 'Georgia, "Yu Mincho", "Hiragino Mincho ProN", "Noto Serif JP", serif';
     return (
-        <div data-opening={panel} style={{ position: 'absolute', inset: 0, minHeight: '100%', overflow: 'hidden', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', padding: '0 16px 44px',
-            background: `linear-gradient(180deg, rgba(8,6,14,0.5) 0%, rgba(8,6,14,0.25) 40%, rgba(8,6,14,0.92) 100%), ${bg ? `center / cover no-repeat url(${bg})` : '#14101F'}`, transition: 'background 0.6s ease' }}>
-            <div style={{ position: 'absolute', left: 0, right: 0, top: '12%', textAlign: 'center', pointerEvents: 'none' }}>
-                <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 8, color: '#F6C85F', textShadow: '0 2px 6px #000' }}>TONIO LAB</div>
-                <div style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 900, fontSize: 'clamp(44px, 10vw, 96px)', lineHeight: 1, letterSpacing: 4, background: 'linear-gradient(180deg, #FFF6C8 0%, #F6C85F 45%, #B8941E 55%, #F6C85F 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0 5px 0 rgba(0,0,0,0.55)) drop-shadow(0 0 30px rgba(246,200,95,0.55))' }}>WORD DUEL</div>
-                <div style={{ marginTop: 8, fontSize: 'clamp(13px, 2vw, 17px)', fontWeight: 800, letterSpacing: 6, color: '#FFFDF2', textShadow: '0 2px 6px #000' }}>{J('千語の塔', 'THE TOWER OF A THOUSAND WORDS')}</div>
+        <div data-opening={phase} data-beat={beat} onClick={phase === 'tap' ? begin : undefined} style={{ position: 'absolute', inset: 0, minHeight: '100%', overflow: 'hidden', background: '#05040A', color: '#fff', cursor: phase === 'tap' ? 'pointer' : 'default', userSelect: 'none' }}>
+            {/* 絵。場面ごとに1枚。重ねて置き、いまの場面だけ見せる(切り替わりは溶ける)。ゆっくり寄る・引く */}
+            <div style={{ position: 'absolute', inset: 0, filter: hush ? 'grayscale(1) brightness(0.45) contrast(1.15)' : 'none', transition: 'filter .35s ease', animation: hush === 1 ? 'duel-quake .45s ease' : undefined }}>
+                {CINE.map((x, i) => (
+                    <div key={x.img} style={{ position: 'absolute', inset: '-2%', opacity: phase !== 'tap' && i === beat ? 1 : 0, transition: 'opacity 1.6s ease', backgroundImage: `url(/duel/opening/${x.img}.webp)`, backgroundSize: 'cover', backgroundPosition: x.origin,
+                        transformOrigin: x.origin, transform: `scale(${phase !== 'tap' && i <= beat ? x.to : x.from})`, transitionProperty: 'opacity, transform', transitionDuration: '1.6s, 16s', transitionTimingFunction: 'ease, cubic-bezier(.2,.5,.3,1)' }} />
+                ))}
             </div>
-            <div key={panel} style={{ position: 'relative', maxWidth: 680, width: '100%', padding: '22px 24px', textAlign: 'center', background: 'linear-gradient(180deg, rgba(42,31,8,0.9), rgba(20,14,4,0.94))', border: '1.5px solid #D4AF37', borderRadius: 14, boxShadow: '0 8px 24px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,242,168,0.25)', animation: 'duel-fadeup .7s ease-out both' }}>
-                <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: 5, color: '#F6C85F' }}>{J('序', 'PROLOGUE')} {panel + 1} / {PROLOGUE.length}</div>
-                <div style={{ marginTop: 10, fontFamily: 'Georgia, "Yu Mincho", "Hiragino Mincho ProN", serif', fontSize: 'clamp(17px, 2.6vw, 24px)', fontWeight: 700, lineHeight: 2, whiteSpace: 'pre-line', color: '#FFFDF2', textShadow: '0 2px 6px #000' }}>{LANG === 'ja' ? PROLOGUE[panel].ja : PROLOGUE[panel].en}</div>
-                <div style={{ display: 'flex', gap: 14, justifyContent: 'center', alignItems: 'center', marginTop: 18, flexWrap: 'wrap' }}>
-                    {!last && <button data-act="opening-next" onClick={() => { playSfx('click'); setPanel(panel + 1); }} style={goldBtn}>{J('次へ', 'Next')}</button>}
-                    {last && onWorld && <button data-act="opening-world" onClick={onWorld} style={goldBtn}>{J('中庭へ — 最初の言葉を取り戻す', 'To the court — win back your first words')}</button>}
-                    {last && !onWorld && <button data-act="opening-skip" onClick={onSkip} style={goldBtn}>{J('はじめる', 'Begin')}</button>}
-                    <button data-act="opening-skip2" onClick={onSkip} style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: 700, textDecoration: 'underline', cursor: 'pointer' }}>{last && onWorld ? J('歩かずに、遊び方へ進む', 'Skip the walk') : J('物語を飛ばす', 'Skip the story')}</button>
+            {/* 暗がりと、映画の帯 */}
+            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 90% 80% at 50% 45%, rgba(0,0,0,0) 35%, rgba(3,2,8,0.78) 100%), linear-gradient(180deg, rgba(3,2,8,0.2) 0%, rgba(3,2,8,0) 30%, rgba(3,2,8,0.82) 100%)' }} />
+            <div style={{ position: 'absolute', left: 0, right: 0, top: 0, height: '9%', background: '#05040A', transform: phase === 'tap' ? 'translateY(-100%)' : 'none', transition: 'transform 1.2s cubic-bezier(.2,.8,.2,1)' }} />
+            <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: '9%', background: '#05040A', transform: phase === 'tap' ? 'translateY(100%)' : 'none', transition: 'transform 1.2s cubic-bezier(.2,.8,.2,1)' }} />
+            {/* 落ちてくる言葉(金の粒) */}
+            {phase !== 'tap' && !hush && Array.from({ length: 26 }).map((_, i) => {
+                const size = 2 + (i % 4), dur = 7 + (i % 6) * 1.4;
+                return <span key={i} style={{ position: 'absolute', left: `${(i * 37 + 9) % 100}%`, top: -12, width: size, height: size, borderRadius: '50%', background: i % 3 ? '#F6C85F' : '#fff', boxShadow: `0 0 ${size * 3}px rgba(246,200,95,0.9)`, opacity: 0, pointerEvents: 'none',
+                    ['--dx' as string]: `${((i * 29) % 60) - 30}px`, ['--dy' as string]: '110vh', ['--rot' as string]: '0deg', animation: `duel-drift ${dur}s linear ${-((i * 1.3) % dur)}s infinite` } as React.CSSProperties} />;
+            })}
+            {/* 白い光(言葉を取り返した瞬間) */}
+            {flash > 0 && <div key={flash} style={{ position: 'absolute', inset: 0, background: '#FFF6C8', pointerEvents: 'none', animation: 'duel-cine-flash 1.4s ease-out forwards' }} />}
+
+            {/* 始める前 */}
+            {phase === 'tap' && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, textAlign: 'center', padding: 20 }}>
+                    <div style={{ width: 74, height: 74, borderRadius: '50%', border: '2px solid #F6C85F', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'duel-pulse 1.6s ease-in-out infinite', boxShadow: '0 0 30px rgba(246,200,95,0.45)' }}>
+                        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="#F6C85F" /></svg>
+                    </div>
+                    <div data-act="opening-begin" style={{ fontFamily: serif, fontSize: 'clamp(18px, 3vw, 26px)', fontWeight: 700, letterSpacing: 4, color: '#FFFDF2' }}>{J('画面を押して、はじめる', 'Press to begin')}</div>
+                    <div style={{ fontSize: 13, letterSpacing: 2, color: 'rgba(255,255,255,0.6)' }}>{J('音が出ます。イヤホンがおすすめです。', 'Sound on. Headphones recommended.')}</div>
                 </div>
-            </div>
+            )}
+
+            {/* 語りの文字。1行ずつ、声に合わせて出る */}
+            {phase === 'play' && (
+                <div style={{ position: 'absolute', left: 0, right: 0, bottom: '14%', padding: '0 6%', textAlign: 'center', pointerEvents: 'none' }}>
+                    {hush === 0 && c.lines.map((l, i) => i <= line && (
+                        <div key={`${beat}-${i}`} style={{ fontFamily: serif, fontWeight: 700, lineHeight: 1.7, letterSpacing: l[0].startsWith('《') ? 8 : 2, fontSize: l[0].startsWith('《') ? 'clamp(30px, 6.5vw, 72px)' : 'clamp(18px, 3.2vw, 36px)',
+                            ...(l[0].startsWith('《') ? { background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0 4px 0 rgba(0,0,0,0.6)) drop-shadow(0 0 26px rgba(246,200,95,0.6))' } : { color: '#FFFDF2', textShadow: '0 2px 10px #000, 0 0 30px rgba(0,0,0,0.9)' }),
+                            animation: 'duel-cine-line 1.3s cubic-bezier(.2,.7,.2,1) both' }}>{LANG === 'ja' ? l[0] : l[1]}</div>
+                    ))}
+                    {hush === 2 && c.hush && <div style={{ fontFamily: serif, fontWeight: 700, fontSize: 'clamp(15px, 2.4vw, 24px)', letterSpacing: 6, color: 'rgba(255,255,255,0.86)', animation: 'duel-cine-line 2s ease both' }}>{LANG === 'ja' ? c.hush[0] : c.hush[1]}</div>}
+                </div>
+            )}
+
+            {/* 最初の1語に触れる */}
+            {(phase === 'grab' || phase === 'got') && first && (
+                <div style={{ position: 'absolute', left: '50%', top: '44%', transform: 'translate(-50%,-50%)', textAlign: 'center' }}>
+                    <div data-act="opening-grab" onClick={grab} style={{ position: 'relative', cursor: phase === 'grab' ? 'pointer' : 'default', animation: phase === 'grab' ? 'duel-bob 1.6s ease-in-out infinite' : 'duel-crest .7s cubic-bezier(.2,1.5,.4,1) both', filter: `drop-shadow(0 0 ${phase === 'grab' ? 26 : 44}px rgba(246,200,95,${phase === 'grab' ? 0.75 : 1}))`, display: 'inline-block' }}>
+                        <div style={{ transform: phase === 'grab' ? 'translateX(50%)' : 'none' }}><Card spec={phase === 'grab' ? { ...first, ja: '', ability: 'NONE' } : { ...first, ability: 'NONE' }} w={Math.round(Math.min(230, window.innerHeight * 0.34 * CW / CH))} back={phase === 'grab'} noCost /></div>
+                    </div>
+                    {phase === 'grab' && <div style={{ marginTop: 26, fontFamily: serif, fontSize: 'clamp(16px, 2.6vw, 24px)', fontWeight: 700, letterSpacing: 5, color: '#FFF6C8', textShadow: '0 2px 8px #000', animation: 'duel-breathe 1.8s ease-in-out infinite' }}>{J('この言葉に、触れろ', 'Touch this word')}</div>}
+                    {phase === 'got' && (
+                        <div style={{ marginTop: 22, animation: 'duel-cine-line 1.2s ease .5s both' }}>
+                            <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: 6, color: '#F6C85F' }}>{J('取り戻した', 'WON BACK')}</div>
+                            <div style={{ fontFamily: serif, fontSize: 'clamp(17px, 2.6vw, 24px)', fontWeight: 700, letterSpacing: 3, color: '#FFFDF2', textShadow: '0 2px 8px #000', marginTop: 4 }}>{J('これが、最初の1枚。', 'This is your first card.')}</div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* 題 */}
+            {phase === 'title' && (
+                <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: 20, background: 'radial-gradient(ellipse at 50% 50%, rgba(5,4,10,0.35), rgba(5,4,10,0.86))', animation: 'duel-veil 1.2s ease both' }}>
+                    <div style={{ fontSize: 13, fontWeight: 900, letterSpacing: 10, color: '#F6C85F', animation: 'duel-cine-line 1.2s ease .2s both' }}>TONIO LAB</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 900, fontSize: 'clamp(46px, 11vw, 132px)', lineHeight: 1.02, letterSpacing: 4 }}>
+                        {'WORD DUEL'.split('').map((ch, i) => <span key={i} style={{ display: 'inline-block', minWidth: ch === ' ' ? '0.3em' : undefined, background: gold, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', filter: 'drop-shadow(0 5px 0 rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(246,200,95,0.6))', animation: `duel-letter .8s cubic-bezier(.2,1.3,.3,1) ${0.5 + i * 0.09}s both` }}>{ch}</span>)}
+                    </div>
+                    <div style={{ width: 'min(520px, 70vw)', height: 2, marginTop: 14, background: 'linear-gradient(90deg, transparent, #FFF6C8, transparent)', boxShadow: '0 0 14px rgba(246,200,95,0.9)', animation: 'duel-line .9s ease-out 1.5s both' }} />
+                    <div style={{ marginTop: 12, fontFamily: serif, fontSize: 'clamp(16px, 2.6vw, 26px)', fontWeight: 700, letterSpacing: 12, color: '#FFFDF2', textShadow: '0 2px 8px #000', animation: 'duel-cine-line 1.2s ease 1.8s both' }}>{J('千語の塔', 'THE TOWER OF A THOUSAND WORDS')}</div>
+                    <button data-act="opening-enter" onClick={leave} style={{ marginTop: 34, border: '2px solid #FFF6C8', background: 'linear-gradient(180deg, #F6C85F, #B8941E)', color: '#2A1F08', fontWeight: 900, fontSize: 19, letterSpacing: 4, borderRadius: 12, padding: '14px 46px', cursor: 'pointer', boxShadow: '0 10px 26px rgba(0,0,0,0.6), 0 0 26px rgba(246,200,95,0.6)', animation: 'duel-cine-line 1s ease 2.8s both' }}>{J('塔へ入る', 'Enter the tower')}</button>
+                </div>
+            )}
+
+            {phase !== 'tap' && phase !== 'title' && <button data-act="opening-skip" onClick={e => { e.stopPropagation(); leave(); }} style={{ position: 'absolute', right: 14, top: 'calc(9% + 10px)', border: '1px solid rgba(255,255,255,0.35)', background: 'rgba(0,0,0,0.35)', color: 'rgba(255,255,255,0.75)', fontSize: 12, fontWeight: 700, letterSpacing: 2, borderRadius: 999, padding: '5px 14px', cursor: 'pointer' }}>{J('飛ばす', 'Skip')}</button>}
         </div>
     );
 }
@@ -1265,7 +1410,7 @@ export default function DuelGame({ guestRoom, pack, worldHref, reading }: { gues
     }, []);
     const hasGame = !!game;
     useEffect(() => { if (hasGame) newStage(); }, [hasGame, newStage]);
-    const bgmWant: BgmName | null = !sound ? null : !game ? 'home' : game.winner === null ? BATTLE_TRACKS[track] : game.winner === 0 ? 'victory' : null;
+    const bgmWant: BgmName | null = !sound || (view === 'opening' && !game) ? null : !game ? 'home' : game.winner === null ? BATTLE_TRACKS[track] : game.winner === 0 ? 'victory' : null;
     wantBgm.current = bgmWant;
     useEffect(() => { setBgm(bgmWant); }, [bgmWant]);
     useEffect(() => {
@@ -1912,6 +2057,7 @@ export default function DuelGame({ guestRoom, pack, worldHref, reading }: { gues
             { key: 'online', icon: 'M9 12a4 4 0 0 1 4-4h3a4 4 0 0 1 0 8h-1v-2h1a2 2 0 0 0 0-4h-3a2 2 0 0 0-2 2zm6 0a4 4 0 0 1-4 4H8a4 4 0 0 1 0-8h1v2H8a2 2 0 0 0 0 4h3a2 2 0 0 0 2-2z', title: t.online, sub: t.onlineSub, on: createRoom, off: !ready || !!pack },
             { key: 'demo', icon: 'M4 5h7a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4zm16 0h-5a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h5z', title: t.how, sub: t.howSub, on: startTutor, off: !pool || pool.length < 12 },
             ...(pack ? [{ key: 'story', icon: 'M12 2l3 6 6 .9-4.5 4.3 1 6.3L12 16.6 6.500 19.500l1-6.300L3 8.900 9 8z', title: lang === 'ja' ? '冒険と殿堂' : 'Journey & Hall', sub: lang === 'ja' ? '章とボス、いまのデッキ、殿堂入りした単語' : 'Chapters and bosses, your deck, mastered words', on: () => { setPlacedMsg(null); setView('story'); } }] : []),
+            ...(pack && worldHref ? [{ key: 'court', icon: 'M12 3l9 6v2H3V9zm-7 9h2v6H5zm4 0h2v6H9zm4 0h2v6h-2zm4 0h2v6h-2zM3 19h18v2H3z', title: lang === 'ja' ? 'はじまりの中庭' : 'The First Court', sub: lang === 'ja' ? '声をたよりに歩いて、言葉を捕まえる(3D)' : 'Walk toward the voice and catch the word (3D)', on: () => { window.location.href = worldHref; } }] : []),
             { key: 'guide', icon: 'M6 3h11a2 2 0 0 1 2 2v16l-3-2-3 2-3-2-3 2-3-2V5a2 2 0 0 1 2-2zm2 5v2h7V8zm0 4v2h7v-2z', title: t.guide, sub: t.guideSub, on: () => setView('guide') },
             { key: 'cards', icon: 'M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm5 5l-3 4 3 4 3-4z', title: t.cards, sub: t.cardsSub, on: () => setView('cards'), off: !pool || !pool.length },
         ];
@@ -1988,18 +2134,16 @@ export default function DuelGame({ guestRoom, pack, worldHref, reading }: { gues
 
         // ── 最初のテスト: どの章から始めるかを決める ──
         // ── 幕開け: 初めて開いた人に、物語の序。読み終えたら中庭(3D)へ ──
-        if (view === 'opening' && pack) {
+        if (view === 'opening' && pack && pool) {
             return shell(
-                <Opening
-                    onWorld={worldHref ? () => { save(OPENING_KEY, 1); window.location.href = worldHref; } : null}
-                    onSkip={() => { save(OPENING_KEY, 1); save(DEMO_SEEN_KEY, 1); setView('home'); startTutor(); }} />,
+                <Opening pool={pool} onDone={() => { save(OPENING_KEY, 1); save(DEMO_SEEN_KEY, 1); setView('home'); startTutor(); }} />,
             );
         }
 
         // ── 入門の儀: 物語の導入と、門番との一戦。越えた関の言葉を「掌握」にして、始める章を決める ──
         if (view === 'test' && pack && pool) {
             return shell(
-                <EntryRite pool={pool} skipStory={!!load<number>(OPENING_KEY, 0)} onClose={() => setView('home')}
+                <EntryRite pool={pool} skipStory onClose={() => setView('home')}
                     onDone={r => {
                         updateProg(pr => {
                             const words = { ...pr.words };
